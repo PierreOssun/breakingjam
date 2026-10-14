@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users\n         set google_sub = $2,\n             password_hash = case when email_verified_at is null then null else password_hash end,\n             email_verified_at = coalesce(email_verified_at, now())\n         where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "07e7deacfefd98c92f9a44a7012270e5842d36fa951ac84f53dc1526043ef9b8"
+}

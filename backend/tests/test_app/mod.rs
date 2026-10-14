@@ -1,0 +1,77 @@
+//! Builds the app for integration tests and sends requests to it.
+#![allow(
+    dead_code,
+    reason = "shared by several test crates, each using a subset"
+)]
+
+use axum::{
+    Router,
+    body::Body,
+    http::{HeaderMap, Request, StatusCode, header, request::Builder},
+};
+use breakingjam::{config::Config, state::AppState};
+use http_body_util::BodyExt;
+use serde_json::Value;
+use sqlx::PgPool;
+use tower::ServiceExt;
+
+pub fn app(pool: PgPool) -> Router {
+    let config = Config::from_lookup(|name| match name {
+        "APP_PORT" => None,
+        "FRONTEND_ORIGIN" => Some("http://localhost:5173".into()),
+        "GOOGLE_REDIRECT_URL" => Some("http://localhost:8080/api/auth/google/callback".into()),
+        _ => Some(format!("test-{name}")),
+    })
+    .unwrap();
+    breakingjam::app(AppState::new(pool, config).unwrap())
+}
+
+pub struct TestResponse {
+    pub status: StatusCode,
+    pub headers: HeaderMap,
+    pub json: Value,
+}
+
+impl TestResponse {
+    /// `name=value` of a cookie the response sets, ready for a `Cookie` header.
+    pub fn cookie(&self, name: &str) -> Option<String> {
+        self.headers
+            .get_all(header::SET_COOKIE)
+            .iter()
+            .filter_map(|value| value.to_str().ok())
+            .find(|value| value.starts_with(&format!("{name}=")))
+            .map(|value| value.split(';').next().unwrap().to_owned())
+    }
+}
+
+pub async fn send(app: &Router, request: Request<Body>) -> TestResponse {
+    let response = app.clone().oneshot(request).await.unwrap();
+    let status = response.status();
+    let headers = response.headers().clone();
+    let body = response.into_body().collect().await.unwrap().to_bytes();
+    let json = serde_json::from_slice(&body).unwrap_or(Value::Null);
+    TestResponse {
+        status,
+        headers,
+        json,
+    }
+}
+
+pub fn get(uri: &str, cookie: Option<&str>) -> Request<Body> {
+    request("GET", uri, cookie).body(Body::empty()).unwrap()
+}
+
+pub fn post(uri: &str, body: Value, cookie: Option<&str>) -> Request<Body> {
+    request("POST", uri, cookie)
+        .header(header::CONTENT_TYPE, "application/json")
+        .body(Body::from(body.to_string()))
+        .unwrap()
+}
+
+fn request(method: &str, uri: &str, cookie: Option<&str>) -> Builder {
+    let request = Request::builder().method(method).uri(uri);
+    match cookie {
+        Some(cookie) => request.header(header::COOKIE, cookie),
+        None => request,
+    }
+}

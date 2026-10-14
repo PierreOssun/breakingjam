@@ -1,0 +1,71 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select u.id, u.email::text as \"email!\", u.display_name, u.role as \"role: Role\"\n           from sessions s join app_users u on u.id = s.user_id\n           where s.id = $1 and s.expires_at > now()",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "email!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "display_name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "role: Role",
+        "type_info": {
+          "Custom": {
+            "name": "user_role",
+            "kind": {
+              "Enum": [
+                "user",
+                "organizer",
+                "seed_admin",
+                "admin"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "role"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      false,
+      false
+    ]
+  },
+  "hash": "34284bd1b626283908e44ac62bdfbe9623179076dae255f9b007e58a5f671d29"
+}

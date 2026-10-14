@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select email_verified_at is not null as \"verified!\" from app_users where id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "verified!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "fbeffbc4398097fa5d50d2b16d12f7899849dad4ff07534230b9e53b60e81403"
+}

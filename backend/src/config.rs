@@ -37,6 +37,11 @@ pub enum ConfigError {
 }
 
 impl Config {
+    /// Cookies get `Secure` when the API is served over https (always in prod).
+    pub fn secure_cookies(&self) -> bool {
+        self.app_base_url.starts_with("https://")
+    }
+
     /// Reads the process environment; reports every missing variable at once.
     pub fn from_env() -> Result<Self, ConfigError> {
         Self::from_lookup(|name| std::env::var(name).ok())

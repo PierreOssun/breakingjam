@@ -1,18 +1,11 @@
 //! Dev seed: admin users, sample jams, dancers and crews (ARCHITECTURE §8).
 
 use anyhow::Context;
-use argon2::{Argon2, PasswordHasher};
+use breakingjam::{auth::password, domain::user::Role};
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
-// Only the variants the seed uses; the full enums move next to their domain types in M3.
-#[derive(Clone, Copy, sqlx::Type)]
-#[sqlx(type_name = "user_role", rename_all = "snake_case")]
-enum UserRole {
-    Admin,
-    SeedAdmin,
-}
-
+// Only the variants the seed uses; moves to `domain/event.rs` in M5.
 #[derive(Clone, Copy, sqlx::Type)]
 #[sqlx(type_name = "event_status", rename_all = "snake_case")]
 enum EventStatus {
@@ -25,18 +18,18 @@ enum EventStatus {
 struct User {
     email: &'static str,
     display_name: &'static str,
-    role: UserRole,
+    role: Role,
 }
 
 const ADMIN: User = User {
     email: "admin@breakingjam.local",
     display_name: "Admin",
-    role: UserRole::Admin,
+    role: Role::Admin,
 };
 const SEED_ADMIN: User = User {
     email: "seed@breakingjam.local",
     display_name: "Seed Admin",
-    role: UserRole::SeedAdmin,
+    role: Role::SeedAdmin,
 };
 
 struct Event {
@@ -170,9 +163,7 @@ async fn main() -> anyhow::Result<()> {
 async fn insert_user(conn: &mut PgConnection, user: &User, password: &str) -> anyhow::Result<Uuid> {
     let id = Uuid::now_v7();
     // Hash per user: a shared hash would reveal that the accounts share a password.
-    let password_hash = Argon2::default()
-        .hash_password(password.as_bytes())?
-        .to_string();
+    let password_hash = password::hash(password.to_owned()).await?;
     sqlx::query!(
         "insert into app_users (id, email, password_hash, display_name, role, email_verified_at)
          values ($1, $2, $3, $4, $5, now())",

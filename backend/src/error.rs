@@ -104,6 +104,27 @@ impl From<sqlx::Error> for AppError {
     }
 }
 
+impl From<validator::ValidationErrors> for AppError {
+    fn from(errors: validator::ValidationErrors) -> Self {
+        let mut fields: Vec<FieldError> = errors
+            .field_errors()
+            .into_iter()
+            .flat_map(|(field, errors)| {
+                errors.iter().map(move |error| FieldError {
+                    field: field.to_string(),
+                    message: error
+                        .message
+                        .as_ref()
+                        .map_or_else(|| error.code.to_string(), ToString::to_string),
+                })
+            })
+            .collect();
+        // Field errors come from a HashMap; sort for a stable response.
+        fields.sort_by(|a, b| a.field.cmp(&b.field));
+        Self::Validation(fields)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

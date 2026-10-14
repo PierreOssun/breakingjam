@@ -1,7 +1,4 @@
-use std::{
-    net::{Ipv4Addr, SocketAddr},
-    sync::Arc,
-};
+use std::net::{Ipv4Addr, SocketAddr};
 
 use anyhow::Context;
 use breakingjam::{config::Config, state::AppState};
@@ -28,10 +25,7 @@ async fn main() -> anyhow::Result<()> {
         .with_context(|| format!("cannot bind {addr}"))?;
     tracing::info!(%addr, "listening");
 
-    let state = AppState {
-        pool,
-        config: Arc::new(config),
-    };
+    let state = AppState::new(pool, config)?;
     axum::serve(listener, breakingjam::app(state))
         .with_graceful_shutdown(shutdown_signal())
         .await?;
