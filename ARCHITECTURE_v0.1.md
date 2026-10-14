@@ -418,6 +418,8 @@ GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, RUST_LOG
 ```
 Loaded via `dotenvy` + a `Config::from_env()` that fails fast with a clear message.
 
+Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empty = same origin), `VITE_PROTOMAPS_KEY`, `VITE_TILES_URL` (optional, see §6 Map). Both `.env` files are git-ignored; `.env.example` files are committed with placeholders.
+
 ### Observability
 - `tracing` with `tracing-subscriber` (JSON in prod, pretty in dev), `tower_http::trace::TraceLayer` with request id.
 
@@ -439,7 +441,11 @@ Loaded via `dotenvy` + a `Config::from_env()` that fails fast with a clear messa
 - i18n: `react-i18next`, language detected from browser, switchable in header, persisted in `localStorage`. Keys namespaced by feature (`events.form.name`). All three JSON files must have identical key sets (add a test).
 - Styling: Tailwind. Mobile-first; the map and landing page must work at 375px.
 - Map:
-  - `react-map-gl/maplibre` with a `.pmtiles` source via `pmtiles` protocol and `protomaps-themes-base` style.
+  - `react-map-gl/maplibre` with `protomaps-themes-base` style (dark theme by default, light variant follows the app theme).
+  - Tile source from env, two modes:
+    - `VITE_TILES_URL` unset (default) → hosted Protomaps API: `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=${VITE_PROTOMAPS_KEY}`. The key is public; it is protected by the origin allowlist in the Protomaps dashboard (localhost:5173, localhost:8080, breakingjam.com, *.breakingjam.com).
+    - `VITE_TILES_URL=pmtiles://https://tiles.breakingjam.com/world.pmtiles` → self-hosted extract on R2 via the `pmtiles` protocol (production, later).
+  - Attribution: Protomaps + OpenStreetMap contributors, always visible (bottom-right), required by both licences.
   - Data source: `GET /api/events.geojson`. Cluster at low zoom (`cluster: true` on the GeoJSON source).
   - Click a point → popup with name, dates, city → link to `/jams/{slug}`.
   - Container: `height: 100dvh` minus header, `touch-action: none`.
@@ -508,3 +514,5 @@ Seed script: `cargo run --bin seed` inserts an `admin` and a `seed_admin` user, 
 12. Organiser jam form; dancer/crew pickers with search-before-create inside entries and staff editing.
 12b. Generated avatars, "Verify me" flow, dancer edit form, admin claims/merge screens.
 13. Integration test coverage pass, README, tag `v0.1.0`.
+
+For Every suggested build order point, save it in milestones/ with a filename matching the build order point.
