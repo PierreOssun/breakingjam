@@ -1,19 +1,15 @@
 //! Dev seed: admin users, sample jams, dancers and crews (ARCHITECTURE §8).
 
 use anyhow::Context;
-use breakingjam::{auth::password, domain::user::Role};
+use breakingjam::{
+    auth::password,
+    domain::{
+        event::{EventStatus, slug},
+        user::Role,
+    },
+};
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
-
-// Only the variants the seed uses; moves to `domain/event.rs` in M5.
-#[derive(Clone, Copy, sqlx::Type)]
-#[sqlx(type_name = "event_status", rename_all = "snake_case")]
-enum EventStatus {
-    Draft,
-    Published,
-    RegistrationClosed,
-    Completed,
-}
 
 struct User {
     email: &'static str,
@@ -262,16 +258,4 @@ async fn insert_events(conn: &mut PgConnection, organizer: Uuid) -> sqlx::Result
         .await?;
     }
     Ok(())
-}
-
-/// `"Paris Cypher Sessions"` → `"paris-cypher-sessions-3f9a1c"`; the suffix is the id's random tail.
-fn slug(name: &str, id: Uuid) -> String {
-    let id = id.simple().to_string();
-    // Unicode-aware so non-Latin names keep their letters instead of collapsing to the suffix.
-    name.split(|c: char| !c.is_alphanumeric())
-        .filter(|w| !w.is_empty())
-        .map(str::to_lowercase)
-        .chain(std::iter::once(id[id.len() - 6..].to_string()))
-        .collect::<Vec<_>>()
-        .join("-")
 }

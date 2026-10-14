@@ -23,7 +23,7 @@ pub enum AppError {
     /// 403: logged in but not allowed.
     #[error("forbidden")]
     Forbidden,
-    /// 409: a uniqueness rule was violated.
+    /// 409: a uniqueness rule or a status transition was violated.
     #[error("{0}")]
     Conflict(String),
     /// 500: anything unexpected; logged, never shown to the client.

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set role = 'organizer' where id = $1 and role = 'user'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0dc0a92f9b2744b584eddff9fcb5328da1c293feaa6221d35376d8a12c8dee94"
+}

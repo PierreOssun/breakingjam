@@ -1,0 +1,132 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, name, slug, starts_on, city, country, lat as \"lat!\", lng as \"lng!\"\n           from events\n           where deleted_at is null and status = any($1) and lat is not null and lng is not null\n           order by starts_on, id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "slug",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "slug"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "starts_on",
+        "type_info": "Date",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "starts_on"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "city",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "city"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "lat!",
+        "type_info": "Float8",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "lat"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "lng!",
+        "type_info": "Float8",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "lng"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        {
+          "Custom": {
+            "name": "event_status[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "event_status",
+                  "kind": {
+                    "Enum": [
+                      "draft",
+                      "published",
+                      "registration_closed",
+                      "completed",
+                      "cancelled"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "8f9d851c5264ea04cf841a5cfa0d3194c1d37b14b9ae2c3626ea38a5c3442e44"
+}

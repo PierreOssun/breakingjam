@@ -68,6 +68,27 @@ pub fn post(uri: &str, body: Value, cookie: Option<&str>) -> Request<Body> {
         .unwrap()
 }
 
+pub fn put(uri: &str, body: Value, cookie: Option<&str>) -> Request<Body> {
+    request("PUT", uri, cookie)
+        .header(header::CONTENT_TYPE, "application/json")
+        .body(Body::from(body.to_string()))
+        .unwrap()
+}
+
+pub fn delete(uri: &str, cookie: Option<&str>) -> Request<Body> {
+    request("DELETE", uri, cookie).body(Body::empty()).unwrap()
+}
+
+/// Registers `email` and returns its session cookie, ready for a `Cookie` header.
+pub async fn sign_up(app: &Router, email: &str) -> String {
+    let body =
+        serde_json::json!({ "email": email, "password": "correct horse", "display_name": "Test" });
+    send(app, post("/api/auth/register", body, None))
+        .await
+        .cookie("bj_session")
+        .unwrap()
+}
+
 fn request(method: &str, uri: &str, cookie: Option<&str>) -> Builder {
     let request = Request::builder().method(method).uri(uri);
     match cookie {

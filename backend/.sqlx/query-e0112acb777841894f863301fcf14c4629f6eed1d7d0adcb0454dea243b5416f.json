@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select deleted_at is not null as \"deleted!\" from events where id = $1::text::uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "deleted!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "e0112acb777841894f863301fcf14c4629f6eed1d7d0adcb0454dea243b5416f"
+}

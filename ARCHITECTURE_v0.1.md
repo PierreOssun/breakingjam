@@ -341,7 +341,7 @@ Transitions are explicit endpoints (`POST /events/{id}/publish` etc.), not a fre
 - Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `RequireRole(Organizer)` helper. Roles are ordered `user < organizer < seed_admin < admin`; a check for a role passes for any higher role.
 - Roles:
   - `user`: can claim a dancer, edit unverified dancers, see everything public.
-  - `organizer`: everything above + create jams and manage their own jams (battles, entries, staff), create dancers/crews from within a jam.
+  - `organizer`: everything above + create jams and manage their own jams (battles, entries, staff), create dancers/crews from within a jam. A `user` who creates their first jam is promoted to `organizer` automatically (jams start as drafts).
   - `seed_admin` ("breakingjam_admin_seed"): everything above + create and edit **any** jam, dancer or crew, including seeding the initial ~200 dancers and historical jams. Cannot review claims, merge dancers or manage users.
   - `admin`: everything. Reviews claims, merges dancers, changes roles.
 - Google OAuth: authorization-code flow with PKCE via `oauth2` crate; on first login create `app_users` row with `google_sub`; on later logins match by `google_sub`, then by verified email.
@@ -365,10 +365,10 @@ GET    /api/auth/me
 GET    /api/auth/google                  → redirect
 GET    /api/auth/google/callback
 
-GET    /api/events                       ?status=published&country=&from=&to=&cursor=&limit=
-GET    /api/events.geojson               published events as FeatureCollection (id, name, slug, starts_on, city, country)
+GET    /api/events                       ?status=published&country=&from=&to=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required)
+GET    /api/events.geojson               published + registration_closed events with coordinates, as FeatureCollection (id, name, slug, starts_on, city, country)
 GET    /api/events/{id_or_slug}
-POST   /api/events                       organizer
+POST   /api/events                       logged in (promotes `user` → `organizer`)
 PUT    /api/events/{id}                  owner/admin
 DELETE /api/events/{id}                  soft delete, owner/admin
 POST   /api/events/{id}/publish | close-registration | complete | cancel

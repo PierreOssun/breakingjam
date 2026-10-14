@@ -129,3 +129,14 @@ pub async fn insert_with_google(
     .fetch_one(conn)
     .await
 }
+
+/// Turns a plain `user` into an `organizer`; higher roles are left alone.
+pub async fn promote_to_organizer(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update app_users set role = 'organizer' where id = $1 and role = 'user'",
+        id
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
+}

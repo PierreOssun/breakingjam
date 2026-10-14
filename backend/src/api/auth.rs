@@ -9,7 +9,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use validator::{Validate, ValidationError};
+use validator::Validate;
 
 use super::json::ValidJson;
 use crate::{
@@ -46,7 +46,7 @@ pub struct RegisterRequest {
     /// Public name, at most 80 characters.
     #[validate(
         length(max = 80, message = "must be at most 80 characters"),
-        custom(function = "not_blank")
+        custom(function = "crate::domain::not_blank")
     )]
     pub display_name: String,
 }
@@ -98,13 +98,6 @@ pub struct GoogleCallbackQuery {
     pub code: Option<String>,
     /// CSRF state echoed back by Google.
     pub state: Option<String>,
-}
-
-fn not_blank(value: &str) -> Result<(), ValidationError> {
-    if value.trim().is_empty() {
-        return Err(ValidationError::new("blank").with_message("must not be blank".into()));
-    }
-    Ok(())
 }
 
 type WithCookie<T> = ([(axum::http::HeaderName, HeaderValue); 1], T);
