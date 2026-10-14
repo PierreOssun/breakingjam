@@ -3,13 +3,13 @@
 use std::collections::HashMap;
 
 use chrono::NaiveDate;
-use sqlx::PgPool;
+use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{
     battle::{BattleAge, BattleFormat, BattleGender, BracketStage, EntryStatus, StaffRole},
     crew::CrewRef,
-    dancer::{Dancer, DancerFields, DancerSource, DancerSummary},
+    dancer::{Dancer, DancerFields, DancerSource, DancerSummary, FieldChange},
     event::EventStatus,
 };
 
@@ -116,7 +116,7 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
         Dancer,
         r#"select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                   instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                  created_by, created_at, updated_at
+                  created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null"#,
         id,
     )
@@ -141,7 +141,7 @@ pub async fn insert(
                    nullif(lower(ltrim(btrim($9), '@')), ''), $10, $11, $12)
            returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                      instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                     created_by, created_at, updated_at"#,
+                     created_by, merged_into_id, created_at, updated_at"#,
         Uuid::now_v7(),
         fields.dancer_name,
         &fields.aliases,
@@ -161,7 +161,11 @@ pub async fn insert(
 }
 
 /// Replaces the editable fields with the same normalisation as `insert`.
-pub async fn update(pool: &PgPool, id: Uuid, fields: &DancerFields) -> sqlx::Result<Dancer> {
+pub async fn update(
+    conn: &mut PgConnection,
+    id: Uuid,
+    fields: &DancerFields,
+) -> sqlx::Result<Dancer> {
     sqlx::query_as!(
         Dancer,
         r#"update dancers set
@@ -172,7 +176,7 @@ pub async fn update(pool: &PgPool, id: Uuid, fields: &DancerFields) -> sqlx::Res
            where id = $1 and deleted_at is null
            returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                      instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                     created_by, created_at, updated_at"#,
+                     created_by, merged_into_id, created_at, updated_at"#,
         id,
         fields.dancer_name,
         &fields.aliases,
@@ -183,8 +187,177 @@ pub async fn update(pool: &PgPool, id: Uuid, fields: &DancerFields) -> sqlx::Res
         fields.bio,
         fields.instagram_handle,
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await
+}
+
+/// A dancer that is neither soft-deleted nor merged away: the only kind that can be written.
+pub async fn find_live(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
+    Ok(find(pool, id).await?.filter(|d| d.merged_into_id.is_none()))
+}
+
+/// Locks a dancer row for the rest of the transaction.
+pub async fn find_for_update(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<Option<Dancer>> {
+    sqlx::query_as!(
+        Dancer,
+        r#"select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
+                  instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
+                  created_by, merged_into_id, created_at, updated_at
+           from dancers where id = $1 and deleted_at is null
+           for update"#,
+        id,
+    )
+    .fetch_optional(conn)
+    .await
+}
+
+/// Appends to the edit audit log (§4 `dancer_edits`).
+pub async fn log_edits(
+    conn: &mut PgConnection,
+    dancer_id: Uuid,
+    user_id: Uuid,
+    changes: &[FieldChange],
+) -> sqlx::Result<()> {
+    for (field, old_value, new_value) in changes {
+        sqlx::query!(
+            "insert into dancer_edits (id, dancer_id, user_id, field, old_value, new_value)
+             values ($1, $2, $3, $4, $5, $6)",
+            Uuid::now_v7(),
+            dancer_id,
+            user_id,
+            field,
+            old_value.as_deref(),
+            new_value.as_deref(),
+        )
+        .execute(&mut *conn)
+        .await?;
+    }
+    Ok(())
+}
+
+/// Moves everything that points at `loser` to `survivor` and turns `loser` into a redirect (§4 "Merge").
+pub async fn merge(
+    conn: &mut PgConnection,
+    loser: &Dancer,
+    survivor: &Dancer,
+    aliases: &[String],
+) -> sqlx::Result<()> {
+    let (from, into) = (loser.id, survivor.id);
+    move_entry_members(conn, from, into).await?;
+    move_staff(conn, from, into).await?;
+    move_memberships(conn, from, into).await?;
+    move_claims(conn, from, into, survivor.verified_at.is_some()).await?;
+    redirect(conn, loser, into, aliases).await
+}
+
+/// Entry rows move unless the survivor is already in that entry; leftovers are dropped.
+async fn move_entry_members(conn: &mut PgConnection, from: Uuid, into: Uuid) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update entry_members set dancer_id = $2
+         where dancer_id = $1
+           and entry_id not in (select entry_id from entry_members where dancer_id = $2)",
+        from,
+        into,
+    )
+    .execute(&mut *conn)
+    .await?;
+    sqlx::query!("delete from entry_members where dancer_id = $1", from)
+        .execute(&mut *conn)
+        .await?;
+    Ok(())
+}
+
+/// Staff rows move unless the survivor already holds that role at the jam; leftovers are dropped.
+async fn move_staff(conn: &mut PgConnection, from: Uuid, into: Uuid) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update event_staff s set dancer_id = $2
+         where dancer_id = $1
+           and not exists (select 1 from event_staff t
+                           where t.dancer_id = $2 and t.event_id = s.event_id and t.role = s.role)",
+        from,
+        into,
+    )
+    .execute(&mut *conn)
+    .await?;
+    sqlx::query!("delete from event_staff where dancer_id = $1", from)
+        .execute(&mut *conn)
+        .await?;
+    Ok(())
+}
+
+/// Memberships move unless the survivor has the same crew and `since`; leftovers are dropped.
+async fn move_memberships(conn: &mut PgConnection, from: Uuid, into: Uuid) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update crew_memberships m set dancer_id = $2
+         where dancer_id = $1
+           and not exists (select 1 from crew_memberships t
+                           where t.dancer_id = $2 and t.crew_id = m.crew_id
+                             and t.since is not distinct from m.since)",
+        from,
+        into,
+    )
+    .execute(&mut *conn)
+    .await?;
+    sqlx::query!("delete from crew_memberships where dancer_id = $1", from)
+        .execute(&mut *conn)
+        .await?;
+    Ok(())
+}
+
+/// Claims move; a user with pending claims on both keeps one, and claims on a verified survivor are moot.
+async fn move_claims(
+    conn: &mut PgConnection,
+    from: Uuid,
+    into: Uuid,
+    survivor_verified: bool,
+) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update dancer_claims set status = 'rejected', reviewed_at = now()
+         where dancer_id = $1 and status = 'pending'
+           and ($3 or user_id in (select user_id from dancer_claims
+                                  where dancer_id = $2 and status = 'pending'))",
+        from,
+        into,
+        survivor_verified,
+    )
+    .execute(&mut *conn)
+    .await?;
+    sqlx::query!(
+        "update dancer_claims set dancer_id = $2 where dancer_id = $1",
+        from,
+        into
+    )
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
+/// The loser (and anything already redirected to it) points at the survivor, which takes the aliases and a missing handle.
+async fn redirect(
+    conn: &mut PgConnection,
+    loser: &Dancer,
+    into: Uuid,
+    aliases: &[String],
+) -> sqlx::Result<()> {
+    // Earlier redirects to the loser now point at the survivor, so there are no chains.
+    sqlx::query!(
+        "update dancers set merged_into_id = $2 where merged_into_id = $1 or id = $1",
+        loser.id,
+        into
+    )
+    .execute(&mut *conn)
+    .await?;
+    // The loser no longer holds the handle (the unique index skips merged rows), so it can move.
+    sqlx::query!(
+        "update dancers set aliases = $2, instagram_handle = coalesce(instagram_handle, $3)
+         where id = $1",
+        into,
+        aliases,
+        loser.instagram_handle,
+    )
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
 }
 
 /// Soft-deletes a dancer; `false` when there was none to delete.
@@ -230,5 +403,16 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
         dancer_id,
     )
     .fetch_all(pool)
+    .await
+}
+
+/// How many of `ids` are live dancers (not deleted, not merged).
+pub async fn count_live(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<i64> {
+    sqlx::query_scalar!(
+        r#"select count(*) as "count!" from dancers
+           where id = any($1) and deleted_at is null and merged_into_id is null"#,
+        ids,
+    )
+    .fetch_one(pool)
     .await
 }

@@ -132,7 +132,7 @@ async fn add_member(
     let crew = db::crews::find(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    db::dancers::find(&state.pool, req.dancer_id)
+    db::dancers::find_live(&state.pool, req.dancer_id)
         .await?
         .ok_or(AppError::NotFound)?;
     if db::crews::is_current_member(&state.pool, id, req.dancer_id).await? {

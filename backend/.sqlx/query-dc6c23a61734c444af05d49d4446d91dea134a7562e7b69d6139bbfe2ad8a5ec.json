@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "update dancers set\n             dancer_name = btrim($2), aliases = array(select btrim(a) from unnest($3::text[]) a),\n             real_name = nullif(btrim($4), ''), country = $5, country2 = $6,\n             city = nullif(btrim($7), ''), bio = nullif(btrim($8), ''),\n             instagram_handle = nullif(lower(ltrim(btrim($9), '@')), '')\n           where id = $1 and deleted_at is null\n           returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                     instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                     created_by, created_at, updated_at",
+  "query": "select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                  instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null",
   "describe": {
     "columns": [
       {
@@ -170,6 +170,17 @@
       },
       {
         "ordinal": 14,
+        "name": "merged_into_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "merged_into_id"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -180,7 +191,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -193,15 +204,7 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Text",
-        "TextArray",
-        "Text",
-        "Bpchar",
-        "Bpchar",
-        "Text",
-        "Text",
-        "Text"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -219,9 +222,10 @@
       true,
       true,
       true,
+      true,
       false,
       false
     ]
   },
-  "hash": "7ded6b622935b03e43459e42439c45faf159c1f02f0b5a30b9fee07770e0370a"
+  "hash": "dc6c23a61734c444af05d49d4446d91dea134a7562e7b69d6139bbfe2ad8a5ec"
 }

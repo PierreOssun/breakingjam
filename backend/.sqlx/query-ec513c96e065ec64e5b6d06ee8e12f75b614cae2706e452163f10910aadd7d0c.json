@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set aliases = $2, instagram_handle = coalesce(instagram_handle, $3)\n         where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "TextArray",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ec513c96e065ec64e5b6d06ee8e12f75b614cae2706e452163f10910aadd7d0c"
+}

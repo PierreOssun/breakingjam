@@ -53,7 +53,31 @@ struct ErrorBody<'a> {
     fields: &'a [FieldError],
 }
 
+impl From<(&str, &str)> for FieldError {
+    fn from((field, message): (&str, &str)) -> Self {
+        Self {
+            field: field.into(),
+            message: message.into(),
+        }
+    }
+}
+
 impl AppError {
+    /// A 422 on one field.
+    pub fn invalid(field: &str, message: &str) -> Self {
+        Self::Validation(vec![(field, message).into()])
+    }
+
+    /// `Ok` when `errors` is empty, else a 422 listing each `(field, message)`.
+    pub fn check(errors: Vec<(&'static str, &'static str)>) -> Result<(), Self> {
+        if errors.is_empty() {
+            return Ok(());
+        }
+        Err(Self::Validation(
+            errors.into_iter().map(FieldError::from).collect(),
+        ))
+    }
+
     fn status_and_code(&self) -> (StatusCode, &'static str) {
         match self {
             Self::NotFound => (StatusCode::NOT_FOUND, "not_found"),
@@ -99,6 +123,15 @@ impl From<sqlx::Error> for AppError {
                 "already exists ({})",
                 db.constraint().unwrap_or("unique")
             )),
+            // Domain validation should catch these first; this keeps a missed rule a 422, not a 500.
+            sqlx::Error::Database(db)
+                if db.is_check_violation() || db.is_foreign_key_violation() =>
+            {
+                Self::Validation(vec![FieldError {
+                    field: db.constraint().unwrap_or("body").to_owned(),
+                    message: "violates a database rule".into(),
+                }])
+            }
             other => Self::Internal(other.into()),
         }
     }

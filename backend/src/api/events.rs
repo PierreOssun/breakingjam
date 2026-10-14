@@ -21,7 +21,7 @@ use crate::{
         ALL_STATUSES, Event, EventFields, EventStatus, MAP_STATUSES, PUBLIC_STATUSES, Transition,
         can_write,
     },
-    error::{AppError, FieldError},
+    error::AppError,
     state::AppState,
 };
 
@@ -191,7 +191,7 @@ async fn create(
     current: CurrentUser,
     ValidJson(fields): ValidJson<EventFields>,
 ) -> Result<(StatusCode, Json<Event>), AppError> {
-    check_cross_fields(&fields)?;
+    AppError::check(fields.cross_field_errors())?;
     let mut tx = state.pool.begin().await?;
     // Registering a first jam makes a plain user an organiser (decided in M5).
     db::users::promote_to_organizer(&mut tx, current.user.id).await?;
@@ -206,7 +206,7 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<EventFields>,
 ) -> Result<Json<Event>, AppError> {
-    check_cross_fields(&fields)?;
+    AppError::check(fields.cross_field_errors())?;
     writable(&state, &current, id).await?;
     Ok(Json(db::events::update(&state.pool, id, &fields).await?))
 }
@@ -270,8 +270,24 @@ async fn transition(
         .ok_or_else(|| AppError::Conflict("status changed meanwhile, reload and retry".into()))
 }
 
+/// The jam if the caller may see it: 404 when it is missing or a draft they can't write.
+pub(super) async fn readable(
+    state: &AppState,
+    current: &MaybeUser,
+    id: Uuid,
+) -> Result<Event, AppError> {
+    db::events::find(&state.pool, &id.to_string())
+        .await?
+        .filter(|event| event.visible_to(current.as_ref().map(|c| &c.user)))
+        .ok_or(AppError::NotFound)
+}
+
 /// The jam if `current` may write it: 404 when it is missing or invisible, 403 when read-only.
-async fn writable(state: &AppState, current: &CurrentUser, id: Uuid) -> Result<Event, AppError> {
+pub(super) async fn writable(
+    state: &AppState,
+    current: &CurrentUser,
+    id: Uuid,
+) -> Result<Event, AppError> {
     let event = db::events::find(&state.pool, &id.to_string())
         .await?
         .filter(|event| event.visible_to(Some(&current.user)))
@@ -280,22 +296,6 @@ async fn writable(state: &AppState, current: &CurrentUser, id: Uuid) -> Result<E
         return Err(AppError::Forbidden);
     }
     Ok(event)
-}
-
-fn check_cross_fields(fields: &EventFields) -> Result<(), AppError> {
-    let errors: Vec<FieldError> = fields
-        .cross_field_errors()
-        .into_iter()
-        .map(|(field, message)| FieldError {
-            field: field.into(),
-            message: message.into(),
-        })
-        .collect();
-    if errors.is_empty() {
-        Ok(())
-    } else {
-        Err(AppError::Validation(errors))
-    }
 }
 
 fn encode_cursor(event: &Event) -> String {

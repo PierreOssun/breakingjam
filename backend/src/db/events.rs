@@ -4,7 +4,11 @@ use chrono::NaiveDate;
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
-use crate::domain::event::{Event, EventFields, EventStatus};
+use crate::domain::{
+    battle::{StaffAssignment, StaffMember, StaffRole},
+    dancer::DancerRef,
+    event::{Event, EventFields, EventStatus},
+};
 
 /// Filters for `list`; `None` means "any".
 pub struct ListFilter<'a> {
@@ -207,6 +211,56 @@ pub async fn soft_delete(pool: &PgPool, id: Uuid) -> sqlx::Result<()> {
         id
     )
     .execute(pool)
+    .await?;
+    Ok(())
+}
+
+/// A jam's staff, by role then name.
+pub async fn staff(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<StaffMember>> {
+    let rows = sqlx::query!(
+        r#"select s.role as "role: StaffRole", d.id, d.dancer_name, d.country, d.country2,
+                  d.instagram_handle
+           from event_staff s join dancers d on d.id = s.dancer_id
+           where s.event_id = $1
+           order by s.role, lower(d.dancer_name), d.id"#,
+        event_id,
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(rows
+        .into_iter()
+        .map(|r| StaffMember {
+            role: r.role,
+            dancer: DancerRef {
+                id: r.id,
+                dancer_name: r.dancer_name,
+                country: r.country,
+                country2: r.country2,
+                instagram_handle: r.instagram_handle,
+            },
+        })
+        .collect())
+}
+
+/// Replaces a jam's whole staff list.
+pub async fn replace_staff(
+    conn: &mut PgConnection,
+    event_id: Uuid,
+    staff: &[StaffAssignment],
+) -> sqlx::Result<()> {
+    let (dancers, roles): (Vec<Uuid>, Vec<StaffRole>) =
+        staff.iter().map(|s| (s.dancer_id, s.role)).unzip();
+    sqlx::query!("delete from event_staff where event_id = $1", event_id)
+        .execute(&mut *conn)
+        .await?;
+    sqlx::query!(
+        "insert into event_staff (event_id, dancer_id, role)
+         select $1, d, r from unnest($2::uuid[], $3::staff_role[]) as t(d, r)",
+        event_id,
+        &dancers,
+        &roles as &[StaffRole],
+    )
+    .execute(&mut *conn)
     .await?;
     Ok(())
 }

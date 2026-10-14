@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "insert into dancers\n             (id, dancer_name, aliases, real_name, country, country2, city, bio,\n              instagram_handle, source, notable, created_by)\n           values ($1, btrim($2), array(select btrim(a) from unnest($3::text[]) a),\n                   nullif(btrim($4), ''), $5, $6, nullif(btrim($7), ''), nullif(btrim($8), ''),\n                   nullif(lower(ltrim(btrim($9), '@')), ''), $10, $11, $12)\n           returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                     instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                     created_by, created_at, updated_at",
+  "query": "insert into dancers\n             (id, dancer_name, aliases, real_name, country, country2, city, bio,\n              instagram_handle, source, notable, created_by)\n           values ($1, btrim($2), array(select btrim(a) from unnest($3::text[]) a),\n                   nullif(btrim($4), ''), $5, $6, nullif(btrim($7), ''), nullif(btrim($8), ''),\n                   nullif(lower(ltrim(btrim($9), '@')), ''), $10, $11, $12)\n           returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                     instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                     created_by, merged_into_id, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -170,6 +170,17 @@
       },
       {
         "ordinal": 14,
+        "name": "merged_into_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "merged_into_id"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -180,7 +191,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -233,9 +244,10 @@
       true,
       true,
       true,
+      true,
       false,
       false
     ]
   },
-  "hash": "416789b7f5927dfb73eb07d8598f1d2cbd6709f87433f998ab486c88f539d054"
+  "hash": "ce0dc2ba18d8102210dde68de41a6654677e898d9b730e4f5beba718ef5fd37c"
 }

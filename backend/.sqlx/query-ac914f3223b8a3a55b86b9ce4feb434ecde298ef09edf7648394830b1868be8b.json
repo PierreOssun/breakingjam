@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update battles set position = (o.ord - 1)::smallint\n         from unnest($2::uuid[]) with ordinality as o(id, ord)\n         where battles.id = o.id and battles.event_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "UuidArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ac914f3223b8a3a55b86b9ce4feb434ecde298ef09edf7648394830b1868be8b"
+}

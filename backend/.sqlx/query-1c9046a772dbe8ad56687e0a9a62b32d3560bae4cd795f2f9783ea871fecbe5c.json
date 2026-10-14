@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update crew_memberships m set dancer_id = $2\n         where dancer_id = $1\n           and not exists (select 1 from crew_memberships t\n                           where t.dancer_id = $2 and t.crew_id = m.crew_id\n                             and t.since is not distinct from m.since)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1c9046a772dbe8ad56687e0a9a62b32d3560bae4cd795f2f9783ea871fecbe5c"
+}

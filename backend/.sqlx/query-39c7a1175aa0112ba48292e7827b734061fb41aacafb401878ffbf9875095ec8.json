@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancer_claims set dancer_id = $2 where dancer_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "39c7a1175aa0112ba48292e7827b734061fb41aacafb401878ffbf9875095ec8"
+}

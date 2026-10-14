@@ -60,6 +60,8 @@ pub struct Dancer {
     pub avatar_url: Option<String>,
     #[serde(skip)]
     pub created_by: Option<Uuid>,
+    /// Set when an admin merged this row into another; it is then only a redirect.
+    pub merged_into_id: Option<Uuid>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -67,7 +69,6 @@ pub struct Dancer {
 impl Dancer {
     /// `seed_admin`+ always; a verified page only by its owner; an unverified one by its creator.
     pub fn can_edit(&self, user: &User) -> bool {
-        // M7b opens unverified pages to every logged-in user once `dancer_edits` audits them.
         if user.role >= Role::SeedAdmin {
             return true;
         }
@@ -90,6 +91,66 @@ pub struct DancerSummary {
     pub instagram_handle: Option<String>,
     pub verified: bool,
     pub crews: Vec<CrewRef>,
+}
+
+/// One changed field for the `dancer_edits` log: `(field, old, new)`, values as text.
+pub type FieldChange = (&'static str, Option<String>, Option<String>);
+
+/// The profile fields that differ between two versions of a dancer.
+pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
+    let aliases = |d: &Dancer| (!d.aliases.is_empty()).then(|| d.aliases.join(", "));
+    let fields: [FieldChange; 8] = [
+        (
+            "dancer_name",
+            Some(old.dancer_name.clone()),
+            Some(new.dancer_name.clone()),
+        ),
+        ("aliases", aliases(old), aliases(new)),
+        ("real_name", old.real_name.clone(), new.real_name.clone()),
+        (
+            "country",
+            Some(old.country.clone()),
+            Some(new.country.clone()),
+        ),
+        ("country2", old.country2.clone(), new.country2.clone()),
+        ("city", old.city.clone(), new.city.clone()),
+        ("bio", old.bio.clone(), new.bio.clone()),
+        (
+            "instagram_handle",
+            old.instagram_handle.clone(),
+            new.instagram_handle.clone(),
+        ),
+    ];
+    fields.into_iter().filter(|(_, a, b)| a != b).collect()
+}
+
+/// Aliases after merging `loser` into `survivor`: both lists plus the loser's name,
+/// without duplicates (case-insensitive) and without the survivor's own name.
+pub fn merged_aliases(survivor: &Dancer, loser: &Dancer) -> Vec<String> {
+    let mut seen = vec![survivor.dancer_name.to_lowercase()];
+    survivor
+        .aliases
+        .iter()
+        .chain(&loser.aliases)
+        .chain(std::iter::once(&loser.dancer_name))
+        .filter(|alias| {
+            let key = alias.to_lowercase();
+            let fresh = !seen.contains(&key);
+            seen.push(key);
+            fresh
+        })
+        .cloned()
+        .collect()
+}
+
+/// A dancer as linked from a jam page: enough to render the name, flags and handle.
+#[derive(Debug, Clone, Serialize)]
+pub struct DancerRef {
+    pub id: Uuid,
+    pub dancer_name: String,
+    pub country: String,
+    pub country2: Option<String>,
+    pub instagram_handle: Option<String>,
 }
 
 /// Everything set when creating or editing a dancer.
@@ -153,6 +214,7 @@ mod tests {
             verified_at: verified.then(Utc::now),
             avatar_url: None,
             created_by,
+            merged_into_id: None,
             created_at: Utc::now(),
             updated_at: Utc::now(),
         }
@@ -184,6 +246,31 @@ mod tests {
             "verification hands the page to its owner"
         );
         assert!(verified.can_edit(&user(Role::SeedAdmin)));
+    }
+
+    #[test]
+    fn changes_list_only_differences() {
+        let old = dancer(false, None, None);
+        let mut new = old.clone();
+        new.city = Some("Lyon".into());
+        new.aliases = vec!["G".into()];
+        let changed: Vec<&str> = changes(&old, &new).iter().map(|c| c.0).collect();
+        assert_eq!(changed, ["aliases", "city"]);
+        assert_eq!(changes(&old, &new)[1], ("city", None, Some("Lyon".into())));
+    }
+
+    #[test]
+    fn merged_aliases_union_without_duplicates() {
+        let mut survivor = dancer(false, None, None);
+        survivor.dancer_name = "Kid Rocket".into();
+        survivor.aliases = vec!["Rocket".into()];
+        let mut loser = dancer(false, None, None);
+        loser.dancer_name = "Kid Rockett".into();
+        loser.aliases = vec!["rocket".into(), "KR".into(), "kid rocket".into()];
+        assert_eq!(
+            merged_aliases(&survivor, &loser),
+            ["Rocket", "KR", "Kid Rockett"]
+        );
     }
 
     #[test]

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update entry_members set dancer_id = $2\n         where dancer_id = $1\n           and entry_id not in (select entry_id from entry_members where dancer_id = $2)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c0297bf616717bcfbcd62cb5d9bbbd72f9d4363ac0e5dffa38239a4ecf611877"
+}

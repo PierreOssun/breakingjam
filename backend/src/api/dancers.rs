@@ -20,7 +20,7 @@ use crate::{
     domain::{
         battle::{BattleAge, BattleFormat, BattleGender, BracketStage, EntryStatus, StaffRole},
         crew::CrewRef,
-        dancer::{Dancer, DancerFields, DancerSource, DancerSummary},
+        dancer::{self, Dancer, DancerFields, DancerSource, DancerSummary},
         event::EventStatus,
         user::Role,
     },
@@ -55,6 +55,17 @@ pub struct DancerResponse {
     pub crews: Vec<CrewRef>,
     /// Whether the caller may `PUT` this dancer.
     pub can_edit: bool,
+}
+
+/// Body of `GET /dancers/{id}`: the page, or where a merged dancer now lives (§4 "Merge").
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
+pub enum DancerPage {
+    /// The frontend redirects to `/dancers/{merged_into}`.
+    Merged {
+        merged_into: Uuid,
+    },
+    Dancer(Box<DancerResponse>),
 }
 
 /// Query of `GET /dancers/{id}/events`.
@@ -202,11 +213,15 @@ async fn show(
     State(state): State<AppState>,
     current: MaybeUser,
     Path(id): Path<Uuid>,
-) -> Result<Json<DancerResponse>, AppError> {
+) -> Result<Json<DancerPage>, AppError> {
     let dancer = db::dancers::find(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    respond(&state, dancer, current.as_ref()).await.map(Json)
+    if let Some(merged_into) = dancer.merged_into_id {
+        return Ok(Json(DancerPage::Merged { merged_into }));
+    }
+    let response = respond(&state, dancer, current.as_ref()).await?;
+    Ok(Json(DancerPage::Dancer(Box::new(response))))
 }
 
 async fn create(
@@ -226,14 +241,21 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<DancerFields>,
 ) -> Result<Json<DancerResponse>, AppError> {
-    let dancer = db::dancers::find(&state.pool, id)
+    let old = db::dancers::find_live(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    if !dancer.can_edit(&current.user) {
+    if !old.can_edit(&current.user) {
         return Err(AppError::Forbidden);
     }
-    let dancer = db::dancers::update(&state.pool, id, &fields).await?;
-    respond(&state, dancer, Some(&current)).await.map(Json)
+    let mut tx = state.pool.begin().await?;
+    let new = db::dancers::update(&mut tx, id, &fields).await?;
+    // §4: every change to an unverified dancer is kept in `dancer_edits`.
+    if old.verified_at.is_none() {
+        let changes = dancer::changes(&old, &new);
+        db::dancers::log_edits(&mut tx, id, current.user.id, &changes).await?;
+    }
+    tx.commit().await?;
+    respond(&state, new, Some(&current)).await.map(Json)
 }
 
 async fn delete(
@@ -253,7 +275,7 @@ async fn events(
     Path(id): Path<Uuid>,
     Query(query): Query<EventsQuery>,
 ) -> Result<Json<DancerEvents>, AppError> {
-    db::dancers::find(&state.pool, id)
+    db::dancers::find_live(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
     let wants = |scope| query.scope.is_none_or(|wanted| wanted == scope);

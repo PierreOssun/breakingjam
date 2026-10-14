@@ -1,0 +1,49 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update entries set\n           team_name = nullif(btrim($2), ''), crew_id = $3, status = $4, reached = $5,\n           final_rank = $6, video_url = $7, video_offset_seconds = $8\n         where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Uuid",
+        {
+          "Custom": {
+            "name": "entry_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "confirmed",
+                "withdrawn"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "bracket_stage",
+            "kind": {
+              "Enum": [
+                "prelims",
+                "top64",
+                "top32",
+                "top16",
+                "top8",
+                "top4",
+                "top2",
+                "winner",
+                "na"
+              ]
+            }
+          }
+        },
+        "Int4",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a6c4460f127d429b27bc51946290d6c77bfde4d82bd2b0f45c70fb1f909275d3"
+}

@@ -140,3 +140,26 @@ pub async fn promote_to_organizer(conn: &mut PgConnection, id: Uuid) -> sqlx::Re
     .await?;
     Ok(())
 }
+
+/// Sets an account's role.
+pub async fn set_role(pool: &PgPool, id: Uuid, role: Role) -> sqlx::Result<User> {
+    sqlx::query_as!(
+        User,
+        r#"update app_users set role = $2 where id = $1
+           returning id, email::text as "email!", display_name, role as "role: Role""#,
+        id,
+        role as Role,
+    )
+    .fetch_one(pool)
+    .await
+}
+
+/// Whether the user already owns a verified dancer page.
+pub async fn owns_dancer(pool: &PgPool, id: Uuid) -> sqlx::Result<bool> {
+    sqlx::query_scalar!(
+        r#"select exists(select 1 from dancers where user_id = $1 and deleted_at is null) as "owns!""#,
+        id,
+    )
+    .fetch_one(pool)
+    .await
+}

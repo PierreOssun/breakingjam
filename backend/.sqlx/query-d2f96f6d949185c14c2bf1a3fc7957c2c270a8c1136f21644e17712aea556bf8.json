@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select exists(\n             select 1 from entry_members m join entries e on e.id = m.entry_id\n             where e.battle_id = $1 and e.status <> 'withdrawn' and m.dancer_id = any($2)\n               and ($3::uuid is null or e.id <> $3)) as \"taken!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "taken!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "UuidArray",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "d2f96f6d949185c14c2bf1a3fc7957c2c270a8c1136f21644e17712aea556bf8"
+}

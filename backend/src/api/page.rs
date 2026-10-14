@@ -2,7 +2,7 @@
 
 use serde::Serialize;
 
-use crate::error::{AppError, FieldError};
+use crate::error::AppError;
 
 const DEFAULT_LIMIT: i64 = 50;
 const MAX_LIMIT: i64 = 200;
@@ -23,10 +23,7 @@ pub fn limit(requested: Option<i64>) -> i64 {
 
 /// 422 on field `cursor`, for cursors this API did not issue.
 pub fn invalid_cursor() -> AppError {
-    AppError::Validation(vec![FieldError {
-        field: "cursor".into(),
-        message: "invalid cursor".into(),
-    }])
+    AppError::invalid("cursor", "invalid cursor")
 }
 
 /// Rows to skip for search lists, whose cursor is the count already returned.

@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into dancer_edits (id, dancer_id, user_id, field, old_value, new_value)\n             values ($1, $2, $3, $4, $5, $6)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3ef6c4ffbb889e5f3be71efc35d2b8fb30f18aff4714f4ee1ca7bb8fb53ac4a0"
+}

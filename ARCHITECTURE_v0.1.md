@@ -16,7 +16,7 @@ This document is the source of truth for v0.1. Anything not listed under *Scope*
 - Jam (event) CRUD for authenticated organisers.
 - Dancer CRUD via the API, used inside the jam flows (search-before-create when adding entry members or staff).
 - Dancer page (`/dancers/{id}`): name, crew(s), country flag(s), Instagram link, generated avatar, and the dancer's jams split into **upcoming** and **past** (with the battle, the stage reached and, once the manager exists, the full result). Reached only by clicking a dancer on a jam page — there is **no dancer directory or search page** for the public in v0.1.
-- Dancer identity: Instagram handle as the (optional) uniqueness key, "Verify me" claim flow with a code-in-bio check reviewed by an admin, community edits on unverified dancers, admin merge. See §4 "Dancer identity".
+- Dancer identity: Instagram handle as the (optional) uniqueness key, "Verify me" claim flow with a code-in-bio check reviewed by an admin, edits on unverified dancers by their creator or a BreakingJam admin (logged in `dancer_edits`), admin merge. See §4 "Dancer identity".
 - Seed data: ~200 well-known dancers entered by a `seed_admin` user before launch (see roles in §5).
 - Crew CRUD and crew membership (dated).
 - Battles per jam (1v1, 2v2 … 10v10, seven-to-smoke; bboy/bgirl/mixed; kids/adult) and entries (registrations) with members and the stage reached.
@@ -177,7 +177,7 @@ create index on dancer_claims (status, created_at);
 create unique index dancer_claims_one_pending_key
   on dancer_claims (dancer_id, user_id) where status = 'pending';   -- one pending claim per (dancer, user)
 
-create table dancer_edits (            -- audit log of community edits on unverified dancers
+create table dancer_edits (            -- audit log of every edit on unverified dancers
   id uuid primary key,
   dancer_id uuid not null references dancers(id),
   user_id uuid not null references app_users(id),
@@ -310,8 +310,8 @@ Principles: the Instagram handle is the identity key but may be absent; verifica
   2. The response carries a short code (`BJ-` + 4 chars, unambiguous alphabet). The UI tells them to put it in their Instagram bio or DM it to @breakingjam.
   3. An admin reviews the queue (`GET /api/admin/claims`), checks the Instagram profile manually, approves or rejects. No scraping of Instagram, ever.
   4. On approve: `dancers.user_id = claim.user_id`, `verified_at = now()`, other pending claims on that dancer are rejected, the code is invalid. The dancer can now edit their own page.
-- **Handle edits**: on an *unverified* dancer any logged-in user may set or correct `instagram_handle`, `aliases`, `country`, `country2`, `city`; every change is written to `dancer_edits`. On a *verified* dancer only the owner, `seed_admin` or `admin` may edit. A handle change after verification does not touch `user_id` or `verified_at` — ownership is bound to the account, not the string. Anonymous visitors can never edit.
-- **Avatar**: when `avatar_url` is null the frontend renders a deterministic generated avatar seeded by `dancer.id` (see §6), with the `country` flag and, if set, the `country2` flag. Verified dancers may upload a picture (`POST /api/dancers/{id}/avatar`, image ≤ 2 MB, stored on R2). Instagram pictures are never fetched.
+- **Edits** (decided in M7b): an *unverified* dancer may be edited only by its creator (usually the organiser who added it during jam registration) or by `seed_admin`/`admin`; every change is written to `dancer_edits`. There are no community edits. On a *verified* dancer only the owner, `seed_admin` or `admin` may edit. A handle change after verification does not touch `user_id` or `verified_at` — ownership is bound to the account, not the string. Anonymous visitors can never edit.
+- **Avatar**: when `avatar_url` is null the frontend renders a deterministic generated avatar seeded by `dancer.id` (see §6), with the `country` flag and, if set, the `country2` flag. Verified dancers may upload a picture (`POST /api/dancers/{id}/avatar`, image ≤ 2 MB, stored on R2) — **deferred** until R2 is set up (decided in M7b). Instagram pictures are never fetched.
 - **Merge**: `POST /api/admin/dancers/{id}/merge {into}` moves `entry_members`, `event_staff`, `crew_memberships`, `dancer_claims` to the survivor, unions `aliases`, keeps the survivor's handle (or adopts the loser's if the survivor had none), and sets `merged_into_id` on the loser. `GET /api/dancers/{id}` on a merged row returns `301`-style `{ "merged_into": uuid }`; the frontend redirects.
 
 ### Event status transitions
@@ -340,14 +340,14 @@ Transitions are explicit endpoints (`POST /events/{id}/publish` etc.), not a fre
 - Sessions: `sessions` table, cookie `bj_session` (HttpOnly, Secure, SameSite=Lax, 30-day expiry, rolling). Session id is a UUIDv4 (random, not v7).
 - Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `RequireRole(Organizer)` helper. Roles are ordered `user < organizer < seed_admin < admin`; a check for a role passes for any higher role.
 - Roles:
-  - `user`: can claim a dancer, edit unverified dancers, see everything public.
+  - `user`: can claim a dancer, edit the unverified dancers they created, see everything public.
   - `organizer`: everything above + create jams and manage their own jams (battles, entries, staff), create dancers/crews from within a jam. A `user` who creates their first jam is promoted to `organizer` automatically (jams start as drafts).
   - `seed_admin` ("breakingjam_admin_seed"): everything above + create and edit **any** jam, dancer or crew, including seeding the initial ~200 dancers and historical jams. Cannot review claims, merge dancers or manage users.
   - `admin`: everything. Reviews claims, merges dancers, changes roles.
 - Google OAuth: authorization-code flow with PKCE via `oauth2` crate; on first login create `app_users` row with `google_sub`; on later logins match by `google_sub`, then by verified email.
 - Authorization rules:
   - Event write: `organizer_id == user.id`, or `seed_admin`+.
-  - Dancer write (unverified): any logged-in user, logged in `dancer_edits`. Dancer write (verified): `dancer.user_id == user.id`, or `seed_admin`+.
+  - Dancer write (unverified): its creator (`created_by`), or `seed_admin`+; logged in `dancer_edits`. Dancer write (verified): `dancer.user_id == user.id`, or `seed_admin`+.
   - Dancer create: `organizer`+ (from a jam), or `user` for their own page (`source = self`).
   - Crew write: `organizer`+ (membership self-service later).
   - Claims review, merge, role changes: `admin` only.
@@ -395,7 +395,7 @@ PUT    /api/dancers/{id}                 see authorization rules; writes dancer_
 DELETE /api/dancers/{id}                 soft delete, seed_admin+
 POST   /api/dancers/{id}/claim           logged-in user → {code, status: pending}
 GET    /api/dancers/{id}/claim           current user's claim on this dancer, if any
-POST   /api/dancers/{id}/avatar          multipart image, owner only
+POST   /api/dancers/{id}/avatar          multipart image, owner only   (deferred: needs R2)
 
 GET    /api/admin/claims                 ?status=pending   admin
 POST   /api/admin/claims/{id}/approve    admin
