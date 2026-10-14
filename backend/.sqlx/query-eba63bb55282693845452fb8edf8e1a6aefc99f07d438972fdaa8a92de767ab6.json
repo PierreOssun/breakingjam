@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into events (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country)\n         values ($1, $2, $3, $4, $5::text::event_status, current_date + $6::int, current_date + $6::int,\n                 'Europe/Paris', 'Paris', 'FR')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "eba63bb55282693845452fb8edf8e1a6aefc99f07d438972fdaa8a92de767ab6"
+}

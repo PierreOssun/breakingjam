@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into entries (id, battle_id, status, reached) values ($1, $2, 'confirmed', $3::text::bracket_stage)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d9a4d460b1a203541f1f9ed35d48a644bc540bd1d21698bd5e53ec37e65fe9ad"
+}

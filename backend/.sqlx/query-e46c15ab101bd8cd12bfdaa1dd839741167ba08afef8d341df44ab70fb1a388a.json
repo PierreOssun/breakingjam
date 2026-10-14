@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select m.dancer_id, c.id, c.name, m.since\n         from crew_memberships m join crews c on c.id = m.crew_id\n         where m.dancer_id = any($1) and m.until is null and c.deleted_at is null\n         order by lower(c.name)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "dancer_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "crew_memberships",
+            "name": "dancer_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "since",
+        "type_info": "Date",
+        "origin": {
+          "Table": {
+            "table": "crew_memberships",
+            "name": "since"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "e46c15ab101bd8cd12bfdaa1dd839741167ba08afef8d341df44ab70fb1a388a"
+}

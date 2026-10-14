@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set deleted_at = now() where id = $1 and deleted_at is null",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "65d048f23e81ae7baaab930c98ee474fe9e6c1a97b8497e85be7ad3dd305de18"
+}

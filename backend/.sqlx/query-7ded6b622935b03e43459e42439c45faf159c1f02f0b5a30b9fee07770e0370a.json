@@ -1,0 +1,227 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set\n             dancer_name = btrim($2), aliases = array(select btrim(a) from unnest($3::text[]) a),\n             real_name = nullif(btrim($4), ''), country = $5, country2 = $6,\n             city = nullif(btrim($7), ''), bio = nullif(btrim($8), ''),\n             instagram_handle = nullif(lower(ltrim(btrim($9), '@')), '')\n           where id = $1 and deleted_at is null\n           returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                     instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                     created_by, created_at, updated_at",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "dancer_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "dancer_name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "aliases",
+        "type_info": "TextArray",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "aliases"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "real_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "real_name"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "country2",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country2"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "city",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "city"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "bio",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "bio"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "source: DancerSource",
+        "type_info": {
+          "Custom": {
+            "name": "dancer_source",
+            "kind": {
+              "Enum": [
+                "seed",
+                "organizer",
+                "self"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "source"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "verified_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "verified_at"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "avatar_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar_url"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "created_by",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "created_by"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "updated_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "updated_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "TextArray",
+        "Text",
+        "Bpchar",
+        "Bpchar",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "7ded6b622935b03e43459e42439c45faf159c1f02f0b5a30b9fee07770e0370a"
+}

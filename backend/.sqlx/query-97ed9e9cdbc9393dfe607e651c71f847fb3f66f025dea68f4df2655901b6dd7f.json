@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update crews set deleted_at = now() where id = $1 and deleted_at is null",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "97ed9e9cdbc9393dfe607e651c71f847fb3f66f025dea68f4df2655901b6dd7f"
+}

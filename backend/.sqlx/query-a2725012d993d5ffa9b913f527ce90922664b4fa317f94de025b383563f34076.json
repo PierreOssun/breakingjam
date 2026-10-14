@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update crew_memberships set until = current_date\n         where crew_id = $1 and dancer_id = $2 and until is null",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a2725012d993d5ffa9b913f527ce90922664b4fa317f94de025b383563f34076"
+}

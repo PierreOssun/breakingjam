@@ -89,6 +89,18 @@ pub async fn sign_up(app: &Router, email: &str) -> String {
         .unwrap()
 }
 
+/// Sets a role directly in the DB (`user`, `organizer`, `seed_admin`, `admin`).
+pub async fn set_role(pool: &PgPool, email: &str, role: &str) {
+    sqlx::query!(
+        "update app_users set role = $2::text::user_role where email = $1::text::citext",
+        email,
+        role,
+    )
+    .execute(pool)
+    .await
+    .unwrap();
+}
+
 fn request(method: &str, uri: &str, cookie: Option<&str>) -> Builder {
     let request = Request::builder().method(method).uri(uri);
     match cookie {

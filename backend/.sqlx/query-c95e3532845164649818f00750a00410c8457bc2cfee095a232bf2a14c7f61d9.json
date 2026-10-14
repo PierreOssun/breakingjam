@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into event_staff (event_id, dancer_id, role) values ($1, $2, 'judge')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c95e3532845164649818f00750a00410c8457bc2cfee095a232bf2a14c7f61d9"
+}

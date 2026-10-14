@@ -9,7 +9,7 @@ use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
 use super::{
-    not_blank,
+    country_code, not_blank,
     user::{Role, User},
 };
 
@@ -233,14 +233,6 @@ pub fn slug(name: &str, id: Uuid) -> String {
         .chain(std::iter::once(id[id.len() - 6..].to_string()))
         .collect::<Vec<_>>()
         .join("-")
-}
-
-fn country_code(value: &str) -> Result<(), ValidationError> {
-    if value.len() == 2 && value.bytes().all(|b| b.is_ascii_uppercase()) {
-        return Ok(());
-    }
-    Err(ValidationError::new("country")
-        .with_message("must be an ISO 3166-1 alpha-2 code, e.g. FR".into()))
 }
 
 /// Blank, or an absolute `http(s)://` link; other schemes would be rendered as `href`s.

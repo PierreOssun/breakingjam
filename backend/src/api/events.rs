@@ -303,15 +303,9 @@ fn encode_cursor(event: &Event) -> String {
 }
 
 fn decode_cursor(cursor: &str) -> Result<(NaiveDate, Uuid), AppError> {
-    let invalid = || {
-        AppError::Validation(vec![FieldError {
-            field: "cursor".into(),
-            message: "invalid cursor".into(),
-        }])
-    };
-    let (date, id) = cursor.split_once('_').ok_or_else(invalid)?;
+    let (date, id) = cursor.split_once('_').ok_or_else(page::invalid_cursor)?;
     Ok((
-        date.parse().map_err(|_| invalid())?,
-        id.parse().map_err(|_| invalid())?,
+        date.parse().map_err(|_| page::invalid_cursor())?,
+        id.parse().map_err(|_| page::invalid_cursor())?,
     ))
 }

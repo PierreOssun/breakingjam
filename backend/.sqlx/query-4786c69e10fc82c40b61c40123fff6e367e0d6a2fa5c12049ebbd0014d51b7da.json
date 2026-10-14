@@ -1,0 +1,110 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, dancer_name, aliases, country, country2, city, instagram_handle,\n                  verified_at is not null as \"verified!\"\n           from dancers\n           where deleted_at is null and merged_into_id is null\n             and ($1::text is null\n                  or dancer_name ilike $1\n                  or instagram_handle ilike $1\n                  or exists (select 1 from unnest(aliases) a where a ilike $1))\n             and ($2::text is null or country = $2 or country2 = $2)\n           order by notable desc, lower(dancer_name), id\n           limit $3 offset $4",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "dancer_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "dancer_name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "aliases",
+        "type_info": "TextArray",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "aliases"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "country2",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country2"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "city",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "city"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "verified!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "4786c69e10fc82c40b61c40123fff6e367e0d6a2fa5c12049ebbd0014d51b7da"
+}

@@ -1,6 +1,8 @@
 //! HTTP API under `/api`, one module per resource.
 
 mod auth;
+mod crews;
+mod dancers;
 mod events;
 mod health;
 mod json;
@@ -16,4 +18,6 @@ pub fn router() -> Router<AppState> {
         .merge(health::router())
         .merge(auth::router())
         .merge(events::router())
+        .merge(dancers::router())
+        .merge(crews::router())
 }

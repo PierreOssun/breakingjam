@@ -387,7 +387,7 @@ DELETE /api/entries/{id}
 GET    /api/events/{id}/staff
 PUT    /api/events/{id}/staff            replace full list
 
-GET    /api/dancers                      ?q=&country=&cursor=&limit=   (q = ilike on dancer_name)
+GET    /api/dancers                      ?q=&country=&cursor=&limit=   (q = ilike on dancer_name, aliases and instagram_handle; notable first)
 GET    /api/dancers/{id}                 profile + current crews
 GET    /api/dancers/{id}/events          ?scope=upcoming|past (default both, grouped)  — jams where the dancer is an entry member or staff; each item: event (id, name, slug, starts_on, ends_on, city, country, status), battle (id, name, format, team_size, gender, age), role (competitor|judge|dj|mc…), entry status, reached, final_rank, video_url
 POST   /api/dancers
