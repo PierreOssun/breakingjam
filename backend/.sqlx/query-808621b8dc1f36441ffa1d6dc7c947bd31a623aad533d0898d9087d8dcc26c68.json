@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into dancers (id, dancer_name, country, instagram_handle) values ($1, 'Other', 'DE', 'KidRocket')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "808621b8dc1f36441ffa1d6dc7c947bd31a623aad533d0898d9087d8dcc26c68"
+}

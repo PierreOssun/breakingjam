@@ -14,6 +14,8 @@ COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
+# sqlx macros check queries against the committed .sqlx data, no database at build time.
+ENV SQLX_OFFLINE=true
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .

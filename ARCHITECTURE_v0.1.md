@@ -99,7 +99,7 @@ Single backend crate for v0.1. Split into a Cargo workspace only when compile ti
 ### Conventions
 - Primary keys: `uuid` generated as **UUIDv7** by the application (`uuid` crate, `v7` feature). Postgres column type `uuid`.
 - Table names: plural, snake_case. Column names: snake_case.
-- Every table: `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()` (trigger or set in code — pick one, be consistent).
+- Every table: `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()` (maintained by the `set_updated_at` trigger, never set in code).
 - Soft delete: `deleted_at timestamptz null` on `events`, `dancers`, `crews` only. All public queries filter `deleted_at is null`.
 - Enums: Postgres `enum` types, mirrored as Rust enums with `#[sqlx(type_name = "...", rename_all = "snake_case")]`.
 - Timestamps in UTC. Event dates are calendar dates (`date`) with a separate `timezone` text column (IANA name).
@@ -174,6 +174,8 @@ create table dancer_claims (
   created_at timestamptz not null default now()
 );
 create index on dancer_claims (status, created_at);
+create unique index dancer_claims_one_pending_key
+  on dancer_claims (dancer_id, user_id) where status = 'pending';   -- one pending claim per (dancer, user)
 
 create table dancer_edits (            -- audit log of community edits on unverified dancers
   id uuid primary key,
@@ -201,9 +203,9 @@ create index on crews (lower(name));
 create table crew_memberships (
   dancer_id uuid not null references dancers(id) on delete cascade,
   crew_id uuid not null references crews(id) on delete cascade,
-  since date,
+  since date,                          -- null = unknown
   until date,                          -- null = current member
-  primary key (dancer_id, crew_id, since)
+  unique nulls not distinct (dancer_id, crew_id, since)   -- not a PK: PK columns are forced NOT NULL
 );
 
 create table events (
@@ -247,16 +249,16 @@ create table battles (
   team_size smallint check (team_size between 1 and 10),   -- 1 = 1v1 … 10 = 10v10; null unless format = 'team'
   gender battle_gender not null default 'mixed',
   age battle_age not null default 'adult',
-  age_min smallint check (age_min >= 0),   -- kids: lower bound (e.g. 8); adult: 18 or e.g. 40 for a masters battle
-  age_max smallint check (age_max >= age_min),   -- kids: 17; adult: null = no upper bound
+  age_min smallint check (age_min >= 0),   -- required for adult (18, or e.g. 40 for a masters battle); kids: optional lower bound (e.g. 8)
+  age_max smallint check (age_max >= age_min),   -- required for kids (17); adult: null = no upper bound
   bracket_size smallint check (bracket_size in (2, 4, 8, 16, 32, 64)),   -- starting bracket after prelims; null = unknown
   max_entries int check (max_entries > 0),
   position smallint not null default 0,   -- display order on the jam page
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   check (format <> 'team' or team_size is not null),
-  check (age <> 'kids' or age_max <= 17),
-  check (age <> 'adult' or age_min >= 18)
+  check (age <> 'kids' or (age_max is not null and age_max <= 17)),
+  check (age <> 'adult' or (age_min is not null and age_min >= 18))
 );
 create index on battles (event_id, position);
 

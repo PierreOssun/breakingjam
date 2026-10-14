@@ -1,12 +1,10 @@
 use std::net::{Ipv4Addr, SocketAddr};
 
-use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
-
 #[tokio::main]
 async fn main() {
     // Missing `.env` is fine: Docker and CI pass variables directly.
     dotenvy::dotenv().ok();
-    init_tracing();
+    breakingjam::init_tracing();
 
     // Full `Config::from_env()` arrives in milestone 3; only the port is needed for now.
     let port = match std::env::var("APP_PORT") {
@@ -26,18 +24,6 @@ async fn main() {
         .with_graceful_shutdown(shutdown_signal())
         .await
         .expect("server error");
-}
-
-/// Pretty logs in dev, JSON when `LOG_FORMAT=json` (prod).
-fn init_tracing() {
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("breakingjam=debug,tower_http=info"));
-    let json = std::env::var("LOG_FORMAT").as_deref() == Ok("json");
-    tracing_subscriber::registry()
-        .with(filter)
-        .with(json.then(|| tracing_subscriber::fmt::layer().json()))
-        .with((!json).then(|| tracing_subscriber::fmt::layer().pretty()))
-        .init();
 }
 
 async fn shutdown_signal() {

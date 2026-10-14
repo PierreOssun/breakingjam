@@ -1,4 +1,4 @@
-//! Application router: API routes plus HTTP middleware.
+//! Application router, HTTP middleware and tracing setup shared by both binaries.
 
 pub mod api;
 
@@ -7,6 +7,19 @@ use tower_http::{
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
     trace::TraceLayer,
 };
+use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
+
+/// Installs the global subscriber: `RUST_LOG` filter, pretty in dev, JSON when `LOG_FORMAT=json`.
+pub fn init_tracing() {
+    let filter = EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| EnvFilter::new("breakingjam=debug,seed=info,tower_http=info"));
+    let json = std::env::var("LOG_FORMAT").as_deref() == Ok("json");
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(json.then(|| tracing_subscriber::fmt::layer().json()))
+        .with((!json).then(|| tracing_subscriber::fmt::layer().pretty()))
+        .init();
+}
 
 /// Builds the full application router.
 pub fn app() -> Router {

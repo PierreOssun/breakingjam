@@ -15,8 +15,25 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: breakingjam
+          POSTGRES_PASSWORD: breakingjam
+          POSTGRES_DB: breakingjam
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U breakingjam -d breakingjam"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
       CARGO_TERM_COLOR: always
+      DATABASE_URL: postgres://breakingjam:breakingjam@localhost:5432/breakingjam
+      # Queries compile against the committed .sqlx data; the DB is only used at test time.
+      SQLX_OFFLINE: "true"
     steps:
       - uses: actions/checkout@v4
       # rust-toolchain.toml pins the version; rustup installs it on first use.
@@ -24,10 +41,16 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: backend
+      - run: cargo install sqlx-cli --locked --version 0.9.0 --no-default-features --features rustls,postgres
+      - run: sqlx migrate run
       - run: cargo fmt --check
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test
-      # Postgres service, SQLX_OFFLINE and `cargo sqlx prepare --check` arrive in milestone 2 with the first queries.
+      # Second run must be a no-op. Runs before `prepare --check`, which touches sources and would force a rebuild.
+      - run: cargo run --bin seed && cargo run --bin seed
+        env:
+          SEED_PASSWORD: ci-only
+      - run: cargo sqlx prepare --check -- --all-targets
 
   frontend:
     runs-on: ubuntu-latest

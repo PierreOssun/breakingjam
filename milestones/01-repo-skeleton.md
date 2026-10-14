@@ -27,7 +27,7 @@ Build order point 1 of `ARCHITECTURE_v0.1.md` §11.
 
 - `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test` (2 tests) — pass.
 - `npm run lint`, `typecheck`, `test` (1 test), `build` — pass.
-- Docker image build **not** verified locally (daemon not running); the CI `docker` job covers it.
+- Docker image build verified later, during milestone 2: builds, serves `/api/health`, logs JSON (58.6 MB).
 
 ## Deferred to later milestones
 

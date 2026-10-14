@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select updated_at > now() - interval '1 minute' as \"fresh!\" from app_users where id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "fresh!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "2eef58eed5663262540fa988b2a173bd30c732d0b6c4a0f0488c727611bb4552"
+}

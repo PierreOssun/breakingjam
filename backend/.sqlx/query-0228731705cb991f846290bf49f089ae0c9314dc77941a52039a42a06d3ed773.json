@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set display_name = 'Renamed' where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0228731705cb991f846290bf49f089ae0c9314dc77941a52039a42a06d3ed773"
+}
