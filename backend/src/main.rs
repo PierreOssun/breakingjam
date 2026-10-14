@@ -1,29 +1,41 @@
-use std::net::{Ipv4Addr, SocketAddr};
+use std::{
+    net::{Ipv4Addr, SocketAddr},
+    sync::Arc,
+};
+
+use anyhow::Context;
+use breakingjam::{config::Config, state::AppState};
+use sqlx::PgPool;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     // Missing `.env` is fine: Docker and CI pass variables directly.
     dotenvy::dotenv().ok();
     breakingjam::init_tracing();
 
-    // Full `Config::from_env()` arrives in milestone 3; only the port is needed for now.
-    let port = match std::env::var("APP_PORT") {
-        Ok(v) => v
-            .parse::<u16>()
-            .expect("APP_PORT must be a valid port number"),
-        Err(_) => 8080,
-    };
-    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
+    let config = Config::from_env()?;
+    let pool = PgPool::connect(&config.database_url)
+        .await
+        .context("cannot connect to DATABASE_URL")?;
+    // Dev builds migrate on startup; release builds rely on `sqlx migrate run` in CI/deploy (§5).
+    if cfg!(debug_assertions) {
+        sqlx::migrate!().run(&pool).await?;
+    }
 
+    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, config.app_port));
     let listener = tokio::net::TcpListener::bind(addr)
         .await
-        .expect("failed to bind listener");
+        .with_context(|| format!("cannot bind {addr}"))?;
     tracing::info!(%addr, "listening");
 
-    axum::serve(listener, breakingjam::app())
+    let state = AppState {
+        pool,
+        config: Arc::new(config),
+    };
+    axum::serve(listener, breakingjam::app(state))
         .with_graceful_shutdown(shutdown_signal())
-        .await
-        .expect("server error");
+        .await?;
+    Ok(())
 }
 
 async fn shutdown_signal() {
