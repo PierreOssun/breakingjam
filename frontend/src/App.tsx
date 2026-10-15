@@ -1,9 +1,14 @@
-// Placeholder shell; routing, i18n and the design system arrive in milestone 9.
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import { routes } from "./router";
+
+const queryClient = new QueryClient();
+const router = createBrowserRouter(routes);
+
 export function App() {
   return (
-    <main>
-      <h1>BreakingJam</h1>
-      <p>The central place for breaking jams.</p>
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   );
 }

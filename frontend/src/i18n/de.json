@@ -1,0 +1,73 @@
+{
+  "nav": {
+    "home": "BreakingJam Startseite",
+    "findJam": "Jam finden",
+    "forOrganisers": "Für Veranstalter",
+    "registerJam": "Jam eintragen",
+    "logIn": "Anmelden",
+    "logOut": "Abmelden",
+    "openMenu": "Menü öffnen",
+    "menu": "Menü",
+    "closeMenu": "Menü schließen",
+    "skipToContent": "Zum Inhalt springen",
+    "language": "Sprache: {{name}}"
+  },
+  "footer": {
+    "tagline": "Der zentrale Ort für Breaking-Jams."
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "submit": "Anmelden",
+      "submitting": "Anmeldung…",
+      "switchPrompt": "Neu hier?",
+      "switchLink": "Konto erstellen"
+    },
+    "register": {
+      "title": "Konto erstellen",
+      "submit": "Konto erstellen",
+      "submitting": "Konto wird erstellt…",
+      "switchPrompt": "Schon ein Konto?",
+      "switchLink": "Anmelden"
+    },
+    "fields": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "passwordHint": "Mindestens 8 Zeichen.",
+      "displayName": "Anzeigename",
+      "displayNameHint": "Wird bei deinen Jams angezeigt."
+    },
+    "google": "Weiter mit Google",
+    "or": "oder",
+    "errors": {
+      "invalidCredentials": "E-Mail oder Passwort falsch.",
+      "emailTaken": "Für diese E-Mail gibt es schon ein Konto. Melde dich stattdessen an.",
+      "google": "Die Google-Anmeldung hat nicht geklappt. Versuch es nochmal oder nutze deine E-Mail.",
+      "generic": "Etwas ist schiefgelaufen. Versuch es nochmal."
+    }
+  },
+  "validation": {
+    "required": "Pflichtfeld.",
+    "email": "Gib eine gültige E-Mail-Adresse ein.",
+    "passwordLength": "Verwende 8 bis 128 Zeichen.",
+    "displayName": "Verwende 1 bis 80 Zeichen."
+  },
+  "pages": {
+    "home": "BreakingJam",
+    "map": "Jam finden",
+    "jam": "Jam",
+    "dancer": "Tänzer:in",
+    "orgJams": "Deine Jams",
+    "orgJamNew": "Jam eintragen",
+    "orgJamEdit": "Jam bearbeiten",
+    "comingSoon": "Diese Seite ist unterwegs."
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "body": "Dieser Link führt ins Leere. Auf der Karte findest du alle Jams.",
+    "action": "Zur Startseite"
+  },
+  "errors": {
+    "generic": "Etwas ist schiefgelaufen. Lade die Seite neu, um es nochmal zu versuchen."
+  }
+}

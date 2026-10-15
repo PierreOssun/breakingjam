@@ -1,0 +1,202 @@
+/* DESIGN.md §2 tokens as a Tailwind v4 theme. Dark is the default; light comes from
+   [data-theme="light"] or the OS setting. `src/styles/tokens.test.ts` keeps these values
+   in sync with the tables in DESIGN.md. */
+@import "tailwindcss";
+@import "@fontsource-variable/unbounded";
+@import "@fontsource-variable/manrope";
+
+@theme {
+  /* Only design tokens exist: no default palette, type scale, radii or shadows. */
+  --color-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  /* §2.1 colour, dark values */
+  --color-bg: #0b0d14;
+  --color-surface: #141826;
+  --color-surface-raised: #1c2133;
+  --color-border: #283048;
+  --color-border-strong: #6b7391;
+  --color-text: #f3f5fa;
+  --color-muted: #a3aac2;
+  --color-primary: #2f5bff;
+  --color-primary-hover: #2850f0;
+  --color-primary-text: #8faaff;
+  --color-on-primary: #ffffff;
+  --color-accent: #6d3af5;
+  --color-accent-text: #b49bff;
+  --color-danger: #ff5c6c;
+  --color-success: #2fd67f;
+  --color-focus: #b49bff;
+  --color-scrim: rgb(5 6 10 / 0.72);
+
+  /* §3 typography */
+  --font-display:
+    "Unbounded Variable", Unbounded, "Arial Black", "Helvetica Neue", system-ui,
+    sans-serif;
+  --font-body:
+    "Manrope Variable", Manrope, ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas,
+    monospace;
+
+  /* §2.2 type scale */
+  --text-display-3xl: 64px;
+  --text-display-3xl--line-height: 68px;
+  --text-display-3xl--letter-spacing: -0.02em;
+  --text-display-3xl--font-weight: 800;
+  --text-display-2xl: 48px;
+  --text-display-2xl--line-height: 54px;
+  --text-display-2xl--letter-spacing: -0.02em;
+  --text-display-2xl--font-weight: 800;
+  --text-display-xl: 40px;
+  --text-display-xl--line-height: 46px;
+  --text-display-xl--letter-spacing: -0.02em;
+  --text-display-xl--font-weight: 800;
+  --text-display-lg: 32px;
+  --text-display-lg--line-height: 38px;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 800;
+  --text-display-md: 24px;
+  --text-display-md--line-height: 30px;
+  --text-display-md--letter-spacing: -0.01em;
+  --text-display-md--font-weight: 800;
+  --text-display-sm: 20px;
+  --text-display-sm--line-height: 26px;
+  --text-display-sm--letter-spacing: -0.01em;
+  --text-display-sm--font-weight: 700;
+  --text-display-xs: 16px;
+  --text-display-xs--line-height: 22px;
+  --text-display-xs--letter-spacing: 0em;
+  --text-display-xs--font-weight: 700;
+  --text-title: 20px;
+  --text-title--line-height: 28px;
+  --text-title--font-weight: 700;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--font-weight: 500;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body--font-weight: 500;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 500;
+  --text-label: 13px;
+  --text-label--line-height: 16px;
+  --text-label--letter-spacing: 0.06em;
+  --text-label--font-weight: 700;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 600;
+  --text-stat: 22px;
+  --text-stat--line-height: 28px;
+  --text-stat--letter-spacing: -0.02em;
+  --text-stat--font-weight: 800;
+  --text-code-xl: 36px;
+  --text-code-xl--line-height: 44px;
+  --text-code-xl--letter-spacing: 0.12em;
+  --text-code-xl--font-weight: 700;
+
+  /* §2.3 radii and shadows (spacing keeps Tailwind's 4px base, which §2.3 uses) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / var(--shadow-a));
+  --shadow-md: 0 4px 12px rgb(0 0 0 / var(--shadow-a));
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / var(--shadow-a));
+  --shadow-selected: 0 0 0 4px
+    color-mix(in srgb, var(--color-primary) 45%, transparent);
+
+  /* §2.4 sizes */
+  --container-content: 1200px;
+  --max-width-prose: 640px;
+  --container-popup: 320px;
+  --container-toast: 400px;
+  --height-header: 56px;
+  --height-header-lg: 64px;
+  --transition-duration-fast: 120ms;
+  --transition-duration-base: 180ms;
+}
+
+@layer base {
+  :root {
+    --shadow-a: 0.55;
+    color-scheme: dark;
+  }
+
+  [data-theme="light"] {
+    --color-bg: #f4f6fb;
+    --color-surface: #ffffff;
+    --color-surface-raised: #ebeef6;
+    --color-border: #d7dce8;
+    --color-border-strong: #7d86a0;
+    --color-text: #0b0d14;
+    --color-muted: #555d75;
+    --color-primary: #002fa7;
+    --color-primary-hover: #1a44c2;
+    --color-primary-text: #002fa7;
+    --color-on-primary: #ffffff;
+    --color-accent: #6d3af5;
+    --color-accent-text: #6d3af5;
+    --color-danger: #b91c1c;
+    --color-success: #0f6e3b;
+    --color-focus: #6d3af5;
+    --color-scrim: rgb(11 13 20 / 0.45);
+    --shadow-a: 0.14;
+    color-scheme: light;
+  }
+
+  /* Same values as above, for visitors whose OS is light and who have not chosen. */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --color-bg: #f4f6fb;
+      --color-surface: #ffffff;
+      --color-surface-raised: #ebeef6;
+      --color-border: #d7dce8;
+      --color-border-strong: #7d86a0;
+      --color-text: #0b0d14;
+      --color-muted: #555d75;
+      --color-primary: #002fa7;
+      --color-primary-hover: #1a44c2;
+      --color-primary-text: #002fa7;
+      --color-on-primary: #ffffff;
+      --color-accent: #6d3af5;
+      --color-accent-text: #6d3af5;
+      --color-danger: #b91c1c;
+      --color-success: #0f6e3b;
+      --color-focus: #6d3af5;
+      --color-scrim: rgb(11 13 20 / 0.45);
+      --shadow-a: 0.14;
+      color-scheme: light;
+    }
+  }
+
+  html {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* §8: a 3px focus outline, 2px offset, on every interactive element. */
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}
+
+/* §9 decoration: thin outlined rings, at most one per screen. */
+@utility rings {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: repeating-radial-gradient(
+    circle at center,
+    transparent 0 27px,
+    color-mix(in srgb, var(--color-primary-text) 16%, transparent) 27px 28px
+  );
+}

@@ -1,0 +1,73 @@
+{
+  "nav": {
+    "home": "BreakingJam home",
+    "findJam": "Find a jam",
+    "forOrganisers": "For organisers",
+    "registerJam": "Register a jam",
+    "logIn": "Log in",
+    "logOut": "Log out",
+    "openMenu": "Open menu",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "skipToContent": "Skip to content",
+    "language": "Language: {{name}}"
+  },
+  "footer": {
+    "tagline": "The central place for breaking jams."
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "submit": "Log in",
+      "submitting": "Logging in…",
+      "switchPrompt": "New here?",
+      "switchLink": "Create an account"
+    },
+    "register": {
+      "title": "Create an account",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "switchPrompt": "Already have an account?",
+      "switchLink": "Log in"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "At least 8 characters.",
+      "displayName": "Display name",
+      "displayNameHint": "Shown on the jams you organise."
+    },
+    "google": "Continue with Google",
+    "or": "or",
+    "errors": {
+      "invalidCredentials": "Wrong email or password.",
+      "emailTaken": "This email already has an account. Log in instead.",
+      "google": "Google sign-in didn’t work. Try again or use your email.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "validation": {
+    "required": "Required.",
+    "email": "Enter a valid email address.",
+    "passwordLength": "Use 8 to 128 characters.",
+    "displayName": "Use 1 to 80 characters."
+  },
+  "pages": {
+    "home": "BreakingJam",
+    "map": "Find a jam",
+    "jam": "Jam",
+    "dancer": "Dancer",
+    "orgJams": "Your jams",
+    "orgJamNew": "Register a jam",
+    "orgJamEdit": "Edit jam",
+    "comingSoon": "This page is on its way."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "This link goes nowhere. The map has every jam.",
+    "action": "Go home"
+  },
+  "errors": {
+    "generic": "Something went wrong. Reload the page to try again."
+  }
+}

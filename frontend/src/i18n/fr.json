@@ -1,0 +1,73 @@
+{
+  "nav": {
+    "home": "Accueil BreakingJam",
+    "findJam": "Trouver une jam",
+    "forOrganisers": "Pour les orgas",
+    "registerJam": "Inscrire une jam",
+    "logIn": "Se connecter",
+    "logOut": "Se déconnecter",
+    "openMenu": "Ouvrir le menu",
+    "menu": "Menu",
+    "closeMenu": "Fermer le menu",
+    "skipToContent": "Aller au contenu",
+    "language": "Langue : {{name}}"
+  },
+  "footer": {
+    "tagline": "Le point central des jams de breaking."
+  },
+  "auth": {
+    "login": {
+      "title": "Se connecter",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "switchPrompt": "Nouveau ici ?",
+      "switchLink": "Créer un compte"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "submit": "Créer le compte",
+      "submitting": "Création du compte…",
+      "switchPrompt": "Déjà un compte ?",
+      "switchLink": "Se connecter"
+    },
+    "fields": {
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "passwordHint": "Au moins 8 caractères.",
+      "displayName": "Nom affiché",
+      "displayNameHint": "Visible sur les jams que vous organisez."
+    },
+    "google": "Continuer avec Google",
+    "or": "ou",
+    "errors": {
+      "invalidCredentials": "E-mail ou mot de passe incorrect.",
+      "emailTaken": "Cet e-mail a déjà un compte. Connectez-vous plutôt.",
+      "google": "La connexion Google n’a pas fonctionné. Réessayez ou utilisez votre e-mail.",
+      "generic": "Une erreur s’est produite. Réessayez."
+    }
+  },
+  "validation": {
+    "required": "Obligatoire.",
+    "email": "Saisissez une adresse e-mail valide.",
+    "passwordLength": "Utilisez entre 8 et 128 caractères.",
+    "displayName": "Utilisez entre 1 et 80 caractères."
+  },
+  "pages": {
+    "home": "BreakingJam",
+    "map": "Trouver une jam",
+    "jam": "Jam",
+    "dancer": "Danseur·se",
+    "orgJams": "Vos jams",
+    "orgJamNew": "Inscrire une jam",
+    "orgJamEdit": "Modifier la jam",
+    "comingSoon": "Cette page arrive bientôt."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "body": "Ce lien ne mène nulle part. La carte a toutes les jams.",
+    "action": "Retour à l’accueil"
+  },
+  "errors": {
+    "generic": "Une erreur s’est produite. Rechargez la page pour réessayer."
+  }
+}
