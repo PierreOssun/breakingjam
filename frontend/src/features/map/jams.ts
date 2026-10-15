@@ -151,16 +151,46 @@ export function firstView(
   const home = country ? COUNTRY_BOUNDS[country] : undefined;
   if (!home) return boundsOf(jams);
   if (jams.length === 0 || jams.some((jam) => inBounds(jam, home))) return home;
-  const [west, south, east, north] = home;
-  const centre = { lng: (west + east) / 2, lat: (south + north) / 2 };
+  const centre = centreOf(home);
   const nearest = [...jams]
     .sort((a, b) => distanceKm(centre, a) - distanceKm(centre, b))
     .slice(0, NEAREST);
+  const [west, south, east, north] = home;
   return boundsOf([
     ...nearest,
     { lng: west, lat: south },
     { lng: east, lat: north },
   ]);
+}
+
+/** How many jams "Featured near you" shows. */
+const FEATURED = 6;
+
+/**
+ * "Featured near you": upcoming jams in the visitor's country, soonest first, then the
+ * nearest others from its centre; the soonest anywhere when the country is unknown.
+ */
+export function featuredJams(
+  jams: MapJam[],
+  country: string | null,
+  today: Date,
+): MapJam[] {
+  const date = isoDate(today);
+  const upcoming = jams
+    .filter((jam) => jam.ends_on >= date)
+    .sort((a, b) => a.starts_on.localeCompare(b.starts_on));
+  const local = upcoming.filter((jam) => jam.country === country);
+  const others = upcoming.filter((jam) => jam.country !== country);
+  const home = country ? COUNTRY_BOUNDS[country] : undefined;
+  if (home) {
+    const centre = centreOf(home);
+    others.sort((a, b) => distanceKm(centre, a) - distanceKm(centre, b));
+  }
+  return [...local, ...others].slice(0, FEATURED);
+}
+
+function centreOf([west, south, east, north]: Bounds) {
+  return { lng: (west + east) / 2, lat: (south + north) / 2 };
 }
 
 /** Cluster count as DESIGN.md §7 writes it: exact below 100, "120+" below 1000, then "1k+". */

@@ -562,12 +562,13 @@ handstand            toprock
 **Landing.**
 - **Mobile 375:**
   1. Header.
-  2. Hero: overline "The world map of breaking jams", then `display-xl` "Every jam. One **map**." with "map." in the blue pill. Under it, a `body-lg muted` pitch and two full-width lg buttons stacked, **Find a jam** (primary) and **Register a jam** (secondary). One `.rings` decoration bleeds off the top-right corner.
-  3. A 240px map preview card with clusters and markers, labelled "Open the map".
-  4. "Next up": three row cards.
-  5. "For organisers": steps 01–03 with `display-md` numbers in `primary-text`, then a full-width primary **Register a jam**.
-  6. Footer.
-- **Desktop:** the hero is a 5/7 grid, with the text and CTAs side by side on the left and a 480px map preview with an open mini-popup on the right. "Next up" is a 4-column grid of cards. The organiser band sits on `surface`, with the heading left and the three steps in columns on the right.
+  2. "Featured near you" (M15, replacing the "Next up" row below the map preview): a `display-md` title, a `body-sm muted` line saying where the jams are ("Upcoming jams in Switzerland and nearby"), a ghost **See the map →**, then up to 6 row cards (one column; two from `sm`, three from `lg`). Hidden when there are no upcoming jams.
+  3. Hero: overline "The world map of breaking jams", then `display-xl` "Every jam. One **map**." with "map." in the blue pill. Under it, a `body-lg muted` pitch and two full-width lg buttons stacked, **Find a jam** (primary) and **Register a jam** (secondary). One `.rings` decoration bleeds off the top-right corner.
+  4. A 240px map preview card with clusters and markers, labelled "Open the map".
+  5. "BreakingJam in numbers" (M15): three counters on `surface` cards (countries, battles, dancers; `text-label muted` label, `display-md` number), then "Battles by country": the 10 busiest countries as rows (bare flag, country name, "12 battles" muted), then "+ N more countries".
+  6. "For organisers": steps 01–03 with `display-md` numbers in `primary-text`, then a full-width primary **Register a jam**.
+  7. Footer.
+- **Desktop:** the hero is a 5/7 grid, with the text and CTAs side by side on the left and a 480px map preview with an open mini-popup on the right. The numbers band is a 5/7 grid too: the title and counters on the left, battles by country in two columns on the right. The organiser band sits on `surface`, with the heading left and the three steps in columns on the right.
 
 **Map with a popup open.**
 - **Mobile:** a dark full-bleed map under a 56px header, with the floating search pill, a filter button (dot when filters are active) and the chip row. The selected marker is 28px with a date tag. The bottom sheet is up, showing the flyer, date, title, distance, badge, categories, **View jam** and Share. **List** and locate float above the sheet.
@@ -578,7 +579,7 @@ handstand            toprock
   1. Back bar (← Map, Share).
   2. Full-bleed 4:5 flyer.
   3. Badge and deadline caption, then the `display-lg` title.
-  4. Fact rows for date/time, venue and fees, each with a `primary-text` icon.
+  4. Fact rows for date/time, venue, fees, website (`Globe`, the host as label, ↗) and email (`EnvelopeSimple`, a `mailto:` link), then Instagram, each with a `primary-text` icon.
   5. **Battles** list: category, format and spots, or "Full" in muted; cash prizes under the name (`Trophy` 16 in `primary-text`, "1st CHF 1,000 · 2nd CHF 500" muted); entries as dancer chips, best result first.
   6. **Lineup:** dancer chips for judges, DJ and MC.
   - For the jam's organiser, people are managed here: an add chip under each battle and per lineup role, edit and delete on each entry, remove on each chip. Battles themselves are edited in the jam editor.

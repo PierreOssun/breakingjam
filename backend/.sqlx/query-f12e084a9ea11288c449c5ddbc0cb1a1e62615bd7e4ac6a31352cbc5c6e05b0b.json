@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "with public_jams as (\n             select id, country from events\n             where deleted_at is null\n               and status in ('published', 'registration_closed', 'completed')\n           )\n           select\n             (select count(distinct country) from public_jams) as \"countries!\",\n             (select count(*) from battles where event_id in (select id from public_jams))\n               as \"battles!\",\n             (select count(*) from dancers\n              where deleted_at is null and merged_into_id is null) as \"dancers!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "countries!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "battles!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "dancers!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "f12e084a9ea11288c449c5ddbc0cb1a1e62615bd7e4ac6a31352cbc5c6e05b0b"
+}

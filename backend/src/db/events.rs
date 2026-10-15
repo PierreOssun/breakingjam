@@ -63,13 +63,15 @@ pub async fn insert(
         Event,
         r#"insert into events
              (id, organizer_id, slug, name, description, starts_on, ends_on, timezone,
-              venue_name, address, city, country, lat, lng, registration_url, instagram_url)
+              venue_name, address, city, country, lat, lng, registration_url, instagram_url,
+              website_url, contact_email)
            values ($1, $2, $3, btrim($4), nullif(btrim($5), ''), $6, $7, $8,
                    nullif(btrim($9), ''), nullif(btrim($10), ''), btrim($11), $12, $13, $14,
-                   nullif(btrim($15), ''), nullif(btrim($16), ''))
+                   nullif(btrim($15), ''), nullif(btrim($16), ''), nullif(btrim($17), ''),
+                   nullif(btrim($18), ''))
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, review_note, created_at, updated_at"#,
+                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at"#,
         id,
         organizer_id,
         crate::domain::event::slug(&fields.name, id),
@@ -86,6 +88,8 @@ pub async fn insert(
         fields.lng,
         fields.registration_url,
         fields.instagram_url,
+        fields.website_url,
+        fields.contact_email,
     )
     .fetch_one(conn)
     .await
@@ -99,11 +103,12 @@ pub async fn update(pool: &PgPool, id: Uuid, fields: &EventFields) -> sqlx::Resu
              name = btrim($2), description = nullif(btrim($3), ''), starts_on = $4, ends_on = $5,
              timezone = $6, venue_name = nullif(btrim($7), ''), address = nullif(btrim($8), ''),
              city = btrim($9), country = $10, lat = $11, lng = $12,
-             registration_url = nullif(btrim($13), ''), instagram_url = nullif(btrim($14), '')
+             registration_url = nullif(btrim($13), ''), instagram_url = nullif(btrim($14), ''),
+             website_url = nullif(btrim($15), ''), contact_email = nullif(btrim($16), '')
            where id = $1 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, review_note, created_at, updated_at"#,
+                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at"#,
         id,
         fields.name,
         fields.description,
@@ -118,6 +123,8 @@ pub async fn update(pool: &PgPool, id: Uuid, fields: &EventFields) -> sqlx::Resu
         fields.lng,
         fields.registration_url,
         fields.instagram_url,
+        fields.website_url,
+        fields.contact_email,
     )
     .fetch_one(pool)
     .await
@@ -130,7 +137,7 @@ pub async fn find(pool: &PgPool, id_or_slug: &str) -> sqlx::Result<Option<Event>
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
                   starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                  registration_url, instagram_url, review_note, created_at, updated_at
+                  registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at
            from events
            where deleted_at is null and (id = $1 or slug = $2)"#,
         id,
@@ -147,7 +154,7 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
                   starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                  registration_url, instagram_url, review_note, created_at, updated_at
+                  registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at
            from events
            where deleted_at is null
              and ($1::event_status is null or status = $1)
@@ -202,7 +209,7 @@ pub async fn set_status(
            where id = $1 and status = $2 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, review_note, created_at, updated_at"#,
+                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at"#,
         id,
         from as EventStatus,
         to as EventStatus,
@@ -225,7 +232,7 @@ pub async fn review(
            where id = $1 and status = 'in_review' and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, review_note, created_at, updated_at"#,
+                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at"#,
         id,
         to as EventStatus,
         note,
@@ -240,7 +247,7 @@ pub async fn in_review(pool: &PgPool, window: super::Window) -> sqlx::Result<Vec
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
                   starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                  registration_url, instagram_url, review_note, created_at, updated_at
+                  registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at
            from events
            where deleted_at is null and status = 'in_review'
            order by starts_on, id

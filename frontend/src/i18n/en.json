@@ -80,11 +80,30 @@
       "title": "For organisers",
       "body": "Put your jam where dancers look for one.",
       "step1Title": "Create your jam",
-      "step1Body": "Name, dates and place. It stays a draft until you publish it.",
+      "step1Body": "Name, dates and place. It stays a draft until you submit it.",
       "step2Title": "Add battles and lineup",
       "step2Body": "1v1s, crews, seven-to-smoke, and your judges, DJ and MC.",
-      "step3Title": "Publish it",
-      "step3Body": "It goes on the map, and on the pages of every dancer in it."
+      "step3Title": "Submit it",
+      "step3Body": "A BreakingJam admin checks it, then it goes on the map and on the page of every dancer in it."
+    },
+    "featured": {
+      "title": "Featured near you",
+      "inCountry": "Upcoming jams in {{country}}",
+      "inCountryAndNearby": "Upcoming jams in {{country}} and nearby",
+      "nearby": "The closest upcoming jams",
+      "soonest": "The next jams on the map",
+      "map": "See the map"
+    },
+    "counts": {
+      "title": "BreakingJam in numbers",
+      "countries": "Countries",
+      "battles": "Battles",
+      "dancers": "Dancers",
+      "byCountry": "Battles by country",
+      "battleCount_one": "{{count}} battle",
+      "battleCount_other": "{{count}} battles",
+      "more_one": "+ {{count}} more country",
+      "more_other": "+ {{count}} more countries"
     }
   },
   "status": {
@@ -122,7 +141,9 @@
     },
     "organiser": "Organiser",
     "contact": "Contact",
-    "edit": "Edit jam"
+    "edit": "Edit jam",
+    "website": "Website",
+    "email": "Email"
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -252,7 +273,10 @@
       "description": "About",
       "registrationUrl": "Registration link",
       "registrationUrlHint": "Where dancers sign up for the battles.",
-      "instagramUrl": "Instagram page"
+      "instagramUrl": "Instagram page",
+      "websiteUrl": "Website",
+      "contactEmail": "Contact email",
+      "contactEmailHint": "Public: shown on the jam page so dancers can write to you."
     },
     "location": {
       "title": "On the map",

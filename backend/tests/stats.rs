@@ -59,3 +59,55 @@ async fn admin_stats_count_jams_dancers_accounts_and_queues(pool: PgPool) {
     let forbidden = send(&app, get("/api/admin/stats", Some(&organizer))).await;
     assert_eq!(forbidden.status, StatusCode::FORBIDDEN);
 }
+
+#[sqlx::test]
+async fn site_stats_count_public_jams_battles_and_dancers(pool: PgPool) {
+    let app = app(pool.clone());
+    let organizer = sign_up(&app, "org@example.com").await;
+    let one_v_one = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
+    let jam = async |name: &str, country: &str, battles: usize| {
+        let body = json!({ "name": name, "starts_on": "2030-06-01", "ends_on": "2030-06-01",
+                           "timezone": "Europe/Paris", "city": "City", "country": country });
+        let id = id_of(&send(&app, post("/api/events", body, Some(&organizer))).await);
+        for _ in 0..battles {
+            let uri = format!("/api/events/{id}/battles");
+            send(&app, post(&uri, one_v_one.clone(), Some(&organizer))).await;
+        }
+        id
+    };
+    let paris = jam("Paris", "FR", 2).await;
+    let lyon = jam("Lyon", "FR", 1).await;
+    let zurich = jam("Zurich", "CH", 1).await;
+    jam("Secret draft", "DE", 3).await;
+    let cancelled = jam("Called off", "IT", 1).await;
+    sqlx::query!(
+        "update events set status = 'published' where id = any($1::text[]::uuid[])",
+        &[paris, lyon, zurich] as &[String],
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+    sqlx::query!(
+        "update events set status = 'cancelled' where id = $1::text::uuid",
+        cancelled
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+    let dancer = json!({ "dancer_name": "Lil G", "country": "FR" });
+    send(&app, post("/api/dancers", dancer, Some(&organizer))).await;
+
+    let stats = send(&app, get("/api/stats", None)).await;
+    assert_eq!(stats.status, StatusCode::OK);
+    assert_eq!(
+        stats.json,
+        json!({
+            "countries": 2, "battles": 4, "dancers": 1,
+            "battles_by_country": [
+                { "country": "FR", "battles": 3 },
+                { "country": "CH", "battles": 1 }
+            ]
+        }),
+        "drafts and cancelled jams don't count"
+    );
+}

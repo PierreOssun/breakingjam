@@ -2,6 +2,8 @@ import {
   ArrowLeft,
   ArrowSquareOut,
   CalendarBlank,
+  EnvelopeSimple,
+  Globe,
   InstagramLogo,
   MapPin,
   PencilSimple,
@@ -115,6 +117,29 @@ function JamDetail({ jam }: { jam: Jam }) {
               {[jam.venue_name, jam.city].filter(Boolean).join(" · ")},{" "}
               {countryName(jam.country, i18n.language)}
             </Fact>
+            {jam.website_url && (
+              <Fact
+                icon={<Globe size={20} weight="bold" />}
+                label={t("jam.website")}
+              >
+                <ExternalLink href={jam.website_url}>
+                  {hostOf(jam.website_url)}
+                </ExternalLink>
+              </Fact>
+            )}
+            {jam.contact_email && (
+              <Fact
+                icon={<EnvelopeSimple size={20} weight="bold" />}
+                label={t("jam.email")}
+              >
+                <a
+                  href={`mailto:${jam.contact_email}`}
+                  className={`${factLink} break-all`}
+                >
+                  {jam.contact_email}
+                </a>
+              </Fact>
+            )}
             {jam.instagram_url && (
               <Fact
                 icon={<InstagramLogo size={20} weight="bold" />}
@@ -281,6 +306,19 @@ function RegisterLink({
   );
 }
 
+/** "pariscypher.com" for `https://www.pariscypher.com/`; the link itself when it won't parse. */
+function hostOf(link: string): string {
+  try {
+    return new URL(link).hostname.replace(/^www\./, "");
+  } catch {
+    return link;
+  }
+}
+
+// A link in a fact row: a 44px touch target, underlined on hover.
+const factLink =
+  "inline-flex min-h-11 items-center gap-1.5 self-start font-bold text-primary-text underline-offset-2 hover:underline";
+
 function ExternalLink({
   href,
   children,
@@ -293,7 +331,7 @@ function ExternalLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex min-h-11 items-center gap-1.5 self-start font-bold text-primary-text underline-offset-2 hover:underline"
+      className={factLink}
     >
       {children}
       <ArrowSquareOut size={16} weight="bold" aria-hidden />

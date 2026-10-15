@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "update events set status = $2, review_note = $3\n           where id = $1 and status = 'in_review' and deleted_at is null\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, review_note, created_at, updated_at",
+  "query": "insert into events\n             (id, organizer_id, slug, name, description, starts_on, ends_on, timezone,\n              venue_name, address, city, country, lat, lng, registration_url, instagram_url,\n              website_url, contact_email)\n           values ($1, $2, $3, btrim($4), nullif(btrim($5), ''), $6, $7, $8,\n                   nullif(btrim($9), ''), nullif(btrim($10), ''), btrim($11), $12, $13, $14,\n                   nullif(btrim($15), ''), nullif(btrim($16), ''), nullif(btrim($17), ''),\n                   nullif(btrim($18), ''))\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -206,6 +206,28 @@
       },
       {
         "ordinal": 17,
+        "name": "website_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "website_url"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "contact_email",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "contact_email"
+          }
+        }
+      },
+      {
+        "ordinal": 19,
         "name": "review_note",
         "type_info": "Text",
         "origin": {
@@ -216,7 +238,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 20,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -227,7 +249,7 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 21,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -241,21 +263,22 @@
     "parameters": {
       "Left": [
         "Uuid",
-        {
-          "Custom": {
-            "name": "event_status",
-            "kind": {
-              "Enum": [
-                "draft",
-                "in_review",
-                "published",
-                "registration_closed",
-                "completed",
-                "cancelled"
-              ]
-            }
-          }
-        },
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Date",
+        "Date",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Bpchar",
+        "Float8",
+        "Float8",
+        "Text",
+        "Text",
+        "Text",
         "Text"
       ]
     },
@@ -278,9 +301,11 @@
       true,
       true,
       true,
+      true,
+      true,
       false,
       false
     ]
   },
-  "hash": "9e4765c8ac88282b8901abc669539823f971e2a423345601561519e8bb79e93e"
+  "hash": "0aac48d33fc53671255b996ae92b6107e820c22b6d9eaed408e254a9b7f3972e"
 }

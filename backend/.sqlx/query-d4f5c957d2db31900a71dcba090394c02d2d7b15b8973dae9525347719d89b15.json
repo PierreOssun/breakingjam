@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                  registration_url, instagram_url, review_note, created_at, updated_at\n           from events\n           where deleted_at is null and status = 'in_review'\n           order by starts_on, id\n           limit $1 offset $2",
+  "query": "update events set status = $3, review_note = null\n           where id = $1 and status = $2 and deleted_at is null\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -206,6 +206,28 @@
       },
       {
         "ordinal": 17,
+        "name": "website_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "website_url"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "contact_email",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "contact_email"
+          }
+        }
+      },
+      {
+        "ordinal": 19,
         "name": "review_note",
         "type_info": "Text",
         "origin": {
@@ -216,7 +238,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 20,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -227,7 +249,7 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 21,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -240,8 +262,37 @@
     ],
     "parameters": {
       "Left": [
-        "Int8",
-        "Int8"
+        "Uuid",
+        {
+          "Custom": {
+            "name": "event_status",
+            "kind": {
+              "Enum": [
+                "draft",
+                "in_review",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "event_status",
+            "kind": {
+              "Enum": [
+                "draft",
+                "in_review",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        }
       ]
     },
     "nullable": [
@@ -263,9 +314,11 @@
       true,
       true,
       true,
+      true,
+      true,
       false,
       false
     ]
   },
-  "hash": "c2f20c0814bb2e55757a005cbde92f2ad52c8cfbacd9c35f63124817e2917dd4"
+  "hash": "d4f5c957d2db31900a71dcba090394c02d2d7b15b8973dae9525347719d89b15"
 }

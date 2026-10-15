@@ -25,6 +25,7 @@ describe("jam fields", () => {
       country: "FR",
       venue_name: "  ",
       registration_url: "https://example.com/register",
+      contact_email: " hello@pariscypher.com ",
     });
     expect(body).toMatchObject({
       name: "Paris Cypher",
@@ -33,6 +34,8 @@ describe("jam fields", () => {
       address: null,
       description: null,
       registration_url: "https://example.com/register",
+      website_url: null,
+      contact_email: "hello@pariscypher.com",
       lat: null,
       lng: null,
     });

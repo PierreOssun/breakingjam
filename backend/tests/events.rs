@@ -66,6 +66,13 @@ async fn create_makes_a_draft_and_promotes_the_user(pool: PgPool) {
     let slug = created.json["slug"].as_str().unwrap();
     assert!(slug.starts_with("paris-cypher-sessions-"));
 
+    let mut reachable = jam("Reachable Jam");
+    reachable["website_url"] = json!(" https://pariscypher.com ");
+    reachable["contact_email"] = json!(" hello@pariscypher.com ");
+    let created = create(&app, &cookie, reachable).await;
+    assert_eq!(created.json["website_url"], "https://pariscypher.com");
+    assert_eq!(created.json["contact_email"], "hello@pariscypher.com");
+
     let me = send(&app, get("/api/auth/me", Some(&cookie))).await;
     assert_eq!(me.json["role"], "organizer");
 }
@@ -84,6 +91,8 @@ async fn create_validates_fields_then_cross_field_rules(pool: PgPool) {
     let mut bad = jam(" ");
     bad["country"] = json!("fr");
     bad["timezone"] = json!("Paris");
+    bad["website_url"] = json!("pariscypher.com");
+    bad["contact_email"] = json!("hello at pariscypher");
     let response = create(&app, &cookie, bad).await;
     assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
     let fields: Vec<&str> = response.json["error"]["fields"]
@@ -92,7 +101,16 @@ async fn create_validates_fields_then_cross_field_rules(pool: PgPool) {
         .iter()
         .map(|f| f["field"].as_str().unwrap())
         .collect();
-    assert_eq!(fields, ["country", "name", "timezone"]);
+    assert_eq!(
+        fields,
+        [
+            "contact_email",
+            "country",
+            "name",
+            "timezone",
+            "website_url"
+        ]
+    );
 
     let mut inconsistent = jam("Jam");
     inconsistent["ends_on"] = json!("2030-05-31");

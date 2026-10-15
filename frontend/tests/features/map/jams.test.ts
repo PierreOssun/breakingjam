@@ -4,6 +4,7 @@ import {
   boundsOf,
   clusterLabel,
   distanceKm,
+  featuredJams,
   firstView,
   inBounds,
   jamsOf,
@@ -130,6 +131,54 @@ describe("map jams", () => {
     // No jam in Austria: its box and the three nearest jams, not Seoul.
     expect(firstView(jams, "AT")).toEqual([2.35, 46.3, 17.2, 52.52]);
     expect(firstView([], "AT")).toEqual([9.5, 46.3, 17.2, 49.1]);
+  });
+
+  it("features the visitor's country first, then the nearest jams", () => {
+    const at = (
+      name: string,
+      country: string,
+      lng: number,
+      lat: number,
+      starts_on = "2030-06-01",
+    ) =>
+      jam({ id: name, name, country, lng, lat, starts_on, ends_on: starts_on });
+    const jams = [
+      at("Over", "CH", 8.54, 47.37, "2026-10-01"),
+      at("Zurich", "CH", 8.54, 47.37),
+      at("Seoul", "KR", 126.98, 37.57),
+      at("Paris", "FR", 2.35, 48.86),
+      at("Geneva", "CH", 6.14, 46.2, "2030-07-01"),
+      at("Berlin", "DE", 13.4, 52.52),
+    ];
+    const names = (country: string | null) =>
+      featuredJams(jams, country, thursday).map((j) => j.name);
+
+    // Past jams never show; the country's own come first, in date order.
+    expect(names("CH")).toEqual([
+      "Zurich",
+      "Geneva",
+      "Paris",
+      "Berlin",
+      "Seoul",
+    ]);
+    // No jam in Austria: the nearest to its centre.
+    expect(names("AT")).toEqual([
+      "Zurich",
+      "Berlin",
+      "Geneva",
+      "Paris",
+      "Seoul",
+    ]);
+    // Unknown country: the soonest anywhere, at most six.
+    expect(names(null)).toEqual([
+      "Zurich",
+      "Seoul",
+      "Paris",
+      "Berlin",
+      "Geneva",
+    ]);
+    const many = Array.from({ length: 8 }, (_, i) => at(`J${i}`, "FR", 2, 48));
+    expect(featuredJams(many, "FR", thursday)).toHaveLength(6);
   });
 
   it("writes cluster counts the DESIGN.md way", () => {

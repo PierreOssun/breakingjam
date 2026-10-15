@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                  registration_url, instagram_url, review_note, created_at, updated_at\n           from events\n           where deleted_at is null and (id = $1 or slug = $2)",
+  "query": "select id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                  registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at\n           from events\n           where deleted_at is null and status = 'in_review'\n           order by starts_on, id\n           limit $1 offset $2",
   "describe": {
     "columns": [
       {
@@ -206,6 +206,28 @@
       },
       {
         "ordinal": 17,
+        "name": "website_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "website_url"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "contact_email",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "contact_email"
+          }
+        }
+      },
+      {
+        "ordinal": 19,
         "name": "review_note",
         "type_info": "Text",
         "origin": {
@@ -216,7 +238,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 20,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -227,7 +249,7 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 21,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -240,8 +262,8 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Text"
+        "Int8",
+        "Int8"
       ]
     },
     "nullable": [
@@ -263,9 +285,11 @@
       true,
       true,
       true,
+      true,
+      true,
       false,
       false
     ]
   },
-  "hash": "062381b7cc220498632f5448dc524c37f7784bf47b614db000394700f89fa797"
+  "hash": "fecb18561172ae36116c668383928036f9565065740b0e99e2b887eb8c831365"
 }

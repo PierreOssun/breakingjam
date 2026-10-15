@@ -21,6 +21,8 @@ const JAM = {
   lng: 2.3522,
   registration_url: "https://example.com/register",
   instagram_url: "https://www.instagram.com/paris.cypher",
+  website_url: "https://www.pariscypher.com/",
+  contact_email: "hello@pariscypher.com",
   created_at: at,
   updated_at: at,
   can_edit: false,
@@ -153,6 +155,13 @@ describe("JamPage", () => {
       main.getAllByText(/Saturday,? 1.+Sunday,? 2 June 2030/).length,
     ).toBeGreaterThan(0);
     expect(main.getByText("Le Hangar · Paris, France")).toBeInTheDocument();
+    expect(main.getByRole("link", { name: "pariscypher.com" })).toHaveAttribute(
+      "href",
+      "https://www.pariscypher.com/",
+    );
+    expect(
+      main.getByRole("link", { name: "hello@pariscypher.com" }),
+    ).toHaveAttribute("href", "mailto:hello@pariscypher.com");
     expect(main.getByText(/Open floor\./)).toBeInTheDocument();
 
     // The inlined SVG names itself (DESIGN.md §4.24); the page adds no second label.

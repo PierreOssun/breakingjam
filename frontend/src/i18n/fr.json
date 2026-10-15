@@ -80,11 +80,30 @@
       "title": "Pour les orgas",
       "body": "Mettez votre jam là où les danseurs la cherchent.",
       "step1Title": "Créez votre jam",
-      "step1Body": "Nom, dates et lieu. Elle reste en brouillon jusqu’à ce que vous la publiiez.",
+      "step1Body": "Nom, dates et lieu. Elle reste en brouillon jusqu’à ce que vous l’envoyiez en vérification.",
       "step2Title": "Ajoutez battles et line-up",
       "step2Body": "1v1, crews, seven-to-smoke, et vos juges, DJ et MC.",
-      "step3Title": "Publiez-la",
-      "step3Body": "Elle apparaît sur la carte et sur la page de chaque danseur·se inscrit·e."
+      "step3Title": "Envoyez-la",
+      "step3Body": "Un·e admin BreakingJam la vérifie, puis elle apparaît sur la carte et sur la page de chaque danseur·se inscrit·e."
+    },
+    "featured": {
+      "title": "À l’affiche près de chez vous",
+      "inCountry": "Prochaines jams : {{country}}",
+      "inCountryAndNearby": "Prochaines jams : {{country}} et alentours",
+      "nearby": "Les prochaines jams les plus proches",
+      "soonest": "Les prochaines jams sur la carte",
+      "map": "Voir la carte"
+    },
+    "counts": {
+      "title": "BreakingJam en chiffres",
+      "countries": "Pays",
+      "battles": "Battles",
+      "dancers": "Danseur·ses",
+      "byCountry": "Battles par pays",
+      "battleCount_one": "{{count}} battle",
+      "battleCount_other": "{{count}} battles",
+      "more_one": "+ {{count}} autre pays",
+      "more_other": "+ {{count}} autres pays"
     }
   },
   "status": {
@@ -122,7 +141,9 @@
     },
     "organiser": "Organisation",
     "contact": "Contacter",
-    "edit": "Modifier la jam"
+    "edit": "Modifier la jam",
+    "website": "Site web",
+    "email": "E-mail"
   },
   "dancer": {
     "aka": "alias {{names}}",
@@ -252,7 +273,10 @@
       "description": "À propos",
       "registrationUrl": "Lien d’inscription",
       "registrationUrlHint": "Là où les danseur·ses s’inscrivent aux battles.",
-      "instagramUrl": "Page Instagram"
+      "instagramUrl": "Page Instagram",
+      "websiteUrl": "Site web",
+      "contactEmail": "E-mail de contact",
+      "contactEmailHint": "Public : affiché sur la page de la jam pour que les danseur·ses puissent vous écrire."
     },
     "location": {
       "title": "Sur la carte",

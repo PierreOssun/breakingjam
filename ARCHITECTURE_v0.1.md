@@ -11,7 +11,7 @@ This document is the source of truth for v0.1. Anything not listed under *Scope*
 - Public landing page: a single screen explaining that BreakingJam is the central place for breaking jams, with exactly two primary actions:
   - **Find a jam** → opens the world map (`/map`).
   - **Register a jam** → create a jam to put on the map (`/org/jams/new`; login required, redirect back after auth).
-  No event list on the landing page — the map is the browse experience in v0.1.
+  Above them, "Featured near you" lists up to six upcoming jams for the visitor's country (M15); below, the site's counts. The map stays the browse experience.
 - World map of published jams (MapLibre GL); clicking a point opens a popup → jam detail page.
 - Jam (event) CRUD for authenticated organisers. An admin approves each organiser's jam before it goes public (M14).
 - Admin area (`/admin`, M14): counts of jams, dancers, organisers and accounts with verification rates, the jams waiting for review, and the Instagram claims. One tab per tool, so new tools join as tabs.
@@ -254,6 +254,8 @@ create table events (
   lng double precision,
   registration_url text,              -- external link allowed in v0.1
   instagram_url text,
+  website_url text,                   -- the jam's own site, http(s) (M15)
+  contact_email text,                 -- public: shown on the jam page as a mailto: link (M15)
   review_note text,                   -- why an admin sent it back to draft; cleared by the next status change (M14)
   deleted_at timestamptz,
   created_at timestamptz not null default now(),
@@ -404,6 +406,7 @@ GET    /api/auth/me
 GET    /api/auth/google                  → redirect
 GET    /api/auth/google/callback
 
+GET    /api/stats                        public counts for the landing page: countries with public jams, battles (total and per country, busiest first), dancers
 GET    /api/geo                          {country}: the visitor's ISO 3166-1 alpha-2 country from the `cf-ipcountry` header (set by the Worker), null when unknown
 
 GET    /api/events                       ?status=published&country=&from=&to=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required)
@@ -492,7 +495,12 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Routing: `/` (landing), `/map`, `/jams/{slug}`, `/dancers/{id}`, `/login`, `/register`, `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review), `/admin/claims` and `/admin/dancers/{id}/merge`. No `/dancers` index and no `/crews` routes in v0.1; the dancer page is reached from dancer names on a jam page, and crews render inline.
 - Dancer page (`/dancers/{id}`): header (avatar, dancer name, one or two country flags, city, current crews, Instagram link, verified tick when `verified_at` is set, "Verify me" button for logged-in non-owners while unverified, "Edit" for whoever is allowed), then two lists from `GET /api/dancers/{id}/events` — **Upcoming** (jams with `starts_on >= today`, link to `/jams/{slug}`) and **Past** (reverse chronological, with battle name, role, a result badge (`final_rank` as "1st/2nd/3rd", else `reached` as "Top 8"…), and a play icon when the entry has a `video_url`). Empty states for each. This page is the seed of the "where does this bboy go / what did he do" feature; the only edit affordances are those in §4 "Dancer identity".
 - Video embeds: a play icon on an entry (jam page or dancer page) opens a modal with the official YouTube iframe (`youtube-nocookie.com/embed/{id}?start={offset}&rel=0`). Only YouTube URLs are accepted, validated server-side (`youtube.com/watch`, `youtu.be`, `youtube.com/live`); the video id is parsed once on save. Nothing is ever downloaded or hosted.
-- Landing page (`/`): hero with the one-line pitch ("The central place for breaking jams"), two buttons — primary **Find a jam** → `/map`, secondary **Register a jam** → `/org/jams/new` (redirects to `/login?next=/org/jams/new` when logged out) — a short three-step "how it works", footer with language switch. No data fetching on this page. A static, decorative map preview card links to `/map` (decided in M10; no jam data).
+- Landing page (`/`), in order:
+  - **Featured near you** (M15): up to six upcoming jams from `GET /api/events.geojson`, chosen by the visitor's country (`GET /api/geo`). That country's jams come first, soonest first, then the nearest others measured from the centre of its box (§6 Map); with an unknown country, the soonest anywhere. Hidden when nothing is upcoming. It also warms the map's data.
+  - The hero with the one-line pitch ("The central place for breaking jams") and two buttons: primary **Find a jam** → `/map`, secondary **Register a jam** → `/org/jams/new` (redirects to `/login?next=/org/jams/new` when logged out). A static, decorative map preview card links to `/map` (M10).
+  - **BreakingJam in numbers** (M15): countries, battles and dancers from `GET /api/stats`, then battles by country, the 10 busiest then "+ N more countries". Public jams count, cancelled ones don't.
+  - A short three-step "how it works", footer with language switch.
+  M10 decided "no data fetching on this page"; M15 reverses that at the author's request.
 - Visual system: follow `DESIGN.md` (tokens, components, states). Tailwind v4: its tokens live in the `@theme` of `src/styles/index.css` (the default palette, type scale, radii and shadows are removed), and `src/styles/tokens.test.ts` fails when they drift from `DESIGN.md` §2; do not hard-code colours or spacing outside it. Where `DESIGN.md` differs from this file on scope or routes (8 languages, `/en/…` prefixes, a cookie, `/d/<slug>`), this file wins: EN/FR/DE, unprefixed routes, `localStorage`.
 - Forms: `react-hook-form` + `zod`. Validation mirrors backend validators; backend remains authoritative.
 - i18n: `react-i18next`, language detected from browser, switchable in header, persisted in `localStorage`. Keys namespaced by feature (`events.form.name`). All three JSON files must have identical key sets (add a test).
@@ -512,6 +520,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Dancer picker (used in entry and staff editing): debounced search on `dancer_name` showing existing matches; "create new dancer" is only enabled after a search has run (search-before-create). The crew picker works the same way.
 - Jam location (decided in M12): the organiser types the address, city and country; **Find on the map** searches them with OpenStreetMap's Nominatim from the browser (on that click only, never as-you-type, at most once a second, attributed under the field), drops the pin on the best match and lists the others; the pin can then be tapped or dragged. Without a pin a jam is published but stays off the map.
 - On the jam page, every dancer (entries, staff) is a link chip with their avatar, to `/dancers/{id}`.
+- Jam page facts (M15): dates, venue, then the optional website (its host as the label, e.g. "pariscypher.com", opening in a new tab), contact email (a `mailto:` link, public by the organiser's choice) and Instagram.
 - People are managed on the jam page, not in the editor: its organiser sees **Add a dancer** (or **Add a team**) under each battle, an add chip per lineup role (judge, DJ, MC, host, staff), and edit and delete on each entry and person, withdrawn entries included. `/org/jams/{id}/edit` keeps the status, details and battles (with their prizes).
 - Generated avatars (decided in M12b, following DESIGN.md §4.16 rather than DiceBear): the pixel 2D-HD bust, a 32×32 sprite drawn in code (`features/dancers/avatarParts.ts`) from six parts (hair, skin, hair colour, hoodie, extra, backdrop) and rendered as inline SVG with crisp edges plus the glow and vignette layer. Parts are seeded from `dancer.id` (same id → same face, no network call) unless `avatar_parts` holds a choice made in the edit sheet. The sprites are a first pass that an illustrator may redraw. Flags are separate chips next to the avatar, never drawn into it. Uploaded avatars (verified dancers) override the generated one. Organiser pages use the same bust, seeded by the account id.
 - Admin screens (`/admin/*`, `/admin/dancers/{id}/merge`): minimal tables and forms, `admin` role only, no design polish required. `/admin` has a tab per tool (Overview, Jams, Claims) carrying the size of its queue; the header's **Admin** link leads there.
@@ -582,5 +591,6 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 12c. Organiser should have a page like a dancer page (without battles) so he can verify with insta as well
 13. Integration test coverage pass, README, tag `v0.1.0`.
 14. Admin area: jams reviewed before going public, overview counts, claims under the same tabs.
+15. Jam contact email and website; landing page "Featured near you" and site counts.
 
 For Every suggested build order point, save it in milestones/ with a filename matching the build order point.

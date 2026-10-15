@@ -6,7 +6,7 @@ use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use uuid::Uuid;
-use validator::{Validate, ValidationError};
+use validator::{Validate, ValidateEmail, ValidationError};
 
 use super::{
     country_code, not_blank, rule,
@@ -174,6 +174,10 @@ pub struct Event {
     pub registration_url: Option<String>,
     /// The jam's Instagram page.
     pub instagram_url: Option<String>,
+    /// The jam's own website.
+    pub website_url: Option<String>,
+    /// Where to write to the organisers; public.
+    pub contact_email: Option<String>,
     /// Why an admin sent it back to draft; null otherwise.
     pub review_note: Option<String>,
     /// Row creation time.
@@ -238,6 +242,12 @@ pub struct EventFields {
     /// The jam's Instagram page; blank is stored as null.
     #[validate(length(max = 500), custom(function = "web_url"))]
     pub instagram_url: Option<String>,
+    /// The jam's own website; blank is stored as null.
+    #[validate(length(max = 500), custom(function = "web_url"))]
+    pub website_url: Option<String>,
+    /// Public contact address; blank is stored as null.
+    #[validate(length(max = 254), custom(function = "email_or_blank"))]
+    pub contact_email: Option<String>,
 }
 
 fn dates_in_order(fields: &EventFields) -> Result<(), ValidationError> {
@@ -277,6 +287,15 @@ pub(crate) fn web_url(value: &str) -> Result<(), ValidationError> {
         return Ok(());
     }
     Err(ValidationError::new("url").with_message("must start with http:// or https://".into()))
+}
+
+/// Blank, or an email address.
+pub(crate) fn email_or_blank(value: &str) -> Result<(), ValidationError> {
+    let value = value.trim();
+    if value.is_empty() || value.validate_email() {
+        return Ok(());
+    }
+    Err(ValidationError::new("email").with_message("must be an email address".into()))
 }
 
 /// Shape check only (`Area/Location` or `UTC`); the full tz database is not embedded.

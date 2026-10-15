@@ -3,6 +3,8 @@ import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { buttonClasses } from "../components/buttonClasses";
 import { MapPreview } from "../components/MapPreview";
+import { FeaturedJams } from "../features/landing/FeaturedJams";
+import { SiteCounts } from "../features/landing/SiteCounts";
 
 const STEPS = [
   {
@@ -22,12 +24,16 @@ const STEPS = [
   },
 ] as const;
 
-/** "/": the pitch and exactly two actions, Find a jam and Register a jam; no data (§1, §6). */
+/**
+ * "/": jams featured near the visitor first, then the pitch with exactly two actions, Find a
+ * jam and Register a jam, the site's counts and the organisers' steps (§1, §6).
+ */
 export function LandingPage() {
   const { t } = useTranslation();
   return (
     <>
       <title>BreakingJam</title>
+      <FeaturedJams />
       <section className="relative overflow-hidden">
         <div
           aria-hidden
@@ -69,6 +75,8 @@ export function LandingPage() {
           <MapPreview className="lg:col-span-7" />
         </div>
       </section>
+
+      <SiteCounts />
 
       <section className="border-t border-border lg:bg-surface">
         <div className="mx-auto grid max-w-content gap-8 px-4 py-10 md:px-6 lg:grid-cols-12 lg:gap-12 lg:px-8 lg:py-20">

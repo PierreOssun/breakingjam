@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "insert into events\n             (id, organizer_id, slug, name, description, starts_on, ends_on, timezone,\n              venue_name, address, city, country, lat, lng, registration_url, instagram_url)\n           values ($1, $2, $3, btrim($4), nullif(btrim($5), ''), $6, $7, $8,\n                   nullif(btrim($9), ''), nullif(btrim($10), ''), btrim($11), $12, $13, $14,\n                   nullif(btrim($15), ''), nullif(btrim($16), ''))\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, review_note, created_at, updated_at",
+  "query": "select id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                  registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at\n           from events\n           where deleted_at is null\n             and ($1::event_status is null or status = $1)\n             and ($2::text is null or country = $2)\n             and ($3::date is null or ends_on >= $3)\n             and ($4::date is null or starts_on <= $4)\n             and ($5::uuid is null or organizer_id = $5)\n             and ($5::uuid is not null or status not in ('draft', 'in_review'))\n             and ($6::date is null or (starts_on, id) > ($6, $7))\n           order by starts_on, id\n           limit $8",
   "describe": {
     "columns": [
       {
@@ -206,6 +206,28 @@
       },
       {
         "ordinal": 17,
+        "name": "website_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "website_url"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "contact_email",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "contact_email"
+          }
+        }
+      },
+      {
+        "ordinal": 19,
         "name": "review_note",
         "type_info": "Text",
         "origin": {
@@ -216,7 +238,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 20,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -227,7 +249,7 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 21,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -240,22 +262,28 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Uuid",
-        "Text",
-        "Text",
+        {
+          "Custom": {
+            "name": "event_status",
+            "kind": {
+              "Enum": [
+                "draft",
+                "in_review",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        },
         "Text",
         "Date",
         "Date",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Bpchar",
-        "Float8",
-        "Float8",
-        "Text",
-        "Text"
+        "Uuid",
+        "Date",
+        "Uuid",
+        "Int8"
       ]
     },
     "nullable": [
@@ -277,9 +305,11 @@
       true,
       true,
       true,
+      true,
+      true,
       false,
       false
     ]
   },
-  "hash": "4898bb9414206fd1e48ff06e5a08cd4503978cd832b3b83ccf0b3f56d103c0d7"
+  "hash": "6bcd1e1becde6f493c94a97d45ef962a8bbb47de18f466ec7004e0f737a71147"
 }

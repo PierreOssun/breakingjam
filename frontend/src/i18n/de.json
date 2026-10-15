@@ -80,11 +80,30 @@
       "title": "Für Veranstalter",
       "body": "Bring deine Jam dorthin, wo Tänzer:innen suchen.",
       "step1Title": "Jam anlegen",
-      "step1Body": "Name, Daten und Ort. Sie bleibt ein Entwurf, bis du sie veröffentlichst.",
+      "step1Body": "Name, Daten und Ort. Sie bleibt ein Entwurf, bis du sie zur Prüfung einreichst.",
       "step2Title": "Battles und Line-up",
       "step2Body": "1v1s, Crews, Seven to Smoke und deine Judges, DJ und MC.",
-      "step3Title": "Veröffentlichen",
-      "step3Body": "Sie erscheint auf der Karte und auf der Seite jeder Tänzerin und jedes Tänzers."
+      "step3Title": "Einreichen",
+      "step3Body": "Ein BreakingJam-Admin prüft sie, dann erscheint sie auf der Karte und auf der Seite jeder Tänzerin und jedes Tänzers."
+    },
+    "featured": {
+      "title": "In deiner Nähe",
+      "inCountry": "Kommende Jams: {{country}}",
+      "inCountryAndNearby": "Kommende Jams: {{country}} und Umgebung",
+      "nearby": "Die nächstgelegenen kommenden Jams",
+      "soonest": "Die nächsten Jams auf der Karte",
+      "map": "Zur Karte"
+    },
+    "counts": {
+      "title": "BreakingJam in Zahlen",
+      "countries": "Länder",
+      "battles": "Battles",
+      "dancers": "Tänzer:innen",
+      "byCountry": "Battles nach Land",
+      "battleCount_one": "{{count}} Battle",
+      "battleCount_other": "{{count}} Battles",
+      "more_one": "+ {{count}} weiteres Land",
+      "more_other": "+ {{count}} weitere Länder"
     }
   },
   "status": {
@@ -122,7 +141,9 @@
     },
     "organiser": "Veranstalter:in",
     "contact": "Kontakt",
-    "edit": "Jam bearbeiten"
+    "edit": "Jam bearbeiten",
+    "website": "Website",
+    "email": "E-Mail"
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -252,7 +273,10 @@
       "description": "Über die Jam",
       "registrationUrl": "Anmeldelink",
       "registrationUrlHint": "Wo sich Tänzer:innen für die Battles anmelden.",
-      "instagramUrl": "Instagram-Seite"
+      "instagramUrl": "Instagram-Seite",
+      "websiteUrl": "Website",
+      "contactEmail": "Kontakt-E-Mail",
+      "contactEmailHint": "Öffentlich: steht auf der Jam-Seite, damit Tänzer:innen dir schreiben können."
     },
     "location": {
       "title": "Auf der Karte",

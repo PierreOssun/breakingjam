@@ -28,6 +28,8 @@ const FIELDS = [
   "description",
   "registration_url",
   "instagram_url",
+  "website_url",
+  "contact_email",
 ] as const;
 
 type JamFormProps = {
@@ -182,6 +184,21 @@ export function JamForm({ initial, submitLabel, onSubmit }: JamFormProps) {
         error={errors.instagram_url?.message}
         {...register("instagram_url")}
       />
+      <TextField
+        type="url"
+        label={<OptionalLabel label={t("org.fields.websiteUrl")} />}
+        placeholder="https://"
+        error={errors.website_url?.message}
+        {...register("website_url")}
+      />
+      <TextField
+        type="email"
+        autoComplete="email"
+        label={<OptionalLabel label={t("org.fields.contactEmail")} />}
+        hint={t("org.fields.contactEmailHint")}
+        error={errors.contact_email?.message}
+        {...register("contact_email")}
+      />
       {errors.root?.message && (
         <p role="alert" className="text-body-sm font-bold text-danger">
           {errors.root.message}
@@ -239,6 +256,15 @@ function useJamSchema() {
           .max(5000, t("validation.tooLong", { max: 5000 })),
         registration_url: link,
         instagram_url: link,
+        website_url: link,
+        contact_email: z
+          .string()
+          .trim()
+          .max(254, t("validation.tooLong", { max: 254 }))
+          .refine(
+            (v) => v === "" || z.email().safeParse(v).success,
+            t("validation.email"),
+          ),
       })
       .refine((v) => !v.starts_on || !v.ends_on || v.ends_on >= v.starts_on, {
         path: ["ends_on"],

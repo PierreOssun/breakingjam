@@ -651,6 +651,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How far BreakingJam reaches: countries, battles (in total and per country) and dancers. */
+        get: operations["site_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/organizers/{id}": {
         parameters: {
             query?: never;
@@ -1007,6 +1024,16 @@ export interface components {
             /** @description Public name. */
             display_name: string;
         };
+        /** @description How many battles a country's public jams hold. */
+        CountryBattles: {
+            /** @description ISO 3166-1 alpha-2. */
+            country: string;
+            /**
+             * Format: int64
+             * @description Battles of its public jams.
+             */
+            battles: number;
+        };
         /** @description A stored crew. */
         Crew: {
             /**
@@ -1358,6 +1385,10 @@ export interface components {
             registration_url?: string | null;
             /** @description The jam's Instagram page. */
             instagram_url?: string | null;
+            /** @description The jam's own website. */
+            website_url?: string | null;
+            /** @description Where to write to the organisers; public. */
+            contact_email?: string | null;
             /** @description Why an admin sent it back to draft; null otherwise. */
             review_note?: string | null;
             /**
@@ -1411,6 +1442,10 @@ export interface components {
             registration_url?: string | null;
             /** @description The jam's Instagram page; blank is stored as null. */
             instagram_url?: string | null;
+            /** @description The jam's own website; blank is stored as null. */
+            website_url?: string | null;
+            /** @description Public contact address; blank is stored as null. */
+            contact_email?: string | null;
         };
         /** @description The jam side of a participation. */
         EventRef: {
@@ -1792,6 +1827,10 @@ export interface components {
                 registration_url?: string | null;
                 /** @description The jam's Instagram page. */
                 instagram_url?: string | null;
+                /** @description The jam's own website. */
+                website_url?: string | null;
+                /** @description Where to write to the organisers; public. */
+                contact_email?: string | null;
                 /** @description Why an admin sent it back to draft; null otherwise. */
                 review_note?: string | null;
                 /**
@@ -1887,6 +1926,26 @@ export interface components {
         RoleRequest: {
             /** @description The new role. */
             role: components["schemas"]["Role"];
+        };
+        /** @description What the landing page counts; public jams are announced or completed, never cancelled. */
+        SiteStats: {
+            /**
+             * Format: int64
+             * @description Countries with at least one public jam.
+             */
+            countries: number;
+            /**
+             * Format: int64
+             * @description Battles of public jams, past and upcoming.
+             */
+            battles: number;
+            /**
+             * Format: int64
+             * @description Dancer pages, merged and deleted ones left out.
+             */
+            dancers: number;
+            /** @description Battles per country, the busiest first. */
+            battles_by_country: components["schemas"]["CountryBattles"][];
         };
         /** @description One person on a jam's staff. */
         StaffAssignment: {
@@ -4403,6 +4462,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    site_stats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteStats"];
                 };
             };
         };

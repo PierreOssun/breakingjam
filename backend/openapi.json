@@ -3418,6 +3418,26 @@
         ]
       }
     },
+    "/api/stats": {
+      "get": {
+        "tags": [
+          "stats"
+        ],
+        "summary": "How far BreakingJam reaches: countries, battles (in total and per country) and dancers.",
+        "operationId": "site_stats",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteStats"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organizers/{id}": {
       "get": {
         "tags": [
@@ -4462,6 +4482,25 @@
           }
         }
       },
+      "CountryBattles": {
+        "type": "object",
+        "description": "How many battles a country's public jams hold.",
+        "required": [
+          "country",
+          "battles"
+        ],
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2."
+          },
+          "battles": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Battles of its public jams."
+          }
+        }
+      },
       "Crew": {
         "type": "object",
         "description": "A stored crew.",
@@ -5315,6 +5354,20 @@
             ],
             "description": "The jam's Instagram page."
           },
+          "website_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The jam's own website."
+          },
+          "contact_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where to write to the organisers; public."
+          },
           "review_note": {
             "type": [
               "string",
@@ -5422,6 +5475,20 @@
               "null"
             ],
             "description": "The jam's Instagram page; blank is stored as null."
+          },
+          "website_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The jam's own website; blank is stored as null."
+          },
+          "contact_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Public contact address; blank is stored as null."
           }
         }
       },
@@ -6356,6 +6423,20 @@
                   ],
                   "description": "The jam's Instagram page."
                 },
+                "website_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The jam's own website."
+                },
+                "contact_email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Where to write to the organisers; public."
+                },
                 "review_note": {
                   "type": [
                     "string",
@@ -6639,6 +6720,40 @@
           }
         }
       },
+      "SiteStats": {
+        "type": "object",
+        "description": "What the landing page counts; public jams are announced or completed, never cancelled.",
+        "required": [
+          "countries",
+          "battles",
+          "dancers",
+          "battles_by_country"
+        ],
+        "properties": {
+          "countries": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Countries with at least one public jam."
+          },
+          "battles": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Battles of public jams, past and upcoming."
+          },
+          "dancers": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Dancer pages, merged and deleted ones left out."
+          },
+          "battles_by_country": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountryBattles"
+            },
+            "description": "Battles per country, the busiest first."
+          }
+        }
+      },
       "StaffAssignment": {
         "type": "object",
         "description": "One person on a jam's staff.",
@@ -6864,6 +6979,10 @@
     {
       "name": "geo",
       "description": "Where the visitor is"
+    },
+    {
+      "name": "stats",
+      "description": "Public counts for the landing page"
     }
   ]
 }

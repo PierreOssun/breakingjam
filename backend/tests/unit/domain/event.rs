@@ -111,6 +111,16 @@ fn timezone_and_country_shapes() {
 }
 
 #[test]
+fn contact_emails_are_blank_or_addresses() {
+    assert!(email_or_blank("").is_ok());
+    assert!(email_or_blank("  ").is_ok());
+    assert!(email_or_blank(" hello@pariscypher.com ").is_ok());
+    assert!(email_or_blank("hello").is_err());
+    assert!(email_or_blank("hello@").is_err());
+    assert!(email_or_blank("mailto:hello@pariscypher.com").is_err());
+}
+
+#[test]
 fn links_are_blank_or_http() {
     assert!(web_url("").is_ok());
     assert!(web_url("  ").is_ok());

@@ -16,6 +16,8 @@ export type JamFormValues = {
   description: string;
   registration_url: string;
   instagram_url: string;
+  website_url: string;
+  contact_email: string;
 };
 
 /** The browser's timezone: the organiser is usually where the jam is. */
@@ -39,6 +41,8 @@ export function emptyJam(): JamFormValues {
     description: "",
     registration_url: "",
     instagram_url: "",
+    website_url: "",
+    contact_email: "",
   };
 }
 
@@ -58,6 +62,8 @@ export function jamValues(jam: Schemas["Event"]): JamFormValues {
     description: jam.description ?? "",
     registration_url: jam.registration_url ?? "",
     instagram_url: jam.instagram_url ?? "",
+    website_url: jam.website_url ?? "",
+    contact_email: jam.contact_email ?? "",
   };
 }
 
@@ -79,6 +85,8 @@ export function jamBody(values: JamFormValues): Schemas["EventFields"] {
     description: orNull(values.description),
     registration_url: orNull(values.registration_url),
     instagram_url: orNull(values.instagram_url),
+    website_url: orNull(values.website_url),
+    contact_email: orNull(values.contact_email),
   };
 }
 
