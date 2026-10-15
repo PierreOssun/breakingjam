@@ -5,7 +5,9 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, delete, get, id_of, post, put, send, set_role, sign_up};
+use test_app::{
+    TestResponse, app, delete, get, id_of, post, publish, put, send, set_role, sign_up,
+};
 use uuid::Uuid;
 
 const SPEC: &str = include_str!("../openapi.json");
@@ -79,6 +81,7 @@ fn valid_body(method: &str, path: &str) -> Value {
         ("put", "/api/crews/{id}") => json!({ "name": "Floor Lords" }),
         ("post", "/api/crews/{id}/members") => json!({ "dancer_id": id() }),
         ("post", "/api/admin/dancers/{id}/merge") => json!({ "into": id() }),
+        ("post", "/api/admin/events/{id}/reject") => json!({ "note": "Add the venue" }),
         ("put", "/api/admin/users/{id}/role") => json!({ "role": "user" }),
         ("put", "/api/organizers/{id}") => json!({ "display_name": "Floor Lords" }),
         _ => json!({}),
@@ -153,8 +156,8 @@ async fn every_paged_list_rejects_a_garbled_cursor(pool: PgPool) {
         checked += 1;
     }
     assert_eq!(
-        checked, 5,
-        "events, dancers, crews and both claim queues are paged"
+        checked, 6,
+        "events, dancers, crews, jams in review and both claim queues are paged"
     );
 }
 
@@ -179,15 +182,7 @@ async fn world(pool: PgPool) -> World {
     let owner = sign_up(&app, "owner@example.com").await;
     let owner_id = id_of(&send(&app, get("/api/auth/me", Some(&owner))).await);
     let jam = id_of(&send(&app, post("/api/events", jam(), Some(&owner))).await);
-    send(
-        &app,
-        post(
-            &format!("/api/events/{jam}/publish"),
-            json!({}),
-            Some(&owner),
-        ),
-    )
-    .await;
+    publish(&app, &pool, &jam, &owner).await;
     let battle_uri = format!("/api/events/{jam}/battles");
     let battle = id_of(&send(&app, post(&battle_uri, battle(), Some(&owner))).await);
     let dancer_body = json!({ "dancer_name": "Lil G", "country": "FR" });

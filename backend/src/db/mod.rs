@@ -7,6 +7,7 @@ pub mod dancers;
 pub mod events;
 pub mod organizers;
 pub mod sessions;
+pub mod stats;
 pub mod users;
 
 /// Rows `offset .. offset + limit` of an ordered query, for offset-paged lists.

@@ -36,6 +36,11 @@ const SEED_ADMIN: User = User {
     display_name: "BreakingJam Team",
     role: Role::SeedAdmin,
 };
+const ORGANIZER: User = User {
+    email: "organizer@breakingjam.local",
+    display_name: "Cypher Collective",
+    role: Role::Organizer,
+};
 
 struct Event {
     name: &'static str,
@@ -208,6 +213,23 @@ const EVENTS: &[Event] = &[
     },
 ];
 
+/// An ordinary organiser's jams, waiting in the admins' review queue.
+#[rustfmt::skip]
+const IN_REVIEW: &[Event] = &[
+    Event {
+        name: "Geneva Lakeside Battle", city: "Geneva", country: "CH", timezone: "Europe/Zurich", lat: 46.2044, lng: 6.1432,
+        starts_in_days: 60, length_days: 1, status: EventStatus::InReview,
+        staff: &[(Judge, "Atlas"), (Dj, "DJ Loopa")],
+        battles: &[Battle { prize: Some(("CHF", [800, 400, 200])), ..BBOY_1V1 }, CREW_2V2],
+    },
+    Event {
+        name: "Milan Breaking Weekend", city: "Milan", country: "IT", timezone: "Europe/Rome", lat: 45.4642, lng: 9.19,
+        starts_in_days: 25, length_days: 2, status: EventStatus::InReview,
+        staff: &[],
+        battles: &[BBOY_1V1, BGIRL_1V1],
+    },
+];
+
 struct Crew {
     name: &'static str,
     country: &'static str,
@@ -325,22 +347,25 @@ async fn main() -> anyhow::Result<()> {
     let mut tx = pool.begin().await?;
     insert_user(&mut tx, &ADMIN, &password).await?;
     let seed_admin = insert_user(&mut tx, &SEED_ADMIN, &password).await?;
+    let organizer = insert_user(&mut tx, &ORGANIZER, &password).await?;
     let crews = insert_crews(&mut tx).await?;
     let dancers = insert_dancers(&mut tx, seed_admin, &crews).await?;
     let ids = Ids {
         dancers,
         crews: CREWS.iter().map(|crew| crew.name).zip(crews).collect(),
     };
-    insert_events(&mut tx, seed_admin, &ids).await?;
+    insert_events(&mut tx, seed_admin, EVENTS, &ids).await?;
+    insert_events(&mut tx, organizer, IN_REVIEW, &ids).await?;
     tx.commit().await?;
 
     tracing::info!(
-        events = EVENTS.len(),
+        events = EVENTS.len() + IN_REVIEW.len(),
         dancers = DANCERS.len(),
         crews = CREWS.len(),
-        "seeded; log in as {} or {} with SEED_PASSWORD",
+        "seeded; log in as {}, {} or {} with SEED_PASSWORD",
         ADMIN.email,
         SEED_ADMIN.email,
+        ORGANIZER.email,
     );
     Ok(())
 }
@@ -521,8 +546,13 @@ async fn insert_dancers(
     Ok(ids)
 }
 
-async fn insert_events(conn: &mut PgConnection, organizer: Uuid, ids: &Ids) -> anyhow::Result<()> {
-    for event in EVENTS {
+async fn insert_events(
+    conn: &mut PgConnection,
+    organizer: Uuid,
+    events: &[Event],
+    ids: &Ids,
+) -> anyhow::Result<()> {
+    for event in events {
         let event_id = insert_event(conn, organizer, event).await?;
         for &(role, name) in event.staff {
             sqlx::query!(

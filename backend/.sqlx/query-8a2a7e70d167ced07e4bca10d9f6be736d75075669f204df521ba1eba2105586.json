@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set verified_at = now() where dancer_name = 'Lil G'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "8a2a7e70d167ced07e4bca10d9f6be736d75075669f204df521ba1eba2105586"
+}

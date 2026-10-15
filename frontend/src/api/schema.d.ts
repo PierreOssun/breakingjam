@@ -186,7 +186,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Move a jam along draft → published → registration_closed → completed, or cancel it. */
+        /**
+         * Move a jam along draft → in_review → published → registration_closed → completed, or
+         *     cancel it; the BreakingJam team publishes drafts without review.
+         */
         post: operations["transition_event"];
         delete?: never;
         options?: never;
@@ -546,6 +549,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The admin overview: what the site holds and what waits for review. */
+        get: operations["admin_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/dancers/{id}/merge": {
         parameters: {
             query?: never;
@@ -574,6 +594,57 @@ export interface paths {
         /** Change an account's role (not your own). */
         put: operations["set_user_role"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Jams waiting for an admin's approval, the soonest first. */
+        get: operations["list_jams_in_review"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/events/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve a jam in review: it goes public. */
+        post: operations["approve_jam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/events/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a jam in review back to draft, with a note for its organiser. */
+        post: operations["reject_jam"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1287,6 +1358,8 @@ export interface components {
             registration_url?: string | null;
             /** @description The jam's Instagram page. */
             instagram_url?: string | null;
+            /** @description Why an admin sent it back to draft; null otherwise. */
+            review_note?: string | null;
             /**
              * Format: date-time
              * @description Row creation time.
@@ -1378,7 +1451,7 @@ export interface components {
          * @description Lifecycle of a jam (§4 "Event status transitions").
          * @enum {string}
          */
-        EventStatus: "draft" | "published" | "registration_closed" | "completed" | "cancelled";
+        EventStatus: "draft" | "in_review" | "published" | "registration_closed" | "completed" | "cancelled";
         /** @description One jam on the map. */
         Feature: {
             /** @description Always `Feature`. */
@@ -1719,6 +1792,8 @@ export interface components {
                 registration_url?: string | null;
                 /** @description The jam's Instagram page. */
                 instagram_url?: string | null;
+                /** @description Why an admin sent it back to draft; null otherwise. */
+                review_note?: string | null;
                 /**
                  * Format: date-time
                  * @description Row creation time.
@@ -1730,6 +1805,18 @@ export interface components {
                  */
                 updated_at: string;
             }[];
+            /** @description Pass as `?cursor=` for the next page; null on the last one. */
+            next_cursor?: string | null;
+        };
+        /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
+        Page_EventResponse: {
+            /** @description At most `limit` rows. */
+            items: (components["schemas"]["Event"] & {
+                /** @description Whether the caller may edit it, change its status or delete it. */
+                can_edit: boolean;
+                /** @description Who runs it: the jam page's organiser card (M12c). */
+                organizer: components["schemas"]["OrganizerRef"];
+            })[];
             /** @description Pass as `?cursor=` for the next page; null on the last one. */
             next_cursor?: string | null;
         };
@@ -1786,6 +1873,11 @@ export interface components {
             /** @description Public name, at most 80 characters. */
             display_name: string;
         };
+        /** @description Body of `POST /admin/events/{id}/reject`. */
+        RejectRequest: {
+            /** @description What the organiser should change, shown on their jam editor. */
+            note: string;
+        };
         /**
          * @description Account role; declaration order is privilege order, so `>=` means "at least".
          * @enum {string}
@@ -1820,6 +1912,79 @@ export interface components {
          * @enum {string}
          */
         StaffRole: "judge" | "dj" | "mc" | "organizer" | "other";
+        /** @description What the site holds and what waits for an admin; percentages are left to the reader. */
+        Stats: {
+            /**
+             * Format: int64
+             * @description Public jams still to come or running.
+             */
+            jams_upcoming: number;
+            /**
+             * Format: int64
+             * @description Public jams that are over, completed or not.
+             */
+            jams_past: number;
+            /**
+             * Format: int64
+             * @description Jams waiting for an admin's approval.
+             */
+            jams_in_review: number;
+            /**
+             * Format: int64
+             * @description Jams still being prepared.
+             */
+            jams_draft: number;
+            /**
+             * Format: int64
+             * @description Jams called off.
+             */
+            jams_cancelled: number;
+            /**
+             * Format: int64
+             * @description Dancer pages, merged and deleted ones left out.
+             */
+            dancers: number;
+            /**
+             * Format: int64
+             * @description Dancer pages whose Instagram an admin confirmed.
+             */
+            dancers_verified: number;
+            /**
+             * Format: int64
+             * @description Dancer pages with an Instagram handle.
+             */
+            dancers_with_instagram: number;
+            /**
+             * Format: int64
+             * @description Accounts with the `organizer` role.
+             */
+            organizers: number;
+            /**
+             * Format: int64
+             * @description Organisers whose Instagram an admin confirmed.
+             */
+            organizers_verified: number;
+            /**
+             * Format: int64
+             * @description All accounts.
+             */
+            accounts: number;
+            /**
+             * Format: int64
+             * @description Accounts created in the last 30 days.
+             */
+            accounts_new: number;
+            /**
+             * Format: int64
+             * @description Dancer claims waiting for review.
+             */
+            dancer_claims_pending: number;
+            /**
+             * Format: int64
+             * @description Organiser claims waiting for review.
+             */
+            organizer_claims_pending: number;
+        };
         /** @description The logged-in account, as returned by register, login and me. */
         UserResponse: {
             /**
@@ -2302,8 +2467,8 @@ export interface operations {
             path: {
                 /** @description Jam id */
                 id: string;
-                /** @description Cancel is allowed from any status but completed */
-                transition: "publish" | "close-registration" | "complete" | "cancel";
+                /** @description `publish` is for `seed_admin`+; cancel is allowed from any status but completed */
+                transition: "submit" | "publish" | "close-registration" | "complete" | "cancel";
             };
             cookie?: never;
         };
@@ -2326,7 +2491,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Not the organiser nor `seed_admin`+ */
+            /** @description Not the organiser nor `seed_admin`+, or `publish` by an organiser */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3892,6 +4057,43 @@ export interface operations {
             };
         };
     };
+    admin_stats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Stats"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     merge_dancers: {
         parameters: {
             query?: never;
@@ -4015,6 +4217,186 @@ export interface operations {
                 };
             };
             /** @description Your own role */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_jams_in_review: {
+        parameters: {
+            query?: {
+                /** @description `next_cursor` of the previous page. */
+                cursor?: string;
+                /** @description Page size, defaulted and clamped by `page::limit`. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_EventResponse"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid cursor */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    approve_jam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Event"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such jam */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not in review */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    reject_jam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Event"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such jam */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not in review */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Blank or too long note */
             422: {
                 headers: {
                     [name: string]: unknown;

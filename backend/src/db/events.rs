@@ -20,7 +20,7 @@ pub struct ListFilter<'a> {
     pub from: Option<NaiveDate>,
     /// Jams starting on or before this date.
     pub to: Option<NaiveDate>,
-    /// Jams owned by this account; the only list that includes drafts, since they are private.
+    /// Jams owned by this account; the only list that includes drafts and jams in review.
     pub organizer_id: Option<Uuid>,
     /// Keyset cursor: rows strictly after `(starts_on, id)`.
     pub after: Option<(NaiveDate, Uuid)>,
@@ -69,7 +69,7 @@ pub async fn insert(
                    nullif(btrim($15), ''), nullif(btrim($16), ''))
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, created_at, updated_at"#,
+                     registration_url, instagram_url, review_note, created_at, updated_at"#,
         id,
         organizer_id,
         crate::domain::event::slug(&fields.name, id),
@@ -103,7 +103,7 @@ pub async fn update(pool: &PgPool, id: Uuid, fields: &EventFields) -> sqlx::Resu
            where id = $1 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, created_at, updated_at"#,
+                     registration_url, instagram_url, review_note, created_at, updated_at"#,
         id,
         fields.name,
         fields.description,
@@ -130,7 +130,7 @@ pub async fn find(pool: &PgPool, id_or_slug: &str) -> sqlx::Result<Option<Event>
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
                   starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                  registration_url, instagram_url, created_at, updated_at
+                  registration_url, instagram_url, review_note, created_at, updated_at
            from events
            where deleted_at is null and (id = $1 or slug = $2)"#,
         id,
@@ -147,7 +147,7 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
                   starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                  registration_url, instagram_url, created_at, updated_at
+                  registration_url, instagram_url, review_note, created_at, updated_at
            from events
            where deleted_at is null
              and ($1::event_status is null or status = $1)
@@ -155,7 +155,7 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
              and ($3::date is null or ends_on >= $3)
              and ($4::date is null or starts_on <= $4)
              and ($5::uuid is null or organizer_id = $5)
-             and ($5::uuid is not null or status <> 'draft')
+             and ($5::uuid is not null or status not in ('draft', 'in_review'))
              and ($6::date is null or (starts_on, id) > ($6, $7))
            order by starts_on, id
            limit $8"#,
@@ -187,7 +187,8 @@ pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
     .await
 }
 
-/// Moves a jam from `from` to `to`; `None` when the status changed under the caller.
+/// Moves a jam from `from` to `to`, clearing any review note; `None` when the status changed
+/// under the caller.
 pub async fn set_status(
     pool: &PgPool,
     id: Uuid,
@@ -197,16 +198,57 @@ pub async fn set_status(
     // Compare-and-set: two concurrent transitions must not both win.
     sqlx::query_as!(
         Event,
-        r#"update events set status = $3
+        r#"update events set status = $3, review_note = null
            where id = $1 and status = $2 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, created_at, updated_at"#,
+                     registration_url, instagram_url, review_note, created_at, updated_at"#,
         id,
         from as EventStatus,
         to as EventStatus,
     )
     .fetch_optional(pool)
+    .await
+}
+
+/// Records an admin's review: a jam in review moves to `to` with `note` for its organiser;
+/// `None` when it is no longer in review.
+pub async fn review(
+    pool: &PgPool,
+    id: Uuid,
+    to: EventStatus,
+    note: Option<&str>,
+) -> sqlx::Result<Option<Event>> {
+    sqlx::query_as!(
+        Event,
+        r#"update events set status = $2, review_note = $3
+           where id = $1 and status = 'in_review' and deleted_at is null
+           returning id, organizer_id, name, slug, description, status as "status: EventStatus",
+                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                     registration_url, instagram_url, review_note, created_at, updated_at"#,
+        id,
+        to as EventStatus,
+        note,
+    )
+    .fetch_optional(pool)
+    .await
+}
+
+/// Jams waiting for review, the soonest first since they are the most urgent.
+pub async fn in_review(pool: &PgPool, window: super::Window) -> sqlx::Result<Vec<Event>> {
+    sqlx::query_as!(
+        Event,
+        r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
+                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                  registration_url, instagram_url, review_note, created_at, updated_at
+           from events
+           where deleted_at is null and status = 'in_review'
+           order by starts_on, id
+           limit $1 offset $2"#,
+        window.limit,
+        window.offset,
+    )
+    .fetch_all(pool)
     .await
 }
 

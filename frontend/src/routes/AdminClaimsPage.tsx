@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { api, type Schemas } from "../api/client";
 import { Button } from "../components/Button";
+import { ExternalLink } from "../components/ExternalLink";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { useToast } from "../components/useToast";
 import { BREAKINGJAM_INSTAGRAM } from "../lib/instagram";
@@ -68,12 +69,12 @@ export function AdminClaimsPage() {
   });
 
   return (
-    <section className="mx-auto flex max-w-content flex-col gap-8 px-4 py-10 md:px-6 lg:px-8">
-      <title>{`${t("admin.claims.title")} · BreakingJam`}</title>
+    <section aria-labelledby="claims-title" className="flex flex-col gap-8">
+      <title>{`${t("admin.claims.title")} · ${t("admin.title")} · BreakingJam`}</title>
       <div className="flex flex-col gap-3">
-        <h1 className="font-display text-display-lg">
+        <h2 id="claims-title" className="font-display text-display-md">
           {t("admin.claims.title")}
-        </h1>
+        </h2>
         <p className="max-w-prose text-body text-muted">
           {t("admin.claims.intro", { account: BREAKINGJAM_INSTAGRAM })}
         </p>
@@ -127,7 +128,7 @@ function Queue({
   const items = queue.data?.pages.flatMap((page) => page.items) ?? [];
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="font-display text-display-sm">{title}</h2>
+      <h3 className="font-display text-display-sm">{title}</h3>
       {queue.isError && <p className="text-danger">{t("errors.generic")}</p>}
       {queue.isSuccess && items.length === 0 && (
         <InlineEmpty>{t("admin.claims.none")}</InlineEmpty>
@@ -162,7 +163,8 @@ function ClaimRow({ review, decide }: { review: Review; decide: DecideFn }) {
         throw new Error(error?.error.message ?? t("errors.generic"));
     },
     onSuccess: (_, decision) => {
-      void queryClient.invalidateQueries({ queryKey: ["admin", "claims"] });
+      // The claim queues and the overview counts.
+      void queryClient.invalidateQueries({ queryKey: ["admin"] });
       toast({
         kind: "success",
         message: t(
@@ -187,14 +189,12 @@ function ClaimRow({ review, decide }: { review: Review; decide: DecideFn }) {
             {review.name}
           </Link>
           {review.handle ? (
-            <a
+            <ExternalLink
               href={`https://instagram.com/${review.handle}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-body-sm font-bold text-primary-text underline"
+              className="text-body-sm"
             >
               @{review.handle}
-            </a>
+            </ExternalLink>
           ) : (
             <span className="text-body-sm text-muted">
               {t("admin.claims.noHandle")}

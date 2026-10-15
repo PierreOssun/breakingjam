@@ -65,11 +65,34 @@ export const routes: RouteObject[] = [
             element: <RequireAdmin />,
             children: [
               {
-                path: "/admin/claims",
+                path: "/admin",
                 lazy: async () => ({
-                  Component: (await import("./routes/AdminClaimsPage"))
-                    .AdminClaimsPage,
+                  Component: (await import("./features/admin/AdminLayout"))
+                    .AdminLayout,
                 }),
+                children: [
+                  {
+                    index: true,
+                    lazy: async () => ({
+                      Component: (await import("./routes/AdminOverviewPage"))
+                        .AdminOverviewPage,
+                    }),
+                  },
+                  {
+                    path: "jams",
+                    lazy: async () => ({
+                      Component: (await import("./routes/AdminJamsPage"))
+                        .AdminJamsPage,
+                    }),
+                  },
+                  {
+                    path: "claims",
+                    lazy: async () => ({
+                      Component: (await import("./routes/AdminClaimsPage"))
+                        .AdminClaimsPage,
+                    }),
+                  },
+                ],
               },
               {
                 path: "/admin/dancers/:id/merge",

@@ -367,7 +367,8 @@ async fn delete(
     Ok(StatusCode::NO_CONTENT)
 }
 
-/// Move a jam along draft → published → registration_closed → completed, or cancel it.
+/// Move a jam along draft → in_review → published → registration_closed → completed, or
+/// cancel it; the BreakingJam team publishes drafts without review.
 #[utoipa::path(
     post,
     path = "/events/{id}/{transition}",
@@ -375,13 +376,13 @@ async fn delete(
     operation_id = "transition_event",
     params(
         ("id" = Uuid, Path, description = "Jam id"),
-        ("transition" = inline(Transition), Path, description = "Cancel is allowed from any status but completed"),
+        ("transition" = inline(Transition), Path, description = "`publish` is for `seed_admin`+; cancel is allowed from any status but completed"),
     ),
     security(("session" = [])),
     responses(
         (status = OK, body = Event),
         (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+, or `publish` by an organiser", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
         (status = CONFLICT, description = "The current status does not allow it", body = ErrorEnvelope),
     )
@@ -392,6 +393,7 @@ async fn transition(
     Path((id, transition)): Path<(Uuid, Transition)>,
 ) -> Result<Json<Event>, AppError> {
     let event = writable(&state, &current, id).await?;
+    current.require(transition.required_role())?;
     let next = event
         .status
         .apply(transition)
@@ -485,9 +487,9 @@ async fn flyer_text(
     Ok((event, text))
 }
 
-/// Drafts are private to their writers; public jams may be cached briefly.
+/// Drafts and jams in review are private to their writers; public jams may be cached briefly.
 fn cache_control(event: &Event) -> &'static str {
-    if event.status == EventStatus::Draft {
+    if !event.status.is_public() {
         "private, no-store"
     } else {
         "public, max-age=300"

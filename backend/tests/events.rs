@@ -3,7 +3,7 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, delete, get, post, put, send, sign_up};
+use test_app::{TestResponse, app, delete, get, post, publish, put, send, set_role, sign_up};
 
 fn jam(name: &str) -> Value {
     json!({
@@ -128,7 +128,7 @@ async fn drafts_are_visible_to_writers_only(pool: PgPool) {
     assert_eq!(seen.status, StatusCode::OK);
     assert_eq!(seen.json["can_edit"], true, "seed_admin writes any jam");
 
-    act(&app, &owner, id, "publish").await;
+    publish(&app, &pool, id, &owner).await;
     let public = send(&app, get(&format!("/api/events/{slug}"), None)).await;
     assert_eq!(public.status, StatusCode::OK);
     assert_eq!(public.json["can_edit"], false);
@@ -142,7 +142,7 @@ async fn update_is_for_owner_and_seed_admin_and_keeps_the_slug(pool: PgPool) {
     let owner = sign_up(&app, "org@example.com").await;
     let created = create(&app, &owner, jam("Old Name")).await;
     let id = created.json["id"].as_str().unwrap();
-    act(&app, &owner, id, "publish").await;
+    publish(&app, &pool, id, &owner).await;
     let uri = format!("/api/events/{id}");
 
     let updated = send(&app, put(&uri, jam("New Name"), Some(&owner))).await;
@@ -168,7 +168,7 @@ async fn delete_is_soft_and_owner_only(pool: PgPool) {
     let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
-    act(&app, &owner, &id, "publish").await;
+    publish(&app, &pool, &id, &owner).await;
     let uri = format!("/api/events/{id}");
 
     let stranger = sign_up(&app, "other@example.com").await;
@@ -197,15 +197,21 @@ async fn delete_is_soft_and_owner_only(pool: PgPool) {
 
 #[sqlx::test]
 async fn status_transitions_follow_the_machine(pool: PgPool) {
-    let app = app(pool);
+    let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
 
     let completed_too_early = act(&app, &owner, &id, "complete").await;
     assert_eq!(completed_too_early.status, StatusCode::CONFLICT);
+    let unreviewed = act(&app, &owner, &id, "publish").await;
+    assert_eq!(
+        unreviewed.status,
+        StatusCode::FORBIDDEN,
+        "an organiser's jam goes through review"
+    );
 
+    publish(&app, &pool, &id, &owner).await;
     for (action, status) in [
-        ("publish", "published"),
         ("close-registration", "registration_closed"),
         ("complete", "completed"),
     ] {
@@ -238,7 +244,7 @@ async fn status_transitions_follow_the_machine(pool: PgPool) {
 
 #[sqlx::test]
 async fn list_shows_public_jams_with_filters_and_pages(pool: PgPool) {
-    let app = app(pool);
+    let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let mut ids = Vec::new();
     for (name, starts_on, country) in [
@@ -252,7 +258,7 @@ async fn list_shows_public_jams_with_filters_and_pages(pool: PgPool) {
         body["ends_on"] = json!(starts_on);
         body["country"] = json!(country);
         let id = draft_id(&app, &owner, body).await;
-        act(&app, &owner, &id, "publish").await;
+        publish(&app, &pool, &id, &owner).await;
         ids.push(id);
     }
     create(&app, &owner, jam("Draft")).await;
@@ -299,8 +305,10 @@ async fn list_shows_public_jams_with_filters_and_pages(pool: PgPool) {
 
 #[sqlx::test]
 async fn geojson_has_upcoming_public_jams_with_coordinates(pool: PgPool) {
-    let app = app(pool);
+    let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
+    // The BreakingJam team publishes without review.
+    set_role(&pool, "org@example.com", "seed_admin").await;
     let make = async |name: &str, actions: &[&str], coords: bool| {
         let mut body = jam(name);
         if !coords {
@@ -315,6 +323,7 @@ async fn geojson_has_upcoming_public_jams_with_coordinates(pool: PgPool) {
     make("Published", &["publish"], true).await;
     make("Closed", &["publish", "close-registration"], true).await;
     make("Draft", &[], true).await;
+    make("In review", &["submit"], true).await;
     make("Done", &["publish", "close-registration", "complete"], true).await;
     make("Nowhere", &["publish"], false).await;
 
@@ -340,7 +349,7 @@ fn text(response: &TestResponse) -> String {
 
 #[sqlx::test]
 async fn flyer_is_an_inlinable_svg_of_the_jam(pool: PgPool) {
-    let app = app(pool);
+    let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
     let battle = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
@@ -357,7 +366,7 @@ async fn flyer_is_an_inlinable_svg_of_the_jam(pool: PgPool) {
     assert_eq!(own_draft.status, StatusCode::OK);
     assert_eq!(own_draft.headers["cache-control"], "private, no-store");
 
-    act(&app, &owner, &id, "publish").await;
+    publish(&app, &pool, &id, &owner).await;
     let flyer = send(&app, get(&uri, None)).await;
     assert_eq!(flyer.status, StatusCode::OK);
     assert_eq!(
@@ -426,10 +435,10 @@ async fn flyer_speaks_the_page_language_and_shows_cancellation(pool: PgPool) {
 
 #[sqlx::test]
 async fn og_image_is_a_1200_by_630_png(pool: PgPool) {
-    let app = app(pool);
+    let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
-    act(&app, &owner, &id, "publish").await;
+    publish(&app, &pool, &id, &owner).await;
     let slug = send(&app, get(&format!("/api/events/{id}"), None))
         .await
         .json["slug"]
@@ -453,7 +462,7 @@ async fn og_image_is_a_1200_by_630_png(pool: PgPool) {
 
 #[sqlx::test]
 async fn geojson_carries_what_the_popup_and_filters_need(pool: PgPool) {
-    let app = app(pool);
+    let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
     let battles = [
@@ -468,7 +477,7 @@ async fn geojson_carries_what_the_popup_and_filters_need(pool: PgPool) {
         )
         .await;
     }
-    act(&app, &owner, &id, "publish").await;
+    publish(&app, &pool, &id, &owner).await;
 
     let response = send(&app, get("/api/events.geojson", None)).await;
     let properties = &response.json["features"][0]["properties"];

@@ -67,6 +67,7 @@
             "kind": {
               "Enum": [
                 "draft",
+                "in_review",
                 "published",
                 "registration_closed",
                 "completed",

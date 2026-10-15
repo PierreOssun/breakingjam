@@ -253,6 +253,7 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
 | State | Classes | Icon | Shown to |
 |---|---|---|---|
 | Draft | `border-dashed border-border-strong text-muted` | `PencilSimple` | Organiser only |
+| In review | `border-primary-text text-primary-text bg-primary/[.12]` | `HourglassMedium` | Organiser and admins only |
 | Published | `border-success text-success bg-success/[.12]` | filled 8px dot | Everyone |
 | Registration closed | `border-accent-text text-accent-text bg-accent/[.15]` | `Lock` | Everyone |
 | Completed | `border-border text-muted bg-surface-raised` | `Check` | Everyone |

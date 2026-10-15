@@ -22,6 +22,8 @@ use super::{
 pub enum EventStatus {
     /// Being prepared; visible to its writers only.
     Draft,
+    /// Submitted, waiting for an admin's approval; still visible to its writers only.
+    InReview,
     /// Announced and open for registration.
     Published,
     /// Announced, registration closed.
@@ -36,6 +38,7 @@ impl fmt::Display for EventStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
             Self::Draft => "draft",
+            Self::InReview => "in_review",
             Self::Published => "published",
             Self::RegistrationClosed => "registration_closed",
             Self::Completed => "completed",
@@ -48,25 +51,37 @@ impl fmt::Display for EventStatus {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "kebab-case")]
 pub enum Transition {
-    /// `draft` → `published`.
+    /// `draft` → `in_review`: an organiser asks for the jam to go public.
+    Submit,
+    /// `draft` → `published` without review, for the BreakingJam team.
     Publish,
     /// `published` → `registration_closed`.
     CloseRegistration,
     /// `registration_closed` → `completed`.
     Complete,
-    /// `draft`, `published` or `registration_closed` → `cancelled`.
+    /// Any status but `completed` and `cancelled` → `cancelled`.
     Cancel,
 }
 
 impl fmt::Display for Transition {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
+            Self::Submit => "submit",
             Self::Publish => "publish",
             Self::CloseRegistration => "close-registration",
             Self::Complete => "complete",
             Self::Cancel => "cancel",
         })
     }
+}
+
+/// An admin's decision on a jam in review.
+#[derive(Debug)]
+pub enum Review {
+    /// `in_review` → `published`.
+    Approve,
+    /// `in_review` → `draft`, with what the organiser should change.
+    Reject(String),
 }
 
 /// A transition that the current status does not allow.
@@ -79,18 +94,46 @@ pub struct InvalidTransition {
     pub transition: Transition,
 }
 
+impl Transition {
+    /// The lowest role that may make this change on a jam it can write: publishing skips
+    /// review, so it is the BreakingJam team's.
+    pub fn required_role(self) -> Role {
+        match self {
+            Self::Publish => Role::SeedAdmin,
+            _ => Role::User,
+        }
+    }
+}
+
 impl EventStatus {
-    /// The status after `transition`, following draft → published → registration_closed →
-    /// completed, with cancel allowed from any state except completed (and cancelled).
+    /// The status after `transition`, following draft → in_review → published →
+    /// registration_closed → completed (the team publishes drafts directly), with cancel
+    /// allowed from any state except completed and cancelled.
     pub fn apply(self, transition: Transition) -> Result<Self, InvalidTransition> {
         use EventStatus::*;
         match (self, transition) {
+            (Draft, Transition::Submit) => Ok(InReview),
             (Draft, Transition::Publish) => Ok(Published),
             (Published, Transition::CloseRegistration) => Ok(RegistrationClosed),
             (RegistrationClosed, Transition::Complete) => Ok(Completed),
-            (Draft | Published | RegistrationClosed, Transition::Cancel) => Ok(Cancelled),
+            (Draft | InReview | Published | RegistrationClosed, Transition::Cancel) => {
+                Ok(Cancelled)
+            }
             (from, transition) => Err(InvalidTransition { from, transition }),
         }
+    }
+
+    /// The status after an admin's `review`; `None` unless the jam is in review.
+    pub fn review(self, review: &Review) -> Option<Self> {
+        (self == Self::InReview).then_some(match review {
+            Review::Approve => Self::Published,
+            Review::Reject(_) => Self::Draft,
+        })
+    }
+
+    /// Drafts and jams in review are private to their writers.
+    pub fn is_public(self) -> bool {
+        !matches!(self, Self::Draft | Self::InReview)
     }
 }
 
@@ -131,6 +174,8 @@ pub struct Event {
     pub registration_url: Option<String>,
     /// The jam's Instagram page.
     pub instagram_url: Option<String>,
+    /// Why an admin sent it back to draft; null otherwise.
+    pub review_note: Option<String>,
     /// Row creation time.
     pub created_at: DateTime<Utc>,
     /// Last write, maintained by a trigger.
@@ -143,9 +188,9 @@ pub fn can_write(user: &User, organizer_id: Uuid) -> bool {
 }
 
 impl Event {
-    /// Drafts are private to their writers; every other status is public.
+    /// Drafts and jams in review are private to their writers; every other status is public.
     pub fn visible_to(&self, user: Option<&User>) -> bool {
-        self.status != EventStatus::Draft || user.is_some_and(|u| can_write(u, self.organizer_id))
+        self.status.is_public() || user.is_some_and(|u| can_write(u, self.organizer_id))
     }
 }
 

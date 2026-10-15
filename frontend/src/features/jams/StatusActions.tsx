@@ -8,23 +8,30 @@ import { Dialog } from "../../components/Dialog";
 import { InlineNotice } from "../../components/InlineNotice";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/useToast";
+import { useMe } from "../auth/useMe";
 
 type Jam = Schemas["EventResponse"];
-type Transition = "publish" | "close-registration" | "complete" | "cancel";
+type Transition =
+  "submit" | "publish" | "close-registration" | "complete" | "cancel";
 
-// §4 "Event status transitions": the one step forward from each status.
+// §4 "Event status transitions": the one step forward from each status. An organiser's draft
+// goes to review; the BreakingJam team publishes its own directly.
 const NEXT: Partial<Record<Schemas["EventStatus"], Transition>> = {
-  draft: "publish",
+  draft: "submit",
   published: "close-registration",
   registration_closed: "complete",
 };
 const CANCELLABLE: Schemas["EventStatus"][] = [
   "draft",
+  "in_review",
   "published",
   "registration_closed",
 ];
 
-/** Where the jam is in its lifecycle, the step forward, cancelling and deleting. */
+/**
+ * Where the jam is in its lifecycle, the step forward (review first, for organisers),
+ * cancelling and deleting, and the admin's note when a jam was sent back.
+ */
 export function StatusActions({ jam }: { jam: Jam }) {
   const { t } = useTranslation();
   const toast = useToast();
@@ -67,7 +74,11 @@ export function StatusActions({ jam }: { jam: Jam }) {
     onError: (error) => toast({ kind: "error", message: error.message }),
   });
 
-  const next = NEXT[jam.status];
+  const role = useMe().data?.role;
+  // The BreakingJam team publishes its drafts without review.
+  const teamDraft =
+    jam.status === "draft" && (role === "seed_admin" || role === "admin");
+  const next = teamDraft ? "publish" : NEXT[jam.status];
   return (
     <section
       aria-labelledby="status-title"
@@ -80,8 +91,15 @@ export function StatusActions({ jam }: { jam: Jam }) {
         <StatusBadge status={jam.status} />
       </div>
       <p className="text-body-sm text-muted">
-        {t(`org.status.explain.${jam.status}`)}
+        {teamDraft
+          ? t("org.status.explain.draftTeam")
+          : t(`org.status.explain.${jam.status}`)}
       </p>
+      {jam.status === "draft" && jam.review_note && (
+        <InlineNotice actionable>
+          {t("org.status.sentBack", { note: jam.review_note })}
+        </InlineNotice>
+      )}
       {jam.status !== "completed" &&
         jam.status !== "cancelled" &&
         jam.lat == null && (

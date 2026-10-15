@@ -190,11 +190,11 @@ describe("organiser pages", () => {
     ).toBeInTheDocument();
   });
 
-  it("publishes a draft and saves its details", async () => {
+  it("submits a draft for review and saves its details", async () => {
     const fetch = editApi({
-      [`POST /api/events/${ID}/publish`]: {
+      [`POST /api/events/${ID}/submit`]: {
         status: 200,
-        body: jam({ status: "published" }),
+        body: jam({ status: "in_review" }),
       },
       [`PUT /api/events/${ID}`]: {
         status: 200,
@@ -208,13 +208,17 @@ describe("organiser pages", () => {
         "Add a pin under “On the map” so dancers find it.",
       ),
     ).toBeInTheDocument();
+    // Organisers can't publish directly: a BreakingJam admin reviews each jam first.
+    expect(
+      within(status).queryByRole("button", { name: "Publish" }),
+    ).toBeNull();
 
     await userEvent.click(
-      within(status).getByRole("button", { name: "Publish" }),
+      within(status).getByRole("button", { name: "Submit for review" }),
     );
-    expect(await within(status).findByText("Published")).toBeInTheDocument();
+    expect(await within(status).findByText("In review")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent(
-      "Published. It’s on the map.",
+      "Submitted. A BreakingJam admin will review it soon.",
     );
 
     const name = screen.getByLabelText("Jam name");
@@ -225,6 +229,43 @@ describe("organiser pages", () => {
       name: "Paris Cypher Vol. 2",
       timezone: "Europe/Paris",
     });
+  });
+
+  it("shows why an admin sent the jam back", async () => {
+    editApi({
+      [`GET /api/events/${ID}`]: {
+        status: 200,
+        body: {
+          ...jam({ review_note: "Add the venue address." }),
+          can_edit: true,
+        },
+      },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+
+    expect(
+      await screen.findByText(
+        "Sent back by BreakingJam: Add the venue address.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("lets the BreakingJam team publish without review", async () => {
+    editApi({
+      "GET /api/auth/me": {
+        status: 200,
+        body: { ...LIL_G, role: "seed_admin" },
+      },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+    const status = await screen.findByRole("region", { name: /Status/ });
+
+    expect(
+      await within(status).findByRole("button", { name: "Publish" }),
+    ).toBeInTheDocument();
+    expect(
+      within(status).getByText(/As the BreakingJam team, you publish it/),
+    ).toBeInTheDocument();
   });
 
   it("adds a battle named from its fields", async () => {

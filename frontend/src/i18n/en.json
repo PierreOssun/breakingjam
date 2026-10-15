@@ -11,7 +11,7 @@
     "closeMenu": "Close menu",
     "skipToContent": "Skip to content",
     "language": "Language: {{name}}",
-    "claims": "Claims"
+    "admin": "Admin"
   },
   "footer": {
     "tagline": "The central place for breaking jams."
@@ -89,6 +89,7 @@
   },
   "status": {
     "draft": "Draft",
+    "in_review": "In review",
     "published": "Published",
     "registration_closed": "Registration closed",
     "completed": "Completed",
@@ -269,24 +270,28 @@
     "status": {
       "title": "Status",
       "explain": {
-        "draft": "Only you can see it. Publish it to put it on the map.",
+        "draft": "Only you can see it. Submit it for review: a BreakingJam admin checks each jam before it goes on the map.",
         "published": "On the map and open for registration.",
         "registration_closed": "On the map; registration is closed.",
         "completed": "It took place. Record the results in the battles below.",
-        "cancelled": "Called off. Its page says so."
+        "cancelled": "Called off. Its page says so.",
+        "in_review": "A BreakingJam admin is checking it. It goes on the map once approved; you can keep editing meanwhile.",
+        "draftTeam": "Only you can see it. As the BreakingJam team, you publish it directly."
       },
       "noPin": "Add a pin under “On the map” so dancers find it.",
       "action": {
         "publish": "Publish",
         "close-registration": "Close registration",
         "complete": "Mark as completed",
-        "cancel": "Cancel jam"
+        "cancel": "Cancel jam",
+        "submit": "Submit for review"
       },
       "done": {
         "publish": "Published. It’s on the map.",
         "close-registration": "Registration closed.",
         "complete": "Marked as completed.",
-        "cancel": "Jam cancelled."
+        "cancel": "Jam cancelled.",
+        "submit": "Submitted. A BreakingJam admin will review it soon."
       },
       "cancelTitle": "Cancel this jam?",
       "cancelBody": "“{{name}}” will show as cancelled. This can’t be undone.",
@@ -294,7 +299,8 @@
       "deleteTitle": "Delete this jam?",
       "deleteBody": "“{{name}}” disappears from the map and from dancers’ pages.",
       "deleted": "Jam deleted.",
-      "keep": "Keep it"
+      "keep": "Keep it",
+      "sentBack": "Sent back by BreakingJam: {{note}}"
     },
     "battles": {
       "none": "No battles yet. Add the first one.",
@@ -483,7 +489,8 @@
       "approved": "{{name}} is verified.",
       "rejected": "Claim on {{name}} rejected.",
       "dancers": "Dancers",
-      "organizers": "Organisers"
+      "organizers": "Organisers",
+      "tab": "Claims"
     },
     "merge": {
       "link": "Merge into another dancer",
@@ -494,6 +501,41 @@
       "confirm": "Merge",
       "change": "Choose someone else",
       "done": "{{from}} merged into {{into}}."
+    },
+    "title": "Admin",
+    "sections": "Admin sections",
+    "overview": {
+      "tab": "Overview",
+      "jams": "Upcoming jams",
+      "jamsDetail": "{{past}} past · {{draft}} drafts · {{cancelled}} cancelled",
+      "dancers": "Dancers",
+      "dancersDetail": "{{verified}} verified · {{instagram}} with Instagram",
+      "organizers": "Organisers",
+      "organizersDetail": "{{verified}} verified",
+      "accounts": "Accounts",
+      "accountsDetail_one": "+{{count}} in the last 30 days",
+      "accountsDetail_other": "+{{count}} in the last 30 days",
+      "toReview": "To review",
+      "jamsWaiting_one": "{{count}} jam waiting",
+      "jamsWaiting_other": "{{count}} jams waiting",
+      "dancerClaims_one": "{{count}} dancer claim",
+      "dancerClaims_other": "{{count}} dancer claims",
+      "organizerClaims_one": "{{count}} organiser claim",
+      "organizerClaims_other": "{{count}} organiser claims"
+    },
+    "jams": {
+      "tab": "Jams",
+      "title": "Jams to review",
+      "intro": "Check that each jam is real (its Instagram, dates and venue) before it goes on the map. Sending one back needs a note: its organiser sees it in their jam editor.",
+      "none": "No jams waiting.",
+      "by": "By",
+      "approve": "Approve",
+      "sendBack": "Send back",
+      "approved": "{{name}} is on the map.",
+      "sentBack": "{{name}} went back to its organiser.",
+      "sendBackTitle": "Send {{name}} back?",
+      "note": "What should the organiser change?",
+      "noteHint": "They see this in their jam editor."
     }
   },
   "organizer": {

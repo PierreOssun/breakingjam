@@ -3,9 +3,10 @@
 **[breakingjam.com](https://breakingjam.com)** · the central place for breaking jams: a world map of jams, jam registration for organisers, and the dancers and crews behind them.
 
 - **Find a jam:** a map of upcoming jams, filtered by date and battle category, searchable by name, city or country.
-- **Register a jam:** organisers create a jam, put it on the map, and run its battles, entries, results and lineup.
+- **Register a jam:** organisers create a jam, submit it for review, and run its battles, entries, results and lineup once a BreakingJam admin has approved it.
 - **Dancer pages:** every dancer's upcoming and past jams, results and battle videos, with a generated pixel avatar. Dancers verify their page through Instagram.
 - **Organiser pages:** the jams an organiser runs, verified the same way.
+- **Admin area:** counts of jams, dancers and accounts, the jams waiting for approval and the Instagram claims.
 
 UI in English, French and German. Scope, data model and decisions are in [`ARCHITECTURE_v0.1.md`](ARCHITECTURE_v0.1.md); the visual system is in [`DESIGN.md`](DESIGN.md).
 
@@ -33,7 +34,11 @@ Without `just`: `docker compose up -d`, then `cargo run` in `backend/` (it migra
 
 The map starts on the visitor's country, which Cloudflare provides in production. Locally, set `DEV_COUNTRY=CH` (any ISO code) in `frontend/.env`; without it the map frames every jam.
 
-The seeded accounts are `admin@breakingjam.local` and `seed@breakingjam.local` ("BreakingJam Team", who runs the demo jams), with `SEED_PASSWORD` from `backend/.env`. Sign in as the latter to manage the demo jams' dancers and lineups from their pages.
+The seeded accounts use `SEED_PASSWORD` from `backend/.env`:
+
+- `admin@breakingjam.local`: the admin area (`/admin`), with two jams waiting for review.
+- `seed@breakingjam.local` ("BreakingJam Team"): runs the demo jams; manage their dancers and lineups from their pages.
+- `organizer@breakingjam.local` ("Cypher Collective"): an ordinary organiser whose jams wait for review.
 
 ## Tests
 

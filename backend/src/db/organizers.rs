@@ -1,5 +1,7 @@
 //! Organiser pages (on `app_users`) and `organizer_claims` queries.
 
+use std::collections::HashMap;
+
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
@@ -35,6 +37,19 @@ pub async fn reference(pool: &PgPool, id: Uuid) -> sqlx::Result<OrganizerRef> {
     )
     .fetch_one(pool)
     .await
+}
+
+/// The organiser cards of `ids`, keyed by account id.
+pub async fn references(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, OrganizerRef>> {
+    let refs = sqlx::query_as!(
+        OrganizerRef,
+        r#"select id, display_name, instagram_handle, verified_at is not null as "verified!"
+           from app_users where id = any($1)"#,
+        ids,
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(refs.into_iter().map(|r| (r.id, r)).collect())
 }
 
 /// Replaces the page's fields; a new handle drops the tick and the pending claim on the old one.
@@ -77,13 +92,13 @@ pub async fn update(
     Ok(organizer)
 }
 
-/// The organiser's public jams (drafts left out), oldest first, each flagged upcoming or not.
+/// The organiser's public jams (drafts and jams in review left out), oldest first, each flagged upcoming or not.
 pub async fn events(pool: &PgPool, organizer_id: Uuid) -> sqlx::Result<Vec<(EventRef, bool)>> {
     let rows = sqlx::query!(
         r#"select id, name, slug, starts_on, ends_on, city, country,
                   status as "status: EventStatus", starts_on >= current_date as "upcoming!"
            from events
-           where organizer_id = $1 and deleted_at is null and status <> 'draft'
+           where organizer_id = $1 and deleted_at is null and status not in ('draft', 'in_review')
            order by starts_on, id"#,
         organizer_id,
     )

@@ -4,7 +4,7 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, get, post, put, send, set_role, sign_up};
+use test_app::{TestResponse, app, get, post, publish, put, send, set_role, sign_up};
 
 /// Signs up and registers a jam (which makes an organiser); returns (cookie, account id, jam id).
 async fn organizer(app: &Router, email: &str, starts_on: &str) -> (String, String, String) {
@@ -38,7 +38,7 @@ async fn claim(app: &Router, id: &str, cookie: &str) -> TestResponse {
 
 #[sqlx::test]
 async fn organisers_have_a_public_page_with_their_jams(pool: PgPool) {
-    let app = app(pool);
+    let app = app(pool.clone());
     let (cookie, id, jam) = organizer(&app, "org@example.com", "2030-06-01").await;
     let page = send(&app, get(&format!("/api/organizers/{id}"), None)).await;
     assert_eq!(page.status, StatusCode::OK);
@@ -49,19 +49,11 @@ async fn organisers_have_a_public_page_with_their_jams(pool: PgPool) {
         "the email is never public"
     );
 
-    // Drafts stay off the page until published.
+    // Drafts and jams in review stay off the page until published.
     let events = format!("/api/organizers/{id}/events");
     let before = send(&app, get(&events, None)).await;
     assert_eq!(before.json["upcoming"], json!([]));
-    send(
-        &app,
-        post(
-            &format!("/api/events/{jam}/publish"),
-            json!({}),
-            Some(&cookie),
-        ),
-    )
-    .await;
+    publish(&app, &pool, &jam, &cookie).await;
     let after = send(&app, get(&events, None)).await;
     assert_eq!(after.json["upcoming"][0]["id"], jam.as_str());
     assert_eq!(after.json["past"], json!([]));

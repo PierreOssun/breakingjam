@@ -1,4 +1,5 @@
-//! Admin-only actions besides claims: merging duplicate dancers and changing roles.
+//! Admin-only tools besides claims and jam reviews: the overview, merging duplicate dancers and
+//! changing roles.
 
 use axum::{
     Json,
@@ -14,7 +15,7 @@ use validator::Validate;
 use super::{auth::UserResponse, json::ValidJson};
 use crate::{
     auth::session::CurrentUser,
-    db,
+    db::{self, stats::Stats},
     domain::{
         dancer::{Dancer, merged_aliases},
         user::Role,
@@ -26,6 +27,7 @@ use crate::{
 /// `/admin/*` routes other than claims.
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
+        .routes(routes!(stats))
         .routes(routes!(merge))
         .routes(routes!(set_role))
 }
@@ -53,6 +55,27 @@ pub struct MergeResponse {
     pub aliases: Vec<String>,
     /// The survivor's handle, taken from the loser when it had none.
     pub instagram_handle: Option<String>,
+}
+
+/// The admin overview: what the site holds and what waits for review.
+#[utoipa::path(
+    get,
+    path = "/admin/stats",
+    tag = "admin",
+    operation_id = "admin_stats",
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Stats),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+    )
+)]
+async fn stats(
+    State(state): State<AppState>,
+    current: CurrentUser,
+) -> Result<Json<Stats>, AppError> {
+    current.require(Role::Admin)?;
+    Ok(Json(db::stats::overview(&state.pool).await?))
 }
 
 /// Merge a duplicate into `into`; `{id}` becomes a redirect.

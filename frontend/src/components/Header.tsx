@@ -103,7 +103,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
   );
 }
 
-/** The claims queue, for admins only. */
+/** The admin area, for admins only. */
 function AdminLink({
   className,
   onClick,
@@ -114,8 +114,8 @@ function AdminLink({
   const { t } = useTranslation();
   if (useMe().data?.role !== "admin") return null;
   return (
-    <NavLink to="/admin/claims" className={className} onClick={onClick}>
-      {t("nav.claims")}
+    <NavLink to="/admin" className={className} onClick={onClick}>
+      {t("nav.admin")}
     </NavLink>
   );
 }

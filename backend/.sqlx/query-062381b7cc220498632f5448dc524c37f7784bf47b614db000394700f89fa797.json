@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "insert into events\n             (id, organizer_id, slug, name, description, starts_on, ends_on, timezone,\n              venue_name, address, city, country, lat, lng, registration_url, instagram_url)\n           values ($1, $2, $3, btrim($4), nullif(btrim($5), ''), $6, $7, $8,\n                   nullif(btrim($9), ''), nullif(btrim($10), ''), btrim($11), $12, $13, $14,\n                   nullif(btrim($15), ''), nullif(btrim($16), ''))\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, created_at, updated_at",
+  "query": "select id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                  registration_url, instagram_url, review_note, created_at, updated_at\n           from events\n           where deleted_at is null and (id = $1 or slug = $2)",
   "describe": {
     "columns": [
       {
@@ -67,6 +67,7 @@
             "kind": {
               "Enum": [
                 "draft",
+                "in_review",
                 "published",
                 "registration_closed",
                 "completed",
@@ -205,6 +206,17 @@
       },
       {
         "ordinal": 17,
+        "name": "review_note",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "review_note"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -215,7 +227,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -229,20 +241,6 @@
     "parameters": {
       "Left": [
         "Uuid",
-        "Uuid",
-        "Text",
-        "Text",
-        "Text",
-        "Date",
-        "Date",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Bpchar",
-        "Float8",
-        "Float8",
-        "Text",
         "Text"
       ]
     },
@@ -264,9 +262,10 @@
       true,
       true,
       true,
+      true,
       false,
       false
     ]
   },
-  "hash": "71423973b831a333dbe27835ca87e7f3ddcde709f0758ea4eaf9ba7ce08d17d6"
+  "hash": "062381b7cc220498632f5448dc524c37f7784bf47b614db000394700f89fa797"
 }

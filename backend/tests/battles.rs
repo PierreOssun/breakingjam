@@ -3,17 +3,18 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, delete, get, id_of, post, put, send, sign_up};
+use test_app::{TestResponse, app, delete, get, id_of, post, publish, put, send, sign_up};
 
 struct Jam {
     app: Router,
+    pool: PgPool,
     owner: String,
     event_id: String,
 }
 
 /// A logged-in organiser with one draft jam.
 async fn jam(pool: PgPool) -> Jam {
-    let app = app(pool);
+    let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let body = json!({
         "name": "Paris Cypher", "starts_on": "2030-06-01", "ends_on": "2030-06-01",
@@ -27,6 +28,7 @@ async fn jam(pool: PgPool) -> Jam {
         .to_owned();
     Jam {
         app,
+        pool,
         owner,
         event_id,
     }
@@ -54,8 +56,7 @@ impl Jam {
     }
 
     async fn publish(&self) {
-        let uri = format!("/api/events/{}/publish", self.event_id);
-        send(&self.app, post(&uri, json!({}), Some(&self.owner))).await;
+        publish(&self.app, &self.pool, &self.event_id, &self.owner).await;
     }
 }
 

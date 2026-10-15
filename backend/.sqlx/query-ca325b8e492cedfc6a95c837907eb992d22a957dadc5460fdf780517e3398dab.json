@@ -1,0 +1,112 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "with jams as (\n             select status in ('published', 'registration_closed') as public, status, ends_on\n             from events where deleted_at is null\n           )\n           select\n             (select count(*) from jams where public and ends_on >= current_date) as \"jams_upcoming!\",\n             (select count(*) from jams\n              where status = 'completed' or (public and ends_on < current_date)) as \"jams_past!\",\n             (select count(*) from jams where status = 'in_review') as \"jams_in_review!\",\n             (select count(*) from jams where status = 'draft') as \"jams_draft!\",\n             (select count(*) from jams where status = 'cancelled') as \"jams_cancelled!\",\n             count(*) as \"dancers!\",\n             count(verified_at) as \"dancers_verified!\",\n             count(instagram_handle) as \"dancers_with_instagram!\",\n             (select count(*) from app_users where role = 'organizer') as \"organizers!\",\n             (select count(*) from app_users\n              where role = 'organizer' and verified_at is not null) as \"organizers_verified!\",\n             (select count(*) from app_users) as \"accounts!\",\n             (select count(*) from app_users\n              where created_at > now() - interval '30 days') as \"accounts_new!\",\n             (select count(*) from dancer_claims where status = 'pending') as \"dancer_claims_pending!\",\n             (select count(*) from organizer_claims\n              where status = 'pending') as \"organizer_claims_pending!\"\n           from dancers\n           where deleted_at is null and merged_into_id is null",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "jams_upcoming!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "jams_past!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "jams_in_review!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "jams_draft!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 4,
+        "name": "jams_cancelled!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 5,
+        "name": "dancers!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 6,
+        "name": "dancers_verified!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 7,
+        "name": "dancers_with_instagram!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 8,
+        "name": "organizers!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 9,
+        "name": "organizers_verified!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 10,
+        "name": "accounts!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 11,
+        "name": "accounts_new!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 12,
+        "name": "dancer_claims_pending!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 13,
+        "name": "organizer_claims_pending!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "ca325b8e492cedfc6a95c837907eb992d22a957dadc5460fdf780517e3398dab"
+}

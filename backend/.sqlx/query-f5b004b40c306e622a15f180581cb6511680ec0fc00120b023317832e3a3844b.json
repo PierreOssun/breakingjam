@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select e.id as \"event_id!\", e.name as \"event_name!\", e.slug as \"slug!\",\n                  e.starts_on as \"starts_on!\", e.ends_on as \"ends_on!\", e.city as \"city!\",\n                  e.country as \"country!\", e.status as \"status!: EventStatus\",\n                  e.starts_on >= current_date as \"upcoming!\",\n                  b.id as \"battle_id?\", b.name as \"battle_name?\",\n                  b.format as \"format?: BattleFormat\", b.team_size as \"team_size?\",\n                  b.gender as \"gender?: BattleGender\", b.age as \"age?: BattleAge\",\n                  null::staff_role as \"staff_role?: StaffRole\",\n                  en.status as \"entry_status?: EntryStatus\", en.reached as \"reached?: BracketStage\",\n                  en.final_rank as \"final_rank?\", en.video_url as \"video_url?\"\n           from entry_members m\n           join entries en on en.id = m.entry_id\n           join battles b on b.id = en.battle_id\n           join events e on e.id = b.event_id\n           where m.dancer_id = $1 and e.deleted_at is null and e.status <> 'draft'\n           union all\n           select e.id, e.name, e.slug, e.starts_on, e.ends_on, e.city, e.country, e.status,\n                  e.starts_on >= current_date,\n                  null::uuid, null::text, null::battle_format, null::smallint,\n                  null::battle_gender, null::battle_age, s.role,\n                  null::entry_status, null::bracket_stage, null::int, null::text\n           from event_staff s\n           join events e on e.id = s.event_id\n           where s.dancer_id = $1 and e.deleted_at is null and e.status <> 'draft'\n           order by 4, 1",
+  "query": "select e.id as \"event_id!\", e.name as \"event_name!\", e.slug as \"slug!\",\n                  e.starts_on as \"starts_on!\", e.ends_on as \"ends_on!\", e.city as \"city!\",\n                  e.country as \"country!\", e.status as \"status!: EventStatus\",\n                  e.starts_on >= current_date as \"upcoming!\",\n                  b.id as \"battle_id?\", b.name as \"battle_name?\",\n                  b.format as \"format?: BattleFormat\", b.team_size as \"team_size?\",\n                  b.gender as \"gender?: BattleGender\", b.age as \"age?: BattleAge\",\n                  null::staff_role as \"staff_role?: StaffRole\",\n                  en.status as \"entry_status?: EntryStatus\", en.reached as \"reached?: BracketStage\",\n                  en.final_rank as \"final_rank?\", en.video_url as \"video_url?\"\n           from entry_members m\n           join entries en on en.id = m.entry_id\n           join battles b on b.id = en.battle_id\n           join events e on e.id = b.event_id\n           where m.dancer_id = $1 and e.deleted_at is null and e.status not in ('draft', 'in_review')\n           union all\n           select e.id, e.name, e.slug, e.starts_on, e.ends_on, e.city, e.country, e.status,\n                  e.starts_on >= current_date,\n                  null::uuid, null::text, null::battle_format, null::smallint,\n                  null::battle_gender, null::battle_age, s.role,\n                  null::entry_status, null::bracket_stage, null::int, null::text\n           from event_staff s\n           join events e on e.id = s.event_id\n           where s.dancer_id = $1 and e.deleted_at is null and e.status not in ('draft', 'in_review')\n           order by 4, 1",
   "describe": {
     "columns": [
       {
@@ -54,6 +54,7 @@
             "kind": {
               "Enum": [
                 "draft",
+                "in_review",
                 "published",
                 "registration_closed",
                 "completed",
@@ -239,5 +240,5 @@
       null
     ]
   },
-  "hash": "bf2940fdc11c798a639bc700aa68e8fe67c070c309fc5e76e1233bd1710a88c9"
+  "hash": "f5b004b40c306e622a15f180581cb6511680ec0fc00120b023317832e3a3844b"
 }

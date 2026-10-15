@@ -664,7 +664,7 @@
         "tags": [
           "events"
         ],
-        "summary": "Move a jam along draft → published → registration_closed → completed, or cancel it.",
+        "summary": "Move a jam along draft → in_review → published → registration_closed → completed, or\ncancel it; the BreakingJam team publishes drafts without review.",
         "operationId": "transition_event",
         "parameters": [
           {
@@ -680,12 +680,13 @@
           {
             "name": "transition",
             "in": "path",
-            "description": "Cancel is allowed from any status but completed",
+            "description": "`publish` is for `seed_admin`+; cancel is allowed from any status but completed",
             "required": true,
             "schema": {
               "type": "string",
               "description": "An explicit status change: the last segment of `POST /events/{id}/{transition}`.",
               "enum": [
+                "submit",
                 "publish",
                 "close-registration",
                 "complete",
@@ -715,7 +716,7 @@
             }
           },
           "403": {
-            "description": "Not the organiser nor `seed_admin`+",
+            "description": "Not the organiser nor `seed_admin`+, or `publish` by an organiser",
             "content": {
               "application/json": {
                 "schema": {
@@ -2938,6 +2939,51 @@
         ]
       }
     },
+    "/api/admin/stats": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "The admin overview: what the site holds and what waits for review.",
+        "operationId": "admin_stats",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stats"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/admin/dancers/{id}/merge": {
       "post": {
         "tags": [
@@ -3106,6 +3152,256 @@
           },
           "422": {
             "description": "Your own role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/events": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Jams waiting for an admin's approval, the soonest first.",
+        "operationId": "list_jams_in_review",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_EventResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/events/{id}/approve": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Approve a jam in review: it goes public.",
+        "operationId": "approve_jam",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Not in review",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/events/{id}/reject": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Send a jam in review back to draft, with a note for its organiser.",
+        "operationId": "reject_jam",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Not in review",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Blank or too long note",
             "content": {
               "application/json": {
                 "schema": {
@@ -5019,6 +5315,13 @@
             ],
             "description": "The jam's Instagram page."
           },
+          "review_note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why an admin sent it back to draft; null otherwise."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -5204,6 +5507,7 @@
         "description": "Lifecycle of a jam (§4 \"Event status transitions\").",
         "enum": [
           "draft",
+          "in_review",
           "published",
           "registration_closed",
           "completed",
@@ -6052,6 +6356,13 @@
                   ],
                   "description": "The jam's Instagram page."
                 },
+                "review_note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Why an admin sent it back to draft; null otherwise."
+                },
                 "created_at": {
                   "type": "string",
                   "format": "date-time",
@@ -6063,6 +6374,52 @@
                   "description": "Last write, maintained by a trigger."
                 }
               }
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
+      "Page_EventResponse": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Event",
+                  "description": "The jam itself."
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "can_edit",
+                    "organizer"
+                  ],
+                  "properties": {
+                    "can_edit": {
+                      "type": "boolean",
+                      "description": "Whether the caller may edit it, change its status or delete it."
+                    },
+                    "organizer": {
+                      "$ref": "#/components/schemas/OrganizerRef",
+                      "description": "Who runs it: the jam page's organiser card (M12c)."
+                    }
+                  }
+                }
+              ],
+              "description": "A jam page: the jam, and whether the caller may edit it."
             },
             "description": "At most `limit` rows."
           },
@@ -6246,6 +6603,19 @@
           }
         }
       },
+      "RejectRequest": {
+        "type": "object",
+        "description": "Body of `POST /admin/events/{id}/reject`.",
+        "required": [
+          "note"
+        ],
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "What the organiser should change, shown on their jam editor."
+          }
+        }
+      },
       "Role": {
         "type": "string",
         "description": "Account role; declaration order is privilege order, so `>=` means \"at least\".",
@@ -6324,6 +6694,98 @@
           "other"
         ]
       },
+      "Stats": {
+        "type": "object",
+        "description": "What the site holds and what waits for an admin; percentages are left to the reader.",
+        "required": [
+          "jams_upcoming",
+          "jams_past",
+          "jams_in_review",
+          "jams_draft",
+          "jams_cancelled",
+          "dancers",
+          "dancers_verified",
+          "dancers_with_instagram",
+          "organizers",
+          "organizers_verified",
+          "accounts",
+          "accounts_new",
+          "dancer_claims_pending",
+          "organizer_claims_pending"
+        ],
+        "properties": {
+          "jams_upcoming": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Public jams still to come or running."
+          },
+          "jams_past": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Public jams that are over, completed or not."
+          },
+          "jams_in_review": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Jams waiting for an admin's approval."
+          },
+          "jams_draft": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Jams still being prepared."
+          },
+          "jams_cancelled": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Jams called off."
+          },
+          "dancers": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Dancer pages, merged and deleted ones left out."
+          },
+          "dancers_verified": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Dancer pages whose Instagram an admin confirmed."
+          },
+          "dancers_with_instagram": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Dancer pages with an Instagram handle."
+          },
+          "organizers": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Accounts with the `organizer` role."
+          },
+          "organizers_verified": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Organisers whose Instagram an admin confirmed."
+          },
+          "accounts": {
+            "type": "integer",
+            "format": "int64",
+            "description": "All accounts."
+          },
+          "accounts_new": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Accounts created in the last 30 days."
+          },
+          "dancer_claims_pending": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Dancer claims waiting for review."
+          },
+          "organizer_claims_pending": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Organiser claims waiting for review."
+          }
+        }
+      },
       "UserResponse": {
         "type": "object",
         "description": "The logged-in account, as returned by register, login and me.",
@@ -6393,7 +6855,7 @@
     },
     {
       "name": "admin",
-      "description": "Merging dancers and changing roles"
+      "description": "The overview, jam reviews, merging dancers and changing roles"
     },
     {
       "name": "organizers",

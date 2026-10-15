@@ -11,7 +11,7 @@
     "closeMenu": "Fermer le menu",
     "skipToContent": "Aller au contenu",
     "language": "Langue : {{name}}",
-    "claims": "Demandes"
+    "admin": "Admin"
   },
   "footer": {
     "tagline": "Le point central des jams de breaking."
@@ -89,6 +89,7 @@
   },
   "status": {
     "draft": "Brouillon",
+    "in_review": "En vérification",
     "published": "Publiée",
     "registration_closed": "Inscriptions closes",
     "completed": "Terminée",
@@ -269,24 +270,28 @@
     "status": {
       "title": "Statut",
       "explain": {
-        "draft": "Vous seul·e la voyez. Publiez-la pour la mettre sur la carte.",
+        "draft": "Vous seul·e la voyez. Envoyez-la en vérification : un·e admin BreakingJam vérifie chaque jam avant de la mettre sur la carte.",
         "published": "Sur la carte et ouverte aux inscriptions.",
         "registration_closed": "Sur la carte ; les inscriptions sont closes.",
         "completed": "Elle a eu lieu. Notez les résultats dans les battles ci-dessous.",
-        "cancelled": "Annulée. Sa page l’indique."
+        "cancelled": "Annulée. Sa page l’indique.",
+        "in_review": "Un·e admin BreakingJam la vérifie. Elle apparaît sur la carte une fois approuvée ; vous pouvez continuer à la modifier en attendant.",
+        "draftTeam": "Vous seul·e la voyez. En tant qu’équipe BreakingJam, vous la publiez directement."
       },
       "noPin": "Ajoutez une épingle dans « Sur la carte » pour qu’on la trouve.",
       "action": {
         "publish": "Publier",
         "close-registration": "Clore les inscriptions",
         "complete": "Marquer comme terminée",
-        "cancel": "Annuler la jam"
+        "cancel": "Annuler la jam",
+        "submit": "Envoyer en vérification"
       },
       "done": {
         "publish": "Publiée. Elle est sur la carte.",
         "close-registration": "Inscriptions closes.",
         "complete": "Marquée comme terminée.",
-        "cancel": "Jam annulée."
+        "cancel": "Jam annulée.",
+        "submit": "Envoyée. Un·e admin BreakingJam la vérifiera bientôt."
       },
       "cancelTitle": "Annuler cette jam ?",
       "cancelBody": "« {{name}} » apparaîtra comme annulée. Impossible de revenir en arrière.",
@@ -294,7 +299,8 @@
       "deleteTitle": "Supprimer cette jam ?",
       "deleteBody": "« {{name}} » disparaît de la carte et des pages des danseur·ses.",
       "deleted": "Jam supprimée.",
-      "keep": "La garder"
+      "keep": "La garder",
+      "sentBack": "Renvoyé par BreakingJam : {{note}}"
     },
     "battles": {
       "none": "Pas encore de battle. Ajoutez la première.",
@@ -483,7 +489,8 @@
       "approved": "{{name}} est vérifié·e.",
       "rejected": "Demande sur {{name}} refusée.",
       "dancers": "Danseur·ses",
-      "organizers": "Organisations"
+      "organizers": "Organisations",
+      "tab": "Demandes"
     },
     "merge": {
       "link": "Fusionner avec un·e autre danseur·se",
@@ -494,6 +501,41 @@
       "confirm": "Fusionner",
       "change": "Choisir quelqu’un d’autre",
       "done": "{{from}} fusionné·e avec {{into}}."
+    },
+    "title": "Admin",
+    "sections": "Sections admin",
+    "overview": {
+      "tab": "Vue d’ensemble",
+      "jams": "Jams à venir",
+      "jamsDetail": "{{past}} passées · {{draft}} brouillons · {{cancelled}} annulées",
+      "dancers": "Danseur·ses",
+      "dancersDetail": "{{verified}} vérifié·es · {{instagram}} avec Instagram",
+      "organizers": "Organisateur·ices",
+      "organizersDetail": "{{verified}} vérifié·es",
+      "accounts": "Comptes",
+      "accountsDetail_one": "+{{count}} ces 30 derniers jours",
+      "accountsDetail_other": "+{{count}} ces 30 derniers jours",
+      "toReview": "À vérifier",
+      "jamsWaiting_one": "{{count}} jam en attente",
+      "jamsWaiting_other": "{{count}} jams en attente",
+      "dancerClaims_one": "{{count}} demande de danseur·se",
+      "dancerClaims_other": "{{count}} demandes de danseur·ses",
+      "organizerClaims_one": "{{count}} demande d’organisateur·ice",
+      "organizerClaims_other": "{{count}} demandes d’organisateur·ices"
+    },
+    "jams": {
+      "tab": "Jams",
+      "title": "Jams à vérifier",
+      "intro": "Vérifiez que chaque jam est réelle (son Instagram, ses dates, son lieu) avant qu’elle apparaisse sur la carte. Pour en renvoyer une, il faut une note : son organisateur·ice la voit dans l’éditeur de la jam.",
+      "none": "Aucune jam en attente.",
+      "by": "Par",
+      "approve": "Approuver",
+      "sendBack": "Renvoyer",
+      "approved": "{{name}} est sur la carte.",
+      "sentBack": "{{name}} a été renvoyée à son organisateur·ice.",
+      "sendBackTitle": "Renvoyer {{name}} ?",
+      "note": "Que doit changer l’organisateur·ice ?",
+      "noteHint": "Visible dans l’éditeur de la jam."
     }
   },
   "organizer": {

@@ -354,7 +354,7 @@ pub async fn soft_delete(pool: &PgPool, id: Uuid) -> sqlx::Result<bool> {
     Ok(result.rows_affected() > 0)
 }
 
-/// Every public jam (not draft, not deleted) where the dancer competed or was staff.
+/// Every public jam (not draft, in review or deleted) where the dancer competed or was staff.
 pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<Participation>> {
     let rows = sqlx::query!(
         r#"select e.id as "event_id!", e.name as "event_name!", e.slug as "slug!",
@@ -371,7 +371,7 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
            join entries en on en.id = m.entry_id
            join battles b on b.id = en.battle_id
            join events e on e.id = b.event_id
-           where m.dancer_id = $1 and e.deleted_at is null and e.status <> 'draft'
+           where m.dancer_id = $1 and e.deleted_at is null and e.status not in ('draft', 'in_review')
            union all
            select e.id, e.name, e.slug, e.starts_on, e.ends_on, e.city, e.country, e.status,
                   e.starts_on >= current_date,
@@ -380,7 +380,7 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
                   null::entry_status, null::bracket_stage, null::int, null::text
            from event_staff s
            join events e on e.id = s.event_id
-           where s.dancer_id = $1 and e.deleted_at is null and e.status <> 'draft'
+           where s.dancer_id = $1 and e.deleted_at is null and e.status not in ('draft', 'in_review')
            order by 4, 1"#,
         dancer_id,
     )

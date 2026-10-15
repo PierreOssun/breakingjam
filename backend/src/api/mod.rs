@@ -12,6 +12,7 @@ mod health;
 mod json;
 mod organizers;
 pub(crate) mod page;
+mod reviews;
 
 use utoipa_axum::router::OpenApiRouter;
 
@@ -29,5 +30,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .merge(battles::router())
         .merge(claims::router())
         .merge(admin::router())
+        .merge(reviews::router())
         .merge(organizers::router())
 }

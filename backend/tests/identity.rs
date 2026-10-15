@@ -4,7 +4,7 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, get, post, put, send, set_role, sign_up};
+use test_app::{TestResponse, app, get, post, publish, put, send, set_role, sign_up};
 use uuid::Uuid;
 
 struct World {
@@ -231,15 +231,7 @@ async fn jam(w: &World) -> (String, String) {
         .as_str()
         .unwrap()
         .to_owned();
-    send(
-        &w.app,
-        post(
-            &format!("/api/events/{event}/publish"),
-            json!({}),
-            Some(&w.organizer),
-        ),
-    )
-    .await;
+    publish(&w.app, &w.pool, &event, &w.organizer).await;
     (event, battle)
 }
 

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, name, slug, starts_on, ends_on, city, country,\n                  status as \"status: EventStatus\", starts_on >= current_date as \"upcoming!\"\n           from events\n           where organizer_id = $1 and deleted_at is null and status <> 'draft'\n           order by starts_on, id",
+  "query": "select id, name, slug, starts_on, ends_on, city, country,\n                  status as \"status: EventStatus\", starts_on >= current_date as \"upcoming!\"\n           from events\n           where organizer_id = $1 and deleted_at is null and status not in ('draft', 'in_review')\n           order by starts_on, id",
   "describe": {
     "columns": [
       {
@@ -89,6 +89,7 @@
             "kind": {
               "Enum": [
                 "draft",
+                "in_review",
                 "published",
                 "registration_closed",
                 "completed",
@@ -128,5 +129,5 @@
       null
     ]
   },
-  "hash": "55d075f6a96eec96dafab519f003844d1f0fc89a470289b03e640d3259a785ae"
+  "hash": "4c9d981ef396017c34a1ad17900b12108f733e25ba437314d0fa1ad411f80b59"
 }

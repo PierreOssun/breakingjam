@@ -1,9 +1,16 @@
-import { Check, Lock, PencilSimple, X } from "@phosphor-icons/react";
+import {
+  Check,
+  HourglassMedium,
+  Lock,
+  PencilSimple,
+  X,
+} from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import type { Schemas } from "../api/client";
 
 const STYLES: Record<Schemas["EventStatus"], string> = {
   draft: "border-dashed border-border-strong text-muted",
+  in_review: "border-primary-text bg-primary/[.12] text-primary-text",
   published: "border-success bg-success/[.12] text-success",
   registration_closed: "border-accent-text bg-accent/[.15] text-accent-text",
   completed: "border-border bg-surface-raised text-muted",
@@ -15,6 +22,8 @@ function StatusIcon({ status }: { status: Schemas["EventStatus"] }) {
   switch (status) {
     case "draft":
       return <PencilSimple {...props} />;
+    case "in_review":
+      return <HourglassMedium {...props} />;
     case "published":
       return <span aria-hidden className="size-2 rounded-full bg-current" />;
     case "registration_closed":
