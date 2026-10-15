@@ -607,7 +607,7 @@ handstand            toprock
 - **Desktop 1024+:** `grid grid-cols-[340px_1fr] gap-12`. The left column is `sticky top-6` and holds the card, chips, action and a 2×2 stats grid. The right column holds the lists, with `display-md` section titles.
 - **Verify modal** (4.9 + 4.19):
   - Title "Verify it’s you", two lines of explanation, then the code.
-  - Buttons: **Copy code** (primary), **Open Instagram** (secondary, opens the @breaking.jam DM thread), **Done** (ghost).
+  - Buttons: **Copy code** (primary), **Open Instagram** (secondary, opens the @breakingjam DM thread), **Done** (ghost).
   - When someone else has already requested it: an inline notice above the code, and the request is still allowed.
   - Submitting moves the page to the pending state.
 - **Edit sheet** (4.9 + 4.20):
@@ -675,6 +675,52 @@ handstand            toprock
 - **Don't** set Unbounded below 16px, or use it for buttons, labels or body text.
 - **Don't** put white text on violet or blue fills except through `on-primary`. Don't use `#002FA7` in dark mode.
 - **Don't** add a second primary button in the same region, or hide labels behind icons without an `aria-label`.
+
+---
+
+## 10. Logo — “Jam” Bounce
+
+The social and app mark. The UI header keeps the text wordmark (“Breaking” + the “Jam” pill, §4.6). The logo is the same “Jam”, turned into a funky, flat-3D sticker.
+
+- **Build** (see `frontend/jam-logo-generator.py`):
+  - The word “Jam” in Unbounded 800, converted to outlines, with tracking −20 units.
+  - Inflated with a round-join stroke (80 units, same colour as the fill), so every corner is soft.
+  - **Bounce:** each letter is lifted or dropped and slightly rotated.
+    - J: 30 down, −7°
+    - a: 55 up, +5°
+    - m: 25 down, −4°
+  - Flat extrusion 150 units down-right in violet `#6D3AF5`, drawn as 16 solid steps.
+  - An ink `#0B0D14` outline 66 units wide around the face and the extrusion.
+  - The face is white, with a pale-blue `#C9D6FF` rim on its lower right.
+  - Everything is solid colour: no gradients, no blur, no lighting.
+- **Container:** a Klein `#002FA7` circle. The lettering spans 78% of the diameter, including the extrusion, and is optically centred.
+- **Sizes:**
+  - Down to 48px: the full “Jam”.
+  - Below 48px: the **J alone**, built the same way (favicon 32 and 16).
+  - Never put “Jam” below 32px.
+- **Clear space:** at least ¼ of the circle's diameter on every side, and nothing touching the circle.
+- **Backgrounds:** the circle works on ink, white, photos and flyers. Don't recolour the letters. On violet surfaces, use the Sticker variant (`logo/funky/jam-sticker.svg`).
+- **Exception to §9:** the tilt and extrusion belong to the logo only. Never apply them to UI text or components.
+- **Files** (`logo/final/`):
+  - `jam-logo.svg`: round master
+  - `jam-logo-square.svg`: full-bleed square
+  - `instagram-1080.png`: upload as the Instagram profile picture; Instagram crops it to the circle itself
+  - `app-icon-1024/512/192.png`: the OS applies its own mask
+  - `apple-touch-icon-180.png`
+  - `favicon.svg` and `favicon-48/32/16.png` (J only)
+  - `jam-logo-round-1024.png`: transparent corners
+- **HTML head:**
+  ```html
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon-180.png">
+  ```
+- **In the site** (`frontend/public/`):
+  - These files are linked as above: `favicon.svg`, `favicon-32.png`, `apple-touch-icon-180.png`.
+  - `site.webmanifest` lists `app-icon-192/512.png` and `jam-logo-square.svg` for Android and desktop installs.
+  - `jam-logo.svg` is published as-is.
+  - The square PNGs are rendered from `jam-logo-square.svg` with macOS QuickLook: `qlmanage -t -s <size> jam-logo-square.svg`.
+  - QuickLook flattens onto white, so the round `favicon-32.png` is rendered with headless Chrome: `--headless=new --screenshot --window-size=32,32 --default-background-color=00000000` on a page showing `favicon.svg` at 32px.
 
 ---
 

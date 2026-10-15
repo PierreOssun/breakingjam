@@ -94,7 +94,7 @@ breakingjam/
     │   ├── features/           # events/, dancers/, crews/, map/, auth/
     │   └── lib/
     ├── tests/                  # Vitest, mirroring src/ (M13)
-    └── public/                 # _headers, robots.txt, favicon
+    └── public/                 # _headers, robots.txt, logo icons and site.webmanifest (DESIGN.md §10)
 ├── deploy/                     # Cloudflare Worker, wrangler.jsonc, deploy guide (M13)
 ```
 

@@ -1,0 +1,24 @@
+{
+  "name": "BreakingJam",
+  "short_name": "BreakingJam",
+  "description": "The central place for breaking jams.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#0b0d14",
+  "theme_color": "#0b0d14",
+  "icons": [
+    {
+      "src": "/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    { "src": "/jam-logo-square.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

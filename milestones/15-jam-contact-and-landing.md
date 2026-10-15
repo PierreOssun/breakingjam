@@ -47,3 +47,15 @@ The landing page's "how it works" still said organisers publish their own jams. 
   - `featuredJams`: the country first, the nearest for a country without jams, the soonest for an unknown one, past jams left out, at most 6.
   - The landing page's featured section and counts (top 10, then "+ 1 more country").
   - The jam page's website and email links, and the form body.
+
+## Follow-up: the logo's icons
+
+The author added the "Jam" logo (DESIGN.md §10) and asked to use it in the site.
+
+- **Header and footer:** they keep the text wordmark, as §10 says. The author first chose to put the logo in the header. I had asked before reading §10, and then asked again; the author chose to follow §10.
+- **Where the logo appears:**
+  - The browser tab shows the J (`favicon.svg`, plus `favicon-32.png`).
+  - iOS home screens use `apple-touch-icon-180.png`.
+  - Android and desktop installs use `site.webmanifest`, which lists `app-icon-192/512.png` and the square SVG.
+  - The square PNGs are rendered from the author's SVGs with macOS QuickLook; the round `favicon-32.png` with headless Chrome on a transparent background, because QuickLook flattens onto white (DESIGN.md §10).
+- **Generator:** `jam-logo-generator.py` moved from `public/` (where it would have been published) to `frontend/`, next to the flyer's reference generator. It instances `backend/assets/fonts/Unbounded-wght.ttf` at weight 800 and writes the three SVGs into `public/` (`pip install fonttools skia-pathops`); the review found the first version never wrote anything and read its font from a temporary path.
