@@ -491,7 +491,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event"
+                  "$ref": "#/components/schemas/EventResponse"
                 }
               }
             }
@@ -2581,7 +2581,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Claim"
+                  "$ref": "#/components/schemas/MyClaim"
                 }
               }
             }
@@ -2636,7 +2636,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Claim"
+                  "$ref": "#/components/schemas/MyClaim"
                 }
               }
             }
@@ -3101,6 +3101,582 @@
           }
         ]
       }
+    },
+    "/api/organizers/{id}": {
+      "get": {
+        "tags": [
+          "organizers"
+        ],
+        "summary": "An organiser's page: name, Instagram, place, bio and the tick.",
+        "operationId": "get_organizer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Account id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizerResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such account, or it never registered a jam",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "organizers"
+        ],
+        "summary": "Replace your organiser page; a new Instagram handle needs verifying again.",
+        "operationId": "update_organizer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Account id: your own",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizerFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizerResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Someone else's page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No organiser page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Instagram handle already taken",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/organizers/{id}/events": {
+      "get": {
+        "tags": [
+          "organizers"
+        ],
+        "summary": "The organiser's public jams, split into upcoming and past.",
+        "operationId": "organizer_events",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Account id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizerEvents"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No organiser page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizers/{id}/claim": {
+      "get": {
+        "tags": [
+          "organizers"
+        ],
+        "summary": "Your latest Instagram claim.",
+        "operationId": "my_organizer_claim",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Account id: your own",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizerClaim"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Someone else's page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No claim yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "organizers"
+        ],
+        "summary": "Verify your Instagram: get a code for your bio; repeating returns the same pending claim.",
+        "operationId": "open_organizer_claim",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Account id: your own",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizerClaim"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Someone else's page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No organiser page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "No Instagram handle to verify",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/organizer-claims": {
+      "get": {
+        "tags": [
+          "organizers"
+        ],
+        "summary": "Organiser claims to review, oldest first.",
+        "operationId": "list_organizer_claims",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Defaults to `pending`.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ClaimStatus"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_OrganizerClaimForReview"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/organizer-claims/{id}/approve": {
+      "post": {
+        "tags": [
+          "organizers"
+        ],
+        "summary": "Approve: the organiser gets the tick, if the handle is still the one claimed.",
+        "operationId": "approve_organizer_claim",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Claim id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizerClaim"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such claim",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already reviewed, or the handle changed since",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/organizer-claims/{id}/reject": {
+      "post": {
+        "tags": [
+          "organizers"
+        ],
+        "summary": "Reject an organiser claim; they may ask again.",
+        "operationId": "reject_organizer_claim",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Claim id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizerClaim"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such claim",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already reviewed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -3428,7 +4004,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Shown to the user, who puts it in their Instagram bio or DMs it to @breakingjam."
+            "description": "Shown to the user, who puts it in their Instagram bio or DMs it to @breaking.jam."
           },
           "status": {
             "$ref": "#/components/schemas/ClaimStatus",
@@ -3751,6 +4327,13 @@
             ],
             "description": "Uploaded picture; null means the generated avatar."
           },
+          "avatar_parts": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The generated avatar's parts, e.g. `h2-s1-c0-o3-e0-b1`; null means seeded from the id."
+          },
           "merged_into_id": {
             "type": [
               "string",
@@ -3852,6 +4435,13 @@
               "null"
             ],
             "description": "`@handle` or `handle`; the identity key when present, unique case-insensitively."
+          },
+          "avatar_parts": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The generated avatar's parts (DESIGN.md §4.16); blank or absent means seeded from the id."
           }
         }
       },
@@ -4487,6 +5077,32 @@
           }
         }
       },
+      "EventResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Event",
+            "description": "The jam itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "can_edit",
+              "organizer"
+            ],
+            "properties": {
+              "can_edit": {
+                "type": "boolean",
+                "description": "Whether the caller may edit it, change its status or delete it."
+              },
+              "organizer": {
+                "$ref": "#/components/schemas/OrganizerRef",
+                "description": "Who runs it: the jam page's organiser card (M12c)."
+              }
+            }
+          }
+        ],
+        "description": "A jam page: the jam, and whether the caller may edit it."
+      },
       "EventStatus": {
         "type": "string",
         "description": "Lifecycle of a jam (§4 \"Event status transitions\").",
@@ -4737,6 +5353,269 @@
             "description": "The survivor's handle, taken from the loser when it had none."
           }
         }
+      },
+      "MyClaim": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Claim",
+            "description": "The claim itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "others_pending"
+            ],
+            "properties": {
+              "others_pending": {
+                "type": "boolean",
+                "description": "Another account has a pending claim on the same page; both go to review."
+              }
+            }
+          }
+        ],
+        "description": "Your claim on a dancer page, and whether someone else is claiming it too."
+      },
+      "Organizer": {
+        "type": "object",
+        "description": "An organiser's page; never the account's email or role.",
+        "required": [
+          "id",
+          "display_name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The account id."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Public name, shown on their jams."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lower case, no `@`."
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2."
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Home city."
+          },
+          "bio": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text."
+          },
+          "verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Set when an admin confirmed the handle; cleared when the handle changes."
+          }
+        }
+      },
+      "OrganizerClaim": {
+        "type": "object",
+        "description": "A request to confirm an organiser's Instagram handle.",
+        "required": [
+          "id",
+          "user_id",
+          "instagram_handle",
+          "code",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The organiser."
+          },
+          "instagram_handle": {
+            "type": "string",
+            "description": "The handle as it was when the claim was opened; approval confirms this one."
+          },
+          "code": {
+            "type": "string",
+            "description": "Shown to the organiser, who puts it in their Instagram bio or DMs it to @breaking.jam."
+          },
+          "status": {
+            "$ref": "#/components/schemas/ClaimStatus",
+            "description": "Review state."
+          },
+          "reviewed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When an admin decided; null while pending."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the claim was opened."
+          }
+        }
+      },
+      "OrganizerClaimForReview": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OrganizerClaim",
+            "description": "The claim itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "user"
+            ],
+            "properties": {
+              "user": {
+                "$ref": "#/components/schemas/ClaimUser",
+                "description": "Who is asking."
+              }
+            }
+          }
+        ],
+        "description": "An organiser claim in the admin review queue."
+      },
+      "OrganizerEvents": {
+        "type": "object",
+        "description": "Body of `GET /organizers/{id}/events`: upcoming soonest first, past most recent first.",
+        "required": [
+          "upcoming",
+          "past"
+        ],
+        "properties": {
+          "upcoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventRef"
+            },
+            "description": "Public jams starting today or later."
+          },
+          "past": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventRef"
+            },
+            "description": "Earlier public jams, cancelled ones included."
+          }
+        }
+      },
+      "OrganizerFields": {
+        "type": "object",
+        "description": "Everything an organiser sets on their page.",
+        "required": [
+          "display_name"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "description": "Public name, up to 80 characters; also the account's display name."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`@handle` or `handle`; unique case-insensitively. Changing it drops the tick."
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2."
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Blank is stored as null."
+          },
+          "bio": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Blank is stored as null."
+          }
+        }
+      },
+      "OrganizerRef": {
+        "type": "object",
+        "description": "The organiser shown on a jam page: name, tick and where to contact them.",
+        "required": [
+          "id",
+          "display_name",
+          "verified"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The account id; the page is `/organizers/{id}`."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Public name."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lower case, no `@`."
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Whether the handle is confirmed."
+          }
+        }
+      },
+      "OrganizerResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Organizer",
+            "description": "The page itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "can_edit"
+            ],
+            "properties": {
+              "can_edit": {
+                "type": "boolean",
+                "description": "Only the organiser edits their own page."
+              }
+            }
+          }
+        ],
+        "description": "An organiser page, and whether the caller may edit it."
       },
       "Page_ClaimForReview": {
         "type": "object",
@@ -5087,6 +5966,47 @@
           }
         }
       },
+      "Page_OrganizerClaimForReview": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/OrganizerClaim",
+                  "description": "The claim itself."
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/ClaimUser",
+                      "description": "Who is asking."
+                    }
+                  }
+                }
+              ],
+              "description": "An organiser claim in the admin review queue."
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
       "Participation": {
         "type": "object",
         "description": "One appearance at a public jam: the jam, the battle when competing, the result when known.",
@@ -5365,6 +6285,10 @@
     {
       "name": "admin",
       "description": "Merging dancers and changing roles"
+    },
+    {
+      "name": "organizers",
+      "description": "Organiser pages and their Instagram verification"
     }
   ]
 }

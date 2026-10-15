@@ -92,6 +92,7 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
         Dancer,
         r#"select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                   instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
+                  avatar_parts,
                   created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null"#,
         id,
@@ -111,12 +112,13 @@ pub async fn insert(
         Dancer,
         r#"insert into dancers
              (id, dancer_name, aliases, real_name, country, country2, city, bio,
-              instagram_handle, source, notable, created_by)
+              instagram_handle, source, notable, created_by, avatar_parts)
            values ($1, btrim($2), array(select btrim(a) from unnest($3::text[]) a),
                    nullif(btrim($4), ''), $5, $6, nullif(btrim($7), ''), nullif(btrim($8), ''),
-                   nullif(lower(ltrim(btrim($9), '@')), ''), $10, $11, $12)
+                   nullif(lower(ltrim(btrim($9), '@')), ''), $10, $11, $12, nullif(btrim($13), ''))
            returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                      instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
+                  avatar_parts,
                      created_by, merged_into_id, created_at, updated_at"#,
         Uuid::now_v7(),
         fields.dancer_name,
@@ -131,6 +133,7 @@ pub async fn insert(
         // §4: seeded dancers are the notable ones; it only affects search ranking.
         source == DancerSource::Seed,
         created_by,
+        fields.avatar_parts,
     )
     .fetch_one(pool)
     .await
@@ -148,10 +151,12 @@ pub async fn update(
              dancer_name = btrim($2), aliases = array(select btrim(a) from unnest($3::text[]) a),
              real_name = nullif(btrim($4), ''), country = $5, country2 = $6,
              city = nullif(btrim($7), ''), bio = nullif(btrim($8), ''),
-             instagram_handle = nullif(lower(ltrim(btrim($9), '@')), '')
+             instagram_handle = nullif(lower(ltrim(btrim($9), '@')), ''),
+             avatar_parts = nullif(btrim($10), '')
            where id = $1 and deleted_at is null
            returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                      instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
+                  avatar_parts,
                      created_by, merged_into_id, created_at, updated_at"#,
         id,
         fields.dancer_name,
@@ -162,6 +167,7 @@ pub async fn update(
         fields.city,
         fields.bio,
         fields.instagram_handle,
+        fields.avatar_parts,
     )
     .fetch_one(conn)
     .await
@@ -178,6 +184,7 @@ pub async fn find_for_update(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<
         Dancer,
         r#"select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                   instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
+                  avatar_parts,
                   created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null
            for update"#,

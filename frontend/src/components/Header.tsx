@@ -36,6 +36,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
           <NavLink to="/org/jams" end className={navLink}>
             {t("nav.forOrganisers")}
           </NavLink>
+          <AdminLink className={navLink} />
         </nav>
         <div className="flex-1" />
         <LanguageSwitch />
@@ -85,6 +86,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
             >
               {t("nav.forOrganisers")}
             </NavLink>
+            <AdminLink className={sheetLink} onClick={closeMenu} />
             <AccountAction className={sheetLink} onDone={closeMenu} />
           </nav>
           <div className="flex-1" />
@@ -98,6 +100,23 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
         </div>
       </dialog>
     </header>
+  );
+}
+
+/** The claims queue, for admins only. */
+function AdminLink({
+  className,
+  onClick,
+}: {
+  className: string;
+  onClick?: () => void;
+}) {
+  const { t } = useTranslation();
+  if (useMe().data?.role !== "admin") return null;
+  return (
+    <NavLink to="/admin/claims" className={className} onClick={onClick}>
+      {t("nav.claims")}
+    </NavLink>
   );
 }
 

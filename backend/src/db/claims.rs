@@ -47,6 +47,20 @@ pub async fn latest(pool: &PgPool, dancer_id: Uuid, user_id: Uuid) -> sqlx::Resu
     .await
 }
 
+/// Whether another account has a pending claim on the dancer (DESIGN.md §6 verify modal).
+pub async fn others_pending(pool: &PgPool, dancer_id: Uuid, user_id: Uuid) -> sqlx::Result<bool> {
+    sqlx::query_scalar!(
+        r#"select exists(
+             select 1 from dancer_claims
+             where dancer_id = $1 and user_id <> $2 and status = 'pending'
+           ) as "exists!""#,
+        dancer_id,
+        user_id,
+    )
+    .fetch_one(pool)
+    .await
+}
+
 /// The review queue for one status, oldest first.
 pub async fn list(
     pool: &PgPool,

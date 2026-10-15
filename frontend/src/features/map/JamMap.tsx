@@ -1,10 +1,5 @@
-import "maplibre-gl/dist/maplibre-gl.css";
 import { Crosshair, Minus, Plus } from "@phosphor-icons/react";
 import type { FeatureCollection, Point } from "geojson";
-import * as maplibre from "maplibre-gl";
-// Self-contained; as a `?url` asset Vite serves it in dev and emits it in the build.
-import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
-import { Protocol } from "pmtiles";
 import {
   type ReactNode,
   useCallback,
@@ -25,7 +20,7 @@ import MapView, {
 import { dayAndMonth, formatDateRange } from "../../lib/dates";
 import { useMediaQuery } from "../../lib/useMediaQuery";
 import { type Bounds, boundsOf, clusterLabel, type MapJam } from "./jams";
-import { mapStyle, tileSource } from "./style";
+import { maplibre, useMapStyle } from "./maplibre";
 import {
   type Box,
   type MarkerItem,
@@ -41,17 +36,6 @@ const DATE_TAGS_FROM = 12;
 // Where the anchored popup's caret ends: 14px (half the selected marker) plus an 8px gap.
 const POPUP_LIFT = 22;
 const MOVE_MS = 600;
-
-const TILES = tileSource({
-  tilesUrl: import.meta.env.VITE_TILES_URL,
-  key: import.meta.env.VITE_PROTOMAPS_KEY,
-});
-// MapLibre finds its worker next to its own module, which Vite moves (pre-bundling in dev,
-// hashed chunks in the build); without this the map never draws.
-maplibre.setWorkerUrl(workerUrl);
-if (import.meta.env.VITE_TILES_URL?.startsWith("pmtiles://")) {
-  maplibre.addProtocol("pmtiles", new Protocol().tile);
-}
 
 /** A camera move asked for by the page: a new object for each move. */
 export type Camera =
@@ -77,14 +61,6 @@ type JamMapProps = {
   onLocate?: () => void;
 };
 
-/** The page's colour scheme: an explicit `data-theme`, else the OS setting (§2.1). */
-function useTheme(): "dark" | "light" {
-  const osLight = useMediaQuery("(prefers-color-scheme: light)");
-  const chosen = document.documentElement.dataset.theme;
-  if (chosen === "dark" || chosen === "light") return chosen;
-  return osLight ? "light" : "dark";
-}
-
 /**
  * The world map of jams (DESIGN.md §7): MapLibre with Protomaps tiles, clustered HTML
  * markers, and the selected jam's popup anchored above its marker.
@@ -92,18 +68,14 @@ function useTheme(): "dark" | "light" {
 export function JamMap(props: JamMapProps) {
   const { jams, selected, onSelect, camera, insets, popup, userLocation } =
     props;
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const mapRef = useRef<MapRef>(null);
   const popupRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const [markers, setMarkers] = useState<MarkerItem[]>([]);
   const [zoom, setZoom] = useState(0);
-  const theme = useTheme();
+  const style = useMapStyle();
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const style = useMemo(
-    () => mapStyle(theme, i18n.resolvedLanguage ?? "en", TILES),
-    [theme, i18n.resolvedLanguage],
-  );
 
   // Read by map callbacks without re-subscribing them on every render.
   const latest = useRef({ props, reducedMotion });

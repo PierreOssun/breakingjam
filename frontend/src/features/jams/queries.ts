@@ -1,4 +1,4 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueries, useQuery } from "@tanstack/react-query";
 import { api } from "../../api/client";
 
 // Reads behind the jam page; a missing or hidden jam is `null`, not an error.
@@ -56,5 +56,21 @@ export function useStaff(eventId: string) {
       if (!data) throw new Error(`staff: ${response.status}`);
       return data;
     },
+  });
+}
+
+/** The caller's own jams, drafts included, a page at a time (`GET /events?mine=true`). */
+export function useMyJams() {
+  return useInfiniteQuery({
+    queryKey: ["events", "mine"],
+    queryFn: async ({ pageParam }) => {
+      const { data, response } = await api.GET("/api/events", {
+        params: { query: { mine: true, cursor: pageParam } },
+      });
+      if (!data) throw new Error(`my jams: ${response.status}`);
+      return data;
+    },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next_cursor ?? undefined,
   });
 }

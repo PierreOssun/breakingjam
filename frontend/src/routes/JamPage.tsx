@@ -4,6 +4,7 @@ import {
   CalendarBlank,
   InstagramLogo,
   MapPin,
+  PencilSimple,
   Play,
 } from "@phosphor-icons/react";
 import { useState, type ReactNode } from "react";
@@ -16,6 +17,7 @@ import { InlineEmpty } from "../components/InlineEmpty";
 import { ResultBadge } from "../components/ResultBadge";
 import { ShareButton } from "../components/ShareButton";
 import { StatusBadge } from "../components/StatusBadge";
+import { VerifiedTick } from "../components/VerifiedTick";
 import { VideoDialog, type Video } from "../components/VideoDialog";
 import { JamFlyer } from "../features/jams/JamFlyer";
 import {
@@ -29,7 +31,7 @@ import { formatDateRange } from "../lib/dates";
 import { instagramLabel } from "../lib/instagram";
 import { NotFoundPage } from "./NotFoundPage";
 
-type Jam = Schemas["Event"];
+type Jam = Schemas["EventResponse"];
 type Entry = Schemas["Entry"];
 
 // Where a result sorts: exact placement first, else the stage reached.
@@ -86,7 +88,18 @@ function JamDetail({ jam }: { jam: Jam }) {
           <ArrowLeft size={16} weight="bold" aria-hidden />
           {t("jam.backToMap")}
         </Link>
-        <ShareButton title={jam.name} />
+        <div className="flex items-center gap-1">
+          {jam.can_edit && (
+            <Link
+              to={`/org/jams/${jam.id}/edit`}
+              className={buttonClasses("ghost", "sm")}
+            >
+              <PencilSimple size={16} weight="bold" aria-hidden />
+              {t("jam.edit")}
+            </Link>
+          )}
+          <ShareButton title={jam.name} />
+        </div>
       </div>
 
       <div className="mx-auto max-w-content lg:grid lg:grid-cols-[440px_1fr] lg:gap-16 lg:px-8">
@@ -204,6 +217,9 @@ function JamDetail({ jam }: { jam: Jam }) {
               )}
             </Section>
           )}
+          <Section title={t("jam.organiser")}>
+            <OrganizerCard organizer={jam.organizer} />
+          </Section>
         </div>
       </div>
 
@@ -313,6 +329,37 @@ function BattleCard({
         </ul>
       )}
     </li>
+  );
+}
+
+/** DESIGN.md §6 jam detail, item 9: who runs it, and a way to reach them. */
+function OrganizerCard({ organizer }: { organizer: Jam["organizer"] }) {
+  const { t } = useTranslation();
+  const handle = organizer.instagram_handle;
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface p-4">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <Link
+          to={`/organizers/${organizer.id}`}
+          className="truncate text-body font-extrabold underline-offset-2 hover:underline"
+        >
+          {organizer.display_name}
+        </Link>
+        {organizer.verified && <VerifiedTick />}
+      </div>
+      {handle && (
+        // An Instagram DM: organisers are reached where they already are.
+        <a
+          href={`https://ig.me/m/${handle}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonClasses("secondary", "sm")}
+        >
+          <InstagramLogo size={16} weight="bold" aria-hidden />
+          {t("jam.contact")}
+        </a>
+      )}
+    </div>
   );
 }
 

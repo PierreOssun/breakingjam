@@ -20,11 +20,26 @@ export function renderApp(path: string) {
 /** A JSON `body`, or a raw `text` body (e.g. an SVG) with its content `type`. */
 type Reply = { status: number; body?: unknown; text?: string; type?: string };
 
-/** Stubs `fetch` with canned replies keyed by `"METHOD /path"`; anything else is a 404. */
-export function mockApi(replies: Record<string, Reply>) {
-  const fetch = vi.fn(async (request: Request) => {
-    const key = `${request.method} ${new URL(request.url).pathname}`;
-    const reply = replies[key] ?? {
+// `fetch` takes a Request (the API client) or a URL string (`geocode`).
+const asRequest = (input: Request | string) =>
+  typeof input === "string" ? new Request(input) : input;
+const keyOf = (request: Request) =>
+  `${request.method} ${new URL(request.url).pathname}`;
+
+/**
+ * Stubs `fetch` with canned replies keyed by `"METHOD /path"`; anything else is a 404. A reply
+ * may be a function of the call number, for lists that change after a save.
+ */
+export function mockApi(
+  replies: Record<string, Reply | ((n: number) => Reply)>,
+) {
+  const seen = new Map<string, number>();
+  const fetch = vi.fn(async (input: Request | string) => {
+    const key = keyOf(asRequest(input));
+    const n = seen.get(key) ?? 0;
+    seen.set(key, n + 1);
+    const canned = replies[key];
+    const reply = (typeof canned === "function" ? canned(n) : canned) ?? {
       status: 404,
       body: { error: { code: "not_found", message: key } },
     };
@@ -44,11 +59,19 @@ export function mockApi(replies: Record<string, Reply>) {
   return fetch;
 }
 
+/** The JSON body of the last `"METHOD /path"` call. */
+export async function bodyOf(fetch: ReturnType<typeof mockApi>, key: string) {
+  const request = fetch.mock.calls
+    .map(([input]) => asRequest(input))
+    .filter((r) => keyOf(r) === key)
+    .at(-1);
+  if (!request) throw new Error(`no ${key} call`);
+  return request.clone().json();
+}
+
 /** The calls `fetch` received, as `"METHOD /path"`. */
 export function calls(fetch: ReturnType<typeof mockApi>) {
-  return fetch.mock.calls.map(
-    ([request]) => `${request.method} ${new URL(request.url).pathname}`,
-  );
+  return fetch.mock.calls.map(([input]) => keyOf(asRequest(input)));
 }
 
 export const LOGGED_OUT = {

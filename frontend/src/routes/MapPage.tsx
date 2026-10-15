@@ -3,8 +3,6 @@ import {
   ListBullets,
   MapPin,
   SlidersHorizontal,
-  WarningCircle,
-  X,
 } from "@phosphor-icons/react";
 import {
   type ReactNode,
@@ -15,7 +13,7 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "../components/Button";
+import { useToast } from "../components/useToast";
 import { FilterChips } from "../features/map/FilterChips";
 import { FilterSheet } from "../features/map/FilterSheet";
 import { JamPopup, JamSheet } from "../features/map/JamCard";
@@ -79,6 +77,7 @@ function useHeight(): [(element: HTMLElement | null) => void, number] {
  */
 export function MapPage() {
   const { t, i18n } = useTranslation();
+  const toast = useToast();
   const wide = useMediaQuery("(min-width: 1024px)");
   const jams = useMapJams();
   const all = jams.data;
@@ -90,7 +89,6 @@ export function MapPage() {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [camera, setCamera] = useState<Camera | null>(null);
   const [userLocation, setUserLocation] = useState<LngLat | null>(null);
-  const [locateFailed, setLocateFailed] = useState(false);
   const [listOpen, setListOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -179,18 +177,19 @@ export function MapPage() {
   }
 
   function locate() {
+    const failed = () =>
+      toast({ kind: "error", message: t("map.locateError") });
     if (!navigator.geolocation) {
-      setLocateFailed(true);
+      failed();
       return;
     }
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const here = { lng: coords.longitude, lat: coords.latitude };
-        setLocateFailed(false);
         setUserLocation(here);
         setCamera({ kind: "center", ...here, zoom: 10 });
       },
-      () => setLocateFailed(true),
+      failed,
       { timeout: 10_000, maximumAge: 5 * 60_000 },
     );
   }
@@ -230,9 +229,6 @@ export function MapPage() {
       onLocate={wide ? locate : undefined}
     />
   );
-  const failure = locateFailed && (
-    <LocateFailed onDismiss={() => setLocateFailed(false)} />
-  );
 
   if (wide) {
     return (
@@ -271,7 +267,6 @@ export function MapPage() {
           )}
         </aside>
         <div className="relative flex-1">{map}</div>
-        {failure}
       </div>
     );
   }
@@ -389,7 +384,6 @@ export function MapPage() {
         onChange={setFilters}
         count={inView.length}
       />
-      {failure}
     </div>
   );
 }
@@ -440,32 +434,5 @@ function FilterButton({
         />
       )}
     </button>
-  );
-}
-
-/** §4.8 error toast: stays until dismissed. */
-function LocateFailed({ onDismiss }: { onDismiss: () => void }) {
-  const { t } = useTranslation();
-  return (
-    <div
-      role="alert"
-      className="fixed inset-x-4 bottom-4 z-50 flex items-center gap-3 rounded-lg border border-border-strong bg-surface-raised py-3 pr-2 pl-4 shadow-lg lg:inset-x-auto lg:right-6 lg:bottom-6 lg:w-[400px]"
-    >
-      <WarningCircle
-        size={22}
-        weight="bold"
-        aria-hidden
-        className="shrink-0 text-danger"
-      />
-      <p className="flex-1 text-body-sm font-bold">{t("map.locateError")}</p>
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={t("map.dismiss")}
-        onClick={onDismiss}
-      >
-        <X size={20} weight="bold" aria-hidden />
-      </Button>
-    </div>
   );
 }

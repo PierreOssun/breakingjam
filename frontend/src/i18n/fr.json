@@ -10,7 +10,8 @@
     "menu": "Menu",
     "closeMenu": "Fermer le menu",
     "skipToContent": "Aller au contenu",
-    "language": "Langue : {{name}}"
+    "language": "Langue : {{name}}",
+    "claims": "Demandes"
   },
   "footer": {
     "tagline": "Le point central des jams de breaking."
@@ -50,14 +51,17 @@
     "required": "Obligatoire.",
     "email": "Saisissez une adresse e-mail valide.",
     "passwordLength": "Utilisez entre 8 et 128 caractères.",
-    "displayName": "Utilisez entre 1 et 80 caractères."
+    "displayName": "Utilisez entre 1 et 80 caractères.",
+    "tooLong": "{{max}} caractères au maximum.",
+    "url": "Utilisez un lien commençant par https://",
+    "endsBeforeStarts": "Le dernier jour ne peut pas précéder le premier.",
+    "handle": "Lettres, chiffres, . ou _ (30 au maximum)."
   },
   "pages": {
     "map": "Trouver une jam",
     "orgJams": "Vos jams",
     "orgJamNew": "Inscrire une jam",
-    "orgJamEdit": "Modifier la jam",
-    "comingSoon": "Cette page arrive bientôt."
+    "orgJamEdit": "Modifier la jam"
   },
   "notFound": {
     "title": "Page introuvable",
@@ -114,7 +118,10 @@
       "mc": "MC",
       "organizer": "Hôtes",
       "other": "Staff"
-    }
+    },
+    "organiser": "Organisation",
+    "contact": "Contacter",
+    "edit": "Modifier la jam"
   },
   "dancer": {
     "aka": "alias {{names}}",
@@ -188,10 +195,301 @@
     "zoomIn": "Zoom avant",
     "zoomOut": "Zoom arrière",
     "close": "Fermer",
-    "dismiss": "Fermer",
     "viewJam": "Voir la jam",
     "cluster_one": "{{count}} jam ici, zoomer",
     "cluster_other": "{{count}} jams ici, zoomer",
     "loadError": "Les jams n’ont pas pu être chargées. Rechargez la page pour réessayer."
+  },
+  "dialog": {
+    "close": "Fermer",
+    "dismiss": "Fermer"
+  },
+  "form": {
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "optional": "facultatif",
+    "discard": "Abandonner vos modifications ?"
+  },
+  "picker": {
+    "placeholder": "Nom, alias ou @compte",
+    "results": "Résultats",
+    "none": "Aucun résultat pour « {{query}} ».",
+    "searchFirst": "Cherchez d’abord : la personne a peut-être déjà une page.",
+    "newDancer": "Créer un·e nouveau·elle danseur·se",
+    "newCrew": "Créer un nouveau crew",
+    "dancerName": "Nom de danse",
+    "crewName": "Nom du crew",
+    "instagram": "Instagram",
+    "create": "Créer",
+    "remove": "Retirer {{name}}",
+    "nameAndCountry": "Un nom et un pays sont nécessaires.",
+    "handleTaken": "Ce compte Instagram a déjà une page. Cherchez-la plutôt."
+  },
+  "org": {
+    "newIntro": "Elle reste en brouillon, visible par vous seul·e, jusqu’à sa publication.",
+    "saveDraft": "Enregistrer le brouillon",
+    "draftSaved": "Brouillon enregistré. Ajoutez maintenant les battles et le line-up.",
+    "saved": "Enregistré.",
+    "details": "Infos",
+    "viewPage": "Voir la page",
+    "showMore": "Voir plus",
+    "empty": {
+      "title": "Pas encore de jam",
+      "body": "Enregistrez votre première jam. Elle reste en brouillon jusqu’à sa publication."
+    },
+    "fields": {
+      "name": "Nom de la jam",
+      "startsOn": "Premier jour",
+      "endsOn": "Dernier jour",
+      "timezone": "Fuseau horaire",
+      "timezoneHint": "Celui du lieu de la jam.",
+      "venue": "Lieu",
+      "address": "Adresse",
+      "city": "Ville",
+      "country": "Pays",
+      "choose": "Choisir…",
+      "description": "À propos",
+      "registrationUrl": "Lien d’inscription",
+      "registrationUrlHint": "Là où les danseur·ses s’inscrivent aux battles.",
+      "instagramUrl": "Page Instagram"
+    },
+    "location": {
+      "title": "Sur la carte",
+      "hint": "Trouvez l’adresse, puis touchez ou faites glisser l’épingle au bon endroit.",
+      "find": "Trouver sur la carte",
+      "none": "Aucun lieu trouvé. Vérifiez l’adresse, ou touchez la carte pour placer l’épingle.",
+      "error": "La recherche d’adresse n’a pas marché. Réessayez dans un instant.",
+      "others": "Pas le bon endroit ? Choisissez-en un autre :",
+      "placed": "L’épingle est placée : la jam apparaîtra sur la carte.",
+      "unplaced": "Pas encore d’épingle : la jam n’apparaîtra pas sur la carte.",
+      "remove": "Retirer l’épingle",
+      "pin": "Lieu de la jam",
+      "attribution": "Recherche d’adresse par Nominatim · © contributeurs OpenStreetMap"
+    },
+    "status": {
+      "title": "Statut",
+      "explain": {
+        "draft": "Vous seul·e la voyez. Publiez-la pour la mettre sur la carte.",
+        "published": "Sur la carte et ouverte aux inscriptions.",
+        "registration_closed": "Sur la carte ; les inscriptions sont closes.",
+        "completed": "Elle a eu lieu. Notez les résultats dans les battles ci-dessous.",
+        "cancelled": "Annulée. Sa page l’indique."
+      },
+      "noPin": "Ajoutez une épingle dans « Sur la carte » pour qu’on la trouve.",
+      "action": {
+        "publish": "Publier",
+        "close-registration": "Clore les inscriptions",
+        "complete": "Marquer comme terminée",
+        "cancel": "Annuler la jam"
+      },
+      "done": {
+        "publish": "Publiée. Elle est sur la carte.",
+        "close-registration": "Inscriptions closes.",
+        "complete": "Marquée comme terminée.",
+        "cancel": "Jam annulée."
+      },
+      "cancelTitle": "Annuler cette jam ?",
+      "cancelBody": "« {{name}} » apparaîtra comme annulée. Impossible de revenir en arrière.",
+      "delete": "Supprimer la jam",
+      "deleteTitle": "Supprimer cette jam ?",
+      "deleteBody": "« {{name}} » disparaît de la carte et des pages des danseur·ses.",
+      "deleted": "Jam supprimée.",
+      "keep": "La garder"
+    },
+    "battles": {
+      "none": "Pas encore de battle. Ajoutez la première.",
+      "add": "Ajouter une battle",
+      "edit": "Modifier la battle",
+      "editOne": "Modifier {{name}}",
+      "deleteOne": "Supprimer {{name}}",
+      "moveUp": "Monter {{name}}",
+      "moveDown": "Descendre {{name}}",
+      "saved": "Battle enregistrée.",
+      "deleted": "Battle supprimée.",
+      "deleteTitle": "Supprimer cette battle ?",
+      "deleteBody": "« {{name}} » et toutes ses inscriptions seront supprimées.",
+      "deleteConfirm": "Supprimer la battle",
+      "format": "Format",
+      "formats": {
+        "team": "Battle",
+        "seven_to_smoke": "Seven to smoke",
+        "na": "Autre"
+      },
+      "teamSize": "Taille",
+      "gender": "Ouvert aux",
+      "genders": {
+        "bboy": "Bboys",
+        "bgirl": "Bgirls",
+        "mixed": "Tout le monde"
+      },
+      "age": "Âge",
+      "ages": {
+        "kids": "Kids (jusqu’à 17 ans)",
+        "adult": "Adultes (18+)",
+        "masters": "Masters (40+)",
+        "na": "Non précisé"
+      },
+      "kidsFrom": "À partir de",
+      "kidsFromHint": "L’âge minimum ; les battles kids s’arrêtent à 17 ans.",
+      "kidsRange": "Kids {{from}}–{{to}} ans",
+      "adultFrom": "{{from}}+",
+      "bracket": "Tableau",
+      "bracketUnknown": "Pas encore connu",
+      "bracketOf": "Top {{n}}",
+      "maxEntries": "Places",
+      "spots_one": "{{count}} place",
+      "spots_other": "{{count}} places",
+      "name": "Nom",
+      "nameHint": "Laissez vide pour un nom tiré des champs ci-dessus."
+    },
+    "entries": {
+      "title_one": "{{count}} inscription",
+      "title_other": "{{count}} inscriptions",
+      "add": "Ajouter une inscription",
+      "edit": "Modifier l’inscription",
+      "editOne": "Modifier {{name}}",
+      "deleteOne": "Supprimer {{name}}",
+      "deleteConfirm": "Supprimer cette inscription ?",
+      "saved": "Inscription enregistrée.",
+      "deleted": "Inscription supprimée.",
+      "dancer": "Danseur·se",
+      "members_one": "Membre",
+      "members_other": "Membres ({{count}})",
+      "needMembers": "Ajoutez au moins un·e danseur·se.",
+      "teamName": "Nom d’équipe",
+      "crew": "Crew",
+      "status": "Inscription",
+      "statuses": {
+        "pending": "En attente",
+        "confirmed": "Confirmée",
+        "withdrawn": "Retirée"
+      },
+      "reached": "Résultat",
+      "stages": {
+        "na": "Pas encore connu",
+        "prelims": "Présélections",
+        "top64": "Top 64",
+        "top32": "Top 32",
+        "top16": "Top 16",
+        "top8": "Top 8",
+        "top4": "Top 4",
+        "top2": "Finale (2e)",
+        "winner": "Vainqueur"
+      },
+      "finalRank": "Place exacte",
+      "finalRankHint": "Par ex. 3 s’il y a eu une petite finale.",
+      "video": "Vidéo de la battle",
+      "videoHint": "Un lien YouTube ; la vidéo se lit sur les pages de la jam et des danseur·ses.",
+      "videoStart": "Commence à",
+      "videoStartHint": "Pour un live : où commence cette battle, par ex. 1:02:03."
+    },
+    "staff": {
+      "none": "Pas encore de juges, DJ ou MC.",
+      "role": "Rôle",
+      "add": "Ajouter au line-up",
+      "remove": "Retirer {{name}} ({{role}})",
+      "saved": "Line-up enregistré."
+    }
+  },
+  "verify": {
+    "thisIsMe": "C’est moi",
+    "title": "Prouvez que c’est vous",
+    "how": "Mettez ce code dans votre bio Instagram, ou envoyez-le en DM à @{{account}}.",
+    "then": "Nous vérifions à la main ; ensuite, cette page est à vous.",
+    "othersPending": "Quelqu’un d’autre a déjà demandé à vérifier ce profil. Nous vérifierons les deux sur Instagram.",
+    "yourCode": "Votre code",
+    "copy": "Copier le code",
+    "openInstagram": "Ouvrir Instagram",
+    "done": "Terminé",
+    "copied": "Code copié",
+    "copyByHand": "Votre code est {{code}}.",
+    "pending": "Vérification en cours",
+    "byHand": "Nous vérifions à la main, en général sous un jour.",
+    "conflict": "Impossible de revendiquer cette page : elle est vérifiée, ou votre compte a déjà une page."
+  },
+  "dancerEdit": {
+    "open": "Modifier le profil",
+    "title": "Modifier le profil",
+    "saved": "Profil enregistré.",
+    "logged": "Les modifications de cette page sont journalisées tant que la personne ne l’a pas vérifiée.",
+    "aliases": "Aussi connu·e sous",
+    "aliasesHint": "Entrée ou virgule ajoute un alias.",
+    "country": "Pays",
+    "country2": "Deuxième pays",
+    "bio": "Bio",
+    "avatar": "Avatar",
+    "avatarHint": "Dessiné à partir de ces éléments ; choisissez le bon teint de peau.",
+    "addInstagram": "Ajouter Instagram",
+    "parts": {
+      "hair": {
+        "label": "Coiffure",
+        "options": [
+          "En pointes",
+          "Casquette",
+          "Bonnet",
+          "Chignon et bandeau",
+          "Afro",
+          "Rasé"
+        ]
+      },
+      "skin": {
+        "label": "Teint",
+        "options": ["Clair", "Hâlé", "Mat", "Foncé"]
+      },
+      "hairColour": {
+        "label": "Couleur des cheveux",
+        "options": ["Noir", "Brun", "Décoloré", "Violet", "Bleu Klein"]
+      },
+      "hoodie": {
+        "label": "Hoodie",
+        "options": ["Encre", "Bleu Klein", "Violet", "Blanc", "Rouge"]
+      },
+      "extra": {
+        "label": "Accessoire",
+        "options": ["Aucun", "Casque", "Chaîne"]
+      },
+      "backdrop": {
+        "label": "Fond",
+        "options": ["Bleu Klein", "Violet", "Encre", "Nuit"]
+      }
+    }
+  },
+  "admin": {
+    "claims": {
+      "title": "Demandes de vérification",
+      "intro": "Ouvrez le profil Instagram et cherchez le code dans la bio ou les DM de @{{account}}. N’approuvez jamais sans l’avoir vu.",
+      "none": "Aucune demande en attente.",
+      "noHandle": "Pas d’Instagram sur la page",
+      "by": "Par {{name}} ({{email}}), le {{date}}",
+      "approve": "Approuver",
+      "reject": "Refuser",
+      "approved": "{{name}} est vérifié·e.",
+      "rejected": "Demande sur {{name}} refusée.",
+      "dancers": "Danseur·ses",
+      "organizers": "Organisations"
+    },
+    "merge": {
+      "link": "Fusionner avec un·e autre danseur·se",
+      "title": "Fusionner des danseur·ses",
+      "from": "Doublon",
+      "into": "À garder",
+      "explain": "Les jams, rôles, crews et demandes de {{from}} passent à {{into}}. {{from}} devient un alias et sa page y redirige.",
+      "confirm": "Fusionner",
+      "change": "Choisir quelqu’un d’autre",
+      "done": "{{from}} fusionné·e avec {{into}}."
+    }
+  },
+  "organizer": {
+    "yourPage": "Votre page d’organisation",
+    "edit": "Modifier la page",
+    "saved": "Page enregistrée.",
+    "name": "Nom",
+    "nameHint": "Affiché sur vos jams : le vôtre, ou celui de votre crew ou association.",
+    "handleTaken": "Ce compte Instagram est déjà sur une autre page d’organisation.",
+    "newHandle": "Un nouveau compte doit être revérifié : la coche disparaît jusqu’à notre vérification.",
+    "whyHandle": "Ajoutez votre Instagram, puis vérifiez-le : les danseur·ses verront que la jam est bien la vôtre.",
+    "verify": "Vérifier Instagram",
+    "noUpcoming": "Pas de jam à venir.",
+    "noPast": "Pas encore de jam passée."
   }
 }

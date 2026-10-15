@@ -25,6 +25,7 @@ use crate::{
     domain::{
         battle::{Battle, Category},
         event::{Event, EventFields, EventStatus, Transition, can_write},
+        organizer::OrganizerRef,
     },
     error::{AppError, ErrorEnvelope},
     flyer::{self, FlyerOptions, FlyerText, Lang},
@@ -245,6 +246,18 @@ fn feature(p: MapPoint, battles: Vec<Battle>) -> Feature {
     }
 }
 
+/// A jam page: the jam, and whether the caller may edit it.
+#[derive(Debug, Serialize, ToSchema)]
+pub struct EventResponse {
+    /// The jam itself.
+    #[serde(flatten)]
+    pub event: Event,
+    /// Whether the caller may edit it, change its status or delete it.
+    pub can_edit: bool,
+    /// Who runs it: the jam page's organiser card (M12c).
+    pub organizer: OrganizerRef,
+}
+
 /// One jam, by id or slug.
 #[utoipa::path(
     get,
@@ -254,7 +267,7 @@ fn feature(p: MapPoint, battles: Vec<Battle>) -> Feature {
     params(("id" = String, Path, description = "Jam id or slug")),
     security((), ("session" = [])),
     responses(
-        (status = OK, body = Event),
+        (status = OK, body = EventResponse),
         (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
     )
 )]
@@ -262,8 +275,17 @@ async fn show(
     State(state): State<AppState>,
     current: MaybeUser,
     Path(id_or_slug): Path<String>,
-) -> Result<Json<Event>, AppError> {
-    Ok(Json(readable(&state, &current, &id_or_slug).await?))
+) -> Result<Json<EventResponse>, AppError> {
+    let event = readable(&state, &current, &id_or_slug).await?;
+    let can_edit = current
+        .as_ref()
+        .is_some_and(|c| can_write(&c.user, event.organizer_id));
+    let organizer = db::organizers::reference(&state.pool, event.organizer_id).await?;
+    Ok(Json(EventResponse {
+        event,
+        can_edit,
+        organizer,
+    }))
 }
 
 /// Register a jam as a draft; a first jam makes a `user` an `organizer`.

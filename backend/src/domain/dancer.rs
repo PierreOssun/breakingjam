@@ -72,6 +72,8 @@ pub struct Dancer {
     pub verified_at: Option<DateTime<Utc>>,
     /// Uploaded picture; null means the generated avatar.
     pub avatar_url: Option<String>,
+    /// The generated avatar's parts, e.g. `h2-s1-c0-o3-e0-b1`; null means seeded from the id.
+    pub avatar_parts: Option<String>,
     #[serde(skip)]
     pub created_by: Option<Uuid>,
     /// Set when an admin merged this row into another; it is then only a redirect.
@@ -124,7 +126,7 @@ pub type FieldChange = (&'static str, Option<String>, Option<String>);
 /// The profile fields that differ between two versions of a dancer.
 pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
     let aliases = |d: &Dancer| (!d.aliases.is_empty()).then(|| d.aliases.join(", "));
-    let fields: [FieldChange; 8] = [
+    let fields: [FieldChange; 9] = [
         (
             "dancer_name",
             Some(old.dancer_name.clone()),
@@ -144,6 +146,11 @@ pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
             "instagram_handle",
             old.instagram_handle.clone(),
             new.instagram_handle.clone(),
+        ),
+        (
+            "avatar_parts",
+            old.avatar_parts.clone(),
+            new.avatar_parts.clone(),
         ),
     ];
     fields.into_iter().filter(|(_, a, b)| a != b).collect()
@@ -302,6 +309,31 @@ pub struct DancerFields {
     /// `@handle` or `handle`; the identity key when present, unique case-insensitively.
     #[validate(custom(function = "crate::domain::instagram_handle"))]
     pub instagram_handle: Option<String>,
+    /// The generated avatar's parts (DESIGN.md §4.16); blank or absent means seeded from the id.
+    #[validate(custom(function = "avatar_parts_shape"))]
+    pub avatar_parts: Option<String>,
+}
+
+/// Each part's letter and highest option: hair, skin, hair colour, hoodie, extra, backdrop.
+const AVATAR_PARTS: [(char, u32); 6] = [('h', 5), ('s', 3), ('c', 4), ('o', 4), ('e', 2), ('b', 3)];
+
+/// Blank, or the six parts in order and in range, e.g. `h2-s1-c0-o3-e0-b1`.
+fn avatar_parts_shape(value: &str) -> Result<(), ValidationError> {
+    let value = value.trim();
+    let parts: Vec<&str> = value.split('-').collect();
+    let in_range = |(part, (letter, max)): (&&str, (char, u32))| {
+        let mut chars = part.chars();
+        chars.next() == Some(letter)
+            && chars
+                .next()
+                .and_then(|c| c.to_digit(10))
+                .is_some_and(|n| n <= max)
+            && chars.next().is_none()
+    };
+    if value.is_empty() || (parts.len() == 6 && parts.iter().zip(AVATAR_PARTS).all(in_range)) {
+        return Ok(());
+    }
+    Err(ValidationError::new("avatar_parts").with_message("must be like h2-s1-c0-o3-e0-b1".into()))
 }
 
 fn aliases(values: &[String]) -> Result<(), ValidationError> {
@@ -334,6 +366,7 @@ mod tests {
             source: DancerSource::Organizer,
             verified_at: verified.then(Utc::now),
             avatar_url: None,
+            avatar_parts: None,
             created_by,
             merged_into_id: None,
             created_at: Utc::now(),
@@ -392,6 +425,27 @@ mod tests {
             merged_aliases(&survivor, &loser),
             ["Rocket", "KR", "Kid Rockett"]
         );
+    }
+
+    #[test]
+    fn avatar_parts_are_six_parts_in_range() {
+        assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b1").is_ok());
+        assert!(avatar_parts_shape("h5-s3-c4-o4-e2-b3").is_ok());
+        assert!(avatar_parts_shape("").is_ok());
+        assert!(
+            avatar_parts_shape("h6-s1-c0-o3-e0-b1").is_err(),
+            "hair out of range"
+        );
+        assert!(
+            avatar_parts_shape("s1-h2-c0-o3-e0-b1").is_err(),
+            "parts out of order"
+        );
+        assert!(
+            avatar_parts_shape("h2-s1-c0-o3-e0").is_err(),
+            "a part missing"
+        );
+        assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b12").is_err());
+        assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b1-x1").is_err());
     }
 
     #[test]

@@ -5,6 +5,7 @@ pub mod claim;
 pub mod crew;
 pub mod dancer;
 pub mod event;
+pub mod organizer;
 pub mod user;
 
 use validator::ValidationError;

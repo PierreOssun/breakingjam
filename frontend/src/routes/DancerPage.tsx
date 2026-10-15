@@ -7,6 +7,8 @@ import { api, type Schemas } from "../api/client";
 import { Button } from "../components/Button";
 import { ShareButton } from "../components/ShareButton";
 import { VideoDialog, type Video } from "../components/VideoDialog";
+import { DancerActions } from "../features/dancers/DancerActions";
+import { DancerAvatar } from "../features/dancers/DancerAvatar";
 import { IdentityCard } from "../features/dancers/IdentityCard";
 import { JamList } from "../features/dancers/JamList";
 import { StatsStrip } from "../features/dancers/StatsStrip";
@@ -86,7 +88,15 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
 
       <div className="flex flex-col gap-8 pb-10 lg:grid lg:grid-cols-[340px_1fr] lg:items-start lg:gap-12 lg:pb-20">
         <aside className="flex flex-col gap-4 lg:sticky lg:top-24">
-          <IdentityCard dancer={dancer} />
+          <IdentityCard
+            name={dancer.dancer_name}
+            verified={Boolean(dancer.verified_at)}
+            flags={[dancer.country, dancer.country2]}
+            aliases={dancer.aliases}
+            instagram={dancer.instagram_handle}
+            path={`/dancers/${dancer.id}`}
+            avatar={<DancerAvatar dancer={dancer} />}
+          />
           {(dancer.crews.length > 0 || dancer.city) && (
             <div className="flex flex-wrap items-center gap-2">
               {dancer.crews.map((crew) => (
@@ -106,6 +116,10 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
               )}
             </div>
           )}
+          {dancer.bio && (
+            <p className="text-body whitespace-pre-line">{dancer.bio}</p>
+          )}
+          <DancerActions dancer={dancer} />
           {events.data && <StatsStrip stats={statsOf(events.data.past)} />}
         </aside>
 

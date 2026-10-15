@@ -23,6 +23,13 @@ const JAM = {
   instagram_url: "https://www.instagram.com/paris.cypher",
   created_at: at,
   updated_at: at,
+  can_edit: false,
+  organizer: {
+    id: "01920000-0000-7000-8000-0000000000a1",
+    display_name: "Floor Lords e.V.",
+    instagram_handle: "floor.lords",
+    verified: true,
+  },
 };
 
 const battle = (
@@ -146,6 +153,25 @@ describe("JamPage", () => {
     expect(
       main.getByRole("link", { name: "Open in maps" }).getAttribute("href"),
     ).toContain("mlat=48.8566");
+
+    // DESIGN.md §6 item 9: the organiser, verified, and a way to reach them.
+    const organiser = main
+      .getByRole("heading", { name: "Organiser" })
+      .closest("section")!;
+    expect(
+      within(organiser).getByRole("link", { name: "Floor Lords e.V." }),
+    ).toHaveAttribute(
+      "href",
+      "/organizers/01920000-0000-7000-8000-0000000000a1",
+    );
+    expect(
+      within(organiser).getByRole("img", { name: "Verified" }),
+    ).toBeInTheDocument();
+    expect(
+      within(organiser).getByRole("link", { name: "Contact" }),
+    ).toHaveAttribute("href", "https://ig.me/m/floor.lords");
+    // Only its writers get the edit link.
+    expect(main.queryByRole("link", { name: "Edit jam" })).toBeNull();
   });
 
   it("lists battles with results first, links every dancer and hides withdrawn entries", async () => {

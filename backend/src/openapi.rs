@@ -23,7 +23,8 @@ use crate::state::AppState;
         (name = "dancers", description = "Dancer pages and search-before-create"),
         (name = "crews", description = "Crews and memberships"),
         (name = "claims", description = "\"Verify me\" claims and their review"),
-        (name = "admin", description = "Merging dancers and changing roles")
+        (name = "admin", description = "Merging dancers and changing roles"),
+        (name = "organizers", description = "Organiser pages and their Instagram verification")
     )
 )]
 struct ApiDoc;

@@ -602,7 +602,7 @@ handstand            toprock
 - **Desktop 1024+:** `grid grid-cols-[340px_1fr] gap-12`. The left column is `sticky top-6` and holds the card, chips, action and a 2×2 stats grid. The right column holds the lists, with `display-md` section titles.
 - **Verify modal** (4.9 + 4.19):
   - Title "Verify it’s you", two lines of explanation, then the code.
-  - Buttons: **Copy code** (primary), **Open Instagram** (secondary, opens the @breakingjam DM thread), **Done** (ghost).
+  - Buttons: **Copy code** (primary), **Open Instagram** (secondary, opens the @breaking.jam DM thread), **Done** (ghost).
   - When someone else has already requested it: an inline notice above the code, and the request is still allowed.
   - Submitting moves the page to the pending state.
 - **Edit sheet** (4.9 + 4.20):

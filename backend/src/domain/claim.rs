@@ -30,7 +30,7 @@ pub struct Claim {
     pub dancer_id: Uuid,
     /// The account claiming it.
     pub user_id: Uuid,
-    /// Shown to the user, who puts it in their Instagram bio or DMs it to @breakingjam.
+    /// Shown to the user, who puts it in their Instagram bio or DMs it to @breaking.jam.
     pub code: String,
     /// Review state.
     pub status: ClaimStatus,

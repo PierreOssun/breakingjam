@@ -4,11 +4,12 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import type { Schemas } from "../../api/client";
 import { Button } from "../../components/Button";
+import { DateBlock } from "../../components/DateBlock";
 import { Flag } from "../../components/Flag";
 import { InlineEmpty } from "../../components/InlineEmpty";
 import { ResultBadge } from "../../components/ResultBadge";
 import { MetaTag, RoleTag } from "../../components/Tag";
-import { dayAndMonth, formatDateRange, yearOf } from "../../lib/dates";
+import { formatDateRange, yearOf } from "../../lib/dates";
 
 type Participation = Schemas["Participation"];
 
@@ -85,21 +86,10 @@ function JamRow({
   onPlay: () => void;
 }) {
   const { t, i18n } = useTranslation();
-  const { day, month } = dayAndMonth(p.event.starts_on, i18n.language);
 
   return (
     <li className="relative flex min-h-[76px] items-center gap-3.5 border-b border-border py-3">
-      <div
-        aria-hidden
-        className="flex h-14 w-[52px] shrink-0 flex-col items-center justify-center rounded-md border border-border bg-surface"
-      >
-        <span className="font-display text-[18px] leading-[22px] font-extrabold">
-          {day}
-        </span>
-        <span className="text-[11px] font-extrabold tracking-[0.06em] text-primary-text uppercase">
-          {month}
-        </span>
-      </div>
+      <DateBlock date={p.event.starts_on} />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         {/* The whole row is the link; the play button sits above it. */}
         <Link

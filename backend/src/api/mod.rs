@@ -9,6 +9,7 @@ mod dancers;
 mod events;
 mod health;
 mod json;
+mod organizers;
 mod page;
 
 use utoipa_axum::router::OpenApiRouter;
@@ -26,4 +27,5 @@ pub fn router() -> OpenApiRouter<AppState> {
         .merge(battles::router())
         .merge(claims::router())
         .merge(admin::router())
+        .merge(organizers::router())
 }

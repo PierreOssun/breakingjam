@@ -10,7 +10,8 @@
     "menu": "Menü",
     "closeMenu": "Menü schließen",
     "skipToContent": "Zum Inhalt springen",
-    "language": "Sprache: {{name}}"
+    "language": "Sprache: {{name}}",
+    "claims": "Anfragen"
   },
   "footer": {
     "tagline": "Der zentrale Ort für Breaking-Jams."
@@ -50,14 +51,17 @@
     "required": "Pflichtfeld.",
     "email": "Gib eine gültige E-Mail-Adresse ein.",
     "passwordLength": "Verwende 8 bis 128 Zeichen.",
-    "displayName": "Verwende 1 bis 80 Zeichen."
+    "displayName": "Verwende 1 bis 80 Zeichen.",
+    "tooLong": "Höchstens {{max}} Zeichen.",
+    "url": "Nutze einen Link, der mit https:// beginnt.",
+    "endsBeforeStarts": "Der letzte Tag darf nicht vor dem ersten liegen.",
+    "handle": "Buchstaben, Ziffern, . oder _ (höchstens 30)."
   },
   "pages": {
     "map": "Jam finden",
     "orgJams": "Deine Jams",
     "orgJamNew": "Jam eintragen",
-    "orgJamEdit": "Jam bearbeiten",
-    "comingSoon": "Diese Seite ist unterwegs."
+    "orgJamEdit": "Jam bearbeiten"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -114,7 +118,10 @@
       "mc": "MC",
       "organizer": "Gastgeber",
       "other": "Team"
-    }
+    },
+    "organiser": "Veranstalter:in",
+    "contact": "Kontakt",
+    "edit": "Jam bearbeiten"
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -188,10 +195,301 @@
     "zoomIn": "Hineinzoomen",
     "zoomOut": "Herauszoomen",
     "close": "Schließen",
-    "dismiss": "Schließen",
     "viewJam": "Jam ansehen",
     "cluster_one": "{{count}} Jam hier, hineinzoomen",
     "cluster_other": "{{count}} Jams hier, hineinzoomen",
     "loadError": "Die Jams wurden nicht geladen. Lade die Seite neu, um es noch einmal zu versuchen."
+  },
+  "dialog": {
+    "close": "Schließen",
+    "dismiss": "Schließen"
+  },
+  "form": {
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "optional": "optional",
+    "discard": "Änderungen verwerfen?"
+  },
+  "picker": {
+    "placeholder": "Name, Alias oder @Handle",
+    "results": "Ergebnisse",
+    "none": "Nichts gefunden für „{{query}}“.",
+    "searchFirst": "Erst suchen: Vielleicht gibt es die Seite schon.",
+    "newDancer": "Neue:n Tänzer:in anlegen",
+    "newCrew": "Neue Crew anlegen",
+    "dancerName": "Tanzname",
+    "crewName": "Crew-Name",
+    "instagram": "Instagram",
+    "create": "Anlegen",
+    "remove": "{{name}} entfernen",
+    "nameAndCountry": "Name und Land sind nötig.",
+    "handleTaken": "Dieses Instagram-Handle hat schon eine Seite. Such lieber danach."
+  },
+  "org": {
+    "newIntro": "Sie bleibt ein Entwurf, nur für dich sichtbar, bis du sie veröffentlichst.",
+    "saveDraft": "Entwurf speichern",
+    "draftSaved": "Entwurf gespeichert. Jetzt Battles und Line-up hinzufügen.",
+    "saved": "Gespeichert.",
+    "details": "Details",
+    "viewPage": "Jam-Seite ansehen",
+    "showMore": "Mehr anzeigen",
+    "empty": {
+      "title": "Noch keine Jams",
+      "body": "Leg deine erste Jam an. Sie bleibt ein Entwurf, bis du sie veröffentlichst."
+    },
+    "fields": {
+      "name": "Name der Jam",
+      "startsOn": "Erster Tag",
+      "endsOn": "Letzter Tag",
+      "timezone": "Zeitzone",
+      "timezoneHint": "Die des Veranstaltungsorts.",
+      "venue": "Location",
+      "address": "Adresse",
+      "city": "Stadt",
+      "country": "Land",
+      "choose": "Auswählen…",
+      "description": "Über die Jam",
+      "registrationUrl": "Anmeldelink",
+      "registrationUrlHint": "Wo sich Tänzer:innen für die Battles anmelden.",
+      "instagramUrl": "Instagram-Seite"
+    },
+    "location": {
+      "title": "Auf der Karte",
+      "hint": "Such die Adresse, dann tippe oder zieh die Nadel an die genaue Stelle.",
+      "find": "Auf der Karte finden",
+      "none": "Kein Ort gefunden. Prüf die Adresse oder tippe auf die Karte, um die Nadel zu setzen.",
+      "error": "Die Adresssuche hat nicht geklappt. Versuch es gleich noch einmal.",
+      "others": "Nicht der richtige Ort? Wähl einen anderen:",
+      "placed": "Die Nadel sitzt: Die Jam erscheint auf der Karte.",
+      "unplaced": "Noch keine Nadel: Die Jam erscheint nicht auf der Karte.",
+      "remove": "Nadel entfernen",
+      "pin": "Ort der Jam",
+      "attribution": "Adresssuche von Nominatim · © OpenStreetMap-Mitwirkende"
+    },
+    "status": {
+      "title": "Status",
+      "explain": {
+        "draft": "Nur du siehst sie. Veröffentliche sie, damit sie auf die Karte kommt.",
+        "published": "Auf der Karte und offen für Anmeldungen.",
+        "registration_closed": "Auf der Karte; die Anmeldung ist geschlossen.",
+        "completed": "Sie hat stattgefunden. Trag die Ergebnisse unten in den Battles ein.",
+        "cancelled": "Abgesagt. Die Seite zeigt das an."
+      },
+      "noPin": "Setz unter „Auf der Karte“ eine Nadel, damit man sie findet.",
+      "action": {
+        "publish": "Veröffentlichen",
+        "close-registration": "Anmeldung schließen",
+        "complete": "Als abgeschlossen markieren",
+        "cancel": "Jam absagen"
+      },
+      "done": {
+        "publish": "Veröffentlicht. Sie ist auf der Karte.",
+        "close-registration": "Anmeldung geschlossen.",
+        "complete": "Als abgeschlossen markiert.",
+        "cancel": "Jam abgesagt."
+      },
+      "cancelTitle": "Diese Jam absagen?",
+      "cancelBody": "„{{name}}“ wird als abgesagt angezeigt. Das lässt sich nicht rückgängig machen.",
+      "delete": "Jam löschen",
+      "deleteTitle": "Diese Jam löschen?",
+      "deleteBody": "„{{name}}“ verschwindet von der Karte und von den Seiten der Tänzer:innen.",
+      "deleted": "Jam gelöscht.",
+      "keep": "Behalten"
+    },
+    "battles": {
+      "none": "Noch keine Battles. Leg das erste an.",
+      "add": "Battle hinzufügen",
+      "edit": "Battle bearbeiten",
+      "editOne": "{{name}} bearbeiten",
+      "deleteOne": "{{name}} löschen",
+      "moveUp": "{{name}} nach oben",
+      "moveDown": "{{name}} nach unten",
+      "saved": "Battle gespeichert.",
+      "deleted": "Battle gelöscht.",
+      "deleteTitle": "Dieses Battle löschen?",
+      "deleteBody": "„{{name}}“ und alle Anmeldungen werden gelöscht.",
+      "deleteConfirm": "Battle löschen",
+      "format": "Format",
+      "formats": {
+        "team": "Battle",
+        "seven_to_smoke": "Seven to Smoke",
+        "na": "Andere"
+      },
+      "teamSize": "Größe",
+      "gender": "Offen für",
+      "genders": {
+        "bboy": "Bboys",
+        "bgirl": "Bgirls",
+        "mixed": "Alle"
+      },
+      "age": "Alter",
+      "ages": {
+        "kids": "Kids (bis 17)",
+        "adult": "Erwachsene (18+)",
+        "masters": "Masters (40+)",
+        "na": "Keine Angabe"
+      },
+      "kidsFrom": "Ab Alter",
+      "kidsFromHint": "Das Mindestalter; Kids-Battles gehen bis 17.",
+      "kidsRange": "Kids {{from}}–{{to}}",
+      "adultFrom": "{{from}}+",
+      "bracket": "Bracket",
+      "bracketUnknown": "Noch unbekannt",
+      "bracketOf": "Top {{n}}",
+      "maxEntries": "Plätze",
+      "spots_one": "{{count}} Platz",
+      "spots_other": "{{count}} Plätze",
+      "name": "Name",
+      "nameHint": "Leer lassen für einen Namen aus den Feldern oben."
+    },
+    "entries": {
+      "title_one": "{{count}} Anmeldung",
+      "title_other": "{{count}} Anmeldungen",
+      "add": "Anmeldung hinzufügen",
+      "edit": "Anmeldung bearbeiten",
+      "editOne": "{{name}} bearbeiten",
+      "deleteOne": "{{name}} löschen",
+      "deleteConfirm": "Diese Anmeldung löschen?",
+      "saved": "Anmeldung gespeichert.",
+      "deleted": "Anmeldung gelöscht.",
+      "dancer": "Tänzer:in",
+      "members_one": "Mitglied",
+      "members_other": "Mitglieder ({{count}})",
+      "needMembers": "Füg mindestens eine:n Tänzer:in hinzu.",
+      "teamName": "Teamname",
+      "crew": "Crew",
+      "status": "Anmeldung",
+      "statuses": {
+        "pending": "Ausstehend",
+        "confirmed": "Bestätigt",
+        "withdrawn": "Zurückgezogen"
+      },
+      "reached": "Ergebnis",
+      "stages": {
+        "na": "Noch unbekannt",
+        "prelims": "Prelims",
+        "top64": "Top 64",
+        "top32": "Top 32",
+        "top16": "Top 16",
+        "top8": "Top 8",
+        "top4": "Top 4",
+        "top2": "Finale (2.)",
+        "winner": "Gewinner:in"
+      },
+      "finalRank": "Genaue Platzierung",
+      "finalRankHint": "Z. B. 3, wenn es ein kleines Finale gab.",
+      "video": "Battle-Video",
+      "videoHint": "Ein YouTube-Link; er läuft auf der Jam- und den Tänzer:innen-Seiten.",
+      "videoStart": "Beginnt bei",
+      "videoStartHint": "Bei einem Livestream: wo dieses Battle beginnt, z. B. 1:02:03."
+    },
+    "staff": {
+      "none": "Noch keine Judges, DJ oder MC.",
+      "role": "Rolle",
+      "add": "Zum Line-up hinzufügen",
+      "remove": "{{name}} ({{role}}) entfernen",
+      "saved": "Line-up gespeichert."
+    }
+  },
+  "verify": {
+    "thisIsMe": "Das bin ich",
+    "title": "Bestätige, dass du es bist",
+    "how": "Setz diesen Code in deine Instagram-Bio oder schick ihn per DM an @{{account}}.",
+    "then": "Wir prüfen von Hand; danach kannst du diese Seite bearbeiten.",
+    "othersPending": "Jemand anderes hat dieses Profil schon zur Bestätigung angefragt. Wir prüfen beide auf Instagram.",
+    "yourCode": "Dein Code",
+    "copy": "Code kopieren",
+    "openInstagram": "Instagram öffnen",
+    "done": "Fertig",
+    "copied": "Code kopiert",
+    "copyByHand": "Dein Code ist {{code}}.",
+    "pending": "Bestätigung ausstehend",
+    "byHand": "Wir prüfen von Hand, meist innerhalb eines Tages.",
+    "conflict": "Diese Seite kann nicht beansprucht werden: Sie ist bestätigt, oder dein Konto hat schon eine Seite."
+  },
+  "dancerEdit": {
+    "open": "Profil bearbeiten",
+    "title": "Profil bearbeiten",
+    "saved": "Profil gespeichert.",
+    "logged": "Änderungen an dieser Seite werden protokolliert, bis die Person sie bestätigt.",
+    "aliases": "Auch bekannt als",
+    "aliasesHint": "Enter oder Komma fügt einen Alias hinzu.",
+    "country": "Land",
+    "country2": "Zweites Land",
+    "bio": "Bio",
+    "avatar": "Avatar",
+    "avatarHint": "Aus diesen Teilen gezeichnet; wähl den passenden Hautton.",
+    "addInstagram": "Instagram hinzufügen",
+    "parts": {
+      "hair": {
+        "label": "Frisur",
+        "options": [
+          "Stachelig",
+          "Cap",
+          "Beanie",
+          "Dutt mit Stirnband",
+          "Afro",
+          "Buzz Cut"
+        ]
+      },
+      "skin": {
+        "label": "Hautton",
+        "options": ["Hell", "Gebräunt", "Mittel", "Dunkel"]
+      },
+      "hairColour": {
+        "label": "Haarfarbe",
+        "options": ["Schwarz", "Braun", "Blondiert", "Violett", "Klein-Blau"]
+      },
+      "hoodie": {
+        "label": "Hoodie",
+        "options": ["Tinte", "Klein-Blau", "Violett", "Weiß", "Rot"]
+      },
+      "extra": {
+        "label": "Extra",
+        "options": ["Keins", "Kopfhörer", "Kette"]
+      },
+      "backdrop": {
+        "label": "Hintergrund",
+        "options": ["Klein-Blau", "Violett", "Tinte", "Nacht"]
+      }
+    }
+  },
+  "admin": {
+    "claims": {
+      "title": "Bestätigungsanfragen",
+      "intro": "Öffne das Instagram-Profil und such den Code in der Bio oder in den DMs von @{{account}}. Nie bestätigen, ohne ihn gesehen zu haben.",
+      "none": "Keine offenen Anfragen.",
+      "noHandle": "Kein Instagram auf der Seite",
+      "by": "Von {{name}} ({{email}}), {{date}}",
+      "approve": "Bestätigen",
+      "reject": "Ablehnen",
+      "approved": "{{name}} ist bestätigt.",
+      "rejected": "Anfrage für {{name}} abgelehnt.",
+      "dancers": "Tänzer:innen",
+      "organizers": "Veranstalter:innen"
+    },
+    "merge": {
+      "link": "Mit anderer:m Tänzer:in zusammenführen",
+      "title": "Tänzer:innen zusammenführen",
+      "from": "Duplikat",
+      "into": "Behalten",
+      "explain": "Jams, Rollen, Crews und Anfragen von {{from}} gehen an {{into}}. {{from}} wird ein Alias, die Seite leitet dorthin weiter.",
+      "confirm": "Zusammenführen",
+      "change": "Jemand anderen wählen",
+      "done": "{{from}} mit {{into}} zusammengeführt."
+    }
+  },
+  "organizer": {
+    "yourPage": "Deine Veranstalter-Seite",
+    "edit": "Seite bearbeiten",
+    "saved": "Seite gespeichert.",
+    "name": "Name",
+    "nameHint": "Wird bei deinen Jams angezeigt: deiner, oder der deiner Crew oder deines Vereins.",
+    "handleTaken": "Dieses Instagram-Handle gehört schon zu einer anderen Veranstalter-Seite.",
+    "newHandle": "Ein neues Handle muss neu bestätigt werden: Der Haken verschwindet, bis wir es prüfen.",
+    "whyHandle": "Füg dein Instagram hinzu und bestätige es: So sehen Tänzer:innen, dass die Jam wirklich deine ist.",
+    "verify": "Instagram bestätigen",
+    "noUpcoming": "Keine kommenden Jams.",
+    "noPast": "Noch keine vergangenen Jams."
   }
 }

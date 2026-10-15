@@ -1,8 +1,8 @@
 import { WarningCircle } from "@phosphor-icons/react";
-import { useId, type ComponentProps } from "react";
+import { type ComponentProps, type ReactNode, useId } from "react";
 
 type TextFieldProps = ComponentProps<"input"> & {
-  label: string;
+  label: ReactNode;
   /** Shown under the field; replaced by `error` when there is one. */
   hint?: string;
   error?: string;

@@ -16,6 +16,7 @@ This document is the source of truth for v0.1. Anything not listed under *Scope*
 - Jam (event) CRUD for authenticated organisers.
 - Dancer CRUD via the API, used inside the jam flows (search-before-create when adding entry members or staff).
 - Dancer page (`/dancers/{id}`): name, crew(s), country flag(s), Instagram link, generated avatar, a stats strip (jams, countries, years active, podiums, from past jams; added in M10), and the dancer's jams split into **upcoming** and **past** (with the battle, the stage reached and, once the manager exists, the full result). Reached only by clicking a dancer on a jam page — there is **no dancer directory or search page** for the public in v0.1.
+- Organiser page (`/organizers/{id}`, added in M12c): like a dancer page without battles: the organiser's name, Instagram, country, city, bio and public jams, upcoming and past. Organisers verify their Instagram handle with the same code-and-review flow as dancers. The jam page links to it from its organiser card.
 - Dancer identity: Instagram handle as the (optional) uniqueness key, "Verify me" claim flow with a code-in-bio check reviewed by an admin, edits on unverified dancers by their creator or a BreakingJam admin (logged in `dancer_edits`), admin merge. See §4 "Dancer identity".
 - Seed data: ~200 well-known dancers entered by a `seed_admin` user before launch (see roles in §5).
 - Crew CRUD and crew membership (dated).
@@ -125,9 +126,17 @@ create table app_users (
   display_name text not null,
   role user_role not null default 'user',
   email_verified_at timestamptz,
+  -- the organiser page (M12c); public, unlike the columns above
+  instagram_handle text,              -- lowercase, no '@'; unique when present
+  country char(2),
+  city text,
+  bio text,
+  verified_at timestamptz,            -- set when an admin confirms the handle; cleared when it changes
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+create unique index app_users_instagram_handle_key
+  on app_users (lower(instagram_handle)) where instagram_handle is not null;
 
 create table sessions (
   id uuid primary key,
@@ -152,6 +161,7 @@ create table dancers (
   notable boolean not null default false,   -- seeded well-known dancers: search ranking only, NO visible badge
   verified_at timestamptz,            -- set on approved claim
   avatar_url text,                    -- uploaded by a verified dancer; null = generated avatar
+  avatar_parts text,                  -- the generated avatar's parts, e.g. 'h2-s1-c0-o3-e0-b1'; null = seeded from id (M12b)
   merged_into_id uuid references dancers(id),   -- non-null = this row is a redirect
   created_by uuid references app_users(id),
   deleted_at timestamptz,
@@ -178,6 +188,19 @@ create table dancer_claims (
 create index on dancer_claims (status, created_at);
 create unique index dancer_claims_one_pending_key
   on dancer_claims (dancer_id, user_id) where status = 'pending';   -- one pending claim per (dancer, user)
+
+create table organizer_claims (       -- M12c: an organiser verifying their Instagram handle
+  id uuid primary key,
+  user_id uuid not null references app_users(id) on delete cascade,
+  instagram_handle text not null,     -- frozen at request: approval confirms this handle only
+  code text not null,
+  status claim_status not null default 'pending',
+  reviewed_by uuid references app_users(id),
+  reviewed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create unique index organizer_claims_one_pending_key
+  on organizer_claims (user_id) where status = 'pending';
 
 create table dancer_edits (            -- audit log of every edit on unverified dancers
   id uuid primary key,
@@ -309,12 +332,16 @@ Principles: the Instagram handle is the identity key but may be absent; verifica
 - **Three origins**, one row shape: `seed` (entered by a `seed_admin` before launch, `notable = true`), `organizer` (created during jam registration via search-before-create), `self` (a logged-in user creating their own page). `notable` affects search ranking only; it is never shown in the UI.
 - **Verification ("Verify me")**:
   1. A logged-in user opens a dancer page and calls `POST /api/dancers/{id}/claim`. One pending claim per (dancer, user).
-  2. The response carries a short code (`BJ-` + 4 chars, unambiguous alphabet). The UI tells them to put it in their Instagram bio or DM it to @breakingjam.
+  2. The response carries a short code (`BJ-` + 4 chars, unambiguous alphabet). The UI tells them to put it in their Instagram bio or DM it to @breaking.jam (BreakingJam's account; @breakingjam was taken).
   3. An admin reviews the queue (`GET /api/admin/claims`), checks the Instagram profile manually, approves or rejects. No scraping of Instagram, ever.
   4. On approve: `dancers.user_id = claim.user_id`, `verified_at = now()`, other pending claims on that dancer are rejected, the code is invalid. The dancer can now edit their own page.
 - **Edits** (decided in M7b): an *unverified* dancer may be edited only by its creator (usually the organiser who added it during jam registration) or by `seed_admin`/`admin`; every change is written to `dancer_edits`. There are no community edits. On a *verified* dancer only the owner, `seed_admin` or `admin` may edit. A handle change after verification does not touch `user_id` or `verified_at` — ownership is bound to the account, not the string. Anonymous visitors can never edit.
-- **Avatar**: when `avatar_url` is null the frontend renders a deterministic generated avatar seeded by `dancer.id` (see §6), with the `country` flag and, if set, the `country2` flag. Verified dancers may upload a picture (`POST /api/dancers/{id}/avatar`, image ≤ 2 MB, stored on R2) — **deferred** until R2 is set up (decided in M7b). Instagram pictures are never fetched.
+- **Avatar**: when `avatar_url` is null the frontend renders the generated pixel avatar of DESIGN.md §4.16, seeded by `dancer.id`; whoever may edit the dancer can choose its parts, stored in `avatar_parts` (decided in M12b). Flags are chips beside it, never drawn into it. Verified dancers may upload a picture (`POST /api/dancers/{id}/avatar`, image ≤ 2 MB, stored on R2) — **deferred** until R2 is set up (decided in M7b). Instagram pictures are never fetched.
 - **Merge**: `POST /api/admin/dancers/{id}/merge {into}` moves `entry_members`, `event_staff`, `crew_memberships`, `dancer_claims` to the survivor, unions `aliases`, keeps the survivor's handle (or adopts the loser's if the survivor had none), and sets `merged_into_id` on the loser. `GET /api/dancers/{id}` on a merged row returns `301`-style `{ "merged_into": uuid }`; the frontend redirects.
+
+### Organiser identity (M12c)
+- The organiser page is the account's public side: `display_name` (shown on their jams), and the `instagram_handle`, `country`, `city`, `bio` columns of `app_users`. Never the email or role. Only accounts that registered a jam (`organizer`+) have one; only its owner edits it.
+- **Verification** is of the handle, not the account: the organiser opens a claim on their current handle (`BJ-` code, same review queue screen as dancers), and approval sets `verified_at` only if the handle is still the claimed one. Changing the handle clears `verified_at` and rejects the pending claim on the old one.
 
 ### Event status transitions
 ```
@@ -369,7 +396,7 @@ GET    /api/auth/google/callback
 
 GET    /api/events                       ?status=published&country=&from=&to=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required)
 GET    /api/events.geojson               published + registration_closed events with coordinates, as FeatureCollection (id, name, slug, starts_on, ends_on, status, city, country, battles: names in display order, categories: what the map's chips match)
-GET    /api/events/{id_or_slug}
+GET    /api/events/{id_or_slug}           + can_edit, organizer {id, display_name, instagram_handle, verified} (M12, M12c)
 GET    /api/events/{id_or_slug}/flyer.svg  ?compact=&lang=en|fr|de   generated 4:5 flyer to inline (DESIGN.md §4.24)
 GET    /api/events/{id_or_slug}/og.png     ?lang=   1200×630 Open Graph image
 POST   /api/events                       logged in (promotes `user` → `organizer`)
@@ -399,6 +426,7 @@ PUT    /api/dancers/{id}                 see authorization rules; writes dancer_
 DELETE /api/dancers/{id}                 soft delete, seed_admin+
 POST   /api/dancers/{id}/claim           logged-in user → {code, status: pending}
 GET    /api/dancers/{id}/claim           current user's claim on this dancer, if any
+                                         (claims carry others_pending: someone else asked too; M12b)
 POST   /api/dancers/{id}/avatar          multipart image, owner only   (deferred: needs R2)
 
 GET    /api/admin/claims                 ?status=pending   admin
@@ -406,6 +434,14 @@ POST   /api/admin/claims/{id}/approve    admin
 POST   /api/admin/claims/{id}/reject     admin
 POST   /api/admin/dancers/{id}/merge     {into: uuid}      admin
 PUT    /api/admin/users/{id}/role        admin
+
+GET    /api/organizers/{id}              organiser page + can_edit; 404 below `organizer` (M12c)
+PUT    /api/organizers/{id}              own page only
+GET    /api/organizers/{id}/events       public jams, {upcoming, past}
+POST   /api/organizers/{id}/claim        own page, needs a handle → {code, status: pending}
+GET    /api/organizers/{id}/claim        own latest claim
+GET    /api/admin/organizer-claims       ?status=pending   admin
+POST   /api/admin/organizer-claims/{id}/approve | reject   admin
 
 GET    /api/crews                        ?q=&cursor=&limit=
 GET    /api/crews/{id}                   includes current members
@@ -437,7 +473,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Vite + React + TS strict. ESLint + Prettier with defaults.
 - Data fetching: TanStack Query only. No global state library. Auth state = `useQuery(['me'])`.
 - API client: `openapi-typescript` generates `src/api/schema.d.ts` from `backend` OpenAPI (`npm run gen:api` fetches `http://localhost:8080/api/openapi.json`). Calls go through `openapi-fetch`.
-- Routing: `/` (landing), `/map`, `/jams/{slug}`, `/dancers/{id}`, `/login`, `/register`, `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`. No `/dancers` index and no `/crews` routes in v0.1; the dancer page is reached from dancer names on a jam page, and crews render inline.
+- Routing: `/` (landing), `/map`, `/jams/{slug}`, `/dancers/{id}`, `/login`, `/register`, `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin/claims` and `/admin/dancers/{id}/merge`. No `/dancers` index and no `/crews` routes in v0.1; the dancer page is reached from dancer names on a jam page, and crews render inline.
 - Dancer page (`/dancers/{id}`): header (avatar, dancer name, one or two country flags, city, current crews, Instagram link, verified tick when `verified_at` is set, "Verify me" button for logged-in non-owners while unverified, "Edit" for whoever is allowed), then two lists from `GET /api/dancers/{id}/events` — **Upcoming** (jams with `starts_on >= today`, link to `/jams/{slug}`) and **Past** (reverse chronological, with battle name, role, a result badge (`final_rank` as "1st/2nd/3rd", else `reached` as "Top 8"…), and a play icon when the entry has a `video_url`). Empty states for each. This page is the seed of the "where does this bboy go / what did he do" feature; the only edit affordances are those in §4 "Dancer identity".
 - Video embeds: a play icon on an entry (jam page or dancer page) opens a modal with the official YouTube iframe (`youtube-nocookie.com/embed/{id}?start={offset}&rel=0`). Only YouTube URLs are accepted, validated server-side (`youtube.com/watch`, `youtu.be`, `youtube.com/live`); the video id is parsed once on save. Nothing is ever downloaded or hosted.
 - Landing page (`/`): hero with the one-line pitch ("The central place for breaking jams"), two buttons — primary **Find a jam** → `/map`, secondary **Register a jam** → `/org/jams/new` (redirects to `/login?next=/org/jams/new` when logged out) — a short three-step "how it works", footer with language switch. No data fetching on this page. A static, decorative map preview card links to `/map` (decided in M10; no jam data).
@@ -456,9 +492,10 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
   - Click a point → popup with name, dates, city → link to `/jams/{slug}`.
   - Filters and search (decided in M11), all client-side over the one GeoJSON download: **When** (this weekend, next 30 days; one at a time) and **battle categories** (1v1, 2v2, crews, 7 to smoke, bgirl, kids; any one matches), combined with AND. Search matches every word against name, city, country code and country name (accents ignored); Enter fits the map to the matches and opens the jam when there is one. The map shows upcoming jams only: no Past or Cancelled filters in v0.1.
   - Container: `height: 100dvh` minus header, `touch-action: none`.
-- Dancer picker (used in entry and staff editing): debounced search on `dancer_name` showing existing matches; "create new dancer" is only enabled after a search has run (search-before-create).
+- Dancer picker (used in entry and staff editing): debounced search on `dancer_name` showing existing matches; "create new dancer" is only enabled after a search has run (search-before-create). The crew picker works the same way.
+- Jam location (decided in M12): the organiser types the address, city and country; **Find on the map** searches them with OpenStreetMap's Nominatim from the browser (on that click only, never as-you-type, at most once a second, attributed under the field), drops the pin on the best match and lists the others; the pin can then be tapped or dragged. Without a pin a jam is published but stays off the map.
 - On the jam page, every dancer name (entries, staff) links to `/dancers/{id}`.
-- Generated avatars: a 2D manga-style illustrated avatar composed deterministically from `dancer.id` (same id → same face everywhere, no storage, no network call). Implementation: a layered SVG part set (face shape, eyes, hair, headwear such as beanie / cap / headband / bandana, top) picked by hashing the id; render client-side as inline SVG, ~1 KB each. Start with an open-source illustrated style (DiceBear's `adventurer` or `lorelei`, MIT/CC-BY — check attribution terms) via the `@dicebear/core` npm package, self-hosted, never the public DiceBear API. Replace with a commissioned breaking-specific part set when the product has traction. Flags are rendered as separate small chips next to the avatar, not drawn into it. Uploaded avatars (verified dancers) override the generated one.
+- Generated avatars (decided in M12b, following DESIGN.md §4.16 rather than DiceBear): the pixel 2D-HD bust, a 32×32 sprite drawn in code (`features/dancers/avatarParts.ts`) from six parts (hair, skin, hair colour, hoodie, extra, backdrop) and rendered as inline SVG with crisp edges plus the glow and vignette layer. Parts are seeded from `dancer.id` (same id → same face, no network call) unless `avatar_parts` holds a choice made in the edit sheet. The sprites are a first pass that an illustrator may redraw. Flags are separate chips next to the avatar, never drawn into it. Uploaded avatars (verified dancers) override the generated one. Organiser pages use the same bust, seeded by the account id.
 - Admin screens (`/admin/claims`, `/admin/dancers/{id}/merge`): minimal tables and forms, `admin` role only, no design polish required.
 
 ## 7. Testing

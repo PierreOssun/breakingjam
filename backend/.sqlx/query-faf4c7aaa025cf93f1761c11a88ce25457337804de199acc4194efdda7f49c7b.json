@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                  instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null\n           for update",
+  "query": "select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                  instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                  avatar_parts,\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null",
   "describe": {
     "columns": [
       {
@@ -159,6 +159,17 @@
       },
       {
         "ordinal": 13,
+        "name": "avatar_parts",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar_parts"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
         "name": "created_by",
         "type_info": "Uuid",
         "origin": {
@@ -169,7 +180,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "merged_into_id",
         "type_info": "Uuid",
         "origin": {
@@ -180,7 +191,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -191,7 +202,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -223,9 +234,10 @@
       true,
       true,
       true,
+      true,
       false,
       false
     ]
   },
-  "hash": "e7a97f44033d5954f11287f6bf59ff0b04942089fcdadc7ba820e7786b77c003"
+  "hash": "faf4c7aaa025cf93f1761c11a88ce25457337804de199acc4194efdda7f49c7b"
 }

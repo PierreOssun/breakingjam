@@ -563,6 +563,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/organizers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An organiser's page: name, Instagram, place, bio and the tick. */
+        get: operations["get_organizer"];
+        /** Replace your organiser page; a new Instagram handle needs verifying again. */
+        put: operations["update_organizer"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/organizers/{id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The organiser's public jams, split into upcoming and past. */
+        get: operations["organizer_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/organizers/{id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your latest Instagram claim. */
+        get: operations["my_organizer_claim"];
+        put?: never;
+        /** Verify your Instagram: get a code for your bio; repeating returns the same pending claim. */
+        post: operations["open_organizer_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/organizer-claims": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Organiser claims to review, oldest first. */
+        get: operations["list_organizer_claims"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/organizer-claims/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve: the organiser gets the tick, if the handle is still the one claimed. */
+        post: operations["approve_organizer_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/organizer-claims/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject an organiser claim; they may ask again. */
+        post: operations["reject_organizer_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -742,7 +846,7 @@ export interface components {
              * @description The account claiming it.
              */
             user_id: string;
-            /** @description Shown to the user, who puts it in their Instagram bio or DMs it to @breakingjam. */
+            /** @description Shown to the user, who puts it in their Instagram bio or DMs it to @breaking.jam. */
             code: string;
             /** @description Review state. */
             status: components["schemas"]["ClaimStatus"];
@@ -880,6 +984,8 @@ export interface components {
             verified_at?: string | null;
             /** @description Uploaded picture; null means the generated avatar. */
             avatar_url?: string | null;
+            /** @description The generated avatar's parts, e.g. `h2-s1-c0-o3-e0-b1`; null means seeded from the id. */
+            avatar_parts?: string | null;
             /**
              * Format: uuid
              * @description Set when an admin merged this row into another; it is then only a redirect.
@@ -921,6 +1027,8 @@ export interface components {
             bio?: string | null;
             /** @description `@handle` or `handle`; the identity key when present, unique case-insensitively. */
             instagram_handle?: string | null;
+            /** @description The generated avatar's parts (DESIGN.md §4.16); blank or absent means seeded from the id. */
+            avatar_parts?: string | null;
         };
         /** @description Body of `GET /dancers/{id}`: the page, or where a merged dancer now lives (§4 "Merge"). */
         DancerPage: {
@@ -1204,6 +1312,13 @@ export interface components {
             /** @description Where it is in its lifecycle. */
             status: components["schemas"]["EventStatus"];
         };
+        /** @description A jam page: the jam, and whether the caller may edit it. */
+        EventResponse: components["schemas"]["Event"] & {
+            /** @description Whether the caller may edit it, change its status or delete it. */
+            can_edit: boolean;
+            /** @description Who runs it: the jam page's organiser card (M12c). */
+            organizer: components["schemas"]["OrganizerRef"];
+        };
         /**
          * @description Lifecycle of a jam (§4 "Event status transitions").
          * @enum {string}
@@ -1314,6 +1429,107 @@ export interface components {
             aliases: string[];
             /** @description The survivor's handle, taken from the loser when it had none. */
             instagram_handle?: string | null;
+        };
+        /** @description Your claim on a dancer page, and whether someone else is claiming it too. */
+        MyClaim: components["schemas"]["Claim"] & {
+            /** @description Another account has a pending claim on the same page; both go to review. */
+            others_pending: boolean;
+        };
+        /** @description An organiser's page; never the account's email or role. */
+        Organizer: {
+            /**
+             * Format: uuid
+             * @description The account id.
+             */
+            id: string;
+            /** @description Public name, shown on their jams. */
+            display_name: string;
+            /** @description Lower case, no `@`. */
+            instagram_handle?: string | null;
+            /** @description ISO 3166-1 alpha-2. */
+            country?: string | null;
+            /** @description Home city. */
+            city?: string | null;
+            /** @description Free text. */
+            bio?: string | null;
+            /**
+             * Format: date-time
+             * @description Set when an admin confirmed the handle; cleared when the handle changes.
+             */
+            verified_at?: string | null;
+        };
+        /** @description A request to confirm an organiser's Instagram handle. */
+        OrganizerClaim: {
+            /**
+             * Format: uuid
+             * @description Primary key, UUIDv7.
+             */
+            id: string;
+            /**
+             * Format: uuid
+             * @description The organiser.
+             */
+            user_id: string;
+            /** @description The handle as it was when the claim was opened; approval confirms this one. */
+            instagram_handle: string;
+            /** @description Shown to the organiser, who puts it in their Instagram bio or DMs it to @breaking.jam. */
+            code: string;
+            /** @description Review state. */
+            status: components["schemas"]["ClaimStatus"];
+            /**
+             * Format: date-time
+             * @description When an admin decided; null while pending.
+             */
+            reviewed_at?: string | null;
+            /**
+             * Format: date-time
+             * @description When the claim was opened.
+             */
+            created_at: string;
+        };
+        /** @description An organiser claim in the admin review queue. */
+        OrganizerClaimForReview: components["schemas"]["OrganizerClaim"] & {
+            /** @description Who is asking. */
+            user: components["schemas"]["ClaimUser"];
+        };
+        /** @description Body of `GET /organizers/{id}/events`: upcoming soonest first, past most recent first. */
+        OrganizerEvents: {
+            /** @description Public jams starting today or later. */
+            upcoming: components["schemas"]["EventRef"][];
+            /** @description Earlier public jams, cancelled ones included. */
+            past: components["schemas"]["EventRef"][];
+        };
+        /** @description Everything an organiser sets on their page. */
+        OrganizerFields: {
+            /** @description Public name, up to 80 characters; also the account's display name. */
+            display_name: string;
+            /** @description `@handle` or `handle`; unique case-insensitively. Changing it drops the tick. */
+            instagram_handle?: string | null;
+            /** @description ISO 3166-1 alpha-2. */
+            country?: string | null;
+            /** @description Blank is stored as null. */
+            city?: string | null;
+            /** @description Blank is stored as null. */
+            bio?: string | null;
+        };
+        /** @description The organiser shown on a jam page: name, tick and where to contact them. */
+        OrganizerRef: {
+            /**
+             * Format: uuid
+             * @description The account id; the page is `/organizers/{id}`.
+             */
+            id: string;
+            /** @description Public name. */
+            display_name: string;
+            /** @description Lower case, no `@`. */
+            instagram_handle?: string | null;
+            /** @description Whether the handle is confirmed. */
+            verified: boolean;
+        };
+        /** @description An organiser page, and whether the caller may edit it. */
+        OrganizerResponse: components["schemas"]["Organizer"] & {
+            /** @description Only the organiser edits their own page. */
+            can_edit: boolean;
         };
         /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
         Page_ClaimForReview: {
@@ -1454,6 +1670,16 @@ export interface components {
                  */
                 updated_at: string;
             }[];
+            /** @description Pass as `?cursor=` for the next page; null on the last one. */
+            next_cursor?: string | null;
+        };
+        /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
+        Page_OrganizerClaimForReview: {
+            /** @description At most `limit` rows. */
+            items: (components["schemas"]["OrganizerClaim"] & {
+                /** @description Who is asking. */
+                user: components["schemas"]["ClaimUser"];
+            })[];
             /** @description Pass as `?cursor=` for the next page; null on the last one. */
             next_cursor?: string | null;
         };
@@ -1885,7 +2111,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Event"];
+                    "application/json": components["schemas"]["EventResponse"];
                 };
             };
             /** @description No such jam, or a draft you can't see */
@@ -3346,7 +3572,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Claim"];
+                    "application/json": components["schemas"]["MyClaim"];
                 };
             };
             /** @description No valid session */
@@ -3386,7 +3612,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Claim"];
+                    "application/json": components["schemas"]["MyClaim"];
                 };
             };
             /** @description No valid session */
@@ -3711,6 +3937,424 @@ export interface operations {
             };
             /** @description Your own role */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_organizer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Account id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizerResponse"];
+                };
+            };
+            /** @description No such account, or it never registered a jam */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    update_organizer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Account id: your own */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizerFields"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizerResponse"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Someone else's page */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No organiser page */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Instagram handle already taken */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    organizer_events: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Account id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizerEvents"];
+                };
+            };
+            /** @description No organiser page */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    my_organizer_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Account id: your own */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizerClaim"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Someone else's page */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No claim yet */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    open_organizer_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Account id: your own */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizerClaim"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Someone else's page */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No organiser page */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Already verified */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No Instagram handle to verify */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_organizer_claims: {
+        parameters: {
+            query?: {
+                /** @description Defaults to `pending`. */
+                status?: components["schemas"]["ClaimStatus"];
+                /** @description `next_cursor` of the previous page. */
+                cursor?: string;
+                /** @description Page size, defaulted and clamped by `page::limit`. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_OrganizerClaimForReview"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid cursor */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    approve_organizer_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Claim id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizerClaim"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Already reviewed, or the handle changed since */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    reject_organizer_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Claim id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizerClaim"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Already reviewed */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

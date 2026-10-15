@@ -60,6 +60,7 @@ async fn claim_then_approve_hands_the_page_over(pool: PgPool) {
     let claim = w.claim(&dancer, &lilg).await;
     assert_eq!(claim.status, StatusCode::OK);
     assert_eq!(claim.json["status"], "pending");
+    assert_eq!(claim.json["others_pending"], false);
     let code = claim.json["code"].as_str().unwrap();
     assert!(code.starts_with("BJ-") && code.len() == 7);
     let again = w.claim(&dancer, &lilg).await;
@@ -68,6 +69,10 @@ async fn claim_then_approve_hands_the_page_over(pool: PgPool) {
         "one pending claim per dancer and user"
     );
     let rival_claim = w.claim(&dancer, &rival).await.json;
+    assert_eq!(
+        rival_claim["others_pending"], true,
+        "the verify modal warns that someone else asked first"
+    );
 
     let mine = send(
         &w.app,
@@ -75,6 +80,7 @@ async fn claim_then_approve_hands_the_page_over(pool: PgPool) {
     )
     .await;
     assert_eq!(mine.json["code"], code);
+    assert_eq!(mine.json["others_pending"], true);
 
     let as_user = send(&w.app, get("/api/admin/claims", Some(&lilg))).await;
     assert_eq!(as_user.status, StatusCode::FORBIDDEN);
@@ -141,7 +147,8 @@ async fn edits_to_unverified_dancers_are_logged(pool: PgPool) {
     let dancer = w.dancer("Lil G", None).await;
     let uri = format!("/api/dancers/{dancer}");
     let body = json!({ "dancer_name": "Lil G", "country": "FR", "city": "Lyon",
-                       "instagram_handle": "@LilG", "aliases": ["G"] });
+                       "instagram_handle": "@LilG", "aliases": ["G"],
+                       "avatar_parts": "h2-s1-c0-o3-e0-b1" });
     assert_eq!(
         send(&w.app, put(&uri, body, Some(&w.organizer)))
             .await
@@ -171,10 +178,15 @@ async fn edits_to_unverified_dancers_are_logged(pool: PgPool) {
         logged,
         [
             ("aliases", None, Some("G")),
+            ("avatar_parts", None, Some("h2-s1-c0-o3-e0-b1")),
             ("city", None, Some("Lyon")),
             ("instagram_handle", None, Some("lilg")),
         ]
     );
+    let bad = json!({ "dancer_name": "Lil G", "country": "FR", "avatar_parts": "h9-s1" });
+    let rejected = send(&w.app, put(&uri, bad, Some(&w.organizer))).await;
+    assert_eq!(rejected.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(rejected.json["error"]["fields"][0]["field"], "avatar_parts");
 
     // Verified pages are their owner's; their edits are not logged.
     sqlx::query!("update dancers set verified_at = now() where id = $1", id)
@@ -192,7 +204,7 @@ async fn edits_to_unverified_dancers_are_logged(pool: PgPool) {
     .fetch_one(&w.pool)
     .await
     .unwrap();
-    assert_eq!(count, 3);
+    assert_eq!(count, 4);
 }
 
 /// A published jam with one 1v1 battle; returns (event id, battle id).

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { ToastProvider } from "./Toast";
 
 function SkipLink() {
   const { t } = useTranslation();
@@ -18,26 +19,30 @@ function SkipLink() {
 /** Content pages: sticky header, document scroll, footer (DESIGN.md §5). */
 export function PageLayout() {
   return (
-    <div className="flex min-h-dvh flex-col">
-      <SkipLink />
-      <Header />
-      <main id="main" className="flex-1">
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
+    <ToastProvider>
+      <div className="flex min-h-dvh flex-col">
+        <SkipLink />
+        <Header />
+        <main id="main" className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </ToastProvider>
   );
 }
 
 /** The map: an app shell with no footer and no page scroll (DESIGN.md §5). */
 export function AppLayout() {
   return (
-    <div className="flex h-dvh flex-col overflow-hidden">
-      <SkipLink />
-      <Header sticky={false} />
-      <main id="main" className="relative flex-1">
-        <Outlet />
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="flex h-dvh flex-col overflow-hidden">
+        <SkipLink />
+        <Header sticky={false} />
+        <main id="main" className="relative flex-1">
+          <Outlet />
+        </main>
+      </div>
+    </ToastProvider>
   );
 }

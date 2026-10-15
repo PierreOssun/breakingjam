@@ -1,33 +1,45 @@
-const shape = "size-24 rounded-[28px] lg:size-28 lg:rounded-[32px]";
+import { useMemo } from "react";
+import { partsOf } from "./avatarParts";
+import { PixelAvatar } from "./PixelAvatar";
 
-/**
- * Rounded-square avatar (DESIGN.md §4.16): the uploaded photo, else a placeholder initial.
- * The generated pixel avatar replaces the initial in M12b.
- */
-export function DancerAvatar({
-  name,
-  avatarUrl,
-}: {
-  name: string;
-  avatarUrl?: string | null;
-}) {
-  if (avatarUrl) {
+const SHAPES = {
+  page: "size-24 rounded-[28px] lg:size-28 lg:rounded-[32px]",
+  form: "size-[72px] rounded-[22px]",
+};
+
+type DancerAvatarProps = {
+  dancer: {
+    id: string;
+    dancer_name: string;
+    avatar_url?: string | null;
+    avatar_parts?: string | null;
+  };
+  /** `page`: the identity card · `form`: the edit sheet's preview (DESIGN.md §4.16). */
+  size?: keyof typeof SHAPES;
+};
+
+/** Rounded-square avatar: the uploaded photo, else the generated pixel bust. */
+export function DancerAvatar({ dancer, size = "page" }: DancerAvatarProps) {
+  const shape = `${SHAPES[size]} shrink-0 overflow-hidden border border-border`;
+  const { id, avatar_parts } = dancer;
+  const parts = useMemo(
+    () => partsOf({ id, avatar_parts }),
+    [id, avatar_parts],
+  );
+  if (dancer.avatar_url) {
     return (
       <img
-        src={avatarUrl}
-        alt={name}
-        className={`${shape} border border-border object-cover`}
+        src={dancer.avatar_url}
+        alt={dancer.dancer_name}
+        className={`${shape} object-cover`}
       />
     );
   }
-  const initial = [...name.trim()][0]?.toUpperCase() ?? "";
   return (
-    <div
-      role="img"
-      aria-label={name}
-      className={`${shape} flex items-center justify-center border border-border bg-surface-raised font-display text-display-lg text-muted`}
-    >
-      {initial}
-    </div>
+    <PixelAvatar
+      parts={parts}
+      label={dancer.dancer_name}
+      className={`${shape} block`}
+    />
   );
 }

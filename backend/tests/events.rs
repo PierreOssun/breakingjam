@@ -114,6 +114,7 @@ async fn drafts_are_visible_to_writers_only(pool: PgPool) {
     let by_slug = send(&app, get(&format!("/api/events/{slug}"), Some(&owner))).await;
     assert_eq!(by_slug.status, StatusCode::OK);
     assert_eq!(by_slug.json["id"], id);
+    assert_eq!(by_slug.json["can_edit"], true);
 
     let anonymous = send(&app, get(&format!("/api/events/{id}"), None)).await;
     assert_eq!(anonymous.status, StatusCode::NOT_FOUND);
@@ -125,10 +126,14 @@ async fn drafts_are_visible_to_writers_only(pool: PgPool) {
     make_seed_admin(&pool, "seed@example.com").await;
     let seen = send(&app, get(&format!("/api/events/{id}"), Some(&admin))).await;
     assert_eq!(seen.status, StatusCode::OK);
+    assert_eq!(seen.json["can_edit"], true, "seed_admin writes any jam");
 
     act(&app, &owner, id, "publish").await;
     let public = send(&app, get(&format!("/api/events/{slug}"), None)).await;
     assert_eq!(public.status, StatusCode::OK);
+    assert_eq!(public.json["can_edit"], false);
+    let read_only = send(&app, get(&format!("/api/events/{slug}"), Some(&stranger))).await;
+    assert_eq!(read_only.json["can_edit"], false);
 }
 
 #[sqlx::test]

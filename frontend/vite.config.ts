@@ -22,6 +22,8 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
+    // Lazy pages wait up to 5 s per findBy (setup.ts); the test needs room for several.
+    testTimeout: 15_000,
     // Vitest blanks CSS by default; the token test needs the real stylesheet text.
     css: { include: [/src\/styles\/index\.css/] },
   },

@@ -1,12 +1,12 @@
 import type { RouteObject } from "react-router";
-import { ComingSoon } from "./components/ComingSoon";
 import { AppLayout, PageLayout } from "./components/Layout";
+import { RequireAdmin } from "./features/auth/RequireAdmin";
 import { RequireAuth } from "./features/auth/RequireAuth";
 import { LandingPage } from "./routes/LandingPage";
 import { NotFoundPage } from "./routes/NotFoundPage";
 
 /**
- * Every page of v0.1 (§6 Routing); `ComingSoon` marks the ones built in M12.
+ * Every page of v0.1 (§6 Routing).
  * Form pages load on demand, so zod and react-hook-form stay out of the first download.
  */
 export const routes: RouteObject[] = [
@@ -29,6 +29,12 @@ export const routes: RouteObject[] = [
         }),
       },
       {
+        path: "/organizers/:id",
+        lazy: async () => ({
+          Component: (await import("./routes/OrganizerPage")).OrganizerPage,
+        }),
+      },
+      {
         path: "/login",
         lazy: async () => ({
           Component: (await import("./routes/LoginPage")).LoginPage,
@@ -43,14 +49,43 @@ export const routes: RouteObject[] = [
       {
         element: <RequireAuth />,
         children: [
-          { path: "/org/jams", element: <ComingSoon title="pages.orgJams" /> },
+          {
+            path: "/org/jams",
+            lazy: async () => ({
+              Component: (await import("./routes/OrgJamsPage")).OrgJamsPage,
+            }),
+          },
           {
             path: "/org/jams/new",
-            element: <ComingSoon title="pages.orgJamNew" />,
+            lazy: async () => ({
+              Component: (await import("./routes/OrgJamNewPage")).OrgJamNewPage,
+            }),
+          },
+          {
+            element: <RequireAdmin />,
+            children: [
+              {
+                path: "/admin/claims",
+                lazy: async () => ({
+                  Component: (await import("./routes/AdminClaimsPage"))
+                    .AdminClaimsPage,
+                }),
+              },
+              {
+                path: "/admin/dancers/:id/merge",
+                lazy: async () => ({
+                  Component: (await import("./routes/AdminMergePage"))
+                    .AdminMergePage,
+                }),
+              },
+            ],
           },
           {
             path: "/org/jams/:id/edit",
-            element: <ComingSoon title="pages.orgJamEdit" />,
+            lazy: async () => ({
+              Component: (await import("./routes/OrgJamEditPage"))
+                .OrgJamEditPage,
+            }),
           },
         ],
       },

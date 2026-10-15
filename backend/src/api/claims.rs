@@ -4,8 +4,8 @@ use axum::{
     Json,
     extract::{Path, Query, State},
 };
-use serde::Deserialize;
-use utoipa::IntoParams;
+use serde::{Deserialize, Serialize};
+use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
@@ -42,6 +42,16 @@ pub struct QueueQuery {
     pub limit: Option<i64>,
 }
 
+/// Your claim on a dancer page, and whether someone else is claiming it too.
+#[derive(Debug, Serialize, ToSchema)]
+pub struct MyClaim {
+    /// The claim itself.
+    #[serde(flatten)]
+    pub claim: Claim,
+    /// Another account has a pending claim on the same page; both go to review.
+    pub others_pending: bool,
+}
+
 /// "Verify me": get a code to put in your Instagram bio; repeating returns the same pending claim.
 #[utoipa::path(
     post,
@@ -51,7 +61,7 @@ pub struct QueueQuery {
     params(("id" = Uuid, Path, description = "Dancer id")),
     security(("session" = [])),
     responses(
-        (status = OK, body = Claim),
+        (status = OK, body = MyClaim),
         (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such dancer, or merged away", body = ErrorEnvelope),
         (status = CONFLICT, description = "Dancer already verified, or you already own a page", body = ErrorEnvelope),
@@ -61,7 +71,7 @@ async fn open(
     State(state): State<AppState>,
     current: CurrentUser,
     Path(dancer_id): Path<Uuid>,
-) -> Result<Json<Claim>, AppError> {
+) -> Result<Json<MyClaim>, AppError> {
     let dancer = db::dancers::find_live(&state.pool, dancer_id)
         .await?
         .ok_or(AppError::NotFound)?;
@@ -72,9 +82,8 @@ async fn open(
     if db::users::owns_dancer(&state.pool, current.user.id).await? {
         return Err(AppError::Conflict("you already own a dancer page".into()));
     }
-    Ok(Json(
-        db::claims::open(&state.pool, dancer_id, current.user.id).await?,
-    ))
+    let claim = db::claims::open(&state.pool, dancer_id, current.user.id).await?;
+    with_others(&state, claim).await
 }
 
 /// Your latest claim on this dancer.
@@ -86,7 +95,7 @@ async fn open(
     params(("id" = Uuid, Path, description = "Dancer id")),
     security(("session" = [])),
     responses(
-        (status = OK, body = Claim),
+        (status = OK, body = MyClaim),
         (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No claim yet", body = ErrorEnvelope),
     )
@@ -95,11 +104,20 @@ async fn mine(
     State(state): State<AppState>,
     current: CurrentUser,
     Path(dancer_id): Path<Uuid>,
-) -> Result<Json<Claim>, AppError> {
-    db::claims::latest(&state.pool, dancer_id, current.user.id)
+) -> Result<Json<MyClaim>, AppError> {
+    let claim = db::claims::latest(&state.pool, dancer_id, current.user.id)
         .await?
-        .map(Json)
-        .ok_or(AppError::NotFound)
+        .ok_or(AppError::NotFound)?;
+    with_others(&state, claim).await
+}
+
+async fn with_others(state: &AppState, claim: Claim) -> Result<Json<MyClaim>, AppError> {
+    let others_pending =
+        db::claims::others_pending(&state.pool, claim.dancer_id, claim.user_id).await?;
+    Ok(Json(MyClaim {
+        claim,
+        others_pending,
+    }))
 }
 
 /// Claims to review, oldest first.
