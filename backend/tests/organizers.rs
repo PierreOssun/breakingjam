@@ -180,3 +180,27 @@ async fn a_handle_changed_during_review_cannot_be_approved(pool: PgPool) {
     assert_eq!(fresh.json["instagram_handle"], "someone.else");
     assert_ne!(fresh.json["id"], opened.json["id"]);
 }
+
+#[sqlx::test]
+async fn a_rejected_claim_can_be_made_again(pool: PgPool) {
+    let app = app(pool.clone());
+    let admin = sign_up(&app, "admin@example.com").await;
+    set_role(&pool, "admin@example.com", "admin").await;
+    let (cookie, id, _) = organizer(&app, "org@example.com", "2030-06-01").await;
+    edit(&app, &id, profile(Some("floor.lords")), &cookie).await;
+    let first = claim(&app, &id, &cookie).await;
+    let first_id = first.json["id"].as_str().unwrap();
+
+    let uri = format!("/api/admin/organizer-claims/{first_id}/reject");
+    let rejected = send(&app, post(&uri, json!({}), Some(&admin))).await;
+    assert_eq!(rejected.status, StatusCode::OK);
+    assert_eq!(rejected.json["status"], "rejected");
+    let again = send(&app, post(&uri, json!({}), Some(&admin))).await;
+    assert_eq!(again.status, StatusCode::CONFLICT, "already reviewed");
+    let page = send(&app, get(&format!("/api/organizers/{id}"), None)).await;
+    assert_eq!(page.json["verified_at"], Value::Null);
+
+    let retry = claim(&app, &id, &cookie).await;
+    assert_eq!(retry.json["status"], "pending");
+    assert_ne!(retry.json["id"], first.json["id"]);
+}

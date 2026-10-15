@@ -1,0 +1,125 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select s.role as \"role: StaffRole\", d.id, d.dancer_name, d.country, d.country2,\n                  d.instagram_handle, d.avatar_url, d.avatar_parts\n           from event_staff s join dancers d on d.id = s.dancer_id\n           where s.event_id = $1\n           order by s.role, lower(d.dancer_name), d.id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "role: StaffRole",
+        "type_info": {
+          "Custom": {
+            "name": "staff_role",
+            "kind": {
+              "Enum": [
+                "judge",
+                "dj",
+                "mc",
+                "organizer",
+                "other"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "event_staff",
+            "name": "role"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "dancer_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "dancer_name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "country2",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country2"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "avatar_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar_url"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "avatar_parts",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar_parts"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "944ed39bfcf70cf6166fa73044c88a6575291ed3d133445ba43d241462cf83e6"
+}

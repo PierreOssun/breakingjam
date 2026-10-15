@@ -3,7 +3,7 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, delete, get, post, put, send, set_role, sign_up};
+use test_app::{TestResponse, app, delete, get, id_of, post, put, send, set_role, sign_up};
 use uuid::Uuid;
 
 fn dancer(name: &str, handle: Option<&str>) -> Value {
@@ -21,10 +21,6 @@ fn dancer(name: &str, handle: Option<&str>) -> Value {
 
 async fn create(app: &Router, cookie: &str, body: Value) -> TestResponse {
     send(app, post("/api/dancers", body, Some(cookie))).await
-}
-
-fn id_of(response: &TestResponse) -> String {
-    response.json["id"].as_str().unwrap().to_owned()
 }
 
 fn names(response: &TestResponse) -> Vec<String> {
@@ -77,6 +73,19 @@ async fn handle_is_unique_but_names_are_not(pool: PgPool) {
     assert_eq!(same_name.status, StatusCode::CREATED);
     let no_handle = create(&app, &cookie, dancer("Lil G", None)).await;
     assert_eq!(no_handle.status, StatusCode::CREATED);
+
+    // Taking someone's handle on an edit is refused too.
+    let id = no_handle.json["id"].as_str().unwrap();
+    let taken = send(
+        &app,
+        put(
+            &format!("/api/dancers/{id}"),
+            dancer("Lil G", Some("LilG")),
+            Some(&cookie),
+        ),
+    )
+    .await;
+    assert_eq!(taken.status, StatusCode::CONFLICT);
 }
 
 #[sqlx::test]

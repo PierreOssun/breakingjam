@@ -79,8 +79,8 @@ async fn create(
     ValidJson(fields): ValidJson<BattleFields>,
 ) -> Result<(StatusCode, Json<Battle>), AppError> {
     writable(&state, &current, event_id).await?;
-    let battle =
-        db::battles::insert(&state.pool, event_id, &fields.display_name(), &fields).await?;
+    let mut conn = state.pool.acquire().await?;
+    let battle = db::battles::insert(&mut conn, event_id, &fields.display_name(), &fields).await?;
     Ok((StatusCode::CREATED, Json(battle)))
 }
 

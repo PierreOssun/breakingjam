@@ -1,15 +1,24 @@
-//! Dev seed: admin users, sample jams, dancers and crews (ARCHITECTURE §8).
+//! Local dev seed: admin users, sample jams with battles and results, dancers and crews (ARCHITECTURE §8).
+
+use std::collections::HashMap;
 
 use anyhow::Context;
 use breakingjam::{
     auth::password,
+    db,
     domain::{
+        battle::{
+            BattleAge, BattleFields, BattleFormat, BattleGender, BracketStage, EntryFields,
+            EntryStatus,
+            StaffRole::{self, Dj, Judge, Mc},
+        },
         event::{EventStatus, slug},
         user::Role,
     },
 };
-use sqlx::{PgConnection, PgPool};
+use sqlx::{PgConnection, PgPool, postgres::PgConnectOptions};
 use uuid::Uuid;
+use validator::Validate;
 
 struct User {
     email: &'static str,
@@ -24,7 +33,7 @@ const ADMIN: User = User {
 };
 const SEED_ADMIN: User = User {
     email: "seed@breakingjam.local",
-    display_name: "Seed Admin",
+    display_name: "BreakingJam Team",
     role: Role::SeedAdmin,
 };
 
@@ -39,20 +48,164 @@ struct Event {
     starts_in_days: i32,
     length_days: i32,
     status: EventStatus,
+    /// Judges, DJs and MCs, by dancer name.
+    staff: &'static [(StaffRole, &'static str)],
+    battles: &'static [Battle],
 }
+
+struct Battle {
+    format: BattleFormat,
+    team_size: Option<i16>,
+    gender: BattleGender,
+    age: BattleAge,
+    /// ISO 4217 currency and the cash prizes for 1st, 2nd and 3rd.
+    prize: Option<(&'static str, [i32; 3])>,
+    /// Dancers, or crews in team battles; a completed jam lists them in finishing order.
+    entrants: &'static [&'static str],
+}
+
+const BBOY_1V1: Battle = Battle {
+    format: BattleFormat::Team,
+    team_size: Some(1),
+    gender: BattleGender::Bboy,
+    age: BattleAge::Na,
+    prize: None,
+    entrants: &[],
+};
+const BGIRL_1V1: Battle = Battle {
+    gender: BattleGender::Bgirl,
+    ..BBOY_1V1
+};
+const KIDS_1V1: Battle = Battle {
+    gender: BattleGender::Mixed,
+    age: BattleAge::Kids,
+    ..BBOY_1V1
+};
+const CREW_2V2: Battle = Battle {
+    team_size: Some(2),
+    gender: BattleGender::Mixed,
+    ..BBOY_1V1
+};
+const CREW_3V3: Battle = Battle {
+    team_size: Some(3),
+    ..CREW_2V2
+};
+const SEVEN_TO_SMOKE: Battle = Battle {
+    format: BattleFormat::SevenToSmoke,
+    team_size: None,
+    ..BBOY_1V1
+};
 
 #[rustfmt::skip]
 const EVENTS: &[Event] = &[
-    Event { name: "Paris Cypher Sessions", city: "Paris", country: "FR", timezone: "Europe/Paris", lat: 48.8566, lng: 2.3522, starts_in_days: 20, length_days: 2, status: EventStatus::Published },
-    Event { name: "Berlin Floor Wars", city: "Berlin", country: "DE", timezone: "Europe/Berlin", lat: 52.5200, lng: 13.4050, starts_in_days: 35, length_days: 1, status: EventStatus::Published },
-    Event { name: "Zurich Toprock Jam", city: "Zurich", country: "CH", timezone: "Europe/Zurich", lat: 47.3769, lng: 8.5417, starts_in_days: 50, length_days: 1, status: EventStatus::Published },
-    Event { name: "Lyon Footwork Fest", city: "Lyon", country: "FR", timezone: "Europe/Paris", lat: 45.7640, lng: 4.8357, starts_in_days: 80, length_days: 2, status: EventStatus::Published },
-    Event { name: "Amsterdam Freeze Frame", city: "Amsterdam", country: "NL", timezone: "Europe/Amsterdam", lat: 52.3676, lng: 4.9041, starts_in_days: 10, length_days: 1, status: EventStatus::RegistrationClosed },
-    Event { name: "Seoul Power Moves", city: "Seoul", country: "KR", timezone: "Asia/Seoul", lat: 37.5665, lng: 126.9780, starts_in_days: 45, length_days: 2, status: EventStatus::Published },
-    Event { name: "Tokyo Underground Cypher", city: "Tokyo", country: "JP", timezone: "Asia/Tokyo", lat: 35.6762, lng: 139.6503, starts_in_days: -30, length_days: 1, status: EventStatus::Completed },
-    Event { name: "Taipei Breaking Open", city: "Taipei", country: "TW", timezone: "Asia/Taipei", lat: 25.0330, lng: 121.5654, starts_in_days: -60, length_days: 2, status: EventStatus::Completed },
-    Event { name: "Bangkok Groove Battle", city: "Bangkok", country: "TH", timezone: "Asia/Bangkok", lat: 13.7563, lng: 100.5018, starts_in_days: -120, length_days: 1, status: EventStatus::Completed },
-    Event { name: "Montpellier Kids Jam", city: "Montpellier", country: "FR", timezone: "Europe/Paris", lat: 43.6108, lng: 3.8767, starts_in_days: 140, length_days: 1, status: EventStatus::Draft },
+    Event {
+        name: "Paris Cypher Sessions", city: "Paris", country: "FR", timezone: "Europe/Paris", lat: 48.8566, lng: 2.3522,
+        starts_in_days: 20, length_days: 2, status: EventStatus::Published,
+        staff: &[(Judge, "Menno"), (Judge, "Hong 10"), (Dj, "DJ Krate"), (Mc, "MC Volta")],
+        battles: &[
+            Battle { prize: Some(("EUR", [1500, 750, 300])), entrants: &["Lilou", "Dany Dann", "Junior", "Mounir", "Kid Rocket", "Ventus", "Moonwalka", "Echo"], ..BBOY_1V1 },
+            Battle { entrants: &["Floor Lords", "Spin Syndicate", "Alpine Breakers", "Tokyo Freeze"], ..CREW_2V2 },
+        ],
+    },
+    Event {
+        name: "Berlin Floor Wars", city: "Berlin", country: "DE", timezone: "Europe/Berlin", lat: 52.5200, lng: 13.4050,
+        starts_in_days: 35, length_days: 1, status: EventStatus::Published,
+        staff: &[(Judge, "Lil Zoo"), (Judge, "Junior"), (Dj, "DJ Loopa"), (Mc, "MC Rhyno")],
+        battles: &[
+            Battle { prize: Some(("EUR", [3000, 1500, 600])), entrants: &["Spin Syndicate", "Floor Lords", "Seoul Riders", "Tokyo Freeze"], ..CREW_3V3 },
+            Battle { entrants: &["Bgirl Lumen", "Bgirl Ember", "Bgirl Saffron", "Bgirl Pixel"], ..BGIRL_1V1 },
+        ],
+    },
+    Event {
+        name: "Zurich Toprock Jam", city: "Zurich", country: "CH", timezone: "Europe/Zurich", lat: 47.3769, lng: 8.5417,
+        starts_in_days: 50, length_days: 1, status: EventStatus::Published,
+        staff: &[(Judge, "Lilou"), (Dj, "DJ Krate"), (Mc, "MC Volta")],
+        battles: &[
+            Battle { prize: Some(("CHF", [1000, 500, 250])), entrants: &["Lil Zoo", "Menno", "Atlas", "Drift", "Spinzilla", "Krypt"], ..BBOY_1V1 },
+            Battle { entrants: &["Alpine Breakers", "Spin Syndicate", "Floor Lords", "Seoul Riders"], ..CREW_2V2 },
+        ],
+    },
+    Event {
+        name: "Lyon Footwork Fest", city: "Lyon", country: "FR", timezone: "Europe/Paris", lat: 45.7640, lng: 4.8357,
+        starts_in_days: 80, length_days: 2, status: EventStatus::Published,
+        staff: &[(Judge, "Victor"), (Dj, "DJ Loopa")],
+        battles: &[
+            Battle { entrants: &["Lilou", "Mounir", "Ventus", "Moonwalka"], ..BBOY_1V1 },
+            Battle { entrants: &["Dany Dann", "Junior", "Kid Rocket", "Echo"], ..SEVEN_TO_SMOKE },
+        ],
+    },
+    Event {
+        name: "Amsterdam Freeze Frame", city: "Amsterdam", country: "NL", timezone: "Europe/Amsterdam", lat: 52.3676, lng: 4.9041,
+        starts_in_days: 10, length_days: 1, status: EventStatus::RegistrationClosed,
+        staff: &[(Judge, "Lil Zoo"), (Judge, "Physicx"), (Dj, "DJ Krate")],
+        battles: &[
+            Battle { prize: Some(("EUR", [1000, 500, 250])), entrants: &["Menno", "Halo", "Glitch", "Sunni", "Echo", "Krypt", "Flexo", "Drift"], ..BBOY_1V1 },
+            Battle { entrants: &["Bgirl Ember", "Bgirl Lumen"], ..BGIRL_1V1 },
+        ],
+    },
+    Event {
+        name: "Seoul Power Moves", city: "Seoul", country: "KR", timezone: "Asia/Seoul", lat: 37.5665, lng: 126.9780,
+        starts_in_days: 45, length_days: 2, status: EventStatus::Published,
+        staff: &[(Judge, "Menno"), (Judge, "Lilou"), (Judge, "Victor"), (Dj, "DJ Loopa"), (Mc, "MC Rhyno")],
+        battles: &[
+            Battle { prize: Some(("KRW", [5_000_000, 2_000_000, 1_000_000])), entrants: &["Hong 10", "Wing", "Physicx", "Pocket", "Shigekix", "Issei", "Sensei Kai", "Vortex"], ..BBOY_1V1 },
+            Battle { entrants: &["Seoul Riders", "Tokyo Freeze", "Floor Lords", "Spin Syndicate"], ..CREW_2V2 },
+        ],
+    },
+    Event {
+        name: "Tokyo Underground Cypher", city: "Tokyo", country: "JP", timezone: "Asia/Tokyo", lat: 35.6762, lng: 139.6503,
+        starts_in_days: -30, length_days: 1, status: EventStatus::Completed,
+        staff: &[(Judge, "Wing"), (Judge, "Lilou"), (Dj, "DJ Krate"), (Mc, "MC Rhyno")],
+        battles: &[
+            Battle { prize: Some(("JPY", [300_000, 150_000, 50_000])), entrants: &["Shigekix", "Issei", "Taisuke", "Hong 10", "Ronin", "Tetris", "Noodle", "Mako"], ..BBOY_1V1 },
+            Battle { entrants: &["Tokyo Freeze", "Seoul Riders", "Floor Lords", "Spin Syndicate"], ..CREW_2V2 },
+        ],
+    },
+    Event {
+        name: "Taipei Breaking Open", city: "Taipei", country: "TW", timezone: "Asia/Taipei", lat: 25.0330, lng: 121.5654,
+        starts_in_days: -60, length_days: 2, status: EventStatus::Completed,
+        staff: &[(Judge, "Hong 10"), (Judge, "Shigekix"), (Dj, "DJ Loopa"), (Mc, "MC Volta")],
+        battles: &[
+            Battle { prize: Some(("TWD", [100_000, 50_000, 20_000])), entrants: &["Physicx", "Wing", "Pocket", "Amir", "Zephyr", "Pharo", "Mako", "Vortex"], ..BBOY_1V1 },
+            Battle { entrants: &["Bgirl Mira", "Bgirl Kaida", "Bgirl Pixel", "Bgirl Ember"], ..BGIRL_1V1 },
+        ],
+    },
+    Event {
+        name: "Vancouver Northern Breaks", city: "Vancouver", country: "CA", timezone: "America/Vancouver", lat: 49.2827, lng: -123.1207,
+        starts_in_days: -75, length_days: 1, status: EventStatus::Completed,
+        staff: &[(Judge, "Lil Zoo"), (Judge, "Menno"), (Dj, "DJ Loopa"), (Mc, "MC Rhyno")],
+        battles: &[
+            Battle { prize: Some(("CAD", [5000, 2500, 1000])), entrants: &["Phil Wizard", "Victor", "Roxrite", "Omar", "Neguin", "Rhythmic", "Lil Nova", "Echo"], ..BBOY_1V1 },
+            Battle { entrants: &["Bgirl Lumen", "Bgirl Saffron", "Toprock Tina", "Bgirl Mira"], ..BGIRL_1V1 },
+        ],
+    },
+    Event {
+        name: "Bangkok Groove Battle", city: "Bangkok", country: "TH", timezone: "Asia/Bangkok", lat: 13.7563, lng: 100.5018,
+        starts_in_days: -120, length_days: 1, status: EventStatus::Completed,
+        staff: &[(Judge, "Menno"), (Dj, "DJ Loopa")],
+        battles: &[
+            Battle { prize: Some(("THB", [50_000, 20_000, 10_000])), entrants: &["Hong 10", "Issei", "Victor", "Pharo", "Jinx", "Taisuke", "Kid Rocket", "Ventus"], ..BBOY_1V1 },
+            Battle { entrants: &["Pocket", "Mako", "Vortex", "Ronin"], ..SEVEN_TO_SMOKE },
+        ],
+    },
+    Event {
+        name: "Vienna Floor Kings", city: "Vienna", country: "AT", timezone: "Europe/Vienna", lat: 48.2082, lng: 16.3738,
+        starts_in_days: -150, length_days: 2, status: EventStatus::Completed,
+        staff: &[(Judge, "Hong 10"), (Judge, "Victor"), (Dj, "DJ Krate"), (Mc, "MC Volta")],
+        battles: &[
+            Battle { prize: Some(("EUR", [2000, 1000, 500])), entrants: &["Lil Zoo", "Menno", "Lilou", "Mounir", "Junior", "Dany Dann", "Sunni", "Spinzilla"], ..BBOY_1V1 },
+            Battle { entrants: &["Spin Syndicate", "Floor Lords", "Seoul Riders", "Tokyo Freeze"], ..CREW_3V3 },
+        ],
+    },
+    Event {
+        name: "Montpellier Kids Jam", city: "Montpellier", country: "FR", timezone: "Europe/Paris", lat: 43.6108, lng: 3.8767,
+        starts_in_days: 140, length_days: 1, status: EventStatus::Draft,
+        staff: &[(Judge, "Kid Rocket"), (Dj, "DJ Krate")],
+        battles: &[
+            KIDS_1V1,
+            Battle { team_size: Some(2), ..KIDS_1V1 },
+        ],
+    },
 ];
 
 struct Crew {
@@ -115,6 +268,31 @@ const DANCERS: &[Dancer] = &[
     Dancer { name: "Toprock Tina", aliases: &["Tina"], country: "GB", country2: Some("IE"), city: "Manchester", handle: None, notable: false, crew: None },
     Dancer { name: "Rhythmic", aliases: &[], country: "US", country2: None, city: "New York", handle: Some("rhythmic_bj"), notable: true, crew: None },
     Dancer { name: "Lil Nova", aliases: &[], country: "US", country2: None, city: "Los Angeles", handle: None, notable: false, crew: None },
+    Dancer { name: "DJ Krate", aliases: &[], country: "DE", country2: None, city: "Berlin", handle: None, notable: false, crew: None },
+    Dancer { name: "DJ Loopa", aliases: &[], country: "NL", country2: None, city: "Rotterdam", handle: None, notable: false, crew: None },
+    Dancer { name: "MC Rhyno", aliases: &[], country: "GB", country2: None, city: "London", handle: None, notable: false, crew: None },
+    Dancer { name: "MC Volta", aliases: &[], country: "FR", country2: None, city: "Paris", handle: None, notable: false, crew: None },
+    // Famous bboys, for local data only: their results at the made-up jams above are invented.
+    Dancer { name: "Hong 10", aliases: &["Hong10"], country: "KR", country2: None, city: "Seoul", handle: None, notable: true, crew: None },
+    Dancer { name: "Wing", aliases: &[], country: "KR", country2: None, city: "Seoul", handle: None, notable: true, crew: None },
+    Dancer { name: "Physicx", aliases: &[], country: "KR", country2: None, city: "Seoul", handle: None, notable: true, crew: None },
+    Dancer { name: "Pocket", aliases: &[], country: "KR", country2: None, city: "Seoul", handle: None, notable: true, crew: None },
+    Dancer { name: "Shigekix", aliases: &[], country: "JP", country2: None, city: "Osaka", handle: None, notable: true, crew: None },
+    Dancer { name: "Issei", aliases: &[], country: "JP", country2: None, city: "Fukuoka", handle: None, notable: true, crew: None },
+    Dancer { name: "Taisuke", aliases: &[], country: "JP", country2: None, city: "Tokyo", handle: None, notable: true, crew: None },
+    Dancer { name: "Lilou", aliases: &[], country: "FR", country2: None, city: "Lyon", handle: None, notable: true, crew: None },
+    Dancer { name: "Mounir", aliases: &[], country: "FR", country2: None, city: "Paris", handle: None, notable: true, crew: None },
+    Dancer { name: "Junior", aliases: &[], country: "FR", country2: None, city: "Paris", handle: None, notable: true, crew: None },
+    Dancer { name: "Dany Dann", aliases: &["Dany"], country: "FR", country2: None, city: "Paris", handle: None, notable: true, crew: None },
+    Dancer { name: "Menno", aliases: &[], country: "NL", country2: None, city: "Amsterdam", handle: None, notable: true, crew: None },
+    Dancer { name: "Lil Zoo", aliases: &[], country: "AT", country2: Some("MA"), city: "Vienna", handle: None, notable: true, crew: None },
+    Dancer { name: "Victor", aliases: &[], country: "US", country2: None, city: "Orlando", handle: None, notable: true, crew: None },
+    Dancer { name: "Roxrite", aliases: &[], country: "US", country2: Some("MX"), city: "Sacramento", handle: None, notable: true, crew: None },
+    Dancer { name: "Omar", aliases: &[], country: "US", country2: None, city: "Los Angeles", handle: None, notable: true, crew: None },
+    Dancer { name: "Phil Wizard", aliases: &["Phil"], country: "CA", country2: None, city: "Vancouver", handle: None, notable: true, crew: None },
+    Dancer { name: "Neguin", aliases: &[], country: "BR", country2: None, city: "Curitiba", handle: None, notable: true, crew: None },
+    Dancer { name: "Amir", aliases: &[], country: "KZ", country2: None, city: "Almaty", handle: None, notable: true, crew: None },
+    Dancer { name: "Sunni", aliases: &[], country: "GB", country2: None, city: "London", handle: None, notable: true, crew: None },
 ];
 
 #[tokio::main]
@@ -124,7 +302,14 @@ async fn main() -> anyhow::Result<()> {
 
     let url = std::env::var("DATABASE_URL").context("DATABASE_URL must be set")?;
     let password = std::env::var("SEED_PASSWORD").context("SEED_PASSWORD must be set")?;
-    let pool = PgPool::connect(&url).await?;
+    let options: PgConnectOptions = url.parse()?;
+    // Demo jams and invented results about real dancers must never reach production.
+    let host = options.get_host();
+    anyhow::ensure!(
+        matches!(host, "localhost" | "127.0.0.1" | "::1"),
+        "the seed only runs against a local database, not {host}"
+    );
+    let pool = PgPool::connect_with(options).await?;
 
     let seeded = sqlx::query_scalar!(
         r#"select exists(select 1 from app_users where email = $1) as "seeded!""#,
@@ -141,8 +326,12 @@ async fn main() -> anyhow::Result<()> {
     insert_user(&mut tx, &ADMIN, &password).await?;
     let seed_admin = insert_user(&mut tx, &SEED_ADMIN, &password).await?;
     let crews = insert_crews(&mut tx).await?;
-    insert_dancers(&mut tx, seed_admin, &crews).await?;
-    insert_events(&mut tx, seed_admin).await?;
+    let dancers = insert_dancers(&mut tx, seed_admin, &crews).await?;
+    let ids = Ids {
+        dancers,
+        crews: CREWS.iter().map(|crew| crew.name).zip(crews).collect(),
+    };
+    insert_events(&mut tx, seed_admin, &ids).await?;
     tx.commit().await?;
 
     tracing::info!(
@@ -154,6 +343,104 @@ async fn main() -> anyhow::Result<()> {
         SEED_ADMIN.email,
     );
     Ok(())
+}
+
+/// Seeded dancers and crews by name, for the jams that refer to them.
+struct Ids {
+    dancers: HashMap<&'static str, Uuid>,
+    crews: HashMap<&'static str, Uuid>,
+}
+
+impl Ids {
+    fn dancer(&self, name: &str) -> anyhow::Result<Uuid> {
+        self.dancers
+            .get(name)
+            .copied()
+            .with_context(|| format!("no seeded dancer {name}"))
+    }
+
+    /// A confirmed entry: one dancer, or in team battles a crew with its first `team_size` dancers.
+    fn entry(
+        &self,
+        battle: &Battle,
+        entrant: &str,
+        reached: BracketStage,
+    ) -> anyhow::Result<EntryFields> {
+        let team_size = usize::try_from(battle.team_size.unwrap_or(1))?;
+        let (crew_id, dancer_ids) = if team_size == 1 {
+            (None, vec![self.dancer(entrant)?])
+        } else {
+            let crew = self
+                .crews
+                .get(entrant)
+                .copied()
+                .with_context(|| format!("no seeded crew {entrant}"))?;
+            let members = DANCERS
+                .iter()
+                .filter(|dancer| {
+                    dancer
+                        .crew
+                        .is_some_and(|(index, _)| CREWS[index].name == entrant)
+                })
+                .take(team_size)
+                .map(|dancer| self.dancer(dancer.name))
+                .collect::<anyhow::Result<Vec<_>>>()?;
+            anyhow::ensure!(
+                members.len() == team_size,
+                "{entrant} has fewer than {team_size} dancers"
+            );
+            (Some(crew), members)
+        };
+        let mut fields = EntryFields {
+            team_name: crew_id.map(|_| entrant.to_owned()),
+            crew_id,
+            dancer_ids,
+            status: EntryStatus::Confirmed,
+            reached,
+            final_rank: None,
+            video_url: None,
+            video_offset_seconds: None,
+        };
+        fields.normalize();
+        Ok(fields)
+    }
+}
+
+impl Battle {
+    /// The fields the API would receive for this battle, so the domain rules check the seed.
+    fn fields(&self) -> BattleFields {
+        let (prize_currency, [first, second, third]) = match self.prize {
+            Some((currency, amounts)) => (Some(currency.to_owned()), amounts.map(Some)),
+            None => (None, [None; 3]),
+        };
+        BattleFields {
+            name: None,
+            format: self.format,
+            team_size: self.team_size,
+            gender: self.gender,
+            age: self.age,
+            age_min: None,
+            age_max: (self.age == BattleAge::Kids).then_some(12),
+            // The smallest bracket that fits the entrants.
+            bracket_size: i16::try_from(self.entrants.len().next_power_of_two().clamp(4, 64)).ok(),
+            max_entries: None,
+            prize_currency,
+            prize_first: first,
+            prize_second: second,
+            prize_third: third,
+        }
+    }
+}
+
+/// The stage reached by the entrant who finished at `place` (0 = winner) of a knockout bracket.
+fn reached(place: usize) -> BracketStage {
+    match place {
+        0 => BracketStage::Winner,
+        1 => BracketStage::Top2,
+        2..=3 => BracketStage::Top4,
+        4..=7 => BracketStage::Top8,
+        _ => BracketStage::Top16,
+    }
 }
 
 async fn insert_user(conn: &mut PgConnection, user: &User, password: &str) -> anyhow::Result<Uuid> {
@@ -196,7 +483,8 @@ async fn insert_dancers(
     conn: &mut PgConnection,
     created_by: Uuid,
     crews: &[Uuid],
-) -> sqlx::Result<()> {
+) -> sqlx::Result<HashMap<&'static str, Uuid>> {
+    let mut ids = HashMap::with_capacity(DANCERS.len());
     // §4: the `seed` origin implies notable; the others are ordinary organizer-created rows.
     for dancer in DANCERS {
         let id = Uuid::now_v7();
@@ -228,34 +516,69 @@ async fn insert_dancers(
             .execute(&mut *conn)
             .await?;
         }
+        ids.insert(dancer.name, id);
+    }
+    Ok(ids)
+}
+
+async fn insert_events(conn: &mut PgConnection, organizer: Uuid, ids: &Ids) -> anyhow::Result<()> {
+    for event in EVENTS {
+        let event_id = insert_event(conn, organizer, event).await?;
+        for &(role, name) in event.staff {
+            sqlx::query!(
+                "insert into event_staff (event_id, dancer_id, role) values ($1, $2, $3)",
+                event_id,
+                ids.dancer(name)?,
+                role as StaffRole,
+            )
+            .execute(&mut *conn)
+            .await?;
+        }
+        for battle in event.battles {
+            let fields = battle.fields();
+            fields.validate()?;
+            let battle_id = db::battles::insert(conn, event_id, &fields.display_name(), &fields)
+                .await?
+                .id;
+            for (place, entrant) in battle.entrants.iter().enumerate() {
+                let reached = match event.status {
+                    EventStatus::Completed => reached(place),
+                    _ => BracketStage::Na,
+                };
+                let entry = ids.entry(battle, entrant, reached)?;
+                db::battles::insert_entry(conn, battle_id, &entry).await?;
+            }
+        }
     }
     Ok(())
 }
 
-async fn insert_events(conn: &mut PgConnection, organizer: Uuid) -> sqlx::Result<()> {
-    for event in EVENTS {
-        let id = Uuid::now_v7();
-        sqlx::query!(
-            "insert into events
-               (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country, lat, lng)
-             values ($1, $2, $3, $4, $5,
-                     current_date + $6::int, current_date + $6::int + $7::int - 1,
-                     $8, $9, $10, $11, $12)",
-            id,
-            organizer,
-            event.name,
-            slug(event.name, id),
-            event.status as _,
-            event.starts_in_days,
-            event.length_days,
-            event.timezone,
-            event.city,
-            event.country,
-            event.lat,
-            event.lng,
-        )
-        .execute(&mut *conn)
-        .await?;
-    }
-    Ok(())
+async fn insert_event(
+    conn: &mut PgConnection,
+    organizer: Uuid,
+    event: &Event,
+) -> sqlx::Result<Uuid> {
+    let id = Uuid::now_v7();
+    sqlx::query!(
+        "insert into events
+           (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country, lat, lng)
+         values ($1, $2, $3, $4, $5,
+                 current_date + $6::int, current_date + $6::int + $7::int - 1,
+                 $8, $9, $10, $11, $12)",
+        id,
+        organizer,
+        event.name,
+        slug(event.name, id),
+        event.status as _,
+        event.starts_in_days,
+        event.length_days,
+        event.timezone,
+        event.city,
+        event.country,
+        event.lat,
+        event.lng,
+    )
+    .execute(conn)
+    .await?;
+    Ok(id)
 }

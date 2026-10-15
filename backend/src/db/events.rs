@@ -225,7 +225,7 @@ pub async fn soft_delete(pool: &PgPool, id: Uuid) -> sqlx::Result<()> {
 pub async fn staff(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<StaffMember>> {
     let rows = sqlx::query!(
         r#"select s.role as "role: StaffRole", d.id, d.dancer_name, d.country, d.country2,
-                  d.instagram_handle
+                  d.instagram_handle, d.avatar_url, d.avatar_parts
            from event_staff s join dancers d on d.id = s.dancer_id
            where s.event_id = $1
            order by s.role, lower(d.dancer_name), d.id"#,
@@ -243,6 +243,8 @@ pub async fn staff(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<StaffMembe
                 country: r.country,
                 country2: r.country2,
                 instagram_handle: r.instagram_handle,
+                avatar_url: r.avatar_url,
+                avatar_parts: r.avatar_parts,
             },
         })
         .collect())

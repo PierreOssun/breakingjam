@@ -23,9 +23,14 @@ pub fn not_blank(value: &str) -> Result<(), ValidationError> {
     Ok(())
 }
 
+/// `len` upper-case ASCII letters: the shape of ISO 3166-1 alpha-2 and ISO 4217 codes.
+pub fn upper_ascii_code(value: &str, len: usize) -> bool {
+    value.len() == len && value.bytes().all(|b| b.is_ascii_uppercase())
+}
+
 /// Validator for ISO 3166-1 alpha-2 country codes, upper case (shape only).
 pub fn country_code(value: &str) -> Result<(), ValidationError> {
-    if value.len() == 2 && value.bytes().all(|b| b.is_ascii_uppercase()) {
+    if upper_ascii_code(value, 2) {
         return Ok(());
     }
     Err(ValidationError::new("country")
@@ -44,20 +49,4 @@ pub fn instagram_handle(value: &str) -> Result<(), ValidationError> {
     }
     Err(ValidationError::new("instagram_handle")
         .with_message("must be an Instagram handle, e.g. @lil_g".into()))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn instagram_handle_shapes() {
-        assert!(instagram_handle("@Lil_G.bboy").is_ok());
-        assert!(instagram_handle("lilg").is_ok());
-        assert!(instagram_handle("").is_ok());
-        assert!(instagram_handle("@").is_err());
-        assert!(instagram_handle("lil g").is_err());
-        assert!(instagram_handle("https://instagram.com/lilg").is_err());
-        assert!(instagram_handle(&"a".repeat(31)).is_err());
-    }
 }

@@ -340,11 +340,21 @@
       "spots_one": "{{count}} place",
       "spots_other": "{{count}} places",
       "name": "Nom",
-      "nameHint": "Laissez vide pour un nom tiré des champs ci-dessus."
+      "nameHint": "Laissez vide pour un nom tiré des champs ci-dessus.",
+      "prize": "Prix en argent",
+      "noPrize": "Pas de prix en argent",
+      "places": {
+        "first": "1re place",
+        "second": "2e place",
+        "third": "3e place"
+      },
+      "prizes": {
+        "first": "1er {{amount}}",
+        "second": "2e {{amount}}",
+        "third": "3e {{amount}}"
+      }
     },
     "entries": {
-      "title_one": "{{count}} inscription",
-      "title_other": "{{count}} inscriptions",
       "add": "Ajouter une inscription",
       "edit": "Modifier l’inscription",
       "editOne": "Modifier {{name}}",
@@ -381,15 +391,22 @@
       "video": "Vidéo de la battle",
       "videoHint": "Un lien YouTube ; la vidéo se lit sur les pages de la jam et des danseur·ses.",
       "videoStart": "Commence à",
-      "videoStartHint": "Pour un live : où commence cette battle, par ex. 1:02:03."
+      "videoStartHint": "Pour un live : où commence cette battle, par ex. 1:02:03.",
+      "addDancer": "Ajouter un·e danseur·se",
+      "addTeam": "Ajouter une équipe"
     },
     "staff": {
-      "none": "Pas encore de juges, DJ ou MC.",
-      "role": "Rôle",
-      "add": "Ajouter au line-up",
       "remove": "Retirer {{name}} ({{role}})",
-      "saved": "Line-up enregistré."
-    }
+      "saved": "Line-up enregistré.",
+      "addRole": {
+        "judge": "Ajouter un juge",
+        "dj": "Ajouter un DJ",
+        "mc": "Ajouter un MC",
+        "organizer": "Ajouter un hôte",
+        "other": "Ajouter du staff"
+      }
+    },
+    "peopleOnJamPage": "Les danseur·ses, juges, DJ et MC s’ajoutent sur la page du jam."
   },
   "verify": {
     "thisIsMe": "C’est moi",

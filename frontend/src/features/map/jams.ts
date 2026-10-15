@@ -1,6 +1,7 @@
 // What the map page shows and how it narrows it down; pure, so it is tested without a map.
 import type { Schemas } from "../../api/client";
 import { countryName } from "../../lib/countries";
+import { COUNTRY_BOUNDS } from "./countryBounds";
 
 export type Category = Schemas["Category"];
 export type MapJam = Schemas["MapJam"] & { lng: number; lat: number };
@@ -134,6 +135,32 @@ export function boundsOf(jams: Pick<MapJam, "lng" | "lat">[]): Bounds | null {
     Math.max(...lngs),
     Math.max(...lats),
   ];
+}
+
+/** How many of the nearest jams a country without any is widened to. */
+const NEAREST = 3;
+
+/**
+ * The first view: the visitor's country, widened to its nearest jams when none is inside it;
+ * every jam when the country is unknown.
+ */
+export function firstView(
+  jams: Pick<MapJam, "lng" | "lat">[],
+  country: string | null,
+): Bounds | null {
+  const home = country ? COUNTRY_BOUNDS[country] : undefined;
+  if (!home) return boundsOf(jams);
+  if (jams.length === 0 || jams.some((jam) => inBounds(jam, home))) return home;
+  const [west, south, east, north] = home;
+  const centre = { lng: (west + east) / 2, lat: (south + north) / 2 };
+  const nearest = [...jams]
+    .sort((a, b) => distanceKm(centre, a) - distanceKm(centre, b))
+    .slice(0, NEAREST);
+  return boundsOf([
+    ...nearest,
+    { lng: west, lat: south },
+    { lng: east, lat: north },
+  ]);
 }
 
 /** Cluster count as DESIGN.md §7 writes it: exact below 100, "120+" below 1000, then "1k+". */

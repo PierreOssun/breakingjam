@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into events\n           (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country, lat, lng)\n         values ($1, $2, $3, $4, $5,\n                 current_date + $6::int, current_date + $6::int + $7::int - 1,\n                 $8, $9, $10, $11, $12)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        {
+          "Custom": {
+            "name": "event_status",
+            "kind": {
+              "Enum": [
+                "draft",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        },
+        "Int4",
+        "Int4",
+        "Text",
+        "Text",
+        "Bpchar",
+        "Float8",
+        "Float8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d6db87f9bd609c0d0f1fd3f59c1191f6dcce0896eb035362dd4bf1b19effb9a6"
+}

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::{Validate, ValidationError, ValidationErrors};
 
-use super::{dancer::DancerRef, rule};
+use super::{dancer::DancerRef, rule, upper_ascii_code};
 
 /// How a battle is run.
 #[derive(
@@ -114,6 +114,14 @@ pub struct Battle {
     pub bracket_size: Option<i16>,
     /// Registration cap; null = unlimited.
     pub max_entries: Option<i32>,
+    /// ISO 4217 code of the prizes, e.g. `CHF`; null when there are none.
+    pub prize_currency: Option<String>,
+    /// Cash prize for 1st place, in whole units of `prize_currency`.
+    pub prize_first: Option<i32>,
+    /// Cash prize for 2nd place.
+    pub prize_second: Option<i32>,
+    /// Cash prize for 3rd place.
+    pub prize_third: Option<i32>,
     /// Display order on the jam page.
     pub position: i16,
     /// Row creation time.
@@ -164,7 +172,8 @@ impl Battle {
     schema(function = "team_size_matches_format"),
     schema(function = "age_bounds_match_category"),
     schema(function = "age_max_not_below_min"),
-    schema(function = "bracket_size_is_valid")
+    schema(function = "bracket_size_is_valid"),
+    schema(function = "prizes_have_a_currency")
 )]
 pub struct BattleFields {
     /// Free text; blank means "generate from the structured fields".
@@ -190,6 +199,18 @@ pub struct BattleFields {
     /// Registration cap; null = unlimited.
     #[validate(range(min = 1))]
     pub max_entries: Option<i32>,
+    /// ISO 4217 code, upper case (`EUR`, `CHF`, `CNY`…); required when a prize is set.
+    #[validate(custom(function = "currency_code"))]
+    pub prize_currency: Option<String>,
+    /// Cash prize for 1st place, in whole units.
+    #[validate(range(min = 0))]
+    pub prize_first: Option<i32>,
+    /// Cash prize for 2nd place, in whole units.
+    #[validate(range(min = 0))]
+    pub prize_second: Option<i32>,
+    /// Cash prize for 3rd place, in whole units.
+    #[validate(range(min = 0))]
+    pub prize_third: Option<i32>,
 }
 
 // The §4 table checks, so a bad combination is a 422 naming the field, not a DB error.
@@ -229,6 +250,25 @@ fn bracket_size_is_valid(fields: &BattleFields) -> Result<(), ValidationError> {
         Some(size) if ![2, 4, 8, 16, 32, 64].contains(&size) => {
             Err(rule("bracket_size", "must be 2, 4, 8, 16, 32 or 64"))
         }
+        _ => Ok(()),
+    }
+}
+
+/// Three upper-case letters: the shape of an ISO 4217 code (the list itself isn't embedded).
+pub(crate) fn currency_code(value: &str) -> Result<(), ValidationError> {
+    if upper_ascii_code(value, 3) {
+        return Ok(());
+    }
+    Err(ValidationError::new("currency").with_message("must be an ISO 4217 code, e.g. EUR".into()))
+}
+
+fn prizes_have_a_currency(fields: &BattleFields) -> Result<(), ValidationError> {
+    let any_prize = [fields.prize_first, fields.prize_second, fields.prize_third]
+        .iter()
+        .any(Option::is_some);
+    match (any_prize, &fields.prize_currency) {
+        (true, None) => Err(rule("prize_currency", "required with a prize")),
+        (false, Some(_)) => Err(rule("prize_currency", "only with a prize")),
         _ => Ok(()),
     }
 }
@@ -475,184 +515,4 @@ pub fn youtube_id(link: &str) -> Option<String> {
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_');
     valid.then_some(id)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn battle_fields(format: BattleFormat, team_size: Option<i16>, age: BattleAge) -> BattleFields {
-        BattleFields {
-            name: None,
-            format,
-            team_size,
-            gender: BattleGender::Mixed,
-            age,
-            age_min: match age {
-                BattleAge::Kids => Some(8),
-                BattleAge::Adult => Some(18),
-                BattleAge::Na => None,
-            },
-            age_max: (age == BattleAge::Kids).then_some(17),
-            bracket_size: None,
-            max_entries: None,
-        }
-    }
-
-    fn battle(format: BattleFormat, team_size: Option<i16>) -> Battle {
-        Battle {
-            id: Uuid::now_v7(),
-            event_id: Uuid::now_v7(),
-            name: String::new(),
-            format,
-            team_size,
-            gender: BattleGender::Mixed,
-            age: BattleAge::Adult,
-            age_min: Some(18),
-            age_max: None,
-            bracket_size: None,
-            max_entries: None,
-            position: 0,
-            created_at: Utc::now(),
-            updated_at: Utc::now(),
-        }
-    }
-
-    fn entry(dancers: usize, status: EntryStatus) -> EntryFields {
-        EntryFields {
-            team_name: None,
-            crew_id: None,
-            dancer_ids: (0..dancers).map(|_| Uuid::now_v7()).collect(),
-            status,
-            reached: BracketStage::Na,
-            final_rank: None,
-            video_url: None,
-            video_offset_seconds: None,
-        }
-    }
-
-    #[test]
-    fn categories_come_from_the_structured_fields() {
-        let mut b = battle(BattleFormat::Team, Some(1));
-        assert_eq!(b.categories(), [Category::OneVOne]);
-        b.team_size = Some(2);
-        assert_eq!(b.categories(), [Category::TwoVTwo]);
-        b.team_size = Some(5);
-        b.gender = BattleGender::Bgirl;
-        b.age = BattleAge::Kids;
-        assert_eq!(
-            b.categories(),
-            [Category::Crew, Category::Bgirl, Category::Kids]
-        );
-        let smoke = battle(BattleFormat::SevenToSmoke, None);
-        assert_eq!(smoke.categories(), [Category::SevenToSmoke]);
-        assert!(battle(BattleFormat::Na, None).categories().is_empty());
-    }
-
-    #[test]
-    fn default_names_follow_the_examples() {
-        let mut fields = battle_fields(BattleFormat::Team, Some(1), BattleAge::Adult);
-        fields.gender = BattleGender::Bboy;
-        assert_eq!(fields.display_name(), "1v1 Bboy");
-        let kids = battle_fields(BattleFormat::Team, Some(2), BattleAge::Kids);
-        assert_eq!(kids.display_name(), "2v2 Mixed Kids");
-        let mut smoke = battle_fields(BattleFormat::SevenToSmoke, None, BattleAge::Adult);
-        smoke.gender = BattleGender::Bgirl;
-        assert_eq!(smoke.display_name(), "Seven to Smoke Bgirl");
-        let mut masters = battle_fields(BattleFormat::Team, Some(1), BattleAge::Adult);
-        masters.age_min = Some(40);
-        assert_eq!(masters.display_name(), "1v1 Mixed Masters");
-        masters.name = Some("  Old School 1v1 ".into());
-        assert_eq!(masters.display_name(), "Old School 1v1");
-    }
-
-    /// Fields named by the struct-level rules that `fields` breaks.
-    fn broken_rules(fields: &BattleFields) -> Vec<String> {
-        match fields.validate() {
-            Ok(()) => Vec::new(),
-            Err(errors) => errors.field_errors()["__all__"]
-                .iter()
-                .map(|e| e.code.to_string())
-                .collect(),
-        }
-    }
-
-    #[test]
-    fn battle_checks_mirror_the_schema() {
-        let ok = battle_fields(BattleFormat::Team, Some(2), BattleAge::Kids);
-        assert!(broken_rules(&ok).is_empty());
-        let no_size = battle_fields(BattleFormat::Team, None, BattleAge::Adult);
-        assert_eq!(broken_rules(&no_size), ["team_size"]);
-        let smoke_with_size = battle_fields(BattleFormat::SevenToSmoke, Some(1), BattleAge::Adult);
-        assert_eq!(broken_rules(&smoke_with_size), ["team_size"]);
-        let mut old_kids = battle_fields(BattleFormat::Team, Some(1), BattleAge::Kids);
-        old_kids.age_max = Some(18);
-        assert_eq!(broken_rules(&old_kids), ["age_max"]);
-        let mut odd_bracket = battle_fields(BattleFormat::Team, Some(1), BattleAge::Adult);
-        odd_bracket.bracket_size = Some(12);
-        assert_eq!(broken_rules(&odd_bracket), ["bracket_size"]);
-    }
-
-    #[test]
-    fn entry_member_counts() {
-        let duo = battle(BattleFormat::Team, Some(2));
-        assert!(entry(1, EntryStatus::Pending).errors_for(&duo).is_empty());
-        assert!(!entry(1, EntryStatus::Confirmed).errors_for(&duo).is_empty());
-        assert!(entry(2, EntryStatus::Confirmed).errors_for(&duo).is_empty());
-        assert!(!entry(3, EntryStatus::Pending).errors_for(&duo).is_empty());
-
-        let smoke = battle(BattleFormat::SevenToSmoke, None);
-        assert!(entry(1, EntryStatus::Pending).errors_for(&smoke).is_empty());
-        assert!(!entry(2, EntryStatus::Pending).errors_for(&smoke).is_empty());
-
-        let mut twice = entry(1, EntryStatus::Pending);
-        twice.dancer_ids.push(twice.dancer_ids[0]);
-        assert!(!twice.errors_for(&duo).is_empty());
-    }
-
-    #[test]
-    fn reached_and_final_rank_agree() {
-        let solo = battle(BattleFormat::Team, Some(1));
-        let mut winner = entry(1, EntryStatus::Confirmed);
-        winner.reached = BracketStage::Winner;
-        winner.normalize();
-        assert_eq!(winner.final_rank, Some(1));
-        assert!(winner.errors_for(&solo).is_empty());
-
-        let mut wrong = entry(1, EntryStatus::Confirmed);
-        wrong.reached = BracketStage::Top8;
-        wrong.final_rank = Some(1);
-        assert_eq!(wrong.errors_for(&solo)[0].0, "final_rank");
-
-        let mut runner_up = entry(1, EntryStatus::Confirmed);
-        runner_up.reached = BracketStage::Top2;
-        runner_up.final_rank = Some(3);
-        assert_eq!(runner_up.errors_for(&solo)[0].0, "final_rank");
-    }
-
-    #[test]
-    fn youtube_links() {
-        let id = Some("dQw4w9WgXcQ".to_owned());
-        assert_eq!(
-            youtube_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42"),
-            id
-        );
-        assert_eq!(youtube_id("https://youtu.be/dQw4w9WgXcQ?t=42"), id);
-        assert_eq!(youtube_id("https://m.youtube.com/watch?v=dQw4w9WgXcQ"), id);
-        assert_eq!(youtube_id("https://www.youtube.com/live/dQw4w9WgXcQ"), id);
-        assert_eq!(youtube_id("https://vimeo.com/123"), None);
-        assert_eq!(youtube_id("https://www.youtube.com/watch?v=short"), None);
-        assert_eq!(
-            youtube_id("javascript:alert(1)//youtu.be/dQw4w9WgXcQ"),
-            None
-        );
-
-        let mut fields = entry(1, EntryStatus::Pending);
-        fields.video_url = Some(" https://youtu.be/dQw4w9WgXcQ?t=42 ".into());
-        fields.normalize();
-        assert_eq!(
-            fields.video_url.as_deref(),
-            Some("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-        );
-    }
 }

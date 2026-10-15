@@ -887,6 +887,26 @@
         ]
       }
     },
+    "/api/geo": {
+      "get": {
+        "tags": [
+          "geo"
+        ],
+        "summary": "The visitor's country, from the `cf-ipcountry` header the Worker sets (deploy/src/index.ts).",
+        "operationId": "geo",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Geo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/dancers": {
       "get": {
         "tags": [
@@ -3784,6 +3804,37 @@
             "format": "int32",
             "description": "Registration cap; null = unlimited."
           },
+          "prize_currency": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 4217 code of the prizes, e.g. `CHF`; null when there are none."
+          },
+          "prize_first": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Cash prize for 1st place, in whole units of `prize_currency`."
+          },
+          "prize_second": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Cash prize for 2nd place."
+          },
+          "prize_third": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Cash prize for 3rd place."
+          },
           "position": {
             "type": "integer",
             "format": "int32",
@@ -3877,6 +3928,37 @@
             ],
             "format": "int32",
             "description": "Registration cap; null = unlimited."
+          },
+          "prize_currency": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 4217 code, upper case (`EUR`, `CHF`, `CNY`…); required when a prize is set."
+          },
+          "prize_first": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Cash prize for 1st place, in whole units."
+          },
+          "prize_second": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Cash prize for 2nd place, in whole units."
+          },
+          "prize_third": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Cash prize for 3rd place, in whole units."
           }
         }
       },
@@ -4470,7 +4552,7 @@
       },
       "DancerRef": {
         "type": "object",
-        "description": "A dancer as linked from a jam page: enough to render the name, flags and handle.",
+        "description": "A dancer as linked from a jam page: enough to render the name, avatar, flags and handle.",
         "required": [
           "id",
           "dancer_name",
@@ -4503,6 +4585,20 @@
               "null"
             ],
             "description": "Lower case, no `@`."
+          },
+          "avatar_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Uploaded photo; null = the generated pixel avatar."
+          },
+          "avatar_parts": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The pixel avatar's chosen parts; null = seeded from the id."
           }
         }
       },
@@ -5173,6 +5269,19 @@
           "message": {
             "type": "string",
             "description": "Human-readable reason."
+          }
+        }
+      },
+      "Geo": {
+        "type": "object",
+        "description": "Body of `GET /geo`.",
+        "properties": {
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2 of the visitor's country; null when unknown."
           }
         }
       },
@@ -6289,6 +6398,10 @@
     {
       "name": "organizers",
       "description": "Organiser pages and their Instagram verification"
+    },
+    {
+      "name": "geo",
+      "description": "Where the visitor is"
     }
   ]
 }

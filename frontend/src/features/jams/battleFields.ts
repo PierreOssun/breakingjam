@@ -1,4 +1,5 @@
 // The battle form's values and the API body they become; pure, so tested without a form.
+import type { TFunction } from "i18next";
 import type { Schemas } from "../../api/client";
 
 type Battle = Schemas["Battle"];
@@ -18,7 +19,16 @@ export type BattleFormValues = {
   age_max: string;
   bracket_size: string;
   max_entries: string;
+  /** ISO 4217 code; blank = no cash prize. */
+  prize_currency: string;
+  prize_first: string;
+  prize_second: string;
+  prize_third: string;
 };
+
+/** Places with a cash prize, in order. */
+export const PLACES = ["first", "second", "third"] as const;
+export type Place = (typeof PLACES)[number];
 
 /** The ages a preset starts with, as `[age_min, age_max]`. */
 export const PRESET_AGES: Record<AgePreset, [string, string]> = {
@@ -51,6 +61,10 @@ export function battleValues(battle?: Battle): BattleFormValues {
       age_max: "",
       bracket_size: "",
       max_entries: "",
+      prize_currency: "",
+      prize_first: "",
+      prize_second: "",
+      prize_third: "",
     };
   }
   return {
@@ -63,6 +77,10 @@ export function battleValues(battle?: Battle): BattleFormValues {
     age_max: text(battle.age_max),
     bracket_size: text(battle.bracket_size),
     max_entries: text(battle.max_entries),
+    prize_currency: battle.prize_currency ?? "",
+    prize_first: text(battle.prize_first),
+    prize_second: text(battle.prize_second),
+    prize_third: text(battle.prize_third),
   };
 }
 
@@ -83,7 +101,43 @@ export function battleBody(values: BattleFormValues): BattleFields {
     age_max: values.preset === "na" ? null : number(values.age_max),
     bracket_size: number(values.bracket_size),
     max_entries: number(values.max_entries),
+    // The amounts are hidden, and dropped, while no currency is chosen.
+    prize_currency: values.prize_currency || null,
+    prize_first: values.prize_currency ? number(values.prize_first) : null,
+    prize_second: values.prize_currency ? number(values.prize_second) : null,
+    prize_third: values.prize_currency ? number(values.prize_third) : null,
   };
+}
+
+/** Every ISO 4217 code the browser knows, plus `keep`, with their names in `language`. */
+export function currencies(language: string, keep?: string | null) {
+  const names = new Intl.DisplayNames([language], { type: "currency" });
+  const codes = Intl.supportedValuesOf("currency");
+  // A stored code this browser doesn't list would show as "no prize" and be dropped on save.
+  if (keep && !codes.includes(keep)) codes.push(keep);
+  return codes.map((code) => ({ code, name: names.of(code) ?? code }));
+}
+
+/** "1st CHF 1,000 · 2nd CHF 500", in `language` and without cents; blank without a prize. */
+export function prizeLine(
+  battle: Pick<Battle, `prize_${"currency" | Place}`>,
+  t: TFunction,
+  language: string,
+): string {
+  const currency = battle.prize_currency;
+  if (!currency) return "";
+  const money = new Intl.NumberFormat(language, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+  return PLACES.flatMap((place) => {
+    const amount = battle[`prize_${place}`];
+    return amount == null
+      ? []
+      : [t(`org.battles.prizes.${place}`, { amount: money.format(amount) })];
+  }).join(" · ");
 }
 
 /**

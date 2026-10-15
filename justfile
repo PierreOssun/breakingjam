@@ -36,8 +36,14 @@ check:
     cd backend && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
     cd backend && cargo sqlx prepare --check -- --all-targets
     cd frontend && npx prettier --check . && npm run lint && npm run typecheck && npm test && npm run build
+    cd deploy && npm run typecheck && npm test
 
 # Regenerate the OpenAPI snapshot and the TypeScript client after an API change.
 openapi:
     cd backend && UPDATE_OPENAPI=1 cargo test --test openapi
     cd frontend && npx openapi-typescript ../backend/openapi.json -o src/api/schema.d.ts
+
+# The production stack locally: Worker, site and API container (Docker, deploy/.dev.vars).
+prod-local:
+    cd frontend && VITE_API_URL= npm run build
+    cd deploy && npm run dev

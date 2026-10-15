@@ -3,7 +3,7 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, delete, get, post, put, send, set_role, sign_up};
+use test_app::{app, delete, get, id_of, post, put, send, set_role, sign_up};
 
 fn crew(name: &str) -> Value {
     json!({ "name": name, "country": "FR", "city": " ", "instagram_handle": "@Floor.Lords" })
@@ -17,16 +17,7 @@ async fn organizer(app: &Router, pool: &PgPool) -> String {
 
 async fn new_dancer(app: &Router, cookie: &str) -> String {
     let body = json!({ "dancer_name": "Lil G", "country": "FR" });
-    send(app, post("/api/dancers", body, Some(cookie)))
-        .await
-        .json["id"]
-        .as_str()
-        .unwrap()
-        .to_owned()
-}
-
-fn id_of(response: &TestResponse) -> String {
-    response.json["id"].as_str().unwrap().to_owned()
+    id_of(&send(app, post("/api/dancers", body, Some(cookie))).await)
 }
 
 #[sqlx::test]

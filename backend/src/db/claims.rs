@@ -71,6 +71,7 @@ pub async fn list(
         r#"select c.id, c.dancer_id, c.user_id, c.code, c.status as "status: ClaimStatus",
                   c.reviewed_at, c.created_at,
                   d.dancer_name, d.country, d.country2, d.instagram_handle,
+                  d.avatar_url, d.avatar_parts,
                   u.email::text as "email!", u.display_name
            from dancer_claims c
            join dancers d on d.id = c.dancer_id
@@ -93,6 +94,8 @@ pub async fn list(
                 country: r.country,
                 country2: r.country2,
                 instagram_handle: r.instagram_handle,
+                avatar_url: r.avatar_url,
+                avatar_parts: r.avatar_parts,
             },
             user: ClaimUser {
                 id: r.user_id,

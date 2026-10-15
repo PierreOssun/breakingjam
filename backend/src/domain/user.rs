@@ -42,15 +42,3 @@ pub struct User {
     /// Privilege level.
     pub role: Role,
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn roles_are_ordered_by_privilege() {
-        assert!(Role::User < Role::Organizer);
-        assert!(Role::Organizer < Role::SeedAdmin);
-        assert!(Role::SeedAdmin < Role::Admin);
-    }
-}

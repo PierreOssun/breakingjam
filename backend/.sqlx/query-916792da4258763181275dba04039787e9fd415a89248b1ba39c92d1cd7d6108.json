@@ -1,0 +1,311 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update battles set\n             name = $2, format = $3, team_size = $4, gender = $5, age = $6, age_min = $7,\n             age_max = $8, bracket_size = $9, max_entries = $10, prize_currency = $11,\n             prize_first = $12, prize_second = $13, prize_third = $14\n           where id = $1\n           returning id, event_id, name, format as \"format: BattleFormat\", team_size,\n                     gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                     bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, created_at, updated_at",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "event_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "event_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "format: BattleFormat",
+        "type_info": {
+          "Custom": {
+            "name": "battle_format",
+            "kind": {
+              "Enum": [
+                "team",
+                "seven_to_smoke",
+                "na"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "format"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "team_size",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "team_size"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "gender: BattleGender",
+        "type_info": {
+          "Custom": {
+            "name": "battle_gender",
+            "kind": {
+              "Enum": [
+                "bboy",
+                "bgirl",
+                "mixed"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "gender"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "age: BattleAge",
+        "type_info": {
+          "Custom": {
+            "name": "battle_age",
+            "kind": {
+              "Enum": [
+                "kids",
+                "adult",
+                "na"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "age"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "age_min",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "age_min"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "age_max",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "age_max"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "bracket_size",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "bracket_size"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "max_entries",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "max_entries"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "prize_currency",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "prize_currency"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "prize_first",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "prize_first"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "prize_second",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "prize_second"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "prize_third",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "prize_third"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "position",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "position"
+          }
+        }
+      },
+      {
+        "ordinal": 16,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 17,
+        "name": "updated_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "updated_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        {
+          "Custom": {
+            "name": "battle_format",
+            "kind": {
+              "Enum": [
+                "team",
+                "seven_to_smoke",
+                "na"
+              ]
+            }
+          }
+        },
+        "Int2",
+        {
+          "Custom": {
+            "name": "battle_gender",
+            "kind": {
+              "Enum": [
+                "bboy",
+                "bgirl",
+                "mixed"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "battle_age",
+            "kind": {
+              "Enum": [
+                "kids",
+                "adult",
+                "na"
+              ]
+            }
+          }
+        },
+        "Int2",
+        "Int2",
+        "Int2",
+        "Int4",
+        "Bpchar",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "916792da4258763181275dba04039787e9fd415a89248b1ba39c92d1cd7d6108"
+}

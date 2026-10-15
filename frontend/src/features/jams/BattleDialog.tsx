@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLayoutEffect, useId } from "react";
+import { useId, useLayoutEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
@@ -15,7 +15,9 @@ import {
   battleBody,
   type BattleFormValues,
   battleValues,
+  currencies,
   defaultBattleName,
+  PLACES,
   PRESET_AGES,
 } from "./battleFields";
 
@@ -28,6 +30,10 @@ const FIELDS = [
   "age_max",
   "bracket_size",
   "max_entries",
+  "prize_currency",
+  "prize_first",
+  "prize_second",
+  "prize_third",
 ] as const;
 const SIZES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const BRACKETS = [2, 4, 8, 16, 32, 64];
@@ -40,17 +46,21 @@ type BattleDialogProps = {
   onClose: () => void;
 };
 
-/** Add or edit a battle: format, size, who may enter, age, bracket and spots (§4). */
+/** Add or edit a battle: format, size, who may enter, age, bracket, spots and prizes (§4). */
 export function BattleDialog({
   jamId,
   battle,
   open,
   onClose,
 }: BattleDialogProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const formId = useId();
+  const money = useMemo(
+    () => currencies(i18n.language, battle?.prize_currency),
+    [i18n.language, battle?.prize_currency],
+  );
   const form = useForm<BattleFormValues>({ defaultValues: battleValues() });
   const { register, handleSubmit, setError, setValue, watch, reset } = form;
   // Each opening starts from the battle being edited. A layout effect, so the reset lands
@@ -204,6 +214,33 @@ export function BattleDialog({
             {...register("max_entries")}
           />
         </div>
+        <SelectField
+          label={<OptionalLabel label={t("org.battles.prize")} />}
+          error={errors.prize_currency?.message}
+          {...register("prize_currency")}
+        >
+          <option value="">{t("org.battles.noPrize")}</option>
+          {money.map(({ code, name }) => (
+            <option key={code} value={code}>{`${code} · ${name}`}</option>
+          ))}
+        </SelectField>
+        {values.prize_currency && (
+          <div className="grid gap-6 sm:grid-cols-3">
+            {PLACES.map((place) => (
+              <TextField
+                key={place}
+                type="number"
+                inputMode="numeric"
+                min={0}
+                label={
+                  <OptionalLabel label={t(`org.battles.places.${place}`)} />
+                }
+                error={errors[`prize_${place}`]?.message}
+                {...register(`prize_${place}`)}
+              />
+            ))}
+          </div>
+        )}
         <TextField
           label={<OptionalLabel label={t("org.battles.name")} />}
           hint={t("org.battles.nameHint")}

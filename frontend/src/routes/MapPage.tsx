@@ -23,6 +23,7 @@ import {
   boundsOf,
   distanceKm,
   type Filters,
+  firstView,
   inBounds,
   isFiltered,
   type MapJam,
@@ -31,7 +32,7 @@ import {
   NO_FILTERS,
 } from "../features/map/jams";
 import { MapEmpty } from "../features/map/MapEmpty";
-import { useMapJams } from "../features/map/queries";
+import { useMapJams, useVisitorCountry } from "../features/map/queries";
 import { RowCard } from "../features/map/RowCard";
 import { SearchForm } from "../features/map/SearchForm";
 import { useMediaQuery } from "../lib/useMediaQuery";
@@ -81,6 +82,7 @@ export function MapPage() {
   const wide = useMediaQuery("(min-width: 1024px)");
   const jams = useMapJams();
   const all = jams.data;
+  const country = useVisitorCountry();
 
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [query, setQuery] = useState("");
@@ -108,15 +110,15 @@ export function MapPage() {
     if (selection && !selected) setSelection(null);
   }, [selection, selected]);
 
-  // The first view shows every jam; later loads (refetches) leave the camera alone.
+  // The first view is the visitor's country; later loads (refetches) leave the camera alone.
   const framed = useRef(false);
   useEffect(() => {
-    if (framed.current || !all) return;
+    if (framed.current || !all || country.isPending) return;
     framed.current = true;
-    const box = boundsOf(all);
+    const box = firstView(all, country.data ?? null);
     if (box)
       setCamera({ kind: "fit", bounds: box, maxZoom: 10, animate: false });
-  }, [all]);
+  }, [all, country.isPending, country.data]);
 
   const select = useCallback((jam: MapJam, trigger: HTMLElement | null) => {
     setSelection({ id: jam.id, trigger });

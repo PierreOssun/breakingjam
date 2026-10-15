@@ -228,6 +228,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/geo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The visitor's country, from the `cf-ipcountry` header the Worker sets (deploy/src/index.ts). */
+        get: operations["geo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/dancers": {
         parameters: {
             query?: never;
@@ -729,6 +746,23 @@ export interface components {
              * @description Registration cap; null = unlimited.
              */
             max_entries?: number | null;
+            /** @description ISO 4217 code of the prizes, e.g. `CHF`; null when there are none. */
+            prize_currency?: string | null;
+            /**
+             * Format: int32
+             * @description Cash prize for 1st place, in whole units of `prize_currency`.
+             */
+            prize_first?: number | null;
+            /**
+             * Format: int32
+             * @description Cash prize for 2nd place.
+             */
+            prize_second?: number | null;
+            /**
+             * Format: int32
+             * @description Cash prize for 3rd place.
+             */
+            prize_third?: number | null;
             /**
              * Format: int32
              * @description Display order on the jam page.
@@ -785,6 +819,23 @@ export interface components {
              * @description Registration cap; null = unlimited.
              */
             max_entries?: number | null;
+            /** @description ISO 4217 code, upper case (`EUR`, `CHF`, `CNY`…); required when a prize is set. */
+            prize_currency?: string | null;
+            /**
+             * Format: int32
+             * @description Cash prize for 1st place, in whole units.
+             */
+            prize_first?: number | null;
+            /**
+             * Format: int32
+             * @description Cash prize for 2nd place, in whole units.
+             */
+            prize_second?: number | null;
+            /**
+             * Format: int32
+             * @description Cash prize for 3rd place, in whole units.
+             */
+            prize_third?: number | null;
         };
         /**
          * @description How a battle is run.
@@ -1038,7 +1089,7 @@ export interface components {
              */
             merged_into: string;
         } | components["schemas"]["DancerResponse"];
-        /** @description A dancer as linked from a jam page: enough to render the name, flags and handle. */
+        /** @description A dancer as linked from a jam page: enough to render the name, avatar, flags and handle. */
         DancerRef: {
             /**
              * Format: uuid
@@ -1053,6 +1104,10 @@ export interface components {
             country2?: string | null;
             /** @description Lower case, no `@`. */
             instagram_handle?: string | null;
+            /** @description Uploaded photo; null = the generated pixel avatar. */
+            avatar_url?: string | null;
+            /** @description The pixel avatar's chosen parts; null = seeded from the id. */
+            avatar_parts?: string | null;
         };
         /** @description A dancer page (§6): profile, current crews, and whether the caller may edit it. */
         DancerResponse: components["schemas"]["Dancer"] & {
@@ -1346,6 +1401,11 @@ export interface components {
             field: string;
             /** @description Human-readable reason. */
             message: string;
+        };
+        /** @description Body of `GET /geo`. */
+        Geo: {
+            /** @description ISO 3166-1 alpha-2 of the visitor's country; null when unknown. */
+            country?: string | null;
         };
         /** @description Body of `GET /api/health`. */
         HealthResponse: {
@@ -2363,6 +2423,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    geo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Geo"];
                 };
             };
         };

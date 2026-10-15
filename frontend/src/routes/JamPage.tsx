@@ -5,21 +5,20 @@ import {
   InstagramLogo,
   MapPin,
   PencilSimple,
-  Play,
 } from "@phosphor-icons/react";
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import type { Schemas } from "../api/client";
-import { Button } from "../components/Button";
 import { buttonClasses } from "../components/buttonClasses";
 import { InlineEmpty } from "../components/InlineEmpty";
-import { ResultBadge } from "../components/ResultBadge";
 import { ShareButton } from "../components/ShareButton";
 import { StatusBadge } from "../components/StatusBadge";
 import { VerifiedTick } from "../components/VerifiedTick";
 import { VideoDialog, type Video } from "../components/VideoDialog";
+import { BattleCard } from "../features/jams/BattleCard";
 import { JamFlyer } from "../features/jams/JamFlyer";
+import { Lineup } from "../features/jams/Lineup";
 import {
   useBattles,
   useEntries,
@@ -32,30 +31,10 @@ import { instagramLabel } from "../lib/instagram";
 import { NotFoundPage } from "./NotFoundPage";
 
 type Jam = Schemas["EventResponse"];
-type Entry = Schemas["Entry"];
-
-// Where a result sorts: exact placement first, else the stage reached.
-const STAGE_ORDER: Record<Schemas["BracketStage"], number> = {
-  winner: 1,
-  top2: 2,
-  top4: 4,
-  top8: 8,
-  top16: 16,
-  top32: 32,
-  top64: 64,
-  prelims: 100,
-  na: 1000,
-};
-
-const ROLE_ORDER: Schemas["StaffRole"][] = [
-  "judge",
-  "dj",
-  "mc",
-  "organizer",
-  "other",
-];
-
-/** `/jams/:slug`: a jam with its battles, entries, lineup and venue (DESIGN.md §6). */
+/**
+ * `/jams/:slug`: a jam with its battles, entries, lineup and venue (DESIGN.md §6). Its
+ * organiser manages the people here: entries in each battle, and the lineup.
+ */
 export function JamPage() {
   const { slug = "" } = useParams();
   const { t } = useTranslation();
@@ -166,28 +145,13 @@ function JamDetail({ jam }: { jam: Jam }) {
             )}
           </Section>
 
-          {staff.data && staff.data.length > 0 && (
+          {staff.data && (jam.can_edit || staff.data.length > 0) && (
             <Section title={t("jam.lineup")}>
-              <div className="flex flex-col gap-5">
-                {ROLE_ORDER.map((role) => {
-                  const people = staff.data.filter((s) => s.role === role);
-                  if (people.length === 0) return null;
-                  return (
-                    <div key={role}>
-                      <h3 className="mb-2 text-label text-muted uppercase">
-                        {t(`jam.roles.${role}`)}
-                      </h3>
-                      <ul className="flex flex-wrap gap-2">
-                        {people.map(({ dancer }) => (
-                          <li key={dancer.id}>
-                            <DancerChip dancer={dancer} />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })}
-              </div>
+              <Lineup
+                jamId={jam.id}
+                staff={staff.data}
+                canEdit={jam.can_edit}
+              />
             </Section>
           )}
 
@@ -231,104 +195,6 @@ function JamDetail({ jam }: { jam: Jam }) {
       )}
       <VideoDialog video={video} onClose={() => setVideo(null)} />
     </article>
-  );
-}
-
-function BattleCard({
-  jam,
-  battle,
-  entries,
-  onPlay,
-}: {
-  jam: Jam;
-  battle: Schemas["Battle"];
-  entries: Entry[] | undefined;
-  onPlay: (video: Video) => void;
-}) {
-  const { t } = useTranslation();
-  const active = (entries ?? []).filter((e) => e.status !== "withdrawn");
-  const ranked = [...active].sort(
-    (a, b) =>
-      (a.final_rank ?? STAGE_ORDER[a.reached]) -
-      (b.final_rank ?? STAGE_ORDER[b.reached]),
-  );
-  const spots =
-    jam.status === "published" && battle.max_entries != null
-      ? battle.max_entries - active.length
-      : null;
-
-  return (
-    <li className="rounded-lg border border-border bg-surface p-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="font-display text-display-xs">{battle.name}</h3>
-        {spots !== null && (
-          <span
-            className={`text-body-sm ${spots > 0 ? "text-primary-text" : "text-muted"}`}
-          >
-            {spots > 0 ? t("jam.spotsLeft", { count: spots }) : t("jam.full")}
-          </span>
-        )}
-      </div>
-      {entries && ranked.length === 0 && (
-        <p className="mt-2 text-body-sm text-muted">{t("jam.noEntries")}</p>
-      )}
-      {ranked.length > 0 && (
-        <ul className="mt-3 divide-y divide-border">
-          {ranked.map((entry) => {
-            const who =
-              entry.team_name ??
-              entry.members.map((m) => m.dancer_name).join(", ");
-            return (
-              <li key={entry.id} className="flex items-center gap-3 py-2.5">
-                <div className="min-w-0 flex-1">
-                  {entry.team_name && (
-                    <p className="text-body font-extrabold">
-                      {entry.team_name}
-                    </p>
-                  )}
-                  <p className="text-body-sm">
-                    {entry.members.map((member, i) => (
-                      <span key={member.id}>
-                        {i > 0 && ", "}
-                        <Link
-                          to={`/dancers/${member.id}`}
-                          className="font-bold underline-offset-2 hover:underline"
-                        >
-                          {member.dancer_name}
-                        </Link>
-                      </span>
-                    ))}
-                    {entry.crew && (
-                      <span className="text-muted"> · {entry.crew.name}</span>
-                    )}
-                  </p>
-                </div>
-                {entry.video_url && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={t("jam.watch", { name: who })}
-                    onClick={() =>
-                      onPlay({
-                        url: entry.video_url ?? "",
-                        offset: entry.video_offset_seconds,
-                        name: `${battle.name} — ${who}`,
-                      })
-                    }
-                  >
-                    <Play size={20} weight="fill" aria-hidden />
-                  </Button>
-                )}
-                <ResultBadge
-                  finalRank={entry.final_rank}
-                  reached={entry.reached}
-                />
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </li>
   );
 }
 
@@ -391,17 +257,6 @@ function Fact({
         <dd className="text-body">{children}</dd>
       </div>
     </div>
-  );
-}
-
-function DancerChip({ dancer }: { dancer: Schemas["DancerRef"] }) {
-  return (
-    <Link
-      to={`/dancers/${dancer.id}`}
-      className="relative inline-flex h-9 items-center rounded-full border border-border-strong px-3.5 text-body-sm font-bold text-text transition-colors duration-fast after:absolute after:-inset-1 after:content-[''] hover:bg-surface-raised"
-    >
-      {dancer.dancer_name}
-    </Link>
   );
 }
 

@@ -24,7 +24,8 @@ use crate::state::AppState;
         (name = "crews", description = "Crews and memberships"),
         (name = "claims", description = "\"Verify me\" claims and their review"),
         (name = "admin", description = "Merging dancers and changing roles"),
-        (name = "organizers", description = "Organiser pages and their Instagram verification")
+        (name = "organizers", description = "Organiser pages and their Instagram verification"),
+        (name = "geo", description = "Where the visitor is")
     )
 )]
 struct ApiDoc;

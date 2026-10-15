@@ -4,6 +4,8 @@ on:
   pull_request:
   push:
     branches: [main]
+  # The deploy workflow runs the same checks first.
+  workflow_call:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -71,6 +73,23 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  # The Cloudflare Worker's types and tests (deploy/).
+  worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deploy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: deploy/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
 
   docker:
     runs-on: ubuntu-latest

@@ -3,7 +3,7 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, delete, get, post, put, send, sign_up};
+use test_app::{TestResponse, app, delete, get, id_of, post, put, send, sign_up};
 
 struct Jam {
     app: Router,
@@ -63,10 +63,6 @@ fn one_v_one() -> Value {
     json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 })
 }
 
-fn id(response: &TestResponse) -> String {
-    response.json["id"].as_str().unwrap().to_owned()
-}
-
 #[sqlx::test]
 async fn battles_get_default_names_and_positions(pool: PgPool) {
     let jam = jam(pool).await;
@@ -83,7 +79,7 @@ async fn battles_get_default_names_and_positions(pool: PgPool) {
 
     let renamed = json!({ "format": "seven_to_smoke", "gender": "bgirl", "age": "adult",
                           "age_min": 18, "name": "Queen of the Floor" });
-    let uri = format!("/api/battles/{}", id(&second));
+    let uri = format!("/api/battles/{}", id_of(&second));
     let updated = send(&jam.app, put(&uri, renamed, Some(&jam.owner))).await;
     assert_eq!(updated.json["name"], "Queen of the Floor");
     assert_eq!(updated.json["team_size"], Value::Null);
@@ -101,6 +97,34 @@ async fn battle_rules_are_422s(pool: PgPool) {
                            "age_min": 8, "age_max": 18 });
     let response = jam.battle(old_kids).await;
     assert_eq!(response.json["error"]["fields"][0]["field"], "age_max");
+
+    let mut no_currency = one_v_one();
+    no_currency["prize_first"] = json!(500);
+    let response = jam.battle(no_currency).await;
+    assert_eq!(
+        response.json["error"]["fields"][0]["field"],
+        "prize_currency"
+    );
+}
+
+#[sqlx::test]
+async fn prizes_are_per_place_in_one_currency(pool: PgPool) {
+    let jam = jam(pool).await;
+    let mut body = one_v_one();
+    body["prize_currency"] = json!("CHF");
+    body["prize_first"] = json!(1000);
+    body["prize_second"] = json!(500);
+    let created = jam.battle(body).await;
+    assert_eq!(created.status, StatusCode::CREATED);
+    assert_eq!(created.json["prize_currency"], "CHF");
+    assert_eq!(created.json["prize_first"], 1000);
+    assert_eq!(created.json["prize_second"], 500);
+    assert_eq!(created.json["prize_third"], Value::Null);
+
+    let uri = format!("/api/battles/{}", id_of(&created));
+    let cleared = send(&jam.app, put(&uri, one_v_one(), Some(&jam.owner))).await;
+    assert_eq!(cleared.json["prize_currency"], Value::Null);
+    assert_eq!(cleared.json["prize_first"], Value::Null);
 }
 
 #[sqlx::test]
@@ -125,8 +149,8 @@ async fn battles_follow_jam_visibility_and_rights(pool: PgPool) {
 #[sqlx::test]
 async fn reorder_needs_every_battle_once(pool: PgPool) {
     let jam = jam(pool).await;
-    let a = id(&jam.battle(one_v_one()).await);
-    let b = id(&jam.battle(one_v_one()).await);
+    let a = id_of(&jam.battle(one_v_one()).await);
+    let b = id_of(&jam.battle(one_v_one()).await);
     let uri = format!("/api/events/{}/battles/order", jam.event_id);
 
     let reordered = send(&jam.app, put(&uri, json!([b, a]), Some(&jam.owner))).await;
@@ -141,7 +165,7 @@ async fn reorder_needs_every_battle_once(pool: PgPool) {
 #[sqlx::test]
 async fn entries_enforce_one_entry_per_dancer_and_team_size(pool: PgPool) {
     let jam = jam(pool).await;
-    let solo = id(&jam.battle(one_v_one()).await);
+    let solo = id_of(&jam.battle(one_v_one()).await);
     let lilg = jam.dancer("Lil G").await;
 
     let entered = jam
@@ -158,7 +182,7 @@ async fn entries_enforce_one_entry_per_dancer_and_team_size(pool: PgPool) {
     assert_eq!(again.status, StatusCode::CONFLICT);
 
     let duo = json!({ "format": "team", "team_size": 2, "gender": "mixed", "age": "adult", "age_min": 18 });
-    let duo = id(&jam.battle(duo).await);
+    let duo = id_of(&jam.battle(duo).await);
     let short = jam
         .entry(&duo, json!({ "dancer_ids": [lilg], "status": "confirmed" }))
         .await;
@@ -181,7 +205,7 @@ async fn max_entries_fills_up(pool: PgPool) {
     let jam = jam(pool).await;
     let mut body = one_v_one();
     body["max_entries"] = json!(1);
-    let battle = id(&jam.battle(body).await);
+    let battle = id_of(&jam.battle(body).await);
     let a = jam.dancer("A").await;
     let b = jam.dancer("B").await;
 
@@ -200,7 +224,7 @@ async fn max_entries_fills_up(pool: PgPool) {
         .entry(&battle, json!({ "dancer_ids": [b], "status": "withdrawn" }))
         .await;
     assert_eq!(withdrawn.status, StatusCode::CREATED);
-    let uri = format!("/api/entries/{}", id(&withdrawn));
+    let uri = format!("/api/entries/{}", id_of(&withdrawn));
     let revived = json!({ "dancer_ids": [b], "status": "pending" });
     let response = send(&jam.app, put(&uri, revived, Some(&jam.owner))).await;
     assert_eq!(response.status, StatusCode::CONFLICT);
@@ -210,9 +234,9 @@ async fn max_entries_fills_up(pool: PgPool) {
 #[sqlx::test]
 async fn results_and_video_are_normalised(pool: PgPool) {
     let jam = jam(pool).await;
-    let battle = id(&jam.battle(one_v_one()).await);
+    let battle = id_of(&jam.battle(one_v_one()).await);
     let lilg = jam.dancer("Lil G").await;
-    let entry = id(&jam.entry(&battle, json!({ "dancer_ids": [lilg] })).await);
+    let entry = id_of(&jam.entry(&battle, json!({ "dancer_ids": [lilg] })).await);
     let uri = format!("/api/entries/{entry}");
 
     let result = json!({
@@ -259,7 +283,7 @@ async fn results_and_video_are_normalised(pool: PgPool) {
 #[sqlx::test]
 async fn deleting_a_battle_removes_its_entries(pool: PgPool) {
     let jam = jam(pool).await;
-    let battle = id(&jam.battle(one_v_one()).await);
+    let battle = id_of(&jam.battle(one_v_one()).await);
     let lilg = jam.dancer("Lil G").await;
     jam.entry(&battle, json!({ "dancer_ids": [lilg] })).await;
 
@@ -298,6 +322,10 @@ async fn staff_is_replaced_as_a_whole(pool: PgPool) {
         ["judge", "dj", "mc"],
         "ordered by role as declared in §4"
     );
+    // Read back by its owner: the jam is still a draft, hidden from everyone else.
+    let listed = send(&jam.app, get(&uri, Some(&jam.owner))).await;
+    assert_eq!(listed.status, StatusCode::OK);
+    assert_eq!(listed.json, replaced.json);
 
     let twice = json!([{ "dancer_id": dj, "role": "dj" }, { "dancer_id": dj, "role": "dj" }]);
     assert_eq!(

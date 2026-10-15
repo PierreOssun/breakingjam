@@ -19,7 +19,8 @@ pub async fn list(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<Battle>> {
         Battle,
         r#"select id, event_id, name, format as "format: BattleFormat", team_size,
                   gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
-                  bracket_size, max_entries, position, created_at, updated_at
+                  bracket_size, max_entries, prize_currency, prize_first, prize_second,
+                  prize_third, position, created_at, updated_at
            from battles where event_id = $1 order by position, id"#,
         event_id,
     )
@@ -36,7 +37,8 @@ pub async fn of_events(
         Battle,
         r#"select id, event_id, name, format as "format: BattleFormat", team_size,
                   gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
-                  bracket_size, max_entries, position, created_at, updated_at
+                  bracket_size, max_entries, prize_currency, prize_first, prize_second,
+                  prize_third, position, created_at, updated_at
            from battles where event_id = any($1) order by event_id, position, id"#,
         event_ids,
     )
@@ -55,7 +57,8 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Battle>> {
         Battle,
         r#"select id, event_id, name, format as "format: BattleFormat", team_size,
                   gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
-                  bracket_size, max_entries, position, created_at, updated_at
+                  bracket_size, max_entries, prize_currency, prize_first, prize_second,
+                  prize_third, position, created_at, updated_at
            from battles where id = $1"#,
         id,
     )
@@ -65,7 +68,7 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Battle>> {
 
 /// Adds a battle at the end of the jam's list.
 pub async fn insert(
-    pool: &PgPool,
+    conn: &mut PgConnection,
     event_id: Uuid,
     name: &str,
     fields: &BattleFields,
@@ -74,12 +77,14 @@ pub async fn insert(
         Battle,
         r#"insert into battles
              (id, event_id, name, format, team_size, gender, age, age_min, age_max,
-              bracket_size, max_entries, position)
-           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+              bracket_size, max_entries, prize_currency, prize_first, prize_second,
+              prize_third, position)
+           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
                    (select coalesce(max(position) + 1, 0) from battles where event_id = $2))
            returning id, event_id, name, format as "format: BattleFormat", team_size,
                      gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
-                     bracket_size, max_entries, position, created_at, updated_at"#,
+                     bracket_size, max_entries, prize_currency, prize_first, prize_second,
+                  prize_third, position, created_at, updated_at"#,
         Uuid::now_v7(),
         event_id,
         name,
@@ -91,8 +96,12 @@ pub async fn insert(
         fields.age_max,
         fields.bracket_size,
         fields.max_entries,
+        fields.prize_currency,
+        fields.prize_first,
+        fields.prize_second,
+        fields.prize_third,
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await
 }
 
@@ -107,11 +116,13 @@ pub async fn update(
         Battle,
         r#"update battles set
              name = $2, format = $3, team_size = $4, gender = $5, age = $6, age_min = $7,
-             age_max = $8, bracket_size = $9, max_entries = $10
+             age_max = $8, bracket_size = $9, max_entries = $10, prize_currency = $11,
+             prize_first = $12, prize_second = $13, prize_third = $14
            where id = $1
            returning id, event_id, name, format as "format: BattleFormat", team_size,
                      gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
-                     bracket_size, max_entries, position, created_at, updated_at"#,
+                     bracket_size, max_entries, prize_currency, prize_first, prize_second,
+                  prize_third, position, created_at, updated_at"#,
         id,
         name,
         fields.format as BattleFormat,
@@ -122,6 +133,10 @@ pub async fn update(
         fields.age_max,
         fields.bracket_size,
         fields.max_entries,
+        fields.prize_currency,
+        fields.prize_first,
+        fields.prize_second,
+        fields.prize_third,
     )
     .fetch_one(pool)
     .await
@@ -203,7 +218,8 @@ async fn fetch_entries(
 
 async fn members(pool: &PgPool, entry_ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, Vec<DancerRef>>> {
     let rows = sqlx::query!(
-        "select m.entry_id, d.id, d.dancer_name, d.country, d.country2, d.instagram_handle
+        "select m.entry_id, d.id, d.dancer_name, d.country, d.country2, d.instagram_handle,
+                d.avatar_url, d.avatar_parts
          from entry_members m join dancers d on d.id = m.dancer_id
          where m.entry_id = any($1)
          order by lower(d.dancer_name), d.id",
@@ -219,6 +235,8 @@ async fn members(pool: &PgPool, entry_ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid
             country: r.country,
             country2: r.country2,
             instagram_handle: r.instagram_handle,
+            avatar_url: r.avatar_url,
+            avatar_parts: r.avatar_parts,
         });
     }
     Ok(by_entry)

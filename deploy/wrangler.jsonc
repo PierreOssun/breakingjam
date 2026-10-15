@@ -1,0 +1,47 @@
+// Production on Cloudflare (ARCHITECTURE §9): one Worker on breakingjam.com serving the built
+// frontend, with the Rust API in a Container behind /api/*. Secrets are not here: set them
+// once with `wrangler secret put` (see deploy/README.md).
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "breakingjam",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-15",
+  "upload_source_maps": true,
+  // The app lives on its own domain only: Google sign-in and cookies are tied to it.
+  "workers_dev": false,
+  "preview_urls": false,
+  // www is a zone Redirect Rule to the apex (deploy/README.md), not a second copy of the site.
+  "routes": [{ "pattern": "breakingjam.com", "custom_domain": true }],
+  "assets": {
+    // Built by `npm run build` in frontend/ before deploying.
+    "directory": "../frontend/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // The Worker runs first only for the API and for jam pages (Open Graph tags).
+    "run_worker_first": ["/api/*", "/jams/*"]
+  },
+  "containers": [
+    {
+      "class_name": "Api",
+      "image": "../backend/Dockerfile",
+      "image_build_context": "../backend",
+      // 1/4 vCPU and 1 GiB: room for the share-image rendering (resvg).
+      "instance_type": "basic",
+      // API_INSTANCES serve traffic; the spare ones let a rollout replace them.
+      "max_instances": 4
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "API", "class_name": "Api" }]
+  },
+  "exports": {
+    "Api": { "type": "durable-object", "storage": "sqlite" }
+  },
+  "vars": {
+    "APP_BASE_URL": "https://breakingjam.com",
+    "GOOGLE_REDIRECT_URL": "https://breakingjam.com/api/auth/google/callback",
+    "RUST_LOG": "breakingjam=info,tower_http=info",
+    "API_INSTANCES": "2"
+  },
+  "observability": { "enabled": true }
+}

@@ -64,7 +64,7 @@ pub struct ClaimUser {
 }
 
 /// No 0/O, 1/I/L: the code is read off a screen and typed into Instagram.
-const CODE_ALPHABET: &[u8] = b"23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+pub(crate) const CODE_ALPHABET: &[u8] = b"23456789ABCDEFGHJKMNPQRSTUVWXYZ";
 
 /// A fresh claim code, `BJ-` + 4 characters, e.g. `BJ-7K2M`.
 pub fn new_code() -> String {
@@ -74,19 +74,4 @@ pub fn new_code() -> String {
         .map(|b| CODE_ALPHABET[usize::from(*b) % CODE_ALPHABET.len()] as char)
         .collect();
     format!("BJ-{chars}")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn codes_use_the_unambiguous_alphabet() {
-        for _ in 0..200 {
-            let code = new_code();
-            assert_eq!(code.len(), 7);
-            assert!(code.starts_with("BJ-"));
-            assert!(code[3..].bytes().all(|b| CODE_ALPHABET.contains(&b)));
-        }
-    }
 }

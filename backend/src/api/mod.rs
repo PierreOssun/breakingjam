@@ -1,16 +1,17 @@
 //! HTTP API under `/api`, one module per resource.
 
 mod admin;
-mod auth;
+pub(crate) mod auth;
 mod battles;
 mod claims;
 mod crews;
 mod dancers;
 mod events;
+pub(crate) mod geo;
 mod health;
 mod json;
 mod organizers;
-mod page;
+pub(crate) mod page;
 
 use utoipa_axum::router::OpenApiRouter;
 
@@ -22,6 +23,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .merge(health::router())
         .merge(auth::router())
         .merge(events::router())
+        .merge(geo::router())
         .merge(dancers::router())
         .merge(crews::router())
         .merge(battles::router())

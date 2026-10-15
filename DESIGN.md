@@ -337,6 +337,8 @@ One component that changes shape by viewport.
 - The hit area is extended to 44px with `after:absolute after:-inset-1 after:content-['']`.
 - Hover: `hover:bg-surface-raised`. Focus: ring.
 - Links to the crew page.
+- **Dancer chip:** the same chip linking to the dancer page, with the 28px avatar (`size-7 rounded-[8px]`, §4.16) at `pl-1 gap-2`. Used for every competitor and lineup member on a jam page. For the jam's organiser it ends with a 28px "Remove …" icon button.
+- **Add chip** (organiser only): the same shape with `border-dashed`, a `Plus` 16 and a label ("Add a dancer", "Add a judge"…).
 
 ### 4.13 Result badge
 
@@ -576,8 +578,9 @@ handstand            toprock
   2. Full-bleed 4:5 flyer.
   3. Badge and deadline caption, then the `display-lg` title.
   4. Fact rows for date/time, venue and fees, each with a `primary-text` icon.
-  5. **Battles** list: category, format and spots, or "Full" in muted.
-  6. **Lineup:** pill chips for judges, DJ and MC.
+  5. **Battles** list: category, format and spots, or "Full" in muted; cash prizes under the name (`Trophy` 16 in `primary-text`, "1st CHF 1,000 · 2nd CHF 500" muted); entries as dancer chips, best result first.
+  6. **Lineup:** dancer chips for judges, DJ and MC.
+  - For the jam's organiser, people are managed here: an add chip under each battle and per lineup role, edit and delete on each entry, remove on each chip. Battles themselves are edited in the jam editor.
   7. **About:** organiser text.
   8. **Venue:** mini map and "Open in maps ↗".
   9. **Organiser** card with **Contact**.

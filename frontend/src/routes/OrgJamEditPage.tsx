@@ -10,11 +10,10 @@ import { BattlesEditor } from "../features/jams/BattlesEditor";
 import { jamValues } from "../features/jams/jamFields";
 import { JamForm } from "../features/jams/JamForm";
 import { useJam } from "../features/jams/queries";
-import { StaffEditor } from "../features/jams/StaffEditor";
 import { StatusActions } from "../features/jams/StatusActions";
 import { NotFoundPage } from "./NotFoundPage";
 
-/** `/org/jams/:id/edit`: status, details, battles with their entries, and the lineup. */
+/** `/org/jams/:id/edit`: status, details and battles; people are managed on the jam page. */
 export function OrgJamEditPage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
@@ -46,15 +45,10 @@ function JamEditor({ jam }: { jam: Schemas["EventResponse"] }) {
           <ArrowLeft size={16} weight="bold" aria-hidden />
           {t("pages.orgJams")}
         </Link>
-        {jam.status !== "draft" && (
-          <Link
-            to={`/jams/${jam.slug}`}
-            className={buttonClasses("ghost", "sm")}
-          >
-            {t("org.viewPage")}
-            <ArrowSquareOut size={16} weight="bold" aria-hidden />
-          </Link>
-        )}
+        <Link to={`/jams/${jam.slug}`} className={buttonClasses("ghost", "sm")}>
+          {t("org.viewPage")}
+          <ArrowSquareOut size={16} weight="bold" aria-hidden />
+        </Link>
       </div>
       <h1 className="font-display text-display-lg break-words lg:text-display-xl">
         {jam.name}
@@ -83,7 +77,15 @@ function JamEditor({ jam }: { jam: Schemas["EventResponse"] }) {
         />
       </section>
       <BattlesEditor jamId={jam.id} />
-      <StaffEditor jamId={jam.id} />
+      <p className="text-body-sm text-muted">
+        {t("org.peopleOnJamPage")}{" "}
+        <Link
+          to={`/jams/${jam.slug}`}
+          className="font-bold text-primary-text underline-offset-2 hover:underline"
+        >
+          {t("org.viewPage")}
+        </Link>
+      </p>
     </div>
   );
 }

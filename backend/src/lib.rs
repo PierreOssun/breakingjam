@@ -10,6 +10,10 @@ pub mod flyer;
 pub mod openapi;
 pub mod state;
 
+#[cfg(test)]
+#[path = "../tests/unit/mod.rs"]
+mod unit_tests;
+
 use axum::{Json, Router, http::Request, routing::get};
 use tower_http::{
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, RequestId, SetRequestIdLayer},

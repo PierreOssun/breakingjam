@@ -46,6 +46,11 @@ impl TestResponse {
     }
 }
 
+/// The `id` of a created or fetched resource.
+pub fn id_of(response: &TestResponse) -> String {
+    response.json["id"].as_str().unwrap().to_owned()
+}
+
 pub async fn send(app: &Router, request: Request<Body>) -> TestResponse {
     let response = app.clone().oneshot(request).await.unwrap();
     let status = response.status();

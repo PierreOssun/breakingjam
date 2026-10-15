@@ -95,30 +95,3 @@ fn cookie(state: &AppState, session_id: Uuid) -> Result<HeaderValue, AppError> {
 pub fn clear(state: &AppState) -> Result<HeaderValue, AppError> {
     super::cookie(COOKIE, "", 0, state.config.secure_cookies())
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn current(role: Role) -> CurrentUser {
-        CurrentUser {
-            user: User {
-                id: Uuid::nil(),
-                email: "a@b.c".into(),
-                display_name: "A".into(),
-                role,
-            },
-            session_id: Uuid::nil(),
-        }
-    }
-
-    #[test]
-    fn require_passes_for_higher_roles() {
-        assert!(current(Role::Admin).require(Role::Organizer).is_ok());
-        assert!(current(Role::Organizer).require(Role::Organizer).is_ok());
-        assert!(matches!(
-            current(Role::User).require(Role::Organizer),
-            Err(AppError::Forbidden)
-        ));
-    }
-}

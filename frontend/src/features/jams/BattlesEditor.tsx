@@ -15,13 +15,12 @@ import { IconButton } from "../../components/IconButton";
 import { InlineEmpty } from "../../components/InlineEmpty";
 import { useToast } from "../../components/useToast";
 import { BattleDialog } from "./BattleDialog";
-import { presetOf } from "./battleFields";
-import { EntriesEditor } from "./EntriesEditor";
+import { prizeLine, presetOf } from "./battleFields";
 import { useBattles } from "./queries";
 
 type Battle = Schemas["Battle"];
 
-/** A jam's battles in display order: add, edit, reorder, delete, and their entries. */
+/** A jam's battles in display order: add, edit, reorder, delete. */
 export function BattlesEditor({ jamId }: { jamId: string }) {
   const { t } = useTranslation();
   const toast = useToast();
@@ -116,7 +115,6 @@ export function BattlesEditor({ jamId }: { jamId: string }) {
                 <Trash size={20} weight="bold" aria-hidden />
               </IconButton>
             </div>
-            <EntriesEditor battle={battle} />
           </li>
         ))}
       </ol>
@@ -167,9 +165,9 @@ export function BattlesEditor({ jamId }: { jamId: string }) {
   );
 }
 
-/** "1v1 · Bboys · 18+ · 16 spots": the structured fields in words. */
+/** "1v1 · Bboys · 18+ · 16 spots · 1st CHF 1,000": the structured fields in words. */
 function BattleSummary({ battle }: { battle: Battle }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const preset = presetOf(battle);
   const parts = [
     // "1v1" already says it is a team battle.
@@ -187,6 +185,7 @@ function BattleSummary({ battle }: { battle: Battle }) {
     battle.bracket_size &&
       t("org.battles.bracketOf", { n: battle.bracket_size }),
     battle.max_entries && t("org.battles.spots", { count: battle.max_entries }),
+    prizeLine(battle, t, i18n.language),
   ].filter(Boolean);
   return <>{parts.join(" · ")}</>;
 }

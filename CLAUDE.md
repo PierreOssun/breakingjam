@@ -32,7 +32,7 @@ Read `ARCHITECTURE_v0.1.md` first; it is the source of truth for scope, schema a
 - Modules: one aggregate each. No `utils.rs`, no `helpers.rs`, no `common.rs`.
 - Errors: `AppError` everywhere in the API layer; `thiserror` for domain errors; `anyhow` only in `main` and the seed binary.
 - SQL: `sqlx::query!`/`query_as!` only. No string-built SQL, no ORM.
-- Tests: integration tests per handler with `#[sqlx::test]`; unit tests next to the domain code. No mocks of the database.
+- Tests: never in source files. Integration tests per handler with `#[sqlx::test]` in `backend/tests/*.rs`; unit tests in `backend/tests/unit/`, mirroring `src/` (helpers they test are `pub(crate)`); frontend tests in `frontend/tests/`, mirroring `src/`. No mocks of the database.
 - Formatting and lints: `cargo fmt`, `cargo clippy --all-targets -- -D warnings`, `eslint` + `prettier` with defaults. Never disable a lint to make it pass.
 
 ## Workflow

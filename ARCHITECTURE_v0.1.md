@@ -81,7 +81,7 @@ breakingjam/
 │   │   │   └── ...
 │   │   ├── db/                 # sqlx queries, one module per aggregate
 │   │   └── api/                # axum handlers + DTOs, one module per resource
-│   └── tests/                  # integration tests (#[sqlx::test])
+│   └── tests/                  # integration tests (#[sqlx::test]); unit/ mirrors src/ (M13)
 └── frontend/
     ├── package.json
     ├── vite.config.ts
@@ -92,7 +92,9 @@ breakingjam/
     │   ├── components/
     │   ├── features/           # events/, dancers/, crews/, map/, auth/
     │   └── lib/
-    └── public/
+    ├── tests/                  # Vitest, mirroring src/ (M13)
+    └── public/                 # _headers, robots.txt, favicon
+├── deploy/                     # Cloudflare Worker, wrangler.jsonc, deploy guide (M13)
 ```
 
 Single backend crate for v0.1. Split into a Cargo workspace only when compile times or module boundaries hurt.
@@ -278,6 +280,10 @@ create table battles (
   age_max smallint check (age_max >= age_min),   -- required for kids (17); adult: null = no upper bound
   bracket_size smallint check (bracket_size in (2, 4, 8, 16, 32, 64)),   -- starting bracket after prelims; null = unknown
   max_entries int check (max_entries > 0),
+  prize_currency char(3) check (prize_currency ~ '^[A-Z]{3}$'),   -- ISO 4217 (EUR, CHF, CNY…); set exactly when a prize is
+  prize_first integer check (prize_first >= 0),     -- cash prizes per place, in whole units of prize_currency
+  prize_second integer check (prize_second >= 0),
+  prize_third integer check (prize_third >= 0),
   position smallint not null default 0,   -- display order on the jam page
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -394,6 +400,8 @@ GET    /api/auth/me
 GET    /api/auth/google                  → redirect
 GET    /api/auth/google/callback
 
+GET    /api/geo                          {country}: the visitor's ISO 3166-1 alpha-2 country from the `cf-ipcountry` header (set by the Worker), null when unknown
+
 GET    /api/events                       ?status=published&country=&from=&to=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required)
 GET    /api/events.geojson               published + registration_closed events with coordinates, as FeatureCollection (id, name, slug, starts_on, ends_on, status, city, country, battles: names in display order, categories: what the map's chips match)
 GET    /api/events/{id_or_slug}           + can_edit, organizer {id, display_name, instagram_handle, verified} (M12, M12c)
@@ -405,7 +413,7 @@ DELETE /api/events/{id}                  soft delete, owner/admin
 POST   /api/events/{id}/publish | close-registration | complete | cancel
 
 GET    /api/events/{id}/battles          ordered by position
-POST   /api/events/{id}/battles          {name?, format, team_size?, gender, age, age_min?, age_max?, bracket_size?, max_entries?}
+POST   /api/events/{id}/battles          {name?, format, team_size?, gender, age, age_min?, age_max?, bracket_size?, max_entries?, prize_currency?, prize_first?, prize_second?, prize_third?}
 PUT    /api/battles/{id}
 DELETE /api/battles/{id}
 PUT    /api/events/{id}/battles/order    [battle_id, ...]
@@ -489,12 +497,14 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
     - `VITE_TILES_URL=pmtiles://https://tiles.breakingjam.com/world.pmtiles` → self-hosted extract on R2 via the `pmtiles` protocol (production, later).
   - Attribution: Protomaps + OpenStreetMap contributors, always visible (bottom-right), required by both licences.
   - Data source: `GET /api/events.geojson`. Cluster at low zoom (`cluster: true` on the GeoJSON source).
+  - First view: the visitor's country from `GET /api/geo`, framed by a bounding box from Natural Earth (main landmass and nearby islands, `features/map/countryBounds.ts`). A country without upcoming jams is widened to its three nearest jams; an unknown country frames every jam. In development, `DEV_COUNTRY` in `frontend/.env` stands in for Cloudflare.
   - Click a point → popup with name, dates, city → link to `/jams/{slug}`.
   - Filters and search (decided in M11), all client-side over the one GeoJSON download: **When** (this weekend, next 30 days; one at a time) and **battle categories** (1v1, 2v2, crews, 7 to smoke, bgirl, kids; any one matches), combined with AND. Search matches every word against name, city, country code and country name (accents ignored); Enter fits the map to the matches and opens the jam when there is one. The map shows upcoming jams only: no Past or Cancelled filters in v0.1.
   - Container: `height: 100dvh` minus header, `touch-action: none`.
 - Dancer picker (used in entry and staff editing): debounced search on `dancer_name` showing existing matches; "create new dancer" is only enabled after a search has run (search-before-create). The crew picker works the same way.
 - Jam location (decided in M12): the organiser types the address, city and country; **Find on the map** searches them with OpenStreetMap's Nominatim from the browser (on that click only, never as-you-type, at most once a second, attributed under the field), drops the pin on the best match and lists the others; the pin can then be tapped or dragged. Without a pin a jam is published but stays off the map.
-- On the jam page, every dancer name (entries, staff) links to `/dancers/{id}`.
+- On the jam page, every dancer (entries, staff) is a link chip with their avatar, to `/dancers/{id}`.
+- People are managed on the jam page, not in the editor: its organiser sees **Add a dancer** (or **Add a team**) under each battle, an add chip per lineup role (judge, DJ, MC, host, staff), and edit and delete on each entry and person, withdrawn entries included. `/org/jams/{id}/edit` keeps the status, details and battles (with their prizes).
 - Generated avatars (decided in M12b, following DESIGN.md §4.16 rather than DiceBear): the pixel 2D-HD bust, a 32×32 sprite drawn in code (`features/dancers/avatarParts.ts`) from six parts (hair, skin, hair colour, hoodie, extra, backdrop) and rendered as inline SVG with crisp edges plus the glow and vignette layer. Parts are seeded from `dancer.id` (same id → same face, no network call) unless `avatar_parts` holds a choice made in the edit sheet. The sprites are a first pass that an illustrator may redraw. Flags are separate chips next to the avatar, never drawn into it. Uploaded avatars (verified dancers) override the generated one. Organiser pages use the same bust, seeded by the account id.
 - Admin screens (`/admin/claims`, `/admin/dancers/{id}/merge`): minimal tables and forms, `admin` role only, no design polish required.
 
@@ -503,10 +513,11 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 ### Backend
 - Integration tests in `backend/tests/` using `#[sqlx::test]` (fresh DB per test from migrations). `DATABASE_URL` points to the compose Postgres locally and a `postgres` service container in CI.
 - Each resource gets: happy-path CRUD, auth/authz rejection, validation error shape, status transition guard.
-- Domain logic (status transitions, team_size check, reached/final_rank consistency) unit-tested in `domain/`.
+- Domain logic (status transitions, team_size check, reached/final_rank consistency) unit-tested. Unit tests live in `backend/tests/unit/`, mirroring `src/`, compiled into the crate under `cfg(test)` from `lib.rs`; the private helpers they test are `pub(crate)`. Source files hold no tests (decided in M13).
+- `tests/access.rs` sweeps every route documented in `openapi.json`: 401 without a session, 404 on an unknown id, 403 on someone else's resources and for non-admins, named field errors, garbled cursors.
 
 ### Frontend
-- Vitest + Testing Library for components with logic (forms, search-before-create). No snapshot tests.
+- Vitest + Testing Library for components with logic (forms, search-before-create). No snapshot tests. Tests live in `frontend/tests/`, mirroring `src/` (M13).
 - i18n key-parity test.
 
 ### CI (`.github/workflows/ci.yml`)
@@ -521,17 +532,19 @@ docker compose up -d                  # postgres on 5432
 cd backend && cp .env.example .env && sqlx database create && sqlx migrate run && cargo run
 cd frontend && npm i && npm run gen:api && npm run dev   # vite proxies /api → :8080
 ```
-Seed script: `cargo run --bin seed` inserts an `admin` and a `seed_admin` user, ~10 events across Europe/Asia with coordinates, ~30 dancers (some with handles, some without, one pair of deliberate near-duplicates for merge testing), 5 crews. The real ~200 notable dancers are entered by hand through the UI by a `seed_admin`, not by this script.
+Seed script: `cargo run --bin seed` inserts an `admin` and a `seed_admin` user ("BreakingJam Team", the organiser of every seeded jam), 12 jams across Europe, Asia and North America with coordinates (5 completed with results, the others upcoming or a draft), two battles each with entries, staff and some cash prizes, ~55 dancers (fictional ones with and without handles, one pair of deliberate near-duplicates for merge testing, 4 DJs and MCs, and 20 well-known bboys with invented results), and 5 crews. It refuses any database host other than localhost. The real ~200 notable dancers are entered by hand through the UI by a `seed_admin`, not by this script.
 
-## 9. Deployment (target, not required for v0.1 to be "done")
+## 9. Deployment (built in M13; guide in `deploy/README.md`)
 
-- **Domain**: `breakingjam.com` on Cloudflare DNS. Frontend at the apex, API served same-origin under `/api/*` via the Worker (keeps session cookies first-party; no CORS in prod).
-- **Frontend**: Cloudflare Pages from `frontend/`, build `npm run build`, output `dist/`. `VITE_API_URL` set per environment (empty in prod = same origin).
-- **Open Graph**: the SPA cannot serve per-page `<meta>` to crawlers; the Worker injects `og:title` / `og:image` (`/api/events/{slug}/og.png`) into `index.html` for `/jams/{slug}`.
-- **API**: `backend/Dockerfile` (multi-stage, `cargo-chef`, distroless or debian-slim runtime). Deployed as a Cloudflare Container behind a thin Worker that proxies `/api/*`. Keep the Dockerfile generic so it runs anywhere.
-- **DB**: Neon Postgres. API connects through Cloudflare Hyperdrive (connection pooling). Migrations run from CI with `sqlx migrate run` against Neon before the container rollout.
-- **Tiles**: Protomaps `.pmtiles` planet extract hosted on Cloudflare R2, served via the pmtiles protocol.
-- Secrets via Wrangler / Cloudflare secrets, never committed.
+- **Domain**: `breakingjam.com` on Cloudflare DNS. One Worker (`deploy/`) serves the site at the apex and the API same-origin under `/api/*` (session cookies stay first-party; no CORS in prod). `www` redirects to the apex with a zone Redirect Rule.
+- **Frontend**: Workers static assets from `frontend/dist` with the SPA fallback, not Cloudflare Pages (Cloudflare's current recommendation; one Worker, one deploy). Built with `VITE_API_URL` empty (same origin). `frontend/public/_headers` sets CSP, HSTS and the immutable cache for `/assets/*`.
+- **Visitor country**: the Worker sets `cf-ipcountry` on every `/api/*` request from `request.cf.country`, replacing any value the client sent; `GET /api/geo` reads it for the map's first view.
+- **Open Graph**: the Worker runs first for `/jams/{slug}`, reads the jam from the API as an anonymous visitor (drafts stay hidden) and appends `og:*` tags (title, dates and city, `/api/events/{slug}/og.png`) to `index.html` with HTMLRewriter.
+- **API**: `backend/Dockerfile` (multi-stage, `cargo-chef`, distroless) runs as a Cloudflare Container (GA April 2026, Workers Paid plan). The Worker passes its vars and secrets to it as environment variables and spreads requests over `API_INSTANCES` instances. Instances sleep after 30 minutes idle and wake in 1–3 s. The Dockerfile stays generic.
+- **DB**: Neon Postgres, reached **directly over TLS** with the API's own sqlx pool. Hyperdrive was the plan, but containers can't use it (cloudflare/containers#97, open as of October 2026). Migrations run from the deploy workflow with `sqlx migrate run` before the new containers roll out, so they must stay compatible with the API version still running.
+- **Releases**: pushing a `v*` tag (or a manual run) starts `.github/workflows/deploy.yml`: the full CI, the frontend build, the migrations, then `wrangler deploy` (Worker, assets, image). `wrangler rollback` returns to the previous version.
+- **Tiles**: the hosted Protomaps API for now; later a `.pmtiles` extract on R2 via the pmtiles protocol (`VITE_TILES_URL`, plus its host in the CSP).
+- Secrets via `wrangler secret put` (API) and GitHub environment secrets (deploy), never committed.
 
 ## 10. Conventions summary (copy to CONVENTIONS.md)
 
