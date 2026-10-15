@@ -9,6 +9,11 @@ pub mod user;
 
 use validator::ValidationError;
 
+/// A failed struct-level rule; `code` carries the field name, which `AppError` reports.
+pub fn rule(field: &'static str, message: &'static str) -> ValidationError {
+    ValidationError::new(field).with_message(message.into())
+}
+
 /// Validator for required text: rejects empty and whitespace-only strings.
 pub fn not_blank(value: &str) -> Result<(), ValidationError> {
     if value.trim().is_empty() {

@@ -25,7 +25,7 @@ Build order point 3 of `ARCHITECTURE_v0.1.md` §11.
 ## Doc conflict, followed ARCHITECTURE
 
 - `AppError::Internal(anyhow::Error)` comes from §5. CLAUDE.md says "`anyhow` only in `main` and the seed binary". I followed §5 because it names the variants explicitly. Switching to `Internal(Box<dyn Error + Send + Sync>)` would be a one-line change if you prefer.
-- `SESSION_SECRET` is loaded and required but unused ("reserved" in §5).
+- `SESSION_SECRET` was loaded and required but unused ("reserved" in §5); dropped from the config and §5 in the 14 Oct 2026 cleanup pass.
 
 ## Verified locally
 

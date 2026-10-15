@@ -1,4 +1,4 @@
-//! JSON request bodies that are deserialized and validated in one step.
+//! Pattern: extractor — JSON request bodies are deserialized and validated in one step.
 
 use axum::{
     Json,

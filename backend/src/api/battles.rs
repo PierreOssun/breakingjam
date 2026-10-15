@@ -1,11 +1,11 @@
 //! Battles, entries and staff of a jam. Readable like the jam; writable by the jam's writers.
 
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, State},
     http::StatusCode,
-    routing::{get, put},
 };
+use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use super::{
@@ -18,24 +18,34 @@ use crate::{
     domain::battle::{
         Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, StaffList, StaffMember,
     },
-    error::AppError,
+    error::{AppError, ErrorEnvelope},
     state::AppState,
 };
 
 /// Battle, entry and staff routes.
-pub fn router() -> Router<AppState> {
-    Router::new()
-        .route("/events/{id}/battles", get(list).post(create))
-        .route("/events/{id}/battles/order", put(reorder))
-        .route("/battles/{id}", put(update).delete(remove))
-        .route(
-            "/battles/{id}/entries",
-            get(list_entries).post(create_entry),
-        )
-        .route("/entries/{id}", put(update_entry).delete(remove_entry))
-        .route("/events/{id}/staff", get(list_staff).put(replace_staff))
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::new()
+        .routes(routes!(list, create))
+        .routes(routes!(reorder))
+        .routes(routes!(update, remove))
+        .routes(routes!(list_entries, create_entry))
+        .routes(routes!(update_entry, remove_entry))
+        .routes(routes!(list_staff, replace_staff))
 }
 
+/// A jam's battles in display order.
+#[utoipa::path(
+    get,
+    path = "/events/{id}/battles",
+    tag = "battles",
+    operation_id = "list_battles",
+    params(("id" = Uuid, Path, description = "Jam id")),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, body = Vec<Battle>),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+    )
+)]
 async fn list(
     State(state): State<AppState>,
     current: MaybeUser,
@@ -45,6 +55,23 @@ async fn list(
     Ok(Json(db::battles::list(&state.pool, event_id).await?))
 }
 
+/// Add a battle at the end; a blank name is generated.
+#[utoipa::path(
+    post,
+    path = "/events/{id}/battles",
+    tag = "battles",
+    operation_id = "create_battle",
+    params(("id" = Uuid, Path, description = "Jam id")),
+    request_body = BattleFields,
+    security(("session" = [])),
+    responses(
+        (status = CREATED, body = Battle),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn create(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -52,12 +79,28 @@ async fn create(
     ValidJson(fields): ValidJson<BattleFields>,
 ) -> Result<(StatusCode, Json<Battle>), AppError> {
     writable(&state, &current, event_id).await?;
-    AppError::check(fields.cross_field_errors())?;
     let battle =
         db::battles::insert(&state.pool, event_id, &fields.display_name(), &fields).await?;
     Ok((StatusCode::CREATED, Json(battle)))
 }
 
+/// Replace a battle's fields (not its position).
+#[utoipa::path(
+    put,
+    path = "/battles/{id}",
+    tag = "battles",
+    operation_id = "update_battle",
+    params(("id" = Uuid, Path, description = "Battle id")),
+    request_body = BattleFields,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Battle),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn update(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -65,11 +108,25 @@ async fn update(
     ValidJson(fields): ValidJson<BattleFields>,
 ) -> Result<Json<Battle>, AppError> {
     writable_battle(&state, &current, id).await?;
-    AppError::check(fields.cross_field_errors())?;
     let battle = db::battles::update(&state.pool, id, &fields.display_name(), &fields).await?;
     Ok(Json(battle))
 }
 
+/// Delete a battle and its entries.
+#[utoipa::path(
+    delete,
+    path = "/battles/{id}",
+    tag = "battles",
+    operation_id = "delete_battle",
+    params(("id" = Uuid, Path, description = "Battle id")),
+    security(("session" = [])),
+    responses(
+        (status = NO_CONTENT, description = "Deleted"),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
+    )
+)]
 async fn remove(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -80,6 +137,23 @@ async fn remove(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// Set the display order; must list every battle of the jam once.
+#[utoipa::path(
+    put,
+    path = "/events/{id}/battles/order",
+    tag = "battles",
+    operation_id = "reorder_battles",
+    params(("id" = Uuid, Path, description = "Jam id")),
+    request_body = BattleOrder,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Vec<Battle>),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Not exactly the jam's battles", body = ErrorEnvelope),
+    )
+)]
 async fn reorder(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -105,6 +179,19 @@ async fn reorder(
     Ok(Json(db::battles::list(&state.pool, event_id).await?))
 }
 
+/// A battle's entries with members and results.
+#[utoipa::path(
+    get,
+    path = "/battles/{id}/entries",
+    tag = "battles",
+    operation_id = "list_entries",
+    params(("id" = Uuid, Path, description = "Battle id")),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, body = Vec<Entry>),
+        (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
+    )
+)]
 async fn list_entries(
     State(state): State<AppState>,
     current: MaybeUser,
@@ -117,6 +204,24 @@ async fn list_entries(
     Ok(Json(db::battles::entries(&state.pool, battle_id).await?))
 }
 
+/// Register an entry; results may be set at once for past jams.
+#[utoipa::path(
+    post,
+    path = "/battles/{id}/entries",
+    tag = "battles",
+    operation_id = "create_entry",
+    params(("id" = Uuid, Path, description = "Battle id")),
+    request_body = EntryFields,
+    security(("session" = [])),
+    responses(
+        (status = CREATED, body = Entry),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
+        (status = CONFLICT, description = "A dancer is already entered in this battle, or the battle is full", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn create_entry(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -134,6 +239,24 @@ async fn create_entry(
     Ok((StatusCode::CREATED, Json(entry)))
 }
 
+/// Replace an entry, its members and its result.
+#[utoipa::path(
+    put,
+    path = "/entries/{id}",
+    tag = "battles",
+    operation_id = "update_entry",
+    params(("id" = Uuid, Path, description = "Entry id")),
+    request_body = EntryFields,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Entry),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such entry, or its jam is a draft you can't see", body = ErrorEnvelope),
+        (status = CONFLICT, description = "A dancer is already entered in this battle, or the battle is full", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn update_entry(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -154,6 +277,21 @@ async fn update_entry(
     Ok(Json(entry))
 }
 
+/// Delete an entry.
+#[utoipa::path(
+    delete,
+    path = "/entries/{id}",
+    tag = "battles",
+    operation_id = "delete_entry",
+    params(("id" = Uuid, Path, description = "Entry id")),
+    security(("session" = [])),
+    responses(
+        (status = NO_CONTENT, description = "Deleted"),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such entry, or its jam is a draft you can't see", body = ErrorEnvelope),
+    )
+)]
 async fn remove_entry(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -167,6 +305,19 @@ async fn remove_entry(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// A jam's judges, DJs, MCs and other staff.
+#[utoipa::path(
+    get,
+    path = "/events/{id}/staff",
+    tag = "battles",
+    operation_id = "list_staff",
+    params(("id" = Uuid, Path, description = "Jam id")),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, body = Vec<StaffMember>),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+    )
+)]
 async fn list_staff(
     State(state): State<AppState>,
     current: MaybeUser,
@@ -176,6 +327,23 @@ async fn list_staff(
     Ok(Json(db::events::staff(&state.pool, event_id).await?))
 }
 
+/// Replace a jam's whole staff list.
+#[utoipa::path(
+    put,
+    path = "/events/{id}/staff",
+    tag = "battles",
+    operation_id = "replace_staff",
+    params(("id" = Uuid, Path, description = "Jam id")),
+    request_body = StaffList,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Vec<StaffMember>),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn replace_staff(
     State(state): State<AppState>,
     current: CurrentUser,

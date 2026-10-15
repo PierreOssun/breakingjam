@@ -1,0 +1,5191 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "BreakingJam API",
+    "description": "The central place for breaking jams. Authenticated calls use the `bj_session` cookie set by register, login or Google sign-in.",
+    "license": {
+      "name": ""
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "The process is up and the database answers.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Database unreachable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Create a password account and log in.",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "headers": {
+              "set-cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "`bj_session`, HttpOnly, 30 days"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Log in with email and password.",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "set-cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "`bj_session`, HttpOnly, 30 days"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unknown email, wrong password or Google-only account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "End the current session; succeeds without one too.",
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": "Session deleted, cookie cleared"
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "The logged-in account; also slides the session 30 days forward.",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "headers": {
+              "set-cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "`bj_session`, HttpOnly, 30 days"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/auth/google": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Start Google sign-in (a browser navigation, not a fetch).",
+        "operationId": "google_start",
+        "parameters": [
+          {
+            "name": "next",
+            "in": "query",
+            "description": "Same-site path to land on after sign-in.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "Redirect to Google's consent screen",
+            "headers": {
+              "location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/google/callback": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Where Google sends the browser back; ends on the frontend either way.",
+        "operationId": "google_callback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "description": "Authorization code; absent when the user cancelled.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "CSRF state echoed back by Google.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "Logged in: to `FRONTEND_ORIGIN` + `next`. Failed: to `/login?error=google`",
+            "headers": {
+              "location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "List public jams, or your own with `mine=true`.",
+        "operationId": "list_events",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Only jams in this status.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/EventStatus"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Only jams in this country (ISO 3166-1 alpha-2).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Only jams still running on or after this date.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Only jams starting on or before this date.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "mine",
+            "in": "query",
+            "description": "`true` lists the caller's own jams, drafts included (organiser list page).",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`mine=true` without a session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Register a jam as a draft; a first jam makes a `user` an `organizer`.",
+        "operationId": "create_event",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/events.geojson": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Upcoming public jams with coordinates, for the world map.",
+        "operationId": "events_geojson",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureCollection"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events/{id}": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "One jam, by id or slug.",
+        "operationId": "get_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id or slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Replace a jam's fields; slug and status never change here.",
+        "operationId": "update_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Soft-delete a jam.",
+        "operationId": "delete_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/{transition}": {
+      "post": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Move a jam along draft → published → registration_closed → completed, or cancel it.",
+        "operationId": "transition_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "transition",
+            "in": "path",
+            "description": "Cancel is allowed from any status but completed",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "An explicit status change: the last segment of `POST /events/{id}/{transition}`.",
+              "enum": [
+                "publish",
+                "close-registration",
+                "complete",
+                "cancel"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The current status does not allow it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/dancers": {
+      "get": {
+        "tags": [
+          "dancers"
+        ],
+        "summary": "Search dancers by name, alias or handle; notable dancers first.",
+        "operationId": "search_dancers",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Substring of the name, an alias or the handle (`@` optional).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Matches the first or second flag.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_DancerSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "dancers"
+        ],
+        "summary": "Create a dancer; `source` follows the creator's role.",
+        "operationId": "create_dancer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DancerFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DancerResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Instagram handle already taken",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/dancers/{id}": {
+      "get": {
+        "tags": [
+          "dancers"
+        ],
+        "summary": "A dancer page, or `{ merged_into }` when the dancer was merged away.",
+        "operationId": "get_dancer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Dancer id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DancerPage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such dancer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "dancers"
+        ],
+        "summary": "Replace a dancer's profile; edits to unverified dancers are logged.",
+        "operationId": "update_dancer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Dancer id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DancerFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DancerResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the creator (unverified), the owner (verified) nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such dancer, or merged away",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Instagram handle already taken",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "dancers"
+        ],
+        "summary": "Soft-delete a dancer.",
+        "operationId": "delete_dancer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Dancer id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Below `seed_admin`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such dancer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/dancers/{id}/events": {
+      "get": {
+        "tags": [
+          "dancers"
+        ],
+        "summary": "The public jams a dancer competed in or worked at, split into upcoming and past.",
+        "operationId": "dancer_events",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Dancer id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "description": "Only one of the two lists; both when absent.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Which list `GET /dancers/{id}/events` fills.",
+              "enum": [
+                "upcoming",
+                "past"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DancerEvents"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such dancer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crews": {
+      "get": {
+        "tags": [
+          "crews"
+        ],
+        "summary": "Search crews by name.",
+        "operationId": "search_crews",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Substring of the crew name.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_Crew"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "crews"
+        ],
+        "summary": "Create a crew.",
+        "operationId": "create_crew",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrewFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Below `organizer`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/crews/{id}": {
+      "get": {
+        "tags": [
+          "crews"
+        ],
+        "summary": "A crew with its current members.",
+        "operationId": "get_crew",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Crew id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such crew",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "crews"
+        ],
+        "summary": "Replace a crew's fields.",
+        "operationId": "update_crew",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Crew id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrewFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Below `organizer`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such crew",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "crews"
+        ],
+        "summary": "Soft-delete a crew; memberships stay for history.",
+        "operationId": "delete_crew",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Crew id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Below `organizer`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such crew",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/crews/{id}/members": {
+      "post": {
+        "tags": [
+          "crews"
+        ],
+        "summary": "Add a dancer to a crew.",
+        "operationId": "add_crew_member",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Crew id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrewDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Below `organizer`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such crew or dancer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already a current member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/crews/{id}/members/{dancer_id}": {
+      "delete": {
+        "tags": [
+          "crews"
+        ],
+        "summary": "End a current membership today.",
+        "operationId": "end_crew_membership",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Crew id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "dancer_id",
+            "in": "path",
+            "description": "Dancer id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Membership ended"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Below `organizer`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No current membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/battles": {
+      "get": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "A jam's battles in display order.",
+        "operationId": "list_battles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Battle"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Add a battle at the end; a blank name is generated.",
+        "operationId": "create_battle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BattleFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Battle"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/battles/order": {
+      "put": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Set the display order; must list every battle of the jam once.",
+        "operationId": "reorder_battles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BattleOrder"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Battle"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Not exactly the jam's battles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/battles/{id}": {
+      "put": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Replace a battle's fields (not its position).",
+        "operationId": "update_battle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Battle id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BattleFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Battle"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such battle, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Delete a battle and its entries.",
+        "operationId": "delete_battle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Battle id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such battle, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/battles/{id}/entries": {
+      "get": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "A battle's entries with members and results.",
+        "operationId": "list_entries",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Battle id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Entry"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such battle, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Register an entry; results may be set at once for past jams.",
+        "operationId": "create_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Battle id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such battle, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A dancer is already entered in this battle, or the battle is full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/entries/{id}": {
+      "put": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Replace an entry, its members and its result.",
+        "operationId": "update_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Entry id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such entry, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A dancer is already entered in this battle, or the battle is full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Delete an entry.",
+        "operationId": "delete_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Entry id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such entry, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/staff": {
+      "get": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "A jam's judges, DJs, MCs and other staff.",
+        "operationId": "list_staff",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffMember"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Replace a jam's whole staff list.",
+        "operationId": "replace_staff",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffList"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffMember"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/dancers/{id}/claim": {
+      "get": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Your latest claim on this dancer.",
+        "operationId": "my_claim",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Dancer id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Claim"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No claim yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "\"Verify me\": get a code to put in your Instagram bio; repeating returns the same pending claim.",
+        "operationId": "open_claim",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Dancer id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Claim"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such dancer, or merged away",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Dancer already verified, or you already own a page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/claims": {
+      "get": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Claims to review, oldest first.",
+        "operationId": "list_claims",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Defaults to `pending`.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ClaimStatus"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ClaimForReview"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/claims/{id}/approve": {
+      "post": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Approve: the dancer gets its owner and competing claims are rejected.",
+        "operationId": "approve_claim",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Claim id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Claim"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such claim, or its dancer is gone",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already reviewed, or the dancer is already verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/claims/{id}/reject": {
+      "post": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Reject a claim; the user may claim again.",
+        "operationId": "reject_claim",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Claim id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Claim"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such claim",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already reviewed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/dancers/{id}/merge": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Merge a duplicate into `into`; `{id}` becomes a redirect.",
+        "operationId": "merge_dancers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Dancer to merge away",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MergeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MergeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such dancer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already merged, or `{id}` is verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`into` is `{id}` or unknown",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/users/{id}/role": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Change an account's role (not your own).",
+        "operationId": "set_user_role",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Your own role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddMemberRequest": {
+        "type": "object",
+        "description": "Body of `POST /crews/{id}/members`.",
+        "required": [
+          "dancer_id"
+        ],
+        "properties": {
+          "dancer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The dancer joining."
+          },
+          "since": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Join date; omit when unknown."
+          }
+        }
+      },
+      "Battle": {
+        "type": "object",
+        "description": "A competition inside a jam, e.g. \"1v1 Bboy\".",
+        "required": [
+          "id",
+          "event_id",
+          "name",
+          "format",
+          "gender",
+          "age",
+          "position",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The jam it belongs to."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name, given or generated."
+          },
+          "format": {
+            "$ref": "#/components/schemas/BattleFormat",
+            "description": "How it is run."
+          },
+          "team_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "1 = 1v1 … 10 = 10v10; set only for team battles."
+          },
+          "gender": {
+            "$ref": "#/components/schemas/BattleGender",
+            "description": "Who may enter."
+          },
+          "age": {
+            "$ref": "#/components/schemas/BattleAge",
+            "description": "Age category."
+          },
+          "age_min": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Lower age bound."
+          },
+          "age_max": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Upper age bound."
+          },
+          "bracket_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Starting bracket after prelims; null = unknown."
+          },
+          "max_entries": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Registration cap; null = unlimited."
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Display order on the jam page."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Row creation time."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last write, maintained by a trigger."
+          }
+        }
+      },
+      "BattleAge": {
+        "type": "string",
+        "description": "Age category.",
+        "enum": [
+          "kids",
+          "adult",
+          "na"
+        ]
+      },
+      "BattleFields": {
+        "type": "object",
+        "description": "Everything set when creating or editing a battle.",
+        "required": [
+          "format",
+          "gender",
+          "age"
+        ],
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text; blank means \"generate from the structured fields\"."
+          },
+          "format": {
+            "$ref": "#/components/schemas/BattleFormat",
+            "description": "How the battle is run."
+          },
+          "team_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "1 = 1v1 … 10 = 10v10; required for team battles, absent otherwise."
+          },
+          "gender": {
+            "$ref": "#/components/schemas/BattleGender",
+            "description": "Who may enter."
+          },
+          "age": {
+            "$ref": "#/components/schemas/BattleAge",
+            "description": "Age category; kids need `age_max` of 17 or less, adults `age_min` of 18 or more."
+          },
+          "age_min": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Lower age bound."
+          },
+          "age_max": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Upper age bound."
+          },
+          "bracket_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Starting bracket after prelims: 2, 4, 8, 16, 32 or 64; null = unknown."
+          },
+          "max_entries": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Registration cap; null = unlimited."
+          }
+        }
+      },
+      "BattleFormat": {
+        "type": "string",
+        "description": "How a battle is run.",
+        "enum": [
+          "team",
+          "seven_to_smoke",
+          "na"
+        ]
+      },
+      "BattleGender": {
+        "type": "string",
+        "description": "Who may enter.",
+        "enum": [
+          "bboy",
+          "bgirl",
+          "mixed"
+        ]
+      },
+      "BattleOrder": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Body of `PUT /events/{id}/battles/order`: every battle id of the jam, in display order."
+      },
+      "BattleRef": {
+        "type": "object",
+        "description": "The battle side of a participation.",
+        "required": [
+          "id",
+          "name",
+          "format",
+          "gender",
+          "age"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Battle id."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name, e.g. \"1v1 Bboy\"."
+          },
+          "format": {
+            "$ref": "#/components/schemas/BattleFormat",
+            "description": "How it is run."
+          },
+          "team_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Team size for team battles."
+          },
+          "gender": {
+            "$ref": "#/components/schemas/BattleGender",
+            "description": "Who may enter."
+          },
+          "age": {
+            "$ref": "#/components/schemas/BattleAge",
+            "description": "Age category."
+          }
+        }
+      },
+      "BracketStage": {
+        "type": "string",
+        "description": "Furthest stage an entry reached; `Winner` is first place.",
+        "enum": [
+          "prelims",
+          "top64",
+          "top32",
+          "top16",
+          "top8",
+          "top4",
+          "top2",
+          "winner",
+          "na"
+        ]
+      },
+      "Claim": {
+        "type": "object",
+        "description": "A claim as its author sees it.",
+        "required": [
+          "id",
+          "dancer_id",
+          "user_id",
+          "code",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "dancer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The page being claimed."
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The account claiming it."
+          },
+          "code": {
+            "type": "string",
+            "description": "Shown to the user, who puts it in their Instagram bio or DMs it to @breakingjam."
+          },
+          "status": {
+            "$ref": "#/components/schemas/ClaimStatus",
+            "description": "Review state."
+          },
+          "reviewed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When an admin decided; null while pending."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the claim was opened."
+          }
+        }
+      },
+      "ClaimForReview": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Claim",
+            "description": "The claim itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "dancer",
+              "user"
+            ],
+            "properties": {
+              "dancer": {
+                "$ref": "#/components/schemas/DancerRef",
+                "description": "The page being claimed."
+              },
+              "user": {
+                "$ref": "#/components/schemas/ClaimUser",
+                "description": "Who is claiming it."
+              }
+            }
+          }
+        ],
+        "description": "A claim in the admin review queue, with who is claiming which page."
+      },
+      "ClaimStatus": {
+        "type": "string",
+        "description": "Review state of a claim.",
+        "enum": [
+          "pending",
+          "approved",
+          "rejected"
+        ]
+      },
+      "ClaimUser": {
+        "type": "object",
+        "description": "The account behind a claim.",
+        "required": [
+          "id",
+          "email",
+          "display_name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Account id."
+          },
+          "email": {
+            "type": "string",
+            "description": "Login email, so the admin can reach them."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Public name."
+          }
+        }
+      },
+      "Crew": {
+        "type": "object",
+        "description": "A stored crew.",
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name; not unique."
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2."
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Home city."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lower case, no `@`."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Row creation time."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last write, maintained by a trigger."
+          }
+        }
+      },
+      "CrewDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Crew",
+            "description": "The crew itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "members"
+            ],
+            "properties": {
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Member"
+                },
+                "description": "Current members, by name."
+              }
+            }
+          }
+        ],
+        "description": "A crew with its current members."
+      },
+      "CrewFields": {
+        "type": "object",
+        "description": "Everything set when creating or editing a crew.",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Up to 100 characters."
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2, upper case; optional."
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Blank is stored as null."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`@handle` or `handle`; blank is stored as null."
+          }
+        }
+      },
+      "CrewName": {
+        "type": "object",
+        "description": "A crew as named on an entry.",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Crew id."
+          },
+          "name": {
+            "type": "string",
+            "description": "Crew name."
+          }
+        }
+      },
+      "CrewRef": {
+        "type": "object",
+        "description": "A crew as shown next to a dancer.",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Crew id."
+          },
+          "name": {
+            "type": "string",
+            "description": "Crew name."
+          },
+          "since": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Join date; null when unknown."
+          }
+        }
+      },
+      "Dancer": {
+        "type": "object",
+        "description": "A stored dancer; `user_id` and `created_by` are never serialized.",
+        "required": [
+          "id",
+          "dancer_name",
+          "aliases",
+          "country",
+          "source",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "dancer_name": {
+            "type": "string",
+            "description": "Stage name; not unique."
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Other names the dancer goes by."
+          },
+          "real_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Legal name, when shared."
+          },
+          "country": {
+            "type": "string",
+            "description": "Primary flag, ISO 3166-1 alpha-2."
+          },
+          "country2": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional second flag."
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Home city."
+          },
+          "bio": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lower case, no `@`; the identity key when present."
+          },
+          "source": {
+            "$ref": "#/components/schemas/DancerSource",
+            "description": "Where the row came from."
+          },
+          "verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Set once a claim is approved; the UI shows a verified tick."
+          },
+          "avatar_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Uploaded picture; null means the generated avatar."
+          },
+          "merged_into_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Set when an admin merged this row into another; it is then only a redirect."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Row creation time."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last write, maintained by a trigger."
+          }
+        }
+      },
+      "DancerEvents": {
+        "type": "object",
+        "description": "Body of `GET /dancers/{id}/events`: upcoming by date, past most recent first.",
+        "required": [
+          "upcoming",
+          "past"
+        ],
+        "properties": {
+          "upcoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Participation"
+            },
+            "description": "Jams starting today or later, soonest first."
+          },
+          "past": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Participation"
+            },
+            "description": "Earlier jams, most recent first."
+          }
+        }
+      },
+      "DancerFields": {
+        "type": "object",
+        "description": "Everything set when creating or editing a dancer.",
+        "required": [
+          "dancer_name",
+          "country"
+        ],
+        "properties": {
+          "dancer_name": {
+            "type": "string",
+            "description": "Stage name, up to 100 characters; not unique."
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Other names the dancer goes by, at most 10."
+          },
+          "real_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Blank is stored as null."
+          },
+          "country": {
+            "type": "string",
+            "description": "Primary flag, ISO 3166-1 alpha-2."
+          },
+          "country2": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional second flag."
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Blank is stored as null."
+          },
+          "bio": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Blank is stored as null."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`@handle` or `handle`; the identity key when present, unique case-insensitively."
+          }
+        }
+      },
+      "DancerPage": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "The frontend redirects to `/dancers/{merged_into}`.",
+            "required": [
+              "merged_into"
+            ],
+            "properties": {
+              "merged_into": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Where the dancer now lives."
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/DancerResponse",
+            "description": "The page itself."
+          }
+        ],
+        "description": "Body of `GET /dancers/{id}`: the page, or where a merged dancer now lives (§4 \"Merge\")."
+      },
+      "DancerRef": {
+        "type": "object",
+        "description": "A dancer as linked from a jam page: enough to render the name, flags and handle.",
+        "required": [
+          "id",
+          "dancer_name",
+          "country"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Dancer id."
+          },
+          "dancer_name": {
+            "type": "string",
+            "description": "Stage name."
+          },
+          "country": {
+            "type": "string",
+            "description": "Primary flag, ISO 3166-1 alpha-2."
+          },
+          "country2": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional second flag."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lower case, no `@`."
+          }
+        }
+      },
+      "DancerResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Dancer",
+            "description": "The profile itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "crews",
+              "can_edit"
+            ],
+            "properties": {
+              "crews": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CrewRef"
+                },
+                "description": "Current crews."
+              },
+              "can_edit": {
+                "type": "boolean",
+                "description": "Whether the caller may `PUT` this dancer."
+              }
+            }
+          }
+        ],
+        "description": "A dancer page (§6): profile, current crews, and whether the caller may edit it."
+      },
+      "DancerSource": {
+        "type": "string",
+        "description": "Where a dancer row came from (§4 \"Dancer identity\").",
+        "enum": [
+          "seed",
+          "organizer",
+          "self"
+        ]
+      },
+      "DancerSummary": {
+        "type": "object",
+        "description": "A search result: enough to tell two \"Lil G\"s apart (§4: name · @handle · country · crew).",
+        "required": [
+          "id",
+          "dancer_name",
+          "aliases",
+          "country",
+          "verified",
+          "crews"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Dancer id."
+          },
+          "dancer_name": {
+            "type": "string",
+            "description": "Stage name."
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Other names the dancer goes by."
+          },
+          "country": {
+            "type": "string",
+            "description": "Primary flag, ISO 3166-1 alpha-2."
+          },
+          "country2": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional second flag."
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Home city."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lower case, no `@`."
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Whether an approved claim links the page to its owner."
+          },
+          "crews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CrewRef"
+            },
+            "description": "Current crews."
+          }
+        }
+      },
+      "Entry": {
+        "type": "object",
+        "description": "A registration in a battle, with its members and result.",
+        "required": [
+          "id",
+          "battle_id",
+          "status",
+          "reached",
+          "members",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "battle_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The battle entered."
+          },
+          "team_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Team name for crew and duo entries; null for 1v1."
+          },
+          "crew": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CrewName",
+                "description": "The crew represented, if any."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/EntryStatus",
+            "description": "Registration state."
+          },
+          "reached": {
+            "$ref": "#/components/schemas/BracketStage",
+            "description": "Furthest stage reached."
+          },
+          "final_rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Exact placement when known."
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Canonical YouTube watch link of the battle video."
+          },
+          "video_offset_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Where the battle starts inside the video."
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DancerRef"
+            },
+            "description": "By dancer name."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Row creation time."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last write, maintained by a trigger."
+          }
+        }
+      },
+      "EntryFields": {
+        "type": "object",
+        "description": "Everything set when registering or editing an entry; results are optional on create.",
+        "required": [
+          "dancer_ids"
+        ],
+        "properties": {
+          "team_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Null for 1v1; blank is stored as null."
+          },
+          "crew_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The crew this entry represents, if any."
+          },
+          "dancer_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Members: 1 to 10 distinct dancers."
+          },
+          "status": {
+            "$ref": "#/components/schemas/EntryStatus",
+            "description": "Registration state; `pending` when omitted."
+          },
+          "reached": {
+            "$ref": "#/components/schemas/BracketStage",
+            "description": "Furthest stage reached; `na` when omitted."
+          },
+          "final_rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Exact placement when known; filled from `reached` for `winner` (1) and `top2` (2)."
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YouTube link; stored as `https://www.youtube.com/watch?v=<id>`."
+          },
+          "video_offset_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "EntryStatus": {
+        "type": "string",
+        "description": "Registration state of an entry.",
+        "enum": [
+          "pending",
+          "confirmed",
+          "withdrawn"
+        ]
+      },
+      "ErrorBody": {
+        "type": "object",
+        "description": "What went wrong; `fields` only for validation errors.",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "`not_found`, `validation`, `unauthorized`, `forbidden`, `conflict` or `internal`."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable; generic for `internal`."
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldError"
+            },
+            "description": "Each invalid field, for `validation`."
+          }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "description": "Body of every error response (§5 Error handling).",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody",
+            "description": "The error itself, under a single key so clients can test for it."
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "description": "A stored jam.",
+        "required": [
+          "id",
+          "organizer_id",
+          "name",
+          "slug",
+          "status",
+          "starts_on",
+          "ends_on",
+          "timezone",
+          "city",
+          "country",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "organizer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The account that created it and owns it."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Stable public URL segment; never changes after creation."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text, null when blank."
+          },
+          "status": {
+            "$ref": "#/components/schemas/EventStatus",
+            "description": "Where it is in its lifecycle."
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "description": "First day, in the jam's timezone."
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "description": "Last day, never before `starts_on`."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA name, e.g. `Europe/Zurich`."
+          },
+          "venue_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Venue, null when blank."
+          },
+          "address": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Street address, null when blank."
+          },
+          "city": {
+            "type": "string",
+            "description": "City shown on cards and in the map popup."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2."
+          },
+          "lat": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Latitude; set together with `lng` or not at all."
+          },
+          "lng": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Longitude; set together with `lat` or not at all."
+          },
+          "registration_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where dancers sign up."
+          },
+          "instagram_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The jam's Instagram page."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Row creation time."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last write, maintained by a trigger."
+          }
+        }
+      },
+      "EventFields": {
+        "type": "object",
+        "description": "Everything an organiser sets when creating or editing a jam.",
+        "required": [
+          "name",
+          "starts_on",
+          "ends_on",
+          "timezone",
+          "city",
+          "country"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name, up to 200 characters."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text, up to 5000 characters; blank is stored as null."
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "description": "First day."
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "description": "Last day; must not be before `starts_on`."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA name, e.g. `Europe/Zurich`."
+          },
+          "venue_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Venue; blank is stored as null."
+          },
+          "address": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Street address; blank is stored as null."
+          },
+          "city": {
+            "type": "string",
+            "description": "City, up to 100 characters."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2, upper case."
+          },
+          "lat": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Latitude; set together with `lng` or not at all."
+          },
+          "lng": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Longitude; set together with `lat` or not at all."
+          },
+          "registration_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where dancers sign up; blank is stored as null."
+          },
+          "instagram_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The jam's Instagram page; blank is stored as null."
+          }
+        }
+      },
+      "EventRef": {
+        "type": "object",
+        "description": "The jam side of a participation.",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "starts_on",
+          "ends_on",
+          "city",
+          "country",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Jam id."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Link target `/jams/{slug}`."
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "description": "First day."
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "description": "Last day."
+          },
+          "city": {
+            "type": "string",
+            "description": "City."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2."
+          },
+          "status": {
+            "$ref": "#/components/schemas/EventStatus",
+            "description": "Where it is in its lifecycle."
+          }
+        }
+      },
+      "EventStatus": {
+        "type": "string",
+        "description": "Lifecycle of a jam (§4 \"Event status transitions\").",
+        "enum": [
+          "draft",
+          "published",
+          "registration_closed",
+          "completed",
+          "cancelled"
+        ]
+      },
+      "Feature": {
+        "type": "object",
+        "description": "One jam on the map.",
+        "required": [
+          "type",
+          "geometry",
+          "properties"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `Feature`."
+          },
+          "geometry": {
+            "$ref": "#/components/schemas/Point",
+            "description": "Where the pin goes."
+          },
+          "properties": {
+            "$ref": "#/components/schemas/MapJam",
+            "description": "What the popup shows."
+          }
+        }
+      },
+      "FeatureCollection": {
+        "type": "object",
+        "description": "`GET /events.geojson` body: a GeoJSON FeatureCollection of points.",
+        "required": [
+          "type",
+          "features"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `FeatureCollection`."
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            },
+            "description": "One feature per jam with coordinates."
+          }
+        }
+      },
+      "FieldError": {
+        "type": "object",
+        "description": "One invalid input field.",
+        "required": [
+          "field",
+          "message"
+        ],
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Field name as sent by the client."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable reason."
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "description": "Body of `GET /api/health`.",
+        "required": [
+          "status",
+          "version"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Always `\"ok\"`; any failure returns the error envelope instead."
+          },
+          "version": {
+            "type": "string",
+            "description": "Crate version of the running binary."
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "description": "Body of `POST /auth/login`.",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Login email, case-insensitive."
+          },
+          "password": {
+            "type": "string",
+            "description": "Plain password."
+          }
+        }
+      },
+      "MapJam": {
+        "type": "object",
+        "description": "What the map popup needs (§6 Map).",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "starts_on",
+          "city",
+          "country"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Jam id."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Link target `/jams/{slug}`."
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "description": "First day."
+          },
+          "city": {
+            "type": "string",
+            "description": "City."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2."
+          }
+        }
+      },
+      "Member": {
+        "type": "object",
+        "description": "A current member as shown on a crew.",
+        "required": [
+          "dancer_id",
+          "dancer_name",
+          "country"
+        ],
+        "properties": {
+          "dancer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Dancer id."
+          },
+          "dancer_name": {
+            "type": "string",
+            "description": "Stage name."
+          },
+          "country": {
+            "type": "string",
+            "description": "Primary flag, ISO 3166-1 alpha-2."
+          },
+          "since": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Join date; null when unknown."
+          }
+        }
+      },
+      "MergeRequest": {
+        "type": "object",
+        "description": "Body of `POST /admin/dancers/{id}/merge`.",
+        "required": [
+          "into"
+        ],
+        "properties": {
+          "into": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The surviving dancer; `{id}` becomes a redirect to it."
+          }
+        }
+      },
+      "MergeResponse": {
+        "type": "object",
+        "description": "Result of a merge: the survivor that now carries everything.",
+        "required": [
+          "merged_into",
+          "aliases"
+        ],
+        "properties": {
+          "merged_into": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The survivor's id."
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The survivor's aliases, now including the loser's names."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The survivor's handle, taken from the loser when it had none."
+          }
+        }
+      },
+      "Page_ClaimForReview": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Claim",
+                  "description": "The claim itself."
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "dancer",
+                    "user"
+                  ],
+                  "properties": {
+                    "dancer": {
+                      "$ref": "#/components/schemas/DancerRef",
+                      "description": "The page being claimed."
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/ClaimUser",
+                      "description": "Who is claiming it."
+                    }
+                  }
+                }
+              ],
+              "description": "A claim in the admin review queue, with who is claiming which page."
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
+      "Page_Crew": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "A stored crew.",
+              "required": [
+                "id",
+                "name",
+                "created_at",
+                "updated_at"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Primary key, UUIDv7."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Display name; not unique."
+                },
+                "country": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "ISO 3166-1 alpha-2."
+                },
+                "city": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Home city."
+                },
+                "instagram_handle": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Lower case, no `@`."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Row creation time."
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Last write, maintained by a trigger."
+                }
+              }
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
+      "Page_DancerSummary": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "A search result: enough to tell two \"Lil G\"s apart (§4: name · @handle · country · crew).",
+              "required": [
+                "id",
+                "dancer_name",
+                "aliases",
+                "country",
+                "verified",
+                "crews"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Dancer id."
+                },
+                "dancer_name": {
+                  "type": "string",
+                  "description": "Stage name."
+                },
+                "aliases": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Other names the dancer goes by."
+                },
+                "country": {
+                  "type": "string",
+                  "description": "Primary flag, ISO 3166-1 alpha-2."
+                },
+                "country2": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Optional second flag."
+                },
+                "city": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Home city."
+                },
+                "instagram_handle": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Lower case, no `@`."
+                },
+                "verified": {
+                  "type": "boolean",
+                  "description": "Whether an approved claim links the page to its owner."
+                },
+                "crews": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CrewRef"
+                  },
+                  "description": "Current crews."
+                }
+              }
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
+      "Page_Event": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "A stored jam.",
+              "required": [
+                "id",
+                "organizer_id",
+                "name",
+                "slug",
+                "status",
+                "starts_on",
+                "ends_on",
+                "timezone",
+                "city",
+                "country",
+                "created_at",
+                "updated_at"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Primary key, UUIDv7."
+                },
+                "organizer_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "The account that created it and owns it."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Display name."
+                },
+                "slug": {
+                  "type": "string",
+                  "description": "Stable public URL segment; never changes after creation."
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Free text, null when blank."
+                },
+                "status": {
+                  "$ref": "#/components/schemas/EventStatus",
+                  "description": "Where it is in its lifecycle."
+                },
+                "starts_on": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "First day, in the jam's timezone."
+                },
+                "ends_on": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Last day, never before `starts_on`."
+                },
+                "timezone": {
+                  "type": "string",
+                  "description": "IANA name, e.g. `Europe/Zurich`."
+                },
+                "venue_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Venue, null when blank."
+                },
+                "address": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Street address, null when blank."
+                },
+                "city": {
+                  "type": "string",
+                  "description": "City shown on cards and in the map popup."
+                },
+                "country": {
+                  "type": "string",
+                  "description": "ISO 3166-1 alpha-2."
+                },
+                "lat": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "format": "double",
+                  "description": "Latitude; set together with `lng` or not at all."
+                },
+                "lng": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "format": "double",
+                  "description": "Longitude; set together with `lat` or not at all."
+                },
+                "registration_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Where dancers sign up."
+                },
+                "instagram_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The jam's Instagram page."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Row creation time."
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Last write, maintained by a trigger."
+                }
+              }
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
+      "Participation": {
+        "type": "object",
+        "description": "One appearance at a public jam: the jam, the battle when competing, the result when known.",
+        "required": [
+          "event",
+          "role"
+        ],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/EventRef",
+            "description": "The jam."
+          },
+          "battle": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BattleRef",
+                "description": "The battle entered; null for staff."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role": {
+            "$ref": "#/components/schemas/ParticipationRole",
+            "description": "Competitor, or the staff role held."
+          },
+          "entry_status": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EntryStatus",
+                "description": "Registration state; null for staff."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reached": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BracketStage",
+                "description": "Furthest stage reached; null for staff."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "final_rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Exact placement when known."
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Battle video, when attached."
+          }
+        }
+      },
+      "ParticipationRole": {
+        "type": "string",
+        "description": "Competitor, or the staff role held at the jam.",
+        "enum": [
+          "competitor",
+          "judge",
+          "dj",
+          "mc",
+          "organizer",
+          "other"
+        ]
+      },
+      "Point": {
+        "type": "object",
+        "description": "GeoJSON point; coordinates are `[lng, lat]`.",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `Point`."
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "`[lng, lat]`, per the GeoJSON spec.",
+            "maxItems": 2,
+            "minItems": 2
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "description": "Body of `POST /auth/register`.",
+        "required": [
+          "email",
+          "password",
+          "display_name"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Login email; unique, case-insensitive."
+          },
+          "password": {
+            "type": "string",
+            "description": "Plain password, 8 to 128 characters."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Public name, at most 80 characters."
+          }
+        }
+      },
+      "Role": {
+        "type": "string",
+        "description": "Account role; declaration order is privilege order, so `>=` means \"at least\".",
+        "enum": [
+          "user",
+          "organizer",
+          "seed_admin",
+          "admin"
+        ]
+      },
+      "RoleRequest": {
+        "type": "object",
+        "description": "Body of `PUT /admin/users/{id}/role`.",
+        "required": [
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/Role",
+            "description": "The new role."
+          }
+        }
+      },
+      "StaffAssignment": {
+        "type": "object",
+        "description": "One person on a jam's staff.",
+        "required": [
+          "dancer_id",
+          "role"
+        ],
+        "properties": {
+          "dancer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The dancer's id."
+          },
+          "role": {
+            "$ref": "#/components/schemas/StaffRole",
+            "description": "The role they hold."
+          }
+        }
+      },
+      "StaffList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/StaffAssignment"
+        },
+        "description": "Body of `PUT /events/{id}/staff`: the full list, replacing the old one."
+      },
+      "StaffMember": {
+        "type": "object",
+        "description": "A staff member as shown on the jam page.",
+        "required": [
+          "role",
+          "dancer"
+        ],
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/StaffRole",
+            "description": "What they do at the jam."
+          },
+          "dancer": {
+            "$ref": "#/components/schemas/DancerRef",
+            "description": "Who."
+          }
+        }
+      },
+      "StaffRole": {
+        "type": "string",
+        "description": "What a staff member does at a jam.",
+        "enum": [
+          "judge",
+          "dj",
+          "mc",
+          "organizer",
+          "other"
+        ]
+      },
+      "UserResponse": {
+        "type": "object",
+        "description": "The logged-in account, as returned by register, login and me.",
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "role"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Account id."
+          },
+          "email": {
+            "type": "string",
+            "description": "Login email."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Public name."
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role",
+            "description": "Account role, snake_case."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "bj_session"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "health",
+      "description": "Liveness"
+    },
+    {
+      "name": "auth",
+      "description": "Accounts and sessions"
+    },
+    {
+      "name": "events",
+      "description": "Jams, their status and the map"
+    },
+    {
+      "name": "battles",
+      "description": "Battles, entries and staff of a jam"
+    },
+    {
+      "name": "dancers",
+      "description": "Dancer pages and search-before-create"
+    },
+    {
+      "name": "crews",
+      "description": "Crews and memberships"
+    },
+    {
+      "name": "claims",
+      "description": "\"Verify me\" claims and their review"
+    },
+    {
+      "name": "admin",
+      "description": "Merging dancers and changing roles"
+    }
+  ]
+}

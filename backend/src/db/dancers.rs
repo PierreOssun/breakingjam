@@ -2,50 +2,26 @@
 
 use std::collections::HashMap;
 
-use chrono::NaiveDate;
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{
     battle::{BattleAge, BattleFormat, BattleGender, BracketStage, EntryStatus, StaffRole},
     crew::CrewRef,
-    dancer::{Dancer, DancerFields, DancerSource, DancerSummary, FieldChange},
+    dancer::{
+        BattleRef, Dancer, DancerFields, DancerSource, DancerSummary, EventRef, FieldChange,
+        Participation,
+    },
     event::EventStatus,
 };
-
-/// One appearance of a dancer at a public jam, as competitor (battle set) or staff (role set).
-#[derive(Debug, Clone)]
-pub struct Participation {
-    pub event_id: Uuid,
-    pub event_name: String,
-    pub slug: String,
-    pub starts_on: NaiveDate,
-    pub ends_on: NaiveDate,
-    pub city: String,
-    pub country: String,
-    pub status: EventStatus,
-    pub upcoming: bool,
-    pub battle_id: Option<Uuid>,
-    pub battle_name: Option<String>,
-    pub format: Option<BattleFormat>,
-    pub team_size: Option<i16>,
-    pub gender: Option<BattleGender>,
-    pub age: Option<BattleAge>,
-    pub staff_role: Option<StaffRole>,
-    pub entry_status: Option<EntryStatus>,
-    pub reached: Option<BracketStage>,
-    pub final_rank: Option<i32>,
-    pub video_url: Option<String>,
-}
 
 /// Search by name, alias or handle (case-insensitive substring), notable dancers first.
 pub async fn search(
     pool: &PgPool,
     query: Option<&str>,
     country: Option<&str>,
-    page: (i64, i64),
+    window: super::Window,
 ) -> sqlx::Result<Vec<DancerSummary>> {
-    let (limit, offset) = page;
     let pattern = query.map(super::contains_pattern);
     let rows = sqlx::query!(
         r#"select id, dancer_name, aliases, country, country2, city, instagram_handle,
@@ -61,8 +37,8 @@ pub async fn search(
            limit $3 offset $4"#,
         pattern,
         country,
-        limit,
-        offset,
+        window.limit,
+        window.offset,
     )
     .fetch_all(pool)
     .await?;
@@ -373,8 +349,7 @@ pub async fn soft_delete(pool: &PgPool, id: Uuid) -> sqlx::Result<bool> {
 
 /// Every public jam (not draft, not deleted) where the dancer competed or was staff.
 pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<Participation>> {
-    sqlx::query_as!(
-        Participation,
+    let rows = sqlx::query!(
         r#"select e.id as "event_id!", e.name as "event_name!", e.slug as "slug!",
                   e.starts_on as "starts_on!", e.ends_on as "ends_on!", e.city as "city!",
                   e.country as "country!", e.status as "status!: EventStatus",
@@ -403,7 +378,39 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
         dancer_id,
     )
     .fetch_all(pool)
-    .await
+    .await?;
+    Ok(rows
+        .into_iter()
+        .map(|r| Participation {
+            event: EventRef {
+                id: r.event_id,
+                name: r.event_name,
+                slug: r.slug,
+                starts_on: r.starts_on,
+                ends_on: r.ends_on,
+                city: r.city,
+                country: r.country,
+                status: r.status,
+            },
+            battle: match (r.battle_id, r.battle_name, r.format, r.gender, r.age) {
+                (Some(id), Some(name), Some(format), Some(gender), Some(age)) => Some(BattleRef {
+                    id,
+                    name,
+                    format,
+                    team_size: r.team_size,
+                    gender,
+                    age,
+                }),
+                _ => None,
+            },
+            role: r.staff_role.into(),
+            entry_status: r.entry_status,
+            reached: r.reached,
+            final_rank: r.final_rank,
+            video_url: r.video_url,
+            upcoming: r.upcoming,
+        })
+        .collect())
 }
 
 /// How many of `ids` are live dancers (not deleted, not merged).

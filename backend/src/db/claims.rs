@@ -51,9 +51,8 @@ pub async fn latest(pool: &PgPool, dancer_id: Uuid, user_id: Uuid) -> sqlx::Resu
 pub async fn list(
     pool: &PgPool,
     status: ClaimStatus,
-    page: (i64, i64),
+    window: super::Window,
 ) -> sqlx::Result<Vec<ClaimForReview>> {
-    let (limit, offset) = page;
     let rows = sqlx::query!(
         r#"select c.id, c.dancer_id, c.user_id, c.code, c.status as "status: ClaimStatus",
                   c.reviewed_at, c.created_at,
@@ -66,8 +65,8 @@ pub async fn list(
            order by c.created_at, c.id
            limit $2 offset $3"#,
         status as ClaimStatus,
-        limit,
-        offset,
+        window.limit,
+        window.offset,
     )
     .fetch_all(pool)
     .await?;

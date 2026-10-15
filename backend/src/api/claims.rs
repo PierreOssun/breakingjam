@@ -1,11 +1,12 @@
 //! "Verify me": users claim a dancer page; admins review the queue (§4 "Dancer identity").
 
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, Query, State},
-    routing::{get, post},
 };
 use serde::Deserialize;
+use utoipa::IntoParams;
+use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use super::page::{self, Page};
@@ -16,28 +17,46 @@ use crate::{
         claim::{Claim, ClaimForReview, ClaimStatus},
         user::Role,
     },
-    error::AppError,
+    error::{AppError, ErrorEnvelope},
     state::AppState,
 };
 
 /// Claim routes, for users and for admins.
-pub fn router() -> Router<AppState> {
-    Router::new()
-        .route("/dancers/{id}/claim", get(mine).post(open))
-        .route("/admin/claims", get(queue))
-        .route("/admin/claims/{id}/approve", post(approve))
-        .route("/admin/claims/{id}/reject", post(reject))
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::new()
+        .routes(routes!(mine, open))
+        .routes(routes!(queue))
+        .routes(routes!(approve))
+        .routes(routes!(reject))
 }
 
 /// Query of `GET /admin/claims`.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct QueueQuery {
     /// Defaults to `pending`.
     pub status: Option<ClaimStatus>,
+    /// `next_cursor` of the previous page.
     pub cursor: Option<String>,
+    /// Page size, defaulted and clamped by `page::limit`.
     pub limit: Option<i64>,
 }
 
+/// "Verify me": get a code to put in your Instagram bio; repeating returns the same pending claim.
+#[utoipa::path(
+    post,
+    path = "/dancers/{id}/claim",
+    tag = "claims",
+    operation_id = "open_claim",
+    params(("id" = Uuid, Path, description = "Dancer id")),
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Claim),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such dancer, or merged away", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Dancer already verified, or you already own a page", body = ErrorEnvelope),
+    )
+)]
 async fn open(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -58,6 +77,20 @@ async fn open(
     ))
 }
 
+/// Your latest claim on this dancer.
+#[utoipa::path(
+    get,
+    path = "/dancers/{id}/claim",
+    tag = "claims",
+    operation_id = "my_claim",
+    params(("id" = Uuid, Path, description = "Dancer id")),
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Claim),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No claim yet", body = ErrorEnvelope),
+    )
+)]
 async fn mine(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -69,6 +102,21 @@ async fn mine(
         .ok_or(AppError::NotFound)
 }
 
+/// Claims to review, oldest first.
+#[utoipa::path(
+    get,
+    path = "/admin/claims",
+    tag = "claims",
+    operation_id = "list_claims",
+    params(QueueQuery),
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Page<ClaimForReview>),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+    )
+)]
 async fn queue(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -78,11 +126,26 @@ async fn queue(
     let limit = page::limit(query.limit);
     let offset = page::offset(query.cursor.as_deref())?;
     let status = query.status.unwrap_or(ClaimStatus::Pending);
-    // One extra row tells whether another page exists.
-    let rows = db::claims::list(&state.pool, status, (limit + 1, offset)).await?;
+    let rows = db::claims::list(&state.pool, status, page::window(limit, offset)).await?;
     Ok(Json(Page::from_offset(rows, limit, offset)))
 }
 
+/// Approve: the dancer gets its owner and competing claims are rejected.
+#[utoipa::path(
+    post,
+    path = "/admin/claims/{id}/approve",
+    tag = "claims",
+    operation_id = "approve_claim",
+    params(("id" = Uuid, Path, description = "Claim id")),
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Claim),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such claim, or its dancer is gone", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Already reviewed, or the dancer is already verified", body = ErrorEnvelope),
+    )
+)]
 async fn approve(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -91,6 +154,22 @@ async fn approve(
     decide(&state, &current, id, ClaimStatus::Approved).await
 }
 
+/// Reject a claim; the user may claim again.
+#[utoipa::path(
+    post,
+    path = "/admin/claims/{id}/reject",
+    tag = "claims",
+    operation_id = "reject_claim",
+    params(("id" = Uuid, Path, description = "Claim id")),
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Claim),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such claim", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Already reviewed", body = ErrorEnvelope),
+    )
+)]
 async fn reject(
     State(state): State<AppState>,
     current: CurrentUser,

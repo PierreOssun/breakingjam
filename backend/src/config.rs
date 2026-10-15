@@ -15,8 +15,6 @@ pub struct Config {
     pub app_base_url: String,
     /// Origin of the frontend, for CORS.
     pub frontend_origin: String,
-    /// Reserved; database sessions do not need it.
-    pub session_secret: String,
     /// Google OAuth client id.
     pub google_client_id: String,
     /// Google OAuth client secret.
@@ -70,7 +68,6 @@ impl Config {
             app_port,
             app_base_url: required("APP_BASE_URL"),
             frontend_origin: required("FRONTEND_ORIGIN"),
-            session_secret: required("SESSION_SECRET"),
             google_client_id: required("GOOGLE_CLIENT_ID"),
             google_client_secret: required("GOOGLE_CLIENT_SECRET"),
             google_redirect_url: required("GOOGLE_REDIRECT_URL"),
@@ -94,7 +91,6 @@ mod tests {
             "DATABASE_URL",
             "APP_BASE_URL",
             "FRONTEND_ORIGIN",
-            "SESSION_SECRET",
             "GOOGLE_CLIENT_ID",
             "GOOGLE_CLIENT_SECRET",
             "GOOGLE_REDIRECT_URL",

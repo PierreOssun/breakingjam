@@ -1,19 +1,23 @@
 //! Dancers: profile fields, origin and who may edit them.
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
 use super::{
+    battle::{BattleAge, BattleFormat, BattleGender, BracketStage, EntryStatus, StaffRole},
     country_code,
     crew::CrewRef,
+    event::EventStatus,
     not_blank,
     user::{Role, User},
 };
 
 /// Where a dancer row came from (§4 "Dancer identity").
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "dancer_source", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum DancerSource {
@@ -39,20 +43,30 @@ impl DancerSource {
 }
 
 /// A stored dancer; `user_id` and `created_by` are never serialized.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct Dancer {
+    /// Primary key, UUIDv7.
     pub id: Uuid,
     /// Owner account, set only by an approved claim.
     #[serde(skip)]
     pub user_id: Option<Uuid>,
+    /// Stage name; not unique.
     pub dancer_name: String,
+    /// Other names the dancer goes by.
     pub aliases: Vec<String>,
+    /// Legal name, when shared.
     pub real_name: Option<String>,
+    /// Primary flag, ISO 3166-1 alpha-2.
     pub country: String,
+    /// Optional second flag.
     pub country2: Option<String>,
+    /// Home city.
     pub city: Option<String>,
+    /// Free text.
     pub bio: Option<String>,
+    /// Lower case, no `@`; the identity key when present.
     pub instagram_handle: Option<String>,
+    /// Where the row came from.
     pub source: DancerSource,
     /// Set once a claim is approved; the UI shows a verified tick.
     pub verified_at: Option<DateTime<Utc>>,
@@ -62,7 +76,9 @@ pub struct Dancer {
     pub created_by: Option<Uuid>,
     /// Set when an admin merged this row into another; it is then only a redirect.
     pub merged_into_id: Option<Uuid>,
+    /// Row creation time.
     pub created_at: DateTime<Utc>,
+    /// Last write, maintained by a trigger.
     pub updated_at: DateTime<Utc>,
 }
 
@@ -80,16 +96,25 @@ impl Dancer {
 }
 
 /// A search result: enough to tell two "Lil G"s apart (§4: name · @handle · country · crew).
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct DancerSummary {
+    /// Dancer id.
     pub id: Uuid,
+    /// Stage name.
     pub dancer_name: String,
+    /// Other names the dancer goes by.
     pub aliases: Vec<String>,
+    /// Primary flag, ISO 3166-1 alpha-2.
     pub country: String,
+    /// Optional second flag.
     pub country2: Option<String>,
+    /// Home city.
     pub city: Option<String>,
+    /// Lower case, no `@`.
     pub instagram_handle: Option<String>,
+    /// Whether an approved claim links the page to its owner.
     pub verified: bool,
+    /// Current crews.
     pub crews: Vec<CrewRef>,
 }
 
@@ -144,17 +169,113 @@ pub fn merged_aliases(survivor: &Dancer, loser: &Dancer) -> Vec<String> {
 }
 
 /// A dancer as linked from a jam page: enough to render the name, flags and handle.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct DancerRef {
+    /// Dancer id.
     pub id: Uuid,
+    /// Stage name.
     pub dancer_name: String,
+    /// Primary flag, ISO 3166-1 alpha-2.
     pub country: String,
+    /// Optional second flag.
     pub country2: Option<String>,
+    /// Lower case, no `@`.
     pub instagram_handle: Option<String>,
 }
 
+/// One appearance at a public jam: the jam, the battle when competing, the result when known.
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
+pub struct Participation {
+    /// The jam.
+    pub event: EventRef,
+    /// The battle entered; null for staff.
+    pub battle: Option<BattleRef>,
+    /// Competitor, or the staff role held.
+    pub role: ParticipationRole,
+    /// Registration state; null for staff.
+    pub entry_status: Option<EntryStatus>,
+    /// Furthest stage reached; null for staff.
+    pub reached: Option<BracketStage>,
+    /// Exact placement when known.
+    pub final_rank: Option<i32>,
+    /// Battle video, when attached.
+    pub video_url: Option<String>,
+    /// Whether the jam starts today or later; splits the dancer page's two lists.
+    #[serde(skip)]
+    pub upcoming: bool,
+}
+
+/// The jam side of a participation.
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
+pub struct EventRef {
+    /// Jam id.
+    pub id: Uuid,
+    /// Display name.
+    pub name: String,
+    /// Link target `/jams/{slug}`.
+    pub slug: String,
+    /// First day.
+    pub starts_on: NaiveDate,
+    /// Last day.
+    pub ends_on: NaiveDate,
+    /// City.
+    pub city: String,
+    /// ISO 3166-1 alpha-2.
+    pub country: String,
+    /// Where it is in its lifecycle.
+    pub status: EventStatus,
+}
+
+/// The battle side of a participation.
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
+pub struct BattleRef {
+    /// Battle id.
+    pub id: Uuid,
+    /// Display name, e.g. "1v1 Bboy".
+    pub name: String,
+    /// How it is run.
+    pub format: BattleFormat,
+    /// Team size for team battles.
+    pub team_size: Option<i16>,
+    /// Who may enter.
+    pub gender: BattleGender,
+    /// Age category.
+    pub age: BattleAge,
+}
+
+/// Competitor, or the staff role held at the jam.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, utoipa::ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum ParticipationRole {
+    /// Entered a battle.
+    Competitor,
+    /// Judged.
+    Judge,
+    /// Played the music.
+    Dj,
+    /// Hosted.
+    Mc,
+    /// Ran the jam.
+    Organizer,
+    /// Any other staff role.
+    Other,
+}
+
+impl From<Option<StaffRole>> for ParticipationRole {
+    fn from(role: Option<StaffRole>) -> Self {
+        match role {
+            None => Self::Competitor,
+            Some(StaffRole::Judge) => Self::Judge,
+            Some(StaffRole::Dj) => Self::Dj,
+            Some(StaffRole::Mc) => Self::Mc,
+            Some(StaffRole::Organizer) => Self::Organizer,
+            Some(StaffRole::Other) => Self::Other,
+        }
+    }
+}
+
 /// Everything set when creating or editing a dancer.
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 pub struct DancerFields {
     /// Stage name, up to 100 characters; not unique.
     #[validate(length(max = 100), custom(function = "not_blank"))]

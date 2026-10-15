@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                  registration_url, instagram_url, created_at, updated_at\n           from events\n           where deleted_at is null\n             and status = any($1)\n             and ($2::text is null or country = $2)\n             and ($3::date is null or ends_on >= $3)\n             and ($4::date is null or starts_on <= $4)\n             and ($5::uuid is null or organizer_id = $5)\n             and ($6::date is null or (starts_on, id) > ($6, $7))\n           order by starts_on, id\n           limit $8",
+  "query": "select id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                  registration_url, instagram_url, created_at, updated_at\n           from events\n           where deleted_at is null\n             and ($1::event_status is null or status = $1)\n             and ($2::text is null or country = $2)\n             and ($3::date is null or ends_on >= $3)\n             and ($4::date is null or starts_on <= $4)\n             and ($5::uuid is null or organizer_id = $5)\n             and ($5::uuid is not null or status <> 'draft')\n             and ($6::date is null or (starts_on, id) > ($6, $7))\n           order by starts_on, id\n           limit $8",
   "describe": {
     "columns": [
       {
@@ -230,22 +230,15 @@
       "Left": [
         {
           "Custom": {
-            "name": "event_status[]",
+            "name": "event_status",
             "kind": {
-              "Array": {
-                "Custom": {
-                  "name": "event_status",
-                  "kind": {
-                    "Enum": [
-                      "draft",
-                      "published",
-                      "registration_closed",
-                      "completed",
-                      "cancelled"
-                    ]
-                  }
-                }
-              }
+              "Enum": [
+                "draft",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
             }
           }
         },
@@ -280,5 +273,5 @@
       false
     ]
   },
-  "hash": "557aac254d1c58010a5d0f832a8273342563148a2f4f25dc323c8f0c1e2265b7"
+  "hash": "df48f041bbbbe9ff68d5b432004418ede49179c9d4c98bb72653fec8fb72a150"
 }

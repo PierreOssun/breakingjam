@@ -1,12 +1,13 @@
 //! Admin-only actions besides claims: merging duplicate dancers and changing roles.
 
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, State},
-    routing::{post, put},
 };
 use serde::Deserialize;
 use sqlx::PgConnection;
+use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 use validator::Validate;
 
@@ -18,38 +19,60 @@ use crate::{
         dancer::{Dancer, merged_aliases},
         user::Role,
     },
-    error::AppError,
+    error::{AppError, ErrorEnvelope},
     state::AppState,
 };
 
 /// `/admin/*` routes other than claims.
-pub fn router() -> Router<AppState> {
-    Router::new()
-        .route("/admin/dancers/{id}/merge", post(merge))
-        .route("/admin/users/{id}/role", put(set_role))
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::new()
+        .routes(routes!(merge))
+        .routes(routes!(set_role))
 }
 
 /// Body of `POST /admin/dancers/{id}/merge`.
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct MergeRequest {
     /// The surviving dancer; `{id}` becomes a redirect to it.
     pub into: Uuid,
 }
 
 /// Body of `PUT /admin/users/{id}/role`.
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct RoleRequest {
+    /// The new role.
     pub role: Role,
 }
 
 /// Result of a merge: the survivor that now carries everything.
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, ToSchema)]
 pub struct MergeResponse {
+    /// The survivor's id.
     pub merged_into: Uuid,
+    /// The survivor's aliases, now including the loser's names.
     pub aliases: Vec<String>,
+    /// The survivor's handle, taken from the loser when it had none.
     pub instagram_handle: Option<String>,
 }
 
+/// Merge a duplicate into `into`; `{id}` becomes a redirect.
+#[utoipa::path(
+    post,
+    path = "/admin/dancers/{id}/merge",
+    tag = "admin",
+    operation_id = "merge_dancers",
+    params(("id" = Uuid, Path, description = "Dancer to merge away")),
+    request_body = MergeRequest,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = MergeResponse),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such dancer", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Already merged, or `{id}` is verified", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "`into` is `{id}` or unknown", body = ErrorEnvelope),
+    )
+)]
 async fn merge(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -105,6 +128,23 @@ async fn lock_pair(
     ))
 }
 
+/// Change an account's role (not your own).
+#[utoipa::path(
+    put,
+    path = "/admin/users/{id}/role",
+    tag = "admin",
+    operation_id = "set_user_role",
+    params(("id" = Uuid, Path, description = "User id")),
+    request_body = RoleRequest,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = UserResponse),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such user", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Your own role", body = ErrorEnvelope),
+    )
+)]
 async fn set_role(
     State(state): State<AppState>,
     current: CurrentUser,

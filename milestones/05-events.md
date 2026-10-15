@@ -26,7 +26,7 @@ Writes on a jam you can't see (someone else's draft) are 404; on a public jam yo
 
 - `EventStatus` (sqlx + serde), `Transition`, `apply` (strictly §4: draft → published → registration_closed → completed; cancel from the first three).
 - `Event` (serialized directly as the API response; no secret fields), `can_write`, `visible_to`.
-- `EventFields`: the request body for POST/PUT with field validation: name/city not blank, country `^[A-Z]{2}$`, timezone shape `Area/Location` or `UTC`, lat/lng ranges, URLs. `cross_field_errors()` adds `ends_on >= starts_on` and lat/lng set together.
+- `EventFields`: the request body for POST/PUT with field validation: name/city not blank, country `^[A-Z]{2}$`, timezone shape `Area/Location` or `UTC`, lat/lng ranges, URLs. Struct-level `validate(schema(…))` rules add `ends_on >= starts_on` and lat/lng set together, so the extractor reports them with the field errors (moved there in the 14 Oct 2026 cleanup pass; originally a `cross_field_errors()` method called by the handlers).
 - `slug()` moved here from the seed (your Unicode-aware version); `not_blank` moved to `domain/mod.rs` and is shared with auth.
 - Optional text fields are trimmed in SQL and `""` becomes null.
 

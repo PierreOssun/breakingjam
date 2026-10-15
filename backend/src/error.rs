@@ -7,6 +7,7 @@ use axum::{
 };
 use serde::Serialize;
 use thiserror::Error;
+use utoipa::ToSchema;
 
 /// Every error a handler can return; maps 1:1 to an HTTP status.
 #[derive(Debug, Error)]
@@ -32,7 +33,7 @@ pub enum AppError {
 }
 
 /// One invalid input field.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct FieldError {
     /// Field name as sent by the client.
     pub field: String,
@@ -40,17 +41,23 @@ pub struct FieldError {
     pub message: String,
 }
 
-#[derive(Serialize)]
-struct ErrorEnvelope<'a> {
-    error: ErrorBody<'a>,
+/// Body of every error response (§5 Error handling).
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ErrorEnvelope {
+    /// The error itself, under a single key so clients can test for it.
+    pub error: ErrorBody,
 }
 
-#[derive(Serialize)]
-struct ErrorBody<'a> {
-    code: &'static str,
-    message: String,
-    #[serde(skip_serializing_if = "<[_]>::is_empty")]
-    fields: &'a [FieldError],
+/// What went wrong; `fields` only for validation errors.
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ErrorBody {
+    /// `not_found`, `validation`, `unauthorized`, `forbidden`, `conflict` or `internal`.
+    pub code: &'static str,
+    /// Human-readable; generic for `internal`.
+    pub message: String,
+    /// Each invalid field, for `validation`.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub fields: Vec<FieldError>,
 }
 
 impl From<(&str, &str)> for FieldError {
@@ -100,9 +107,9 @@ impl IntoResponse for AppError {
             }
             other => other.to_string(),
         };
-        let fields = match &self {
-            Self::Validation(fields) => fields.as_slice(),
-            _ => &[],
+        let fields = match self {
+            Self::Validation(fields) => fields,
+            _ => Vec::new(),
         };
         let body = ErrorEnvelope {
             error: ErrorBody {
@@ -144,7 +151,12 @@ impl From<validator::ValidationErrors> for AppError {
             .into_iter()
             .flat_map(|(field, errors)| {
                 errors.iter().map(move |error| FieldError {
-                    field: field.to_string(),
+                    // Struct-level rules land under `__all__` and name their field in `code`.
+                    field: if field == "__all__" {
+                        error.code.to_string()
+                    } else {
+                        field.to_string()
+                    },
                     message: error
                         .message
                         .as_ref()

@@ -12,15 +12,15 @@ use crate::domain::{
 
 /// Filters for `list`; `None` means "any".
 pub struct ListFilter<'a> {
-    /// Jams in any of these statuses.
-    pub statuses: &'a [EventStatus],
+    /// Jams in this status.
+    pub status: Option<EventStatus>,
     /// ISO 3166-1 alpha-2.
     pub country: Option<&'a str>,
     /// Jams still running on or after this date.
     pub from: Option<NaiveDate>,
     /// Jams starting on or before this date.
     pub to: Option<NaiveDate>,
-    /// Jams owned by this account.
+    /// Jams owned by this account; the only list that includes drafts, since they are private.
     pub organizer_id: Option<Uuid>,
     /// Keyset cursor: rows strictly after `(starts_on, id)`.
     pub after: Option<(NaiveDate, Uuid)>,
@@ -146,15 +146,16 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
                   registration_url, instagram_url, created_at, updated_at
            from events
            where deleted_at is null
-             and status = any($1)
+             and ($1::event_status is null or status = $1)
              and ($2::text is null or country = $2)
              and ($3::date is null or ends_on >= $3)
              and ($4::date is null or starts_on <= $4)
              and ($5::uuid is null or organizer_id = $5)
+             and ($5::uuid is not null or status <> 'draft')
              and ($6::date is null or (starts_on, id) > ($6, $7))
            order by starts_on, id
            limit $8"#,
-        filter.statuses as &[EventStatus],
+        filter.status as Option<EventStatus>,
         filter.country,
         filter.from,
         filter.to,
@@ -167,15 +168,15 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
     .await
 }
 
-/// Points for the world map: jams in `statuses` that have coordinates.
-pub async fn map_points(pool: &PgPool, statuses: &[EventStatus]) -> sqlx::Result<Vec<MapPoint>> {
+/// Points for the world map: announced jams with coordinates, not yet completed or cancelled.
+pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
     sqlx::query_as!(
         MapPoint,
         r#"select id, name, slug, starts_on, city, country, lat as "lat!", lng as "lng!"
            from events
-           where deleted_at is null and status = any($1) and lat is not null and lng is not null
+           where deleted_at is null and status in ('published', 'registration_closed')
+             and lat is not null and lng is not null
            order by starts_on, id"#,
-        statuses as &[EventStatus],
     )
     .fetch_all(pool)
     .await

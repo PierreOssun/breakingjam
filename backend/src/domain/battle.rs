@@ -3,12 +3,14 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use validator::{Validate, ValidationErrors};
+use validator::{Validate, ValidationError, ValidationErrors};
 
-use super::dancer::DancerRef;
+use super::{dancer::DancerRef, rule};
 
 /// How a battle is run.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "battle_format", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum BattleFormat {
@@ -19,7 +21,9 @@ pub enum BattleFormat {
 }
 
 /// Who may enter.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "battle_gender", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum BattleGender {
@@ -30,7 +34,9 @@ pub enum BattleGender {
 }
 
 /// Age category.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "battle_age", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum BattleAge {
@@ -40,7 +46,9 @@ pub enum BattleAge {
 }
 
 /// Furthest stage an entry reached; `Winner` is first place.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "bracket_stage", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum BracketStage {
@@ -56,7 +64,9 @@ pub enum BracketStage {
 }
 
 /// Registration state of an entry.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "entry_status", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum EntryStatus {
@@ -66,7 +76,9 @@ pub enum EntryStatus {
 }
 
 /// What a staff member does at a jam.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "staff_role", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum StaffRole {
@@ -78,81 +90,114 @@ pub enum StaffRole {
 }
 
 /// A competition inside a jam, e.g. "1v1 Bboy".
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct Battle {
+    /// Primary key, UUIDv7.
     pub id: Uuid,
+    /// The jam it belongs to.
     pub event_id: Uuid,
+    /// Display name, given or generated.
     pub name: String,
+    /// How it is run.
     pub format: BattleFormat,
     /// 1 = 1v1 … 10 = 10v10; set only for team battles.
     pub team_size: Option<i16>,
+    /// Who may enter.
     pub gender: BattleGender,
+    /// Age category.
     pub age: BattleAge,
+    /// Lower age bound.
     pub age_min: Option<i16>,
+    /// Upper age bound.
     pub age_max: Option<i16>,
     /// Starting bracket after prelims; null = unknown.
     pub bracket_size: Option<i16>,
+    /// Registration cap; null = unlimited.
     pub max_entries: Option<i32>,
     /// Display order on the jam page.
     pub position: i16,
+    /// Row creation time.
     pub created_at: DateTime<Utc>,
+    /// Last write, maintained by a trigger.
     pub updated_at: DateTime<Utc>,
 }
 
 /// Everything set when creating or editing a battle.
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
+#[validate(
+    schema(function = "team_size_matches_format"),
+    schema(function = "age_bounds_match_category"),
+    schema(function = "age_max_not_below_min"),
+    schema(function = "bracket_size_is_valid")
+)]
 pub struct BattleFields {
     /// Free text; blank means "generate from the structured fields".
     #[validate(length(max = 100))]
     pub name: Option<String>,
+    /// How the battle is run.
     pub format: BattleFormat,
+    /// 1 = 1v1 … 10 = 10v10; required for team battles, absent otherwise.
     #[validate(range(min = 1, max = 10))]
     pub team_size: Option<i16>,
+    /// Who may enter.
     pub gender: BattleGender,
+    /// Age category; kids need `age_max` of 17 or less, adults `age_min` of 18 or more.
     pub age: BattleAge,
+    /// Lower age bound.
     #[validate(range(min = 0, max = 120))]
     pub age_min: Option<i16>,
+    /// Upper age bound.
     #[validate(range(min = 0, max = 120))]
     pub age_max: Option<i16>,
+    /// Starting bracket after prelims: 2, 4, 8, 16, 32 or 64; null = unknown.
     pub bracket_size: Option<i16>,
+    /// Registration cap; null = unlimited.
     #[validate(range(min = 1))]
     pub max_entries: Option<i32>,
 }
 
-impl BattleFields {
-    /// The §4 table checks, so a bad combination is a 422 naming the field, not a DB error.
-    pub fn cross_field_errors(&self) -> Vec<(&'static str, &'static str)> {
-        let mut errors = Vec::new();
-        match (self.format, self.team_size) {
-            (BattleFormat::Team, None) => errors.push(("team_size", "required for team battles")),
-            (BattleFormat::SevenToSmoke | BattleFormat::Na, Some(_)) => {
-                errors.push(("team_size", "only for team battles"))
-            }
-            _ => {}
+// The §4 table checks, so a bad combination is a 422 naming the field, not a DB error.
+fn team_size_matches_format(fields: &BattleFields) -> Result<(), ValidationError> {
+    match (fields.format, fields.team_size) {
+        (BattleFormat::Team, None) => Err(rule("team_size", "required for team battles")),
+        (BattleFormat::SevenToSmoke | BattleFormat::Na, Some(_)) => {
+            Err(rule("team_size", "only for team battles"))
         }
-        match self.age {
-            BattleAge::Kids if !self.age_max.is_some_and(|max| max <= 17) => {
-                errors.push(("age_max", "kids battles need an upper age of 17 or less"))
-            }
-            BattleAge::Adult if !self.age_min.is_some_and(|min| min >= 18) => {
-                errors.push(("age_min", "adult battles need a lower age of 18 or more"))
-            }
-            _ => {}
-        }
-        if let (Some(min), Some(max)) = (self.age_min, self.age_max)
-            && max < min
-        {
-            errors.push(("age_max", "must not be below age_min"));
-        }
-        if self
-            .bracket_size
-            .is_some_and(|size| ![2, 4, 8, 16, 32, 64].contains(&size))
-        {
-            errors.push(("bracket_size", "must be 2, 4, 8, 16, 32 or 64"));
-        }
-        errors
+        _ => Ok(()),
     }
+}
 
+fn age_bounds_match_category(fields: &BattleFields) -> Result<(), ValidationError> {
+    match fields.age {
+        BattleAge::Kids if !fields.age_max.is_some_and(|max| max <= 17) => Err(rule(
+            "age_max",
+            "kids battles need an upper age of 17 or less",
+        )),
+        BattleAge::Adult if !fields.age_min.is_some_and(|min| min >= 18) => Err(rule(
+            "age_min",
+            "adult battles need a lower age of 18 or more",
+        )),
+        _ => Ok(()),
+    }
+}
+
+fn age_max_not_below_min(fields: &BattleFields) -> Result<(), ValidationError> {
+    match (fields.age_min, fields.age_max) {
+        (Some(min), Some(max)) if max < min => Err(rule("age_max", "must not be below age_min")),
+        _ => Ok(()),
+    }
+}
+
+fn bracket_size_is_valid(fields: &BattleFields) -> Result<(), ValidationError> {
+    match fields.bracket_size {
+        Some(size) if ![2, 4, 8, 16, 32, 64].contains(&size) => {
+            Err(rule("bracket_size", "must be 2, 4, 8, 16, 32 or 64"))
+        }
+        _ => Ok(()),
+    }
+}
+
+impl BattleFields {
     /// The organiser's name, or one built from the structured fields (§4: "2v2 Mixed Kids").
     pub fn display_name(&self) -> String {
         if let Some(name) = self
@@ -183,7 +228,7 @@ impl BattleFields {
 }
 
 /// Everything set when registering or editing an entry; results are optional on create.
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EntryFields {
     /// Null for 1v1; blank is stored as null.
     #[validate(length(max = 100))]
@@ -193,8 +238,10 @@ pub struct EntryFields {
     /// Members: 1 to 10 distinct dancers.
     #[validate(length(min = 1, max = 10))]
     pub dancer_ids: Vec<Uuid>,
+    /// Registration state; `pending` when omitted.
     #[serde(default = "pending")]
     pub status: EntryStatus,
+    /// Furthest stage reached; `na` when omitted.
     #[serde(default = "not_applicable")]
     pub reached: BracketStage,
     /// Exact placement when known; filled from `reached` for `winner` (1) and `top2` (2).
@@ -281,46 +328,63 @@ impl EntryFields {
 }
 
 /// A registration in a battle, with its members and result.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct Entry {
+    /// Primary key, UUIDv7.
     pub id: Uuid,
+    /// The battle entered.
     pub battle_id: Uuid,
+    /// Team name for crew and duo entries; null for 1v1.
     pub team_name: Option<String>,
+    /// The crew represented, if any.
     pub crew: Option<CrewName>,
+    /// Registration state.
     pub status: EntryStatus,
+    /// Furthest stage reached.
     pub reached: BracketStage,
+    /// Exact placement when known.
     pub final_rank: Option<i32>,
+    /// Canonical YouTube watch link of the battle video.
     pub video_url: Option<String>,
+    /// Where the battle starts inside the video.
     pub video_offset_seconds: Option<i32>,
     /// By dancer name.
     pub members: Vec<DancerRef>,
+    /// Row creation time.
     pub created_at: DateTime<Utc>,
+    /// Last write, maintained by a trigger.
     pub updated_at: DateTime<Utc>,
 }
 
 /// A crew as named on an entry.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct CrewName {
+    /// Crew id.
     pub id: Uuid,
+    /// Crew name.
     pub name: String,
 }
 
 /// A staff member as shown on the jam page.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct StaffMember {
+    /// What they do at the jam.
     pub role: StaffRole,
+    /// Who.
     pub dancer: DancerRef,
 }
 
 /// One person on a jam's staff.
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, utoipa::ToSchema)]
 pub struct StaffAssignment {
+    /// The dancer's id.
     pub dancer_id: Uuid,
+    /// The role they hold.
     pub role: StaffRole,
 }
 
 /// Body of `PUT /events/{id}/staff`: the full list, replacing the old one.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, utoipa::ToSchema)]
 #[serde(transparent)]
 pub struct StaffList(pub Vec<StaffAssignment>);
 
@@ -341,7 +405,7 @@ impl Validate for StaffList {
 }
 
 /// Body of `PUT /events/{id}/battles/order`: every battle id of the jam, in display order.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, utoipa::ToSchema)]
 #[serde(transparent)]
 pub struct BattleOrder(pub Vec<Uuid>);
 
@@ -448,20 +512,31 @@ mod tests {
         assert_eq!(masters.display_name(), "Old School 1v1");
     }
 
+    /// Fields named by the struct-level rules that `fields` breaks.
+    fn broken_rules(fields: &BattleFields) -> Vec<String> {
+        match fields.validate() {
+            Ok(()) => Vec::new(),
+            Err(errors) => errors.field_errors()["__all__"]
+                .iter()
+                .map(|e| e.code.to_string())
+                .collect(),
+        }
+    }
+
     #[test]
     fn battle_checks_mirror_the_schema() {
         let ok = battle_fields(BattleFormat::Team, Some(2), BattleAge::Kids);
-        assert!(ok.cross_field_errors().is_empty());
+        assert!(broken_rules(&ok).is_empty());
         let no_size = battle_fields(BattleFormat::Team, None, BattleAge::Adult);
-        assert_eq!(no_size.cross_field_errors()[0].0, "team_size");
+        assert_eq!(broken_rules(&no_size), ["team_size"]);
         let smoke_with_size = battle_fields(BattleFormat::SevenToSmoke, Some(1), BattleAge::Adult);
-        assert_eq!(smoke_with_size.cross_field_errors()[0].0, "team_size");
+        assert_eq!(broken_rules(&smoke_with_size), ["team_size"]);
         let mut old_kids = battle_fields(BattleFormat::Team, Some(1), BattleAge::Kids);
         old_kids.age_max = Some(18);
-        assert_eq!(old_kids.cross_field_errors()[0].0, "age_max");
+        assert_eq!(broken_rules(&old_kids), ["age_max"]);
         let mut odd_bracket = battle_fields(BattleFormat::Team, Some(1), BattleAge::Adult);
         odd_bracket.bracket_size = Some(12);
-        assert_eq!(odd_bracket.cross_field_errors()[0].0, "bracket_size");
+        assert_eq!(broken_rules(&odd_bracket), ["bracket_size"]);
     }
 
     #[test]

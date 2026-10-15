@@ -6,11 +6,12 @@ pub mod config;
 pub mod db;
 pub mod domain;
 pub mod error;
+pub mod openapi;
 pub mod state;
 
-use axum::{Router, http::Request};
+use axum::{Json, Router, http::Request, routing::get};
 use tower_http::{
-    request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
+    request_id::{MakeRequestUuid, PropagateRequestIdLayer, RequestId, SetRequestIdLayer},
     trace::{DefaultOnResponse, TraceLayer},
 };
 use tracing::Level;
@@ -30,17 +31,33 @@ pub fn init_tracing() {
         .init();
 }
 
+/// The OpenAPI document of the API, as served at `/api/openapi.json`.
+pub fn openapi() -> utoipa::openapi::OpenApi {
+    openapi::router().into_openapi()
+}
+
 /// Builds the full application router.
 pub fn app(state: AppState) -> Router {
-    Router::new()
-        .nest("/api", api::router())
+    let (router, spec) = openapi::router().split_for_parts();
+    let router = router.route(
+        "/api/openapi.json",
+        get(move || std::future::ready(Json(spec.clone()))),
+    );
+    // Swagger UI is a dev tool (§5 Routes); release builds only serve the JSON.
+    #[cfg(debug_assertions)]
+    let router = router.merge(
+        utoipa_swagger_ui::SwaggerUi::new("/api/docs")
+            .config(utoipa_swagger_ui::Config::new(["/api/openapi.json"])),
+    );
+    router
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|req: &Request<_>| {
+                    // Set by `SetRequestIdLayer` below, which wraps this layer and so runs first.
                     let request_id = req
-                        .headers()
-                        .get("x-request-id")
-                        .and_then(|v| v.to_str().ok())
+                        .extensions()
+                        .get::<RequestId>()
+                        .and_then(|id| id.header_value().to_str().ok())
                         .unwrap_or_default();
                     tracing::info_span!(
                         "request",

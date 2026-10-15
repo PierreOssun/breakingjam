@@ -1,13 +1,13 @@
 //! `/dancers`: search-before-create, profiles and the jams a dancer took part in.
 
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, Query, State},
     http::StatusCode,
-    routing::get,
 };
-use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
+use utoipa::{IntoParams, ToSchema};
+use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use super::{
@@ -16,67 +16,74 @@ use super::{
 };
 use crate::{
     auth::session::{CurrentUser, MaybeUser},
-    db::{self, dancers::Participation},
+    db,
     domain::{
-        battle::{BattleAge, BattleFormat, BattleGender, BracketStage, EntryStatus, StaffRole},
         crew::CrewRef,
-        dancer::{self, Dancer, DancerFields, DancerSource, DancerSummary},
-        event::EventStatus,
+        dancer::{self, Dancer, DancerFields, DancerSource, DancerSummary, Participation},
         user::Role,
     },
-    error::AppError,
+    error::{AppError, ErrorEnvelope},
     state::AppState,
 };
 
 /// `/dancers*` routes.
-pub fn router() -> Router<AppState> {
-    Router::new()
-        .route("/dancers", get(list).post(create))
-        .route("/dancers/{id}", get(show).put(update).delete(delete))
-        .route("/dancers/{id}/events", get(events))
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::new()
+        .routes(routes!(list, create))
+        .routes(routes!(show, update, delete))
+        .routes(routes!(events))
 }
 
 /// Query of `GET /dancers`.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct ListQuery {
     /// Substring of the name, an alias or the handle (`@` optional).
     pub q: Option<String>,
     /// Matches the first or second flag.
     pub country: Option<String>,
+    /// `next_cursor` of the previous page.
     pub cursor: Option<String>,
+    /// Page size, defaulted and clamped by `page::limit`.
     pub limit: Option<i64>,
 }
 
 /// A dancer page (§6): profile, current crews, and whether the caller may edit it.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct DancerResponse {
+    /// The profile itself.
     #[serde(flatten)]
     pub dancer: Dancer,
+    /// Current crews.
     pub crews: Vec<CrewRef>,
     /// Whether the caller may `PUT` this dancer.
     pub can_edit: bool,
 }
 
 /// Body of `GET /dancers/{id}`: the page, or where a merged dancer now lives (§4 "Merge").
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 #[serde(untagged)]
 pub enum DancerPage {
     /// The frontend redirects to `/dancers/{merged_into}`.
     Merged {
+        /// Where the dancer now lives.
         merged_into: Uuid,
     },
+    /// The page itself.
     Dancer(Box<DancerResponse>),
 }
 
 /// Query of `GET /dancers/{id}/events`.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct EventsQuery {
     /// Only one of the two lists; both when absent.
+    #[param(inline)]
     pub scope: Option<Scope>,
 }
 
 /// Which list `GET /dancers/{id}/events` fills.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum Scope {
     Upcoming,
@@ -84,108 +91,26 @@ pub enum Scope {
 }
 
 /// Body of `GET /dancers/{id}/events`: upcoming by date, past most recent first.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct DancerEvents {
-    pub upcoming: Vec<ParticipationResponse>,
-    pub past: Vec<ParticipationResponse>,
+    /// Jams starting today or later, soonest first.
+    pub upcoming: Vec<Participation>,
+    /// Earlier jams, most recent first.
+    pub past: Vec<Participation>,
 }
 
-/// One appearance: the jam, the battle when competing, and the result when known.
-#[derive(Debug, Serialize)]
-pub struct ParticipationResponse {
-    pub event: EventRef,
-    /// Null for staff.
-    pub battle: Option<BattleRef>,
-    pub role: ParticipationRole,
-    pub entry_status: Option<EntryStatus>,
-    pub reached: Option<BracketStage>,
-    pub final_rank: Option<i32>,
-    pub video_url: Option<String>,
-}
-
-/// The jam side of a participation.
-#[derive(Debug, Serialize)]
-pub struct EventRef {
-    pub id: Uuid,
-    pub name: String,
-    pub slug: String,
-    pub starts_on: NaiveDate,
-    pub ends_on: NaiveDate,
-    pub city: String,
-    pub country: String,
-    pub status: EventStatus,
-}
-
-/// The battle side of a participation.
-#[derive(Debug, Serialize)]
-pub struct BattleRef {
-    pub id: Uuid,
-    pub name: String,
-    pub format: BattleFormat,
-    pub team_size: Option<i16>,
-    pub gender: BattleGender,
-    pub age: BattleAge,
-}
-
-/// Competitor, or the staff role held at the jam.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ParticipationRole {
-    Competitor,
-    Judge,
-    Dj,
-    Mc,
-    Organizer,
-    Other,
-}
-
-impl From<Option<StaffRole>> for ParticipationRole {
-    fn from(role: Option<StaffRole>) -> Self {
-        match role {
-            None => Self::Competitor,
-            Some(StaffRole::Judge) => Self::Judge,
-            Some(StaffRole::Dj) => Self::Dj,
-            Some(StaffRole::Mc) => Self::Mc,
-            Some(StaffRole::Organizer) => Self::Organizer,
-            Some(StaffRole::Other) => Self::Other,
-        }
-    }
-}
-
-impl From<Participation> for ParticipationResponse {
-    fn from(p: Participation) -> Self {
-        let battle = match (p.battle_id, p.battle_name, p.format, p.gender, p.age) {
-            (Some(id), Some(name), Some(format), Some(gender), Some(age)) => Some(BattleRef {
-                id,
-                name,
-                format,
-                team_size: p.team_size,
-                gender,
-                age,
-            }),
-            _ => None,
-        };
-        Self {
-            event: EventRef {
-                id: p.event_id,
-                name: p.event_name,
-                slug: p.slug,
-                starts_on: p.starts_on,
-                ends_on: p.ends_on,
-                city: p.city,
-                country: p.country,
-                status: p.status,
-            },
-            battle,
-            role: p.staff_role.into(),
-            entry_status: p.entry_status,
-            reached: p.reached,
-            final_rank: p.final_rank,
-            video_url: p.video_url,
-        }
-    }
-}
-
+/// Search dancers by name, alias or handle; notable dancers first.
+#[utoipa::path(
+    get,
+    path = "/dancers",
+    tag = "dancers",
+    operation_id = "search_dancers",
+    params(ListQuery),
+    responses(
+        (status = OK, body = Page<DancerSummary>),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+    )
+)]
 async fn list(
     State(state): State<AppState>,
     Query(query): Query<ListQuery>,
@@ -198,17 +123,29 @@ async fn list(
         .as_deref()
         .map(|q| q.trim().trim_start_matches('@'))
         .filter(|q| !q.is_empty());
-    // One extra row tells whether another page exists.
     let rows = db::dancers::search(
         &state.pool,
         q,
         query.country.as_deref(),
-        (limit + 1, offset),
+        page::window(limit, offset),
     )
     .await?;
     Ok(Json(Page::from_offset(rows, limit, offset)))
 }
 
+/// A dancer page, or `{ merged_into }` when the dancer was merged away.
+#[utoipa::path(
+    get,
+    path = "/dancers/{id}",
+    tag = "dancers",
+    operation_id = "get_dancer",
+    params(("id" = Uuid, Path, description = "Dancer id")),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, body = DancerPage),
+        (status = NOT_FOUND, description = "No such dancer", body = ErrorEnvelope),
+    )
+)]
 async fn show(
     State(state): State<AppState>,
     current: MaybeUser,
@@ -224,6 +161,21 @@ async fn show(
     Ok(Json(DancerPage::Dancer(Box::new(response))))
 }
 
+/// Create a dancer; `source` follows the creator's role.
+#[utoipa::path(
+    post,
+    path = "/dancers",
+    tag = "dancers",
+    operation_id = "create_dancer",
+    request_body = DancerFields,
+    security(("session" = [])),
+    responses(
+        (status = CREATED, body = DancerResponse),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn create(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -235,6 +187,24 @@ async fn create(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
+/// Replace a dancer's profile; edits to unverified dancers are logged.
+#[utoipa::path(
+    put,
+    path = "/dancers/{id}",
+    tag = "dancers",
+    operation_id = "update_dancer",
+    params(("id" = Uuid, Path, description = "Dancer id")),
+    request_body = DancerFields,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = DancerResponse),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the creator (unverified), the owner (verified) nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such dancer, or merged away", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn update(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -258,6 +228,21 @@ async fn update(
     respond(&state, new, Some(&current)).await.map(Json)
 }
 
+/// Soft-delete a dancer.
+#[utoipa::path(
+    delete,
+    path = "/dancers/{id}",
+    tag = "dancers",
+    operation_id = "delete_dancer",
+    params(("id" = Uuid, Path, description = "Dancer id")),
+    security(("session" = [])),
+    responses(
+        (status = NO_CONTENT, description = "Deleted"),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Below `seed_admin`", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such dancer", body = ErrorEnvelope),
+    )
+)]
 async fn delete(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -270,6 +255,18 @@ async fn delete(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// The public jams a dancer competed in or worked at, split into upcoming and past.
+#[utoipa::path(
+    get,
+    path = "/dancers/{id}/events",
+    tag = "dancers",
+    operation_id = "dancer_events",
+    params(("id" = Uuid, Path, description = "Dancer id"), EventsQuery),
+    responses(
+        (status = OK, body = DancerEvents),
+        (status = NOT_FOUND, description = "No such dancer", body = ErrorEnvelope),
+    )
+)]
 async fn events(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
@@ -278,23 +275,22 @@ async fn events(
     db::dancers::find_live(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    let wants = |scope| query.scope.is_none_or(|wanted| wanted == scope);
     let (upcoming, mut past): (Vec<_>, Vec<_>) = db::dancers::participations(&state.pool, id)
         .await?
         .into_iter()
         .partition(|p| p.upcoming);
     // Rows come oldest first; the past list reads most recent first.
     past.reverse();
-    let convert = |rows: Vec<Participation>, scope| {
-        if wants(scope) {
-            rows.into_iter().map(Into::into).collect()
+    let wanted = |scope, rows: Vec<Participation>| {
+        if query.scope.is_none_or(|s| s == scope) {
+            rows
         } else {
             Vec::new()
         }
     };
     Ok(Json(DancerEvents {
-        upcoming: convert(upcoming, Scope::Upcoming),
-        past: convert(past, Scope::Past),
+        upcoming: wanted(Scope::Upcoming, upcoming),
+        past: wanted(Scope::Past, past),
     }))
 }
 

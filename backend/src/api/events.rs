@@ -1,13 +1,14 @@
 //! `/events`: jam CRUD, status transitions and the map's GeoJSON.
 
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, Query, State},
     http::StatusCode,
-    routing::{get, post},
 };
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
+use utoipa::{IntoParams, ToSchema};
+use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use super::{
@@ -17,28 +18,23 @@ use super::{
 use crate::{
     auth::session::{CurrentUser, MaybeUser},
     db,
-    domain::event::{
-        ALL_STATUSES, Event, EventFields, EventStatus, MAP_STATUSES, PUBLIC_STATUSES, Transition,
-        can_write,
-    },
-    error::AppError,
+    domain::event::{Event, EventFields, EventStatus, Transition, can_write},
+    error::{AppError, ErrorEnvelope},
     state::AppState,
 };
 
 /// `/events*` routes.
-pub fn router() -> Router<AppState> {
-    Router::new()
-        .route("/events", get(list).post(create))
-        .route("/events.geojson", get(geojson))
-        .route("/events/{id}", get(show).put(update).delete(delete))
-        .route("/events/{id}/publish", post(publish))
-        .route("/events/{id}/close-registration", post(close_registration))
-        .route("/events/{id}/complete", post(complete))
-        .route("/events/{id}/cancel", post(cancel))
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::new()
+        .routes(routes!(list, create))
+        .routes(routes!(geojson))
+        .routes(routes!(show, update, delete))
+        .routes(routes!(transition))
 }
 
 /// Query of `GET /events`.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct ListQuery {
     /// Only jams in this status.
     pub status: Option<EventStatus>,
@@ -57,24 +53,8 @@ pub struct ListQuery {
     pub limit: Option<i64>,
 }
 
-impl ListQuery {
-    /// The statuses this query may return: `mine` sees drafts, everyone else public ones only.
-    fn statuses(&self) -> Vec<EventStatus> {
-        let visible: &[EventStatus] = if self.mine {
-            &ALL_STATUSES
-        } else {
-            &PUBLIC_STATUSES
-        };
-        visible
-            .iter()
-            .copied()
-            .filter(|status| self.status.is_none_or(|wanted| wanted == *status))
-            .collect()
-    }
-}
-
 /// `GET /events.geojson` body: a GeoJSON FeatureCollection of points.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct FeatureCollection {
     /// Always `FeatureCollection`.
     #[serde(rename = "type")]
@@ -84,7 +64,7 @@ pub struct FeatureCollection {
 }
 
 /// One jam on the map.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct Feature {
     /// Always `Feature`.
     #[serde(rename = "type")]
@@ -96,17 +76,18 @@ pub struct Feature {
 }
 
 /// GeoJSON point; coordinates are `[lng, lat]`.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct Point {
     /// Always `Point`.
     #[serde(rename = "type")]
     pub kind: &'static str,
     /// `[lng, lat]`, per the GeoJSON spec.
+    #[schema(value_type = Vec<f64>, min_items = 2, max_items = 2)]
     pub coordinates: [f64; 2],
 }
 
 /// What the map popup needs (§6 Map).
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct MapJam {
     /// Jam id.
     pub id: Uuid,
@@ -122,6 +103,20 @@ pub struct MapJam {
     pub country: String,
 }
 
+/// List public jams, or your own with `mine=true`.
+#[utoipa::path(
+    get,
+    path = "/events",
+    tag = "events",
+    operation_id = "list_events",
+    params(ListQuery),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, body = Page<Event>),
+        (status = UNAUTHORIZED, description = "`mine=true` without a session", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+    )
+)]
 async fn list(
     State(state): State<AppState>,
     current: MaybeUser,
@@ -132,10 +127,9 @@ async fn list(
         (true, Some(current)) => Some(current.user.id),
         (true, None) => return Err(AppError::Unauthorized),
     };
-    let statuses = query.statuses();
     let limit = page::limit(query.limit);
     let filter = db::events::ListFilter {
-        statuses: &statuses,
+        status: query.status,
         country: query.country.as_deref(),
         from: query.from,
         to: query.to,
@@ -148,8 +142,16 @@ async fn list(
     Ok(Json(Page::from_rows(rows, limit, encode_cursor)))
 }
 
+/// Upcoming public jams with coordinates, for the world map.
+#[utoipa::path(
+    get,
+    path = "/events.geojson",
+    tag = "events",
+    operation_id = "events_geojson",
+    responses((status = OK, body = FeatureCollection))
+)]
 async fn geojson(State(state): State<AppState>) -> Result<Json<FeatureCollection>, AppError> {
-    let points = db::events::map_points(&state.pool, &MAP_STATUSES).await?;
+    let points = db::events::map_points(&state.pool).await?;
     let features = points
         .into_iter()
         .map(|p| Feature {
@@ -174,6 +176,19 @@ async fn geojson(State(state): State<AppState>) -> Result<Json<FeatureCollection
     }))
 }
 
+/// One jam, by id or slug.
+#[utoipa::path(
+    get,
+    path = "/events/{id}",
+    tag = "events",
+    operation_id = "get_event",
+    params(("id" = String, Path, description = "Jam id or slug")),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, body = Event),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+    )
+)]
 async fn show(
     State(state): State<AppState>,
     current: MaybeUser,
@@ -186,12 +201,25 @@ async fn show(
     Ok(Json(event))
 }
 
+/// Register a jam as a draft; a first jam makes a `user` an `organizer`.
+#[utoipa::path(
+    post,
+    path = "/events",
+    tag = "events",
+    operation_id = "create_event",
+    request_body = EventFields,
+    security(("session" = [])),
+    responses(
+        (status = CREATED, body = Event),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn create(
     State(state): State<AppState>,
     current: CurrentUser,
     ValidJson(fields): ValidJson<EventFields>,
 ) -> Result<(StatusCode, Json<Event>), AppError> {
-    AppError::check(fields.cross_field_errors())?;
     let mut tx = state.pool.begin().await?;
     // Registering a first jam makes a plain user an organiser (decided in M5).
     db::users::promote_to_organizer(&mut tx, current.user.id).await?;
@@ -200,17 +228,48 @@ async fn create(
     Ok((StatusCode::CREATED, Json(event)))
 }
 
+/// Replace a jam's fields; slug and status never change here.
+#[utoipa::path(
+    put,
+    path = "/events/{id}",
+    tag = "events",
+    operation_id = "update_event",
+    params(("id" = Uuid, Path, description = "Jam id")),
+    request_body = EventFields,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Event),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+    )
+)]
 async fn update(
     State(state): State<AppState>,
     current: CurrentUser,
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<EventFields>,
 ) -> Result<Json<Event>, AppError> {
-    AppError::check(fields.cross_field_errors())?;
     writable(&state, &current, id).await?;
     Ok(Json(db::events::update(&state.pool, id, &fields).await?))
 }
 
+/// Soft-delete a jam.
+#[utoipa::path(
+    delete,
+    path = "/events/{id}",
+    tag = "events",
+    operation_id = "delete_event",
+    params(("id" = Uuid, Path, description = "Jam id")),
+    security(("session" = [])),
+    responses(
+        (status = NO_CONTENT, description = "Deleted"),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+    )
+)]
 async fn delete(
     State(state): State<AppState>,
     current: CurrentUser,
@@ -221,43 +280,29 @@ async fn delete(
     Ok(StatusCode::NO_CONTENT)
 }
 
-async fn publish(
-    state: State<AppState>,
-    current: CurrentUser,
-    id: Path<Uuid>,
-) -> Result<Json<Event>, AppError> {
-    transition(state, current, id, Transition::Publish).await
-}
-
-async fn close_registration(
-    state: State<AppState>,
-    current: CurrentUser,
-    id: Path<Uuid>,
-) -> Result<Json<Event>, AppError> {
-    transition(state, current, id, Transition::CloseRegistration).await
-}
-
-async fn complete(
-    state: State<AppState>,
-    current: CurrentUser,
-    id: Path<Uuid>,
-) -> Result<Json<Event>, AppError> {
-    transition(state, current, id, Transition::Complete).await
-}
-
-async fn cancel(
-    state: State<AppState>,
-    current: CurrentUser,
-    id: Path<Uuid>,
-) -> Result<Json<Event>, AppError> {
-    transition(state, current, id, Transition::Cancel).await
-}
-
+/// Move a jam along draft → published → registration_closed → completed, or cancel it.
+#[utoipa::path(
+    post,
+    path = "/events/{id}/{transition}",
+    tag = "events",
+    operation_id = "transition_event",
+    params(
+        ("id" = Uuid, Path, description = "Jam id"),
+        ("transition" = inline(Transition), Path, description = "Cancel is allowed from any status but completed"),
+    ),
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Event),
+        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        (status = CONFLICT, description = "The current status does not allow it", body = ErrorEnvelope),
+    )
+)]
 async fn transition(
     State(state): State<AppState>,
     current: CurrentUser,
-    Path(id): Path<Uuid>,
-    transition: Transition,
+    Path((id, transition)): Path<(Uuid, Transition)>,
 ) -> Result<Json<Event>, AppError> {
     let event = writable(&state, &current, id).await?;
     let next = event

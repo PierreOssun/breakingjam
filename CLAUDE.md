@@ -10,8 +10,8 @@ Read `ARCHITECTURE_v0.1.md` first; it is the source of truth for scope, schema a
 
 ## Design patterns
 - Default is no pattern: a module of plain types and functions.
-- Use a named pattern only when it removes real complexity. Allowed and expected here: newtype, typestate for the event status machine, extractor (axum), repository-free data access (sqlx queries in `db/`, no trait layer), builder only via `derive` crates.
-- If a file deliberately uses a pattern, say so in the first line: `//! Pattern: typestate — event status transitions are compile-time checked.` Otherwise no header.
+- Use a named pattern only when it removes real complexity. Allowed and expected here: newtype, an enum state machine for event status (`EventStatus::apply`; the status comes from the database at runtime, so typestate cannot check it), extractor (axum), repository-free data access (sqlx queries in `db/`, no trait layer), builder only via `derive` crates.
+- If a file deliberately uses a pattern, say so in the first line: `//! Pattern: extractor — the session cookie becomes a handler argument.` Otherwise no header.
 - Any new `trait` or generic parameter needs a one-line justification in the PR description. One implementation = no trait.
 
 ## Documentation

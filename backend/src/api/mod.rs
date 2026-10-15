@@ -11,13 +11,13 @@ mod health;
 mod json;
 mod page;
 
-use axum::Router;
+use utoipa_axum::router::OpenApiRouter;
 
 use crate::state::AppState;
 
-/// All `/api` routes.
-pub fn router() -> Router<AppState> {
-    Router::new()
+/// All `/api` routes, documented by their `#[utoipa::path]` attributes.
+pub fn router() -> OpenApiRouter<AppState> {
+    OpenApiRouter::new()
         .merge(health::router())
         .merge(auth::router())
         .merge(events::router())

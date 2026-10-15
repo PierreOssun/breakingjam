@@ -9,12 +9,14 @@ use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
 use super::{
-    country_code, not_blank,
+    country_code, not_blank, rule,
     user::{Role, User},
 };
 
 /// Lifecycle of a jam (§4 "Event status transitions").
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "event_status", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum EventStatus {
@@ -42,29 +44,9 @@ impl fmt::Display for EventStatus {
     }
 }
 
-/// Every status, for listing a writer's own jams.
-pub const ALL_STATUSES: [EventStatus; 5] = [
-    EventStatus::Draft,
-    EventStatus::Published,
-    EventStatus::RegistrationClosed,
-    EventStatus::Completed,
-    EventStatus::Cancelled,
-];
-
-/// Every status anyone may see; drafts are visible to their writers only.
-pub const PUBLIC_STATUSES: [EventStatus; 4] = [
-    EventStatus::Published,
-    EventStatus::RegistrationClosed,
-    EventStatus::Completed,
-    EventStatus::Cancelled,
-];
-
-/// Statuses shown on the map: announced jams not yet completed or cancelled; no date filter.
-pub const MAP_STATUSES: [EventStatus; 2] =
-    [EventStatus::Published, EventStatus::RegistrationClosed];
-
-/// An explicit status change, one endpoint each.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// An explicit status change: the last segment of `POST /events/{id}/{transition}`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, utoipa::ToSchema)]
+#[serde(rename_all = "kebab-case")]
 pub enum Transition {
     /// `draft` → `published`.
     Publish,
@@ -113,7 +95,7 @@ impl EventStatus {
 }
 
 /// A stored jam.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct Event {
     /// Primary key, UUIDv7.
     pub id: Uuid,
@@ -168,7 +150,11 @@ impl Event {
 }
 
 /// Everything an organiser sets when creating or editing a jam.
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
+#[validate(
+    schema(function = "dates_in_order"),
+    schema(function = "coords_together")
+)]
 pub struct EventFields {
     /// Display name, up to 200 characters.
     #[validate(length(max = 200), custom(function = "not_blank"))]
@@ -209,18 +195,18 @@ pub struct EventFields {
     pub instagram_url: Option<String>,
 }
 
-impl EventFields {
-    /// Rules spanning two fields, reported as `(field, message)`.
-    pub fn cross_field_errors(&self) -> Vec<(&'static str, &'static str)> {
-        let mut errors = Vec::new();
-        if self.ends_on < self.starts_on {
-            errors.push(("ends_on", "must not be before starts_on"));
-        }
-        if self.lat.is_some() != self.lng.is_some() {
-            errors.push(("lat", "lat and lng must be set together"));
-        }
-        errors
+fn dates_in_order(fields: &EventFields) -> Result<(), ValidationError> {
+    if fields.ends_on < fields.starts_on {
+        return Err(rule("ends_on", "must not be before starts_on"));
     }
+    Ok(())
+}
+
+fn coords_together(fields: &EventFields) -> Result<(), ValidationError> {
+    if fields.lat.is_some() != fields.lng.is_some() {
+        return Err(rule("lat", "lat and lng must be set together"));
+    }
+    Ok(())
 }
 
 /// URL slug: the name's words plus the last 6 hex digits of the id, e.g. `paris-cypher-3f9a1c`.

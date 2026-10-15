@@ -7,42 +7,59 @@ use uuid::Uuid;
 use super::dancer::DancerRef;
 
 /// Review state of a claim.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
 #[sqlx(type_name = "claim_status", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum ClaimStatus {
+    /// Waiting for an admin.
     Pending,
+    /// The user now owns the page.
     Approved,
+    /// Turned down; the user may claim again.
     Rejected,
 }
 
 /// A claim as its author sees it.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct Claim {
+    /// Primary key, UUIDv7.
     pub id: Uuid,
+    /// The page being claimed.
     pub dancer_id: Uuid,
+    /// The account claiming it.
     pub user_id: Uuid,
     /// Shown to the user, who puts it in their Instagram bio or DMs it to @breakingjam.
     pub code: String,
+    /// Review state.
     pub status: ClaimStatus,
+    /// When an admin decided; null while pending.
     pub reviewed_at: Option<DateTime<Utc>>,
+    /// When the claim was opened.
     pub created_at: DateTime<Utc>,
 }
 
 /// A claim in the admin review queue, with who is claiming which page.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct ClaimForReview {
+    /// The claim itself.
     #[serde(flatten)]
     pub claim: Claim,
+    /// The page being claimed.
     pub dancer: DancerRef,
+    /// Who is claiming it.
     pub user: ClaimUser,
 }
 
 /// The account behind a claim.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct ClaimUser {
+    /// Account id.
     pub id: Uuid,
+    /// Login email, so the admin can reach them.
     pub email: String,
+    /// Public name.
     pub display_name: String,
 }
 

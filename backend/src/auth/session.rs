@@ -1,4 +1,4 @@
-//! Session cookie and the `CurrentUser` / `MaybeUser` extractors.
+//! Pattern: extractor — the session cookie becomes a `CurrentUser` / `MaybeUser` handler argument.
 
 use axum::{
     extract::{FromRequestParts, OptionalFromRequestParts},

@@ -2,13 +2,13 @@
 
 use serde::Serialize;
 
-use crate::error::AppError;
+use crate::{db, error::AppError};
 
 const DEFAULT_LIMIT: i64 = 50;
 const MAX_LIMIT: i64 = 200;
 
 /// One page of a list endpoint; `next_cursor` is null on the last page.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, utoipa::ToSchema)]
 pub struct Page<T> {
     /// At most `limit` rows.
     pub items: Vec<T>,
@@ -35,6 +35,14 @@ pub fn offset(cursor: Option<&str>) -> Result<i64, AppError> {
             .ok()
             .filter(|n: &i64| *n >= 0)
             .ok_or_else(invalid_cursor),
+    }
+}
+
+/// The rows `from_offset` needs: one past `limit`, which only tells whether another page exists.
+pub fn window(limit: i64, offset: i64) -> db::Window {
+    db::Window {
+        limit: limit + 1,
+        offset,
     }
 }
 

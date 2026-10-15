@@ -63,13 +63,14 @@ breakingjam/
 │   ├── Cargo.toml
 │   ├── Dockerfile
 │   ├── .sqlx/                  # committed offline query data
+│   ├── openapi.json            # committed OpenAPI snapshot, kept in sync by `cargo test`
 │   ├── migrations/
 │   ├── src/
 │   │   ├── main.rs             # config, tracing, pool, router, serve
 │   │   ├── config.rs           # env → Config
 │   │   ├── error.rs            # AppError + IntoResponse
 │   │   ├── state.rs            # AppState { pool, config, ... }
-│   │   ├── openapi.rs          # utoipa ApiDoc + Swagger UI mount
+│   │   ├── openapi.rs          # utoipa ApiDoc: info, tags, session security scheme
 │   │   ├── auth/               # password, google oauth, session extractor
 │   │   ├── domain/             # types + invariants, no sqlx
 │   │   │   ├── event.rs
@@ -415,8 +416,7 @@ DELETE /api/crews/{id}/members/{dancer_id}   sets until = today
 ### Config (env)
 ```
 DATABASE_URL, APP_PORT (default 8080), APP_BASE_URL, FRONTEND_ORIGIN (CORS),
-SESSION_SECRET (unused by DB sessions but reserved), GOOGLE_CLIENT_ID,
-GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, RUST_LOG
+GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, RUST_LOG
 ```
 Loaded via `dotenvy` + a `Config::from_env()` that fails fast with a clear message.
 
@@ -470,7 +470,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 ### CI (`.github/workflows/ci.yml`)
 Jobs on PR and main:
 1. `backend`: Postgres 17 service, `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`, `cargo sqlx prepare --check`.
-2. `frontend`: `npm ci`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
+2. `frontend`: `npm ci`, regenerate `src/api/schema.d.ts` from `backend/openapi.json` and fail on any diff, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 
 ## 8. Local development
 

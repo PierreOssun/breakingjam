@@ -10,9 +10,8 @@ use crate::domain::crew::{Crew, CrewFields, Member};
 pub async fn search(
     pool: &PgPool,
     query: Option<&str>,
-    page: (i64, i64),
+    window: super::Window,
 ) -> sqlx::Result<Vec<Crew>> {
-    let (limit, offset) = page;
     let pattern = query.map(super::contains_pattern);
     sqlx::query_as!(
         Crew,
@@ -22,8 +21,8 @@ pub async fn search(
          order by lower(name), id
          limit $2 offset $3",
         pattern,
-        limit,
-        offset,
+        window.limit,
+        window.offset,
     )
     .fetch_all(pool)
     .await
