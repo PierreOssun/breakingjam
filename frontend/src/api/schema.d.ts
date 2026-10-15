@@ -194,6 +194,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/events/{id}/flyer.svg": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The generated 4:5 flyer of a jam (DESIGN.md §4.24), as SVG to inline in the page. */
+        get: operations["event_flyer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events/{id}/og.png": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The 1200×630 Open Graph image of a jam: the flyer template rasterised to PNG. */
+        get: operations["event_og_image"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/dancers": {
         parameters: {
             query?: never;
@@ -1429,6 +1463,11 @@ export interface components {
          * @enum {string}
          */
         ParticipationRole: "competitor" | "judge" | "dj" | "mc" | "organizer" | "other";
+        /**
+         * Format: binary
+         * @description A PNG body: `image/png` on the wire, binary in the OpenAPI document.
+         */
+        Png: string;
         /** @description GeoJSON point; coordinates are `[lng, lat]`. */
         Point: {
             /** @description Always `Point`. */
@@ -2005,6 +2044,78 @@ export interface operations {
             };
             /** @description The current status does not allow it */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    event_flyer: {
+        parameters: {
+            query?: {
+                /** @description Date and art only, for thumbnails narrower than 120px. */
+                compact?: boolean;
+                /** @description Language of the printed weekday, month and "cancelled" band. */
+                lang?: "en" | "fr" | "de";
+            };
+            header?: never;
+            path: {
+                /** @description Jam id or slug */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description SVG document: `role="img"` with a localised label, or `aria-hidden` when compact */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/svg+xml": string;
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    event_og_image: {
+        parameters: {
+            query?: {
+                /** @description Language of the printed weekday and month. */
+                lang?: "en" | "fr" | "de";
+            };
+            header?: never;
+            path: {
+                /** @description Jam id or slug */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PNG, 1200×630 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": components["schemas"]["Png"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

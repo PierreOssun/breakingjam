@@ -3,7 +3,7 @@ import type en from "../i18n/en.json";
 
 type PageKey = `pages.${Exclude<keyof typeof en.pages, "comingSoon">}`;
 
-/** Stand-in for pages built in later milestones (M10–M12). */
+/** Stand-in for pages built in later milestones (M11–M12). */
 export function ComingSoon({ title }: { title: PageKey }) {
   const { t } = useTranslation();
   return (

@@ -3,7 +3,11 @@
 use axum::{
     Json,
     extract::{Path, Query, State},
-    http::StatusCode,
+    http::{
+        StatusCode,
+        header::{CACHE_CONTROL, CONTENT_TYPE},
+    },
+    response::{IntoResponse, Response},
 };
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
@@ -20,6 +24,7 @@ use crate::{
     db,
     domain::event::{Event, EventFields, EventStatus, Transition, can_write},
     error::{AppError, ErrorEnvelope},
+    flyer::{self, FlyerOptions, FlyerText, Lang},
     state::AppState,
 };
 
@@ -30,6 +35,8 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(geojson))
         .routes(routes!(show, update, delete))
         .routes(routes!(transition))
+        .routes(routes!(flyer_svg))
+        .routes(routes!(og_png))
 }
 
 /// Query of `GET /events`.
@@ -51,6 +58,40 @@ pub struct ListQuery {
     pub cursor: Option<String>,
     /// Page size, defaulted and clamped by `page::limit`.
     pub limit: Option<i64>,
+}
+
+/// Query of the flyer and share-image routes.
+#[derive(Debug, Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct FlyerQuery {
+    /// Date and art only, for thumbnails narrower than 120px.
+    #[serde(default)]
+    pub compact: bool,
+    /// Language of the printed weekday, month and "cancelled" band.
+    #[serde(default)]
+    #[param(inline)]
+    pub lang: Lang,
+}
+
+/// Query of the share-image route.
+#[derive(Debug, Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct OgQuery {
+    /// Language of the printed weekday and month.
+    #[serde(default)]
+    #[param(inline)]
+    pub lang: Lang,
+}
+
+/// A PNG body: `image/png` on the wire, binary in the OpenAPI document.
+#[derive(Debug, ToSchema)]
+#[schema(value_type = String, format = Binary)]
+pub struct Png(pub Vec<u8>);
+
+impl IntoResponse for Png {
+    fn into_response(self) -> Response {
+        ([(CONTENT_TYPE, "image/png")], self.0).into_response()
+    }
 }
 
 /// `GET /events.geojson` body: a GeoJSON FeatureCollection of points.
@@ -194,11 +235,7 @@ async fn show(
     current: MaybeUser,
     Path(id_or_slug): Path<String>,
 ) -> Result<Json<Event>, AppError> {
-    let event = db::events::find(&state.pool, &id_or_slug)
-        .await?
-        .filter(|event| event.visible_to(current.as_ref().map(|c| &c.user)))
-        .ok_or(AppError::NotFound)?;
-    Ok(Json(event))
+    Ok(Json(readable(&state, &current, &id_or_slug).await?))
 }
 
 /// Register a jam as a draft; a first jam makes a `user` an `organizer`.
@@ -315,13 +352,105 @@ async fn transition(
         .ok_or_else(|| AppError::Conflict("status changed meanwhile, reload and retry".into()))
 }
 
+/// The generated 4:5 flyer of a jam (DESIGN.md §4.24), as SVG to inline in the page.
+#[utoipa::path(
+    get,
+    path = "/events/{id}/flyer.svg",
+    tag = "events",
+    operation_id = "event_flyer",
+    params(("id" = String, Path, description = "Jam id or slug"), FlyerQuery),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, description = "SVG document: `role=\"img\"` with a localised label, or `aria-hidden` when compact", content_type = "image/svg+xml", body = String),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+    )
+)]
+async fn flyer_svg(
+    State(state): State<AppState>,
+    current: MaybeUser,
+    Path(id_or_slug): Path<String>,
+    Query(query): Query<FlyerQuery>,
+) -> Result<Response, AppError> {
+    let (event, text) = flyer_text(&state, &current, &id_or_slug, query.lang).await?;
+    // Gradient ids live in the page's id space: unique per jam and variant.
+    let id = event.id.simple().to_string();
+    let uid = format!("f{}{}", &id[20..], if query.compact { "c" } else { "" });
+    let options = FlyerOptions {
+        compact: query.compact,
+        label: query.lang.flyer_label(),
+        cancelled: (event.status == EventStatus::Cancelled).then(|| query.lang.cancelled()),
+        uid: &uid,
+    };
+    let svg = flyer::flyer_svg(&text, flyer::seed(&event.id.to_string()), options);
+    let headers = [
+        (CONTENT_TYPE, "image/svg+xml; charset=utf-8"),
+        (CACHE_CONTROL, cache_control(&event)),
+    ];
+    Ok((headers, svg).into_response())
+}
+
+/// The 1200×630 Open Graph image of a jam: the flyer template rasterised to PNG.
+#[utoipa::path(
+    get,
+    path = "/events/{id}/og.png",
+    tag = "events",
+    operation_id = "event_og_image",
+    params(("id" = String, Path, description = "Jam id or slug"), OgQuery),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, description = "PNG, 1200×630", content_type = "image/png", body = Png),
+        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+    )
+)]
+async fn og_png(
+    State(state): State<AppState>,
+    current: MaybeUser,
+    Path(id_or_slug): Path<String>,
+    Query(query): Query<OgQuery>,
+) -> Result<Response, AppError> {
+    let (event, text) = flyer_text(&state, &current, &id_or_slug, query.lang).await?;
+    let svg = flyer::og_svg(&text, flyer::seed(&event.id.to_string()), "og");
+    // Rasterising takes tens of milliseconds of CPU; keep it off the request threads.
+    let png = tokio::task::spawn_blocking(move || flyer::og_png(&svg))
+        .await
+        .map_err(|err| AppError::Internal(err.into()))?
+        .map_err(|err| AppError::Internal(err.into()))?;
+    Ok(([(CACHE_CONTROL, cache_control(&event))], Png(png)).into_response())
+}
+
+/// A visible jam and the text of its flyer.
+async fn flyer_text(
+    state: &AppState,
+    current: &MaybeUser,
+    id_or_slug: &str,
+    lang: Lang,
+) -> Result<(Event, FlyerText), AppError> {
+    let event = readable(state, current, id_or_slug).await?;
+    let names = db::battles::list(&state.pool, event.id)
+        .await?
+        .into_iter()
+        .map(|battle| battle.name)
+        .collect();
+    let text = FlyerText::for_event(&event, names, lang);
+    Ok((event, text))
+}
+
+/// Drafts are private to their writers; public jams may be cached briefly.
+fn cache_control(event: &Event) -> &'static str {
+    if event.status == EventStatus::Draft {
+        "private, no-store"
+    } else {
+        "public, max-age=300"
+    }
+}
+
 /// The jam if the caller may see it: 404 when it is missing or a draft they can't write.
 pub(super) async fn readable(
     state: &AppState,
     current: &MaybeUser,
-    id: Uuid,
+    id_or_slug: &str,
 ) -> Result<Event, AppError> {
-    db::events::find(&state.pool, &id.to_string())
+    db::events::find(&state.pool, id_or_slug)
         .await?
         .filter(|event| event.visible_to(current.as_ref().map(|c| &c.user)))
         .ok_or(AppError::NotFound)

@@ -30,6 +30,8 @@ pub struct TestResponse {
     pub status: StatusCode,
     pub headers: HeaderMap,
     pub json: Value,
+    /// The raw body, for non-JSON responses (SVG, PNG).
+    pub bytes: Vec<u8>,
 }
 
 impl TestResponse {
@@ -54,6 +56,7 @@ pub async fn send(app: &Router, request: Request<Body>) -> TestResponse {
         status,
         headers,
         json,
+        bytes: body.to_vec(),
     }
 }
 

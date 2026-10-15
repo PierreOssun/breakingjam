@@ -2,8 +2,9 @@ import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LIL_G, LOGGED_OUT, calls, mockApi, renderApp } from "../test/app";
 
-function header() {
-  return within(screen.getByRole("banner"));
+/** The page header, once the (possibly lazy) route has rendered. */
+async function header() {
+  return within(await screen.findByRole("banner"));
 }
 
 describe("Header", () => {
@@ -12,12 +13,14 @@ describe("Header", () => {
     renderApp("/");
 
     await userEvent.click(
-      await header().findByRole("button", { name: "Language: English" }),
+      await (
+        await header()
+      ).findByRole("button", { name: "Language: English" }),
     );
     await userEvent.click(screen.getByRole("option", { name: "Français" }));
 
     expect(
-      await header().findByRole("link", { name: "Trouver une jam" }),
+      await (await header()).findByRole("link", { name: "Trouver une jam" }),
     ).toBeInTheDocument();
     expect(document.documentElement.lang).toBe("fr");
     expect(localStorage.getItem("bj.lang")).toBe("fr");
@@ -26,7 +29,9 @@ describe("Header", () => {
   it("works from the keyboard", async () => {
     mockApi({ "GET /api/auth/me": LOGGED_OUT });
     renderApp("/");
-    const button = await header().findByRole("button", {
+    const button = await (
+      await header()
+    ).findByRole("button", {
       name: "Language: English",
     });
 
@@ -35,14 +40,14 @@ describe("Header", () => {
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}");
 
     expect(
-      await header().findByRole("link", { name: "Jam finden" }),
+      await (await header()).findByRole("link", { name: "Jam finden" }),
     ).toBeInTheDocument();
     expect(
-      header().getByRole("button", { name: "Sprache: Deutsch" }),
+      (await header()).getByRole("button", { name: "Sprache: Deutsch" }),
     ).toHaveFocus();
 
     await userEvent.click(
-      header().getByRole("button", { name: "Sprache: Deutsch" }),
+      (await header()).getByRole("button", { name: "Sprache: Deutsch" }),
     );
     await userEvent.keyboard("{Escape}");
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
@@ -56,11 +61,11 @@ describe("Header", () => {
     renderApp("/jams/paris-cypher-3f9a1c");
 
     await userEvent.click(
-      await header().findByRole("button", { name: "Log out" }),
+      await (await header()).findByRole("button", { name: "Log out" }),
     );
 
     expect(
-      await header().findByRole("link", { name: "Log in" }),
+      await (await header()).findByRole("link", { name: "Log in" }),
     ).toBeInTheDocument();
     expect(calls(fetch)).toContain("POST /api/auth/logout");
   });
@@ -69,7 +74,7 @@ describe("Header", () => {
     mockApi({ "GET /api/auth/me": LOGGED_OUT });
     renderApp("/jams/paris-cypher-3f9a1c");
 
-    const login = await header().findByRole("link", { name: "Log in" });
+    const login = await (await header()).findByRole("link", { name: "Log in" });
     expect(login).toHaveAttribute(
       "href",
       "/login?next=%2Fjams%2Fparis-cypher-3f9a1c",

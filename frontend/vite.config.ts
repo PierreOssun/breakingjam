@@ -5,6 +5,11 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    // 271 flags would bloat the bundle as data URIs; keep each a file fetched when shown.
+    assetsInlineLimit: (file) =>
+      file.includes("flag-icons") ? false : undefined,
+  },
   server: {
     port: 5173,
     // Tests read ../DESIGN.md (token sync); the dev server never serves the repo root.

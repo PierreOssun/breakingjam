@@ -51,7 +51,7 @@ async fn list(
     current: MaybeUser,
     Path(event_id): Path<Uuid>,
 ) -> Result<Json<Vec<Battle>>, AppError> {
-    readable(&state, &current, event_id).await?;
+    readable(&state, &current, &event_id.to_string()).await?;
     Ok(Json(db::battles::list(&state.pool, event_id).await?))
 }
 
@@ -200,7 +200,7 @@ async fn list_entries(
     let battle = db::battles::find(&state.pool, battle_id)
         .await?
         .ok_or(AppError::NotFound)?;
-    readable(&state, &current, battle.event_id).await?;
+    readable(&state, &current, &battle.event_id.to_string()).await?;
     Ok(Json(db::battles::entries(&state.pool, battle_id).await?))
 }
 
@@ -323,7 +323,7 @@ async fn list_staff(
     current: MaybeUser,
     Path(event_id): Path<Uuid>,
 ) -> Result<Json<Vec<StaffMember>>, AppError> {
-    readable(&state, &current, event_id).await?;
+    readable(&state, &current, &event_id.to_string()).await?;
     Ok(Json(db::events::staff(&state.pool, event_id).await?))
 }
 

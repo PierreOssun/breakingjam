@@ -752,6 +752,141 @@
         ]
       }
     },
+    "/api/events/{id}/flyer.svg": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "The generated 4:5 flyer of a jam (DESIGN.md §4.24), as SVG to inline in the page.",
+        "operationId": "event_flyer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id or slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compact",
+            "in": "query",
+            "description": "Date and art only, for thumbnails narrower than 120px.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "Language of the printed weekday, month and \"cancelled\" band.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Language of the printed weekday, month and \"cancelled\" band.",
+              "enum": [
+                "en",
+                "fr",
+                "de"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SVG document: `role=\"img\"` with a localised label, or `aria-hidden` when compact",
+            "content": {
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/og.png": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "The 1200×630 Open Graph image of a jam: the flyer template rasterised to PNG.",
+        "operationId": "event_og_image",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id or slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "Language of the printed weekday and month.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Language of the printed weekday, month and \"cancelled\" band.",
+              "enum": [
+                "en",
+                "fr",
+                "de"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG, 1200×630",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "$ref": "#/components/schemas/Png"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/dancers": {
       "get": {
         "tags": [
@@ -4990,6 +5125,11 @@
           "organizer",
           "other"
         ]
+      },
+      "Png": {
+        "type": "string",
+        "format": "binary",
+        "description": "A PNG body: `image/png` on the wire, binary in the OpenAPI document."
       },
       "Point": {
         "type": "object",

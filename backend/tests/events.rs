@@ -328,3 +328,120 @@ async fn geojson_has_upcoming_public_jams_with_coordinates(pool: PgPool) {
         json!({ "type": "Point", "coordinates": [2.3522, 48.8566] })
     );
 }
+
+fn text(response: &TestResponse) -> String {
+    String::from_utf8(response.bytes.clone()).unwrap()
+}
+
+#[sqlx::test]
+async fn flyer_is_an_inlinable_svg_of_the_jam(pool: PgPool) {
+    let app = app(pool);
+    let owner = sign_up(&app, "org@example.com").await;
+    let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
+    let battle = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
+    send(
+        &app,
+        post(&format!("/api/events/{id}/battles"), battle, Some(&owner)),
+    )
+    .await;
+    let uri = format!("/api/events/{id}/flyer.svg");
+
+    let draft = send(&app, get(&uri, None)).await;
+    assert_eq!(draft.status, StatusCode::NOT_FOUND, "drafts stay private");
+    let own_draft = send(&app, get(&uri, Some(&owner))).await;
+    assert_eq!(own_draft.status, StatusCode::OK);
+    assert_eq!(own_draft.headers["cache-control"], "private, no-store");
+
+    act(&app, &owner, &id, "publish").await;
+    let flyer = send(&app, get(&uri, None)).await;
+    assert_eq!(flyer.status, StatusCode::OK);
+    assert_eq!(
+        flyer.headers["content-type"],
+        "image/svg+xml; charset=utf-8"
+    );
+    assert_eq!(flyer.headers["cache-control"], "public, max-age=300");
+    let svg = text(&flyer);
+    assert!(svg.starts_with(r#"<svg xmlns="http://www.w3.org/2000/svg""#));
+    // DESIGN.md §4.24: a named image, "Generated flyer: <name>, <date>, <city>".
+    assert!(svg.contains(
+        r#"role="img" aria-label="Generated flyer: Paris Cypher Sessions, Sat 01 Jun, Paris""#
+    ));
+    for printed in [
+        ">SAT</text>",
+        ">01</text>",
+        ">JUN</text>",
+        ">Paris</text>",
+        "Paris · FR",
+        "1V1 BBOY",
+    ] {
+        assert!(svg.contains(printed), "{printed} missing");
+    }
+    assert!(!svg.contains("CANCELLED"));
+}
+
+#[sqlx::test]
+async fn flyer_speaks_the_page_language_and_shows_cancellation(pool: PgPool) {
+    let app = app(pool);
+    let owner = sign_up(&app, "org@example.com").await;
+    let id = draft_id(&app, &owner, jam("Jam")).await;
+    act(&app, &owner, &id, "cancel").await;
+
+    let fr = text(
+        &send(
+            &app,
+            get(&format!("/api/events/{id}/flyer.svg?lang=fr"), None),
+        )
+        .await,
+    );
+    assert!(fr.contains(">SAM</text>") && fr.contains(">JUIN</text>"));
+    assert!(fr.contains(">ANNULÉ</text>"));
+    assert!(fr.contains(r#"aria-label="Flyer généré : Jam, Sam 01 Juin, Paris""#));
+
+    let compact = text(
+        &send(
+            &app,
+            get(&format!("/api/events/{id}/flyer.svg?compact=true"), None),
+        )
+        .await,
+    );
+    assert!(compact.contains(">CANCELLED</text>"));
+    assert!(
+        !compact.contains("BREAKINGJAM"),
+        "compact keeps date and art only"
+    );
+    assert!(compact.contains(r#"aria-hidden="true""#) && !compact.contains("role="));
+
+    let unknown = send(
+        &app,
+        get(&format!("/api/events/{id}/flyer.svg?lang=xx"), None),
+    )
+    .await;
+    assert_eq!(unknown.status, StatusCode::BAD_REQUEST);
+}
+
+#[sqlx::test]
+async fn og_image_is_a_1200_by_630_png(pool: PgPool) {
+    let app = app(pool);
+    let owner = sign_up(&app, "org@example.com").await;
+    let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
+    act(&app, &owner, &id, "publish").await;
+    let slug = send(&app, get(&format!("/api/events/{id}"), None))
+        .await
+        .json["slug"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    let png = send(&app, get(&format!("/api/events/{slug}/og.png"), None)).await;
+    assert_eq!(png.status, StatusCode::OK);
+    assert_eq!(png.headers["content-type"], "image/png");
+    assert_eq!(&png.bytes[..8], b"\x89PNG\r\n\x1a\n");
+    assert_eq!(
+        u32::from_be_bytes(png.bytes[16..20].try_into().unwrap()),
+        1200
+    );
+    assert_eq!(
+        u32::from_be_bytes(png.bytes[20..24].try_into().unwrap()),
+        630
+    );
+}

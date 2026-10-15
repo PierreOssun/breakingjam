@@ -53,10 +53,7 @@
     "displayName": "Verwende 1 bis 80 Zeichen."
   },
   "pages": {
-    "home": "BreakingJam",
     "map": "Jam finden",
-    "jam": "Jam",
-    "dancer": "Tänzer:in",
     "orgJams": "Deine Jams",
     "orgJamNew": "Jam eintragen",
     "orgJamEdit": "Jam bearbeiten",
@@ -69,5 +66,92 @@
   },
   "errors": {
     "generic": "Etwas ist schiefgelaufen. Lade die Seite neu, um es nochmal zu versuchen."
+  },
+  "landing": {
+    "overline": "Die Weltkarte der Breaking-Jams",
+    "title": "Jede Jam. Eine <pill>Karte.</pill>",
+    "pitch": "Der zentrale Ort für Breaking-Jams. Finde eine in deiner Nähe oder bring deine auf die Karte.",
+    "mapPreview": "Karte öffnen",
+    "organisers": {
+      "title": "Für Veranstalter",
+      "body": "Bring deine Jam dorthin, wo Tänzer:innen suchen.",
+      "step1Title": "Jam anlegen",
+      "step1Body": "Name, Daten und Ort. Sie bleibt ein Entwurf, bis du sie veröffentlichst.",
+      "step2Title": "Battles und Line-up",
+      "step2Body": "1v1s, Crews, Seven to Smoke und deine Judges, DJ und MC.",
+      "step3Title": "Veröffentlichen",
+      "step3Body": "Sie erscheint auf der Karte und auf der Seite jeder Tänzerin und jedes Tänzers."
+    }
+  },
+  "status": {
+    "draft": "Entwurf",
+    "published": "Veröffentlicht",
+    "registration_closed": "Anmeldung geschlossen",
+    "completed": "Abgeschlossen",
+    "cancelled": "Abgesagt"
+  },
+  "jam": {
+    "backToMap": "Karte",
+    "share": "Teilen",
+    "linkCopied": "Link kopiert",
+    "dates": "Daten",
+    "venue": "Ort",
+    "instagram": "Instagram",
+    "openInMaps": "In Karten öffnen",
+    "register": "Zum Battle anmelden",
+    "battles": "Battles",
+    "lineup": "Line-up",
+    "about": "Über die Jam",
+    "noBattles": "Noch keine Battles angekündigt.",
+    "noEntries": "Noch niemand angemeldet.",
+    "spotsLeft_one": "{{count}} Platz frei",
+    "spotsLeft_other": "{{count}} Plätze frei",
+    "full": "Voll",
+    "watch": "{{name}} ansehen",
+    "roles": {
+      "judge": "Judges",
+      "dj": "DJ",
+      "mc": "MC",
+      "organizer": "Gastgeber",
+      "other": "Team"
+    }
+  },
+  "dancer": {
+    "aka": "aka {{names}}",
+    "verified": "Verifiziert",
+    "upcoming": "Demnächst",
+    "past": "Vergangen",
+    "noUpcoming": "Keine kommenden Jams.",
+    "noPast": "Noch keine vergangenen Jams erfasst — Veranstalter tragen Ergebnisse nach der Jam ein.",
+    "showMore": "Mehr anzeigen ({{count}})",
+    "back": "Zurück",
+    "stats": {
+      "jams_one": "Jam",
+      "jams_other": "Jams",
+      "countries_one": "Land",
+      "countries_other": "Länder",
+      "years_one": "Jahr aktiv",
+      "years_other": "Jahre aktiv",
+      "podiums_one": "Podium",
+      "podiums_other": "Podien"
+    },
+    "roles": {
+      "judge": "Judge",
+      "dj": "DJ",
+      "mc": "MC",
+      "organizer": "Gastgeber",
+      "other": "Team"
+    }
+  },
+  "result": {
+    "rank1": "1.",
+    "rank2": "2.",
+    "rank3": "3.",
+    "top": "Top {{n}}",
+    "prelims": "Vorrunde"
+  },
+  "video": {
+    "close": "Video schließen",
+    "title": "Video: {{name}}"
   }
 }

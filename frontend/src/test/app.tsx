@@ -17,7 +17,8 @@ export function renderApp(path: string) {
   return router;
 }
 
-type Reply = { status: number; body?: unknown };
+/** A JSON `body`, or a raw `text` body (e.g. an SVG) with its content `type`. */
+type Reply = { status: number; body?: unknown; text?: string; type?: string };
 
 /** Stubs `fetch` with canned replies keyed by `"METHOD /path"`; anything else is a 404. */
 export function mockApi(replies: Record<string, Reply>) {
@@ -27,6 +28,12 @@ export function mockApi(replies: Record<string, Reply>) {
       status: 404,
       body: { error: { code: "not_found", message: key } },
     };
+    if (reply.text !== undefined) {
+      return new Response(reply.text, {
+        status: reply.status,
+        headers: { "content-type": reply.type ?? "text/plain" },
+      });
+    }
     const body = reply.body === undefined ? null : JSON.stringify(reply.body);
     return new Response(body, {
       status: reply.status,

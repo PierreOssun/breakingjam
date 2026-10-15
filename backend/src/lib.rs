@@ -6,6 +6,7 @@ pub mod config;
 pub mod db;
 pub mod domain;
 pub mod error;
+pub mod flyer;
 pub mod openapi;
 pub mod state;
 

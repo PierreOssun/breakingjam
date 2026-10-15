@@ -228,7 +228,7 @@ Base: `inline-flex items-center justify-center gap-2 rounded-full border-2 font-
   4. status badge
 - **Row card** (mobile lists, map side panel): `flex gap-3 p-3`. The flyer is `w-16 h-20` (or `w-20 h-[100px]` on the landing page), `rounded-md`, with the same text stack as the grid card and a `display-xs` title.
   - Selected row: `border-primary-text bg-surface-raised`, plus `aria-current="true"`.
-- **Missing flyer:** `bg-surface-raised` placeholder with a `.rings` pattern (§6) and the first letter of the jam name in `display-md text-muted`.
+- **No flyer image:** render the **generated flyer** (4.24) at the same size. There is no empty placeholder.
 
 ### 4.4 Map popup
 
@@ -448,6 +448,87 @@ One component that changes shape by viewport.
 - For an optional field the viewer could fill in, e.g. "Add Instagram": `inline-flex items-center gap-2 min-h-11 text-body-sm font-bold text-muted`, with a `Plus` icon and the label underlined by a `1.5px dashed border-strong`.
 - It opens the edit sheet focused on that field.
 - Show it only to logged-in users. Visitors see nothing in that spot.
+
+### 4.24 Generated flyer *(v0.1: jams have no image upload)*
+
+Every jam gets a 4:5 poster built from its own data, in the same pixel 2D-HD language as the dancer avatars. It's used wherever a flyer appears: the jam page hero, cards, popup and list thumbnails, and the share image. When uploads arrive, an uploaded image replaces it, and the generated one stays as the fallback and the OG image. See the "Generated flyer" artboard; `generated-flyer-reference.py` is a reference implementation that outputs SVG.
+
+- **Inputs:** name, date (weekday, day, month), start time, city, country code, categories. Nothing else.
+- **Rendering:** a single SVG with `viewBox="0 0 400 500"`, `preserveAspectRatio="xMidYMid slice"` and `shape-rendering="crispEdges"`. It scales to any size.
+  - Render it server-side (Rust: build the SVG string; `resvg` for PNG/OG).
+  - Text is real `<text>` in Unbounded and Manrope; embed the fonts when rasterising.
+  - Accessibility: `role="img"` with `aria-label="Generated flyer: <name>, <date>, <city>"`.
+- **Seed:** `h = sha1(jam.id)`.
+  - Palette = `["klein","violet","ink"][h % 3]`.
+  - Pose = `["handstand","toprock"][(h / 3) % 2]`.
+  - Stable forever, with no randomness at render time.
+- **Palettes** (theme-independent, the same in dark and light UI):
+
+| | bg | rings | text | sub | dancer | rim | shadow | floor |
+|---|---|---|---|---|---|---|---|---|
+| klein | `#002FA7` | `#1440BE` | `#FFFFFF` | `#C7D4FF` | `#0B0D14` | `#8FAAFF` | `#001C6B` | `#5F80E6` |
+| violet | `#6D3AF5` | `#7C4FFF` | `#FFFFFF` | `#E6DDFF` | `#0B0D14` | `#D6C7FF` | `#4818C6` | `#A88CFF` |
+| ink | `#0B0D14` | `#182038` | `#F3F5FA` | `#8FAAFF` | `#2F5BFF` | `#B9CAFF` | `#111833` | `#2A3A72` |
+
+- **Layers, back to front** (400×500 units):
+  1. Background fill.
+  2. **Pixel record rings:** 8-unit cells whose centre lies within 4 units of the radii 56, 96, 136, 176, 216 and 256 around (300, 170).
+  3. **Floor:** dashes 8×4 every 16 units at y = 270.
+  4. **Pixel dancer:** the 20×20 bitmap below at 8 units per cell, x = 196, standing on the floor.
+     - Shadow: the same bitmap offset by one cell, in `shadow`.
+     - Rim light: the right-most third of the last cell in each run, in `rim`.
+  5. **HD layer:**
+     - Radial glow at (25%, 20%): white from 16% to 0%.
+     - Bottom vignette from 55% down: black from 0% to 45%.
+  6. **Type:**
+     - Weekday in Manrope 800 16, tracking 2, colour `sub`, at (28, 54).
+     - Day in Unbounded 800 72 at (24, 124).
+     - Month in Unbounded 800 28 at (28, 160).
+     - Time in Manrope 700 15, `sub`, at (28, 188).
+     - "BREAKINGJAM" in Manrope 800 11, tracking 2, right-aligned at (372, 46).
+     - **Name:** Unbounded 800, line height 1.08, last baseline at y = 420.
+     - City and country in Manrope 800 17 at y = 452.
+     - Categories, uppercase, in Manrope 700 12, tracking 1.4, `sub`, at y = 478.
+- **Name fit:**
+  - Width 344. Assume an average glyph width of 0.8em for Unbounded.
+  - Try 46, then 40, then 34 px over at most 3 lines, then 28 and 24 px over at most 4 lines.
+  - The block must stay below the floor (at most 126 units from the first cap height to the last baseline).
+  - If the last line is ≤ 3 characters, pull the previous word down.
+  - Use an ellipsis only when 4 lines at 24 px still overflow.
+- **Compact** (any render ≤ 120px wide): rings, dancer, weekday, day and month only. No name, city or categories, and `aria-hidden` (the row next to it carries the text).
+- **Cancelled:** a band rotated −12° across the centre in `#D8354A`, with "CANCELLED" in Unbounded 800 30 white. Other statuses don't touch the flyer.
+- **Share image:** the same seed and layers in 1200×630.
+  - Text sits on the left: date line, name at 84 → 50 px over ≤ 3 lines, city, then categories + "BREAKINGJAM.COM".
+  - The dancer sits on the right at 16 units per cell.
+- **Pose bitmaps** (`X` = filled, rows top to bottom):
+
+```
+handstand            toprock
+..XX..........XX.... ........XX..........
+..XXX........XXX.... .......XXX..........
+...XXX......XXX..... .......XX...........
+....XXX....XXX...... ......XX....XXX.....
+.....XXX..XXX....... ......XX...XXXXX....
+......XXXXXX........ .......XX..XXXXX....
+.......XXXX......... .......XX..XXXXX....
+.......XXXX......... ........XX..XXX.....
+.......XXXX......... .........XXXXXX.....
+.......XXXX......... ........XXXXXXXXXX..
+.......XXXX......... ........XXXXXXX..XX.
+......XXXXXX........ ........XXXXXXX...XX
+.....XXXXXXXX....... .........XXXXX...XX.
+....XXX.XX.XXX...... .........XXXXX..XX..
+....XX.XXXX.XX...... .........XXXXX......
+...XX..XXXX..XX..... ........XXXXXXX.....
+...XX..XXXX..XX..... .......XXX...XXX....
+..XX....XX....XX.... ......XXX.....XXX...
+..XX..........XX.... .....XXX.......XX...
+.XXX..........XXX... ....XXX........XX...
+                     ...XXX.........XXX..
+                     ..XXXX.........XXXX.
+```
+
+- **On the jam page:** the flyer is the hero exactly as an uploaded flyer would be (mobile full-bleed 375×469; desktop left column, `rounded-lg`). The `<h1>` and fact rows stay below it, so the layout doesn't change when uploads ship.
 
 ---
 

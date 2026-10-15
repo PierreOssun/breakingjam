@@ -72,7 +72,10 @@ describe("LoginPage", () => {
 
     await fillAndSubmit("lilg@example.com", "correct horse");
     expect(
-      await screen.findByRole("heading", { name: "BreakingJam" }),
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Every jam. One map.",
+      }),
     ).toBeInTheDocument();
   });
 

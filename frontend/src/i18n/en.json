@@ -53,10 +53,7 @@
     "displayName": "Use 1 to 80 characters."
   },
   "pages": {
-    "home": "BreakingJam",
     "map": "Find a jam",
-    "jam": "Jam",
-    "dancer": "Dancer",
     "orgJams": "Your jams",
     "orgJamNew": "Register a jam",
     "orgJamEdit": "Edit jam",
@@ -69,5 +66,92 @@
   },
   "errors": {
     "generic": "Something went wrong. Reload the page to try again."
+  },
+  "landing": {
+    "overline": "The world map of breaking jams",
+    "title": "Every jam. One <pill>map.</pill>",
+    "pitch": "The central place for breaking jams. Find one near you, or put yours on the map.",
+    "mapPreview": "Open the map",
+    "organisers": {
+      "title": "For organisers",
+      "body": "Put your jam where dancers look for one.",
+      "step1Title": "Create your jam",
+      "step1Body": "Name, dates and place. It stays a draft until you publish it.",
+      "step2Title": "Add battles and lineup",
+      "step2Body": "1v1s, crews, seven-to-smoke, and your judges, DJ and MC.",
+      "step3Title": "Publish it",
+      "step3Body": "It goes on the map, and on the pages of every dancer in it."
+    }
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "registration_closed": "Registration closed",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "jam": {
+    "backToMap": "Map",
+    "share": "Share",
+    "linkCopied": "Link copied",
+    "dates": "Dates",
+    "venue": "Venue",
+    "instagram": "Instagram",
+    "openInMaps": "Open in maps",
+    "register": "Register to battle",
+    "battles": "Battles",
+    "lineup": "Lineup",
+    "about": "About",
+    "noBattles": "No battles announced yet.",
+    "noEntries": "No one has entered yet.",
+    "spotsLeft_one": "{{count}} spot left",
+    "spotsLeft_other": "{{count}} spots left",
+    "full": "Full",
+    "watch": "Watch {{name}}",
+    "roles": {
+      "judge": "Judges",
+      "dj": "DJ",
+      "mc": "MC",
+      "organizer": "Hosts",
+      "other": "Staff"
+    }
+  },
+  "dancer": {
+    "aka": "aka {{names}}",
+    "verified": "Verified",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "noUpcoming": "No upcoming jams.",
+    "noPast": "No past jams on record yet — organisers add results after the jam.",
+    "showMore": "Show more ({{count}})",
+    "back": "Back",
+    "stats": {
+      "jams_one": "jam",
+      "jams_other": "jams",
+      "countries_one": "country",
+      "countries_other": "countries",
+      "years_one": "year active",
+      "years_other": "years active",
+      "podiums_one": "podium",
+      "podiums_other": "podiums"
+    },
+    "roles": {
+      "judge": "Judge",
+      "dj": "DJ",
+      "mc": "MC",
+      "organizer": "Host",
+      "other": "Staff"
+    }
+  },
+  "result": {
+    "rank1": "1st",
+    "rank2": "2nd",
+    "rank3": "3rd",
+    "top": "Top {{n}}",
+    "prelims": "Prelims"
+  },
+  "video": {
+    "close": "Close video",
+    "title": "Video: {{name}}"
   }
 }
