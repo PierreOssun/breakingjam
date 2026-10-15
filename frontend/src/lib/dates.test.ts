@@ -1,4 +1,9 @@
-import { dayAndMonth, formatDateRange, yearOf } from "./dates";
+import {
+  dayAndMonth,
+  formatDateRange,
+  formatShortDateRange,
+  yearOf,
+} from "./dates";
 
 describe("dates", () => {
   // Punctuation varies with the ICU version, so match the parts that carry meaning.
@@ -14,6 +19,18 @@ describe("dates", () => {
     );
     expect(formatDateRange("2026-11-14", "2026-11-14", "de")).toMatch(
       /^Samstag, 14\. November 2026$/,
+    );
+  });
+
+  it("has a short form for labels", () => {
+    expect(formatShortDateRange("2026-11-14", "2026-11-14", "en")).toMatch(
+      /^Sat,? 14 Nov$/,
+    );
+    expect(formatShortDateRange("2026-11-14", "2026-11-15", "en")).toMatch(
+      /^Sat,? 14.+Sun,? 15 Nov$/,
+    );
+    expect(formatShortDateRange("2026-11-14", "2026-11-14", "fr")).toMatch(
+      /^sam\. 14 nov\.$/,
     );
   });
 

@@ -27,6 +27,28 @@ pub async fn list(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<Battle>> {
     .await
 }
 
+/// The battles of several jams by jam, each jam's in display order.
+pub async fn of_events(
+    pool: &PgPool,
+    event_ids: &[Uuid],
+) -> sqlx::Result<HashMap<Uuid, Vec<Battle>>> {
+    let battles = sqlx::query_as!(
+        Battle,
+        r#"select id, event_id, name, format as "format: BattleFormat", team_size,
+                  gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
+                  bracket_size, max_entries, position, created_at, updated_at
+           from battles where event_id = any($1) order by event_id, position, id"#,
+        event_ids,
+    )
+    .fetch_all(pool)
+    .await?;
+    let mut by_event = HashMap::<Uuid, Vec<Battle>>::new();
+    for battle in battles {
+        by_event.entry(battle.event_id).or_default().push(battle);
+    }
+    Ok(by_event)
+}
+
 /// One battle.
 pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Battle>> {
     sqlx::query_as!(

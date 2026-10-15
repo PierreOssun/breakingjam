@@ -153,5 +153,45 @@
   "video": {
     "close": "Fermer la vidéo",
     "title": "Vidéo : {{name}}"
+  },
+  "map": {
+    "search": "Rechercher des jams",
+    "searchPlaceholder": "Jam, ville ou pays",
+    "filters": "Filtres",
+    "filtersOn_one": "Filtres, {{count}} actif",
+    "filtersOn_other": "Filtres, {{count}} actifs",
+    "when": "Quand",
+    "battles": "Battles",
+    "weekend": "Ce week-end",
+    "month": "30 prochains jours",
+    "categories": {
+      "one_v_one": "1v1",
+      "two_v_two": "2v2",
+      "crew": "Crews",
+      "seven_to_smoke": "7 to smoke",
+      "bgirl": "Bgirl",
+      "kids": "Kids"
+    },
+    "clear": "Effacer",
+    "clearFilters": "Effacer les filtres",
+    "showJams_one": "Voir {{count}} jam",
+    "showJams_other": "Voir {{count}} jams",
+    "inArea_one": "{{count}} jam dans cette zone",
+    "inArea_other": "{{count}} jams dans cette zone",
+    "emptyTitle": "Pas encore de jam ici",
+    "emptyBody": "Dézoomez ou effacez vos filtres. Vous en organisez une ? Mettez-la sur la carte.",
+    "list": "Liste",
+    "backToMap": "Carte",
+    "locate": "Afficher ma position",
+    "locateError": "Impossible d’obtenir votre position.",
+    "you": "Votre position",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "close": "Fermer",
+    "dismiss": "Fermer",
+    "viewJam": "Voir la jam",
+    "cluster_one": "{{count}} jam ici, zoomer",
+    "cluster_other": "{{count}} jams ici, zoomer",
+    "loadError": "Les jams n’ont pas pu être chargées. Rechargez la page pour réessayer."
   }
 }

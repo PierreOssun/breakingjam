@@ -21,8 +21,11 @@ use super::{
 };
 use crate::{
     auth::session::{CurrentUser, MaybeUser},
-    db,
-    domain::event::{Event, EventFields, EventStatus, Transition, can_write},
+    db::{self, events::MapPoint},
+    domain::{
+        battle::{Battle, Category},
+        event::{Event, EventFields, EventStatus, Transition, can_write},
+    },
     error::{AppError, ErrorEnvelope},
     flyer::{self, FlyerOptions, FlyerText, Lang},
     state::AppState,
@@ -138,10 +141,18 @@ pub struct MapJam {
     pub slug: String,
     /// First day.
     pub starts_on: NaiveDate,
+    /// Last day.
+    pub ends_on: NaiveDate,
+    /// `published` or `registration_closed`.
+    pub status: EventStatus,
     /// City.
     pub city: String,
     /// ISO 3166-1 alpha-2.
     pub country: String,
+    /// Battle names in display order: the popup's category line.
+    pub battles: Vec<String>,
+    /// What the map's category chips match, from all battles, without repeats.
+    pub categories: Vec<Category>,
 }
 
 /// List public jams, or your own with `mine=true`.
@@ -193,28 +204,45 @@ async fn list(
 )]
 async fn geojson(State(state): State<AppState>) -> Result<Json<FeatureCollection>, AppError> {
     let points = db::events::map_points(&state.pool).await?;
+    let ids: Vec<Uuid> = points.iter().map(|p| p.id).collect();
+    let mut battles = db::battles::of_events(&state.pool, &ids).await?;
     let features = points
         .into_iter()
-        .map(|p| Feature {
-            kind: "Feature",
-            geometry: Point {
-                kind: "Point",
-                coordinates: [p.lng, p.lat],
-            },
-            properties: MapJam {
-                id: p.id,
-                name: p.name,
-                slug: p.slug,
-                starts_on: p.starts_on,
-                city: p.city,
-                country: p.country,
-            },
+        .map(|p| {
+            let battles = battles.remove(&p.id).unwrap_or_default();
+            feature(p, battles)
         })
         .collect();
     Ok(Json(FeatureCollection {
         kind: "FeatureCollection",
         features,
     }))
+}
+
+/// A map point with its battles as one GeoJSON feature.
+fn feature(p: MapPoint, battles: Vec<Battle>) -> Feature {
+    let mut categories: Vec<Category> = battles.iter().flat_map(Battle::categories).collect();
+    categories.sort();
+    categories.dedup();
+    Feature {
+        kind: "Feature",
+        geometry: Point {
+            kind: "Point",
+            coordinates: [p.lng, p.lat],
+        },
+        properties: MapJam {
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
+            starts_on: p.starts_on,
+            ends_on: p.ends_on,
+            status: p.status,
+            city: p.city,
+            country: p.country,
+            battles: battles.into_iter().map(|b| b.name).collect(),
+            categories,
+        },
+    }
 }
 
 /// One jam, by id or slug.

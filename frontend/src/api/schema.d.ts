@@ -720,6 +720,11 @@ export interface components {
          * @enum {string}
          */
         BracketStage: "prelims" | "top64" | "top32" | "top16" | "top8" | "top4" | "top2" | "winner" | "na";
+        /**
+         * @description What the map's category chips filter on, derived from a battle's structured fields.
+         * @enum {string}
+         */
+        Category: "one_v_one" | "two_v_two" | "crew" | "seven_to_smoke" | "bgirl" | "kids";
         /** @description A claim as its author sees it. */
         Claim: {
             /**
@@ -1257,10 +1262,21 @@ export interface components {
              * @description First day.
              */
             starts_on: string;
+            /**
+             * Format: date
+             * @description Last day.
+             */
+            ends_on: string;
+            /** @description `published` or `registration_closed`. */
+            status: components["schemas"]["EventStatus"];
             /** @description City. */
             city: string;
             /** @description ISO 3166-1 alpha-2. */
             country: string;
+            /** @description Battle names in display order: the popup's category line. */
+            battles: string[];
+            /** @description What the map's category chips match, from all battles, without repeats. */
+            categories: components["schemas"]["Category"][];
         };
         /** @description A current member as shown on a crew. */
         Member: {

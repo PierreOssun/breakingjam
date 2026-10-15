@@ -1,0 +1,471 @@
+import {
+  Crosshair,
+  ListBullets,
+  MapPin,
+  SlidersHorizontal,
+  WarningCircle,
+  X,
+} from "@phosphor-icons/react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from "../components/Button";
+import { FilterChips } from "../features/map/FilterChips";
+import { FilterSheet } from "../features/map/FilterSheet";
+import { JamPopup, JamSheet } from "../features/map/JamCard";
+import { type Camera, JamMap } from "../features/map/JamMap";
+import {
+  type Bounds,
+  boundsOf,
+  distanceKm,
+  type Filters,
+  inBounds,
+  isFiltered,
+  type MapJam,
+  matchesFilters,
+  matchesSearch,
+  NO_FILTERS,
+} from "../features/map/jams";
+import { MapEmpty } from "../features/map/MapEmpty";
+import { useMapJams } from "../features/map/queries";
+import { RowCard } from "../features/map/RowCard";
+import { SearchForm } from "../features/map/SearchForm";
+import { useMediaQuery } from "../lib/useMediaQuery";
+
+type LngLat = { lng: number; lat: number };
+type Selection = { id: string; trigger: HTMLElement | null };
+
+/** The jams that pass the filters and a search, judged from today. */
+function narrow(
+  jams: MapJam[],
+  filters: Filters,
+  search: string,
+  language: string,
+): MapJam[] {
+  const today = new Date();
+  return jams.filter(
+    (jam) =>
+      matchesFilters(jam, filters, today) &&
+      matchesSearch(jam, search, language),
+  );
+}
+
+/**
+ * A callback ref and the rendered height of its element, kept live as the element comes,
+ * changes size or goes; 0 where ResizeObserver is missing.
+ */
+function useHeight(): [(element: HTMLElement | null) => void, number] {
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => setHeight(element.offsetHeight));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [element]);
+  return [setElement, height];
+}
+
+/**
+ * `/map`: every upcoming jam on a world map, narrowed by time, battle category and a search
+ * on name, city or country (DESIGN.md §5, §6). ≥ lg a side panel lists the jams in view;
+ * below, the map is full-bleed with a list view one tap away.
+ */
+export function MapPage() {
+  const { t, i18n } = useTranslation();
+  const wide = useMediaQuery("(min-width: 1024px)");
+  const jams = useMapJams();
+  const all = jams.data;
+
+  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  const [query, setQuery] = useState("");
+  const [search, setSearch] = useState("");
+  const [bounds, setBounds] = useState<Bounds | null>(null);
+  const [selection, setSelection] = useState<Selection | null>(null);
+  const [camera, setCamera] = useState<Camera | null>(null);
+  const [userLocation, setUserLocation] = useState<LngLat | null>(null);
+  const [locateFailed, setLocateFailed] = useState(false);
+  const [listOpen, setListOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const matching = useMemo(
+    () => narrow(all ?? [], filters, search, i18n.language),
+    [all, filters, search, i18n.language],
+  );
+  const inView = bounds
+    ? matching.filter((jam) => inBounds(jam, bounds))
+    : matching;
+  const narrowed = isFiltered(filters) || search !== "";
+  const selected = selection
+    ? (matching.find((jam) => jam.id === selection.id) ?? null)
+    : null;
+  // A jam the filters or search hide is no longer selected: it must not pop back later.
+  useEffect(() => {
+    if (selection && !selected) setSelection(null);
+  }, [selection, selected]);
+
+  // The first view shows every jam; later loads (refetches) leave the camera alone.
+  const framed = useRef(false);
+  useEffect(() => {
+    if (framed.current || !all) return;
+    framed.current = true;
+    const box = boundsOf(all);
+    if (box)
+      setCamera({ kind: "fit", bounds: box, maxZoom: 10, animate: false });
+  }, [all]);
+
+  const select = useCallback((jam: MapJam, trigger: HTMLElement | null) => {
+    setSelection({ id: jam.id, trigger });
+  }, []);
+  const close = useCallback(() => {
+    // §4.4: focus goes back to the marker or row that opened it.
+    const trigger = selection?.trigger;
+    setSelection(null);
+    if (trigger?.isConnected) trigger.focus();
+  }, [selection]);
+
+  useEffect(() => {
+    if (!selection || filtersOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [selection, filtersOpen, close]);
+
+  // Keep the selected row of the side panel in view.
+  useEffect(() => {
+    if (!wide || !selection) return;
+    document
+      .querySelector(`[data-row="${CSS.escape(selection.id)}"]`)
+      ?.scrollIntoView?.({ block: "nearest" });
+  }, [wide, selection]);
+
+  function changeQuery(value: string) {
+    setQuery(value);
+    // Emptying the field brings every jam back without another Enter.
+    if (value.trim() === "") setSearch("");
+  }
+
+  function submitSearch() {
+    const value = query.trim();
+    setSearch(value);
+    setListOpen(false);
+    if (!wide && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur(); // closes the phone keyboard
+    }
+    if (!value) return;
+    const found = narrow(all ?? [], filters, value, i18n.language);
+    const box = boundsOf(found);
+    if (box)
+      setCamera({ kind: "fit", bounds: box, maxZoom: 13, animate: true });
+    // One match is the jam they were looking for: open it.
+    const [only] = found;
+    setSelection(
+      found.length === 1 && only ? { id: only.id, trigger: null } : null,
+    );
+  }
+
+  function clearAll() {
+    setFilters(NO_FILTERS);
+    setQuery("");
+    setSearch("");
+  }
+
+  function locate() {
+    if (!navigator.geolocation) {
+      setLocateFailed(true);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const here = { lng: coords.longitude, lat: coords.latitude };
+        setLocateFailed(false);
+        setUserLocation(here);
+        setCamera({ kind: "center", ...here, zoom: 10 });
+      },
+      () => setLocateFailed(true),
+      { timeout: 10_000, maximumAge: 5 * 60_000 },
+    );
+  }
+
+  const [top, topHeight] = useHeight();
+  const [bottom, bottomHeight] = useHeight();
+
+  const count = (
+    <p role="status" className="text-body-sm text-muted">
+      {all && t("map.inArea", { count: inView.length })}
+    </p>
+  );
+  const loadError = jams.isError && (
+    <p role="alert" className="text-body-sm text-danger">
+      {t("map.loadError")}
+    </p>
+  );
+  const map = (
+    <JamMap
+      jams={matching}
+      selected={selected}
+      onSelect={select}
+      onClear={() => setSelection(null)}
+      onBoundsChange={setBounds}
+      camera={camera}
+      insets={
+        wide
+          ? { top: 0, right: 60, bottom: 20, left: 0 }
+          : { top: topHeight, right: 0, bottom: bottomHeight, left: 0 }
+      }
+      popup={
+        wide && selected ? (
+          <JamPopup jam={selected} onClose={close} />
+        ) : undefined
+      }
+      userLocation={userLocation}
+      onLocate={wide ? locate : undefined}
+    />
+  );
+  const failure = locateFailed && (
+    <LocateFailed onDismiss={() => setLocateFailed(false)} />
+  );
+
+  if (wide) {
+    return (
+      <div className="absolute inset-0 flex">
+        <title>{`${t("pages.map")} · BreakingJam`}</title>
+        <h1 className="sr-only">{t("pages.map")}</h1>
+        <aside className="flex w-[400px] shrink-0 flex-col overflow-y-auto border-r border-border">
+          <div className="flex flex-col gap-4 p-4">
+            <SearchForm
+              value={query}
+              onChange={changeQuery}
+              onSubmit={submitSearch}
+            />
+            <FilterChips
+              filters={filters}
+              onChange={setFilters}
+              variant="panel"
+            />
+            {count}
+            {loadError}
+          </div>
+          {all && inView.length === 0 ? (
+            <MapEmpty onClear={narrowed ? clearAll : null} />
+          ) : (
+            <ul className="flex flex-col gap-3 px-4 pb-4">
+              {inView.map((jam) => (
+                <li key={jam.id}>
+                  <RowCard
+                    jam={jam}
+                    selected={jam.id === selected?.id}
+                    onSelect={select}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </aside>
+        <div className="relative flex-1">{map}</div>
+        {failure}
+      </div>
+    );
+  }
+
+  const distance =
+    selected && userLocation ? distanceKm(userLocation, selected) : null;
+  const emptyHere = narrowed && all !== undefined && inView.length === 0;
+  const sheetUp = selected !== null || emptyHere;
+  return (
+    <div className="absolute inset-0">
+      <title>{`${t("pages.map")} · BreakingJam`}</title>
+      <h1 className="sr-only">{t("pages.map")}</h1>
+      <div inert={listOpen} className="absolute inset-0">
+        {map}
+      </div>
+
+      <div
+        ref={top}
+        className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2 pt-3"
+      >
+        <div className="pointer-events-auto flex gap-2 px-4">
+          <SearchForm
+            value={query}
+            onChange={changeQuery}
+            onSubmit={submitSearch}
+            floating
+          />
+          <FilterButton
+            active={(filters.when ? 1 : 0) + filters.categories.length}
+            onClick={() => setFiltersOpen(true)}
+          />
+        </div>
+        <div className="pointer-events-auto">
+          <FilterChips filters={filters} onChange={setFilters} variant="map" />
+        </div>
+      </div>
+
+      {listOpen ? (
+        <>
+          <div
+            className="absolute inset-0 z-20 flex flex-col gap-3 overflow-y-auto bg-bg px-4 pb-24"
+            style={{ paddingTop: topHeight + 8 }}
+          >
+            {count}
+            {loadError}
+            {all && inView.length === 0 ? (
+              <MapEmpty onClear={narrowed ? clearAll : null} />
+            ) : (
+              <ul className="flex flex-col gap-3">
+                {inView.map((jam) => (
+                  <li key={jam.id}>
+                    <RowCard jam={jam} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="absolute inset-x-0 bottom-4 z-30 flex justify-center">
+            <Pill onClick={() => setListOpen(false)}>
+              <MapPin size={16} weight="bold" aria-hidden />
+              {t("map.backToMap")}
+            </Pill>
+          </div>
+        </>
+      ) : (
+        <div
+          ref={bottom}
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col"
+        >
+          {loadError && (
+            <div className="pointer-events-auto mx-4 mb-3 rounded-lg border border-border-strong bg-surface-raised p-3 shadow-lg">
+              {loadError}
+            </div>
+          )}
+          {/* 16px above the sheet; with none, clear of the attribution under the locate pill. */}
+          <div
+            className={`flex items-end justify-between px-4 ${sheetUp ? "pb-4" : "pb-8"}`}
+          >
+            <Pill
+              onClick={() => {
+                setSelection(null);
+                setListOpen(true);
+              }}
+            >
+              <ListBullets size={16} weight="bold" aria-hidden />
+              {t("map.list")}
+            </Pill>
+            <button
+              type="button"
+              aria-label={t("map.locate")}
+              onClick={locate}
+              className="pointer-events-auto grid size-11 cursor-pointer place-items-center rounded-full border border-border-strong bg-surface-raised text-text shadow-md transition-colors duration-fast hover:bg-surface"
+            >
+              <Crosshair size={20} weight="bold" aria-hidden />
+            </button>
+          </div>
+          <div className="pointer-events-auto">
+            {selected ? (
+              <JamSheet jam={selected} onClose={close} distance={distance} />
+            ) : (
+              emptyHere && (
+                <div className="rounded-t-xl border-t border-border-strong bg-surface-raised shadow-lg">
+                  <MapEmpty onClear={clearAll} />
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      )}
+
+      <FilterSheet
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        filters={filters}
+        onChange={setFilters}
+        count={inView.length}
+      />
+      {failure}
+    </div>
+  );
+}
+
+/** A floating pill over the map: List, and Map to come back (DESIGN.md §5). */
+function Pill({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="pointer-events-auto inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border-2 border-text bg-bg px-[18px] text-body-sm font-bold text-text shadow-md transition-colors duration-fast hover:bg-text hover:text-bg"
+    >
+      {children}
+    </button>
+  );
+}
+
+/** Opens the filter sheet; a dot says filters are on, the name says how many. */
+function FilterButton({
+  active,
+  onClick,
+}: {
+  active: number;
+  onClick: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <button
+      type="button"
+      aria-haspopup="dialog"
+      aria-label={
+        active > 0 ? t("map.filtersOn", { count: active }) : t("map.filters")
+      }
+      onClick={onClick}
+      className="relative grid size-12 shrink-0 cursor-pointer place-items-center rounded-full border border-border-strong bg-surface text-text shadow-sm transition-colors duration-fast hover:bg-surface-raised"
+    >
+      <SlidersHorizontal size={20} weight="bold" aria-hidden />
+      {active > 0 && (
+        <span
+          aria-hidden
+          className="absolute top-2.5 right-2.5 size-2.5 rounded-full border-2 border-surface bg-accent"
+        />
+      )}
+    </button>
+  );
+}
+
+/** §4.8 error toast: stays until dismissed. */
+function LocateFailed({ onDismiss }: { onDismiss: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <div
+      role="alert"
+      className="fixed inset-x-4 bottom-4 z-50 flex items-center gap-3 rounded-lg border border-border-strong bg-surface-raised py-3 pr-2 pl-4 shadow-lg lg:inset-x-auto lg:right-6 lg:bottom-6 lg:w-[400px]"
+    >
+      <WarningCircle
+        size={22}
+        weight="bold"
+        aria-hidden
+        className="shrink-0 text-danger"
+      />
+      <p className="flex-1 text-body-sm font-bold">{t("map.locateError")}</p>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={t("map.dismiss")}
+        onClick={onDismiss}
+      >
+        <X size={20} weight="bold" aria-hidden />
+      </Button>
+    </div>
+  );
+}

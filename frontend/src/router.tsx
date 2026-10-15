@@ -6,7 +6,7 @@ import { LandingPage } from "./routes/LandingPage";
 import { NotFoundPage } from "./routes/NotFoundPage";
 
 /**
- * Every page of v0.1 (§6 Routing); `ComingSoon` marks the ones built in M11–M12.
+ * Every page of v0.1 (§6 Routing); `ComingSoon` marks the ones built in M12.
  * Form pages load on demand, so zod and react-hook-form stay out of the first download.
  */
 export const routes: RouteObject[] = [
@@ -59,6 +59,15 @@ export const routes: RouteObject[] = [
   },
   {
     element: <AppLayout />,
-    children: [{ path: "/map", element: <ComingSoon title="pages.map" /> }],
+    // MapLibre is the largest dependency; only this page loads it.
+    HydrateFallback: () => null,
+    children: [
+      {
+        path: "/map",
+        lazy: async () => ({
+          Component: (await import("./routes/MapPage")).MapPage,
+        }),
+      },
+    ],
   },
 ];

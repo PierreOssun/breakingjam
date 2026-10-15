@@ -122,6 +122,42 @@ pub struct Battle {
     pub updated_at: DateTime<Utc>,
 }
 
+/// What the map's category chips filter on, derived from a battle's structured fields.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, utoipa::ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Category {
+    /// Team battle of one: 1v1.
+    OneVOne,
+    /// Team battle of two: 2v2.
+    TwoVTwo,
+    /// Team battle of three or more.
+    Crew,
+    SevenToSmoke,
+    Bgirl,
+    Kids,
+}
+
+impl Battle {
+    /// The categories this battle counts for; a 1v1 Bgirl Kids battle is all three.
+    pub fn categories(&self) -> Vec<Category> {
+        let mut categories = Vec::new();
+        match (self.format, self.team_size) {
+            (BattleFormat::Team, Some(1)) => categories.push(Category::OneVOne),
+            (BattleFormat::Team, Some(2)) => categories.push(Category::TwoVTwo),
+            (BattleFormat::Team, Some(_)) => categories.push(Category::Crew),
+            (BattleFormat::SevenToSmoke, _) => categories.push(Category::SevenToSmoke),
+            _ => {}
+        }
+        if self.gender == BattleGender::Bgirl {
+            categories.push(Category::Bgirl);
+        }
+        if self.age == BattleAge::Kids {
+            categories.push(Category::Kids);
+        }
+        categories
+    }
+}
+
 /// Everything set when creating or editing a battle.
 #[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 #[validate(
@@ -493,6 +529,24 @@ mod tests {
             video_url: None,
             video_offset_seconds: None,
         }
+    }
+
+    #[test]
+    fn categories_come_from_the_structured_fields() {
+        let mut b = battle(BattleFormat::Team, Some(1));
+        assert_eq!(b.categories(), [Category::OneVOne]);
+        b.team_size = Some(2);
+        assert_eq!(b.categories(), [Category::TwoVTwo]);
+        b.team_size = Some(5);
+        b.gender = BattleGender::Bgirl;
+        b.age = BattleAge::Kids;
+        assert_eq!(
+            b.categories(),
+            [Category::Crew, Category::Bgirl, Category::Kids]
+        );
+        let smoke = battle(BattleFormat::SevenToSmoke, None);
+        assert_eq!(smoke.categories(), [Category::SevenToSmoke]);
+        assert!(battle(BattleFormat::Na, None).categories().is_empty());
     }
 
     #[test]

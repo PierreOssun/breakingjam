@@ -18,22 +18,59 @@ export function calendarDate(iso: string): Date {
   return new Date(Date.UTC(year, month - 1, day));
 }
 
+const STYLES = {
+  long: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
+  short: { weekday: "short", day: "numeric", month: "short" },
+} satisfies Record<string, Intl.DateTimeFormatOptions>;
+
+const formatters = new Map<string, Intl.DateTimeFormat>();
+
+/** The formatter of a style and language, built once: creating one is the slow part of Intl. */
+function formatter(
+  style: keyof typeof STYLES,
+  language: string,
+): Intl.DateTimeFormat {
+  const locale = localeOf(language);
+  const key = `${style}:${locale}`;
+  let format = formatters.get(key);
+  if (!format) {
+    format = new Intl.DateTimeFormat(locale, {
+      ...STYLES[style],
+      timeZone: "UTC",
+    });
+    formatters.set(key, format);
+  }
+  return format;
+}
+
+function range(
+  style: keyof typeof STYLES,
+  startsOn: string,
+  endsOn: string,
+  language: string,
+): string {
+  const format = formatter(style, language);
+  return startsOn === endsOn
+    ? format.format(calendarDate(startsOn))
+    : format.formatRange(calendarDate(startsOn), calendarDate(endsOn));
+}
+
 /** "Saturday 14 November 2026", or a range when the jam lasts several days. */
 export function formatDateRange(
   startsOn: string,
   endsOn: string,
   language: string,
 ): string {
-  const format = new Intl.DateTimeFormat(localeOf(language), {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-  return startsOn === endsOn
-    ? format.format(calendarDate(startsOn))
-    : format.formatRange(calendarDate(startsOn), calendarDate(endsOn));
+  return range("long", startsOn, endsOn, language);
+}
+
+/** "Sat 14 Nov", or "Sat 14 – Sun 15 Nov": the date label of cards and popups. */
+export function formatShortDateRange(
+  startsOn: string,
+  endsOn: string,
+  language: string,
+): string {
+  return range("short", startsOn, endsOn, language);
 }
 
 /** Day of the month and short month without dots, for date blocks: `{ day: "14", month: "Nov" }`. */

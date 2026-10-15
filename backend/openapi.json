@@ -3387,6 +3387,18 @@
           "na"
         ]
       },
+      "Category": {
+        "type": "string",
+        "description": "What the map's category chips filter on, derived from a battle's structured fields.",
+        "enum": [
+          "one_v_one",
+          "two_v_two",
+          "crew",
+          "seven_to_smoke",
+          "bgirl",
+          "kids"
+        ]
+      },
       "Claim": {
         "type": "object",
         "description": "A claim as its author sees it.",
@@ -4592,8 +4604,12 @@
           "name",
           "slug",
           "starts_on",
+          "ends_on",
+          "status",
           "city",
-          "country"
+          "country",
+          "battles",
+          "categories"
         ],
         "properties": {
           "id": {
@@ -4614,6 +4630,15 @@
             "format": "date",
             "description": "First day."
           },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "description": "Last day."
+          },
+          "status": {
+            "$ref": "#/components/schemas/EventStatus",
+            "description": "`published` or `registration_closed`."
+          },
           "city": {
             "type": "string",
             "description": "City."
@@ -4621,6 +4646,20 @@
           "country": {
             "type": "string",
             "description": "ISO 3166-1 alpha-2."
+          },
+          "battles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Battle names in display order: the popup's category line."
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Category"
+            },
+            "description": "What the map's category chips match, from all battles, without repeats."
           }
         }
       },

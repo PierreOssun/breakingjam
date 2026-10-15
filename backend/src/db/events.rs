@@ -38,6 +38,10 @@ pub struct MapPoint {
     pub slug: String,
     /// First day.
     pub starts_on: NaiveDate,
+    /// Last day.
+    pub ends_on: NaiveDate,
+    /// `published` or `registration_closed`.
+    pub status: EventStatus,
     /// City.
     pub city: String,
     /// ISO 3166-1 alpha-2.
@@ -172,7 +176,8 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
 pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
     sqlx::query_as!(
         MapPoint,
-        r#"select id, name, slug, starts_on, city, country, lat as "lat!", lng as "lng!"
+        r#"select id, name, slug, starts_on, ends_on, status as "status: EventStatus", city,
+                  country, lat as "lat!", lng as "lng!"
            from events
            where deleted_at is null and status in ('published', 'registration_closed')
              and lat is not null and lng is not null

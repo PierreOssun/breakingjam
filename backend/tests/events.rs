@@ -445,3 +445,37 @@ async fn og_image_is_a_1200_by_630_png(pool: PgPool) {
         630
     );
 }
+
+#[sqlx::test]
+async fn geojson_carries_what_the_popup_and_filters_need(pool: PgPool) {
+    let app = app(pool);
+    let owner = sign_up(&app, "org@example.com").await;
+    let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
+    let battles = [
+        json!({ "format": "team", "team_size": 1, "gender": "bgirl", "age": "adult", "age_min": 18 }),
+        json!({ "format": "team", "team_size": 5, "gender": "mixed", "age": "adult", "age_min": 18 }),
+        json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "kids", "age_min": 8, "age_max": 17 }),
+    ];
+    for battle in battles {
+        send(
+            &app,
+            post(&format!("/api/events/{id}/battles"), battle, Some(&owner)),
+        )
+        .await;
+    }
+    act(&app, &owner, &id, "publish").await;
+
+    let response = send(&app, get("/api/events.geojson", None)).await;
+    let properties = &response.json["features"][0]["properties"];
+    assert_eq!(properties["ends_on"], "2030-06-02");
+    assert_eq!(properties["status"], "published");
+    assert_eq!(
+        properties["battles"],
+        json!(["1v1 Bgirl", "5v5 Mixed", "1v1 Bboy Kids"])
+    );
+    // Each category once, in a stable order, whichever battles it came from.
+    assert_eq!(
+        properties["categories"],
+        json!(["one_v_one", "crew", "bgirl", "kids"])
+    );
+}

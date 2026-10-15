@@ -30,6 +30,8 @@
   --color-success: #2fd67f;
   --color-focus: #b49bff;
   --color-scrim: rgb(5 6 10 / 0.72);
+  /* §7: the 2px ring around a map marker */
+  --color-marker-ring: #f3f5fa;
 
   /* §3 typography */
   --font-display:
@@ -145,6 +147,7 @@
     --color-success: #0f6e3b;
     --color-focus: #6d3af5;
     --color-scrim: rgb(11 13 20 / 0.45);
+    --color-marker-ring: #ffffff;
     --shadow-a: 0.14;
     color-scheme: light;
   }
@@ -169,6 +172,7 @@
       --color-success: #0f6e3b;
       --color-focus: #6d3af5;
       --color-scrim: rgb(11 13 20 / 0.45);
+      --color-marker-ring: #ffffff;
       --shadow-a: 0.14;
       color-scheme: light;
     }
@@ -199,4 +203,17 @@
     transparent 0 27px,
     color-mix(in srgb, var(--color-primary-text) 16%, transparent) 27px 28px
   );
+}
+
+/* MapLibre's attribution (§6 Map: always visible, bottom-right), in the page's colours. */
+.maplibregl-ctrl.maplibregl-ctrl-attrib {
+  background-color: color-mix(in srgb, var(--color-bg) 80%, transparent);
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--color-muted);
 }

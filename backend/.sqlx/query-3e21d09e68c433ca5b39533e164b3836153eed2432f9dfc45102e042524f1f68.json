@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, name, slug, starts_on, city, country, lat as \"lat!\", lng as \"lng!\"\n           from events\n           where deleted_at is null and status in ('published', 'registration_closed')\n             and lat is not null and lng is not null\n           order by starts_on, id",
+  "query": "select id, name, slug, starts_on, ends_on, status as \"status: EventStatus\", city,\n                  country, lat as \"lat!\", lng as \"lng!\"\n           from events\n           where deleted_at is null and status in ('published', 'registration_closed')\n             and lat is not null and lng is not null\n           order by starts_on, id",
   "describe": {
     "columns": [
       {
@@ -49,6 +49,41 @@
       },
       {
         "ordinal": 4,
+        "name": "ends_on",
+        "type_info": "Date",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "ends_on"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "status: EventStatus",
+        "type_info": {
+          "Custom": {
+            "name": "event_status",
+            "kind": {
+              "Enum": [
+                "draft",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
         "name": "city",
         "type_info": "Text",
         "origin": {
@@ -59,7 +94,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 7,
         "name": "country",
         "type_info": "Bpchar",
         "origin": {
@@ -70,7 +105,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 8,
         "name": "lat!",
         "type_info": "Float8",
         "origin": {
@@ -81,7 +116,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 9,
         "name": "lng!",
         "type_info": "Float8",
         "origin": {
@@ -102,9 +137,11 @@
       false,
       false,
       false,
+      false,
+      false,
       true,
       true
     ]
   },
-  "hash": "8a4b8f0b5102b88522c81a74d300b0fc4d9ac9a98cddab1188a57b89a643a221"
+  "hash": "3e21d09e68c433ca5b39533e164b3836153eed2432f9dfc45102e042524f1f68"
 }
