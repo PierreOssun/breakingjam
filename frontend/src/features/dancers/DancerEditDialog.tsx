@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLayoutEffect, useId, useMemo } from "react";
+import { useLayoutEffect, useId, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -20,10 +20,11 @@ import { countryOptions } from "../../lib/countries";
 import { toHandle } from "../../lib/instagram";
 import {
   type AvatarParts,
+  DETAILS,
   formatParts,
+  hasDetail,
   PARTS,
   partsOf,
-  seededParts,
 } from "./avatarParts";
 import { DancerAvatar } from "./DancerAvatar";
 
@@ -86,8 +87,14 @@ export function DancerEditDialog(props: DancerEditDialogProps) {
   const { errors, isDirty } = form.formState;
   // Each opening starts from the saved page. A layout effect, so the reset lands before
   // the dialog shows and can never wipe what was just typed into it.
+  // Null parts mean nobody has drawn the dancer yet (a battle may then suggest a look); once
+  // the picker is touched, the parts are a choice, even when they match the seed.
+  const drawn = useRef(false);
   useLayoutEffect(() => {
-    if (open) reset(valuesOf(dancer));
+    if (open) {
+      reset(valuesOf(dancer));
+      drawn.current = false;
+    }
   }, [open, dancer, reset]);
   const countries = useMemo(
     () => countryOptions(i18n.language),
@@ -109,7 +116,10 @@ export function DancerEditDialog(props: DancerEditDialogProps) {
           city: values.city.trim() || null,
           instagram_handle: toHandle(values.instagram_handle) || null,
           bio: values.bio.trim() || null,
-          avatar_parts: chosenParts(dancer, values.parts),
+          avatar_parts:
+            dancer.avatar_parts || drawn.current
+              ? formatParts(values.parts)
+              : null,
         },
       }),
     onSuccess: ({ data, error, response }) => {
@@ -230,9 +240,10 @@ export function DancerEditDialog(props: DancerEditDialogProps) {
         <AvatarPicker
           dancer={dancer}
           parts={parts}
-          onChange={(next) =>
-            form.setValue("parts", next, { shouldDirty: true })
-          }
+          onChange={(next) => {
+            drawn.current = true;
+            form.setValue("parts", next, { shouldDirty: true });
+          }}
         />
         {errors.root?.message && (
           <p role="alert" className="text-body-sm font-bold text-danger">
@@ -244,15 +255,7 @@ export function DancerEditDialog(props: DancerEditDialogProps) {
   );
 }
 
-/** The parts to store: null while they are still the seed, so the edit log stays quiet. */
-function chosenParts(dancer: Dancer, parts: AvatarParts): string | null {
-  const code = formatParts(parts);
-  const seeded =
-    !dancer.avatar_parts && code === formatParts(seededParts(dancer.id));
-  return seeded ? null : code;
-}
-
-/** The avatar's six parts as selects, with a live preview (DESIGN.md §4.16 seeding). */
+/** The avatar's six parts as selects and its details as checkboxes, with a live preview (§4.16). */
 function AvatarPicker({
   dancer,
   parts,
@@ -304,6 +307,29 @@ function AvatarPicker({
             </SelectField>
           );
         })}
+      </div>
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        {DETAILS.map(({ name, bit }) => (
+          <label
+            key={name}
+            className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-body"
+          >
+            <input
+              type="checkbox"
+              checked={hasDetail(parts, name)}
+              onChange={(e) =>
+                onChange({
+                  ...parts,
+                  details: e.target.checked
+                    ? parts.details | bit
+                    : parts.details & ~bit,
+                })
+              }
+              className="size-5 accent-primary"
+            />
+            {t(`dancerEdit.parts.details.${name}`)}
+          </label>
+        ))}
       </div>
     </fieldset>
   );

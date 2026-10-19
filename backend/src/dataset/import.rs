@@ -136,7 +136,7 @@ fn importable<'a>(data: &'a Dataset, problems: &[Problem]) -> (Vec<&'a str>, Vec
     let (mut events, mut skipped) = (Vec::new(), Vec::new());
     for (key, event) in &data.events {
         let bad_dancer = dancers_of(event).find(|d| bad_dancers.contains(d));
-        let bad_crew = crews_of(event).find(|c| bad_crews.contains(c));
+        let bad_crew = crews_of(data, event).find(|c| bad_crews.contains(c));
         match (bad_events.contains(key.as_str()), bad_dancer, bad_crew) {
             (true, ..) => skipped.push(format!("{key}: breaks a rule of `data check`")),
             (_, Some(dancer), _) => skipped.push(format!("{key}: dancer {dancer} breaks a rule")),
@@ -147,7 +147,7 @@ fn importable<'a>(data: &'a Dataset, problems: &[Problem]) -> (Vec<&'a str>, Vec
     (events, skipped)
 }
 
-/// The dancers and crews the jams name, with the crews of those dancers that are in the dataset.
+/// The dancers and crews the jams name.
 fn needed<'a>(data: &'a Dataset, events: &[&str]) -> (BTreeSet<&'a str>, BTreeSet<&'a str>) {
     let mut dancers = BTreeSet::new();
     let mut crews = BTreeSet::new();
@@ -157,17 +157,8 @@ fn needed<'a>(data: &'a Dataset, events: &[&str]) -> (BTreeSet<&'a str>, BTreeSe
         .filter(|(key, _)| events.contains(&key.as_str()))
     {
         dancers.extend(dancers_of(event));
-        crews.extend(crews_of(event));
+        crews.extend(crews_of(data, event));
     }
-    let dancer_crews = dancers
-        .iter()
-        .flat_map(|d| data.dancers.get(*d))
-        .flat_map(|d| d.crews.iter());
-    crews.extend(
-        dancer_crews
-            .map(String::as_str)
-            .filter(|c| data.crews.contains_key(*c)),
-    );
     (dancers, crews)
 }
 
@@ -199,11 +190,17 @@ fn dancers_of(event: &EventRecord) -> impl Iterator<Item = &str> {
     staff.chain(entrants)
 }
 
-fn crews_of(event: &EventRecord) -> impl Iterator<Item = &str> {
-    event
+/// The crews a jam's teams dance for, and those of its dancers that are in the dataset.
+fn crews_of<'a>(data: &'a Dataset, event: &'a EventRecord) -> impl Iterator<Item = &'a str> {
+    let teams = event
         .battles
         .iter()
-        .flat_map(|b| b.teams.values().filter_map(|team| team.crew.as_deref()))
+        .flat_map(|b| b.teams.values().filter_map(|team| team.crew.as_deref()));
+    let dancers = dancers_of(event)
+        .flat_map(|d| data.dancers.get(d))
+        .flat_map(|d| d.crews.iter().map(String::as_str))
+        .filter(|c| data.crews.contains_key(*c));
+    teams.chain(dancers)
 }
 
 /// What became of one jam.
@@ -259,7 +256,8 @@ async fn insert_event(
             .id;
         // `check` passed, so the bracket holds.
         for standing in battle.standings().unwrap_or_default() {
-            db::battles::insert_entry(conn, battle_id, &entry(battle, &standing, cx)?).await?;
+            let entry = entry(battle, &standing, cx)?;
+            db::battles::insert_entry(conn, battle_id, fields.gender, &entry).await?;
         }
     }
     Ok(Written::Event {
@@ -313,6 +311,8 @@ fn battle_fields(battle: &BattleRecord) -> BattleFields {
         prize_first: None,
         prize_second: None,
         prize_third: None,
+        // The sources give days, not running orders.
+        starts_at: None,
     }
 }
 

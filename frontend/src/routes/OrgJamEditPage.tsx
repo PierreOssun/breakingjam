@@ -76,7 +76,7 @@ function JamEditor({ jam }: { jam: Schemas["EventResponse"] }) {
           }}
         />
       </section>
-      <BattlesEditor jamId={jam.id} />
+      <BattlesEditor jam={jam} />
       <p className="text-body-sm text-muted">
         {t("org.peopleOnJamPage")}{" "}
         <Link

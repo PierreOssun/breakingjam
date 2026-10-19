@@ -15,7 +15,7 @@
     "admin": "Admin"
   },
   "footer": {
-    "tagline": "Le point central des jams de breaking."
+    "links": "Liens du site"
   },
   "auth": {
     "login": {
@@ -79,33 +79,48 @@
     "pitch": "Le point central des jams de breaking. Trouvez-en une près de chez vous, ou mettez la vôtre sur la carte.",
     "mapPreview": "Ouvrir la carte",
     "organisers": {
-      "title": "Pour les orgas",
-      "body": "Mettez votre jam là où les danseurs la cherchent.",
+      "title": "Mets ta jam là où les danseurs cherchent.",
+      "body": "Gratuit, et ta jam arrive sur la carte et sur la page de chaque danseur qui y participe.",
       "step1Title": "Créez votre jam",
       "step1Body": "Nom, dates et lieu. Elle reste en brouillon jusqu’à ce que vous l’envoyiez en vérification.",
       "step2Title": "Ajoutez battles et line-up",
       "step2Body": "1v1, crews, seven-to-smoke, et vos juges, DJ et MC.",
       "step3Title": "Envoyez-la",
-      "step3Body": "Un·e admin BreakingJam la vérifie, puis elle apparaît sur la carte et sur la page de chaque danseur·se inscrit·e."
+      "step3Body": "Un·e admin BreakingJam la vérifie, puis elle apparaît sur la carte et sur la page de chaque danseur·se inscrit·e.",
+      "overline": "Pour les orgas"
     },
-    "featured": {
-      "title": "À l’affiche près de chez vous",
-      "inCountry": "Prochaines jams : {{country}}",
-      "inCountryAndNearby": "Prochaines jams : {{country}} et alentours",
-      "nearby": "Les prochaines jams les plus proches",
-      "soonest": "Les prochaines jams sur la carte",
-      "map": "Voir la carte"
+    "preview": {
+      "upcoming_one": "{{count}} jam à venir",
+      "upcoming_other": "{{count}} jams à venir"
     },
-    "counts": {
-      "title": "BreakingJam en chiffres",
-      "countries": "Pays",
-      "battles": "Battles",
-      "dancers": "Danseur·ses",
+    "next": {
+      "title": "Bientôt près de chez toi",
+      "around": "Autour de : {{place}}",
+      "aroundYou": "Autour de toi",
+      "worldwide": "Partout dans le monde",
+      "change": "changer",
+      "map": "Tout voir sur la carte"
+    },
+    "dancers": {
+      "overline": "Pour les danseurs",
+      "title": "Toutes tes battles, sur une seule page.",
+      "body": "Tes jams, tes rounds et tes résultats, tels que les orgas les publient.",
+      "search": "Trouver ta page de danseur",
+      "placeholder": "Ton nom de danseur",
+      "submit": "Me trouver",
+      "notThere": "Pas encore là ? Tu apparais automatiquement dès qu’un orga t’ajoute."
+    },
+    "scene": {
+      "title": "La scène jusqu’ici",
+      "battles_one": "battle",
+      "battles_other": "battles",
+      "countries_one": "pays",
+      "countries_other": "pays",
+      "dancers_one": "danseur",
+      "dancers_other": "danseurs",
       "byCountry": "Battles par pays",
-      "battleCount_one": "{{count}} battle",
-      "battleCount_other": "{{count}} battles",
-      "more_one": "+ {{count}} autre pays",
-      "more_other": "+ {{count}} autres pays"
+      "more_one": "+{{count}} autre",
+      "more_other": "+{{count}} autres"
     }
   },
   "status": {
@@ -145,7 +160,8 @@
     "contact": "Contacter",
     "edit": "Modifier la jam",
     "website": "Site web",
-    "email": "E-mail"
+    "email": "E-mail",
+    "battleStart": "Début {{when}}"
   },
   "dancer": {
     "aka": "alias {{names}}",
@@ -385,7 +401,10 @@
         "first": "1er {{amount}}",
         "second": "2e {{amount}}",
         "third": "3e {{amount}}"
-      }
+      },
+      "startDay": "Jour",
+      "startTime": "Heure de début",
+      "startTimeHint": "À laisser vide tant que le programme n’est pas fixé."
     },
     "entries": {
       "add": "Ajouter une inscription",
@@ -479,7 +498,14 @@
           "Bonnet",
           "Chignon et bandeau",
           "Afro",
-          "Rasé"
+          "Rasé",
+          "Longs, mèche sur le côté",
+          "Space buns",
+          "Box braids",
+          "Afro puffs",
+          "Queue de cheval haute",
+          "Carré avec frange",
+          "Casquette sur cheveux longs"
         ]
       },
       "skin": {
@@ -501,6 +527,11 @@
       "backdrop": {
         "label": "Fond",
         "options": ["Bleu Klein", "Violet", "Encre", "Nuit"]
+      },
+      "details": {
+        "lashes": "Cils relevés",
+        "lips": "Teinte sur les lèvres",
+        "hoops": "Créoles"
       }
     }
   },
@@ -582,6 +613,7 @@
     "search": "Nom, alias ou @compte",
     "hint": "Bboys, bgirls, DJs, MCs, juges.",
     "empty": "Personne ne correspond à « {{q}} ».",
+    "nobody": "Personne n’est encore inscrit.",
     "showMore": "Voir plus"
   }
 }

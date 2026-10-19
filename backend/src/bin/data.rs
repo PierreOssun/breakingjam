@@ -130,11 +130,14 @@ fn append_new(
     mut names: BTreeMap<String, DraftName>,
     lines: fn(&BTreeMap<String, DraftName>) -> String,
 ) -> anyhow::Result<()> {
-    let existing = if path.exists() {
+    let mut existing = if path.exists() {
         read(path)?
     } else {
         String::new()
     };
+    if !existing.is_empty() && !existing.ends_with('\n') {
+        existing.push('\n');
+    }
     let known: toml::Table =
         toml::from_str(&existing).with_context(|| format!("{}", path.display()))?;
     let reused: Vec<&String> = names

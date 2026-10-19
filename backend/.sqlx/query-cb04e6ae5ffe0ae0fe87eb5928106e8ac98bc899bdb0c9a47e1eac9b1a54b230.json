@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set avatar_parts = suggested.look\n         from unnest($1::uuid[], $2::text[]) as suggested(id, look)\n         where dancers.id = suggested.id and dancers.avatar_parts is null",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "UuidArray",
+        "TextArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cb04e6ae5ffe0ae0fe87eb5928106e8ac98bc899bdb0c9a47e1eac9b1a54b230"
+}

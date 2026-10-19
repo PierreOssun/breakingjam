@@ -93,6 +93,8 @@ async fn create_validates_fields_then_cross_field_rules(pool: PgPool) {
     bad["timezone"] = json!("Paris");
     bad["website_url"] = json!("pariscypher.com");
     bad["contact_email"] = json!("hello at pariscypher");
+    // A short pitch: 200 characters at most.
+    bad["description"] = json!("x".repeat(201));
     let response = create(&app, &cookie, bad).await;
     assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
     let fields: Vec<&str> = response.json["error"]["fields"]
@@ -106,6 +108,7 @@ async fn create_validates_fields_then_cross_field_rules(pool: PgPool) {
         [
             "contact_email",
             "country",
+            "description",
             "name",
             "timezone",
             "website_url"
@@ -179,6 +182,19 @@ async fn update_is_for_owner_and_seed_admin_and_keeps_the_slug(pool: PgPool) {
     make_seed_admin(&pool, "other@example.com").await;
     let by_admin = send(&app, put(&uri, jam("Fixed"), Some(&stranger))).await;
     assert_eq!(by_admin.status, StatusCode::OK);
+}
+
+#[sqlx::test]
+async fn jams_the_team_entered_name_no_organiser(pool: PgPool) {
+    let app = app(pool.clone());
+    let team = sign_up(&app, "team@example.com").await;
+    make_seed_admin(&pool, "team@example.com").await;
+    let id = draft_id(&app, &team, jam("Imported")).await;
+    act(&app, &team, &id, "publish").await;
+
+    let page = send(&app, get(&format!("/api/events/{id}"), None)).await;
+    assert_eq!(page.status, StatusCode::OK);
+    assert_eq!(page.json["organizer"], Value::Null);
 }
 
 #[sqlx::test]

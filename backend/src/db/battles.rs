@@ -20,7 +20,7 @@ pub async fn list(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<Battle>> {
         r#"select id, event_id, name, format as "format: BattleFormat", team_size,
                   gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
                   bracket_size, max_entries, prize_currency, prize_first, prize_second,
-                  prize_third, position, created_at, updated_at
+                  prize_third, position, starts_at, created_at, updated_at
            from battles where event_id = $1 order by position, id"#,
         event_id,
     )
@@ -38,7 +38,7 @@ pub async fn of_events(
         r#"select id, event_id, name, format as "format: BattleFormat", team_size,
                   gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
                   bracket_size, max_entries, prize_currency, prize_first, prize_second,
-                  prize_third, position, created_at, updated_at
+                  prize_third, position, starts_at, created_at, updated_at
            from battles where event_id = any($1) order by event_id, position, id"#,
         event_ids,
     )
@@ -58,7 +58,7 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Battle>> {
         r#"select id, event_id, name, format as "format: BattleFormat", team_size,
                   gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
                   bracket_size, max_entries, prize_currency, prize_first, prize_second,
-                  prize_third, position, created_at, updated_at
+                  prize_third, position, starts_at, created_at, updated_at
            from battles where id = $1"#,
         id,
     )
@@ -78,13 +78,13 @@ pub async fn insert(
         r#"insert into battles
              (id, event_id, name, format, team_size, gender, age, age_min, age_max,
               bracket_size, max_entries, prize_currency, prize_first, prize_second,
-              prize_third, position)
-           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+              prize_third, starts_at, position)
+           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
                    (select coalesce(max(position) + 1, 0) from battles where event_id = $2))
            returning id, event_id, name, format as "format: BattleFormat", team_size,
                      gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
                      bracket_size, max_entries, prize_currency, prize_first, prize_second,
-                  prize_third, position, created_at, updated_at"#,
+                  prize_third, position, starts_at, created_at, updated_at"#,
         Uuid::now_v7(),
         event_id,
         name,
@@ -100,6 +100,7 @@ pub async fn insert(
         fields.prize_first,
         fields.prize_second,
         fields.prize_third,
+        fields.starts_at,
     )
     .fetch_one(conn)
     .await
@@ -117,12 +118,12 @@ pub async fn update(
         r#"update battles set
              name = $2, format = $3, team_size = $4, gender = $5, age = $6, age_min = $7,
              age_max = $8, bracket_size = $9, max_entries = $10, prize_currency = $11,
-             prize_first = $12, prize_second = $13, prize_third = $14
+             prize_first = $12, prize_second = $13, prize_third = $14, starts_at = $15
            where id = $1
            returning id, event_id, name, format as "format: BattleFormat", team_size,
                      gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
                      bracket_size, max_entries, prize_currency, prize_first, prize_second,
-                  prize_third, position, created_at, updated_at"#,
+                  prize_third, position, starts_at, created_at, updated_at"#,
         id,
         name,
         fields.format as BattleFormat,
@@ -137,6 +138,7 @@ pub async fn update(
         fields.prize_first,
         fields.prize_second,
         fields.prize_third,
+        fields.starts_at,
     )
     .fetch_one(pool)
     .await
@@ -278,10 +280,11 @@ pub async fn already_entered(
     .await
 }
 
-/// Inserts an entry (already normalised) and its members.
+/// Inserts an entry (already normalised) and its members into a battle of `gender`.
 pub async fn insert_entry(
     conn: &mut PgConnection,
     battle_id: Uuid,
+    gender: BattleGender,
     fields: &EntryFields,
 ) -> sqlx::Result<Uuid> {
     let id = Uuid::now_v7();
@@ -302,14 +305,15 @@ pub async fn insert_entry(
     )
     .execute(&mut *conn)
     .await?;
-    replace_members(conn, id, &fields.dancer_ids).await?;
+    replace_members(conn, id, &fields.dancer_ids, gender).await?;
     Ok(id)
 }
 
-/// Replaces an entry's fields and members.
+/// Replaces an entry's fields and members; `gender` is its battle's.
 pub async fn update_entry(
     conn: &mut PgConnection,
     id: Uuid,
+    gender: BattleGender,
     fields: &EntryFields,
 ) -> sqlx::Result<()> {
     sqlx::query!(
@@ -328,13 +332,14 @@ pub async fn update_entry(
     )
     .execute(&mut *conn)
     .await?;
-    replace_members(conn, id, &fields.dancer_ids).await
+    replace_members(conn, id, &fields.dancer_ids, gender).await
 }
 
 async fn replace_members(
     conn: &mut PgConnection,
     entry_id: Uuid,
     dancer_ids: &[Uuid],
+    gender: BattleGender,
 ) -> sqlx::Result<()> {
     sqlx::query!("delete from entry_members where entry_id = $1", entry_id)
         .execute(&mut *conn)
@@ -346,7 +351,7 @@ async fn replace_members(
     )
     .execute(&mut *conn)
     .await?;
-    Ok(())
+    super::dancers::suggest_looks(conn, dancer_ids, gender).await
 }
 
 /// Deletes an entry and its members.

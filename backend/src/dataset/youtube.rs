@@ -234,7 +234,8 @@ fn vs_segment(title: &str) -> Option<(String, Option<Round>)> {
 /// `title` without any of `phrases`, case aside.
 fn without(title: &str, phrases: &[String]) -> String {
     let mut title = title.to_owned();
-    for phrase in phrases {
+    // An empty phrase is found everywhere and removes nothing.
+    for phrase in phrases.iter().filter(|p| !p.is_empty()) {
         // ASCII lower-casing keeps byte offsets, so positions found in it hold in `title`.
         while let Some(at) = title
             .to_ascii_lowercase()

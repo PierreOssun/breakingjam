@@ -120,7 +120,12 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
             <p className="text-body whitespace-pre-line">{dancer.bio}</p>
           )}
           <DancerActions dancer={dancer} />
-          {events.data && <StatsStrip stats={statsOf(events.data.past)} />}
+          {events.data && (
+            <StatsStrip
+              stats={statsOf(events.data.past)}
+              className="lg:grid-cols-2"
+            />
+          )}
         </aside>
 
         <div className="flex flex-col gap-10">

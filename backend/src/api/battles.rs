@@ -15,8 +15,12 @@ use super::{
 use crate::{
     auth::session::{CurrentUser, MaybeUser},
     db,
-    domain::battle::{
-        Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, StaffList, StaffMember,
+    domain::{
+        battle::{
+            Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, StaffList,
+            StaffMember,
+        },
+        event::Event,
     },
     error::{AppError, ErrorEnvelope},
     state::AppState,
@@ -78,7 +82,8 @@ async fn create(
     Path(event_id): Path<Uuid>,
     ValidJson(fields): ValidJson<BattleFields>,
 ) -> Result<(StatusCode, Json<Battle>), AppError> {
-    writable(&state, &current, event_id).await?;
+    let event = writable(&state, &current, event_id).await?;
+    check_start(&fields, &event)?;
     let mut conn = state.pool.acquire().await?;
     let battle = db::battles::insert(&mut conn, event_id, &fields.display_name(), &fields).await?;
     Ok((StatusCode::CREATED, Json(battle)))
@@ -107,7 +112,8 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<BattleFields>,
 ) -> Result<Json<Battle>, AppError> {
-    writable_battle(&state, &current, id).await?;
+    let (_, event) = writable_battle(&state, &current, id).await?;
+    check_start(&fields, &event)?;
     let battle = db::battles::update(&state.pool, id, &fields.display_name(), &fields).await?;
     Ok(Json(battle))
 }
@@ -228,10 +234,10 @@ async fn create_entry(
     Path(battle_id): Path<Uuid>,
     ValidJson(mut fields): ValidJson<EntryFields>,
 ) -> Result<(StatusCode, Json<Entry>), AppError> {
-    let battle = writable_battle(&state, &current, battle_id).await?;
+    let (battle, _) = writable_battle(&state, &current, battle_id).await?;
     check_entry(&state, &battle, &mut fields, None).await?;
     let mut tx = state.pool.begin().await?;
-    let id = db::battles::insert_entry(&mut tx, battle_id, &fields).await?;
+    let id = db::battles::insert_entry(&mut tx, battle_id, battle.gender, &fields).await?;
     tx.commit().await?;
     let entry = db::battles::find_entry(&state.pool, id)
         .await?
@@ -266,10 +272,10 @@ async fn update_entry(
     let entry = db::battles::find_entry(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    let battle = writable_battle(&state, &current, entry.battle_id).await?;
+    let (battle, _) = writable_battle(&state, &current, entry.battle_id).await?;
     check_entry(&state, &battle, &mut fields, Some(id)).await?;
     let mut tx = state.pool.begin().await?;
-    db::battles::update_entry(&mut tx, id, &fields).await?;
+    db::battles::update_entry(&mut tx, id, battle.gender, &fields).await?;
     tx.commit().await?;
     let entry = db::battles::find_entry(&state.pool, id)
         .await?
@@ -368,12 +374,24 @@ async fn writable_battle(
     state: &AppState,
     current: &CurrentUser,
     id: Uuid,
-) -> Result<Battle, AppError> {
+) -> Result<(Battle, Event), AppError> {
     let battle = db::battles::find(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    writable(state, current, battle.event_id).await?;
-    Ok(battle)
+    let event = writable(state, current, battle.event_id).await?;
+    Ok((battle, event))
+}
+
+/// A battle starts on one of its jam's days, or has no start yet.
+fn check_start(fields: &BattleFields, event: &Event) -> Result<(), AppError> {
+    if fields.starts_during(event.starts_on, event.ends_on) {
+        Ok(())
+    } else {
+        Err(AppError::invalid(
+            "starts_at",
+            "must be on one of the jam's days",
+        ))
+    }
 }
 
 /// Normalises the entry, then checks the §4 rules: domain, referenced rows, one entry per

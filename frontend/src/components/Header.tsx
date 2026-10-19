@@ -28,7 +28,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
       className={`${sticky ? "sticky top-0" : ""} z-40 h-header border-b border-border bg-bg lg:h-header-lg`}
     >
       <div className="mx-auto flex h-full max-w-content items-center gap-2 px-4 md:px-6 lg:px-8">
-        <Wordmark />
+        <Wordmark logo="mark" />
         <nav aria-label={t("nav.menu")} className="ml-4 hidden gap-1 lg:flex">
           <NavLink to="/map" className={navLink}>
             {t("nav.findJam")}

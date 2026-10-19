@@ -304,6 +304,12 @@ describe("organiser pages", () => {
       "EUR",
     );
     await userEvent.type(within(dialog).getByLabelText(/^1st place/), "500");
+    // The jam runs two days: the start takes a day and a time.
+    await userEvent.selectOptions(
+      within(dialog).getByLabelText("Day"),
+      "2030-06-02",
+    );
+    await userEvent.type(within(dialog).getByLabelText(/^Start time/), "14:30");
     await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
 
     expect(
@@ -324,6 +330,7 @@ describe("organiser pages", () => {
       prize_first: 500,
       prize_second: null,
       prize_third: null,
+      starts_at: "2030-06-02T14:30:00",
     });
   });
 });

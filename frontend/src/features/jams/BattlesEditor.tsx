@@ -14,6 +14,7 @@ import { Dialog } from "../../components/Dialog";
 import { IconButton } from "../../components/IconButton";
 import { InlineEmpty } from "../../components/InlineEmpty";
 import { useToast } from "../../components/useToast";
+import { daysOf } from "../../lib/dates";
 import { BattleDialog } from "./BattleDialog";
 import { prizeLine, presetOf } from "./battleFields";
 import { useBattles } from "./queries";
@@ -21,7 +22,12 @@ import { useBattles } from "./queries";
 type Battle = Schemas["Battle"];
 
 /** A jam's battles in display order: add, edit, reorder, delete. */
-export function BattlesEditor({ jamId }: { jamId: string }) {
+export function BattlesEditor({
+  jam,
+}: {
+  jam: Pick<Schemas["EventResponse"], "id" | "starts_on" | "ends_on">;
+}) {
+  const jamId = jam.id;
   const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -129,6 +135,7 @@ export function BattlesEditor({ jamId }: { jamId: string }) {
 
       <BattleDialog
         jamId={jamId}
+        days={daysOf(jam.starts_on, jam.ends_on)}
         battle={editing === "new" || editing === null ? undefined : editing}
         open={editing !== null}
         onClose={() => setEditing(null)}

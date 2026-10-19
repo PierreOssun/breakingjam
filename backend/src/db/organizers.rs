@@ -27,24 +27,25 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Organizer>> {
     .await
 }
 
-/// The organiser of a jam, for its page.
-pub async fn reference(pool: &PgPool, id: Uuid) -> sqlx::Result<OrganizerRef> {
+/// The organiser of a jam, for its page; none when the BreakingJam team entered it, since the
+/// team lists jams it doesn't run.
+pub async fn reference(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<OrganizerRef>> {
     sqlx::query_as!(
         OrganizerRef,
         r#"select id, display_name, instagram_handle, verified_at is not null as "verified!"
-           from app_users where id = $1"#,
+           from app_users where id = $1 and role not in ('seed_admin', 'admin')"#,
         id,
     )
-    .fetch_one(pool)
+    .fetch_optional(pool)
     .await
 }
 
-/// The organiser cards of `ids`, keyed by account id.
+/// The organiser cards of `ids`, keyed by account id; team accounts have none, as in `reference`.
 pub async fn references(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, OrganizerRef>> {
     let refs = sqlx::query_as!(
         OrganizerRef,
         r#"select id, display_name, instagram_handle, verified_at is not null as "verified!"
-           from app_users where id = any($1)"#,
+           from app_users where id = any($1) and role not in ('seed_admin', 'admin')"#,
         ids,
     )
     .fetch_all(pool)

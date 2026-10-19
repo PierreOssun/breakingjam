@@ -206,9 +206,12 @@ function JamDetail({ jam }: { jam: Jam }) {
               )}
             </Section>
           )}
-          <Section title={t("jam.organiser")}>
-            <OrganizerCard organizer={jam.organizer} />
-          </Section>
+          {/* The BreakingJam team lists jams it doesn't run: no organiser then. */}
+          {jam.organizer && (
+            <Section title={t("jam.organiser")}>
+              <OrganizerCard organizer={jam.organizer} />
+            </Section>
+          )}
         </div>
       </div>
 
@@ -224,7 +227,11 @@ function JamDetail({ jam }: { jam: Jam }) {
 }
 
 /** DESIGN.md §6 jam detail, item 9: who runs it, and a way to reach them. */
-function OrganizerCard({ organizer }: { organizer: Jam["organizer"] }) {
+function OrganizerCard({
+  organizer,
+}: {
+  organizer: NonNullable<Jam["organizer"]>;
+}) {
   const { t } = useTranslation();
   const handle = organizer.instagram_handle;
   return (

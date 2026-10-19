@@ -327,18 +327,23 @@ impl Draft {
             .crew
             .as_deref()
             .map(|crew| self.crew(crew, crew_country));
-        let members: Vec<String> = side
-            .members
-            .iter()
-            .map(|member| {
-                let dancer = self.dancer(&member.name, member.country);
-                if let Some(crew) = &crew {
-                    let entry = self.dancers.entry(dancer.clone()).or_default();
-                    entry.crews.insert(crew.clone());
-                }
-                dancer
-            })
-            .collect();
+        let mut members = Vec::new();
+        for member in &side.members {
+            let dancer = self.dancer(&member.name, member.country);
+            // A member with no key (a name in another script) is for a human to add.
+            if dancer.is_empty() {
+                self.problems.push(format!(
+                    "{context}: {:?} has no key; add that dancer by hand",
+                    member.name
+                ));
+                continue;
+            }
+            if let Some(crew) = &crew {
+                let entry = self.dancers.entry(dancer.clone()).or_default();
+                entry.crews.insert(crew.clone());
+            }
+            members.push(dancer);
+        }
         if spec.sides() != Sides::Dancers {
             teams
                 .entry(key.clone())

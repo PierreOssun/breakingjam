@@ -1,6 +1,6 @@
 //! Battles, entries and staff: enums, fields and the rules §4 leaves to domain code.
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::{Validate, ValidationError, ValidationErrors};
@@ -124,6 +124,8 @@ pub struct Battle {
     pub prize_third: Option<i32>,
     /// Display order on the jam page.
     pub position: i16,
+    /// When it starts, as wall-clock time in the jam's timezone; null until announced.
+    pub starts_at: Option<NaiveDateTime>,
     /// Row creation time.
     pub created_at: DateTime<Utc>,
     /// Last write, maintained by a trigger.
@@ -211,6 +213,8 @@ pub struct BattleFields {
     /// Cash prize for 3rd place, in whole units.
     #[validate(range(min = 0))]
     pub prize_third: Option<i32>,
+    /// When it starts, wall-clock time in the jam's timezone, on one of its days; null = not announced.
+    pub starts_at: Option<NaiveDateTime>,
 }
 
 // The §4 table checks, so a bad combination is a 422 naming the field, not a DB error.
@@ -273,7 +277,28 @@ fn prizes_have_a_currency(fields: &BattleFields) -> Result<(), ValidationError> 
     }
 }
 
+/// Whether a start, if any, falls on one of the jam's days.
+pub fn starts_during(
+    start: Option<NaiveDateTime>,
+    first_day: NaiveDate,
+    last_day: NaiveDate,
+) -> bool {
+    start.is_none_or(|at| (first_day..=last_day).contains(&at.date()))
+}
+
+impl Battle {
+    /// Whether the start, if any, falls on one of the jam's days.
+    pub fn starts_during(&self, first_day: NaiveDate, last_day: NaiveDate) -> bool {
+        starts_during(self.starts_at, first_day, last_day)
+    }
+}
+
 impl BattleFields {
+    /// Whether the start, if any, falls on one of the jam's days.
+    pub fn starts_during(&self, first_day: NaiveDate, last_day: NaiveDate) -> bool {
+        starts_during(self.starts_at, first_day, last_day)
+    }
+
     /// The organiser's name, or one built from the structured fields (§4: "2v2 Mixed Kids").
     pub fn display_name(&self) -> String {
         if let Some(name) = self

@@ -1,5 +1,7 @@
 import {
   dayAndMonth,
+  daysOf,
+  formatBattleStart,
   formatDateRange,
   formatShortDateRange,
   yearOf,
@@ -41,5 +43,28 @@ describe("dates", () => {
       month: "déc",
     });
     expect(yearOf("2026-12-31")).toBe(2026);
+  });
+
+  it("lists a jam's days, across a month end", () => {
+    expect(daysOf("2023-09-22", "2023-09-24")).toEqual([
+      "2023-09-22",
+      "2023-09-23",
+      "2023-09-24",
+    ]);
+    expect(daysOf("2030-06-30", "2030-07-01")).toEqual([
+      "2030-06-30",
+      "2030-07-01",
+    ]);
+    expect(daysOf("2030-06-01", "2030-06-01")).toEqual(["2030-06-01"]);
+  });
+
+  it("gives a battle's start as a time, with the day when the jam runs several days", () => {
+    expect(formatBattleStart("2023-09-23T14:30:00", true, "en")).toBe("14:30");
+    expect(formatBattleStart("2023-09-23T14:30:00", false, "en")).toMatch(
+      /^Sat,? 23 Sept?,? 14:30$/,
+    );
+    expect(formatBattleStart("2023-09-23T14:30:00", false, "fr")).toMatch(
+      /^sam\.? 23 sept\.?,? 14:30$/,
+    );
   });
 });

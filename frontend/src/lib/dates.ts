@@ -92,3 +92,34 @@ export function dayAndMonth(
 export function yearOf(iso: string): number {
   return calendarDate(iso).getUTCFullYear();
 }
+
+/** Every day of a jam, `["2023-09-22", "2023-09-23", "2023-09-24"]`. */
+export function daysOf(startsOn: string, endsOn: string): string[] {
+  const days: string[] = [];
+  for (
+    let day = calendarDate(startsOn);
+    day <= calendarDate(endsOn);
+    day = new Date(day.getTime() + 86_400_000)
+  ) {
+    days.push(day.toISOString().slice(0, 10));
+  }
+  return days;
+}
+
+/**
+ * When a battle starts, a wall-clock time in the jam's timezone: "14:30" on a one-day jam,
+ * "Sat 23 Sept, 14:30" when the jam runs over several days.
+ */
+export function formatBattleStart(
+  startsAt: string,
+  oneDay: boolean,
+  language: string,
+): string {
+  // Read as UTC and formatted as UTC, so no viewer timezone moves the clock.
+  return new Intl.DateTimeFormat(localeOf(language), {
+    ...(oneDay ? {} : STYLES.short),
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(new Date(`${startsAt}Z`));
+}

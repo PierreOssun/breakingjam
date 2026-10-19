@@ -24,6 +24,10 @@ export type BattleFormValues = {
   prize_first: string;
   prize_second: string;
   prize_third: string;
+  /** One of the jam's days, `YYYY-MM-DD`. */
+  start_day: string;
+  /** `HH:MM`; blank = the start isn't announced. */
+  start_time: string;
 };
 
 /** Places with a cash prize, in order. */
@@ -48,8 +52,11 @@ export function presetOf(battle: Pick<Battle, "age" | "age_min">): AgePreset {
   return (battle.age_min ?? 0) >= 40 ? "masters" : "adult";
 }
 
-/** The form for a new battle (1v1 Mixed Adult), or filled with a stored one. */
-export function battleValues(battle?: Battle): BattleFormValues {
+/** The form for a new battle (1v1 Mixed Adult, starting on the jam's first day), or a stored one. */
+export function battleValues(
+  firstDay: string,
+  battle?: Battle,
+): BattleFormValues {
   if (!battle) {
     return {
       name: "",
@@ -65,6 +72,8 @@ export function battleValues(battle?: Battle): BattleFormValues {
       prize_first: "",
       prize_second: "",
       prize_third: "",
+      start_day: firstDay,
+      start_time: "",
     };
   }
   return {
@@ -81,6 +90,8 @@ export function battleValues(battle?: Battle): BattleFormValues {
     prize_first: text(battle.prize_first),
     prize_second: text(battle.prize_second),
     prize_third: text(battle.prize_third),
+    start_day: battle.starts_at?.slice(0, 10) ?? firstDay,
+    start_time: battle.starts_at?.slice(11, 16) ?? "",
   };
 }
 
@@ -106,6 +117,9 @@ export function battleBody(values: BattleFormValues): BattleFields {
     prize_first: values.prize_currency ? number(values.prize_first) : null,
     prize_second: values.prize_currency ? number(values.prize_second) : null,
     prize_third: values.prize_currency ? number(values.prize_third) : null,
+    starts_at: values.start_time
+      ? `${values.start_day}T${values.start_time}:00`
+      : null,
   };
 }
 

@@ -42,11 +42,35 @@ describe("jam fields", () => {
   });
 });
 
+const DAY = "2030-06-01";
+
 describe("battle fields", () => {
+  it("sends a start only with a time, on the chosen day", () => {
+    expect(battleBody(battleValues(DAY)).starts_at).toBeNull();
+    const evening = { ...battleValues(DAY), start_time: "14:30" };
+    expect(battleBody(evening).starts_at).toBe("2030-06-01T14:30:00");
+    const later = { ...evening, start_day: "2030-06-02" };
+    expect(battleBody(later).starts_at).toBe("2030-06-02T14:30:00");
+    // A stored start reads back as its day and time.
+    const stored = battleValues(DAY, {
+      ...battleBody(later),
+      id: "b1",
+      event_id: "j1",
+      name: "1v1 Mixed",
+      position: 0,
+      created_at: "",
+      updated_at: "",
+    } as Parameters<typeof battleValues>[1]);
+    expect([stored.start_day, stored.start_time]).toEqual([
+      "2030-06-02",
+      "14:30",
+    ]);
+  });
+
   // The examples of `BattleFields::display_name` in the API.
   it("names battles the way the server does", () => {
     const named = (values: Partial<ReturnType<typeof battleValues>>) =>
-      defaultBattleName(battleBody({ ...battleValues(), ...values }));
+      defaultBattleName(battleBody({ ...battleValues(DAY), ...values }));
     expect(named({ gender: "bboy" })).toBe("1v1 Bboy");
     expect(
       named({ team_size: "2", preset: "kids", age_min: "8", age_max: "17" }),
@@ -62,16 +86,16 @@ describe("battle fields", () => {
   it("maps presets to the stored ages, and back", () => {
     expect(
       battleBody({
-        ...battleValues(),
+        ...battleValues(DAY),
         preset: "kids",
         age_min: "10",
         age_max: "17",
       }),
     ).toMatchObject({ age: "kids", age_min: 10, age_max: 17 });
     expect(
-      battleBody({ ...battleValues(), preset: "masters", age_min: "40" }),
+      battleBody({ ...battleValues(DAY), preset: "masters", age_min: "40" }),
     ).toMatchObject({ age: "adult", age_min: 40, age_max: null });
-    expect(battleBody({ ...battleValues(), preset: "na" })).toMatchObject({
+    expect(battleBody({ ...battleValues(DAY), preset: "na" })).toMatchObject({
       age: "na",
       age_min: null,
     });
@@ -82,7 +106,7 @@ describe("battle fields", () => {
   it("sends a team size only for team battles, and blank numbers as null", () => {
     expect(
       battleBody({
-        ...battleValues(),
+        ...battleValues(DAY),
         format: "seven_to_smoke",
         team_size: "3",
       }),
@@ -93,21 +117,25 @@ describe("battle fields", () => {
       name: null,
     });
     expect(
-      battleBody({ ...battleValues(), bracket_size: "16", max_entries: "32" }),
+      battleBody({
+        ...battleValues(DAY),
+        bracket_size: "16",
+        max_entries: "32",
+      }),
     ).toMatchObject({ team_size: 1, bracket_size: 16, max_entries: 32 });
   });
 
   it("sends prizes only with a currency", () => {
     const prizes = { prize_first: "1000", prize_second: "", prize_third: "" };
     expect(
-      battleBody({ ...battleValues(), ...prizes, prize_currency: "CHF" }),
+      battleBody({ ...battleValues(DAY), ...prizes, prize_currency: "CHF" }),
     ).toMatchObject({
       prize_currency: "CHF",
       prize_first: 1000,
       prize_second: null,
       prize_third: null,
     });
-    expect(battleBody({ ...battleValues(), ...prizes })).toMatchObject({
+    expect(battleBody({ ...battleValues(DAY), ...prizes })).toMatchObject({
       prize_currency: null,
       prize_first: null,
     });

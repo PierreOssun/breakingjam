@@ -164,8 +164,8 @@ export function JamForm({ initial, submitLabel, onSubmit }: JamFormProps) {
       )}
       <TextAreaField
         label={<OptionalLabel label={t("org.fields.description")} />}
-        rows={6}
-        counter={{ length: description.length, max: 5000 }}
+        rows={3}
+        counter={{ length: description.length, max: 200 }}
         error={errors.description?.message}
         {...register("description")}
       />
@@ -251,9 +251,7 @@ function useJamSchema() {
         country: z.string().regex(/^[A-Z]{2}$/, required),
         lat: z.number().nullable(),
         lng: z.number().nullable(),
-        description: z
-          .string()
-          .max(5000, t("validation.tooLong", { max: 5000 })),
+        description: z.string().max(200, t("validation.tooLong", { max: 200 })),
         registration_url: link,
         instagram_url: link,
         website_url: link,

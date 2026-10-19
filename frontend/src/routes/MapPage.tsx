@@ -13,6 +13,7 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
 import { useToast } from "../components/useToast";
 import { FilterChips } from "../features/map/FilterChips";
 import { FilterSheet } from "../features/map/FilterSheet";
@@ -37,9 +38,9 @@ import { MapEmpty } from "../features/map/MapEmpty";
 import { useMapJams, useVisitorCountry } from "../features/map/queries";
 import { RowCard } from "../features/map/RowCard";
 import { SearchForm } from "../features/map/SearchForm";
+import { currentPosition, type LngLat } from "../lib/position";
 import { useMediaQuery } from "../lib/useMediaQuery";
 
-type LngLat = { lng: number; lat: number };
 type Selection = { id: string; trigger: HTMLElement | null };
 
 /**
@@ -93,9 +94,12 @@ export function MapPage() {
   const all = jams.data;
   const country = useVisitorCountry();
 
+  // The landing page's search arrives as `?q=` (DESIGN.md §4.26).
+  const [params] = useSearchParams();
+  const asked = params.get("q")?.trim() ?? "";
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
-  const [query, setQuery] = useState("");
-  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState(asked);
+  const [search, setSearch] = useState(asked);
   const [bounds, setBounds] = useState<Bounds | null>(null);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [camera, setCamera] = useState<Camera | null>(null);
@@ -119,17 +123,20 @@ export function MapPage() {
     if (selection && !selected) setSelection(null);
   }, [selection, selected]);
 
-  // The first view is the visitor's country; later loads (refetches) leave the camera alone.
+  // The first view is what a `?q=` search matches, else the visitor's country; later loads
+  // (refetches) leave the camera alone.
   const framed = useRef(false);
   useEffect(() => {
     if (framed.current || !all || country.isPending) return;
     framed.current = true;
     const today = new Date();
     const upcoming = all.filter((jam) => !isPast(jam, today));
-    const box = firstView(upcoming, country.data ?? null);
+    const box =
+      (asked ? boundsOf(matching) : null) ??
+      firstView(upcoming, country.data ?? null);
     if (box)
       setCamera({ kind: "fit", bounds: box, maxZoom: 10, animate: false });
-  }, [all, country.isPending, country.data]);
+  }, [all, country.isPending, country.data, asked, matching]);
 
   const select = useCallback((jam: MapJam, trigger: HTMLElement | null) => {
     setSelection({ id: jam.id, trigger });
@@ -190,20 +197,12 @@ export function MapPage() {
   }
 
   function locate() {
-    const failed = () =>
-      toast({ kind: "error", message: t("map.locateError") });
-    if (!navigator.geolocation) {
-      failed();
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const here = { lng: coords.longitude, lat: coords.latitude };
+    currentPosition().then(
+      (here) => {
         setUserLocation(here);
         setCamera({ kind: "center", ...here, zoom: 10 });
       },
-      failed,
-      { timeout: 10_000, maximumAge: 5 * 60_000 },
+      () => toast({ kind: "error", message: t("map.locateError") }),
     );
   }
 

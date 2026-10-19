@@ -254,8 +254,9 @@ pub struct EventResponse {
     pub event: Event,
     /// Whether the caller may edit it, change its status or delete it.
     pub can_edit: bool,
-    /// Who runs it: the jam page's organiser card (M12c).
-    pub organizer: OrganizerRef,
+    /// Who runs it: the jam page's organiser card (M12c); null when the BreakingJam team
+    /// entered it, as the team is not its organiser.
+    pub organizer: Option<OrganizerRef>,
 }
 
 /// One jam, by id or slug.
@@ -339,7 +340,28 @@ async fn update(
     ValidJson(fields): ValidJson<EventFields>,
 ) -> Result<Json<Event>, AppError> {
     writable(&state, &current, id).await?;
+    check_days(&state, id, &fields).await?;
     Ok(Json(db::events::update(&state.pool, id, &fields).await?))
+}
+
+/// The jam's days keep every announced battle start; the boundary that would drop one is refused.
+async fn check_days(state: &AppState, id: Uuid, fields: &EventFields) -> Result<(), AppError> {
+    let battles = db::battles::list(&state.pool, id).await?;
+    let outside = battles
+        .iter()
+        .find(|b| !b.starts_during(fields.starts_on, fields.ends_on))
+        .and_then(|b| b.starts_at);
+    match outside {
+        None => Ok(()),
+        Some(at) if at.date() < fields.starts_on => Err(AppError::invalid(
+            "starts_on",
+            "a battle starts before this day; move the battle first",
+        )),
+        Some(_) => Err(AppError::invalid(
+            "ends_on",
+            "a battle starts after this day; move the battle first",
+        )),
+    }
 }
 
 /// Soft-delete a jam.

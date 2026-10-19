@@ -935,6 +935,15 @@
             }
           },
           {
+            "name": "verified",
+            "in": "query",
+            "description": "Only verified (`true`) or only unverified (`false`) dancers.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "cursor",
             "in": "query",
             "description": "`next_cursor` of the previous page.",
@@ -4156,6 +4165,14 @@
             "format": "int32",
             "description": "Display order on the jam page."
           },
+          "starts_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When it starts, as wall-clock time in the jam's timezone; null until announced."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -4275,6 +4292,14 @@
             ],
             "format": "int32",
             "description": "Cash prize for 3rd place, in whole units."
+          },
+          "starts_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When it starts, wall-clock time in the jam's timezone, on one of its days; null = not announced."
           }
         }
       },
@@ -5422,7 +5447,7 @@
               "string",
               "null"
             ],
-            "description": "Free text, up to 5000 characters; blank is stored as null."
+            "description": "A short pitch, up to 200 characters; blank is stored as null."
           },
           "starts_on": {
             "type": "string",
@@ -5566,8 +5591,7 @@
           {
             "type": "object",
             "required": [
-              "can_edit",
-              "organizer"
+              "can_edit"
             ],
             "properties": {
               "can_edit": {
@@ -5575,8 +5599,15 @@
                 "description": "Whether the caller may edit it, change its status or delete it."
               },
               "organizer": {
-                "$ref": "#/components/schemas/OrganizerRef",
-                "description": "Who runs it: the jam page's organiser card (M12c)."
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/OrganizerRef",
+                    "description": "Who runs it: the jam page's organiser card (M12c); null when the BreakingJam team\nentered it, as the team is not its organiser."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             }
           }
@@ -6513,8 +6544,7 @@
                 {
                   "type": "object",
                   "required": [
-                    "can_edit",
-                    "organizer"
+                    "can_edit"
                   ],
                   "properties": {
                     "can_edit": {
@@ -6522,8 +6552,15 @@
                       "description": "Whether the caller may edit it, change its status or delete it."
                     },
                     "organizer": {
-                      "$ref": "#/components/schemas/OrganizerRef",
-                      "description": "Who runs it: the jam page's organiser card (M12c)."
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/OrganizerRef",
+                          "description": "Who runs it: the jam page's organiser card (M12c); null when the BreakingJam team\nentered it, as the team is not its organiser."
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   }
                 }

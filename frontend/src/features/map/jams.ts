@@ -186,12 +186,12 @@ export function firstView(
   ]);
 }
 
-/** How many jams "Featured near you" shows. */
+/** How many jams "Next up near you" shows at most. */
 const FEATURED = 6;
 
 /**
- * "Featured near you": upcoming jams in the visitor's country, soonest first, then the
- * nearest others from its centre; the soonest anywhere when the country is unknown.
+ * "Next up near you" from the visitor's IP: upcoming jams in their country, soonest first,
+ * then the nearest others from its centre; the soonest anywhere when the country is unknown.
  */
 export function featuredJams(
   jams: MapJam[],
@@ -210,6 +210,19 @@ export function featuredJams(
     others.sort((a, b) => distanceKm(centre, a) - distanceKm(centre, b));
   }
   return [...local, ...others].slice(0, FEATURED);
+}
+
+/** "Next up near you" from the visitor's position: the nearest upcoming jams, soonest first. */
+export function nearestJams(
+  jams: MapJam[],
+  point: { lng: number; lat: number },
+  today: Date,
+): MapJam[] {
+  return jams
+    .filter((jam) => !isPast(jam, today))
+    .sort((a, b) => distanceKm(point, a) - distanceKm(point, b))
+    .slice(0, FEATURED)
+    .sort((a, b) => a.starts_on.localeCompare(b.starts_on));
 }
 
 function centreOf([west, south, east, north]: Bounds) {

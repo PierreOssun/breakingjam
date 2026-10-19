@@ -229,6 +229,7 @@ Base: `inline-flex items-center justify-center gap-2 rounded-full border-2 font-
 - **Row card** (mobile lists, map side panel): `flex gap-3 p-3`. The flyer is `w-16 h-20` (or `w-20 h-[100px]` on the landing page), `rounded-md`, with the same text stack as the grid card and a `display-xs` title.
   - Selected row: `border-primary-text bg-surface-raised`, plus `aria-current="true"`.
 - **No flyer image:** render the **generated flyer** (4.24) at the same size. There is no empty placeholder.
+- Public cards show a status badge only when it's exceptional: Registration closed or Cancelled. Never show Published.
 
 ### 4.4 Map popup
 
@@ -262,14 +263,16 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
 ### 4.6 Header with language switch
 
 - `sticky top-0 z-40 h-header lg:h-header-lg bg-bg border-b border-border`, with the content inside the content container. On the map page it is not sticky. It's simply the first row.
-- **Wordmark:** `font-display font-extrabold` at 16px (mobile) or 18px (desktop), "Breaking" plus "Jam" in a `bg-primary text-on-primary rounded-full px-[.35em]` pill. It links to `/`.
+- **Home link:** the **logo mark plus the wordmark**, `flex items-center gap-2 lg:gap-2.5`, `aria-label="BreakingJam home"`, linking to `/`. The same on every page, including the map and jam pages.
+  - **Mark:** the Bounce "J" (`frontend/public/favicon.svg`, J only, as §10 requires below 48px), `size-8` on mobile and `size-9` from `lg`, decorative (`alt=""`).
+  - **Wordmark:** `font-display font-extrabold` at 16px (mobile) or 18px (desktop), "Breaking" plus "Jam" in a `bg-primary text-on-primary rounded-full px-[.35em]` pill.
 - **≥ lg**, left to right:
-  1. Wordmark
+  1. Home link (mark + wordmark)
   2. Nav: ghost sm links "Find a jam", "Find someone" and, once logged in, "My jams" (`/org/jams`). The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
   3. Spacer
   4. Language switch: ghost sm with `Globe` + ISO code + `CaretDown`
   5. Primary sm **Register a jam**
-- **< lg:** wordmark, then the language switch (`Globe` + code), then a menu icon button. The menu opens a full-height sheet with the nav links (`h-14 text-title`) and a full-width primary **Register a jam**.
+- **< lg:** the home link, then the language switch (`Globe` + code), then a menu icon button. The menu opens a full-height sheet with the nav links (`h-14 text-title`) and a full-width primary **Register a jam**.
 - **Language menu:**
   - Menu box: `w-[200px] rounded-lg border border-border-strong bg-surface-raised shadow-lg p-1`, `role="listbox"`.
   - Options: `h-11 px-3 rounded-md`, each named in its own language with its own `lang` attribute (English, Français, Deutsch, Español, Português, Italiano, 日本語, 한국어).
@@ -326,6 +329,7 @@ One component that changes shape by viewport.
 - Show at most 2 per dancer.
 - Not interactive. A flag sits next to a name, never inside an avatar.
 - In list rows, use the bare 16×11 flag before the city, with no chip.
+- **Country count chip:** `h-8 pl-2 pr-3`, with the flag, the country name in `font-extrabold`, and the count in `text-muted font-bold` ("Belgium 28").
 
 ### 4.11 Meta tag and role tag
 
@@ -372,7 +376,7 @@ One component that changes shape by viewport.
 ### 4.16 Avatar + verified tick
 
 - **Avatar:** `size-24 rounded-[28px] overflow-hidden border border-border` (`size-28 rounded-[32px]` in the ≥ lg left column, `size-[72px] rounded-[22px]` in forms, `size-[52px] rounded-[16px]` in person rows). It's a rounded square, so it never reads as a map marker or a social profile bubble.
-  - **Generated (default): pixel 2D-HD bust.** Pixel art with modern lighting on top. See the "Pixel avatar" artboard.
+  - **Generated (default): pixel 2D-HD bust.** Pixel art with modern lighting on top. See the "Pixel avatar" artboard. The app draws it in `features/dancers/avatarParts.ts`.
     - **Sprite:** a 32×32 grid rendered as SVG with `shape-rendering="crispEdges"`, or a PNG at 8× with `image-rendering: pixelated`. Never smooth the scaling.
     - **Drawing rules:**
       - A 1px ink (`#0B0D14`) outline around the silhouette.
@@ -385,13 +389,21 @@ One component that changes shape by viewport.
       - Bottom vignette, black at 35% opacity.
       - This is the only place gradients are allowed in the product.
     - **Parts:**
-      - Hair: spiky, cap with side brim, beanie, bun with headband, afro, buzz.
-      - Skin: light, tan, medium, deep.
-      - Hair colour: black, brown, bleached, violet, Klein blue.
-      - Hoodie: ink, Klein, violet, white, red.
-      - Extras: none, headphones, chain.
-      - Backdrop: Klein, violet, ink or night, with pixel "record" rings.
+      - **Hair (13):**
+        - Short and covered: spiky · cap with side brim · beanie · buzz · afro.
+        - Long and up: bun with headband · long with centre part and side fringe · space buns · box braids · afro puffs · high ponytail · blunt bob with bangs · cap over long hair.
+      - **Skin:** light, tan, medium, deep.
+      - **Hair colour:** black, brown, bleached, violet, Klein blue.
+      - **Hoodie:** ink, Klein, violet, white, red.
+      - **Extras:** none, headphones, chain.
+      - **Details** (optional, combinable): lash flicks · lip tint `#B4475F` · hoop earrings (silver).
+      - **Backdrop:** Klein, violet, ink or night, with pixel "record" rings.
     - **Seeding:** parts are seeded from the dancer id, so the avatar is stable. Anyone who can edit the dancer can change the parts in the edit sheet (skin tone especially should never stay a random guess once someone cares).
+      - No part is tied to a gender, and the schema has no gender field.
+      - The seed picks evenly across all 13 hair styles, and turns each detail on with a 1-in-3 chance.
+      - A dancer entered in a bgirl battle whom nobody has drawn yet gets a long or tied-up style with lash flicks (lip tint 1 in 2, hoops 1 in 3); one entered in a bboy battle gets a short or covered style without details. The battle is the only signal; it is stored as an ordinary choice, so it can be changed like any other.
+      - Anyone who can edit the dancer can change any part in the edit sheet.
+    - Reference implementation: `frontend/pixel-avatar-generator.py` (`make()`, `svg()`, `PRESETS`; bgirl presets `w1`–`w8`).
     - Never draw a flag, text, logo, or any existing character into the sprite.
   - **Photo (verified owners only):** `object-cover`, same mask.
   - `alt` is the dancer name.
@@ -544,6 +556,31 @@ handstand            toprock
 - **Paging:** 20 rows, then a full-width secondary **Show more** for the next 20.
 - **No match:** the inline empty state (§4.22), "No one matches “…”."
 
+### 4.26 Hero search
+
+- **Desktop:** `flex items-center gap-2.5 h-[60px] pl-5 pr-1.5 rounded-full border border-border-strong bg-surface shadow-lg`.
+  - `MagnifyingGlass` 20 in muted.
+  - Input in `text-body`, with a muted placeholder.
+  - An inline primary sm button at the end.
+- **Mobile:** `h-14`, with no inline button; the CTAs sit below.
+- **Behaviour (v1):**
+  - The landing search submits to `/map?q=`.
+  - The dancer search submits to `/dancers?q=`.
+  - No typeahead yet.
+
+### 4.27 Map preview
+
+- **Container:** `relative h-[260px] lg:h-[560px] rounded-[28px] overflow-hidden border border-border`.
+  - The whole card is a link to `/map`.
+  - It uses the same MapLibre style as the map page, non-interactive: no scroll-zoom, no drag.
+  - Lazy-load it below the fold on mobile.
+- **Content:**
+  - Upcoming jams as markers, with clusters (§7), framed on the visitor's region.
+  - Desktop only: one mini popup for the soonest jam. It's a `w-[300px]` row card with a compact flyer of 64×80.
+- **Overlays:**
+  - Top-left chip: `h-9 px-3.5 rounded-full bg-bg border border-border shadow-md text-[13px] font-extrabold`, with an 8px `success` dot and "N upcoming jams".
+  - Bottom-left: secondary sm **Open the map →** on `bg-bg`.
+
 ---
 
 ## 5. Layout rules
@@ -570,16 +607,54 @@ handstand            toprock
 
 ## 6. Screens (see the canvas artboards)
 
-**Landing.**
-- **Mobile 375:**
-  1. Header.
-  2. "Featured near you" (M15, replacing the "Next up" row below the map preview): a `display-md` title, a `body-sm muted` line saying where the jams are ("Upcoming jams in Switzerland and nearby"), a ghost **See the map →**, then up to 6 row cards (one column; two from `sm`, three from `lg`). Hidden when there are no upcoming jams.
-  3. Hero: overline "The world map of breaking jams", then `display-xl` "Every jam. One **map**." with "map." in the blue pill. Under it, a `body-lg muted` pitch and two full-width lg buttons stacked, **Find a jam** (primary) and **Register a jam** (secondary). One `.rings` decoration bleeds off the top-right corner.
-  4. A 240px map preview card with clusters and markers, labelled "Open the map".
-  5. "BreakingJam in numbers" (M15): three counters on `surface` cards (countries, battles, dancers; `text-label muted` label, `display-md` number), then "Battles by country": the 10 busiest countries as rows (bare flag, country name, "12 battles" muted), then "+ N more countries".
-  6. "For organisers": steps 01–03 with `display-md` numbers in `primary-text`, then a full-width primary **Register a jam**.
-  7. Footer.
-- **Desktop:** the hero is a 5/7 grid, with the text and CTAs side by side on the left and a 480px map preview with an open mini-popup on the right. The numbers band is a 5/7 grid too: the title and counters on the left, battles by country in two columns on the right. The organiser band sits on `surface`, with the heading left and the three steps in columns on the right.
+**Landing** (order is the same on every viewport):
+
+1. **Header.**
+2. **Hero.**
+   - **Desktop:** `grid grid-cols-[5fr_7fr] gap-14 items-center py-20`. One `.rings` (900px) sits behind the map, bleeding off the top right.
+     - Left column, top to bottom:
+       1. overline `text-label text-primary-text` "The world map of breaking jams"
+       2. `display-3xl` "Every jam. One **map.**", with "map." in the blue pill
+       3. `body-lg muted` pitch, max 440px
+       4. hero search (§4.26) with an inline primary **Find a jam**
+       5. secondary **Register a jam**
+     - Right column: map preview (§4.27) at 560px.
+   - **Mobile:** the same stack with a `display-xl` headline. The search has no inline button. Below it, **Find a jam** (primary) and **Register a jam** (secondary) are full width, then the map preview at 260px.
+3. **Next up near you.**
+   - **Title row:**
+     - Title: `display-xl` on desktop, `display-md` on mobile.
+     - Location line: `body-sm muted` "Around <city> · change". Use geolocation if granted, otherwise IP; fall back to "Worldwide".
+     - Link: ghost **See all on the map →**.
+   - **Cards:** grid cards (§4.3), soonest first.
+     - Desktop: 4 columns, first 4 jams.
+     - Mobile: horizontal scroll-snap row of 240px cards, up to 6.
+   - Hide the section when there are no upcoming jams.
+4. **For dancers.** A `bg-surface` band.
+   - **Left:**
+     1. overline "For dancers"
+     2. title "Every battle you've entered, on one page."
+     3. one line of copy
+     4. dancer search (§4.26, placeholder "Your dancer name", inline button **Find me** → `/dancers?q=`)
+     5. `caption` "Not there yet? You appear automatically once an organiser lists you."
+   - **Right** (max 440px): a featured verified dancer's identity card (§4.17), their stats strip (§4.15) and their 2 latest past rows (§4.14). Hide this column if no featured dancer exists.
+   - Desktop: `grid-cols-[6fr_5fr]`. Mobile: stacked.
+5. **The scene so far.** Replaces "BreakingJam in numbers" and "Battles by country".
+   - Overline, then the counters.
+     - Desktop: inline, each counter a `display-xl` number + `body-lg muted` label, separated by a muted "·".
+     - Mobile: a 3-cell stats strip.
+     - Counters: battles, countries, dancers.
+   - Then the 10 busiest countries as country chips (§4.10), plus a muted "+N more" chip.
+6. **For organisers.**
+   - **Desktop:** `grid-cols-[4fr_5fr_3fr]`.
+     - Column 1: overline, title "Put your jam where dancers look.", one line, primary **Register a jam**.
+     - Column 2: steps 01–03 as rows with `border-b` dividers.
+     - Column 3: a generated flyer at 4:5.
+   - **Mobile:** stacked, with the flyer at 112×140 and a full-width primary CTA at the end.
+7. **Footer.**
+   - The round Bounce logo at 56px next to the wordmark.
+   - Links: Find a jam, Find someone, Register a jam, Instagram.
+   - Language switch.
+   - Desktop: one row. Mobile: stacked.
 
 **Map with a popup open.**
 - **Mobile:** a dark full-bleed map under a 56px header, with the floating search pill, a filter button (dot when filters are active) and the chip row. The selected marker is 28px with a date tag. The bottom sheet is up, showing the flyer, date, title, distance, badge, categories, **View jam** and Share. **List** and locate float above the sheet.
@@ -591,12 +666,12 @@ handstand            toprock
   2. Full-bleed 4:5 flyer.
   3. Badge and deadline caption, then the `display-lg` title.
   4. Fact rows for date/time, venue, fees, website (`Globe`, the host as label, ↗) and email (`EnvelopeSimple`, a `mailto:` link), then Instagram, each with a `primary-text` icon.
-  5. **Battles** list: category, format and spots, or "Full" in muted; cash prizes under the name (`Trophy` 16 in `primary-text`, "1st CHF 1,000 · 2nd CHF 500" muted); entries as dancer chips, best result first.
+  5. **Battles** list: category, format and spots, or "Full" in muted; the start under the name when set (`Clock` 16 in `primary-text`, "Starts 14:30" muted, or "Starts Sat 23 Sept, 14:30" when the jam runs several days); cash prizes under the name (`Trophy` 16 in `primary-text`, "1st CHF 1,000 · 2nd CHF 500" muted); entries as dancer chips, best result first.
   6. **Lineup:** dancer chips for judges, DJ and MC.
   - For the jam's organiser, people are managed here: an add chip under each battle and per lineup role, edit and delete on each entry, remove on each chip. Battles themselves are edited in the jam editor.
-  7. **About:** organiser text.
+  7. **About:** the organiser's pitch, up to 200 characters.
   8. **Venue:** mini map and "Open in maps ↗".
-  9. **Organiser** card with **Contact**.
+  9. **Organiser** card with **Contact**. Left out when the BreakingJam team entered the jam: the team lists jams it doesn't run.
   10. Sticky bottom bar: fee and primary **Register to battle**.
 - **Desktop:** two columns. The left holds the flyer and the registration card (fees, deadline, lg primary CTA). The right holds the `display-2xl` title, a 2-column fact grid and the same sections.
 
@@ -691,7 +766,12 @@ handstand            toprock
 
 ## 10. Logo — “Jam” Bounce
 
-The social and app mark. The UI header keeps the text wordmark (“Breaking” + the “Jam” pill, §4.6). The logo is the same “Jam”, turned into a funky, flat-3D sticker.
+The social and app mark: the same “Jam” as the wordmark (“Breaking” + the “Jam” pill, §4.6), turned into a funky, flat-3D sticker.
+
+- **Where it appears:**
+  - **Header:** the J mark at 32/36px before the text wordmark (§4.6).
+  - **Footer:** the full round “Jam” at 56px next to the wordmark.
+  - **Favicon, app icons and social:** as listed below.
 
 - **Build** (see `frontend/jam-logo-generator.py`):
   - The word “Jam” in Unbounded 800, converted to outlines, with tracking −20 units.

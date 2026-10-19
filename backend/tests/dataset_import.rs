@@ -167,3 +167,41 @@ async fn imports_the_jams_that_pass_check(pool: PgPool) {
     .unwrap();
     assert_eq!(memberships, ["Hustle Kidz"]);
 }
+
+#[sqlx::test]
+async fn a_jam_whose_dancer_dances_for_a_crew_with_a_broken_rule_is_left_out(pool: PgPool) {
+    let dir = data_dir();
+    // The judge's crew is in crews.toml with a country that is no code; only a dancer names it.
+    fs::write(
+        dir.join("crews.toml"),
+        "hustle-kidz = { name = \"Hustle Kidz\", country = \"NL\" }\nruggeds = { name = \"The Ruggeds\" }\nflow = { name = \"Flow Mo\", country = \"Finland\" }\n",
+    )
+    .unwrap();
+    let dancers = fs::read_to_string(dir.join("dancers.toml")).unwrap();
+    fs::write(
+        dir.join("dancers.toml"),
+        dancers.replace(
+            "storm = { name = \"Storm\", country = \"DE\" }",
+            "storm = { name = \"Storm\", country = \"DE\", crews = [\"flow\"] }",
+        ),
+    )
+    .unwrap();
+    let (data, unreadable) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    assert!(unreadable.is_empty(), "{unreadable:?}");
+    let owner = organizer(&pool).await;
+    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
+
+    let mut tx = pool.begin().await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner, today).await.unwrap();
+    tx.commit().await.unwrap();
+
+    assert_eq!(imported.events, 0);
+    assert_eq!(
+        imported.skipped,
+        [
+            "bc-one/2023: crew flow breaks a rule",
+            "bc-one/2024: breaks a rule of `data check`",
+        ]
+    );
+}

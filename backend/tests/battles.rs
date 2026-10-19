@@ -109,6 +109,45 @@ async fn battle_rules_are_422s(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn a_battle_starts_on_one_of_the_jams_days(pool: PgPool) {
+    let jam = jam(pool).await;
+    // The jam is one day: 1 June 2030.
+    let unannounced = jam.battle(one_v_one()).await;
+    assert_eq!(unannounced.json["starts_at"], Value::Null);
+
+    let mut body = one_v_one();
+    body["starts_at"] = json!("2030-06-01T14:30:00");
+    let battle = jam.battle(body.clone()).await;
+    assert_eq!(battle.status, StatusCode::CREATED);
+    assert_eq!(battle.json["starts_at"], "2030-06-01T14:30:00");
+
+    body["starts_at"] = json!("2030-06-02T14:30:00");
+    let outside = jam.battle(body.clone()).await;
+    assert_eq!(outside.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(outside.json["error"]["fields"][0]["field"], "starts_at");
+    let uri = format!("/api/battles/{}", id_of(&battle));
+    let moved = send(&jam.app, put(&uri, body, Some(&jam.owner))).await;
+    assert_eq!(moved.status, StatusCode::UNPROCESSABLE_ENTITY);
+
+    // Nor can the jam move away from under the battle: the boundary that would drop it is named.
+    let jam_uri = format!("/api/events/{}", jam.event_id);
+    let mut days = json!({
+        "name": "Paris Cypher", "starts_on": "2030-06-02", "ends_on": "2030-06-02",
+        "timezone": "Europe/Paris", "city": "Paris", "country": "FR"
+    });
+    let dropped = send(&jam.app, put(&jam_uri, days.clone(), Some(&jam.owner))).await;
+    assert_eq!(dropped.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(dropped.json["error"]["fields"][0]["field"], "starts_on");
+    days["starts_on"] = json!("2030-05-31");
+    days["ends_on"] = json!("2030-05-31");
+    let dropped = send(&jam.app, put(&jam_uri, days.clone(), Some(&jam.owner))).await;
+    assert_eq!(dropped.json["error"]["fields"][0]["field"], "ends_on");
+    days["ends_on"] = json!("2030-06-01");
+    let kept = send(&jam.app, put(&jam_uri, days, Some(&jam.owner))).await;
+    assert_eq!(kept.status, StatusCode::OK);
+}
+
+#[sqlx::test]
 async fn prizes_are_per_place_in_one_currency(pool: PgPool) {
     let jam = jam(pool).await;
     let mut body = one_v_one();
@@ -199,6 +238,45 @@ async fn entries_enforce_one_entry_per_dancer_and_team_size(pool: PgPool) {
         .entry(&duo, json!({ "dancer_ids": [uuid::Uuid::now_v7()] }))
         .await;
     assert_eq!(unknown.status, StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+#[sqlx::test]
+async fn entering_a_bgirl_or_bboy_battle_draws_an_avatar_nobody_chose(pool: PgPool) {
+    let jam = jam(pool).await;
+    let mut bgirl_battle = one_v_one();
+    bgirl_battle["gender"] = json!("bgirl");
+    let bgirls = id_of(&jam.battle(bgirl_battle).await);
+    let bboys = id_of(&jam.battle(one_v_one()).await);
+    let ami = jam.dancer("Ami").await;
+    let menno = jam.dancer("Menno").await;
+    let chosen = jam.dancer("Chosen").await;
+    let parts = |id: &str| {
+        let uri = format!("/api/dancers/{id}");
+        let app = jam.app.clone();
+        async move { send(&app, get(&uri, None)).await.json["avatar_parts"].clone() }
+    };
+    let body =
+        json!({ "dancer_name": "Chosen", "country": "FR", "avatar_parts": "h0-s0-c0-o0-e0-b1" });
+    let saved = send(
+        &jam.app,
+        put(&format!("/api/dancers/{chosen}"), body, Some(&jam.owner)),
+    )
+    .await;
+    assert_eq!(saved.status, StatusCode::OK);
+
+    for (battle, dancer) in [(&bgirls, &ami), (&bboys, &menno), (&bgirls, &chosen)] {
+        let body = json!({ "dancer_ids": [dancer] });
+        assert_eq!(jam.entry(battle, body).await.status, StatusCode::CREATED);
+    }
+
+    // A bgirl gets long or tied-up hair and lash flicks; a bboy short hair, no details.
+    let ami = parts(&ami).await;
+    let ami = ami.as_str().unwrap();
+    assert!(ami.contains("-d"), "{ami}");
+    let menno = parts(&menno).await;
+    assert!(!menno.as_str().unwrap().contains("-d"), "{menno}");
+    // Somebody's choice is never replaced.
+    assert_eq!(parts(&chosen).await, "h0-s0-c0-o0-e0-b1");
 }
 
 #[sqlx::test]

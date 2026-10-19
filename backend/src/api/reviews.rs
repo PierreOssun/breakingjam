@@ -81,19 +81,12 @@ async fn queue(
     let organizers = db::organizers::references(&state.pool, &ids).await?;
     let rows = jams
         .into_iter()
-        .map(|event| {
-            // Every jam has an organiser row; a missing one is a broken foreign key.
-            let organizer = organizers
-                .get(&event.organizer_id)
-                .cloned()
-                .ok_or(sqlx::Error::RowNotFound)?;
-            Ok(EventResponse {
-                can_edit: can_write(&current.user, event.organizer_id),
-                event,
-                organizer,
-            })
+        .map(|event| EventResponse {
+            can_edit: can_write(&current.user, event.organizer_id),
+            organizer: organizers.get(&event.organizer_id).cloned(),
+            event,
         })
-        .collect::<Result<Vec<_>, AppError>>()?;
+        .collect();
     Ok(Json(Page::from_offset(rows, limit, offset)))
 }
 

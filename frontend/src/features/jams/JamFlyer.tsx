@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { type RefObject, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
 import type { Language } from "../../i18n";
+import { useNearViewport } from "../../lib/useNearViewport";
 
 type JamFlyerProps = {
   /** `updated_at` refreshes the flyer after an edit; lists without it keep it 5 minutes. */
@@ -54,28 +55,4 @@ export function JamFlyer({
       dangerouslySetInnerHTML={flyer.data ? { __html: flyer.data } : undefined}
     />
   );
-}
-
-/** Whether the element is within 200px of the viewport; always true unless `lazy`. */
-function useNearViewport(
-  ref: RefObject<HTMLElement | null>,
-  lazy: boolean,
-): boolean {
-  // Without IntersectionObserver (old browsers, jsdom) everything loads at once.
-  const [near, setNear] = useState(
-    !lazy || typeof IntersectionObserver === "undefined",
-  );
-  useEffect(() => {
-    const element = ref.current;
-    if (near || !element) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) setNear(true);
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [ref, near]);
-  return near;
 }

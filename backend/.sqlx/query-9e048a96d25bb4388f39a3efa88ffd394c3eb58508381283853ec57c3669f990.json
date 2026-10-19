@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "update battles set\n             name = $2, format = $3, team_size = $4, gender = $5, age = $6, age_min = $7,\n             age_max = $8, bracket_size = $9, max_entries = $10, prize_currency = $11,\n             prize_first = $12, prize_second = $13, prize_third = $14\n           where id = $1\n           returning id, event_id, name, format as \"format: BattleFormat\", team_size,\n                     gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                     bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, created_at, updated_at",
+  "query": "select id, event_id, name, format as \"format: BattleFormat\", team_size,\n                  gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                  bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at, created_at, updated_at\n           from battles where event_id = any($1) order by event_id, position, id",
   "describe": {
     "columns": [
       {
@@ -214,6 +214,17 @@
       },
       {
         "ordinal": 16,
+        "name": "starts_at",
+        "type_info": "Timestamp",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "starts_at"
+          }
+        }
+      },
+      {
+        "ordinal": 17,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -224,7 +235,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -237,53 +248,7 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Text",
-        {
-          "Custom": {
-            "name": "battle_format",
-            "kind": {
-              "Enum": [
-                "team",
-                "seven_to_smoke",
-                "na"
-              ]
-            }
-          }
-        },
-        "Int2",
-        {
-          "Custom": {
-            "name": "battle_gender",
-            "kind": {
-              "Enum": [
-                "bboy",
-                "bgirl",
-                "mixed"
-              ]
-            }
-          }
-        },
-        {
-          "Custom": {
-            "name": "battle_age",
-            "kind": {
-              "Enum": [
-                "kids",
-                "adult",
-                "na"
-              ]
-            }
-          }
-        },
-        "Int2",
-        "Int2",
-        "Int2",
-        "Int4",
-        "Bpchar",
-        "Int4",
-        "Int4",
-        "Int4"
+        "UuidArray"
       ]
     },
     "nullable": [
@@ -303,9 +268,10 @@
       true,
       true,
       false,
+      true,
       false,
       false
     ]
   },
-  "hash": "916792da4258763181275dba04039787e9fd415a89248b1ba39c92d1cd7d6108"
+  "hash": "9e048a96d25bb4388f39a3efa88ffd394c3eb58508381283853ec57c3669f990"
 }

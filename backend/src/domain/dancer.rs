@@ -322,26 +322,72 @@ pub struct DancerFields {
     pub avatar_parts: Option<String>,
 }
 
-/// Each part's letter and highest option: hair, skin, hair colour, hoodie, extra, backdrop.
-const AVATAR_PARTS: [(char, u32); 6] = [('h', 5), ('s', 3), ('c', 4), ('o', 4), ('e', 2), ('b', 3)];
+/// Each part's letter and highest option: hair, skin, hair colour, hoodie, extra, backdrop, then
+/// the optional details, a bitmask of lash flicks (1), lip tint (2) and hoops (4).
+const AVATAR_PARTS: [(char, u32); 7] = [
+    ('h', 12),
+    ('s', 3),
+    ('c', 4),
+    ('o', 4),
+    ('e', 2),
+    ('b', 3),
+    ('d', 7),
+];
 
-/// Blank, or the six parts in order and in range, e.g. `h2-s1-c0-o3-e0-b1`.
+/// Blank, or the six parts in order and in range with the details optional, e.g. `h2-s1-c0-o3-e0-b1-d5`.
 pub(crate) fn avatar_parts_shape(value: &str) -> Result<(), ValidationError> {
     let value = value.trim();
     let parts: Vec<&str> = value.split('-').collect();
-    let in_range = |(part, (letter, max)): (&&str, (char, u32))| {
-        let mut chars = part.chars();
-        chars.next() == Some(letter)
-            && chars
-                .next()
-                .and_then(|c| c.to_digit(10))
-                .is_some_and(|n| n <= max)
-            && chars.next().is_none()
+    let in_range = |(part, &(letter, max)): (&&str, &(char, u32))| {
+        part.strip_prefix(letter)
+            .filter(|n| (1..=2).contains(&n.len()) && n.bytes().all(|b| b.is_ascii_digit()))
+            .and_then(|n| n.parse::<u32>().ok())
+            .is_some_and(|n| n <= max)
     };
-    if value.is_empty() || (parts.len() == 6 && parts.iter().zip(AVATAR_PARTS).all(in_range)) {
+    let shaped = matches!(parts.len(), 6 | 7) && parts.iter().zip(&AVATAR_PARTS).all(in_range);
+    if value.is_empty() || shaped {
         return Ok(());
     }
-    Err(ValidationError::new("avatar_parts").with_message("must be like h2-s1-c0-o3-e0-b1".into()))
+    Err(ValidationError::new("avatar_parts")
+        .with_message("must be like h2-s1-c0-o3-e0-b1-d5".into()))
+}
+
+/// Long or tied-up hair: bun, long, space buns, box braids, afro puffs, ponytail, bob, cap over long hair.
+const LONG_HAIR: [u64; 8] = [3, 6, 7, 8, 9, 10, 11, 12];
+/// Short or covered hair: spiky, cap, beanie, afro, buzz.
+const SHORT_HAIR: [u64; 5] = [0, 1, 2, 4, 5];
+/// The hoodie each backdrop would swallow (klein, violet, ink, night), as the frontend's seed avoids.
+const CLASHES: [u64; 4] = [1, 2, 0, 0];
+
+/// The avatar a bgirl or bboy battle suggests for a dancer nobody has drawn yet (DESIGN.md §4.16
+/// seeding): stable for the id; none for mixed battles, which say nothing about the dancer.
+pub fn default_look(id: Uuid, gender: BattleGender) -> Option<String> {
+    // The random half of a UUIDv7.
+    let mut seed = u64::from_le_bytes(id.as_bytes()[8..].try_into().ok()?);
+    let mut pick = |n: u64| {
+        let value = seed % n;
+        seed /= n;
+        value
+    };
+    let (hair, details) = match gender {
+        // Lash flicks always; lip tint one time in two, hoops one in three.
+        BattleGender::Bgirl => (
+            LONG_HAIR[pick(8) as usize],
+            1 | if pick(2) == 0 { 2 } else { 0 } | if pick(3) == 0 { 4 } else { 0 },
+        ),
+        BattleGender::Bboy => (SHORT_HAIR[pick(5) as usize], 0),
+        BattleGender::Mixed => return None,
+    };
+    let (skin, colour, mut hoodie, extra, backdrop) = (pick(4), pick(5), pick(5), pick(3), pick(4));
+    if CLASHES[backdrop as usize] == hoodie {
+        hoodie += 1;
+    }
+    let code = format!("h{hair}-s{skin}-c{colour}-o{hoodie}-e{extra}-b{backdrop}");
+    Some(if details == 0 {
+        code
+    } else {
+        format!("{code}-d{details}")
+    })
 }
 
 fn aliases(values: &[String]) -> Result<(), ValidationError> {

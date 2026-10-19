@@ -19,13 +19,8 @@ import MapView, {
 } from "react-map-gl/maplibre";
 import { dayAndMonth, formatDateRange } from "../../lib/dates";
 import { useMediaQuery } from "../../lib/useMediaQuery";
-import {
-  type Bounds,
-  boundsOf,
-  clusterLabel,
-  isPast,
-  type MapJam,
-} from "./jams";
+import { ClusterDot } from "./ClusterDot";
+import { type Bounds, boundsOf, isPast, type MapJam } from "./jams";
 import { maplibre, useMapStyle } from "./maplibre";
 import {
   type Box,
@@ -410,9 +405,8 @@ function ClusterButton({
   onClick: () => void;
 }) {
   const { t } = useTranslation();
-  // §7: 36px for 2–9, 44px for 10–99, 56px from 100; the hit area is never under 44px.
+  // The hit area is never under 44px, whatever the cluster's size (§8).
   const hit = count >= 100 ? "size-14" : "size-11";
-  const visual = count >= 10 ? hit : "size-9";
   return (
     <button
       type="button"
@@ -420,12 +414,7 @@ function ClusterButton({
       onClick={onClick}
       className={`grid cursor-pointer place-items-center rounded-full ${hit}`}
     >
-      <span
-        aria-hidden
-        className={`grid place-items-center rounded-full border-2 border-primary-text bg-bg text-[14px] leading-none font-extrabold text-primary-text shadow-sm ${visual}`}
-      >
-        {clusterLabel(count)}
-      </span>
+      <ClusterDot count={count} />
     </button>
   );
 }

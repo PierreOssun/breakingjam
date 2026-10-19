@@ -17,7 +17,7 @@ This document is the source of truth for v0.1. Anything not listed under *Scope*
 - Admin area (`/admin`, M14): counts of jams, dancers, organisers and accounts with verification rates, the jams waiting for review, and the Instagram claims. One tab per tool, so new tools join as tabs.
 - Dancer CRUD via the API, used inside the jam flows (search-before-create when adding entry members or staff).
 - Dancer page (`/dancers/{id}`): name, crew(s), country flag(s), Instagram link, generated avatar, a stats strip (jams, countries, years active, podiums, from past jams; added in M10), and the dancer's jams split into **upcoming** and **past** (with the battle, the stage reached and, once the manager exists, the full result). Reached from a dancer on a jam page, or from **Find someone** (`/dancers`): a public search by name, alias or handle over everyone (bboys, bgirls, DJs, MCs, judges), notable dancers first (`GET /api/dancers`).
-- Organiser page (`/organizers/{id}`, added in M12c): like a dancer page without battles: the organiser's name, Instagram, country, city, bio and public jams, upcoming and past. Organisers verify their Instagram handle with the same code-and-review flow as dancers. The jam page links to it from its organiser card.
+- Organiser page (`/organizers/{id}`, added in M12c): like a dancer page without battles: the organiser's name, Instagram, country, city, bio and public jams, upcoming and past. Organisers verify their Instagram handle with the same code-and-review flow as dancers. The jam page links to it from its organiser card, which is left out for jams the BreakingJam team entered (seed admins and admins list jams they don't run, such as the imported historical ones).
 - Dancer identity: Instagram handle as the (optional) uniqueness key, "Verify me" claim flow with a code-in-bio check reviewed by an admin, edits on unverified dancers by their creator or a BreakingJam admin (logged in `dancer_edits`), admin merge. See §4 "Dancer identity".
 - Seed data: ~200 well-known dancers entered by a `seed_admin` user before launch (see roles in §5).
 - Crew CRUD and crew membership (dated).
@@ -164,7 +164,7 @@ create table dancers (
   notable boolean not null default false,   -- seeded well-known dancers: search ranking only, NO visible badge
   verified_at timestamptz,            -- set on approved claim
   avatar_url text,                    -- uploaded by a verified dancer; null = generated avatar
-  avatar_parts text,                  -- the generated avatar's parts, e.g. 'h2-s1-c0-o3-e0-b1'; null = seeded from id (M12b)
+  avatar_parts text,                  -- the generated avatar's parts, e.g. 'h2-s1-c0-o3-e0-b1', '-d5' for details (M17); null = seeded from id (M12b)
   merged_into_id uuid references dancers(id),   -- non-null = this row is a redirect
   created_by uuid references app_users(id),
   deleted_at timestamptz,
@@ -289,6 +289,7 @@ create table battles (
   prize_second integer check (prize_second >= 0),
   prize_third integer check (prize_third >= 0),
   position smallint not null default 0,   -- display order on the jam page
+  starts_at timestamp,                    -- wall-clock start in the jam's timezone, on one of its days (API-checked); null = not announced (M18)
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   check (format <> 'team' or team_size is not null),
@@ -420,7 +421,7 @@ DELETE /api/events/{id}                  soft delete, owner/admin
 POST   /api/events/{id}/submit | publish | close-registration | complete | cancel   (publish: seed_admin+, skips review)
 
 GET    /api/events/{id}/battles          ordered by position
-POST   /api/events/{id}/battles          {name?, format, team_size?, gender, age, age_min?, age_max?, bracket_size?, max_entries?, prize_currency?, prize_first?, prize_second?, prize_third?}
+POST   /api/events/{id}/battles          {name?, format, team_size?, gender, age, age_min?, age_max?, bracket_size?, max_entries?, prize_currency?, prize_first?, prize_second?, prize_third?, starts_at?}
 PUT    /api/battles/{id}
 DELETE /api/battles/{id}
 PUT    /api/events/{id}/battles/order    [battle_id, ...]
@@ -433,7 +434,7 @@ DELETE /api/entries/{id}
 GET    /api/events/{id}/staff
 PUT    /api/events/{id}/staff            replace full list
 
-GET    /api/dancers                      ?q=&country=&cursor=&limit=   (q = ilike on dancer_name, aliases and instagram_handle; notable first)
+GET    /api/dancers                      ?q=&country=&verified=&cursor=&limit=   (q = ilike on dancer_name, aliases and instagram_handle; verified = true|false; notable first)
 GET    /api/dancers/{id}                 profile + current crews
 GET    /api/dancers/{id}/events          ?scope=upcoming|past (default both, grouped)  — jams where the dancer is an entry member or staff; each item: event (id, name, slug, starts_on, ends_on, city, country, status), battle (id, name, format, team_size, gender, age), role (competitor|judge|dj|mc…), entry status, reached, final_rank, video_url
 POST   /api/dancers
@@ -495,11 +496,12 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Routing: `/` (landing), `/map`, `/jams/{slug}`, `/dancers` (Find someone), `/dancers/{id}`, `/login`, `/register`, `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review), `/admin/claims` and `/admin/dancers/{id}/merge`. No `/crews` routes in v0.1; crews render inline.
 - Dancer page (`/dancers/{id}`): header (avatar, dancer name, one or two country flags, city, current crews, Instagram link, verified tick when `verified_at` is set, "Verify me" button for logged-in non-owners while unverified, "Edit" for whoever is allowed), then two lists from `GET /api/dancers/{id}/events` — **Upcoming** (jams with `starts_on >= today`, link to `/jams/{slug}`) and **Past** (reverse chronological, with battle name, role, a result badge (`final_rank` as "1st/2nd/3rd", else `reached` as "Top 8"…), and a play icon when the entry has a `video_url`). Empty states for each. This page is the seed of the "where does this bboy go / what did he do" feature; the only edit affordances are those in §4 "Dancer identity".
 - Video embeds: a play icon on an entry (jam page or dancer page) opens a modal with the official YouTube iframe (`youtube-nocookie.com/embed/{id}?start={offset}&rel=0`). Only YouTube URLs are accepted, validated server-side (`youtube.com/watch`, `youtu.be`, `youtube.com/live`); the video id is parsed once on save. Nothing is ever downloaded or hosted.
-- Landing page (`/`), in order:
-  - **Featured near you** (M15): up to six upcoming jams from `GET /api/events.geojson`, chosen by the visitor's country (`GET /api/geo`). That country's jams come first, soonest first, then the nearest others measured from the centre of its box (§6 Map); with an unknown country, the soonest anywhere. Hidden when nothing is upcoming. It also warms the map's data.
-  - The hero with the one-line pitch ("The central place for breaking jams") and two buttons: primary **Find a jam** → `/map`, secondary **Register a jam** → `/org/jams/new` (redirects to `/login?next=/org/jams/new` when logged out). A static, decorative map preview card links to `/map` (M10).
-  - **BreakingJam in numbers** (M15): countries, battles and dancers from `GET /api/stats`, then battles by country, the 10 busiest then "+ N more countries". Public jams count, cancelled ones don't.
-  - A short three-step "how it works", footer with language switch.
+- Landing page (`/`), in order (M16, DESIGN.md §6 Landing):
+  - The hero: the one-line pitch, a jam search that hands its words to `/map?q=` (the map searches and frames them on load), primary **Find a jam**, secondary **Register a jam** → `/org/jams/new` (redirects to `/login?next=/org/jams/new` when logged out), and the map preview: a non-interactive MapLibre map of the upcoming jams from `GET /api/events.geojson`, framed like the map's first view, the whole card a link to `/map`. MapLibre loads lazily, once the card nears the screen.
+  - **Next up near you**: up to six upcoming jams as grid cards. By the visitor's position when they already allowed it (or tap "change" to share it): the nearest, soonest first. Else by their country (`GET /api/geo`): that country's jams first, soonest first, then the nearest others measured from the centre of its box (§6 Map); with an unknown country, the soonest anywhere. Hidden when nothing is upcoming.
+  - **For dancers**: a search that goes to `/dancers?q=`, next to a verified dancer's identity card, stats and two latest past jams (`GET /api/dancers?verified=true&limit=1`, then its events); that column is hidden while nobody is verified.
+  - **The scene so far**: battles, countries and dancers from `GET /api/stats`, then the 10 busiest countries as chips and "+N more". Public jams count, cancelled ones don't.
+  - **For organisers**: the three steps and a generated flyer as the example. Then the footer: round logo, tagline, links, Instagram, language switch.
   M10 decided "no data fetching on this page"; M15 reverses that at the author's request.
 - Visual system: follow `DESIGN.md` (tokens, components, states). Tailwind v4: its tokens live in the `@theme` of `src/styles/index.css` (the default palette, type scale, radii and shadows are removed), and `src/styles/tokens.test.ts` fails when they drift from `DESIGN.md` §2; do not hard-code colours or spacing outside it. Where `DESIGN.md` differs from this file on scope or routes (8 languages, `/en/…` prefixes, a cookie, `/d/<slug>`), this file wins: EN/FR/DE, unprefixed routes, `localStorage`.
 - Forms: `react-hook-form` + `zod`. Validation mirrors backend validators; backend remains authoritative.
@@ -520,9 +522,9 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Dancer picker (used in entry and staff editing): debounced search on `dancer_name` showing existing matches; "create new dancer" is only enabled after a search has run (search-before-create). The crew picker works the same way.
 - Jam location (decided in M12): the organiser types the address, city and country; **Find on the map** searches them with OpenStreetMap's Nominatim from the browser (on that click only, never as-you-type, at most once a second, attributed under the field), drops the pin on the best match and lists the others; the pin can then be tapped or dragged. Without a pin a jam is published but stays off the map.
 - On the jam page, every dancer (entries, staff) is a link chip with their avatar, to `/dancers/{id}`.
-- Jam page facts (M15): dates, venue, then the optional website (its host as the label, e.g. "pariscypher.com", opening in a new tab), contact email (a `mailto:` link, public by the organiser's choice) and Instagram.
+- Jam page facts (M15): dates, venue, then the optional website (its host as the label, e.g. "pariscypher.com", opening in a new tab), contact email (a `mailto:` link, public by the organiser's choice) and Instagram. The description is a short pitch of at most 200 characters (About). Each of these shows only when set; the dev seed fills them on its invented jams, the imported historical jams leave them empty.
 - People are managed on the jam page, not in the editor: its organiser sees **Add a dancer** (or **Add a team**) under each battle, an add chip per lineup role (judge, DJ, MC, host, staff), and edit and delete on each entry and person, withdrawn entries included. `/org/jams/{id}/edit` keeps the status, details and battles (with their prizes).
-- Generated avatars (decided in M12b, following DESIGN.md §4.16 rather than DiceBear): the pixel 2D-HD bust, a 32×32 sprite drawn in code (`features/dancers/avatarParts.ts`) from six parts (hair, skin, hair colour, hoodie, extra, backdrop) and rendered as inline SVG with crisp edges plus the glow and vignette layer. Parts are seeded from `dancer.id` (same id → same face, no network call) unless `avatar_parts` holds a choice made in the edit sheet. The sprites are a first pass that an illustrator may redraw. Flags are separate chips next to the avatar, never drawn into it. Uploaded avatars (verified dancers) override the generated one. Organiser pages use the same bust, seeded by the account id.
+- Generated avatars (decided in M12b, following DESIGN.md §4.16 rather than DiceBear): the pixel 2D-HD bust, a 32×32 sprite drawn in code (`features/dancers/avatarParts.ts`) from six parts (hair, skin, hair colour, hoodie, extra, backdrop) plus optional details (lash flicks, lip tint, hoops; M17) and rendered as inline SVG with crisp edges plus the glow and vignette layer. Parts are seeded from `dancer.id` (same id → same face, no network call) unless `avatar_parts` holds a choice made in the edit sheet. Entering a dancer nobody has drawn into a bgirl or bboy battle stores a fitting default look (`domain::dancer::default_look`, M17). The sprites are a first pass that an illustrator may redraw. Flags are separate chips next to the avatar, never drawn into it. Uploaded avatars (verified dancers) override the generated one. Organiser pages use the same bust, seeded by the account id.
 - Admin screens (`/admin/*`, `/admin/dancers/{id}/merge`): minimal tables and forms, `admin` role only, no design polish required. `/admin` has a tab per tool (Overview, Jams, Claims) carrying the size of its queue; the header's **Admin** link leads there.
 
 ## 7. Testing

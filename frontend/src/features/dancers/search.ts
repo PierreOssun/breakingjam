@@ -13,7 +13,8 @@ export async function searchDancers(q: string) {
 /** Everyone matching `q` (everyone when blank), notable dancers first, twenty at a time. */
 export function useDancerSearch(q: string) {
   return useInfiniteQuery({
-    queryKey: ["dancers", "search", q],
+    // Not `["dancers", "search", q]`: the pickers cache their plain lists there (SearchPicker).
+    queryKey: ["dancers", "pages", q],
     queryFn: async ({ pageParam }) => {
       const { data, response } = await api.GET("/api/dancers", {
         params: { query: { q: q || undefined, limit: 20, cursor: pageParam } },

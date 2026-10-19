@@ -17,6 +17,7 @@ use breakingjam::{
         user::Role,
     },
 };
+use chrono::{Days, NaiveDate, NaiveDateTime};
 use sqlx::{PgConnection, PgPool, postgres::PgConnectOptions};
 use uuid::Uuid;
 use validator::Validate;
@@ -50,6 +51,8 @@ struct Event {
     timezone: &'static str,
     lat: f64,
     lng: f64,
+    /// The jam page's pitch, website and contact; `.example` domains, which never resolve.
+    about: About,
     /// Start date relative to today, so the invented jams stay upcoming; past jams come from `data/`.
     starts_in_days: i32,
     length_days: i32,
@@ -57,6 +60,12 @@ struct Event {
     /// Judges, DJs and MCs, by dancer name.
     staff: &'static [(StaffRole, &'static str)],
     battles: &'static [Battle],
+}
+
+struct About {
+    description: &'static str,
+    website: &'static str,
+    email: &'static str,
 }
 
 struct Battle {
@@ -106,6 +115,7 @@ const SEVEN_TO_SMOKE: Battle = Battle {
 const EVENTS: &[Event] = &[
     Event {
         name: "Paris Cypher Sessions", city: "Paris", country: "FR", timezone: "Europe/Paris", lat: 48.8566, lng: 2.3522,
+        about: About { description: "Two days of cyphers and battles under the Paris rooftops. Bring your crew, bring your best rounds, and stay for the open cypher after the final.", website: "https://pariscypher.example", email: "hello@pariscypher.example" },
         starts_in_days: 20, length_days: 2, status: EventStatus::Published,
         staff: &[(Judge, "Menno"), (Judge, "Hong 10"), (Dj, "DJ Krate"), (Mc, "MC Volta")],
         battles: &[
@@ -115,6 +125,7 @@ const EVENTS: &[Event] = &[
     },
     Event {
         name: "Berlin Floor Wars", city: "Berlin", country: "DE", timezone: "Europe/Berlin", lat: 52.5200, lng: 13.4050,
+        about: About { description: "Berlin's crew war is back: 3v3 crews on one floor, a bgirl bracket, and a DJ set that runs until the last round is danced.", website: "https://berlinfloorwars.example", email: "hello@berlinfloorwars.example" },
         starts_in_days: 35, length_days: 1, status: EventStatus::Published,
         staff: &[(Judge, "Lil Zoo"), (Judge, "Junior"), (Dj, "DJ Loopa"), (Mc, "MC Rhyno")],
         battles: &[
@@ -124,6 +135,7 @@ const EVENTS: &[Event] = &[
     },
     Event {
         name: "Zurich Toprock Jam", city: "Zurich", country: "CH", timezone: "Europe/Zurich", lat: 47.3769, lng: 8.5417,
+        about: About { description: "A jam for the foundations: toprock, footwork and style first. 1v1 bboys and a 2v2 by the lake, with live DJ and MC.", website: "https://zurichtoprock.example", email: "hello@zurichtoprock.example" },
         starts_in_days: 50, length_days: 1, status: EventStatus::Published,
         staff: &[(Judge, "Lilou"), (Dj, "DJ Krate"), (Mc, "MC Volta")],
         battles: &[
@@ -133,6 +145,7 @@ const EVENTS: &[Event] = &[
     },
     Event {
         name: "Lyon Footwork Fest", city: "Lyon", country: "FR", timezone: "Europe/Paris", lat: 45.7640, lng: 4.8357,
+        about: About { description: "Lyon's weekend of footwork: a 1v1 bracket on Saturday, a seven-to-smoke on Sunday, and workshops in between.", website: "https://lyonfootwork.example", email: "hello@lyonfootwork.example" },
         starts_in_days: 80, length_days: 2, status: EventStatus::Published,
         staff: &[(Judge, "Victor"), (Dj, "DJ Loopa")],
         battles: &[
@@ -142,6 +155,7 @@ const EVENTS: &[Event] = &[
     },
     Event {
         name: "Amsterdam Freeze Frame", city: "Amsterdam", country: "NL", timezone: "Europe/Amsterdam", lat: 52.3676, lng: 4.9041,
+        about: About { description: "One night, one bracket: the Freeze Frame 1v1 and a bgirl showcase in the heart of Amsterdam. Registration is full.", website: "https://freezeframe.example", email: "hello@freezeframe.example" },
         starts_in_days: 10, length_days: 1, status: EventStatus::RegistrationClosed,
         staff: &[(Judge, "Lil Zoo"), (Judge, "Physicx"), (Dj, "DJ Krate")],
         battles: &[
@@ -151,6 +165,7 @@ const EVENTS: &[Event] = &[
     },
     Event {
         name: "Seoul Power Moves", city: "Seoul", country: "KR", timezone: "Asia/Seoul", lat: 37.5665, lng: 126.9780,
+        about: About { description: "Power moves, big sets and a top 8 from across Asia. Two days in Seoul with a 2v2 crew bracket on day two.", website: "https://seoulpowermoves.example", email: "hello@seoulpowermoves.example" },
         starts_in_days: 45, length_days: 2, status: EventStatus::Published,
         staff: &[(Judge, "Menno"), (Judge, "Lilou"), (Judge, "Victor"), (Dj, "DJ Loopa"), (Mc, "MC Rhyno")],
         battles: &[
@@ -160,6 +175,7 @@ const EVENTS: &[Event] = &[
     },
     Event {
         name: "Montpellier Kids Jam", city: "Montpellier", country: "FR", timezone: "Europe/Paris", lat: 43.6108, lng: 3.8767,
+        about: About { description: "A jam for the next generation: 1v1 and 2v2 kids battles, open to dancers under 18, with parents welcome in the stands.", website: "https://montpellierkids.example", email: "hello@montpellierkids.example" },
         starts_in_days: 140, length_days: 1, status: EventStatus::Draft,
         staff: &[(Judge, "Kid Rocket"), (Dj, "DJ Krate")],
         battles: &[
@@ -174,12 +190,14 @@ const EVENTS: &[Event] = &[
 const IN_REVIEW: &[Event] = &[
     Event {
         name: "Geneva Lakeside Battle", city: "Geneva", country: "CH", timezone: "Europe/Zurich", lat: 46.2044, lng: 6.1432,
+        about: About { description: "Battles on the shore of Lake Geneva: a 1v1 bboy bracket with cash prizes and a 2v2 for every style.", website: "https://genevalakeside.example", email: "hello@genevalakeside.example" },
         starts_in_days: 60, length_days: 1, status: EventStatus::InReview,
         staff: &[(Judge, "Atlas"), (Dj, "DJ Loopa")],
         battles: &[Battle { prize: Some(("CHF", [800, 400, 200])), ..BBOY_1V1 }, CREW_2V2],
     },
     Event {
         name: "Milan Breaking Weekend", city: "Milan", country: "IT", timezone: "Europe/Rome", lat: 45.4642, lng: 9.19,
+        about: About { description: "A weekend of breaking in Milan, with bboy and bgirl brackets and an open floor all day.", website: "https://milanbreaking.example", email: "hello@milanbreaking.example" },
         starts_in_days: 25, length_days: 2, status: EventStatus::InReview,
         staff: &[],
         battles: &[BBOY_1V1, BGIRL_1V1],
@@ -308,18 +326,24 @@ async fn main() -> anyhow::Result<()> {
     let organizer = insert_user(&mut tx, &ORGANIZER, &password).await?;
     let imported = import_data(&mut tx, seed_admin).await?;
     let crews = insert_crews(&mut tx).await?;
-    let dancers = insert_dancers(&mut tx, seed_admin, &crews, &imported.dancers).await?;
     let ids = Ids {
-        dancers: dancers.clone(),
+        dancers: insert_dancers(&mut tx, seed_admin, &crews, &imported.dancers).await?,
         crews: CREWS.iter().map(|crew| crew.name).zip(crews).collect(),
     };
-    insert_events(&mut tx, seed_admin, EVENTS, &ids).await?;
+    // The seed's dancers the import already wrote were reused, not written again.
+    let new_dancers = ids
+        .dancers
+        .values()
+        .filter(|id| !imported.dancers.values().any(|i| i == *id))
+        .count();
+    // An organiser runs the invented jams; the imported ones were entered by the team, which runs none.
+    insert_events(&mut tx, organizer, EVENTS, &ids).await?;
     insert_events(&mut tx, organizer, IN_REVIEW, &ids).await?;
     tx.commit().await?;
 
     tracing::info!(
         events = EVENTS.len() + IN_REVIEW.len() + imported.events,
-        dancers = dancers.len() + imported.dancers.len(),
+        dancers = new_dancers + imported.dancers.len(),
         crews = CREWS.len() + imported.crews,
         "seeded; log in as {}, {} or {} with SEED_PASSWORD",
         ADMIN.email,
@@ -407,6 +431,7 @@ impl Battle {
             prize_first: first,
             prize_second: second,
             prize_third: third,
+            starts_at: None,
         }
     }
 }
@@ -521,7 +546,7 @@ async fn insert_events(
     ids: &Ids,
 ) -> anyhow::Result<()> {
     for event in events {
-        let event_id = insert_event(conn, organizer, event).await?;
+        let (event_id, first_day) = insert_event(conn, organizer, event).await?;
         for &(role, name) in event.staff {
             sqlx::query!(
                 "insert into event_staff (event_id, dancer_id, role) values ($1, $2, $3)",
@@ -532,33 +557,47 @@ async fn insert_events(
             .execute(&mut *conn)
             .await?;
         }
-        for battle in event.battles {
-            let fields = battle.fields();
+        for (index, battle) in event.battles.iter().enumerate() {
+            let fields = BattleFields {
+                starts_at: afternoon(first_day, index, event.length_days),
+                ..battle.fields()
+            };
             fields.validate()?;
             let battle_id = db::battles::insert(conn, event_id, &fields.display_name(), &fields)
                 .await?
                 .id;
             for entrant in battle.entrants {
                 let entry = ids.entry(battle, entrant)?;
-                db::battles::insert_entry(conn, battle_id, &entry).await?;
+                db::battles::insert_entry(conn, battle_id, fields.gender, &entry).await?;
             }
         }
     }
     Ok(())
 }
 
+/// Battles start in the afternoon: one a day on jams of several days, else 2h30 apart from 14:00.
+fn afternoon(first_day: NaiveDate, index: usize, length_days: i32) -> Option<NaiveDateTime> {
+    let days = usize::try_from(length_days).ok()?.max(1);
+    let day = first_day.checked_add_days(Days::new(u64::try_from(index % days).ok()?))?;
+    let minutes = 14 * 60 + 150 * u32::try_from(index / days).ok()?;
+    day.and_hms_opt(minutes / 60, minutes % 60, 0)
+}
+
+/// Writes the jam; returns its id and first day.
 async fn insert_event(
     conn: &mut PgConnection,
     organizer: Uuid,
     event: &Event,
-) -> sqlx::Result<Uuid> {
+) -> sqlx::Result<(Uuid, NaiveDate)> {
     let id = Uuid::now_v7();
-    sqlx::query!(
+    let first_day = sqlx::query_scalar!(
         "insert into events
-           (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country, lat, lng)
+           (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country, lat, lng,
+            description, website_url, contact_email)
          values ($1, $2, $3, $4, $5,
                  current_date + $6::int, current_date + $6::int + $7::int - 1,
-                 $8, $9, $10, $11, $12)",
+                 $8, $9, $10, $11, $12, $13, $14, $15)
+         returning starts_on",
         id,
         organizer,
         event.name,
@@ -571,8 +610,11 @@ async fn insert_event(
         event.country,
         event.lat,
         event.lng,
+        event.about.description,
+        event.about.website,
+        event.about.email,
     )
-    .execute(conn)
+    .fetch_one(conn)
     .await?;
-    Ok(id)
+    Ok((id, first_day))
 }

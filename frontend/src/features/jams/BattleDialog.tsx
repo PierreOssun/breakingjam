@@ -10,6 +10,7 @@ import { SelectField } from "../../components/SelectField";
 import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
 import { splitFieldErrors } from "../../lib/apiErrors";
+import { formatShortDateRange } from "../../lib/dates";
 import {
   type AgePreset,
   battleBody,
@@ -34,12 +35,15 @@ const FIELDS = [
   "prize_first",
   "prize_second",
   "prize_third",
+  "starts_at",
 ] as const;
 const SIZES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const BRACKETS = [2, 4, 8, 16, 32, 64];
 
 type BattleDialogProps = {
   jamId: string;
+  /** The jam's days, `YYYY-MM-DD`; a battle starts on one of them. */
+  days: string[];
   /** The battle to edit; a new one when absent. */
   battle?: Schemas["Battle"];
   open: boolean;
@@ -49,6 +53,7 @@ type BattleDialogProps = {
 /** Add or edit a battle: format, size, who may enter, age, bracket, spots and prizes (§4). */
 export function BattleDialog({
   jamId,
+  days,
   battle,
   open,
   onClose,
@@ -61,13 +66,16 @@ export function BattleDialog({
     () => currencies(i18n.language, battle?.prize_currency),
     [i18n.language, battle?.prize_currency],
   );
-  const form = useForm<BattleFormValues>({ defaultValues: battleValues() });
+  const firstDay = days[0] ?? "";
+  const form = useForm<BattleFormValues>({
+    defaultValues: battleValues(firstDay),
+  });
   const { register, handleSubmit, setError, setValue, watch, reset } = form;
   // Each opening starts from the battle being edited. A layout effect, so the reset lands
   // before the dialog shows and can never wipe what was just typed into it.
   useLayoutEffect(() => {
-    if (open) reset(battleValues(battle));
-  }, [open, battle, reset]);
+    if (open) reset(battleValues(firstDay, battle));
+  }, [open, battle, reset, firstDay]);
   const { errors, isDirty } = form.formState;
   const values = watch();
 
@@ -85,7 +93,9 @@ export function BattleDialog({
     onSuccess: ({ data, error }) => {
       if (!data) {
         const { fields, rest } = splitFieldErrors(error, FIELDS);
-        for (const [field, message] of fields) setError(field, { message });
+        // The day and time are one field to the server.
+        for (const [field, message] of fields)
+          setError(field === "starts_at" ? "start_time" : field, { message });
         if (rest) setError("root", { message: rest });
         return;
       }
@@ -212,6 +222,28 @@ export function BattleDialog({
             label={<OptionalLabel label={t("org.battles.maxEntries")} />}
             error={errors.max_entries?.message}
             {...register("max_entries")}
+          />
+        </div>
+        {/* One-day jams need only the time; longer ones also the day (DESIGN.md §6). */}
+        <div className="grid gap-6 sm:grid-cols-2">
+          {days.length > 1 && (
+            <SelectField
+              label={t("org.battles.startDay")}
+              {...register("start_day")}
+            >
+              {days.map((day) => (
+                <option key={day} value={day}>
+                  {formatShortDateRange(day, day, i18n.language)}
+                </option>
+              ))}
+            </SelectField>
+          )}
+          <TextField
+            type="time"
+            label={<OptionalLabel label={t("org.battles.startTime")} />}
+            hint={t("org.battles.startTimeHint")}
+            error={errors.start_time?.message}
+            {...register("start_time")}
           />
         </div>
         <SelectField

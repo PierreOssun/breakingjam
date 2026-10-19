@@ -262,6 +262,45 @@ describe("MapPage", () => {
     expect(await rows()).toEqual(["Concrete Cypher"]);
   });
 
+  it("takes the landing page's search from ?q= and frames its matches", async () => {
+    desktop();
+    api();
+    renderApp("/map?q=zurich");
+
+    expect(await rows()).toEqual(["Concrete Cypher"]);
+    expect(screen.getByRole("searchbox", { name: "Search jams" })).toHaveValue(
+      "zurich",
+    );
+    expect(
+      JSON.parse(screen.getByTestId("map").dataset.camera ?? "null"),
+    ).toEqual({
+      kind: "fit",
+      bounds: [8.54, 47.37, 8.54, 47.37],
+      maxZoom: 10,
+      animate: false,
+    });
+  });
+
+  it("frames the visitor's country when the ?q= search matches nothing", async () => {
+    desktop();
+    mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "GET /api/events.geojson": { status: 200, body: GEOJSON },
+      "GET /api/geo": { status: 200, body: { country: "CH" } },
+    });
+    renderApp("/map?q=nowhere");
+
+    await screen.findByRole("heading", { name: "No jams here yet" });
+    expect(
+      JSON.parse(screen.getByTestId("map").dataset.camera ?? "null"),
+    ).toEqual({
+      kind: "fit",
+      bounds: [5.9, 45.8, 10.5, 47.8],
+      maxZoom: 10,
+      animate: false,
+    });
+  });
+
   it("says when nothing is in view and clears filters and search", async () => {
     desktop();
     api();

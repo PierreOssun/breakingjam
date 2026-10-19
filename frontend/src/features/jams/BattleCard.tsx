@@ -1,4 +1,10 @@
-import { PencilSimple, Play, Trash, Trophy } from "@phosphor-icons/react";
+import {
+  Clock,
+  PencilSimple,
+  Play,
+  Trash,
+  Trophy,
+} from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,6 +14,7 @@ import { IconButton } from "../../components/IconButton";
 import { ResultBadge } from "../../components/ResultBadge";
 import { useToast } from "../../components/useToast";
 import type { Video } from "../../components/VideoDialog";
+import { formatBattleStart } from "../../lib/dates";
 import { AddChip, DancerChip } from "../dancers/DancerChip";
 import { membersPerEntry, prizeLine } from "./battleFields";
 import { entryLabel } from "./entryFields";
@@ -68,6 +75,23 @@ export function BattleCard({ jam, battle, entries, onPlay }: BattleCardProps) {
             </span>
           )}
         </div>
+        {battle.starts_at && (
+          <p className="flex items-center gap-1.5 text-body-sm text-muted">
+            <Clock
+              size={16}
+              weight="bold"
+              aria-hidden
+              className="shrink-0 text-primary-text"
+            />
+            {t("jam.battleStart", {
+              when: formatBattleStart(
+                battle.starts_at,
+                jam.starts_on === jam.ends_on,
+                i18n.language,
+              ),
+            })}
+          </p>
+        )}
         {prizes && (
           <p className="flex items-center gap-1.5 text-body-sm text-muted">
             <Trophy

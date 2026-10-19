@@ -1,6 +1,10 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
+  formatParts,
+  seededParts,
+} from "../../src/features/dancers/avatarParts";
+import {
   LIL_G,
   LOGGED_OUT,
   bodyOf,
@@ -185,7 +189,16 @@ describe("dancer identity", () => {
       within(dialog).getByLabelText("Skin tone"),
       "3",
     );
-    await userEvent.selectOptions(within(dialog).getByLabelText("Hair"), "4");
+    await userEvent.selectOptions(within(dialog).getByLabelText("Hair"), "8");
+    // Details combine freely; whatever the seed had, end on lash flicks alone.
+    for (const [name, on] of [
+      ["Lash flicks", true],
+      ["Lip tint", false],
+      ["Hoop earrings", false],
+    ] as const) {
+      const box = within(dialog).getByRole("checkbox", { name });
+      if ((box as HTMLInputElement).checked !== on) await userEvent.click(box);
+    }
     await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("Profile saved.")).toBeInTheDocument();
@@ -200,7 +213,50 @@ describe("dancer identity", () => {
       instagram_handle: "ventus_bj",
       bio: null,
     });
-    expect(body.avatar_parts).toMatch(/^h4-s3-c\d-o\d-e\d-b\d$/);
+    expect(body.avatar_parts).toMatch(/^h8-s3-c\d-o\d-e\d-b\d-d1$/);
+  });
+
+  it("stores the avatar only once the picker is touched, even when it ends on the seed", async () => {
+    const fetch = page(
+      user,
+      { can_edit: true },
+      {
+        [`PUT /api/dancers/${ID}`]: {
+          status: 200,
+          body: { ...DANCER, can_edit: true },
+        },
+      },
+    );
+    renderApp(`/dancers/${ID}`);
+
+    // Untouched: null, so a bgirl or bboy battle may still suggest a look.
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Add Instagram" }),
+    );
+    let dialog = screen.getByRole("dialog", { name: "Edit profile" });
+    await userEvent.type(within(dialog).getByLabelText(/^City/), "!");
+    await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+    expect(await screen.findByText("Profile saved.")).toBeInTheDocument();
+    expect((await bodyOf(fetch, `PUT /api/dancers/${ID}`)).avatar_parts).toBe(
+      null,
+    );
+
+    // Touched and put back: the seed's face, now the dancer's own choice.
+    await userEvent.click(
+      screen.getByRole("button", { name: "Add Instagram" }),
+    );
+    dialog = screen.getByRole("dialog", { name: "Edit profile" });
+    const hoops = within(dialog).getByRole("checkbox", {
+      name: "Hoop earrings",
+    });
+    await userEvent.click(hoops);
+    await userEvent.click(hoops);
+    await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+    await vi.waitFor(async () =>
+      expect((await bodyOf(fetch, `PUT /api/dancers/${ID}`)).avatar_parts).toBe(
+        formatParts(seededParts(ID)),
+      ),
+    );
   });
 
   it("lists claims for admins, who approve them after checking Instagram", async () => {

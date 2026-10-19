@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, event_id, name, format as \"format: BattleFormat\", team_size,\n                  gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                  bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, created_at, updated_at\n           from battles where id = $1",
+  "query": "insert into battles\n             (id, event_id, name, format, team_size, gender, age, age_min, age_max,\n              bracket_size, max_entries, prize_currency, prize_first, prize_second,\n              prize_third, starts_at, position)\n           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,\n                   (select coalesce(max(position) + 1, 0) from battles where event_id = $2))\n           returning id, event_id, name, format as \"format: BattleFormat\", team_size,\n                     gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                     bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -214,6 +214,17 @@
       },
       {
         "ordinal": 16,
+        "name": "starts_at",
+        "type_info": "Timestamp",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "starts_at"
+          }
+        }
+      },
+      {
+        "ordinal": 17,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -224,7 +235,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -237,7 +248,55 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Uuid",
+        "Uuid",
+        "Text",
+        {
+          "Custom": {
+            "name": "battle_format",
+            "kind": {
+              "Enum": [
+                "team",
+                "seven_to_smoke",
+                "na"
+              ]
+            }
+          }
+        },
+        "Int2",
+        {
+          "Custom": {
+            "name": "battle_gender",
+            "kind": {
+              "Enum": [
+                "bboy",
+                "bgirl",
+                "mixed"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "battle_age",
+            "kind": {
+              "Enum": [
+                "kids",
+                "adult",
+                "na"
+              ]
+            }
+          }
+        },
+        "Int2",
+        "Int2",
+        "Int2",
+        "Int4",
+        "Bpchar",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Timestamp"
       ]
     },
     "nullable": [
@@ -257,9 +316,10 @@
       true,
       true,
       false,
+      true,
       false,
       false
     ]
   },
-  "hash": "e6e44b31ea0af41182cea0455091d123697e8cd5c136dd0cd9f29adb36a54e91"
+  "hash": "6a4a0aa3b106ef1aa03d4e69a8a2392b832407251a50c14c879b41f6658b6454"
 }

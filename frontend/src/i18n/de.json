@@ -15,7 +15,7 @@
     "admin": "Admin"
   },
   "footer": {
-    "tagline": "Der zentrale Ort für Breaking-Jams."
+    "links": "Links der Seite"
   },
   "auth": {
     "login": {
@@ -79,33 +79,48 @@
     "pitch": "Der zentrale Ort für Breaking-Jams. Finde eine in deiner Nähe oder bring deine auf die Karte.",
     "mapPreview": "Karte öffnen",
     "organisers": {
-      "title": "Für Veranstalter",
-      "body": "Bring deine Jam dorthin, wo Tänzer:innen suchen.",
+      "title": "Bring deine Jam dorthin, wo Tänzer suchen.",
+      "body": "Kostenlos, und sie erscheint auf der Karte und auf der Seite jedes Tänzers, der dabei ist.",
       "step1Title": "Jam anlegen",
       "step1Body": "Name, Daten und Ort. Sie bleibt ein Entwurf, bis du sie zur Prüfung einreichst.",
       "step2Title": "Battles und Line-up",
       "step2Body": "1v1s, Crews, Seven to Smoke und deine Judges, DJ und MC.",
       "step3Title": "Einreichen",
-      "step3Body": "Ein BreakingJam-Admin prüft sie, dann erscheint sie auf der Karte und auf der Seite jeder Tänzerin und jedes Tänzers."
+      "step3Body": "Ein BreakingJam-Admin prüft sie, dann erscheint sie auf der Karte und auf der Seite jeder Tänzerin und jedes Tänzers.",
+      "overline": "Für Veranstalter"
     },
-    "featured": {
-      "title": "In deiner Nähe",
-      "inCountry": "Kommende Jams: {{country}}",
-      "inCountryAndNearby": "Kommende Jams: {{country}} und Umgebung",
-      "nearby": "Die nächstgelegenen kommenden Jams",
-      "soonest": "Die nächsten Jams auf der Karte",
-      "map": "Zur Karte"
+    "preview": {
+      "upcoming_one": "{{count}} kommende Jam",
+      "upcoming_other": "{{count}} kommende Jams"
     },
-    "counts": {
-      "title": "BreakingJam in Zahlen",
-      "countries": "Länder",
-      "battles": "Battles",
-      "dancers": "Tänzer:innen",
+    "next": {
+      "title": "Bald in deiner Nähe",
+      "around": "Rund um {{place}}",
+      "aroundYou": "In deiner Nähe",
+      "worldwide": "Weltweit",
+      "change": "ändern",
+      "map": "Alle auf der Karte"
+    },
+    "dancers": {
+      "overline": "Für Tänzer",
+      "title": "Jeder Battle, den du getanzt hast, auf einer Seite.",
+      "body": "Deine Jams, Runden und Ergebnisse, so wie Veranstalter sie eintragen.",
+      "search": "Deine Tänzerseite finden",
+      "placeholder": "Dein Tänzername",
+      "submit": "Finde mich",
+      "notThere": "Noch nicht dabei? Du erscheinst automatisch, sobald ein Veranstalter dich einträgt."
+    },
+    "scene": {
+      "title": "Die Szene bisher",
+      "battles_one": "Battle",
+      "battles_other": "Battles",
+      "countries_one": "Land",
+      "countries_other": "Länder",
+      "dancers_one": "Tänzer",
+      "dancers_other": "Tänzer",
       "byCountry": "Battles nach Land",
-      "battleCount_one": "{{count}} Battle",
-      "battleCount_other": "{{count}} Battles",
-      "more_one": "+ {{count}} weiteres Land",
-      "more_other": "+ {{count}} weitere Länder"
+      "more_one": "+{{count}} weiteres",
+      "more_other": "+{{count}} weitere"
     }
   },
   "status": {
@@ -145,7 +160,8 @@
     "contact": "Kontakt",
     "edit": "Jam bearbeiten",
     "website": "Website",
-    "email": "E-Mail"
+    "email": "E-Mail",
+    "battleStart": "Beginn {{when}}"
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -385,7 +401,10 @@
         "first": "1. Platz {{amount}}",
         "second": "2. Platz {{amount}}",
         "third": "3. Platz {{amount}}"
-      }
+      },
+      "startDay": "Tag",
+      "startTime": "Startzeit",
+      "startTimeHint": "Leer lassen, bis der Ablauf feststeht."
     },
     "entries": {
       "add": "Anmeldung hinzufügen",
@@ -479,7 +498,14 @@
           "Beanie",
           "Dutt mit Stirnband",
           "Afro",
-          "Buzz Cut"
+          "Buzz Cut",
+          "Lang, seitlicher Pony",
+          "Space Buns",
+          "Box Braids",
+          "Afro Puffs",
+          "Hoher Pferdeschwanz",
+          "Bob mit Pony",
+          "Cap über langen Haaren"
         ]
       },
       "skin": {
@@ -501,6 +527,11 @@
       "backdrop": {
         "label": "Hintergrund",
         "options": ["Klein-Blau", "Violett", "Tinte", "Nacht"]
+      },
+      "details": {
+        "lashes": "Wimpernschwung",
+        "lips": "Lippentönung",
+        "hoops": "Creolen"
       }
     }
   },
@@ -582,6 +613,7 @@
     "search": "Name, Alias oder @Handle",
     "hint": "Bboys, Bgirls, DJs, MCs, Judges.",
     "empty": "Niemand passt zu „{{q}}“.",
+    "nobody": "Noch niemand eingetragen.",
     "showMore": "Mehr anzeigen"
   }
 }

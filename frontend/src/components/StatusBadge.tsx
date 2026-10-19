@@ -47,3 +47,9 @@ export function StatusBadge({ status }: { status: Schemas["EventStatus"] }) {
     </span>
   );
 }
+
+/** The badge on a public card, only when the status matters to a visitor (DESIGN.md §4.3). */
+export function CardStatus({ status }: { status: Schemas["EventStatus"] }) {
+  if (status !== "registration_closed" && status !== "cancelled") return null;
+  return <StatusBadge status={status} />;
+}

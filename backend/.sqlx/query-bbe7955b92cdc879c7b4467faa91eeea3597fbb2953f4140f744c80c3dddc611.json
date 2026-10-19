@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, event_id, name, format as \"format: BattleFormat\", team_size,\n                  gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                  bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, created_at, updated_at\n           from battles where event_id = any($1) order by event_id, position, id",
+  "query": "select id, event_id, name, format as \"format: BattleFormat\", team_size,\n                  gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                  bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at, created_at, updated_at\n           from battles where id = $1",
   "describe": {
     "columns": [
       {
@@ -214,6 +214,17 @@
       },
       {
         "ordinal": 16,
+        "name": "starts_at",
+        "type_info": "Timestamp",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "starts_at"
+          }
+        }
+      },
+      {
+        "ordinal": 17,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -224,7 +235,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -237,7 +248,7 @@
     ],
     "parameters": {
       "Left": [
-        "UuidArray"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -257,9 +268,10 @@
       true,
       true,
       false,
+      true,
       false,
       false
     ]
   },
-  "hash": "3a2f9df6acef77a3f2f52a3404ca51e2c409432966fc03c2f31a125111c12041"
+  "hash": "bbe7955b92cdc879c7b4467faa91eeea3597fbb2953f4140f744c80c3dddc611"
 }

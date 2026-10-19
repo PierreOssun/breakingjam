@@ -1,6 +1,6 @@
 //! Unit tests of `crate::domain::battle`.
 
-use chrono::Utc;
+use chrono::{NaiveDate, Utc};
 use uuid::Uuid;
 use validator::Validate;
 
@@ -25,6 +25,7 @@ fn battle_fields(format: BattleFormat, team_size: Option<i16>, age: BattleAge) -
         prize_first: None,
         prize_second: None,
         prize_third: None,
+        starts_at: None,
     }
 }
 
@@ -46,6 +47,7 @@ fn battle(format: BattleFormat, team_size: Option<i16>) -> Battle {
         prize_second: None,
         prize_third: None,
         position: 0,
+        starts_at: None,
         created_at: Utc::now(),
         updated_at: Utc::now(),
     }
@@ -207,4 +209,17 @@ fn prizes_need_a_currency_and_a_currency_needs_a_prize() {
     assert!(currency_code("CNY").is_ok());
     assert!(currency_code("chf").is_err());
     assert!(currency_code("EURO").is_err());
+}
+
+#[test]
+fn a_battle_starts_on_one_of_its_jams_days() {
+    let day = |d: u32| NaiveDate::from_ymd_opt(2023, 9, d).unwrap();
+    let at = |d: u32| Some(day(d).and_hms_opt(14, 0, 0).unwrap());
+    let mut fields = battle_fields(BattleFormat::Team, Some(1), BattleAge::Adult);
+    // Unbreakable 2023: Friday 22 to Sunday 24 September.
+    assert!(fields.starts_during(day(22), day(24)), "no start is fine");
+    for (start, ok) in [(21, false), (22, true), (24, true), (25, false)] {
+        fields.starts_at = at(start);
+        assert_eq!(fields.starts_during(day(22), day(24)), ok, "day {start}");
+    }
 }

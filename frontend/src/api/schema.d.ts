@@ -858,6 +858,11 @@ export interface components {
             position: number;
             /**
              * Format: date-time
+             * @description When it starts, as wall-clock time in the jam's timezone; null until announced.
+             */
+            starts_at?: string | null;
+            /**
+             * Format: date-time
              * @description Row creation time.
              */
             created_at: string;
@@ -924,6 +929,11 @@ export interface components {
              * @description Cash prize for 3rd place, in whole units.
              */
             prize_third?: number | null;
+            /**
+             * Format: date-time
+             * @description When it starts, wall-clock time in the jam's timezone, on one of its days; null = not announced.
+             */
+            starts_at?: string | null;
         };
         /**
          * @description How a battle is run.
@@ -1410,7 +1420,7 @@ export interface components {
         EventFields: {
             /** @description Display name, up to 200 characters. */
             name: string;
-            /** @description Free text, up to 5000 characters; blank is stored as null. */
+            /** @description A short pitch, up to 200 characters; blank is stored as null. */
             description?: string | null;
             /**
              * Format: date
@@ -1483,8 +1493,7 @@ export interface components {
         EventResponse: components["schemas"]["Event"] & {
             /** @description Whether the caller may edit it, change its status or delete it. */
             can_edit: boolean;
-            /** @description Who runs it: the jam page's organiser card (M12c). */
-            organizer: components["schemas"]["OrganizerRef"];
+            organizer?: components["schemas"]["OrganizerRef"] | null;
         };
         /**
          * @description Lifecycle of a jam (§4 "Event status transitions").
@@ -1861,8 +1870,7 @@ export interface components {
             items: (components["schemas"]["Event"] & {
                 /** @description Whether the caller may edit it, change its status or delete it. */
                 can_edit: boolean;
-                /** @description Who runs it: the jam page's organiser card (M12c). */
-                organizer: components["schemas"]["OrganizerRef"];
+                organizer?: components["schemas"]["OrganizerRef"] | null;
             })[];
             /** @description Pass as `?cursor=` for the next page; null on the last one. */
             next_cursor?: string | null;
@@ -2685,6 +2693,8 @@ export interface operations {
                 q?: string;
                 /** @description Matches the first or second flag. */
                 country?: string;
+                /** @description Only verified (`true`) or only unverified (`false`) dancers. */
+                verified?: boolean;
                 /** @description `next_cursor` of the previous page. */
                 cursor?: string;
                 /** @description Page size, defaulted and clamped by `page::limit`. */

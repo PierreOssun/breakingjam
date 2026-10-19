@@ -76,14 +76,15 @@ function YearLabel({ year }: { year: number }) {
   );
 }
 
-function JamRow({
+/** One jam a dancer was in (§4.14); the play button shows when there is a video and `onPlay`. */
+export function JamRow({
   participation: p,
   past,
   onPlay,
 }: {
   participation: Participation;
   past: boolean;
-  onPlay: () => void;
+  onPlay?: () => void;
 }) {
   const { t, i18n } = useTranslation();
 
@@ -115,7 +116,7 @@ function JamRow({
           </div>
         )}
       </div>
-      {p.video_url && (
+      {p.video_url && onPlay && (
         <Button
           variant="ghost"
           size="icon"

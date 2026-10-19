@@ -96,6 +96,43 @@ describe("PeoplePage", () => {
     ).toBeInTheDocument();
   });
 
+  it("says when nobody is listed yet", async () => {
+    mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "GET /api/dancers": page([]),
+    });
+    renderApp("/dancers");
+
+    expect(
+      await screen.findByText("Nobody is listed yet."),
+    ).toBeInTheDocument();
+  });
+
+  it("clears the search when the header's link opens the page again", async () => {
+    mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "GET /api/dancers": page([]),
+    });
+    const router = renderApp("/dancers?q=zzz");
+    await screen.findByText("No one matches “zzz”.");
+
+    await userEvent.click(
+      within(screen.getByRole("banner")).getByRole("link", {
+        name: "Find someone",
+      }),
+    );
+
+    expect(
+      await screen.findByText("Nobody is listed yet."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("searchbox", { name: "Name, alias or @handle" }),
+    ).toHaveValue("");
+    // The stale search must not come back once the typing pause has passed.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(router.state.location.search).toBe("");
+  });
+
   it("shows more from the next page", async () => {
     const fetch = mockApi({
       "GET /api/auth/me": LOGGED_OUT,

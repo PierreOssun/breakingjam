@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Flag } from "../../components/Flag";
-import { StatusBadge } from "../../components/StatusBadge";
+import { CardStatus } from "../../components/StatusBadge";
 import { formatDateRange, formatShortDateRange } from "../../lib/dates";
 import { JamFlyer } from "../jams/JamFlyer";
 import type { MapJam } from "./jams";
@@ -13,9 +13,12 @@ type RowCardProps = {
   onSelect?: (jam: MapJam, trigger: HTMLElement) => void;
 };
 
+/** A card's border, hover and focus ring; the colours come with the card (§4.3). */
+export const cardShell =
+  "relative rounded-lg border transition-colors duration-fast hover:border-border-strong has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus has-focus-visible:outline-solid";
 // The title holds the button or link, stretched over the card by `after:`; the focus ring
 // moves to the card (§4.3).
-const target =
+export const stretched =
   "text-left after:absolute after:inset-0 after:rounded-lg after:content-[''] focus-visible:outline-none";
 
 /** A jam as a row card: the map's side panel and the mobile list (DESIGN.md §4.3). */
@@ -33,7 +36,7 @@ export function RowCard({ jam, selected = false, onSelect }: RowCardProps) {
   return (
     <article
       data-row={jam.id}
-      className={`relative flex gap-3 rounded-lg border p-3 transition-colors duration-fast hover:border-border-strong has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus has-focus-visible:outline-solid ${selected ? "border-primary-text bg-surface-raised" : "border-border bg-surface"}`}
+      className={`${cardShell} flex gap-3 p-3 ${selected ? "border-primary-text bg-surface-raised" : "border-border bg-surface"}`}
     >
       <JamFlyer
         jam={jam}
@@ -51,12 +54,12 @@ export function RowCard({ jam, selected = false, onSelect }: RowCardProps) {
               type="button"
               aria-current={selected || undefined}
               onClick={(e) => onSelect(jam, e.currentTarget)}
-              className={`cursor-pointer ${target}`}
+              className={`cursor-pointer ${stretched}`}
             >
               {name}
             </button>
           ) : (
-            <Link to={`/jams/${jam.slug}`} className={target}>
+            <Link to={`/jams/${jam.slug}`} className={stretched}>
               {name}
             </Link>
           )}
@@ -65,7 +68,7 @@ export function RowCard({ jam, selected = false, onSelect }: RowCardProps) {
           <Flag code={jam.country} size="bare" />
           {jam.city}
         </p>
-        <StatusBadge status={jam.status} />
+        <CardStatus status={jam.status} />
       </div>
     </article>
   );

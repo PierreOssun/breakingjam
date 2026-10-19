@@ -121,20 +121,25 @@ function JamToReview({ jam }: { jam: Jam }) {
           {jam.city}, {countryName(jam.country, i18n.language)}
         </p>
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm">
-          <span className="text-muted">{t("admin.jams.by")}</span>
-          <Link
-            to={`/organizers/${organizer.id}`}
-            className="font-bold underline"
-          >
-            {organizer.display_name}
-          </Link>
-          {organizer.verified && <VerifiedTick />}
-          {organizer.instagram_handle && (
-            <ExternalLink
-              href={`https://instagram.com/${organizer.instagram_handle}`}
-            >
-              @{organizer.instagram_handle}
-            </ExternalLink>
+          {/* None when the BreakingJam team entered the jam. */}
+          {organizer && (
+            <>
+              <span className="text-muted">{t("admin.jams.by")}</span>
+              <Link
+                to={`/organizers/${organizer.id}`}
+                className="font-bold underline"
+              >
+                {organizer.display_name}
+              </Link>
+              {organizer.verified && <VerifiedTick />}
+              {organizer.instagram_handle && (
+                <ExternalLink
+                  href={`https://instagram.com/${organizer.instagram_handle}`}
+                >
+                  @{organizer.instagram_handle}
+                </ExternalLink>
+              )}
+            </>
           )}
           {jam.instagram_url && (
             <ExternalLink href={jam.instagram_url}>

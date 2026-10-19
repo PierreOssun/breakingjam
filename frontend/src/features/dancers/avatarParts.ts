@@ -1,7 +1,8 @@
-// The generated pixel avatar (DESIGN.md §4.16): a 32×32 bust drawn from six parts. Pure, so
-// the drawing is tested without a browser; `PixelAvatar.tsx` turns the grid into SVG.
+// The generated pixel avatar (DESIGN.md §4.16): a 32×32 bust drawn from six parts and
+// optional details. Pure, so the drawing is tested without a browser; `PixelAvatar.tsx` turns
+// the grid into SVG. `frontend/pixel-avatar-generator.py` is the reference drawing.
 
-/** The six parts, each an index into its option list below. */
+/** The six parts, each an index into its option list below, and the details as a bitmask. */
 export type AvatarParts = {
   hair: number;
   skin: number;
@@ -9,16 +10,33 @@ export type AvatarParts = {
   hoodie: number;
   extra: number;
   backdrop: number;
+  /** Bits of `DETAILS`; 0 for none. */
+  details: number;
 };
 
-type Part = keyof AvatarParts;
+type Part = Exclude<keyof AvatarParts, "details">;
 
 /** Each part's code letter and option names, in the order of `dancers.avatar_parts`. */
 export const PARTS: { part: Part; letter: string; options: string[] }[] = [
   {
     part: "hair",
     letter: "h",
-    options: ["spiky", "cap", "beanie", "bun", "afro", "buzz"],
+    // New styles go at the end: stored codes keep pointing at the same hair.
+    options: [
+      "spiky",
+      "cap",
+      "beanie",
+      "bun",
+      "afro",
+      "buzz",
+      "long",
+      "spaceBuns",
+      "braids",
+      "puffs",
+      "ponytail",
+      "bob",
+      "capLong",
+    ],
   },
   { part: "skin", letter: "s", options: ["light", "tan", "medium", "deep"] },
   {
@@ -39,9 +57,24 @@ export const PARTS: { part: Part; letter: string; options: string[] }[] = [
   },
 ];
 
-/** `h2-s1-c0-o3-e0-b1`: how `dancers.avatar_parts` stores a choice. */
+/** The details any avatar may combine, each one bit of `AvatarParts.details`. */
+export const DETAILS = [
+  { name: "lashes", bit: 1 },
+  { name: "lips", bit: 2 },
+  { name: "hoops", bit: 4 },
+] as const;
+
+export type Detail = (typeof DETAILS)[number]["name"];
+
+/** Whether the avatar has that detail on. */
+export function hasDetail(parts: AvatarParts, name: Detail): boolean {
+  return DETAILS.some((d) => d.name === name && (parts.details & d.bit) !== 0);
+}
+
+/** `h2-s1-c0-o3-e0-b1`, then `-d5` when details are on: how `dancers.avatar_parts` stores a choice. */
 export function formatParts(parts: AvatarParts): string {
-  return PARTS.map(({ part, letter }) => `${letter}${parts[part]}`).join("-");
+  const code = PARTS.map(({ part, letter }) => `${letter}${parts[part]}`);
+  return [...code, ...(parts.details ? [`d${parts.details}`] : [])].join("-");
 }
 
 /** The stored code as parts; null when blank or malformed (then the seed decides). */
@@ -49,18 +82,25 @@ export function parseParts(
   code: string | null | undefined,
 ): AvatarParts | null {
   const pieces = code?.trim().split("-") ?? [];
-  if (pieces.length !== PARTS.length) return null;
-  const parts = {} as AvatarParts;
+  if (pieces.length !== PARTS.length && pieces.length !== PARTS.length + 1)
+    return null;
+  const number = (piece: string | undefined, letter: string, count: number) => {
+    const digits = piece?.slice(1) ?? "";
+    const n = Number(digits);
+    return piece?.[0] === letter && /^\d{1,2}$/.test(digits) && n < count
+      ? n
+      : null;
+  };
+  const parts = { details: 0 } as AvatarParts;
   for (const [i, { part, letter, options }] of PARTS.entries()) {
-    const piece = pieces[i] ?? "";
-    const n = Number(piece.slice(1));
-    if (
-      piece[0] !== letter ||
-      !/^\d$/.test(piece.slice(1)) ||
-      n >= options.length
-    )
-      return null;
+    const n = number(pieces[i], letter, options.length);
+    if (n === null) return null;
     parts[part] = n;
+  }
+  if (pieces.length > PARTS.length) {
+    const details = number(pieces[PARTS.length], "d", 8);
+    if (details === null) return null;
+    parts.details = details;
   }
   return parts;
 }
@@ -84,13 +124,19 @@ export function seededParts(id: string): AvatarParts {
     h = Math.floor(h / n);
     return value;
   };
+  // Every style is equally likely and no part is tied to a gender; each detail is on one
+  // time in three (§4.16). Bgirls and bboys get theirs from their battles (the API).
   const parts = {
-    hair: pick(6),
+    hair: pick(13),
     skin: pick(4),
     hairColour: pick(5),
     hoodie: pick(5),
     extra: pick(3),
     backdrop: pick(4),
+    details: DETAILS.reduce(
+      (bits, { bit }) => bits | (pick(3) === 0 ? bit : 0),
+      0,
+    ),
   };
   // A hoodie the colour of its backdrop disappears; the next one never clashes.
   if (CLASHES[parts.backdrop] === parts.hoodie) parts.hoodie += 1;
@@ -133,6 +179,8 @@ const BACKDROPS = [
   { base: "#141826", ring: "#283048", rim: "#8FAAFF" },
 ];
 const EYE = "#2B2233";
+const LIP = "#B4475F";
+const SILVER = ["#E3E8F4", "#9AA3BC"];
 const GOLD = ["#F2C14E", "#C7952B"];
 const PHONES = { base: "#1C2133", light: "#6B7391" };
 
@@ -186,7 +234,10 @@ export function drawAvatar(parts: AvatarParts): string[][] {
   if (parts.hair === 4) drawAfro(grid, hair);
   drawHead(grid, skin);
   drawFace(grid, skin, hair);
+  drawMakeUp(grid, parts);
   HAIRSTYLES[parts.hair]!(grid, hair, hoodie);
+  // Over the hair: hoops show even under long hair.
+  if (hasDetail(parts, "hoops")) drawHoops(grid);
   if (parts.extra === 2) drawChain(grid);
   outline(grid);
   rimLight(grid, backdrop.rim);
@@ -351,17 +402,28 @@ const spiky: HairStyle = (grid, hair) => {
   ]);
 };
 
-const cap: HairStyle = (grid, hair, hoodie) => {
-  // The cap matches the hoodie; the brim points to the side.
+/** A cap in the hoodie's colours, its brim pointing to one side. */
+function capCrown(
+  grid: Grid,
+  hoodie: (typeof HOODIES)[number],
+  brim: "left" | "right",
+) {
   const fabric = (x: number) => (x >= 19 ? hoodie.shade : hoodie.base);
   grid.shape(
     { 4: [12, 19], 5: [11, 20], 6: [10, 21], 7: [10, 21], 8: [10, 21] },
     fabric,
   );
   grid.row(9, 9, 22, () => hoodie.shade);
-  grid.shape({ 9: [3, 9], 10: [4, 9] }, () => hoodie.shade);
+  grid.shape(
+    brim === "left" ? { 9: [3, 9], 10: [4, 9] } : { 9: [22, 28], 10: [22, 27] },
+    () => hoodie.shade,
+  );
   grid.dot(15, 3, hoodie.shade);
   grid.row(5, 12, 13, () => hoodie.detail);
+}
+
+const cap: HairStyle = (grid, hair, hoodie) => {
+  capCrown(grid, hoodie, "left");
   grid.shape({ 10: [10, 11] }, () => hair.base);
   grid.dot(21, 10, hair.shade);
   sideburns(grid, hair.shade, 11, 13);
@@ -439,7 +501,195 @@ const buzz: HairStyle = (grid, hair) => {
   ]);
 };
 
-const HAIRSTYLES: HairStyle[] = [spiky, cap, beanie, bun, afro, buzz];
+/** Hair over the top of the head, for the long and tied-up styles; a parting at the centre. */
+function crown(grid: Grid, hair: (typeof HAIR)[number]) {
+  grid.shape(
+    {
+      4: [12, 19],
+      5: [11, 20],
+      6: [10, 21],
+      7: [9, 22],
+      8: [9, 22],
+      9: [9, 22],
+    },
+    hairPaint(hair),
+  );
+  grid.row(10, 9, 10, () => hair.base);
+  grid.row(10, 21, 22, () => hair.shade);
+}
+
+function parting(grid: Grid, hair: (typeof HAIR)[number]) {
+  for (const y of [5, 6, 7]) grid.dot(15, y, hair.shade);
+}
+
+/** Hair falling past the ears onto the shoulders, wider below the jaw, cut straight at `to`. */
+function curtains(grid: Grid, hair: (typeof HAIR)[number], to: number) {
+  for (let y = 10; y <= to; y++) {
+    const [left, right] = y < 20 ? [7, 24] : [6, 25];
+    grid.row(y, left, 9, () => hair.base);
+    grid.row(y, 22, right, () => hair.shade);
+  }
+}
+
+/** A filled disc of hair, rough like the afro. */
+function puff(
+  grid: Grid,
+  hair: (typeof HAIR)[number],
+  cx: number,
+  cy: number,
+  r: number,
+) {
+  for (let y = Math.floor(cy - r); y <= Math.ceil(cy + r); y++) {
+    for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) {
+      if (Math.hypot(x - cx, y - cy) >= r) continue;
+      const rough = (x * 7 + y * 13) % (x >= cx ? 3 : 5) === 0;
+      grid.dot(x, y, rough || x >= cx + r / 2 ? hair.shade : hair.base);
+    }
+  }
+}
+
+const long: HairStyle = (grid, hair) => {
+  curtains(grid, hair, 27);
+  crown(grid, hair);
+  parting(grid, hair);
+  // A side fringe swept over the left of the forehead, clear of the brow.
+  grid.row(10, 11, 14, () => hair.base);
+  grid.dot(10, 11, hair.base);
+  streak(grid, hair.light, [
+    [11, 7],
+    [12, 6],
+    [13, 5],
+  ]);
+};
+
+const spaceBuns: HairStyle = (grid, hair, hoodie) => {
+  crown(grid, hair);
+  puff(grid, hair, 10.5, 3.5, 3.2);
+  puff(grid, hair, 20.5, 3.5, 3.2);
+  parting(grid, hair);
+  // Hair ties where each bun meets the head.
+  grid.row(6, 10, 12, () => hoodie.base);
+  grid.row(6, 19, 21, () => hoodie.base);
+  sideburns(grid, hair.shade, 11, 13);
+};
+
+const braids: HairStyle = (grid, hair, hoodie) => {
+  crown(grid, hair);
+  parting(grid, hair);
+  sideburns(grid, hair.shade, 11, 12);
+  // Two plaited braids on each side, with a bead and a tip.
+  for (let y = 10; y <= 27; y++) {
+    const columns = y < 20 ? [7, 8, 23, 24] : [8, 9, 22, 23];
+    for (const x of columns)
+      grid.dot(x, y, (x + y) % 2 ? hair.base : hair.shade);
+  }
+  for (const x of [8, 9, 22, 23]) {
+    grid.dot(x, 28, hoodie.base);
+    grid.dot(x, 29, hair.shade);
+  }
+};
+
+const puffs: HairStyle = (grid, hair, hoodie) => {
+  puff(grid, hair, 7.5, 6, 4.2);
+  puff(grid, hair, 23.5, 6, 4.2);
+  crown(grid, hair);
+  parting(grid, hair);
+  for (const [x, y] of [
+    [11, 6],
+    [11, 7],
+    [20, 6],
+    [20, 7],
+  ] as const)
+    grid.dot(x, y, hoodie.base);
+  sideburns(grid, hair.shade, 11, 12);
+};
+
+const ponytail: HairStyle = (grid, hair, hoodie) => {
+  // The tail rises from the back of the head and falls to the right.
+  for (let y = 2; y <= 15; y++) {
+    for (let x = 22; x <= 28; x++) {
+      if (((x - 25) / 2.6) ** 2 + ((y - 8.5) / 6.4) ** 2 < 1)
+        grid.dot(x, y, x >= 26 ? hair.shade : hair.base);
+    }
+  }
+  crown(grid, hair);
+  for (const [x, y] of [
+    [21, 5],
+    [22, 5],
+    [22, 6],
+  ] as const)
+    grid.dot(x, y, hoodie.base);
+  sideburns(grid, hair.shade, 11, 13);
+  streak(grid, hair.light, [
+    [12, 7],
+    [13, 6],
+    [14, 5],
+  ]);
+};
+
+const bob: HairStyle = (grid, hair) => {
+  crown(grid, hair);
+  // Blunt bangs to just above the brows, and sides cut straight at the jaw.
+  grid.row(10, 9, 22, hairPaint(hair));
+  for (let y = 11; y <= 19; y++) {
+    grid.row(y, 7, 9, () => hair.base);
+    grid.row(y, 22, 24, () => hair.shade);
+  }
+  streak(grid, hair.light, [
+    [11, 8],
+    [12, 7],
+    [13, 6],
+  ]);
+};
+
+const capLong: HairStyle = (grid, hair, hoodie) => {
+  curtains(grid, hair, 27);
+  capCrown(grid, hoodie, "right");
+  grid.row(10, 10, 13, () => hair.base);
+};
+
+const HAIRSTYLES: HairStyle[] = [
+  spiky,
+  cap,
+  beanie,
+  bun,
+  afro,
+  buzz,
+  long,
+  spaceBuns,
+  braids,
+  puffs,
+  ponytail,
+  bob,
+  capLong,
+];
+
+/** Lash flicks at the outer corners and a lip tint (DESIGN.md §4.16 details). */
+function drawMakeUp(grid: Grid, parts: AvatarParts) {
+  if (hasDetail(parts, "lashes")) {
+    for (const [x, y] of [
+      [10, 12],
+      [10, 13],
+      [21, 12],
+      [21, 13],
+    ] as const)
+      grid.dot(x, y, INK);
+  }
+  if (hasDetail(parts, "lips")) {
+    grid.row(19, 14, 16, () => LIP);
+    grid.dot(17, 18, LIP);
+  }
+}
+
+/** A small silver hoop under each ear. */
+function drawHoops(grid: Grid) {
+  for (const cx of [8, 23]) {
+    grid.dot(cx, 16, SILVER[0]!);
+    grid.dot(cx - 1, 17, SILVER[0]!);
+    grid.dot(cx + 1, 17, SILVER[1]!);
+    grid.dot(cx, 18, SILVER[1]!);
+  }
+}
 
 /** Cups on the collarbones, the band behind the neck. */
 function drawHeadphones(grid: Grid) {

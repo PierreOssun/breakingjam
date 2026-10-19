@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, display_name, instagram_handle, verified_at is not null as \"verified!\"\n           from app_users where id = any($1)",
+  "query": "select id, display_name, instagram_handle, verified_at is not null as \"verified!\"\n           from app_users where id = any($1) and role not in ('seed_admin', 'admin')",
   "describe": {
     "columns": [
       {
@@ -55,5 +55,5 @@
       null
     ]
   },
-  "hash": "ff78302861b650775e317fb404f96e1483a0b0b3e9307fa9a60c26566bb54425"
+  "hash": "80c92d91dfc19a47a4e3d1cfd82ea1be25b7a2fc7b10a83ed056695bd29b7e22"
 }

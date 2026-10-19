@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import { Button } from "../components/Button";
@@ -14,15 +14,23 @@ export function PeoplePage() {
   const q = params.get("q") ?? "";
   const [text, setText] = useState(q);
   // Search once typing pauses; the URL keeps the search, so back and shared links return to it.
+  const pushed = useRef(q);
   useEffect(() => {
     const next = text.trim();
     if (next === q) return;
-    const timer = setTimeout(
-      () => setParams(next ? { q: next } : {}, { replace: true }),
-      250,
-    );
+    const timer = setTimeout(() => {
+      pushed.current = next;
+      setParams(next ? { q: next } : {}, { replace: true });
+    }, 250);
     return () => clearTimeout(timer);
   }, [text, q, setParams]);
+  // A `q` this page did not push (back, forward, the header's link) replaces what was typed.
+  useEffect(() => {
+    if (q !== pushed.current) {
+      pushed.current = q;
+      setText(q);
+    }
+  }, [q]);
   const people = useDancerSearch(q);
   const items = people.data?.pages.flatMap((page) => page.items) ?? [];
 
@@ -42,7 +50,9 @@ export function PeoplePage() {
       />
       {people.isError && <p className="text-danger">{t("errors.generic")}</p>}
       {people.isSuccess && items.length === 0 && (
-        <InlineEmpty>{t("people.empty", { q })}</InlineEmpty>
+        <InlineEmpty>
+          {q ? t("people.empty", { q }) : t("people.nobody")}
+        </InlineEmpty>
       )}
       <ul aria-label={t("pages.people")}>
         {items.map((person) => (

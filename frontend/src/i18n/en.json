@@ -15,7 +15,7 @@
     "admin": "Admin"
   },
   "footer": {
-    "tagline": "The central place for breaking jams."
+    "links": "Site links"
   },
   "auth": {
     "login": {
@@ -79,33 +79,48 @@
     "pitch": "The central place for breaking jams. Find one near you, or put yours on the map.",
     "mapPreview": "Open the map",
     "organisers": {
-      "title": "For organisers",
-      "body": "Put your jam where dancers look for one.",
+      "title": "Put your jam where dancers look.",
+      "body": "Free to list, and it lands on the map and on the page of every dancer in it.",
       "step1Title": "Create your jam",
       "step1Body": "Name, dates and place. It stays a draft until you submit it.",
       "step2Title": "Add battles and lineup",
       "step2Body": "1v1s, crews, seven-to-smoke, and your judges, DJ and MC.",
       "step3Title": "Submit it",
-      "step3Body": "A BreakingJam admin checks it, then it goes on the map and on the page of every dancer in it."
+      "step3Body": "A BreakingJam admin checks it, then it goes on the map and on the page of every dancer in it.",
+      "overline": "For organisers"
     },
-    "featured": {
-      "title": "Featured near you",
-      "inCountry": "Upcoming jams in {{country}}",
-      "inCountryAndNearby": "Upcoming jams in {{country}} and nearby",
-      "nearby": "The closest upcoming jams",
-      "soonest": "The next jams on the map",
-      "map": "See the map"
+    "preview": {
+      "upcoming_one": "{{count}} upcoming jam",
+      "upcoming_other": "{{count}} upcoming jams"
     },
-    "counts": {
-      "title": "BreakingJam in numbers",
-      "countries": "Countries",
-      "battles": "Battles",
-      "dancers": "Dancers",
+    "next": {
+      "title": "Next up near you",
+      "around": "Around {{place}}",
+      "aroundYou": "Around you",
+      "worldwide": "Worldwide",
+      "change": "change",
+      "map": "See all on the map"
+    },
+    "dancers": {
+      "overline": "For dancers",
+      "title": "Every battle you've entered, on one page.",
+      "body": "Your jams, rounds and results, as organisers list them.",
+      "search": "Find your dancer page",
+      "placeholder": "Your dancer name",
+      "submit": "Find me",
+      "notThere": "Not there yet? You appear automatically once an organiser lists you."
+    },
+    "scene": {
+      "title": "The scene so far",
+      "battles_one": "battle",
+      "battles_other": "battles",
+      "countries_one": "country",
+      "countries_other": "countries",
+      "dancers_one": "dancer",
+      "dancers_other": "dancers",
       "byCountry": "Battles by country",
-      "battleCount_one": "{{count}} battle",
-      "battleCount_other": "{{count}} battles",
-      "more_one": "+ {{count}} more country",
-      "more_other": "+ {{count}} more countries"
+      "more_one": "+{{count}} more",
+      "more_other": "+{{count}} more"
     }
   },
   "status": {
@@ -145,7 +160,8 @@
     "contact": "Contact",
     "edit": "Edit jam",
     "website": "Website",
-    "email": "Email"
+    "email": "Email",
+    "battleStart": "Starts {{when}}"
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -385,7 +401,10 @@
         "first": "1st {{amount}}",
         "second": "2nd {{amount}}",
         "third": "3rd {{amount}}"
-      }
+      },
+      "startDay": "Day",
+      "startTime": "Start time",
+      "startTimeHint": "Leave empty until the running order is set."
     },
     "entries": {
       "add": "Add an entry",
@@ -479,7 +498,14 @@
           "Beanie",
           "Bun and headband",
           "Afro",
-          "Buzz cut"
+          "Buzz cut",
+          "Long, side fringe",
+          "Space buns",
+          "Box braids",
+          "Afro puffs",
+          "High ponytail",
+          "Bob with bangs",
+          "Cap over long hair"
         ]
       },
       "skin": {
@@ -501,6 +527,11 @@
       "backdrop": {
         "label": "Background",
         "options": ["Klein blue", "Violet", "Ink", "Night"]
+      },
+      "details": {
+        "lashes": "Lash flicks",
+        "lips": "Lip tint",
+        "hoops": "Hoop earrings"
       }
     }
   },
@@ -582,6 +613,7 @@
     "search": "Name, alias or @handle",
     "hint": "Bboys, bgirls, DJs, MCs, judges.",
     "empty": "No one matches “{{q}}”.",
+    "nobody": "Nobody is listed yet.",
     "showMore": "Show more"
   }
 }

@@ -42,6 +42,20 @@ impl World {
 }
 
 #[sqlx::test]
+async fn jams_the_team_entered_name_no_organiser(pool: PgPool) {
+    let w = world(pool.clone()).await;
+    let team = sign_up(&w.app, "team@example.com").await;
+    set_role(&pool, "team@example.com", "seed_admin").await;
+    let jam = w.draft(&team, "BC One 2023").await;
+    w.call(&format!("/api/events/{jam}/submit"), json!({}), Some(&team))
+        .await;
+
+    let queue = w.read("/api/admin/events", Some(&w.admin)).await;
+    assert_eq!(queue.json["items"][0]["id"], jam.as_str());
+    assert_eq!(queue.json["items"][0]["organizer"], Value::Null);
+}
+
+#[sqlx::test]
 async fn organisers_submit_and_admins_approve(pool: PgPool) {
     let w = world(pool).await;
     let jam = w.draft(&w.organizer, "Paris Cypher").await;

@@ -10,19 +10,29 @@ use crate::domain::{
     crew::CrewRef,
     dancer::{
         BattleRef, Dancer, DancerFields, DancerSource, DancerSummary, EventRef, FieldChange,
-        Participation,
+        Participation, default_look,
     },
     event::EventStatus,
 };
 
+/// What `search` narrows to; each `None` matches everyone.
+#[derive(Debug)]
+pub struct DancerFilter<'a> {
+    /// Substring of the name, an alias or the handle.
+    pub query: Option<&'a str>,
+    /// The first or second flag.
+    pub country: Option<&'a str>,
+    /// Only verified (`true`) or only unverified (`false`) dancers.
+    pub verified: Option<bool>,
+}
+
 /// Search by name, alias or handle (case-insensitive substring), notable dancers first.
 pub async fn search(
     pool: &PgPool,
-    query: Option<&str>,
-    country: Option<&str>,
+    filter: &DancerFilter<'_>,
     window: super::Window,
 ) -> sqlx::Result<Vec<DancerSummary>> {
-    let pattern = query.map(super::contains_pattern);
+    let pattern = filter.query.map(super::contains_pattern);
     let rows = sqlx::query!(
         r#"select id, dancer_name, aliases, country, country2, city, instagram_handle,
                   verified_at is not null as "verified!", avatar_url, avatar_parts
@@ -33,10 +43,12 @@ pub async fn search(
                   or instagram_handle ilike $1
                   or exists (select 1 from unnest(aliases) a where a ilike $1))
              and ($2::text is null or country = $2 or country2 = $2)
+             and ($3::bool is null or (verified_at is not null) = $3)
            order by notable desc, lower(dancer_name), id
-           limit $3 offset $4"#,
+           limit $4 offset $5"#,
         pattern,
-        country,
+        filter.country,
+        filter.verified,
         window.limit,
         window.offset,
     )
@@ -431,4 +443,30 @@ pub async fn count_live(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<i64> {
     )
     .fetch_one(pool)
     .await
+}
+
+/// Gives the dancers nobody has drawn yet the look a bgirl or bboy battle suggests; a mixed
+/// battle suggests none.
+pub async fn suggest_looks(
+    conn: &mut PgConnection,
+    dancer_ids: &[Uuid],
+    gender: BattleGender,
+) -> sqlx::Result<()> {
+    let (ids, looks): (Vec<Uuid>, Vec<String>) = dancer_ids
+        .iter()
+        .filter_map(|&id| Some((id, default_look(id, gender)?)))
+        .unzip();
+    if ids.is_empty() {
+        return Ok(());
+    }
+    sqlx::query!(
+        "update dancers set avatar_parts = suggested.look
+         from unnest($1::uuid[], $2::text[]) as suggested(id, look)
+         where dancers.id = suggested.id and dancers.avatar_parts is null",
+        &ids,
+        &looks,
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
 }

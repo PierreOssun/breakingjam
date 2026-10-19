@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into events\n           (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country, lat, lng,\n            description, website_url, contact_email)\n         values ($1, $2, $3, $4, $5,\n                 current_date + $6::int, current_date + $6::int + $7::int - 1,\n                 $8, $9, $10, $11, $12, $13, $14, $15)\n         returning starts_on",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "starts_on",
+        "type_info": "Date",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "starts_on"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        {
+          "Custom": {
+            "name": "event_status",
+            "kind": {
+              "Enum": [
+                "draft",
+                "in_review",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        },
+        "Int4",
+        "Int4",
+        "Text",
+        "Text",
+        "Bpchar",
+        "Float8",
+        "Float8",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "bb07b5fde58f6ef4e1e3ed33dd92ca527aa6ad521ab47e597c6c82a893b543c3"
+}

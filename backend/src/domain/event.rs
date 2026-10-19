@@ -208,8 +208,8 @@ pub struct EventFields {
     /// Display name, up to 200 characters.
     #[validate(length(max = 200), custom(function = "not_blank"))]
     pub name: String,
-    /// Free text, up to 5000 characters; blank is stored as null.
-    #[validate(length(max = 5000))]
+    /// A short pitch, up to 200 characters; blank is stored as null.
+    #[validate(length(max = 200))]
     pub description: Option<String>,
     /// First day.
     pub starts_on: NaiveDate,

@@ -4,6 +4,7 @@ use chrono::Utc;
 use uuid::Uuid;
 
 use crate::domain::{
+    battle::BattleGender,
     dancer::*,
     user::{Role, User},
 };
@@ -85,13 +86,18 @@ fn merged_aliases_union_without_duplicates() {
 }
 
 #[test]
-fn avatar_parts_are_six_parts_in_range() {
+fn avatar_parts_are_six_parts_in_range_then_optional_details() {
     assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b1").is_ok());
-    assert!(avatar_parts_shape("h5-s3-c4-o4-e2-b3").is_ok());
+    assert!(avatar_parts_shape("h12-s3-c4-o4-e2-b3").is_ok());
+    assert!(avatar_parts_shape("h8-s1-c0-o3-e0-b1-d7").is_ok());
     assert!(avatar_parts_shape("").is_ok());
     assert!(
-        avatar_parts_shape("h6-s1-c0-o3-e0-b1").is_err(),
+        avatar_parts_shape("h13-s1-c0-o3-e0-b1").is_err(),
         "hair out of range"
+    );
+    assert!(
+        avatar_parts_shape("h2-s1-c0-o3-e0-b1-d8").is_err(),
+        "details out of range"
     );
     assert!(
         avatar_parts_shape("s1-h2-c0-o3-e0-b1").is_err(),
@@ -103,6 +109,36 @@ fn avatar_parts_are_six_parts_in_range() {
     );
     assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b12").is_err());
     assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b1-x1").is_err());
+    assert!(avatar_parts_shape("h123-s1-c0-o3-e0-b1").is_err());
+}
+
+#[test]
+fn bgirls_get_long_hair_and_lashes_bboys_short_hair_mixed_nothing() {
+    let hair = |code: &str| code[1..code.find('-').unwrap()].parse::<u32>().unwrap();
+    for _ in 0..200 {
+        let id = Uuid::now_v7();
+        let bgirl = default_look(id, BattleGender::Bgirl).unwrap();
+        assert!(avatar_parts_shape(&bgirl).is_ok(), "{bgirl}");
+        assert!(
+            [3, 6, 7, 8, 9, 10, 11, 12].contains(&hair(&bgirl)),
+            "{bgirl}"
+        );
+        let details: u32 = bgirl.rsplit_once("-d").unwrap().1.parse().unwrap();
+        assert_eq!(details & 1, 1, "lash flicks always: {bgirl}");
+
+        let bboy = default_look(id, BattleGender::Bboy).unwrap();
+        assert!(avatar_parts_shape(&bboy).is_ok(), "{bboy}");
+        assert!([0, 1, 2, 4, 5].contains(&hair(&bboy)), "{bboy}");
+        assert!(!bboy.contains("-d"), "no details: {bboy}");
+
+        assert_eq!(default_look(id, BattleGender::Mixed), None);
+    }
+    let id = Uuid::now_v7();
+    assert_eq!(
+        default_look(id, BattleGender::Bgirl),
+        default_look(id, BattleGender::Bgirl),
+        "stable for the id"
+    );
 }
 
 #[test]

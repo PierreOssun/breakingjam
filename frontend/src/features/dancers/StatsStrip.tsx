@@ -2,7 +2,14 @@ import { useTranslation } from "react-i18next";
 import type { DancerStats } from "./stats";
 
 /** Jams, countries, years active, podiums; gone entirely when all are 0 (DESIGN.md §4.15). */
-export function StatsStrip({ stats }: { stats: DancerStats }) {
+export function StatsStrip({
+  stats,
+  className = "",
+}: {
+  stats: DancerStats;
+  /** Layout from the caller, e.g. `lg:grid-cols-2` in the dancer page's left column. */
+  className?: string;
+}) {
   const { t } = useTranslation();
   if (Object.values(stats).every((value) => value === 0)) return null;
   const cells = [
@@ -21,7 +28,9 @@ export function StatsStrip({ stats }: { stats: DancerStats }) {
     },
   ];
   return (
-    <dl className="grid grid-cols-4 gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-2">
+    <dl
+      className={`grid grid-cols-4 gap-px overflow-hidden rounded-lg border border-border bg-border ${className}`}
+    >
       {cells.map((cell) => (
         <div
           key={cell.label}

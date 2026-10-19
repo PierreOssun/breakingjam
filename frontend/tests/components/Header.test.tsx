@@ -8,6 +8,27 @@ async function header() {
 }
 
 describe("Header", () => {
+  it("leads home from the J mark and wordmark; the footer has the round logo", async () => {
+    mockApi({ "GET /api/auth/me": LOGGED_OUT });
+    renderApp("/");
+    const home = (await header()).getByRole("link", {
+      name: "BreakingJam home",
+    });
+
+    expect(home).toHaveAttribute("href", "/");
+    expect(home.querySelector("img")).toHaveAttribute("src", "/favicon.svg");
+    const footer = within(screen.getByRole("contentinfo"));
+    expect(
+      footer
+        .getByRole("link", { name: "BreakingJam home" })
+        .querySelector("img"),
+    ).toHaveAttribute("src", "/jam-logo.svg");
+    expect(footer.getByRole("link", { name: "Instagram" })).toHaveAttribute(
+      "href",
+      "https://instagram.com/breaking.jam",
+    );
+  });
+
   it("switches language from the listbox and remembers it", async () => {
     mockApi({ "GET /api/auth/me": LOGGED_OUT });
     renderApp("/");

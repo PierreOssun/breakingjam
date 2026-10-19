@@ -14,6 +14,8 @@ type IdentityCardProps = {
   /** The page's own path, printed as its canonical URL. */
   path: string;
   avatar: ReactNode;
+  /** The name's heading: the page title on the dancer's own page, a sub-head elsewhere. */
+  heading?: "h1" | "h3";
 };
 
 /**
@@ -22,6 +24,7 @@ type IdentityCardProps = {
  */
 export function IdentityCard(props: IdentityCardProps) {
   const { name, verified, aliases = [], instagram, path, avatar } = props;
+  const Heading = props.heading ?? "h1";
   const { t } = useTranslation();
   const flags = props.flags.filter((c): c is string => Boolean(c)).slice(0, 2);
 
@@ -31,7 +34,9 @@ export function IdentityCard(props: IdentityCardProps) {
       {/* `relative` keeps the content painted above the absolutely positioned rings. */}
       <div className="relative">{avatar}</div>
       <div className="relative flex flex-wrap items-center gap-2">
-        <h1 className="font-display text-display-lg break-words">{name}</h1>
+        <Heading className="font-display text-display-lg break-words">
+          {name}
+        </Heading>
         {verified && <VerifiedTick />}
         {flags.map((code) => (
           <FlagChip key={code} code={code} />

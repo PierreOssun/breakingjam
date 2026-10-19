@@ -238,6 +238,31 @@ describe("JamPage", () => {
     }
   });
 
+  it("leaves out the organiser, the website, the email and the pitch when there are none", async () => {
+    // A jam the BreakingJam team entered, e.g. an imported past edition.
+    mockJam({
+      organizer: null,
+      website_url: null,
+      contact_email: null,
+      description: null,
+    });
+    renderApp(`/jams/${JAM.slug}`);
+    const main = within(await screen.findByRole("main"));
+
+    expect(
+      await main.findByRole("heading", {
+        level: 1,
+        name: "Paris Cypher Sessions",
+      }),
+    ).toBeInTheDocument();
+    expect(main.queryByRole("heading", { name: "Organiser" })).toBeNull();
+    expect(main.queryByRole("heading", { name: "About" })).toBeNull();
+    expect(main.queryByRole("link", { name: "pariscypher.com" })).toBeNull();
+    expect(
+      main.queryByRole("link", { name: "hello@pariscypher.com" }),
+    ).toBeNull();
+  });
+
   it("drops registration and spots once the jam is completed", async () => {
     mockJam({ status: "completed" });
     renderApp(`/jams/${JAM.slug}`);
@@ -271,6 +296,28 @@ describe("JamPage", () => {
       within(dialog).getByRole("button", { name: "Close video" }),
     );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("shows when each battle starts, with the day as the jam runs two days", async () => {
+    mockJam(
+      {},
+      {
+        [`GET /api/events/${JAM.id}/battles`]: {
+          status: 200,
+          body: [
+            {
+              ...battle("b1", "1v1 Bboy", 1, 16),
+              starts_at: "2030-06-02T14:30:00",
+            },
+          ],
+        },
+      },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+
+    expect(
+      await screen.findByText(/^Starts Sun,? 2 Jun,? 14:30$/),
+    ).toBeInTheDocument();
   });
 
   it("shows prizes in the battle's currency", async () => {
@@ -358,6 +405,34 @@ describe("JamPage", () => {
       team_name: null,
       crew_id: null,
     });
+  });
+
+  it("searches dancers in the picker after a search on Find someone", async () => {
+    asOrganiser({
+      "GET /api/dancers": {
+        status: 200,
+        body: { items: [], next_cursor: null },
+      },
+    });
+    // Find someone pages its results; the picker must not read those pages as its list.
+    const router = renderApp("/dancers?q=Lil");
+    expect(
+      await screen.findByText("No one matches “Lil”."),
+    ).toBeInTheDocument();
+    await router.navigate(`/jams/${JAM.slug}`);
+
+    const solo = (
+      await screen.findByRole("heading", { name: "1v1 Bboy" })
+    ).closest("li")!;
+    await userEvent.click(
+      within(solo).getByRole("button", { name: "Add a dancer" }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Add an entry" });
+    await userEvent.type(within(dialog).getByLabelText("Dancer"), "Lil");
+
+    expect(
+      await within(dialog).findByText("Nothing found for “Lil”."),
+    ).toBeInTheDocument();
   });
 
   it("lets its organiser delete an entry", async () => {
