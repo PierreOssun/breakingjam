@@ -1,0 +1,33 @@
+name = "Unbreakable 2009"
+# starts_on = YYYY-MM-DD  (not on the hall of fame)
+timezone = "Europe/Brussels"
+city = "Leuven"
+country = "BE"
+lat = 50.8815
+lng = 4.7138
+venue = "Het Depot"
+sources = ["https://unbreakable.be/20-years/#hall-of-fame"]
+judges = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "rugged-manouvres", reached = "winner" },
+]
+
+[battles.teams]
+rugged-manouvres = { crew = "rugged-manouvres" }
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "cetowy-kleju", reached = "winner" },
+]
+
+[battles.teams]
+cetowy-kleju = { crew = "polskee-flavour", members = ["cetowy", "kleju"] }

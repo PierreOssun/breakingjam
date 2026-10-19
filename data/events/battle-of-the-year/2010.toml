@@ -1,0 +1,50 @@
+name = "Battle of the Year 2010"
+starts_on = 2010-11-20
+timezone = "Europe/Paris"
+city = "Montpellier"
+country = "FR"
+lat = 43.5733
+lng = 3.9517
+venue = "Arena Montpellier"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://web.archive.org/web/20101022064045/http://www.battleoftheyear.net/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "jinjo-crew", reached = "winner" },
+  { entrant = "gamblerz", reached = "top4" },
+  { entrant = "la-smala", reached = "top4" },
+  { entrant = "mortal-combat", reached = "top2" },
+]
+
+[battles.teams]
+gamblerz = { crew = "gamblerz" }
+jinjo-crew = { crew = "jinjo-crew" }
+la-smala = { crew = "la-smala" }
+mortal-combat = { crew = "mortal-combat" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "alkolil", reached = "top2" },
+  { entrant = "thesis", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "ayumi-micchan", reached = "winner" },
+]
+
+[battles.teams]
+ayumi-micchan = { members = ["ayumi", "micchan"] }

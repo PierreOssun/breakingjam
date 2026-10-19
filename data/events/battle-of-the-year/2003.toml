@@ -1,0 +1,29 @@
+name = "Battle of the Year 2003"
+starts_on = 2003-10-25
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://web.archive.org/web/20060422183225/http://www.battleoftheyear.net/worldwide/boty2003/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "pockemon", reached = "winner" },
+  { entrant = "fire-works", reached = "top4", rank = 4 },
+  { entrant = "expression-crew", reached = "top2" },
+  { entrant = "gamblerz", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+expression-crew = { crew = "expression-crew" }
+fire-works = { crew = "fire-works" }
+gamblerz = { crew = "gamblerz" }
+pockemon = { crew = "pockemon" }

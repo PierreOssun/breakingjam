@@ -1,0 +1,38 @@
+name = "Unbreakable 2012"
+starts_on = 2012-03-31
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2301
+lng = 4.4418
+venue = "Lotto Arena"
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/935"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "menno", reached = "winner" },
+]
+
+[[battles]]
+key = "kids-u14"
+name = "Kids under 14"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "kid-kong", reached = "winner" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "total-feeling", reached = "winner" },
+]
+
+[battles.teams]
+total-feeling = { crew = "total-feeling" }

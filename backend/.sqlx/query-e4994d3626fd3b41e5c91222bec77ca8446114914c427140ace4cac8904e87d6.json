@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select coalesce(d.dancer_name, en.team_name) as \"who!\", en.reached::text as \"reached!\", en.final_rank, en.video_url\n           from entries en\n           left join entry_members m on m.entry_id = en.id\n           left join dancers d on d.id = m.dancer_id\n           order by en.final_rank nulls last, 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "who!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "reached!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "final_rank",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "entries",
+            "name": "final_rank"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "video_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "entries",
+            "name": "video_url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null,
+      true,
+      true
+    ]
+  },
+  "hash": "e4994d3626fd3b41e5c91222bec77ca8446114914c427140ace4cac8904e87d6"
+}

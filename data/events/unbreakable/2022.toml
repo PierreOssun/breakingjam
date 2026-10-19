@@ -1,0 +1,59 @@
+name = "Unbreakable 2022"
+starts_on = 2022-10-01
+ends_on = 2022-10-02
+timezone = "Europe/Brussels"
+city = "Leuven"
+country = "BE"
+lat = 50.8788
+lng = 4.7069
+venue = "Ladeuzeplein"
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/3874"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "menno", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "san-andrea", reached = "winner" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "rhythm-box", reached = "winner" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "the-ruggeds", reached = "winner" },
+]
+
+[battles.teams]
+the-ruggeds = { crew = "the-ruggeds" }
+
+[[battles]]
+key = "kids-crew"
+name = "Kids crew battle"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "eastside-kingz", reached = "winner" },
+]
+
+[battles.teams]
+eastside-kingz = { crew = "eastside-kingz" }

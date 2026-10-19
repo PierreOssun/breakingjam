@@ -3,6 +3,7 @@
 pub mod api;
 pub mod auth;
 pub mod config;
+pub mod dataset;
 pub mod db;
 pub mod domain;
 pub mod error;

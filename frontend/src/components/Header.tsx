@@ -33,10 +33,10 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
           <NavLink to="/map" className={navLink}>
             {t("nav.findJam")}
           </NavLink>
-          <NavLink to="/org/jams" end className={navLink}>
-            {t("nav.forOrganisers")}
+          <NavLink to="/dancers" end className={navLink}>
+            {t("nav.findSomeone")}
           </NavLink>
-          <AdminLink className={navLink} />
+          <AccountLinks className={navLink} />
         </nav>
         <div className="flex-1" />
         <LanguageSwitch />
@@ -79,14 +79,14 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
               {t("nav.findJam")}
             </NavLink>
             <NavLink
-              to="/org/jams"
+              to="/dancers"
               end
               className={sheetLink}
               onClick={closeMenu}
             >
-              {t("nav.forOrganisers")}
+              {t("nav.findSomeone")}
             </NavLink>
-            <AdminLink className={sheetLink} onClick={closeMenu} />
+            <AccountLinks className={sheetLink} onClick={closeMenu} />
             <AccountAction className={sheetLink} onDone={closeMenu} />
           </nav>
           <div className="flex-1" />
@@ -103,8 +103,8 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
   );
 }
 
-/** The admin area, for admins only. */
-function AdminLink({
+/** "My jams" once logged in, and the admin area for admins. */
+function AccountLinks({
   className,
   onClick,
 }: {
@@ -112,11 +112,19 @@ function AdminLink({
   onClick?: () => void;
 }) {
   const { t } = useTranslation();
-  if (useMe().data?.role !== "admin") return null;
+  const me = useMe().data;
+  if (!me) return null;
   return (
-    <NavLink to="/admin" className={className} onClick={onClick}>
-      {t("nav.admin")}
-    </NavLink>
+    <>
+      <NavLink to="/org/jams" end className={className} onClick={onClick}>
+        {t("nav.myJams")}
+      </NavLink>
+      {me.role === "admin" && (
+        <NavLink to="/admin" className={className} onClick={onClick}>
+          {t("nav.admin")}
+        </NavLink>
+      )}
+    </>
   );
 }
 

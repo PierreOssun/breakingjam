@@ -1,0 +1,64 @@
+name = "Battle of the Year 2016"
+starts_on = 2016-10-29
+timezone = "Europe/Berlin"
+city = "Essen"
+country = "DE"
+lat = 51.4311
+lng = 6.9976
+venue = "Grugahalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20161012221959/http://www.battleoftheyear.de/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "flooriorz", reached = "winner" },
+  { entrant = "body-carnival", reached = "top4" },
+  { entrant = "kienjuice", reached = "top4" },
+  { entrant = "melting-force", reached = "top2" },
+]
+
+[battles.teams]
+body-carnival = { crew = "body-carnival" }
+flooriorz = { crew = "flooriorz" }
+kienjuice = { crew = "kienjuice" }
+melting-force = { crew = "melting-force" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "bruce-almighty", b = "inside", winner = "bruce-almighty" },
+  { round = "top16", a = "fernandinho", b = "elia", winner = "fernandinho" },
+  { round = "top16", a = "poter", b = "kid-colombia", winner = "poter" },
+  { round = "top16", a = "ayumi", b = "zoob", winner = "ayumi" },
+  { round = "top16", a = "nasso", b = "aleks", winner = "nasso" },
+  { round = "top16", a = "lil-zoo", b = "admiracles", winner = "lil-zoo" },
+  { round = "top16", a = "taisuke", b = "spin", winner = "taisuke" },
+  { round = "top16", a = "pac-pac", b = "akorn", winner = "pac-pac" },
+  { round = "top8", a = "bruce-almighty", b = "fernandinho", winner = "bruce-almighty" },
+  { round = "top8", a = "poter", b = "ayumi", winner = "poter" },
+  { round = "top8", a = "nasso", b = "lil-zoo", winner = "nasso" },
+  { round = "top8", a = "taisuke", b = "pac-pac", winner = "taisuke" },
+  { round = "top4", a = "bruce-almighty", b = "poter", winner = "bruce-almighty" },
+  { round = "top4", a = "nasso", b = "taisuke", winner = "nasso" },
+  { round = "final", a = "bruce-almighty", b = "nasso", winner = "bruce-almighty" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "ami-ayu", reached = "winner" },
+]
+
+[battles.teams]
+ami-ayu = { members = ["ayu", "ami"] }

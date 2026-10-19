@@ -1,0 +1,41 @@
+name: Backup
+
+# Nightly dump of the production database to R2: a copy outside Neon, kept 30 days by the
+# bucket's lifecycle rule (deploy/README.md). The `backup` environment reads with a role that
+# can't write.
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    environment: backup
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: deploy/package-lock.json
+
+      - name: Dump the database
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        # pg_dump must be at least the server's version, which the runner's client isn't.
+        run: |
+          docker run --rm -e DATABASE_URL postgres:17 \
+            sh -c 'pg_dump --format=custom --no-owner --no-privileges --dbname="$DATABASE_URL"' \
+            > breakingjam.dump
+          ls -l breakingjam.dump
+
+      - name: Upload it to R2
+        working-directory: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npm ci
+          npx wrangler r2 object put "breakingjam-backups/$(date -u +%F).dump" \
+            --file ../breakingjam.dump --remote

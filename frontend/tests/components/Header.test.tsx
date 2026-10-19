@@ -59,6 +59,10 @@ describe("Header", () => {
       "POST /api/auth/logout": { status: 204 },
     });
     renderApp("/jams/paris-cypher-3f9a1c");
+    // Logged in, an organiser finds their jams in the header.
+    expect(
+      await (await header()).findByRole("link", { name: "My jams" }),
+    ).toHaveAttribute("href", "/org/jams");
 
     await userEvent.click(
       await (await header()).findByRole("button", { name: "Log out" }),
@@ -67,6 +71,9 @@ describe("Header", () => {
     expect(
       await (await header()).findByRole("link", { name: "Log in" }),
     ).toBeInTheDocument();
+    expect(
+      (await header()).queryByRole("link", { name: "My jams" }),
+    ).not.toBeInTheDocument();
     expect(calls(fetch)).toContain("POST /api/auth/logout");
   });
 

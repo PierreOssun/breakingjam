@@ -1,0 +1,29 @@
+name = "Unbreakable 2010"
+# starts_on = YYYY-MM-DD  (not on the hall of fame)
+timezone = "Europe/Brussels"
+city = "Leuven"
+country = "BE"
+lat = 50.9283
+lng = 4.7247
+venue = "Sportoase"
+sources = ["https://unbreakable.be/20-years/#hall-of-fame"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "thesis", reached = "winner" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "rugged-solutions", reached = "winner" },
+]
+
+[battles.teams]
+rugged-solutions = { crew = "rugged-solutions" }

@@ -1,0 +1,29 @@
+name = "Battle of the Year 2005"
+starts_on = 2005-10-22
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://web.archive.org/web/20060422183352/http://www.battleoftheyear.net/worldwide/boty2005/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "last-for-one", reached = "winner" },
+  { entrant = "phase-t", reached = "top4", rank = 4 },
+  { entrant = "ichigeki", reached = "top2" },
+  { entrant = "gamblerz", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+gamblerz = { crew = "gamblerz" }
+ichigeki = { crew = "ichigeki" }
+last-for-one = { crew = "last-for-one" }
+phase-t = { crew = "phase-t" }

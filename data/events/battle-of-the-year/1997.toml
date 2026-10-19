@@ -1,0 +1,29 @@
+name = "Battle of the Year 1997"
+starts_on = 1997-10-04
+timezone = "Europe/Berlin"
+city = "Offenbach am Main"
+country = "DE"
+lat = 50.0830
+lng = 8.7768
+venue = "Stadthalle Offenbach"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20020128212140/http://www.battleoftheyear.net/pastevents/boty97.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "style-elements", reached = "winner" },
+  { entrant = "suicidal-lifestyle", reached = "top4", rank = 4 },
+  { entrant = "south-side-rockers", reached = "top2" },
+  { entrant = "black-noise", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+black-noise = { crew = "black-noise" }
+south-side-rockers = { crew = "south-side-rockers" }
+style-elements = { crew = "style-elements" }
+suicidal-lifestyle = { crew = "suicidal-lifestyle" }

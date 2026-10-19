@@ -1,0 +1,60 @@
+name = "Unbreakable 2019"
+starts_on = 2019-09-21
+ends_on = 2019-09-22
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2186
+lng = 4.4016
+venue = "Groenplaats"
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/2853"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "zoopreme", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "Bgirl 7 to smoke"
+gender = "bgirl"
+format = "seven_to_smoke"
+results = [
+  { entrant = "rawgina", reached = "winner" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "lorenzo", reached = "winner" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "back2school", reached = "winner" },
+]
+
+[battles.teams]
+back2school = { crew = "back2school" }
+
+[[battles]]
+key = "kids-crew"
+name = "Kids crew battle"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "psychos", reached = "winner" },
+]
+
+[battles.teams]
+psychos = { crew = "psychos" }

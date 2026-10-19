@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select c.name from crew_memberships m join crews c on c.id = m.crew_id join dancers d on d.id = m.dancer_id where d.dancer_name = 'Menno'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "name"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d1088b86394bff7a06ee6cc2e9395912779af34b3b16340e877642be808d043c"
+}

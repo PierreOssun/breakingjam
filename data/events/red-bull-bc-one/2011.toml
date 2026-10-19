@@ -1,0 +1,34 @@
+name = "Red Bull BC One World Final 2011"
+starts_on = 2011-11-26
+timezone = "Europe/Moscow"
+city = "Moscow"
+country = "RU"
+lat = 55.6256
+lng = 37.6064
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["bootuz", "lamine", "machine", "pelezinho", "wing"]
+mcs = ["rakaa-iriscience"]
+djs = ["dj-renegade"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "lagaet", b = "el-nino", winner = "el-nino", votes = [2, 3] },
+  { round = "top16", a = "soso", b = "roxrite", winner = "roxrite", votes = [0, 5] },
+  { round = "top16", a = "flying-buddha", b = "neguin", winner = "neguin", votes = [0, 5] },
+  { round = "top16", a = "vero", b = "niek", winner = "vero", votes = [4, 1] },
+  { round = "top16", a = "salo", b = "morris", winner = "morris", votes = [1, 4] },
+  { round = "top16", a = "3t", b = "taisuke", winner = "taisuke", votes = [0, 5] },
+  { round = "top16", a = "yan", b = "hong-10", winner = "yan", votes = [4, 1] },
+  { round = "top16", a = "lil-g", b = "mounir", winner = "lil-g", votes = [4, 1] },
+  { round = "top8", a = "el-nino", b = "roxrite", winner = "roxrite", votes = [2, 3] },
+  { round = "top8", a = "neguin", b = "vero", winner = "neguin" },
+  { round = "top8", a = "morris", b = "taisuke", winner = "morris", votes = [3, 1] },
+  { round = "top8", a = "yan", b = "lil-g", winner = "lil-g", votes = [0, 5] },
+  { round = "top4", a = "roxrite", b = "neguin", winner = "roxrite", votes = [3, 2] },
+  { round = "top4", a = "morris", b = "lil-g", winner = "lil-g", votes = [1, 4] },
+  { round = "final", a = "roxrite", b = "lil-g", winner = "roxrite", votes = [4, 1] },
+]

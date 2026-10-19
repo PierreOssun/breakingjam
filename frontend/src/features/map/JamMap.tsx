@@ -19,7 +19,13 @@ import MapView, {
 } from "react-map-gl/maplibre";
 import { dayAndMonth, formatDateRange } from "../../lib/dates";
 import { useMediaQuery } from "../../lib/useMediaQuery";
-import { type Bounds, boundsOf, clusterLabel, type MapJam } from "./jams";
+import {
+  type Bounds,
+  boundsOf,
+  clusterLabel,
+  isPast,
+  type MapJam,
+} from "./jams";
 import { maplibre, useMapStyle } from "./maplibre";
 import {
   type Box,
@@ -365,6 +371,12 @@ function JamMarker({
   const { i18n } = useTranslation();
   const { day, month } = dayAndMonth(jam.starts_on, i18n.language);
   const dates = formatDateRange(jam.starts_on, jam.ends_on, i18n.language);
+  // §7: a past jam is a smaller grey dot, so the upcoming ones stand out.
+  const dot = selected
+    ? "size-7 border-marker-ring bg-primary shadow-selected"
+    : isPast(jam, new Date())
+      ? "size-3.5 border-bg bg-border-strong"
+      : "size-5 border-marker-ring bg-primary shadow-sm";
   return (
     // A 44px hit area around a 20px dot (§8), named like "Concrete Cypher, Saturday 14
     // November 2026, Zurich" (§7).
@@ -377,10 +389,7 @@ function JamMarker({
       onClick={(e) => onSelect(jam, e.currentTarget)}
       className="relative grid size-11 cursor-pointer place-items-center rounded-full"
     >
-      <span
-        aria-hidden
-        className={`rounded-full border-2 border-marker-ring bg-primary ${selected ? "size-7 shadow-selected" : "size-5 shadow-sm"}`}
-      />
+      <span aria-hidden className={`rounded-full border-2 ${dot}`} />
       {showDate && (
         <span
           aria-hidden

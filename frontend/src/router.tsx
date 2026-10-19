@@ -23,6 +23,12 @@ export const routes: RouteObject[] = [
         }),
       },
       {
+        path: "/dancers",
+        lazy: async () => ({
+          Component: (await import("./routes/PeoplePage")).PeoplePage,
+        }),
+      },
+      {
         path: "/dancers/:id",
         lazy: async () => ({
           Component: (await import("./routes/DancerPage")).DancerPage,

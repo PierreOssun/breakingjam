@@ -4,6 +4,7 @@
 mod api;
 mod auth;
 mod config;
+mod dataset;
 mod db;
 mod domain;
 mod error;

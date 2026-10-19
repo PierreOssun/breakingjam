@@ -1,0 +1,35 @@
+name = "Red Bull BC One World Final 2007"
+starts_on = 2007-09-22
+timezone = "Africa/Johannesburg"
+city = "Johannesburg"
+country = "ZA"
+lat = -26.2540
+lng = 27.9239
+venue = "Orlando Power Station"
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://and8.dance/e/314"]
+judges = ["speedy", "emile", "kazuhiro", "kujo", "salah"]
+mcs = ["rakaa-iriscience"]
+djs = ["dj-renegade"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "hong-10", b = "daniel-qdm", winner = "hong-10" },
+  { round = "top16", a = "spee-d", b = "dark-marc", winner = "spee-d" },
+  { round = "top16", a = "taisuke", b = "sebastien", winner = "taisuke" },
+  { round = "top16", a = "ronnie", b = "drunk", winner = "ronnie" },
+  { round = "top16", a = "roxrite", b = "bootuz", winner = "roxrite" },
+  { round = "top16", a = "jed", b = "cico", winner = "cico" },
+  { round = "top16", a = "ben-j", b = "lilou", winner = "lilou" },
+  { round = "top16", a = "benny", b = "twixx", winner = "benny" },
+  { round = "top8", a = "hong-10", b = "spee-d", winner = "hong-10" },
+  { round = "top8", a = "taisuke", b = "ronnie", winner = "ronnie" },
+  { round = "top8", a = "roxrite", b = "cico", winner = "roxrite" },
+  { round = "top8", a = "lilou", b = "benny", winner = "lilou" },
+  { round = "top4", a = "hong-10", b = "ronnie", winner = "ronnie" },
+  { round = "top4", a = "roxrite", b = "lilou", winner = "roxrite" },
+  { round = "final", a = "ronnie", b = "roxrite", winner = "ronnie" },
+]

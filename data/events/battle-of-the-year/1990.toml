@@ -1,0 +1,28 @@
+name = "Battle of the Year 1990"
+starts_on = 1990-06-09
+timezone = "Europe/Berlin"
+city = "Hannover"
+country = "DE"
+lat = 52.3745
+lng = 9.7386
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "tdb", reached = "winner" },
+  { entrant = "robot-force", reached = "top4", rank = 4 },
+  { entrant = "crazy-force-crew", reached = "top2" },
+  { entrant = "city-rockers", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+city-rockers = { crew = "city-rockers" }
+crazy-force-crew = { crew = "crazy-force-crew" }
+robot-force = { crew = "robot-force" }
+tdb = { crew = "tdb" }

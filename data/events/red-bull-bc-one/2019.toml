@@ -1,0 +1,57 @@
+name = "Red Bull BC One World Final 2019"
+starts_on = 2019-11-09
+timezone = "Asia/Kolkata"
+city = "Mumbai"
+country = "IN"
+lat = 19.0550
+lng = 72.8692
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["lil-g", "poe-one", "narumi", "intact", "physicx"]
+mcs = ["amjad"]
+djs = ["dj-smirnoff"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "bumblebee", b = "stripes", winner = "bumblebee", votes = [4, 1] },
+  { round = "top16", a = "nori", b = "menno", winner = "menno", votes = [0, 5] },
+  { round = "top16", a = "onel", b = "heady", winner = "onel", votes = [5, 0] },
+  { round = "top16", a = "kazuki-rock", b = "phil-wizard", winner = "kazuki-rock", votes = [5, 0] },
+  { round = "top16", a = "beetle", b = "khalil", winner = "beetle", votes = [5, 0] },
+  { round = "top16", a = "monkey-king", b = "bart", winner = "bart", votes = [1, 4] },
+  { round = "top16", a = "killa-kolya", b = "lil-zoo", winner = "killa-kolya", votes = [3, 2] },
+  { round = "top16", a = "robin", b = "flying-machine", winner = "robin", votes = [5, 0] },
+  { round = "top8", a = "bumblebee", b = "menno", winner = "menno", votes = [1, 4] },
+  { round = "top8", a = "onel", b = "kazuki-rock", winner = "kazuki-rock", votes = [0, 5] },
+  { round = "top8", a = "beetle", b = "bart", winner = "bart", votes = [0, 5] },
+  { round = "top8", a = "killa-kolya", b = "robin", winner = "killa-kolya", votes = [3, 2] },
+  { round = "top4", a = "menno", b = "kazuki-rock", winner = "menno", votes = [4, 1] },
+  { round = "top4", a = "bart", b = "killa-kolya", winner = "killa-kolya", votes = [1, 4] },
+  { round = "final", a = "menno", b = "killa-kolya", winner = "menno", votes = [3, 1] },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "logistx", b = "kastet", winner = "kastet", votes = [2, 3] },
+  { round = "top16", a = "fen-qi", b = "yell", winner = "yell", votes = [0, 5] },
+  { round = "top16", a = "jilou", b = "alessandrina", winner = "jilou", votes = [5, 0] },
+  { round = "top16", a = "sarah-bee", b = "mimz", winner = "mimz", votes = [0, 5] },
+  { round = "top16", a = "san-andrea", b = "mess", winner = "san-andrea", votes = [5, 0] },
+  { round = "top16", a = "ayumi", b = "ramona", winner = "ayumi", votes = [5, 0] },
+  { round = "top16", a = "estrella", b = "sidi", winner = "estrella", votes = [3, 2] },
+  { round = "top16", a = "luma", b = "ami", winner = "ami", votes = [0, 5] },
+  { round = "top8", a = "kastet", b = "yell", winner = "kastet", votes = [5, 0] },
+  { round = "top8", a = "jilou", b = "mimz", winner = "mimz", votes = [1, 4] },
+  { round = "top8", a = "san-andrea", b = "ayumi", winner = "ayumi", votes = [2, 3] },
+  { round = "top8", a = "estrella", b = "ami", winner = "ami", votes = [0, 5] },
+  { round = "top4", a = "kastet", b = "mimz", winner = "kastet", votes = [4, 1] },
+  { round = "top4", a = "ayumi", b = "ami", winner = "ayumi", votes = [4, 1] },
+  { round = "final", a = "kastet", b = "ayumi", winner = "kastet", votes = [3, 1] },
+]

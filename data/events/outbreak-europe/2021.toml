@@ -1,0 +1,50 @@
+name = "Outbreak Europe 2021"
+starts_on = 2021-07-22
+ends_on = 2021-07-25
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7309
+lng = 19.1375
+venue = "Europa SC"
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://and8.dance/en/e/3672/info", "https://www.teraz.sk/regiony/the-legits-blast-v-banskej-bystrici-opa/563401-clanok.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "nord-diamond", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "nicka", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "jordi-robb", reached = "winner" },
+]
+
+[battles.teams]
+jordi-robb = { members = ["robb", "jordi"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "point", reached = "winner" },
+]

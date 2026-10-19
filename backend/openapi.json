@@ -453,7 +453,7 @@
         "tags": [
           "events"
         ],
-        "summary": "Upcoming public jams with coordinates, for the world map.",
+        "summary": "Public jams with coordinates, upcoming and past, for the world map.",
         "operationId": "events_geojson",
         "responses": {
           "200": {
@@ -5032,6 +5032,20 @@
             "type": "boolean",
             "description": "Whether an approved claim links the page to its owner."
           },
+          "avatar_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Uploaded picture, which replaces the generated avatar."
+          },
+          "avatar_parts": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The generated avatar's chosen parts; seeded from the id when null."
+          },
           "crews": {
             "type": "array",
             "items": {
@@ -6280,6 +6294,20 @@
                 "verified": {
                   "type": "boolean",
                   "description": "Whether an approved claim links the page to its owner."
+                },
+                "avatar_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Uploaded picture, which replaces the generated avatar."
+                },
+                "avatar_parts": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The generated avatar's chosen parts; seeded from the id when null."
                 },
                 "crews": {
                   "type": "array",

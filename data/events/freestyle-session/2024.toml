@@ -1,0 +1,88 @@
+name = "Freestyle Session 2024"
+starts_on = 2024-11-16
+ends_on = 2024-11-17
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://and8.dance/en/e/4771"]
+judges = []
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "anti", b = "kate", winner = "kate", video = "https://youtu.be/WJ2makdBjtM" },
+  { round = "top4", a = "alessandrina", b = "riko", winner = "riko", video = "https://youtu.be/iVPB0AgoNc8" },
+  { round = "final", a = "riko", b = "kate", winner = "TODO", video = "https://youtu.be/mNcPlJ4HoQg" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "northbeast-n-efx", b = "bgfk", winner = "bgfk", video = "https://youtu.be/X5l83521U3M" },
+  { round = "top4", a = "first-class-kidz", b = "four-spiritz", winner = "first-class-kidz", video = "https://youtu.be/VxpyY6976LY" },
+  { round = "final", a = "first-class-kidz", b = "bgfk", winner = "TODO", video = "https://youtu.be/nHYs0N_sMKU" },
+]
+
+[battles.teams]
+bgfk = { name = "BGFK" }
+first-class-kidz = { name = "First Class Kidz" }
+four-spiritz = { name = "Four Spiritz" }
+northbeast-n-efx = { name = "NorTHBeasT n EFX" }
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "total-feeling", b = "xii-after-ours", winner = "xii-after-ours", video = "https://youtu.be/vooIu_X47c8" },
+  { round = "top16", a = "alvin-jeffro-gravity", b = "tmb", winner = "alvin-jeffro-gravity", video = "https://youtu.be/77L--9G78xM" },
+  { round = "top16", a = "concrete-force-kingz", b = "flxible-flav", winner = "TODO", video = "https://youtu.be/nGcvnH99ivc" },
+  { round = "top16", a = "breakinmia", b = "havikoro", winner = "breakinmia", video = "https://youtu.be/sp26kZNEDsM" },
+  { round = "top16", a = "fnc", b = "airheads", winner = "fnc", video = "https://youtu.be/J9utkEKROMs" },
+  { round = "top16", a = "matadors", b = "doa", winner = "matadors", video = "https://youtu.be/J0HTEfZqV00" },
+  { round = "top16", a = "intact-den-kate", b = "flow-killerz", winner = "intact-den-kate", video = "https://youtu.be/JC7IYd1tsMI" },
+  { round = "top16", a = "green-panda", b = "brickheadz", winner = "green-panda", video = "https://youtu.be/m8WSNmJDmHY" },
+  { round = "top8", a = "alvin-jeffro-gravity", b = "xii-after-ours", winner = "xii-after-ours", video = "https://youtu.be/usihfFPjg3Q" },
+  { round = "top8", a = "breakinmia", b = "flexible-flav", winner = "flexible-flav", video = "https://youtu.be/AJRWRZaVAig" },
+  { round = "top8", a = "matadors", b = "fnc", winner = "fnc", video = "https://youtu.be/2d9aabcb0Bs" },
+  { round = "top8", a = "green-panda", b = "intact-den-kate", winner = "green-panda", video = "https://youtu.be/sqsXX5NKj4E" },
+  { round = "top4", a = "flexible-flav", b = "xii-after-ours", winner = "xii-after-ours", video = "https://youtu.be/B1vRL8PwJfw" },
+  { round = "top4", a = "green-panda", b = "fnc", winner = "green-panda", video = "https://youtu.be/qLAigQF9504" },
+  { round = "final", a = "danzel", b = "gq", winner = "TODO", video = "https://youtu.be/f2MNBCUp8h0" },
+  { round = "final", a = "charlie-chill-out", b = "kitchy-rock", winner = "TODO", video = "https://youtu.be/1fBdY2ZRHq8" },
+  { round = "final", a = "green-panda", b = "xii-after-ours", winner = "TODO", video = "https://youtu.be/QHdovIj5AwI" },
+]
+
+[battles.teams]
+airheads = { crew = "airheads" }
+alvin-jeffro-gravity = { crew = "alvin-jeffro-gravity" }
+breakinmia = { crew = "breakinmia" }
+brickheadz = { crew = "brickheadz" }
+charlie-chill-out = { crew = "charlie-chill-out" }
+concrete-force-kingz = { crew = "concrete-force-kingz" }
+danzel = { crew = "danzel" }
+doa = { crew = "doa" }
+flexible-flav = { crew = "flexible-flav" }
+flow-killerz = { crew = "flow-killerz" }
+flxible-flav = { crew = "flxible-flav" }
+fnc = { crew = "fnc" }
+gq = { crew = "gq" }
+green-panda = { crew = "green-panda" }
+havikoro = { crew = "havikoro" }
+intact-den-kate = { crew = "intact-den-kate" }
+kitchy-rock = { crew = "kitchy-rock" }
+matadors = { crew = "matadors" }
+tmb = { crew = "tmb" }
+total-feeling = { crew = "total-feeling" }
+xii-after-ours = { crew = "xii-after-ours" }

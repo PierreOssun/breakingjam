@@ -1,0 +1,20 @@
+name = "Unbreakable"
+country = "BE"
+timezone = "Europe/Brussels"
+
+[youtube]
+channels = [
+  "UCDpTV6PL7WoPdHWPl-LoWXw",   # LawkSam (2021, 2026)
+  "UCySwo6Ue4QxxsYDvIBdwynw",   # BBOY WORLD (2011–2018)
+]
+title = "Unbreakable"
+exclude = ["who's the one"]     # a Greek jam where a bboy is called Unbreakable
+ignore = ["bboy world"]         # BBOY WORLD's signature, which would otherwise name the 1v1
+# The 1v1 comes first: titles naming no battle and linked to no other match go there, as most are 1v1s.
+battles = [
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["bboy", "b-boy", "1on1", "1v1"] },
+  { key = "crew", name = "Crew battle", sides = "crews", words = ["crew"] },
+  { key = "kids-crew", name = "Kids crew battle", age = "kids", sides = "crews", words = ["kidz crew", "kids crew"] },
+  { key = "bgirl", name = "1v1 Bgirl", gender = "bgirl", words = ["bgirl", "b-girl"] },
+  { key = "kids", name = "Kids", age = "kids", words = ["kidz", "kids"] },
+]

@@ -1,0 +1,42 @@
+name = "Unbreakable 2014"
+starts_on = 2014-04-05
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2301
+lng = 4.4418
+venue = "Lotto Arena"
+sources = ["https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCySwo6Ue4QxxsYDvIBdwynw", "https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/933"]
+judges = ["extremo", "menno", "renegade"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "sonic", b = "cheerito", winner = "cheerito", video = "https://youtu.be/MilA2QLbJ6g" },
+  { round = "top16", a = "dol", b = "niek", winner = "niek", video = "https://youtu.be/OEncJN5hsqM" },
+  { round = "top16", a = "mounir", b = "chey", winner = "mounir", video = "https://youtu.be/fINGLXW9Eag" },
+  { round = "top16", a = "shorty-force", b = "tonio", winner = "tonio", video = "https://youtu.be/-yocR8bohKU" },
+  { round = "top16", a = "bruce-almighty", b = "vicious-vic", winner = "bruce-almighty", video = "https://youtu.be/0w_1uxv-27U" },
+  { round = "top16", a = "differ", b = "luan", winner = "TODO", video = "https://youtu.be/QESwFWI6QlQ" },
+  { round = "top16", a = "isaiah", b = "titris", winner = "TODO", video = "https://youtu.be/Vuw27mL2ysk" },
+  { round = "top8", a = "cheerito", b = "sambo", winner = "cheerito", video = "https://youtu.be/msL1EvCbkMQ" },
+  { round = "top8", a = "mounir", b = "niek", winner = "niek", video = "https://youtu.be/K8CBlGxIUYE" },
+  { round = "top8", a = "bruce-almighty", b = "tonio", winner = "bruce-almighty", video = "https://youtu.be/Ve4sVB5Cshc" },
+  { round = "top4", a = "niek", b = "cheerito", winner = "cheerito", video = "https://youtu.be/i_JuPaLp83I" },
+  { round = "top4", a = "bruce-almighty", b = "differ", winner = "bruce-almighty", video = "https://youtu.be/Ssm8lvMckEs" },
+  { round = "final", a = "bruce-almighty", b = "cheerito", winner = "bruce-almighty", video = "https://youtu.be/ZdPMr46TBPA" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "shmetta-skwad", reached = "winner" },
+]
+
+[battles.teams]
+shmetta-skwad = { crew = "shmetta-skwad" }

@@ -1,0 +1,64 @@
+name = "Battle of the Year 2013"
+starts_on = 2013-10-19
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://and8.dance/en/e/362"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "fusion-mc", reached = "winner" },
+  { entrant = "b-town-all-stars", reached = "top4" },
+  { entrant = "flooriorz", reached = "top4" },
+  { entrant = "the-ruggeds", reached = "top2" },
+]
+
+[battles.teams]
+b-town-all-stars = { crew = "b-town-all-stars" }
+flooriorz = { crew = "flooriorz" }
+fusion-mc = { crew = "fusion-mc" }
+the-ruggeds = { crew = "the-ruggeds" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "pocket", b = "mat", winner = "pocket" },
+  { round = "top16", a = "issei", b = "hulk", winner = "issei" },
+  { round = "top16", a = "tonio", b = "menno", winner = "menno" },
+  { round = "top16", a = "nori", b = "lil-zoo", winner = "nori" },
+  { round = "top16", a = "slav", b = "thesis", winner = "thesis" },
+  { round = "top16", a = "wing", b = "bootuz", winner = "wing" },
+  { round = "top16", a = "lil-g", b = "titris", winner = "lil-g" },
+  { round = "top16", a = "cherry", b = "robin", winner = "robin" },
+  { round = "top8", a = "pocket", b = "issei", winner = "issei" },
+  { round = "top8", a = "menno", b = "nori", winner = "menno" },
+  { round = "top8", a = "thesis", b = "wing", winner = "thesis" },
+  { round = "top8", a = "lil-g", b = "robin", winner = "lil-g" },
+  { round = "top4", a = "issei", b = "menno", winner = "menno" },
+  { round = "top4", a = "thesis", b = "lil-g", winner = "thesis" },
+  { round = "final", a = "menno", b = "thesis", winner = "menno" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "kanami-myw", reached = "winner" },
+]
+
+[battles.teams]
+kanami-myw = { members = ["kanami", "myw"] }

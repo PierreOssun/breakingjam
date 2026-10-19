@@ -1,0 +1,61 @@
+name = "Freestyle Session 2025"
+starts_on = 2025-11-15
+ends_on = 2025-11-16
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://and8.dance/en/e/5130", "https://www.freestylesession.com/blogs/vlogsblogs-more/freestyle-session-tickets-on-sale-now"]
+judges = []
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "red-bull-bc-one-all-stars", b = "anti-riko", winner = "anti-riko", video = "https://youtu.be/HXTfmYwAFkM" },
+  { round = "top4", a = "good-foot", b = "xii-after-ours", winner = "TODO", video = "https://youtu.be/r6FARG6Fem0" },
+  { round = "final", a = "ami-ayu", b = "anti-riko", winner = "TODO", video = "https://youtu.be/9dPs4eAW4y0" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+bracket_size = 2
+matches = [
+  { round = "final", a = "holy-rain-so", b = "amy-miyu", winner = "TODO", video = "https://youtu.be/li8HYhI76W0" },
+]
+
+[battles.teams]
+amy-miyu = { members = ["miyu", "amy"] }
+holy-rain-so = { members = ["holy-rain", "so"] }
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "corrupt-path", b = "breakinmia", winner = "breakinmia", video = "https://youtu.be/LcA6GWmYsjQ" },
+  { round = "top4", a = "gunsmoke-by-nature", b = "bumblebee-grom", winner = "TODO", video = "https://youtu.be/N37EWG6RKm0" },
+  { round = "top4", a = "danzel-fantaye", b = "assassins", winner = "danzel-fantaye", video = "https://youtu.be/Y8Kn89yvjNs" },
+  { round = "top4", a = "ryu-yuta", b = "waackxxxy-yoonji", winner = "waackxxxy-yoonji", video = "https://youtu.be/AAfQUnq76R4" },
+  { round = "final", a = "danzel-fantaye", b = "waackxxxy-yoonji", winner = "danzel-fantaye", video = "https://youtu.be/aBjr_6dOfes" },
+  { round = "final", a = "breakinmia", b = "gun-smoke-by-nature", winner = "TODO", video = "https://youtu.be/FDBpJ7eLzDc" },
+]
+
+[battles.teams]
+assassins = { crew = "assassins" }
+breakinmia = { crew = "breakinmia" }
+bumblebee-grom = { members = ["bumblebee", "grom"] }
+corrupt-path = { crew = "corrupt-path" }
+danzel-fantaye = { members = ["fantaye", "danzel"] }
+gun-smoke-by-nature = { crew = "gun-smoke-by-nature" }
+gunsmoke-by-nature = { crew = "gunsmoke-by-nature" }
+ryu-yuta = { members = ["ryu", "yuta"] }
+waackxxxy-yoonji = { members = ["waackxxxy", "yoonji"] }

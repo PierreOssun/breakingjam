@@ -1,0 +1,57 @@
+name = "Red Bull BC One World Final 2024"
+starts_on = 2024-12-07
+timezone = "America/Sao_Paulo"
+city = "Rio de Janeiro"
+country = "BR"
+lat = -22.9110
+lng = -43.2094
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["amir", "narumi", "jeromeskee", "roxy", "lil-g"]
+mcs = ["amjad", "maga-moura"]
+djs = ["dj-nobunaga"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "hiro-10", b = "samuka", winner = "samuka", votes = [1, 4] },
+  { round = "top16", a = "quake", b = "zooty-zoot", winner = "zooty-zoot", votes = [1, 4] },
+  { round = "top16", a = "nori", b = "menno", winner = "menno", votes = [2, 3] },
+  { round = "top16", a = "dias", b = "victor", winner = "victor", votes = [2, 3] },
+  { round = "top16", a = "leony", b = "khalil", winner = "khalil", votes = [0, 5] },
+  { round = "top16", a = "kalmius", b = "icey-ives", winner = "icey-ives", votes = [0, 5] },
+  { round = "top16", a = "robb", b = "klash", winner = "robb", votes = [4, 1] },
+  { round = "top16", a = "slav", b = "alvin", winner = "alvin", votes = [1, 4] },
+  { round = "top8", a = "samuka", b = "zooty-zoot", winner = "samuka", votes = [4, 1] },
+  { round = "top8", a = "menno", b = "victor", winner = "menno", votes = [5, 0] },
+  { round = "top8", a = "khalil", b = "icey-ives", winner = "icey-ives", votes = [0, 5] },
+  { round = "top8", a = "robb", b = "alvin", winner = "alvin", votes = [2, 3] },
+  { round = "top4", a = "samuka", b = "menno", winner = "menno", votes = [2, 3] },
+  { round = "top4", a = "icey-ives", b = "alvin", winner = "icey-ives", votes = [3, 2] },
+  { round = "final", a = "menno", b = "icey-ives", winner = "menno", votes = [4, 1] },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "yasmin", b = "royal", winner = "yasmin", votes = [5, 0] },
+  { round = "top16", a = "syssy", b = "nicka", winner = "nicka", votes = [2, 3] },
+  { round = "top16", a = "kate", b = "toquinha", winner = "toquinha", votes = [2, 3] },
+  { round = "top16", a = "yingzi", b = "lola", winner = "yingzi", votes = [5, 0] },
+  { round = "top16", a = "india", b = "starry", winner = "india", votes = [5, 0] },
+  { round = "top16", a = "logistx", b = "luma", winner = "logistx", votes = [3, 2] },
+  { round = "top16", a = "mini-japa", b = "swami", winner = "mini-japa", votes = [4, 1] },
+  { round = "top16", a = "kimie", b = "mimz", winner = "kimie", votes = [3, 2] },
+  { round = "top8", a = "yasmin", b = "nicka", winner = "nicka", votes = [1, 4] },
+  { round = "top8", a = "toquinha", b = "yingzi", winner = "toquinha", votes = [4, 1] },
+  { round = "top8", a = "india", b = "logistx", winner = "india", votes = [5, 0] },
+  { round = "top8", a = "mini-japa", b = "kimie", winner = "kimie", votes = [0, 5] },
+  { round = "top4", a = "nicka", b = "toquinha", winner = "nicka", votes = [5, 0] },
+  { round = "top4", a = "india", b = "kimie", winner = "india", votes = [4, 1] },
+  { round = "final", a = "nicka", b = "india", winner = "india", votes = [2, 3] },
+]

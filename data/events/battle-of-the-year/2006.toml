@@ -1,0 +1,29 @@
+name = "Battle of the Year 2006"
+starts_on = 2006-10-21
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://web.archive.org/web/20070205101818/http://www.battleoftheyear.net/worldwide/boty2006/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "vagabonds", reached = "winner" },
+  { entrant = "drifterz", reached = "top4" },
+  { entrant = "b-town-allstars", reached = "top4" },
+  { entrant = "last-for-one", reached = "top2" },
+]
+
+[battles.teams]
+b-town-allstars = { crew = "b-town-allstars" }
+drifterz = { crew = "drifterz" }
+last-for-one = { crew = "last-for-one" }
+vagabonds = { crew = "vagabonds" }

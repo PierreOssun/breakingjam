@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update events set status = $2 where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "event_status",
+            "kind": {
+              "Enum": [
+                "draft",
+                "in_review",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "05c492feff2ec5c1b511f364919bed52fb01cf0280302a2dc2fde914ab5f72cc"
+}

@@ -195,7 +195,7 @@ async fn list(
     Ok(Json(Page::from_rows(rows, limit, encode_cursor)))
 }
 
-/// Upcoming public jams with coordinates, for the world map.
+/// Public jams with coordinates, upcoming and past, for the world map.
 #[utoipa::path(
     get,
     path = "/events.geojson",

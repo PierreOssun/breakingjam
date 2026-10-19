@@ -1,0 +1,10 @@
+name = "DPC Jam"
+# From the stance video descriptions ("from Zurich, Switzerland"); check it holds for every edition.
+city = "Zurich"
+country = "CH"
+timezone = "Europe/Zurich"
+
+[youtube]
+channels = ["UCgiz3Pm3FBhDyy3g_fP5OVA"]   # stance
+title = "DPC Jam"
+battles = [{ key = "2v2", name = "2v2", team_size = 2 }]

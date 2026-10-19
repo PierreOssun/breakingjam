@@ -1,10 +1,11 @@
-//! Local dev seed: admin users, sample jams with battles and results, dancers and crews (ARCHITECTURE §8).
+//! Local dev seed: admin users, the curated past jams of `data/`, and invented upcoming jams with dancers and crews (ARCHITECTURE §8).
 
-use std::collections::HashMap;
+use std::{collections::HashMap, path::Path};
 
 use anyhow::Context;
 use breakingjam::{
     auth::password,
+    dataset::{self, import, key_for},
     db,
     domain::{
         battle::{
@@ -49,7 +50,7 @@ struct Event {
     timezone: &'static str,
     lat: f64,
     lng: f64,
-    /// Start date relative to today, so the seed always has upcoming and past jams.
+    /// Start date relative to today, so the invented jams stay upcoming; past jams come from `data/`.
     starts_in_days: i32,
     length_days: i32,
     status: EventStatus,
@@ -65,7 +66,7 @@ struct Battle {
     age: BattleAge,
     /// ISO 4217 currency and the cash prizes for 1st, 2nd and 3rd.
     prize: Option<(&'static str, [i32; 3])>,
-    /// Dancers, or crews in team battles; a completed jam lists them in finishing order.
+    /// Dancers, or crews in team battles, registered.
     entrants: &'static [&'static str],
 }
 
@@ -155,51 +156,6 @@ const EVENTS: &[Event] = &[
         battles: &[
             Battle { prize: Some(("KRW", [5_000_000, 2_000_000, 1_000_000])), entrants: &["Hong 10", "Wing", "Physicx", "Pocket", "Shigekix", "Issei", "Sensei Kai", "Vortex"], ..BBOY_1V1 },
             Battle { entrants: &["Seoul Riders", "Tokyo Freeze", "Floor Lords", "Spin Syndicate"], ..CREW_2V2 },
-        ],
-    },
-    Event {
-        name: "Tokyo Underground Cypher", city: "Tokyo", country: "JP", timezone: "Asia/Tokyo", lat: 35.6762, lng: 139.6503,
-        starts_in_days: -30, length_days: 1, status: EventStatus::Completed,
-        staff: &[(Judge, "Wing"), (Judge, "Lilou"), (Dj, "DJ Krate"), (Mc, "MC Rhyno")],
-        battles: &[
-            Battle { prize: Some(("JPY", [300_000, 150_000, 50_000])), entrants: &["Shigekix", "Issei", "Taisuke", "Hong 10", "Ronin", "Tetris", "Noodle", "Mako"], ..BBOY_1V1 },
-            Battle { entrants: &["Tokyo Freeze", "Seoul Riders", "Floor Lords", "Spin Syndicate"], ..CREW_2V2 },
-        ],
-    },
-    Event {
-        name: "Taipei Breaking Open", city: "Taipei", country: "TW", timezone: "Asia/Taipei", lat: 25.0330, lng: 121.5654,
-        starts_in_days: -60, length_days: 2, status: EventStatus::Completed,
-        staff: &[(Judge, "Hong 10"), (Judge, "Shigekix"), (Dj, "DJ Loopa"), (Mc, "MC Volta")],
-        battles: &[
-            Battle { prize: Some(("TWD", [100_000, 50_000, 20_000])), entrants: &["Physicx", "Wing", "Pocket", "Amir", "Zephyr", "Pharo", "Mako", "Vortex"], ..BBOY_1V1 },
-            Battle { entrants: &["Bgirl Mira", "Bgirl Kaida", "Bgirl Pixel", "Bgirl Ember"], ..BGIRL_1V1 },
-        ],
-    },
-    Event {
-        name: "Vancouver Northern Breaks", city: "Vancouver", country: "CA", timezone: "America/Vancouver", lat: 49.2827, lng: -123.1207,
-        starts_in_days: -75, length_days: 1, status: EventStatus::Completed,
-        staff: &[(Judge, "Lil Zoo"), (Judge, "Menno"), (Dj, "DJ Loopa"), (Mc, "MC Rhyno")],
-        battles: &[
-            Battle { prize: Some(("CAD", [5000, 2500, 1000])), entrants: &["Phil Wizard", "Victor", "Roxrite", "Omar", "Neguin", "Rhythmic", "Lil Nova", "Echo"], ..BBOY_1V1 },
-            Battle { entrants: &["Bgirl Lumen", "Bgirl Saffron", "Toprock Tina", "Bgirl Mira"], ..BGIRL_1V1 },
-        ],
-    },
-    Event {
-        name: "Bangkok Groove Battle", city: "Bangkok", country: "TH", timezone: "Asia/Bangkok", lat: 13.7563, lng: 100.5018,
-        starts_in_days: -120, length_days: 1, status: EventStatus::Completed,
-        staff: &[(Judge, "Menno"), (Dj, "DJ Loopa")],
-        battles: &[
-            Battle { prize: Some(("THB", [50_000, 20_000, 10_000])), entrants: &["Hong 10", "Issei", "Victor", "Pharo", "Jinx", "Taisuke", "Kid Rocket", "Ventus"], ..BBOY_1V1 },
-            Battle { entrants: &["Pocket", "Mako", "Vortex", "Ronin"], ..SEVEN_TO_SMOKE },
-        ],
-    },
-    Event {
-        name: "Vienna Floor Kings", city: "Vienna", country: "AT", timezone: "Europe/Vienna", lat: 48.2082, lng: 16.3738,
-        starts_in_days: -150, length_days: 2, status: EventStatus::Completed,
-        staff: &[(Judge, "Hong 10"), (Judge, "Victor"), (Dj, "DJ Krate"), (Mc, "MC Volta")],
-        battles: &[
-            Battle { prize: Some(("EUR", [2000, 1000, 500])), entrants: &["Lil Zoo", "Menno", "Lilou", "Mounir", "Junior", "Dany Dann", "Sunni", "Spinzilla"], ..BBOY_1V1 },
-            Battle { entrants: &["Spin Syndicate", "Floor Lords", "Seoul Riders", "Tokyo Freeze"], ..CREW_3V3 },
         ],
     },
     Event {
@@ -294,7 +250,7 @@ const DANCERS: &[Dancer] = &[
     Dancer { name: "DJ Loopa", aliases: &[], country: "NL", country2: None, city: "Rotterdam", handle: None, notable: false, crew: None },
     Dancer { name: "MC Rhyno", aliases: &[], country: "GB", country2: None, city: "London", handle: None, notable: false, crew: None },
     Dancer { name: "MC Volta", aliases: &[], country: "FR", country2: None, city: "Paris", handle: None, notable: false, crew: None },
-    // Famous bboys, for local data only: their results at the made-up jams above are invented.
+    // Famous bboys judging or registered at the made-up upcoming jams; when `data/` has them, its rows are reused.
     Dancer { name: "Hong 10", aliases: &["Hong10"], country: "KR", country2: None, city: "Seoul", handle: None, notable: true, crew: None },
     Dancer { name: "Wing", aliases: &[], country: "KR", country2: None, city: "Seoul", handle: None, notable: true, crew: None },
     Dancer { name: "Physicx", aliases: &[], country: "KR", country2: None, city: "Seoul", handle: None, notable: true, crew: None },
@@ -325,11 +281,13 @@ async fn main() -> anyhow::Result<()> {
     let url = std::env::var("DATABASE_URL").context("DATABASE_URL must be set")?;
     let password = std::env::var("SEED_PASSWORD").context("SEED_PASSWORD must be set")?;
     let options: PgConnectOptions = url.parse()?;
-    // Demo jams and invented results about real dancers must never reach production.
+    // Demo jams and invented results about real dancers must never reach production. A remote
+    // database (UAT) is seeded only when SEED_ALLOW_HOST names its host exactly.
     let host = options.get_host();
+    let allowed = std::env::var("SEED_ALLOW_HOST").is_ok_and(|allowed| allowed == host);
     anyhow::ensure!(
-        matches!(host, "localhost" | "127.0.0.1" | "::1"),
-        "the seed only runs against a local database, not {host}"
+        allowed || matches!(host, "localhost" | "127.0.0.1" | "::1"),
+        "the seed only runs against a local database or SEED_ALLOW_HOST, not {host}"
     );
     let pool = PgPool::connect_with(options).await?;
 
@@ -348,10 +306,11 @@ async fn main() -> anyhow::Result<()> {
     insert_user(&mut tx, &ADMIN, &password).await?;
     let seed_admin = insert_user(&mut tx, &SEED_ADMIN, &password).await?;
     let organizer = insert_user(&mut tx, &ORGANIZER, &password).await?;
+    let imported = import_data(&mut tx, seed_admin).await?;
     let crews = insert_crews(&mut tx).await?;
-    let dancers = insert_dancers(&mut tx, seed_admin, &crews).await?;
+    let dancers = insert_dancers(&mut tx, seed_admin, &crews, &imported.dancers).await?;
     let ids = Ids {
-        dancers,
+        dancers: dancers.clone(),
         crews: CREWS.iter().map(|crew| crew.name).zip(crews).collect(),
     };
     insert_events(&mut tx, seed_admin, EVENTS, &ids).await?;
@@ -359,9 +318,9 @@ async fn main() -> anyhow::Result<()> {
     tx.commit().await?;
 
     tracing::info!(
-        events = EVENTS.len() + IN_REVIEW.len(),
-        dancers = DANCERS.len(),
-        crews = CREWS.len(),
+        events = EVENTS.len() + IN_REVIEW.len() + imported.events,
+        dancers = dancers.len() + imported.dancers.len(),
+        crews = CREWS.len() + imported.crews,
         "seeded; log in as {}, {} or {} with SEED_PASSWORD",
         ADMIN.email,
         SEED_ADMIN.email,
@@ -385,12 +344,7 @@ impl Ids {
     }
 
     /// A confirmed entry: one dancer, or in team battles a crew with its first `team_size` dancers.
-    fn entry(
-        &self,
-        battle: &Battle,
-        entrant: &str,
-        reached: BracketStage,
-    ) -> anyhow::Result<EntryFields> {
+    fn entry(&self, battle: &Battle, entrant: &str) -> anyhow::Result<EntryFields> {
         let team_size = usize::try_from(battle.team_size.unwrap_or(1))?;
         let (crew_id, dancer_ids) = if team_size == 1 {
             (None, vec![self.dancer(entrant)?])
@@ -421,7 +375,7 @@ impl Ids {
             crew_id,
             dancer_ids,
             status: EntryStatus::Confirmed,
-            reached,
+            reached: BracketStage::Na,
             final_rank: None,
             video_url: None,
             video_offset_seconds: None,
@@ -457,15 +411,23 @@ impl Battle {
     }
 }
 
-/// The stage reached by the entrant who finished at `place` (0 = winner) of a knockout bracket.
-fn reached(place: usize) -> BracketStage {
-    match place {
-        0 => BracketStage::Winner,
-        1 => BracketStage::Top2,
-        2..=3 => BracketStage::Top4,
-        4..=7 => BracketStage::Top8,
-        _ => BracketStage::Top16,
+/// The past jams of `data/` that pass `data check`, owned by the seed admin; the rest is logged.
+async fn import_data(conn: &mut PgConnection, owner: Uuid) -> anyhow::Result<import::Imported> {
+    let (data, unreadable) = dataset::load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../data"));
+    for error in &unreadable {
+        tracing::debug!(%error, "data file left out");
     }
+    let today = chrono::Utc::now().date_naive();
+    let imported = import::insert_all(conn, &data, owner, today).await?;
+    for why in &imported.skipped {
+        tracing::debug!(why, "left out");
+    }
+    tracing::info!(
+        jams = imported.events,
+        left_out = imported.skipped.len() + unreadable.len(),
+        "imported data/ (RUST_LOG=seed=debug lists what was left out and why)"
+    );
+    Ok(imported)
 }
 
 async fn insert_user(conn: &mut PgConnection, user: &User, password: &str) -> anyhow::Result<Uuid> {
@@ -504,14 +466,20 @@ async fn insert_crews(conn: &mut PgConnection) -> sqlx::Result<Vec<Uuid>> {
     Ok(ids)
 }
 
+/// The dancers of `DANCERS`; one `data/` already wrote (by key) keeps that row.
 async fn insert_dancers(
     conn: &mut PgConnection,
     created_by: Uuid,
     crews: &[Uuid],
+    imported: &std::collections::BTreeMap<String, Uuid>,
 ) -> sqlx::Result<HashMap<&'static str, Uuid>> {
     let mut ids = HashMap::with_capacity(DANCERS.len());
     // §4: the `seed` origin implies notable; the others are ordinary organizer-created rows.
     for dancer in DANCERS {
+        if let Some(id) = imported.get(&key_for(dancer.name)) {
+            ids.insert(dancer.name, *id);
+            continue;
+        }
         let id = Uuid::now_v7();
         sqlx::query!(
             "insert into dancers
@@ -570,12 +538,8 @@ async fn insert_events(
             let battle_id = db::battles::insert(conn, event_id, &fields.display_name(), &fields)
                 .await?
                 .id;
-            for (place, entrant) in battle.entrants.iter().enumerate() {
-                let reached = match event.status {
-                    EventStatus::Completed => reached(place),
-                    _ => BracketStage::Na,
-                };
-                let entry = ids.entry(battle, entrant, reached)?;
+            for entrant in battle.entrants {
+                let entry = ids.entry(battle, entrant)?;
                 db::battles::insert_entry(conn, battle_id, &entry).await?;
             }
         }

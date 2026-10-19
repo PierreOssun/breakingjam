@@ -1,0 +1,58 @@
+name = "Red Bull BC One World Final 2018"
+starts_on = 2018-09-29
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+lat = 47.4114
+lng = 8.5517
+venue = "Hallenstadion"
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://and8.dance/en/e/2603"]
+judges = ["tuff-kid", "benny-flying-steps", "wicket", "junior", "taisuke"]
+mcs = ["amjad"]
+djs = ["dj-fleg"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "issei", b = "luka", winner = "issei", votes = [5, 0] },
+  { round = "top16", a = "cri6", b = "dr-hill", winner = "dr-hill", votes = [1, 4] },
+  { round = "top16", a = "the-wolfer", b = "nori", winner = "the-wolfer", votes = [3, 2] },
+  { round = "top16", a = "sunni", b = "luigi", winner = "luigi", votes = [2, 3] },
+  { round = "top16", a = "lil-zoo", b = "vero", winner = "lil-zoo", votes = [4, 1] },
+  { round = "top16", a = "lil-kev", b = "kid-colombia", winner = "lil-kev", votes = [3, 2] },
+  { round = "top16", a = "victor", b = "leony", winner = "victor", votes = [5, 0] },
+  { round = "top16", a = "uzee-rock", b = "chey", winner = "uzee-rock", votes = [5, 0] },
+  { round = "top8", a = "issei", b = "dr-hill", winner = "dr-hill", votes = [2, 3] },
+  { round = "top8", a = "the-wolfer", b = "luigi", winner = "luigi", votes = [2, 3] },
+  { round = "top8", a = "lil-zoo", b = "lil-kev", winner = "lil-zoo", votes = [4, 1] },
+  { round = "top8", a = "victor", b = "uzee-rock", winner = "victor", votes = [4, 1] },
+  { round = "top4", a = "dr-hill", b = "luigi", winner = "luigi", votes = [2, 3] },
+  { round = "top4", a = "lil-zoo", b = "victor", winner = "lil-zoo", votes = [4, 1] },
+  { round = "final", a = "luigi", b = "lil-zoo", winner = "lil-zoo", votes = [1, 3] },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "mess", b = "roxy", winner = "roxy", votes = [1, 3] },
+  { round = "top16", a = "at", b = "san-andrea", winner = "san-andrea", votes = [0, 5] },
+  { round = "top16", a = "ayumi", b = "jk47", winner = "ayumi", votes = [5, 0] },
+  { round = "top16", a = "sarah-bee", b = "primary-soul", winner = "sarah-bee", votes = [5, 0] },
+  { round = "top16", a = "ami", b = "kastet", winner = "ami", votes = [3, 1] },
+  { round = "top16", a = "kate", b = "mini-japa", winner = "kate", votes = [4, 0] },
+  { round = "top16", a = "sunny", b = "paulina", winner = "sunny", votes = [4, 0] },
+  { round = "top16", a = "narumi", b = "sayora", winner = "narumi", votes = [4, 0] },
+  { round = "top8", a = "roxy", b = "san-andrea", winner = "san-andrea", votes = [1, 4] },
+  { round = "top8", a = "ayumi", b = "sarah-bee", winner = "ayumi", votes = [3, 1] },
+  { round = "top8", a = "ami", b = "kate", winner = "ami", votes = [3, 1] },
+  { round = "top8", a = "sunny", b = "narumi", winner = "narumi", votes = [1, 4] },
+  { round = "top4", a = "san-andrea", b = "ayumi", winner = "san-andrea", votes = [3, 2] },
+  { round = "top4", a = "ami", b = "narumi", winner = "ami", votes = [5, 0] },
+  { round = "final", a = "ami", b = "san-andrea", winner = "ami", votes = [3, 1] },
+]

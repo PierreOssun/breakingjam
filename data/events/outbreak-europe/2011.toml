@@ -1,0 +1,31 @@
+name = "Outbreak Europe 2011"
+starts_on = 2011-06-30
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7354
+lng = 19.1457
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+judges = ["lamine", "el-nino", "nasty-ray"]
+mcs = ["mario-bee", "lil-pablo", "mex-one"]
+djs = ["lean-rock", "renegade", "woo-d", "piggo"]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "movie-one", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "blanka-neguin", reached = "winner" },
+]
+
+[battles.teams]
+blanka-neguin = { members = ["neguin", "blanka"] }

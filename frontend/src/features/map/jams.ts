@@ -7,7 +7,7 @@ export type Category = Schemas["Category"];
 export type MapJam = Schemas["MapJam"] & { lng: number; lat: number };
 
 /** Time filters of the chip row; at most one at a time. */
-export type When = "weekend" | "month";
+export type When = "weekend" | "month" | "past";
 export type Filters = { when: When | null; categories: Category[] };
 
 export const NO_FILTERS: Filters = { when: null, categories: [] };
@@ -53,7 +53,10 @@ function addDays(date: Date, days: number): Date {
  * First and last day of a time filter, from the viewer's `today`: the coming Saturday and
  * Sunday (or what is left of the current weekend), or the next 30 days.
  */
-export function rangeOf(when: When, today: Date): [string, string] {
+export function rangeOf(
+  when: "weekend" | "month",
+  today: Date,
+): [string, string] {
   if (when === "month") return [isoDate(today), isoDate(addDays(today, 30))];
   const day = today.getDay(); // 0 Sunday … 6 Saturday
   const saturday = addDays(today, day === 0 ? -1 : 6 - day);
@@ -69,14 +72,34 @@ export function overlaps(
   return jam.starts_on <= to && jam.ends_on >= from;
 }
 
+/** Whether a jam is over, judged from the viewer's `today`. */
+export function isPast(jam: Pick<MapJam, "ends_on">, today: Date): boolean {
+  return jam.ends_on < isoDate(today);
+}
+
+/** Upcoming jams soonest first, then past ones most recent first (DESIGN.md §4.14). */
+export function byDate(today: Date) {
+  return (a: MapJam, b: MapJam) => {
+    const past = isPast(a, today);
+    if (past !== isPast(b, today)) return past ? 1 : -1;
+    return past
+      ? b.starts_on.localeCompare(a.starts_on)
+      : a.starts_on.localeCompare(b.starts_on);
+  };
+}
+
+function matchesWhen(jam: MapJam, when: When, today: Date): boolean {
+  if (when === "past") return isPast(jam, today);
+  return overlaps(jam, rangeOf(when, today));
+}
+
 /** Time AND categories; within categories, any one is enough. */
 export function matchesFilters(
   jam: MapJam,
   filters: Filters,
   today: Date,
 ): boolean {
-  if (filters.when && !overlaps(jam, rangeOf(filters.when, today)))
-    return false;
+  if (filters.when && !matchesWhen(jam, filters.when, today)) return false;
   if (
     filters.categories.length > 0 &&
     !jam.categories.some((c) => filters.categories.includes(c))

@@ -1,0 +1,26 @@
+name = "Battle of the Year 1995"
+# starts_on = YYYY-MM-DD  (not found on the page)
+timezone = "TODO"
+city = "TODO"
+country = "TODO"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "the-family", reached = "winner" },
+  { entrant = "flying-steps", reached = "top4", rank = 4 },
+  { entrant = "enemy-squad", reached = "top2" },
+  { entrant = "out-of-control", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+enemy-squad = { crew = "enemy-squad" }
+flying-steps = { crew = "flying-steps" }
+out-of-control = { crew = "out-of-control" }
+the-family = { crew = "the-family" }

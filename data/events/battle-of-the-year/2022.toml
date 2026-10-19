@@ -1,0 +1,29 @@
+name = "Battle of the Year 2022"
+starts_on = 2022-12-03
+timezone = "Asia/Tokyo"
+city = "Okinawa"
+country = "JP"
+lat = 26.3328
+lng = 127.7836
+venue = "Okinawa Arena"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/editions/2022", "https://www.boty-worldfinals-usc.com/2022-en"]
+judges = ["hong-10", "kazuhiro", "kid-david", "poe-one", "valentine"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "the-ruggeds", reached = "winner" },
+  { entrant = "rock-force-crew", reached = "top4" },
+  { entrant = "mortal-combat", reached = "top4" },
+  { entrant = "flooriorz", reached = "top2" },
+]
+
+[battles.teams]
+flooriorz = { crew = "flooriorz" }
+mortal-combat = { crew = "mortal-combat" }
+rock-force-crew = { crew = "rock-force-crew" }
+the-ruggeds = { crew = "the-ruggeds" }

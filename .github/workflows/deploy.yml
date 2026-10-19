@@ -1,14 +1,15 @@
 name: Deploy
 
-# Production (deploy/README.md): push a version tag, or run it by hand from the Actions tab.
+# main is the development branch and deploys nowhere. Pushing to `uat` deploys UAT, pushing to
+# `prod` deploys production (deploy/README.md). Each branch has a GitHub environment of the same
+# name holding its secrets; `prod` also waits for a reviewer.
 on:
   push:
-    tags: ["v*"]
-  workflow_dispatch:
+    branches: [uat, prod]
 
-# One deploy at a time, never cancelled halfway (migrations may have run).
+# One deploy per target at a time, never cancelled halfway (migrations may have run).
 concurrency:
-  group: deploy-production
+  group: deploy-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -18,7 +19,11 @@ jobs:
   deploy:
     needs: ci
     runs-on: ubuntu-latest
-    environment: production
+    environment: ${{ github.ref_name }}
+    env:
+      # wrangler.jsonc: the top level is production, `env.uat` is UAT.
+      WRANGLER_ENV: ${{ github.ref_name == 'uat' && 'uat' || '' }}
+      SITE_URL: ${{ github.ref_name == 'uat' && 'https://uat.breakingjam.com' || 'https://breakingjam.com' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,6 +43,18 @@ jobs:
           VITE_TILES_URL: ${{ vars.VITE_TILES_URL }}
         run: npm ci && npm run build
 
+      - name: Snapshot the database
+        # A Neon branch of the data as it was before the migrations, to restore from if a release
+        # damages it. It has no compute (costs only its changes) and expires after a week.
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: |
+          npx --yes neonctl@8.8.0 branches create \
+            --project-id "${{ vars.NEON_PROJECT_ID }}" \
+            --name "pre-deploy-$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}" \
+            --no-compute --no-secrets \
+            --expires-at "$(date -u -d '+7 days' +%Y-%m-%dT%H:%M:%SZ)"
+
       - uses: actions/cache@v4
         with:
           path: ~/.cargo/bin/sqlx
@@ -46,6 +63,7 @@ jobs:
         # Runs before the new API starts, so each migration must also suit the API version
         # still serving (add columns first, drop them a release later).
         env:
+          # The owner role: the API's own role can't change the schema.
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           command -v sqlx || cargo install sqlx-cli --locked --version 0.9.0 --no-default-features --features rustls,postgres
@@ -56,4 +74,8 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npm ci && npx wrangler deploy
+        run: npm ci && npx wrangler deploy --env "$WRANGLER_ENV"
+
+      - name: Check the site answers
+        # A cold container takes a few seconds to start. On UAT, Access lets this one path through.
+        run: curl --fail --silent --show-error --retry 12 --retry-delay 10 --retry-all-errors "$SITE_URL/api/health"

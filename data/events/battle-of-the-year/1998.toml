@@ -1,0 +1,29 @@
+name = "Battle of the Year 1998"
+starts_on = 1998-11-07
+timezone = "Europe/Berlin"
+city = "Offenbach am Main"
+country = "DE"
+lat = 50.1055
+lng = 8.7611
+venue = "Messehalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20020131093000/http://www.battleoftheyear.net/pastevents/boty98.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "rock-force", reached = "winner" },
+  { entrant = "suicidal-lifestyle", reached = "top4", rank = 4 },
+  { entrant = "the-family", reached = "top2" },
+  { entrant = "phase-2", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+phase-2 = { crew = "phase-2" }
+rock-force = { crew = "rock-force" }
+suicidal-lifestyle = { crew = "suicidal-lifestyle" }
+the-family = { crew = "the-family" }

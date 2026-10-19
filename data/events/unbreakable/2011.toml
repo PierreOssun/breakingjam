@@ -1,0 +1,47 @@
+name = "Unbreakable 2011"
+starts_on = 2011-04-16
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2301
+lng = 4.4418
+venue = "Lotto Arena"
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://web.archive.org/web/20110321110712/unbreakable.be/info.htm"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "neguin", reached = "winner" },
+]
+
+[[battles]]
+key = "kids-u14"
+name = "Kids under 14"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "kid-colombia", reached = "winner" },
+]
+
+[[battles]]
+key = "kids-u18"
+name = "Kids under 18"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "snelle-jelle", reached = "winner" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "shmetta-skwad", reached = "winner" },
+]
+
+[battles.teams]
+shmetta-skwad = { crew = "shmetta-skwad" }

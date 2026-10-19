@@ -1,0 +1,42 @@
+name = "Red Bull BC One World Final 2020"
+starts_on = 2020-11-28
+timezone = "Europe/Vienna"
+city = "Salzburg"
+country = "AT"
+lat = 47.7937
+lng = 13.0074
+venue = "Hangar-7"
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://www.redbull.com/int-en/shigekix-things-to-know"]
+judges = ["omar", "movie-one", "at", "lilou", "ayumi"]
+mcs = ["redchild"]
+djs = ["just-a-kid"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "shigekix", b = "kid-karam", winner = "shigekix", votes = [5, 0] },
+  { round = "top8", a = "killa-kolya", b = "vero", winner = "vero", votes = [2, 3] },
+  { round = "top8", a = "lil-zoo", b = "philip", winner = "lil-zoo", votes = [4, 1] },
+  { round = "top8", a = "alkolil", b = "pac-pac", winner = "alkolil", votes = [3, 2] },
+  { round = "top4", a = "shigekix", b = "vero", winner = "shigekix", votes = [4, 1] },
+  { round = "top4", a = "lil-zoo", b = "alkolil", winner = "alkolil", votes = [0, 5] },
+  { round = "final", a = "shigekix", b = "alkolil", winner = "shigekix", votes = [4, 1] },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "madmax", b = "sunny", winner = "madmax", votes = [3, 2] },
+  { round = "top8", a = "jilou", b = "sina", winner = "jilou", votes = [4, 1] },
+  { round = "top8", a = "kastet", b = "mess", winner = "kastet", votes = [5, 0] },
+  { round = "top8", a = "ayane", b = "kami", winner = "ayane", votes = [5, 0] },
+  { round = "top4", a = "madmax", b = "jilou", winner = "madmax", votes = [4, 1] },
+  { round = "top4", a = "kastet", b = "ayane", winner = "kastet", votes = [3, 2] },
+  { round = "final", a = "madmax", b = "kastet", winner = "kastet", votes = [1, 4] },
+]

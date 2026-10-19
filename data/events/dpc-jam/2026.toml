@@ -1,0 +1,52 @@
+name = "DPC Jam 2026"
+starts_on = 2026-10-03
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+lat = 47.3673
+lng = 8.5038
+venue = "GZ Heuried"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://and8.dance/de/e/5319"]
+judges = []
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "alexis-gohan", b = "enzo-nana", winner = "enzo-nana", video = "https://youtu.be/dXVlgZDzdDA" },
+  { round = "top16", a = "phumlailai-titan-zehr", b = "gekkon-joker", winner = "gekkon-joker", video = "https://youtu.be/_BNpPi4l4m0" },
+  { round = "top16", a = "yugoslavian-bboys", b = "damani-syssy", winner = "damani-syssy", video = "https://youtu.be/CSzU3E5OFsY" },
+  { round = "top16", a = "flakes-jackm8", b = "lil-wenhao-teddy-z", winner = "lil-wenhao-teddy-z", video = "https://youtu.be/3V4_1UhnLys" },
+  { round = "top16", a = "skilluminated", b = "allef-loop", winner = "allef-loop", video = "https://youtu.be/pRyj9rBP7Do" },
+  { round = "top16", a = "mauricio-ibz-nambrandzz", b = "hijack-icey-ives", winner = "hijack-icey-ives", video = "https://youtu.be/fzr8-2pqYpU" },
+  { round = "top16", a = "cicov-mav", b = "crazy-c-leader", winner = "crazy-c-leader", video = "https://youtu.be/puWl3C-2b4c" },
+  { round = "top16", a = "primal-instincts", b = "nori-ryoga", winner = "nori-ryoga", video = "https://youtu.be/95AJxYFgM68" },
+  { round = "top8", a = "crazy-c-leader", b = "nori-ryoga", winner = "nori-ryoga", video = "https://youtu.be/VR14aOiDnJ8" },
+  { round = "top8", a = "allef-loop", b = "hijack-icey-ives", winner = "hijack-icey-ives", video = "https://youtu.be/_oyfpfUHtQU" },
+  { round = "top8", a = "damani-syssy", b = "lil-wenhao-teddy-z", winner = "damani-syssy", video = "https://youtu.be/0DsUA7Jec-Y" },
+  { round = "top8", a = "enzo-nana", b = "gekkon-joker", winner = "gekkon-joker", video = "https://youtu.be/tpsbwXOQfW0" },
+  { round = "top4", a = "hijack-icey-ives", b = "nori-ryoga", winner = "nori-ryoga", video = "https://youtu.be/T7icRDt8oCQ" },
+  { round = "top4", a = "gekkon-joker", b = "damani-syssy", winner = "damani-syssy", video = "https://youtu.be/AeRG9jU60K0" },
+  { round = "final", a = "damani-syssy", b = "nori-ryoga", winner = "damani-syssy", video = "https://youtu.be/DBvep1eahRs" },
+]
+
+[battles.teams]
+alexis-gohan = { members = ["alexis", "gohan"] }
+allef-loop = { members = ["loop", "allef"] }
+cicov-mav = { members = ["cicov", "mav"] }
+crazy-c-leader = { members = ["crazy-c", "leader"] }
+damani-syssy = { members = ["damani", "syssy"] }
+enzo-nana = { crew = "formless-corp", members = ["nana", "enzo"] }
+flakes-jackm8 = { members = ["jackm8", "flakes"] }
+gekkon-joker = { members = ["gekkon", "joker"] }
+hijack-icey-ives = { members = ["icey-ives", "hijack"] }
+lil-wenhao-teddy-z = { members = ["lil-wenhao", "teddy-z"] }
+mauricio-ibz-nambrandzz = { members = ["nambrandzz", "mauricio-ibz"] }
+nori-ryoga = { members = ["nori", "ryoga"] }
+phumlailai-titan-zehr = { members = ["phumlailai", "titan-zehr"] }
+primal-instincts = { name = "Primal Instincts" }
+skilluminated = { name = "Skilluminated" }
+yugoslavian-bboys = { name = "Yugoslavian Bboys" }

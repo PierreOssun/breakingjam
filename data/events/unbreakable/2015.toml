@@ -1,0 +1,59 @@
+name = "Unbreakable 2015"
+starts_on = 2015-05-09
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2301
+lng = 4.4418
+venue = "Lotto Arena"
+sources = ["https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCySwo6Ue4QxxsYDvIBdwynw", "https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/294"]
+judges = ["bruce-almighty", "at", "mario-bee"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "leon", b = "snelle-jelle", winner = "leon", video = "https://youtu.be/EfbH2S-6X0o" },
+  { round = "top16", a = "cheerito", b = "gimnast", winner = "gimnast", video = "https://youtu.be/QBHNVH79blg" },
+  { round = "top16", a = "fleau", b = "lil-g", winner = "fleau", video = "https://youtu.be/IFonbHfJNUo" },
+  { round = "top16", a = "kleju", b = "kujo", winner = "kleju", video = "https://youtu.be/jUAdRcOVRYE" },
+  { round = "top16", a = "kid-colombia", b = "zeshen", winner = "zeshen", video = "https://youtu.be/PV7LnxE44Rg" },
+  { round = "top16", a = "saewl", b = "admiracles", winner = "saewl", video = "https://youtu.be/ZQMxSvwC3s8" },
+  { round = "top16", a = "sunni", b = "c-lil", winner = "sunni", video = "https://youtu.be/AmSLklZNJr0" },
+  { round = "top8", a = "gimnast", b = "leon", winner = "gimnast", video = "https://youtu.be/HJJRfwGY2SU" },
+  { round = "top8", a = "kleju", b = "fleau", winner = "kleju", video = "https://youtu.be/mAATyoE6qxs" },
+  { round = "top8", a = "saewl", b = "zeshen", winner = "zeshen", video = "https://youtu.be/bfVEAzFp5gM" },
+  { round = "top8", a = "sunni", b = "jazzy", winner = "sunni", video = "https://youtu.be/mE2I8XNMYqE" },
+  { round = "top4", a = "sunni", b = "zeshen", winner = "sunni", video = "https://youtu.be/GnIbpGc5hWs" },
+  { round = "top4", a = "kleju", b = "gimnast", winner = "gimnast", video = "https://youtu.be/YpjOYQxyHcc" },
+  { round = "final", a = "sunni", b = "gimnast", winner = "sunni", video = "https://youtu.be/Go2KO9xYcp8" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 2
+matches = [
+  { round = "final", a = "shmetta-skwad", b = "breaknuts", winner = "breaknuts", video = "https://youtu.be/cGnu34aHh4U" },
+]
+
+[battles.teams]
+breaknuts = { crew = "breaknuts" }
+shmetta-skwad = { crew = "shmetta-skwad" }
+
+[[battles]]
+key = "kids-crew"
+name = "Kids crew battle"
+gender = "mixed"
+age = "kids"
+bracket_size = 2
+matches = [
+  { round = "final", a = "battle-droids", b = "fresh-allstars", winner = "battle-droids", video = "https://youtu.be/9Fl8hcEp1iI" },
+]
+
+[battles.teams]
+battle-droids = { crew = "battle-droids" }
+fresh-allstars = { crew = "fresh-allstars" }

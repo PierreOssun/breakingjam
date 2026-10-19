@@ -179,14 +179,14 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
     .await
 }
 
-/// Points for the world map: announced jams with coordinates, not yet completed or cancelled.
+/// Points for the world map: announced or completed jams with coordinates, never cancelled ones.
 pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
     sqlx::query_as!(
         MapPoint,
         r#"select id, name, slug, starts_on, ends_on, status as "status: EventStatus", city,
                   country, lat as "lat!", lng as "lng!"
            from events
-           where deleted_at is null and status in ('published', 'registration_closed')
+           where deleted_at is null and status in ('published', 'registration_closed', 'completed')
              and lat is not null and lng is not null
            order by starts_on, id"#,
     )

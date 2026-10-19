@@ -1,0 +1,29 @@
+name = "Battle of the Year 2000"
+starts_on = 2000-10-14
+timezone = "Europe/Berlin"
+city = "Hannover"
+country = "DE"
+lat = 52.3224
+lng = 9.8165
+venue = "Preussag Arena"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://web.archive.org/web/20020114193114/http://www.battleoftheyear.net/pastevents/boty2000.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "flying-steps", reached = "winner" },
+  { entrant = "south-african-allstars", reached = "top4", rank = 4 },
+  { entrant = "waseda-breakers", reached = "top2" },
+  { entrant = "scrambling-feet", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+flying-steps = { crew = "flying-steps" }
+scrambling-feet = { crew = "scrambling-feet" }
+south-african-allstars = { crew = "south-african-allstars" }
+waseda-breakers = { crew = "waseda-breakers" }

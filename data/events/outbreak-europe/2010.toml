@@ -1,0 +1,32 @@
+name = "Outbreak Europe 2010"
+starts_on = 2010-07-01
+ends_on = 2010-07-04
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7354
+lng = 19.1457
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+judges = ["roxrite", "kid-david", "keebz"]
+mcs = ["mario-bee", "lil-pablo"]
+djs = ["lean-rock", "renegade", "woo-d", "piggo"]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "nadia", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "intact-pluto", reached = "winner" },
+]
+
+[battles.teams]
+intact-pluto = { members = ["intact", "pluto"] }

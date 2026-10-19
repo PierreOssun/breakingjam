@@ -1,0 +1,50 @@
+name = "Battle of the Year 2018"
+starts_on = 2018-11-17
+timezone = "Europe/Paris"
+city = "Montpellier"
+country = "FR"
+lat = 43.5733
+lng = 3.9517
+venue = "Sud de France Arena"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20180529195232/http://www.battleoftheyear.net/boty-2018/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "jinjo-crew", reached = "winner" },
+  { entrant = "top-coalition", reached = "top4" },
+  { entrant = "vagabonds", reached = "top4" },
+  { entrant = "foundnation", reached = "top2" },
+]
+
+[battles.teams]
+foundnation = { crew = "foundnation" }
+jinjo-crew = { crew = "jinjo-crew" }
+top-coalition = { crew = "top-coalition" }
+vagabonds = { crew = "vagabonds" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "beetle", reached = "top2" },
+  { entrant = "dany", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "ayane", reached = "winner" },
+]
+
+[battles.teams]
+ayane = { name = "Ayane" }

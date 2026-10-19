@@ -1,0 +1,50 @@
+name = "Battle of the Year 2009"
+starts_on = 2009-10-17
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://www.rap2soul.de/2009/20-jahre-battle-of-the-year-geburtstag-im-oktober-in-braunschweig-7540"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "gamblerz", reached = "winner" },
+  { entrant = "all-area-crew", reached = "top4" },
+  { entrant = "phase-t", reached = "top4" },
+  { entrant = "top-9", reached = "top2" },
+]
+
+[battles.teams]
+all-area-crew = { crew = "all-area-crew" }
+gamblerz = { crew = "gamblerz" }
+phase-t = { crew = "phase-t" }
+top-9 = { crew = "top-9" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "morris", reached = "top2" },
+  { entrant = "lilou", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "narumi-shie-chan", reached = "winner" },
+]
+
+[battles.teams]
+narumi-shie-chan = { members = ["shie-chan", "narumi"] }

@@ -1,0 +1,8 @@
+name = "Red Bull BC One World Final"
+
+[wikipedia]
+page = "https://en.wikipedia.org/wiki/Red_Bull_BC_One"
+battles = [
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["b-boy"] },
+  { key = "bgirl", name = "1v1 Bgirl", gender = "bgirl", words = ["b-girl"] },
+]

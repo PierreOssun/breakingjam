@@ -1,0 +1,97 @@
+name = "Freestyle Session 2017"
+starts_on = 2017-11-11
+ends_on = 2017-11-12
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://web.archive.org/web/20210302203329/https://www.probreakingtour.com/2017/11/13/freestyle-session-world-finals-17-20th-anniversary/"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 2
+matches = [
+  { round = "final", a = "el-nino", b = "thesis", winner = "TODO", video = "https://youtu.be/tJn-9MjAFSI" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 32
+matches = [
+  { round = "top32", a = "good-foot", b = "808-breakers", winner = "808-breakers", video = "https://youtu.be/5k4BiGCkgWQ" },
+  { round = "top32", a = "team-ukraine", b = "hazardous-beings", winner = "team-ukraine", video = "https://youtu.be/7VPYsnzKdns" },
+  { round = "top32", a = "lion-city-bboys", b = "squadron", winner = "squadron", video = "https://youtu.be/8NP7AQEbB_Y" },
+  { round = "top32", a = "floor-gangz", b = "waseda-breakers", winner = "waseda-breakers", video = "https://youtu.be/A2Btf6_jqVI" },
+  { round = "top32", a = "fresh-all-stars", b = "monster-energy-bboys", winner = "TODO", video = "https://youtu.be/C_Uj8xicSKU" },
+  { round = "top32", a = "the-saxonz", b = "flooriorz", winner = "TODO", video = "https://youtu.be/PUk1-we-ISo" },
+  { round = "top32", a = "ill-abilities", b = "momentum-crew", winner = "TODO", video = "https://youtu.be/_NPZiOizGvU" },
+  { round = "top32", a = "lil-killaz", b = "mighty-zulu-kings", winner = "TODO", video = "https://youtu.be/gCF1ZJ7fIw8" },
+  { round = "top32", a = "elusive-fenz", b = "found-nation", winner = "found-nation", video = "https://youtu.be/sctj6NWz5_M" },
+  { round = "top32", a = "killafornia-monsta-squad", b = "gunsmoke-breakers", winner = "TODO", video = "https://youtu.be/seCUfd04xEU" },
+  { round = "top32", a = "13-26-11", b = "body-carnival", winner = "body-carnival", video = "https://youtu.be/vyv8yaCpct0" },
+  { round = "top32", a = "kadetes-del-toke", b = "supernaturalz", winner = "supernaturalz", video = "https://youtu.be/1v2k-2mvCvg" },
+  { round = "top32", a = "top-coalition", b = "the-ruggeds", winner = "TODO", video = "https://youtu.be/ZYtWjVUo6dA" },
+  { round = "top32", a = "unstoppabullz", b = "knuckleheads-cali", winner = "knuckleheads-cali", video = "https://youtu.be/lS5HpSitxjU" },
+  { round = "top32", a = "skechers-all-stars", b = "concrete-all-stars", winner = "concrete-all-stars", video = "https://youtu.be/lv7s6cUZRjw" },
+  { round = "top16", a = "body-carnival", b = "team-ukraine", winner = "team-ukraine", video = "https://youtu.be/If2QTCIBiII" },
+  { round = "top16", a = "808-breakers", b = "monster-energy", winner = "monster-energy", video = "https://youtu.be/QJKE0xtGLqA" },
+  { round = "top16", a = "concrete-all-stars", b = "waseda-breakers", winner = "concrete-all-stars", video = "https://youtu.be/RTfmPDtiTto" },
+  { round = "top16", a = "knuckleheads-cali", b = "momentum", winner = "TODO", video = "https://youtu.be/WJSPmUEQQg0" },
+  { round = "top16", a = "found-nation", b = "mighty-zulu-kingz", winner = "found-nation", video = "https://youtu.be/cSNV7uzz1fM" },
+  { round = "top16", a = "killafornia", b = "flow-mo", winner = "killafornia", video = "https://youtu.be/joZ600h2Iiw" },
+  { round = "top16", a = "ruggeds", b = "supernaturalz", winner = "supernaturalz", video = "https://youtu.be/k80Sm6YXsf0" },
+  { round = "top16", a = "floorriorz", b = "squadron", winner = "squadron", video = "https://youtu.be/l-9eTJugyAs" },
+  { round = "top8", a = "concrete-all-stars", b = "monster-energy", winner = "monster-energy", video = "https://youtu.be/1el5J8x6V4Q" },
+  { round = "top8", a = "killafornia", b = "team-ukraine", winner = "team-ukraine", video = "https://youtu.be/FOZ5XCMLfXg" },
+  { round = "top8", a = "momentum-crew", b = "supernaturalz", winner = "momentum-crew", video = "https://youtu.be/du0gv1nWp8M" },
+  { round = "top8", a = "found-nation", b = "squadron", winner = "squadron", video = "https://youtu.be/zteenFUZGi4" },
+  { round = "top4", a = "team-ukraine", b = "squadron", winner = "squadron", video = "https://youtu.be/LlNGHaBjaH4" },
+  { round = "top4", a = "monster-energy", b = "momentum-crew", winner = "monster-energy", video = "https://youtu.be/JpfyhgXNUU0" },
+  { round = "final", a = "monster-energy", b = "squadron", winner = "TODO", video = "https://youtu.be/joG8XsnWlKY" },
+]
+
+[battles.teams]
+13-26-11 = { crew = "13-26-11" }
+808-breakers = { crew = "808-breakers" }
+body-carnival = { crew = "body-carnival" }
+concrete-all-stars = { crew = "concrete-all-stars" }
+elusive-fenz = { crew = "elusive-fenz" }
+floor-gangz = { crew = "floor-gangz" }
+flooriorz = { crew = "flooriorz" }
+floorriorz = { crew = "floorriorz" }
+flow-mo = { crew = "flow-mo" }
+found-nation = { crew = "found-nation" }
+fresh-all-stars = { crew = "fresh-all-stars" }
+good-foot = { crew = "good-foot" }
+gunsmoke-breakers = { crew = "gunsmoke-breakers" }
+hazardous-beings = { crew = "hazardous-beings" }
+ill-abilities = { crew = "ill-abilities" }
+kadetes-del-toke = { crew = "kadetes-del-toke" }
+killafornia = { crew = "killafornia" }
+killafornia-monsta-squad = { crew = "killafornia-monsta-squad" }
+knuckleheads-cali = { crew = "knuckleheads-cali" }
+lil-killaz = { crew = "lil-killaz" }
+lion-city-bboys = { crew = "lion-city-bboys" }
+mighty-zulu-kings = { crew = "mighty-zulu-kings" }
+mighty-zulu-kingz = { crew = "mighty-zulu-kingz" }
+momentum = { crew = "momentum" }
+momentum-crew = { crew = "momentum-crew" }
+monster-energy = { crew = "monster-energy" }
+monster-energy-bboys = { crew = "monster-energy-bboys" }
+ruggeds = { crew = "ruggeds" }
+skechers-all-stars = { crew = "skechers-all-stars" }
+squadron = { crew = "squadron" }
+supernaturalz = { crew = "supernaturalz" }
+team-ukraine = { crew = "team-ukraine" }
+the-ruggeds = { crew = "the-ruggeds" }
+the-saxonz = { crew = "the-saxonz" }
+top-coalition = { crew = "top-coalition" }
+unstoppabullz = { crew = "unstoppabullz" }
+waseda-breakers = { crew = "waseda-breakers" }

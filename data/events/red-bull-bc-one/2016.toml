@@ -1,0 +1,34 @@
+name = "Red Bull BC One World Final 2016"
+starts_on = 2016-12-03
+timezone = "Asia/Tokyo"
+city = "Nagoya"
+country = "JP"
+lat = 35.1851
+lng = 136.8998
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["storm", "freeze", "wicket", "kosuke", "mounir"]
+mcs = ["rakaa"]
+djs = ["dj-mar-ski"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "leony", b = "taisuke", winner = "taisuke", votes = [0, 5] },
+  { round = "top16", a = "focus", b = "hong-10", winner = "hong-10", votes = [0, 5] },
+  { round = "top16", a = "cheerito", b = "bruce-almighty", winner = "bruce-almighty", votes = [0, 5] },
+  { round = "top16", a = "kid-colombia", b = "neguin", winner = "neguin", votes = [1, 4] },
+  { round = "top16", a = "benstacks", b = "sunni", winner = "sunni", votes = [1, 4] },
+  { round = "top16", a = "soso", b = "issei", winner = "issei", votes = [0, 5] },
+  { round = "top16", a = "kuzya", b = "nori", winner = "nori", votes = [2, 3] },
+  { round = "top16", a = "kleju", b = "victor", winner = "victor", votes = [0, 5] },
+  { round = "top8", a = "taisuke", b = "hong-10", winner = "hong-10", votes = [2, 3] },
+  { round = "top8", a = "bruce-almighty", b = "neguin", winner = "bruce-almighty", votes = [3, 2] },
+  { round = "top8", a = "sunni", b = "issei", winner = "issei", votes = [2, 3] },
+  { round = "top8", a = "nori", b = "victor", winner = "victor", votes = [0, 5] },
+  { round = "top4", a = "hong-10", b = "bruce-almighty", winner = "hong-10", votes = [4, 1] },
+  { round = "top4", a = "issei", b = "victor", winner = "issei", votes = [5, 0] },
+  { round = "final", a = "issei", b = "hong-10", winner = "issei", votes = [3, 2] },
+]

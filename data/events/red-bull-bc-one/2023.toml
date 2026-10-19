@@ -1,0 +1,57 @@
+name = "Red Bull BC One World Final 2023"
+starts_on = 2023-10-21
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8535
+lng = 2.3484
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["flea-rock", "movie-one", "dr-hill", "babyson", "kill"]
+mcs = ["amjad", "myverse"]
+djs = ["dj-one-up"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kid-colombia", b = "kastrito", winner = "kastrito", votes = [0, 5] },
+  { round = "top16", a = "phil-wizard", b = "amaro", winner = "phil-wizard", votes = [4, 1] },
+  { round = "top16", a = "khalil", b = "jeffro", winner = "khalil", votes = [3, 2] },
+  { round = "top16", a = "issin", b = "tiro", winner = "issin", votes = [5, 0] },
+  { round = "top16", a = "hong-10", b = "lego-sam", winner = "hong-10", votes = [5, 0] },
+  { round = "top16", a = "kid-karam", b = "allef", winner = "kid-karam", votes = [5, 0] },
+  { round = "top16", a = "wigor", b = "dany-dann", winner = "dany-dann", votes = [0, 5] },
+  { round = "top16", a = "mighty-jake", b = "x-rain", winner = "mighty-jake", votes = [5, 0] },
+  { round = "top8", a = "kastrito", b = "phil-wizard", winner = "phil-wizard", votes = [0, 5] },
+  { round = "top8", a = "khalil", b = "issin", winner = "issin", votes = [0, 5] },
+  { round = "top8", a = "hong-10", b = "kid-karam", winner = "hong-10", votes = [3, 2] },
+  { round = "top8", a = "dany-dann", b = "mighty-jake", winner = "dany-dann", votes = [3, 2] },
+  { round = "top4", a = "phil-wizard", b = "issin", winner = "phil-wizard", votes = [4, 1] },
+  { round = "top4", a = "hong-10", b = "dany-dann", winner = "hong-10", votes = [4, 1] },
+  { round = "final", a = "phil-wizard", b = "hong-10", winner = "hong-10", votes = [0, 5] },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "syssy", b = "kotya", winner = "syssy", votes = [4, 1] },
+  { round = "top16", a = "firebird", b = "671", winner = "671", votes = [0, 5] },
+  { round = "top16", a = "yasmin", b = "maia", winner = "yasmin", votes = [4, 1] },
+  { round = "top16", a = "vanessa", b = "nicka", winner = "nicka", votes = [0, 5] },
+  { round = "top16", a = "india", b = "mono", winner = "india", votes = [5, 0] },
+  { round = "top16", a = "stefani", b = "shun", winner = "stefani", votes = [5, 0] },
+  { round = "top16", a = "toquinha", b = "ami", winner = "ami", votes = [0, 5] },
+  { round = "top16", a = "kimie", b = "riko", winner = "riko", votes = [0, 5] },
+  { round = "top8", a = "syssy", b = "671", winner = "671", votes = [2, 3] },
+  { round = "top8", a = "yasmin", b = "nicka", winner = "nicka", votes = [0, 5] },
+  { round = "top8", a = "india", b = "stefani", winner = "india", votes = [5, 0] },
+  { round = "top8", a = "ami", b = "riko", winner = "ami", votes = [4, 1] },
+  { round = "top4", a = "671", b = "nicka", winner = "671", votes = [4, 1] },
+  { round = "top4", a = "india", b = "ami", winner = "ami", votes = [2, 3] },
+  { round = "final", a = "671", b = "ami", winner = "ami", votes = [1, 4] },
+]

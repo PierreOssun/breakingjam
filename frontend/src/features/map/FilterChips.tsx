@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { CATEGORIES, type Category, type Filters, type When } from "./jams";
 
-const WHEN: When[] = ["weekend", "month"];
+const WHEN: When[] = ["weekend", "month", "past"];
 
 type FilterChipsProps = {
   filters: Filters;

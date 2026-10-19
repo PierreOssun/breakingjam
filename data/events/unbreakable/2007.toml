@@ -1,0 +1,33 @@
+name = "Unbreakable 2007"
+# starts_on = YYYY-MM-DD  (not on the hall of fame)
+timezone = "Europe/Brussels"
+city = "Leuven"
+country = "BE"
+lat = 50.8815
+lng = 4.7138
+venue = "Het Depot"
+sources = ["https://unbreakable.be/20-years/#hall-of-fame"]
+judges = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "need-for-speed", reached = "winner" },
+]
+
+[battles.teams]
+need-for-speed = { crew = "need-for-speed" }
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "hurricane-illest-foe", reached = "winner" },
+]
+
+[battles.teams]
+hurricane-illest-foe = { members = ["illest-foe", "hurricane"] }

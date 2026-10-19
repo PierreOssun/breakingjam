@@ -502,32 +502,17 @@ fn sprite(pose: Pose, origin: (u32, u32), cell: u32, colors: &Colors) -> String 
 
 /// The 4:5 flyer (400×500 viewBox), filling its container.
 pub fn flyer_svg(text: &FlyerText, look: (Palette, Pose), options: FlyerOptions) -> String {
-    let (palette, pose) = look;
+    // No pixel art on the flyer itself (DESIGN.md §4.24); the pose only draws the share image.
+    let (palette, _) = look;
     let p = palette.colors();
     let uid = options.uid;
     let (w, h) = (400, 500);
-    let floor_y = 270;
     let mut s = String::new();
     let _ = write!(
         s,
         r#"<rect width="{w}" height="{h}" fill="{}"></rect>"#,
         p.bg
     );
-    s += &pixel_rings(
-        (300.0, 170.0),
-        &[56.0, 96.0, 136.0, 176.0, 216.0, 256.0],
-        8,
-        (w, h),
-        p.ring,
-    );
-    for gx in (0..w).step_by(16) {
-        let _ = write!(
-            s,
-            r#"<rect x="{gx}" y="{floor_y}" width="8" height="4" fill="{}"></rect>"#,
-            p.floor
-        );
-    }
-    s += &sprite(pose, (196, floor_y - pose.rows().len() as u32 * 8), 8, &p);
     // HD layer: glow from the top left and a bottom vignette.
     let _ = write!(
         s,

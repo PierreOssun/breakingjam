@@ -1,0 +1,29 @@
+name = "Battle of the Year 2001"
+# starts_on = 2001-11-??  (battleoftheyear.net says 11 November, a Sunday; its programme 17 November)
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://web.archive.org/web/20020115215521/http://www.battleoftheyear.net/pastevents/boty2001.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "wanted", reached = "winner" },
+  { entrant = "visual-shock", reached = "top4", rank = 4 },
+  { entrant = "team-ohh", reached = "top2" },
+  { entrant = "havikoro", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+havikoro = { crew = "havikoro" }
+team-ohh = { crew = "team-ohh" }
+visual-shock = { crew = "visual-shock" }
+wanted = { crew = "wanted" }

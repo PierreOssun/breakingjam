@@ -1,0 +1,113 @@
+name = "Outbreak Europe 2026"
+# The competition days; the whole festival ran July 19–26.
+starts_on = 2026-07-23
+ends_on = 2026-07-26
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7309
+lng = 19.1375
+venue = "Europa SC"
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://and8.dance/en/e/5193", "https://thelegitsblast.com/banska-bystrica"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 32
+matches = [
+  { round = "top32", a = "z", b = "mowgly", winner = "z", votes = [4, 1] },
+  { round = "top32", a = "federico", b = "djibril", winner = "djibril", votes = [0, 5] },
+  { round = "top32", a = "so-ta", b = "bez", winner = "so-ta", votes = [5, 0] },
+  { round = "top32", a = "mini-joe", b = "armand-the-young-hustler", winner = "mini-joe", votes = [5, 0] },
+  { round = "top32", a = "dias", b = "nike1do", winner = "dias", votes = [4, 1] },
+  { round = "top32", a = "cis", b = "mighty-jake", winner = "cis", votes = [3, 2] },
+  { round = "top32", a = "kalmius", b = "monster", winner = "kalmius", votes = [3, 2] },
+  { round = "top32", a = "jee-ess", b = "gravity", winner = "jee-ess", votes = [5, 0] },
+  { round = "top32", a = "jun", b = "blaze", winner = "blaze", votes = [1, 4] },
+  { round = "top32", a = "raptor", b = "rythymbox", winner = "raptor", votes = [4, 1] },
+  { round = "top32", a = "saturn", b = "j-attack", winner = "j-attack", votes = [1, 4] },
+  { round = "top32", a = "seier", b = "davy", winner = "davy", votes = [0, 5] },
+  { round = "top32", a = "r-one", b = "pesto", winner = "pesto", votes = [0, 5] },
+  { round = "top32", a = "nord-diamond", b = "irving", winner = "nord-diamond", votes = [5, 0] },
+  { round = "top32", a = "mauricio", b = "miracle", winner = "miracle", votes = [1, 4] },
+  { round = "top32", a = "fabab", b = "cyz", winner = "fabab", votes = [4, 1] },
+  { round = "top16", a = "z", b = "djibril", winner = "djibril" },
+  { round = "top16", a = "so-ta", b = "mini-joe", winner = "so-ta" },
+  { round = "top16", a = "dias", b = "cis", winner = "dias" },
+  { round = "top16", a = "kalmius", b = "jee-ess", winner = "jee-ess" },
+  { round = "top16", a = "blaze", b = "raptor", winner = "raptor" },
+  { round = "top16", a = "j-attack", b = "davy", winner = "j-attack" },
+  { round = "top16", a = "pesto", b = "nord-diamond", winner = "nord-diamond" },
+  { round = "top16", a = "miracle", b = "fabab", winner = "miracle" },
+  { round = "top8", a = "djibril", b = "so-ta", winner = "so-ta" },
+  { round = "top8", a = "dias", b = "jee-ess", winner = "dias" },
+  { round = "top8", a = "raptor", b = "j-attack", winner = "raptor" },
+  { round = "top8", a = "nord-diamond", b = "miracle", winner = "nord-diamond" },
+  { round = "top4", a = "so-ta", b = "dias", winner = "dias" },
+  { round = "top4", a = "raptor", b = "nord-diamond", winner = "raptor" },
+  { round = "final", a = "dias", b = "raptor", winner = "raptor" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 32
+matches = [
+  { round = "top32", a = "hiyo", b = "lito", winner = "hiyo", votes = [5, 0] },
+  { round = "top32", a = "kaede", b = "chithdara", winner = "kaede", votes = [3, 2] },
+  { round = "top32", a = "paulina", b = "eli", winner = "paulina", votes = [4, 1] },
+  { round = "top32", a = "jazzy", b = "jin", winner = "jazzy", votes = [4, 1] },
+  { round = "top32", a = "carla", b = "strawberry", winner = "carla", votes = [4, 1] },
+  { round = "top32", a = "nina", b = "monse", winner = "monse", votes = [0, 5] },
+  { round = "top32", a = "mini-japa", b = "vika-wins", winner = "mini-japa", votes = [4, 1] },
+  { round = "top32", a = "ayane", b = "emka", winner = "ayane", votes = [5, 0] },
+  { round = "top32", a = "riva", b = "julianna", winner = "julianna", votes = [2, 3] },
+  { round = "top32", a = "mery-berry", b = "anti", winner = "anti", votes = [0, 5] },
+  { round = "top32", a = "mila", b = "sayora", winner = "mila", votes = [5, 0] },
+  { round = "top32", a = "aksi", b = "india", winner = "india", votes = [0, 5] },
+  { round = "top32", a = "jayon", b = "nika-star", winner = "nika-star", votes = [2, 3] },
+  { round = "top32", a = "nora-leah", b = "alessandrina", winner = "alessandrina", votes = [0, 5] },
+  { round = "top32", a = "elsa", b = "sonya", winner = "elsa", votes = [4, 1] },
+  { round = "top32", a = "cocoa", b = "fluxa", winner = "cocoa", votes = [5, 0] },
+  { round = "top16", a = "hiyo", b = "kaede", winner = "hiyo" },
+  { round = "top16", a = "paulina", b = "jazzy", winner = "jazzy" },
+  { round = "top16", a = "carla", b = "monse", winner = "carla" },
+  { round = "top16", a = "mini-japa", b = "ayane", winner = "ayane" },
+  { round = "top16", a = "julianna", b = "anti", winner = "anti" },
+  { round = "top16", a = "mila", b = "india", winner = "india" },
+  { round = "top16", a = "nika-star", b = "alessandrina", winner = "alessandrina" },
+  { round = "top16", a = "elsa", b = "cocoa", winner = "cocoa" },
+  { round = "top8", a = "hiyo", b = "jazzy", winner = "hiyo" },
+  { round = "top8", a = "carla", b = "ayane", winner = "ayane" },
+  { round = "top8", a = "anti", b = "india", winner = "india" },
+  { round = "top8", a = "alessandrina", b = "cocoa", winner = "alessandrina" },
+  { round = "top4", a = "hiyo", b = "ayane", winner = "hiyo" },
+  { round = "top4", a = "india", b = "alessandrina", winner = "india" },
+  { round = "final", a = "hiyo", b = "india", winner = "hiyo" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "damani-killian", reached = "winner" },
+]
+
+[battles.teams]
+damani-killian = { members = ["damani", "killian"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "xueyu", reached = "winner" },
+]

@@ -1,0 +1,98 @@
+name = "Freestyle Session 2021"
+starts_on = 2021-11-13
+ends_on = 2021-11-14
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://www.eventbrite.com/e/freestyle-session-2021-los-angeles-tickets-170381353214"]
+judges = []
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "pep-c", b = "genesis", winner = "pep-c", video = "https://youtu.be/zyNZ9bHirOI" },
+  { round = "top8", a = "la-vix", b = "meelisa", winner = "meelisa", video = "https://youtu.be/mCJXAuYK58Y" },
+  { round = "top8", a = "isis", b = "queen-nv", winner = "isis", video = "https://youtu.be/chda1Qfm6GM" },
+  { round = "top8", a = "cara", b = "logistx", winner = "logistx", video = "https://youtu.be/B4l2pc_p-NY" },
+  { round = "top4", a = "meelisa", b = "logistx", winner = "logistx", video = "https://youtu.be/6GBWvQf2Dtg" },
+  { round = "top4", a = "isis", b = "pep-c", winner = "isis", video = "https://youtu.be/a0gMnCRw8_Y" },
+  { round = "final", a = "isis", b = "logistx", winner = "TODO", video = "https://youtu.be/1cIr2m-0ymU" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "unexpected", b = "break-squad", winner = "break-squad", video = "https://youtu.be/GYLcg1WEClg" },
+  { round = "top16", a = "kids-next-door", b = "red-bull-bc-one-squad", winner = "red-bull-bc-one-squad", video = "https://youtu.be/APTJUlbpeMM" },
+  { round = "top8", a = "break-squad", b = "red-bull-bc-one-squad", winner = "TODO", video = "https://youtu.be/c5q-VPx8EbM" },
+]
+
+[battles.teams]
+break-squad = { name = "Break Squad" }
+kids-next-door = { name = "Kids Next Door" }
+red-bull-bc-one-squad = { name = "Red Bull BC One Squad" }
+unexpected = { name = "Unexpected" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "uncle-will", b = "jeffro", winner = "uncle-will", video = "https://youtu.be/OqfNzljFYFM" },
+  { round = "top16", a = "victor", b = "hk-marcus", winner = "victor", video = "https://youtu.be/NVVa00kV0-4" },
+  { round = "top16", a = "thor", b = "doug", winner = "thor", video = "https://youtu.be/76hMPSMkbJg" },
+  { round = "top16", a = "spindian", b = "fuzion", winner = "spindian", video = "https://youtu.be/UcOWpdbhDnE" },
+  { round = "top16", a = "nebz", b = "nelzwon", winner = "nelzwon", video = "https://youtu.be/DKDZyjrAZpQ" },
+  { round = "top16", a = "jolty", b = "links", winner = "links", video = "https://youtu.be/vYqrS8Yaj5Y" },
+  { round = "top16", a = "jfunky", b = "valencio", winner = "valencio", video = "https://youtu.be/2AC1HF4HbCs" },
+  { round = "top16", a = "cody-soles", b = "riven", winner = "cody-soles", video = "https://youtu.be/db31yy2iWG4" },
+  { round = "top8", a = "victor", b = "links", winner = "victor", video = "https://youtu.be/Eh2tbj6JLP4" },
+  { round = "top8", a = "uncle-will", b = "spindian", winner = "uncle-will", video = "https://youtu.be/AE41O9ZO0qo" },
+  { round = "top8", a = "thor", b = "valencio", winner = "valencio", video = "https://youtu.be/vxATHA6J1Rw" },
+  { round = "top8", a = "cody-soles", b = "nelzwon", winner = "nelzwon", video = "https://youtu.be/_P7Ut9qZKnU" },
+  { round = "top4", a = "victor", b = "valencio", winner = "victor", video = "https://youtu.be/W9-89vvFX8s" },
+  { round = "top4", a = "uncle-will", b = "nelzwon", winner = "nelzwon", video = "https://youtu.be/YaP4p4kNnLQ" },
+  { round = "final", a = "victor", b = "nelzwon", winner = "TODO", video = "https://youtu.be/ABH5s1VwZS8" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "raw-materials", b = "rock-force-crew", winner = "rock-force-crew", video = "https://youtu.be/LSJrUpLcRnE" },
+  { round = "top16", a = "rad", b = "killafornia", winner = "rad", video = "https://youtu.be/mZJcFCdD73M" },
+  { round = "top16", a = "sopitas-con-huevos", b = "breakinmia", winner = "breakinmia", video = "https://youtu.be/1KxeZUhQ_1M" },
+  { round = "top16", a = "mighty-zulu-kings", b = "raw-adikts", winner = "mighty-zulu-kings", video = "https://youtu.be/SH2kcl0vheQ" },
+  { round = "top16", a = "breakmatic", b = "modd-squad", winner = "breakmatic", video = "https://youtu.be/b-aTFXtb6CI" },
+  { round = "top16", a = "havikoro", b = "kosher-bullz", winner = "havikoro", video = "https://youtu.be/OBgTGfKWlag" },
+  { round = "top8", a = "rad", b = "rock-force-crew", winner = "TODO", video = "https://youtu.be/nFe7I2kKS4Q" },
+  { round = "top8", a = "mighty-zulu-kings", b = "breakinmia", winner = "TODO", video = "https://youtu.be/ipRppCIm5ws" },
+  { round = "top8", a = "havikoro", b = "breakmatic", winner = "TODO", video = "https://youtu.be/PZdGpHMNcCA" },
+]
+
+[battles.teams]
+breakinmia = { crew = "breakinmia" }
+breakmatic = { crew = "breakmatic" }
+havikoro = { crew = "havikoro" }
+killafornia = { crew = "killafornia" }
+kosher-bullz = { crew = "kosher-bullz" }
+mighty-zulu-kings = { crew = "mighty-zulu-kings" }
+modd-squad = { crew = "modd-squad" }
+rad = { crew = "rad" }
+raw-adikts = { crew = "raw-adikts" }
+raw-materials = { crew = "raw-materials" }
+rock-force-crew = { crew = "rock-force-crew" }
+sopitas-con-huevos = { crew = "sopitas-con-huevos" }

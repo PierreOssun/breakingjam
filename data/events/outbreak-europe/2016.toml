@@ -1,0 +1,64 @@
+name = "Outbreak Europe 2016"
+starts_on = 2016-07-29
+ends_on = 2016-07-31
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7354
+lng = 19.1457
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+judges = ["abstrak", "nasty-ray", "bgirl-at", "dyzee", "lil-john"]
+mcs = ["mario-bee", "lil-pablo", "osto"]
+djs = ["lean-rock", "fleg", "ervin-arana", "renegade", "scream", "plash", "smirnoff", "felix", "shimo"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kuzya", b = "shigekix", winner = "kuzya" },
+  { round = "top16", a = "kleju", b = "mini-joe", winner = "kleju" },
+  { round = "top16", a = "thomaz", b = "klesio", winner = "thomaz" },
+  { round = "top16", a = "hulk", b = "twister", winner = "hulk" },
+  { round = "top16", a = "sunni", b = "sapa", winner = "sunni" },
+  { round = "top16", a = "milhouse", b = "yarko", winner = "milhouse" },
+  { round = "top16", a = "niek", b = "t-rock", winner = "niek" },
+  { round = "top16", a = "lil-g", b = "noindex", winner = "lil-g" },
+  { round = "top8", a = "kuzya", b = "kleju", winner = "kuzya" },
+  { round = "top8", a = "thomaz", b = "hulk", winner = "thomaz" },
+  { round = "top8", a = "sunni", b = "milhouse", winner = "sunni" },
+  { round = "top8", a = "niek", b = "lil-g", winner = "niek" },
+  { round = "top4", a = "kuzya", b = "thomaz", winner = "kuzya" },
+  { round = "top4", a = "sunni", b = "niek", winner = "sunni" },
+  { round = "final", a = "kuzya", b = "sunni", winner = "kuzya" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "paulina", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "intact-pluto", reached = "winner" },
+]
+
+[battles.teams]
+intact-pluto = { members = ["intact", "pluto"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "shigekix", reached = "winner" },
+]

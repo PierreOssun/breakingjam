@@ -1,0 +1,36 @@
+name = "Red Bull BC One World Final 2005"
+starts_on = 2005-05-21
+timezone = "Europe/Berlin"
+city = "Berlin"
+country = "DE"
+lat = 52.5174
+lng = 13.3951
+venue = "Palast der Republik"
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://and8.dance/e/325"]
+judges = ["asia-one", "ducky", "david-colas", "poe-one", "storm"]
+mcs = ["rahzel"]
+djs = ["dj-ace", "dj-billy-brown"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "lilou", b = "physicx", winner = "lilou", votes = [3, 2] },
+  { round = "top16", a = "omar", b = "benny", winner = "omar", votes = [5, 0] },
+  { round = "top16", a = "jora", b = "junior", winner = "junior", votes = [0, 5] },
+  { round = "top16", a = "born", b = "ronnie", winner = "ronnie", votes = [1, 4] },
+  { round = "top16", a = "moy", b = "hong-10", winner = "hong-10", votes = [0, 5] },
+  { round = "top16", a = "brahim", b = "machine", winner = "machine", votes = [0, 5] },
+  { round = "top16", a = "cico", b = "pelezinho", winner = "pelezinho", votes = [2, 3] },
+  { round = "top16", a = "rubber-legz", b = "sonic", winner = "sonic", votes = [0, 4] },
+  { round = "top8", a = "lilou", b = "omar", winner = "lilou", votes = [3, 1] },
+  { round = "top8", a = "junior", b = "ronnie", winner = "ronnie", votes = [2, 3] },
+  { round = "top8", a = "hong-10", b = "machine", winner = "hong-10", votes = [3, 0] },
+  { round = "top8", a = "pelezinho", b = "sonic", winner = "pelezinho", votes = [3, 1] },
+  { round = "top4", a = "lilou", b = "ronnie", winner = "lilou", votes = [5, 0] },
+  { round = "top4", a = "hong-10", b = "pelezinho", winner = "hong-10", votes = [4, 1] },
+  { round = "final", a = "lilou", b = "hong-10", winner = "lilou", votes = [3, 0] },
+  { round = "third", a = "ronnie", b = "pelezinho", winner = "ronnie", votes = [4, 1] },
+]

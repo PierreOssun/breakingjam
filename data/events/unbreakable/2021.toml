@@ -1,0 +1,59 @@
+name = "Unbreakable 2021"
+starts_on = 2021-09-18
+ends_on = 2021-09-19
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2182
+lng = 4.4216
+venue = "Koningin Astridplein"
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/3633"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "amir", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "madmax", reached = "winner" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "anthony", reached = "winner" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "the-unbreakable-crew", reached = "winner" },
+]
+
+[battles.teams]
+the-unbreakable-crew = { crew = "the-unbreakable-crew" }
+
+[[battles]]
+key = "kids-crew"
+name = "Kids crew battle"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "grafters", reached = "winner" },
+]
+
+[battles.teams]
+grafters = { crew = "grafters" }

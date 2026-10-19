@@ -1,0 +1,34 @@
+name = "Red Bull BC One World Final 2012"
+starts_on = 2012-12-08
+timezone = "America/Sao_Paulo"
+city = "Rio de Janeiro"
+country = "BR"
+lat = -22.9110
+lng = -43.2094
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["neguin", "taisuke", "moy", "niek", "storm"]
+mcs = ["dughettu"]
+djs = ["dj-skeme-richards"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "slav", b = "hill", winner = "hill", votes = [0, 5] },
+  { round = "top16", a = "vicious-victor", b = "issei", winner = "vicious-victor", votes = [4, 1] },
+  { round = "top16", a = "sunni", b = "differ", winner = "differ", votes = [0, 5] },
+  { round = "top16", a = "roxrite", b = "arex", winner = "roxrite", votes = [5, 0] },
+  { round = "top16", a = "shorty-force", b = "junior", winner = "junior", votes = [0, 5] },
+  { round = "top16", a = "kid-david", b = "lil-zoo", winner = "kid-david", votes = [5, 0] },
+  { round = "top16", a = "mounir", b = "domkey", winner = "mounir", votes = [5, 0] },
+  { round = "top16", a = "exact", b = "klesio", winner = "klesio", votes = [0, 5] },
+  { round = "top8", a = "hill", b = "vicious-victor", winner = "hill" },
+  { round = "top8", a = "differ", b = "roxrite", winner = "differ", votes = [4, 1] },
+  { round = "top8", a = "junior", b = "kid-david", winner = "junior", votes = [4, 1] },
+  { round = "top8", a = "mounir", b = "klesio", winner = "mounir", votes = [4, 1] },
+  { round = "top4", a = "hill", b = "differ", winner = "differ", votes = [1, 4] },
+  { round = "top4", a = "junior", b = "mounir", winner = "mounir", votes = [2, 3] },
+  { round = "final", a = "differ", b = "mounir", winner = "mounir", votes = [0, 5] },
+]

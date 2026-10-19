@@ -117,43 +117,44 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
 
 // SHA-1 of the reference's output (fonts, escaping, xmlns and the §4.24 room patched as in
 // the module docs; labelled except compact), produced by running
-// generated-flyer-reference.py as a test oracle.
+// generated-flyer-reference.py as a test oracle; since the pixel art left the flyer, the
+// same output with the rings, floor and dancer removed.
 const FLYER: [(&str, &str, &str, &str); 6] = [
     (
         "concrete",
-        "f8e4587f3689f4d916920b22563e1424cf09483d",
-        "2006e5327ee17bf0561da5d3ee56fa6f1d352b1c",
-        "7be45b8829aede6ab038265fbf239ccc9e1010b6",
+        "4488e456c654eb36186dab17c62b4e5d476ca165",
+        "06c61c1f4068045529369d319ac892f63d81f749",
+        "91b3496c474a901abef94968ebf0d74bd919c46f",
     ),
     (
         "rooftop",
-        "d2a2d865b1d2716a81ef3b2e7f60f4d8f5a2c45e",
-        "bff8690d63b94702d0f81b7ee5a68dfaecfdea6a",
-        "67f8094aca690aebc56165aaf8ae301383492610",
+        "a1fc30359193b0c53b522ef9fd5a2f707a748512",
+        "28faf0e82385365a0ff8af5b205cb73c7ce80be7",
+        "acf36933d279b2940dc70a621b9afc67a1cef3dd",
     ),
     (
         "kids",
-        "dbb774a6c862a462a47dbbc5a3d2f91a38d2f8fc",
-        "82989985ac76ad20ddb29e5023c17c5033a58073",
-        "8f2594fdcd4936c9c5244dcc214d26545d2a9e39",
+        "7e872deaaeb204fdd64b700d63bf84c231593893",
+        "1cbdf66051f1ed3870d7b7e6f035708ea36e243c",
+        "472b16068aba4638c97c78be420ac77ccd4d5a81",
     ),
     (
         "under",
-        "dcfcda590fdfc0357129e1d0f5832a915666e5f4",
-        "95071ec18249c864a66c3365eb6a122e5ccf126c",
-        "c270031ce8021af6f54f6e16ce823bcddc05c465",
+        "467a5c3095131c0b52f0fba9bedc6fb699585e54",
+        "ac36b515adec510307d5c26732b510d5f997bc5c",
+        "1698c90591f4cb5f22dddee210a4799126db1dc0",
     ),
     (
         "seven",
-        "1728a6651e623b6e07f8a0d62d8fbb0f2af98eef",
-        "1b20295f72f1a44cc033af004b9eadc8b6ffeab2",
-        "adba6f59da18f656cb316865ead76829813855ab",
+        "83608e89762f0ceaa85094dcdbddd0caa47a66d6",
+        "3db85f4c439eda74253ca6f50f6c7f5572595f7e",
+        "84d8c2f3d454a347d5f9424c22d81d546e0a3361",
     ),
     (
         "long",
-        "dff9c0b2d780653be56f2400688bcf331cace9dc",
-        "57c8af9335b935445e4d66ba33e0db5bda1da757",
-        "e4cf7679029078878e4587ba1b641db70dac3881",
+        "6418f01d34eeefe40f5cfb84e47df505e276b069",
+        "b0e7457430095cf9ea2069170b009601936c056d",
+        "0a4c753d4905342e33f5483023c5468381cab26c",
     ),
 ];
 

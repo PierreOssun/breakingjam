@@ -1,0 +1,74 @@
+name = "Unbreakable 2016"
+starts_on = 2016-05-14
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2211
+lng = 4.3997
+venue = "Parkspoor Noord"
+sources = ["https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCySwo6Ue4QxxsYDvIBdwynw", "https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/288"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "lagaet", b = "issei", winner = "issei", video = "https://youtu.be/btwZcRaaDWc" },
+  { round = "top16", a = "dany", b = "hulk", winner = "dany", video = "https://youtu.be/_1YIa7bVboI" },
+  { round = "top16", a = "pac-pac", b = "illz", winner = "pac-pac", video = "https://youtu.be/qKNdaMhiSzw" },
+  { round = "top16", a = "minnesota-joe", b = "kuzya", winner = "kuzya", video = "https://youtu.be/CfwyiXOsEsg" },
+  { round = "top16", a = "daniel", b = "moa", winner = "moa", video = "https://youtu.be/MwB6CrPQ74Q" },
+  { round = "top16", a = "alkolil", b = "kleju", winner = "alkolil", video = "https://youtu.be/b4sUMaWVDQE" },
+  { round = "top16", a = "t-rock", b = "jazz", winner = "t-rock", video = "https://youtu.be/vwRkVmdHDHk" },
+  { round = "top16", a = "kill", b = "sunni", winner = "sunni", video = "https://youtu.be/LY7hPwaSBbM" },
+  { round = "top8", a = "dany", b = "issei", winner = "issei", video = "https://youtu.be/G9rbV2z7bog" },
+  { round = "top8", a = "sunni", b = "pac-pac", winner = "sunni", video = "https://youtu.be/unhnBMITMZs" },
+  { round = "top8", a = "alkolil", b = "kuzya", winner = "kuzya", video = "https://youtu.be/q2_OpzZP4o0" },
+  { round = "top8", a = "t-rock", b = "moa", winner = "moa", video = "https://youtu.be/S7i4f0JgY3I" },
+  { round = "top4", a = "sunni", b = "issei", winner = "issei", video = "https://youtu.be/6yfMKHp8pW4" },
+  { round = "top4", a = "moa", b = "kuzya", winner = "kuzya", video = "https://youtu.be/-sfV5lCvL1U" },
+  { round = "final", a = "kuzya", b = "issei", winner = "kuzya", video = "https://youtu.be/NOe-UG6fD2A" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "funky-belgianz", b = "hidden-trip", winner = "TODO", video = "https://youtu.be/vpZ0m3xF23A" },
+  { round = "top4", a = "shmetta-skwad", b = "breaknuts", winner = "shmetta-skwad", video = "https://youtu.be/8d86JgRA-U8" },
+  { round = "final", a = "hidden-artifacts", b = "shmetta-skwad", winner = "shmetta-skwad", video = "https://youtu.be/xr148Ht_IWA" },
+]
+
+[battles.teams]
+breaknuts = { crew = "breaknuts" }
+funky-belgianz = { crew = "funky-belgianz" }
+hidden-artifacts = { crew = "hidden-artifacts" }
+hidden-trip = { crew = "hidden-trip" }
+shmetta-skwad = { crew = "shmetta-skwad" }
+
+[[battles]]
+key = "kids-crew"
+name = "Kids crew battle"
+gender = "mixed"
+age = "kids"
+bracket_size = 2
+matches = [
+  { round = "final", a = "hfc", b = "infilaskills", winner = "TODO", video = "https://youtu.be/eG7oVOYcSVs" },
+]
+
+[battles.teams]
+hfc = { crew = "hfc" }
+infilaskills = { crew = "infilaskills" }
+
+[[battles]]
+key = "bgirl"
+name = "Bgirl 7 to smoke"
+gender = "bgirl"
+format = "seven_to_smoke"
+results = [
+  { entrant = "paulina", reached = "winner" },
+]

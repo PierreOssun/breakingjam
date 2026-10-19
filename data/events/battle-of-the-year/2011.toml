@@ -1,0 +1,50 @@
+name = "Battle of the Year 2011"
+starts_on = 2011-11-19
+timezone = "Europe/Paris"
+city = "Montpellier"
+country = "FR"
+lat = 43.5733
+lng = 3.9517
+venue = "Park & Suites Arena"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://www.neo2.com/?p=38548", "https://braunbattleoftheyear.com/en/about.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "vagabonds", reached = "winner" },
+  { entrant = "nine-state-b-boyz", reached = "top4" },
+  { entrant = "tpec", reached = "top4" },
+  { entrant = "battle-born", reached = "top2" },
+]
+
+[battles.teams]
+battle-born = { crew = "battle-born" }
+nine-state-b-boyz = { crew = "nine-state-b-boyz" }
+tpec = { crew = "tpec" }
+vagabonds = { crew = "vagabonds" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "vicious-victor", reached = "top2" },
+  { entrant = "niek", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "eri-fenesis-yurie", reached = "winner" },
+]
+
+[battles.teams]
+eri-fenesis-yurie = { members = ["eri-fenesis", "yurie"] }

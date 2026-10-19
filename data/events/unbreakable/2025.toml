@@ -1,0 +1,93 @@
+name = "Unbreakable 2025"
+starts_on = 2025-10-03
+ends_on = 2025-10-05
+timezone = "Europe/Brussels"
+city = "Leuven"
+country = "BE"
+lat = 50.8788
+lng = 4.7069
+venue = "Ladeuzeplein"
+sources = ["https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCySwo6Ue4QxxsYDvIBdwynw", "https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/4932"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 32
+matches = [
+  { round = "top32", a = "clav", b = "aleon", winner = "aleon", video = "https://youtu.be/sRpdyBhqGfs" },
+  { round = "top32", a = "prorock", b = "killian", winner = "TODO", video = "https://youtu.be/PfzDDfohB38" },
+  { round = "top32", a = "johnny-fox", b = "cis", winner = "cis", video = "https://youtu.be/Kq8auejh7TU" },
+  { round = "top32", a = "philip", b = "mass", winner = "mass", video = "https://youtu.be/6F2oDNLHdGA" },
+  { round = "top32", a = "cyga", b = "shlag", winner = "shlag", video = "https://youtu.be/yX7s57BIyl0" },
+  { round = "top32", a = "cyz", b = "anthony", winner = "cyz", video = "https://youtu.be/fmF2l7YW-mk" },
+  { round = "top32", a = "stepper", b = "raptor", winner = "raptor", video = "https://youtu.be/SMZAuhi38LI" },
+  { round = "top32", a = "mathis", b = "sheka", winner = "sheka", video = "https://youtu.be/0r1_Fetn428" },
+  { round = "top32", a = "noneski", b = "wess", winner = "noneski", video = "https://youtu.be/xIfzNB8iEWo" },
+  { round = "top32", a = "nebulas", b = "anton", winner = "anton", video = "https://youtu.be/LHOrVcqQEDY" },
+  { round = "top32", a = "p-nut", b = "m17", winner = "TODO", video = "https://youtu.be/Oi4l2G9lb5Q" },
+  { round = "top32", a = "link-le-neil", b = "federico", winner = "federico", video = "https://youtu.be/POsn_pqmVVI" },
+  { round = "top32", a = "tiger5", b = "stimul", winner = "stimul", video = "https://youtu.be/lTZ34AbigtM" },
+  { round = "top32", a = "ichigo", b = "litefoot", winner = "ichigo", video = "https://youtu.be/MxtFwIQSOog" },
+  { round = "top32", a = "beat-the-young-hustler", b = "flowolf", winner = "flowolf", video = "https://youtu.be/P48LAc36POY" },
+  { round = "top32", a = "djibril", b = "deeogo", winner = "djibril", video = "https://youtu.be/4HWEdCIcsKM" },
+  { round = "top16", a = "aleon", b = "killian", winner = "TODO", video = "https://youtu.be/XtFhUIhwtkA" },
+  { round = "top16", a = "cyz", b = "sheka", winner = "TODO", video = "https://youtu.be/TT7dwwD9g6U" },
+  { round = "top16", a = "cis", b = "mass", winner = "TODO", video = "https://youtu.be/sdUygzgdN14" },
+  { round = "top16", a = "shlag", b = "raptor", winner = "TODO", video = "https://youtu.be/RmAbjyIa7ZE" },
+  { round = "top16", a = "stimul", b = "federico", winner = "TODO", video = "https://youtu.be/lbDnmtkTtK8" },
+  { round = "top16", a = "anton", b = "ichigo", winner = "TODO", video = "https://youtu.be/XZcDay0AC4A" },
+  { round = "top16", a = "flowolf", b = "djibril", winner = "TODO", video = "https://youtu.be/F2oGJwuHGBA" },
+  { round = "top16", a = "prorock", b = "noneski", winner = "TODO", video = "https://youtu.be/Am1pxMVTMoE" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "ruffneck-attack-x-doomsday", b = "anormal", winner = "TODO", video = "https://youtu.be/XSLY1ClIQ-I" },
+  { round = "top16", a = "chasseurs2primes", b = "gimmicks", winner = "TODO", video = "https://youtu.be/YWpiLmTPvYg" },
+  { round = "top16", a = "xvii-generation", b = "grimy-miners", winner = "TODO", video = "https://youtu.be/LJP3bXwIml4" },
+  { round = "top16", a = "unexpected", b = "stardust", winner = "TODO", video = "https://youtu.be/amn-VsFZTxo" },
+  { round = "top16", a = "primal-instincts", b = "sul-clan", winner = "TODO", video = "https://youtu.be/oLbDGc7Fn6Q" },
+  { round = "top16", a = "legiteam-obstruxion", b = "uncontrolled-substance", winner = "TODO", video = "https://youtu.be/LvseeamLGF0" },
+  { round = "top16", a = "belchina", b = "legacy", winner = "TODO", video = "https://youtu.be/Ju6-EIoq5qs" },
+  { round = "top16", a = "antithesis-x-vissick-stylez", b = "shin-sedai", winner = "TODO", video = "https://youtu.be/5lZO8mZk4qg" },
+]
+
+[battles.teams]
+anormal = { crew = "anormal" }
+antithesis-x-vissick-stylez = { crew = "antithesis-x-vissick-stylez" }
+belchina = { crew = "belchina" }
+chasseurs2primes = { crew = "chasseurs2primes" }
+gimmicks = { crew = "gimmicks" }
+grimy-miners = { crew = "grimy-miners" }
+legacy = { crew = "legacy" }
+legiteam-obstruxion = { crew = "legiteam-obstruxion" }
+primal-instincts = { crew = "primal-instincts" }
+ruffneck-attack-x-doomsday = { crew = "ruffneck-attack-x-doomsday" }
+shin-sedai = { crew = "shin-sedai" }
+stardust = { crew = "stardust" }
+sul-clan = { crew = "sul-clan" }
+uncontrolled-substance = { crew = "uncontrolled-substance" }
+unexpected = { crew = "unexpected" }
+xvii-generation = { crew = "xvii-generation" }
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kate", b = "spidergirl", winner = "TODO", video = "https://youtu.be/-KGtpNmOuVs" },
+  { round = "top16", a = "jin", b = "tata", winner = "TODO", video = "https://youtu.be/BViIcaHCrqw" },
+  { round = "top16", a = "abril", b = "carla", winner = "TODO", video = "https://youtu.be/_5ua3UJw554" },
+  { round = "top16", a = "vavi", b = "carlota", winner = "TODO", video = "https://youtu.be/s6zp1yhwrrg" },
+  { round = "top16", a = "stefani", b = "lola", winner = "TODO", video = "https://youtu.be/9KpqckRv0qE" },
+  { round = "top16", a = "karla", b = "sidi", winner = "TODO", video = "https://youtu.be/KT5CLH2yPGQ" },
+  { round = "top16", a = "mery-berry", b = "royal", winner = "TODO", video = "https://youtu.be/QFhgP2p3PcA" },
+  { round = "top16", a = "cha-ja", b = "emma", winner = "TODO", video = "https://youtu.be/nv91rJ5slfE" },
+]

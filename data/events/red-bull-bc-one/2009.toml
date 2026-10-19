@@ -1,0 +1,34 @@
+name = "Red Bull BC One World Final 2009"
+starts_on = 2009-11-18
+timezone = "America/New_York"
+city = "New York City"
+country = "US"
+lat = 40.7127
+lng = -74.0060
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["katsu", "salah", "ronnie", "cico", "float"]
+mcs = ["krs-one"]
+djs = ["dj-dp-one"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "neguin", b = "lagaet", winner = "neguin", votes = [4, 1] },
+  { round = "top16", a = "menno", b = "kid-glyde", winner = "menno", votes = [4, 1] },
+  { round = "top16", a = "differ", b = "flying-buddha", winner = "differ" },
+  { round = "top16", a = "cloud", b = "kaku", winner = "cloud", votes = [5, 0] },
+  { round = "top16", a = "morris", b = "lil-g", winner = "morris", votes = [4, 1] },
+  { round = "top16", a = "wing", b = "punisher", winner = "wing", votes = [3, 2] },
+  { round = "top16", a = "lil-ceng", b = "thesis", winner = "thesis", votes = [1, 4] },
+  { round = "top16", a = "kolobok", b = "lilou", winner = "lilou", votes = [0, 5] },
+  { round = "top8", a = "neguin", b = "menno", winner = "neguin", votes = [4, 0] },
+  { round = "top8", a = "cloud", b = "differ", winner = "cloud", votes = [5, 0] },
+  { round = "top8", a = "morris", b = "wing", winner = "morris" },
+  { round = "top8", a = "thesis", b = "lilou", winner = "lilou", votes = [0, 3] },
+  { round = "top4", a = "neguin", b = "cloud", winner = "cloud", votes = [0, 5] },
+  { round = "top4", a = "lilou", b = "morris", winner = "lilou", votes = [5, 0] },
+  { round = "final", a = "lilou", b = "cloud", winner = "lilou", votes = [3, 2] },
+]

@@ -131,12 +131,9 @@ def flyer_svg(jam, label=True, compact=False, status=None, uid='f'):
     p = PAL[pal_name]
     W, H = 400, 500
     parts = [f'<rect width="{W}" height="{H}" fill="{p["bg"]}"></rect>']
-    parts.append(pixel_rings(300, 170, (56, 96, 136, 176, 216, 256), 8, W, H, p['ring']))
-    # floor
+    # no pixel art on the flyer (rings, floor and dancer stay on the share image); the name
+    # block keeps its room below where the floor was
     floor_y = 270
-    for gx in range(0, W, 16):
-        parts.append(f'<rect x="{gx}" y="{floor_y}" width="8" height="4" fill="{p["floor"]}"></rect>')
-    parts.append(sprite(pose, 196, floor_y - len(POSES[pose]) * 8, 8, p))
     # glow + vignette (HD layer)
     parts.append(f'<defs><radialGradient id="{uid}g" cx="0.25" cy="0.2" r="0.8"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".16"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>'
                  f'<linearGradient id="{uid}v" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity=".45"></stop></linearGradient></defs>'

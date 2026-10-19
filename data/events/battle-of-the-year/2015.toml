@@ -1,0 +1,64 @@
+name = "Battle of the Year 2015"
+starts_on = 2015-10-24
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://and8.dance/en/e/104"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "flooriorz", reached = "winner" },
+  { entrant = "u-taipei", reached = "top4" },
+  { entrant = "doble-k-o", reached = "top4" },
+  { entrant = "kienjuice", reached = "top2" },
+]
+
+[battles.teams]
+doble-k-o = { crew = "doble-k-o" }
+flooriorz = { crew = "flooriorz" }
+kienjuice = { crew = "kienjuice" }
+u-taipei = { crew = "u-taipei" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "menno", b = "rafastil", winner = "menno" },
+  { round = "top16", a = "shigekix", b = "lawson", winner = "shigekix" },
+  { round = "top16", a = "sunni", b = "kacyo", winner = "sunni" },
+  { round = "top16", a = "el-nino", b = "taower", winner = "el-nino" },
+  { round = "top16", a = "alkolil", b = "akorn", winner = "alkolil" },
+  { round = "top16", a = "victor", b = "lagaet", winner = "victor" },
+  { round = "top16", a = "fleau", b = "onel", winner = "fleau" },
+  { round = "top16", a = "poter", b = "dany", winner = "poter" },
+  { round = "top8", a = "menno", b = "shigekix", winner = "menno" },
+  { round = "top8", a = "sunni", b = "el-nino", winner = "sunni" },
+  { round = "top8", a = "alkolil", b = "victor", winner = "alkolil" },
+  { round = "top8", a = "fleau", b = "poter", winner = "fleau" },
+  { round = "top4", a = "menno", b = "sunni", winner = "menno" },
+  { round = "top4", a = "alkolil", b = "fleau", winner = "alkolil" },
+  { round = "final", a = "menno", b = "alkolil", winner = "menno" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "ayane-noa", reached = "winner" },
+]
+
+[battles.teams]
+ayane-noa = { members = ["ayane", "noa"] }

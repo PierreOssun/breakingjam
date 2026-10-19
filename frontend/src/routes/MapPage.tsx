@@ -21,11 +21,13 @@ import { type Camera, JamMap } from "../features/map/JamMap";
 import {
   type Bounds,
   boundsOf,
+  byDate,
   distanceKm,
   type Filters,
   firstView,
   inBounds,
   isFiltered,
+  isPast,
   type MapJam,
   matchesFilters,
   matchesSearch,
@@ -40,7 +42,10 @@ import { useMediaQuery } from "../lib/useMediaQuery";
 type LngLat = { lng: number; lat: number };
 type Selection = { id: string; trigger: HTMLElement | null };
 
-/** The jams that pass the filters and a search, judged from today. */
+/**
+ * The jams that pass the filters and a search, judged from today: upcoming ones unless the
+ * "Past jams" filter is on or a search looks through every jam.
+ */
 function narrow(
   jams: MapJam[],
   filters: Filters,
@@ -48,11 +53,15 @@ function narrow(
   language: string,
 ): MapJam[] {
   const today = new Date();
-  return jams.filter(
-    (jam) =>
-      matchesFilters(jam, filters, today) &&
-      matchesSearch(jam, search, language),
-  );
+  const upcomingOnly = filters.when === null && search === "";
+  return jams
+    .filter(
+      (jam) =>
+        !(upcomingOnly && isPast(jam, today)) &&
+        matchesFilters(jam, filters, today) &&
+        matchesSearch(jam, search, language),
+    )
+    .sort(byDate(today));
 }
 
 /**
@@ -72,7 +81,7 @@ function useHeight(): [(element: HTMLElement | null) => void, number] {
 }
 
 /**
- * `/map`: every upcoming jam on a world map, narrowed by time, battle category and a search
+ * `/map`: every upcoming jam on a world map, past ones on demand, narrowed by time, battle category and a search
  * on name, city or country (DESIGN.md §5, §6). ≥ lg a side panel lists the jams in view;
  * below, the map is full-bleed with a list view one tap away.
  */
@@ -115,7 +124,9 @@ export function MapPage() {
   useEffect(() => {
     if (framed.current || !all || country.isPending) return;
     framed.current = true;
-    const box = firstView(all, country.data ?? null);
+    const today = new Date();
+    const upcoming = all.filter((jam) => !isPast(jam, today));
+    const box = firstView(upcoming, country.data ?? null);
     if (box)
       setCamera({ kind: "fit", bounds: box, maxZoom: 10, animate: false });
   }, [all, country.isPending, country.data]);

@@ -1,0 +1,48 @@
+name = "Unbreakable 2023"
+starts_on = 2023-09-22
+ends_on = 2023-09-24
+timezone = "Europe/Brussels"
+city = "Leuven"
+venue = "Monseigneur Ladeuzeplein"  # the Lotto WDSF World Breaking Championship
+country = "BE"
+lat = 50.8788
+lng = 4.7069
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/3909"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "victor", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "nicka", reached = "winner" },
+]
+
+[[battles]]
+key = "crew"
+name = "3v3 Crew battle"
+gender = "mixed"
+team_size = 3
+results = [
+  { entrant = "brits-abroad", reached = "winner" },
+]
+
+[battles.teams]
+brits-abroad = { crew = "brits-abroad" }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "danger", reached = "winner" },
+]

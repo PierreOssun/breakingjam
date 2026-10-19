@@ -265,7 +265,7 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
 - **Wordmark:** `font-display font-extrabold` at 16px (mobile) or 18px (desktop), "Breaking" plus "Jam" in a `bg-primary text-on-primary rounded-full px-[.35em]` pill. It links to `/`.
 - **≥ lg**, left to right:
   1. Wordmark
-  2. Nav: ghost sm links "Find a jam" and "For organisers". The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
+  2. Nav: ghost sm links "Find a jam", "Find someone" and, once logged in, "My jams" (`/org/jams`). The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
   3. Spacer
   4. Language switch: ghost sm with `Globe` + ISO code + `CaretDown`
   5. Primary sm **Register a jam**
@@ -371,7 +371,7 @@ One component that changes shape by viewport.
 
 ### 4.16 Avatar + verified tick
 
-- **Avatar:** `size-24 rounded-[28px] overflow-hidden border border-border` (`size-28 rounded-[32px]` in the ≥ lg left column, `size-[72px] rounded-[22px]` in forms). It's a rounded square, so it never reads as a map marker or a social profile bubble.
+- **Avatar:** `size-24 rounded-[28px] overflow-hidden border border-border` (`size-28 rounded-[32px]` in the ≥ lg left column, `size-[72px] rounded-[22px]` in forms, `size-[52px] rounded-[16px]` in person rows). It's a rounded square, so it never reads as a map marker or a social profile bubble.
   - **Generated (default): pixel 2D-HD bust.** Pixel art with modern lighting on top. See the "Pixel avatar" artboard.
     - **Sprite:** a 32×32 grid rendered as SVG with `shape-rendering="crispEdges"`, or a PNG at 8× with `image-rendering: pixelated`. Never smooth the scaling.
     - **Drawing rules:**
@@ -454,7 +454,7 @@ One component that changes shape by viewport.
 
 ### 4.24 Generated flyer *(v0.1: jams have no image upload)*
 
-Every jam gets a 4:5 poster built from its own data, in the same pixel 2D-HD language as the dancer avatars. It's used wherever a flyer appears: the jam page hero, cards, popup and list thumbnails, and the share image. When uploads arrive, an uploaded image replaces it, and the generated one stays as the fallback and the OG image. See the "Generated flyer" artboard; `generated-flyer-reference.py` is a reference implementation that outputs SVG.
+Every jam gets a 4:5 poster built from its own data: the palette's background with a soft HD glow, and the jam's details set in type. No pixel art (decided after M15); the share image keeps the pixel rings, floor and dancer. It's used wherever a flyer appears: the jam page hero, cards, popup and list thumbnails, and the share image. When uploads arrive, an uploaded image replaces it, and the generated one stays as the fallback and the OG image. See the "Generated flyer" artboard; `generated-flyer-reference.py` is a reference implementation that outputs SVG.
 
 - **Inputs:** name, date (weekday, day, month), start time, city, country code, categories. Nothing else.
 - **Rendering:** a single SVG with `viewBox="0 0 400 500"`, `preserveAspectRatio="xMidYMid slice"` and `shape-rendering="crispEdges"`. It scales to any size.
@@ -463,9 +463,9 @@ Every jam gets a 4:5 poster built from its own data, in the same pixel 2D-HD lan
   - Accessibility: `role="img"` with `aria-label="Generated flyer: <name>, <date>, <city>"`.
 - **Seed:** `h = sha1(jam.id)`.
   - Palette = `["klein","violet","ink"][h % 3]`.
-  - Pose = `["handstand","toprock"][(h / 3) % 2]`.
+  - Pose = `["handstand","toprock"][(h / 3) % 2]` (share image only).
   - Stable forever, with no randomness at render time.
-- **Palettes** (theme-independent, the same in dark and light UI):
+- **Palettes** (theme-independent, the same in dark and light UI; rings, dancer, rim, shadow and floor colour the share image only):
 
 | | bg | rings | text | sub | dancer | rim | shadow | floor |
 |---|---|---|---|---|---|---|---|---|
@@ -475,15 +475,10 @@ Every jam gets a 4:5 poster built from its own data, in the same pixel 2D-HD lan
 
 - **Layers, back to front** (400×500 units):
   1. Background fill.
-  2. **Pixel record rings:** 8-unit cells whose centre lies within 4 units of the radii 56, 96, 136, 176, 216 and 256 around (300, 170).
-  3. **Floor:** dashes 8×4 every 16 units at y = 270.
-  4. **Pixel dancer:** the 20×20 bitmap below at 8 units per cell, x = 196, standing on the floor.
-     - Shadow: the same bitmap offset by one cell, in `shadow`.
-     - Rim light: the right-most third of the last cell in each run, in `rim`.
-  5. **HD layer:**
+  2. **HD layer:**
      - Radial glow at (25%, 20%): white from 16% to 0%.
      - Bottom vignette from 55% down: black from 0% to 45%.
-  6. **Type:**
+  3. **Type:**
      - Weekday in Manrope 800 16, tracking 2, colour `sub`, at (28, 54).
      - Day in Unbounded 800 72 at (24, 124).
      - Month in Unbounded 800 28 at (28, 160).
@@ -495,14 +490,19 @@ Every jam gets a 4:5 poster built from its own data, in the same pixel 2D-HD lan
 - **Name fit:**
   - Width 344. Assume an average glyph width of 0.8em for Unbounded.
   - Try 46, then 40, then 34 px over at most 3 lines, then 28 and 24 px over at most 4 lines.
-  - The block must stay below the floor (at most 126 units from the first cap height to the last baseline).
+  - The block must stay in the lower part, below y = 282 (at most 126 units from the first cap height to the last baseline).
   - If the last line is ≤ 3 characters, pull the previous word down.
   - Use an ellipsis only when 4 lines at 24 px still overflow.
-- **Compact** (any render ≤ 120px wide): rings, dancer, weekday, day and month only. No name, city or categories, and `aria-hidden` (the row next to it carries the text).
+- **Compact** (any render ≤ 120px wide): background, weekday, day and month only. No name, city or categories, and `aria-hidden` (the row next to it carries the text).
 - **Cancelled:** a band rotated −12° across the centre in `#D8354A`, with "CANCELLED" in Unbounded 800 30 white. Other statuses don't touch the flyer.
-- **Share image:** the same seed and layers in 1200×630.
+- **Share image:** the same seed and palette in 1200×630, with the pixel art the flyer doesn't have.
+  - **Pixel record rings:** 12-unit cells whose centre lies within 6 units of the radii 90, 150, 210, 270, 330 and 390 around (940, 260).
+  - **Floor:** dashes 12×6 every 24 units at y = 520.
+  - **Pixel dancer:** the bitmap of its pose (below) at 16 units per cell, x = 800, standing on the floor.
+    - Shadow: the same bitmap offset by one cell, in `shadow`.
+    - Rim light: the right-most third of the last cell in each run, in `rim`.
+  - Bottom vignette from 60% down: black from 0% to 40%.
   - Text sits on the left: date line, name at 84 → 50 px over ≤ 3 lines, city, then categories + "BREAKINGJAM.COM".
-  - The dancer sits on the right at 16 units per cell.
 - **Pose bitmaps** (`X` = filled, rows top to bottom):
 
 ```
@@ -532,6 +532,17 @@ handstand            toprock
 ```
 
 - **On the jam page:** the flyer is the hero exactly as an uploaded flyer would be (mobile full-bleed 375×469; desktop left column, `rounded-lg`). The `<h1>` and fact rows stay below it, so the layout doesn't change when uploads ship.
+
+### 4.25 Person list row ("Find someone")
+
+- **Page** `/dancers`: the `max-w-prose` column, the `font-display` H1 "Find someone", then a search field (label "Name, alias or @handle", hint "Bboys, bgirls, DJs, MCs, judges.").
+  - Typing searches after a 250 ms pause and keeps `?q=` in the URL, so back and shared links return to the same results.
+  - A blank search lists everyone, notable dancers first.
+- **Row** (`<a>` to the dancer page, the whole row tappable): the jam row's shape (§4.14), `flex items-center gap-3.5 py-3 min-h-[76px] border-b border-border`:
+  1. The avatar at `size-[52px] rounded-[16px]` (§4.16), decorative here (`aria-hidden`).
+  2. Body: the name in `text-body font-extrabold truncate` with the verified tick after it; then the bare flags (up to 2), the city and the crews (`City · Crew, Crew`) in `text-[13px] leading-[18px] text-muted`.
+- **Paging:** 20 rows, then a full-width secondary **Show more** for the next 20.
+- **No match:** the inline empty state (§4.22), "No one matches “…”."
 
 ---
 

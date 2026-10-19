@@ -5,6 +5,7 @@ import { PixelAvatar } from "./PixelAvatar";
 const SHAPES = {
   page: "size-24 rounded-[28px] lg:size-28 lg:rounded-[32px]",
   form: "size-[72px] rounded-[22px]",
+  row: "size-[52px] rounded-[16px]",
   chip: "size-7 rounded-[8px]",
 };
 
@@ -15,7 +16,7 @@ type DancerAvatarProps = {
     avatar_url?: string | null;
     avatar_parts?: string | null;
   };
-  /** `page`: the identity card · `form`: the edit sheet's preview · `chip`: a dancer chip (DESIGN.md §4.16). */
+  /** `page`: the identity card · `form`: the edit sheet's preview · `row`: a person row · `chip`: a dancer chip (DESIGN.md §4.16). */
   size?: keyof typeof SHAPES;
 };
 

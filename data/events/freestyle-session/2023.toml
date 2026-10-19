@@ -1,0 +1,73 @@
+name = "Freestyle Session 2023"
+starts_on = 2023-11-11
+ends_on = 2023-11-12
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://breakkonnect.com/event/2242"]
+judges = ["battala", "kosi", "loose-joint", "berry-groove", "waackeisha", "viktor-manoel"]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "anti", b = "deepfriedtiff", winner = "anti", video = "https://youtu.be/LoFx-gESnco" },
+  { round = "top4", a = "sarah-bee", b = "nicka", winner = "nicka", video = "https://youtu.be/yfycQhTQIe0" },
+  { round = "final", a = "anti", b = "nicka", winner = "TODO", video = "https://youtu.be/VQJ1xBOplnA" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "first-class-kids", b = "shuffles-and-flow-all-stars", winner = "shuffles-and-flow-all-stars", video = "https://youtu.be/_DL06j732Ss" },
+  { round = "top4", a = "impact", b = "break-in-kids", winner = "impact", video = "https://youtu.be/-rTlSNFBK3E" },
+  { round = "final", a = "shuffles-and-flow-all-stars", b = "impact", winner = "TODO", video = "https://youtu.be/9pm1bHBJZ20" },
+]
+
+[battles.teams]
+break-in-kids = { name = "Break'in Kids" }
+first-class-kids = { name = "First Class Kids" }
+impact = { name = "Impact" }
+shuffles-and-flow-all-stars = { name = "Shuffles and Flow All-Stars" }
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "junior", b = "data", winner = "junior", video = "https://youtu.be/jODgeK-vTrU" },
+  { round = "top4", a = "kmel", b = "recon", winner = "kmel", video = "https://youtu.be/goxw80rpAlI" },
+  { round = "top4", a = "red-bull-bc-one-all-stars", b = "breakinmia", winner = "breakinmia", video = "https://youtu.be/WRqAy9nRtEE" },
+  { round = "top4", a = "phil-wizard-lil-zoo-sunni", b = "rock-force", winner = "phil-wizard-lil-zoo-sunni", video = "https://youtu.be/X1coNpQ0CUk" },
+  { round = "final", a = "charlie-chillout", b = "babylon", winner = "TODO", video = "https://youtu.be/0ipnIIcGJWI" },
+  { round = "final", a = "mels", b = "nero-the-professor", winner = "TODO", video = "https://youtu.be/gQENaoeEqX4" },
+  { round = "final", a = "marvelous", b = "lily", winner = "TODO", video = "https://youtu.be/RjpykVspv1E" },
+  { round = "final", a = "kmel", b = "junior", winner = "TODO", video = "https://youtu.be/UjASDDJiZ2k" },
+  { round = "final", a = "phil-wizard-lil-zoo-sunni", b = "breakinmia", winner = "TODO", video = "https://youtu.be/Q2IXGGpMp4U" },
+]
+
+[battles.teams]
+babylon = { crew = "babylon" }
+breakinmia = { crew = "breakinmia" }
+charlie-chillout = { crew = "charlie-chillout" }
+data = { crew = "data" }
+junior = { crew = "junior" }
+kmel = { crew = "kmel" }
+lily = { crew = "lily" }
+marvelous = { crew = "marvelous" }
+mels = { crew = "mels" }
+nero-the-professor = { crew = "nero-the-professor" }
+phil-wizard-lil-zoo-sunni = { crew = "phil-wizard-lil-zoo-sunni" }
+recon = { crew = "recon" }
+red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars" }
+rock-force = { crew = "rock-force" }

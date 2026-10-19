@@ -210,6 +210,28 @@ describe("MapPage", () => {
     expect(await rows()).toEqual(["Concrete Cypher", "Kids Jam Paris"]);
   });
 
+  it("shows past jams on demand, most recent first, and finds them by search", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2030, 5, 17, 12)); // Monday 17 June 2030
+    desktop();
+    api();
+    renderApp("/map");
+
+    expect(await rows()).toEqual(["Berlin Breaks"]);
+
+    const past = screen.getByRole("button", { name: "Past jams" });
+    await userEvent.click(past);
+    expect(past).toHaveAttribute("aria-pressed", "true");
+    expect(await rows()).toEqual(["Kids Jam Paris", "Concrete Cypher"]);
+
+    await userEvent.click(past);
+    await userEvent.type(
+      screen.getByRole("searchbox", { name: "Search jams" }),
+      "cypher{Enter}",
+    );
+    expect(await rows()).toEqual(["Concrete Cypher"]);
+  });
+
   it("searches by name, city or country and frames the matches", async () => {
     desktop();
     api();

@@ -25,7 +25,7 @@ pub async fn search(
     let pattern = query.map(super::contains_pattern);
     let rows = sqlx::query!(
         r#"select id, dancer_name, aliases, country, country2, city, instagram_handle,
-                  verified_at is not null as "verified!"
+                  verified_at is not null as "verified!", avatar_url, avatar_parts
            from dancers
            where deleted_at is null and merged_into_id is null
              and ($1::text is null
@@ -57,6 +57,8 @@ pub async fn search(
             city: r.city,
             instagram_handle: r.instagram_handle,
             verified: r.verified,
+            avatar_url: r.avatar_url,
+            avatar_parts: r.avatar_parts,
         })
         .collect())
 }

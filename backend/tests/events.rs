@@ -322,7 +322,7 @@ async fn list_shows_public_jams_with_filters_and_pages(pool: PgPool) {
 }
 
 #[sqlx::test]
-async fn geojson_has_upcoming_public_jams_with_coordinates(pool: PgPool) {
+async fn geojson_has_public_jams_with_coordinates_past_ones_included(pool: PgPool) {
     let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     // The BreakingJam team publishes without review.
@@ -353,8 +353,7 @@ async fn geojson_has_upcoming_public_jams_with_coordinates(pool: PgPool) {
         .iter()
         .map(|f| f["properties"]["name"].as_str().unwrap())
         .collect();
-    assert_eq!(names.len(), 2);
-    assert!(names.contains(&"Published") && names.contains(&"Closed"));
+    assert_eq!(names, ["Published", "Closed", "Done"]);
     assert_eq!(
         features[0]["geometry"],
         json!({ "type": "Point", "coordinates": [2.3522, 48.8566] })

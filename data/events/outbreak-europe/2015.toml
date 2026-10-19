@@ -1,0 +1,64 @@
+name = "Outbreak Europe 2015"
+starts_on = 2015-07-24
+ends_on = 2015-07-26
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7354
+lng = 19.1457
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+judges = ["kid-david", "menno", "ata", "lego", "roxrite"]
+mcs = ["mario-bee", "lil-pablo", "osto"]
+djs = ["lean-rock", "fleg", "renegade", "scream", "plash", "smirnoff", "felix"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "el-nino", b = "husky-husk", winner = "el-nino" },
+  { round = "top16", a = "klesio", b = "kanedsi", winner = "klesio" },
+  { round = "top16", a = "twister", b = "yuri-dominggos", winner = "twister" },
+  { round = "top16", a = "perna", b = "vint", winner = "perna" },
+  { round = "top16", a = "fantum", b = "onel", winner = "fantum" },
+  { round = "top16", a = "kleju", b = "tricky", winner = "kleju" },
+  { round = "top16", a = "lb", b = "hill", winner = "lb" },
+  { round = "top16", a = "hulk", b = "conni", winner = "hulk" },
+  { round = "top8", a = "el-nino", b = "klesio", winner = "el-nino" },
+  { round = "top8", a = "twister", b = "perna", winner = "twister" },
+  { round = "top8", a = "fantum", b = "kleju", winner = "fantum" },
+  { round = "top8", a = "lb", b = "hulk", winner = "lb" },
+  { round = "top4", a = "el-nino", b = "twister", winner = "el-nino" },
+  { round = "top4", a = "fantum", b = "lb", winner = "fantum" },
+  { round = "final", a = "el-nino", b = "fantum", winner = "el-nino" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "sunny", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "menno-roxrite", reached = "winner" },
+]
+
+[battles.teams]
+menno-roxrite = { members = ["menno", "roxrite"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "untied", reached = "winner" },
+]

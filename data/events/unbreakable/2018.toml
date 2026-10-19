@@ -1,0 +1,65 @@
+name = "Unbreakable 2018"
+starts_on = 2018-04-21
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2211
+lng = 4.3997
+venue = "Parkspoor Noord"
+sources = ["https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCySwo6Ue4QxxsYDvIBdwynw", "https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/2250"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "greku", b = "beetle", winner = "beetle", video = "https://youtu.be/chNYZMJcRNQ" },
+  { round = "top16", a = "deeogo", b = "yan", winner = "yan", video = "https://youtu.be/9aGfEbcZfUU" },
+  { round = "top16", a = "gimnast", b = "wingzero", winner = "wingzero", video = "https://youtu.be/jjoLF7mZZjg" },
+  { round = "top16", a = "stripes", b = "twister", winner = "stripes", video = "https://youtu.be/d2oNQ_baHa8" },
+  { round = "top16", a = "lucky", b = "sunni", winner = "sunni", video = "https://youtu.be/AyWqwIifTHI" },
+  { round = "top16", a = "luan", b = "mighty-jim", winner = "luan", video = "https://youtu.be/a1T-5vqPZwE" },
+  { round = "top16", a = "cri6", b = "lagaet", winner = "lagaet", video = "https://youtu.be/gppyiuM4OH8" },
+  { round = "top16", a = "justen", b = "heady", winner = "justen", video = "https://youtu.be/fXSMlbSI8oU" },
+  { round = "top8", a = "wingzero", b = "sunni", winner = "sunni", video = "https://youtu.be/zXWYPI91-Pc" },
+  { round = "top8", a = "stripes", b = "lagaet", winner = "stripes", video = "https://youtu.be/Vo7yw5QOOyc" },
+  { round = "top8", a = "yan", b = "justen", winner = "justen", video = "https://youtu.be/VPEkjxGno0A" },
+  { round = "top8", a = "luan", b = "beetle", winner = "beetle", video = "https://youtu.be/p9qkkQkd9nc" },
+  { round = "top4", a = "stripes", b = "justen", winner = "stripes", video = "https://youtu.be/qFpShaCHLdY" },
+  { round = "top4", a = "sunni", b = "beetle", winner = "sunni", video = "https://youtu.be/Oll61g66v6A" },
+  { round = "final", a = "stripes", b = "sunni", winner = "stripes", video = "https://youtu.be/j6-zUnvBGC0" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "Bgirl 7 to smoke"
+gender = "bgirl"
+format = "seven_to_smoke"
+results = [
+  { entrant = "kami", reached = "winner" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "soul-mavericks", reached = "winner" },
+]
+
+[battles.teams]
+soul-mavericks = { crew = "soul-mavericks" }
+
+[[battles]]
+key = "kids-crew"
+name = "Kids crew battle"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "battle-droids", reached = "winner" },
+]
+
+[battles.teams]
+battle-droids = { crew = "battle-droids" }

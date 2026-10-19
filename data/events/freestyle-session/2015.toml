@@ -1,0 +1,33 @@
+name = "Freestyle Session 2015"
+starts_on = 2015-11-07
+ends_on = 2015-11-08
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://web.archive.org/web/20210306112417/https://www.probreakingtour.com/2015/11/09/freestyle-session-world-finals-15/"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 2
+matches = [
+  { round = "final", a = "kleju", b = "victor", winner = "TODO", video = "https://youtu.be/022pDuPskk4" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 2
+matches = [
+  { round = "final", a = "7-commandoz", b = "found-carnival", winner = "TODO", video = "https://youtu.be/Ii5NCj_bABw" },
+]
+
+[battles.teams]
+7-commandoz = { crew = "7-commandoz" }
+found-carnival = { crew = "found-carnival" }

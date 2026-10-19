@@ -7,3 +7,6 @@ dist/
 .dev.vars*
 !.dev.vars.example
 .wrangler/
+
+# The data/ tools' YouTube listings (data/README.md).
+data/.cache/

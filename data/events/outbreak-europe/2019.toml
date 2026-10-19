@@ -1,0 +1,51 @@
+name = "Outbreak Europe 2019"
+# and8.dance gives July 24–28, which seems to include the festival week; the battles were on July 27.
+starts_on = 2019-07-26
+ends_on = 2019-07-28
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7357
+lng = 19.1280
+venue = "Aqualand"
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://en.wikipedia.org/w/index.php?oldid=909527419", "https://www.teraz.sk/regiony/medzinarodny-festival-the-legits-blast/406705-clanok.html", "https://and8.dance/en/e/3142"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "victor", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "san-andrea", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "stripes-vicious", reached = "winner" },
+]
+
+[battles.teams]
+stripes-vicious = { members = ["stripes", "vicious"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "angry-boy-grom", reached = "winner" },
+]

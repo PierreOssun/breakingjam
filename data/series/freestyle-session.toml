@@ -1,0 +1,18 @@
+name = "Freestyle Session"
+
+[youtube]
+channels = ["UCgiz3Pm3FBhDyy3g_fP5OVA"]   # stance
+title = "Freestyle Session"
+# The World Final only: not the regional events, qualifiers or other dance styles.
+exclude = [
+  "europe", "japan", "korea", "norway", "minnesota", "soundset", "latin america", "qualifier", "qual.",
+  "boston", "exhibition", "special edition", "popping", "locking", "hip hop", "house", "all styles",
+  "40+",   # the veterans' category; add it as its own battle when wanted
+]
+battles = [
+  { key = "bgirl", name = "1v1 Bgirl", gender = "bgirl", words = ["bgirl", "b-girl"] },
+  { key = "kids", name = "Kids", age = "kids", sides = "teams", words = ["kids"] },
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["1v1", "1-v-1", "bboy", "b-boy"] },
+  # No words: titles naming no category are the crew battle, the main one.
+  { key = "crew", name = "Crew battle", sides = "crews" },
+]

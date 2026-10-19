@@ -1,0 +1,50 @@
+name = "Outbreak Europe 2020"
+# Online only (The Legits Blast Online 2020), streamed from a studio in Banská Bystrica; the physical edition was cancelled (COVID-19).
+starts_on = 2020-10-01
+ends_on = 2020-11-08
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7354
+lng = 19.1457
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://and8.dance/en/e/3404"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "johnnyfox", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "ayumi", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "thesis-willastr8", reached = "winner" },
+]
+
+[battles.teams]
+thesis-willastr8 = { members = ["willastr8", "thesis"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "miracle", reached = "winner" },
+]

@@ -1,0 +1,36 @@
+name = "Red Bull BC One World Final 2004"
+starts_on = 2004-05-08
+timezone = "Europe/Zurich"
+city = "Biel"
+country = "CH"
+lat = 47.1360
+lng = 7.2499
+venue = "Gaskessel"
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://and8.dance/e/315"]
+judges = ["benny-flying-steps", "lamine", "george", "asia-one", "tuff-kid"]
+mcs = ["rahzel"]
+djs = ["dj-supreme"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "leo", b = "bebe", winner = "bebe", votes = [1, 4] },
+  { round = "top16", a = "sonic", b = "kc", winner = "sonic", votes = [5, 0] },
+  { round = "top16", a = "extremo", b = "omar", winner = "omar", votes = [0, 3] },
+  { round = "top16", a = "by", b = "lil-tim", winner = "by", votes = [5, 0] },
+  { round = "top16", a = "ronnie", b = "kousuke", winner = "ronnie", votes = [5, 0] },
+  { round = "top16", a = "eagle", b = "iron-monkey", winner = "iron-monkey", votes = [2, 3] },
+  { round = "top16", a = "wake-up", b = "wongo", winner = "wake-up", votes = [4, 0] },
+  { round = "top16", a = "junior", b = "nuno", winner = "junior", votes = [4, 0] },
+  { round = "top8", a = "bebe", b = "sonic", winner = "sonic", votes = [0, 3] },
+  { round = "top8", a = "omar", b = "by", winner = "omar", votes = [3, 2] },
+  { round = "top8", a = "ronnie", b = "iron-monkey", winner = "ronnie", votes = [4, 1] },
+  { round = "top8", a = "wake-up", b = "junior", winner = "junior", votes = [0, 3] },
+  { round = "top4", a = "sonic", b = "omar", winner = "omar", votes = [0, 5] },
+  { round = "top4", a = "ronnie", b = "junior", winner = "ronnie", votes = [3, 2] },
+  { round = "final", a = "omar", b = "ronnie", winner = "omar" },
+  { round = "third", a = "sonic", b = "junior", winner = "junior", votes = [1, 4] },
+]

@@ -1,0 +1,58 @@
+name = "Red Bull BC One World Final 2021"
+starts_on = 2021-11-05
+ends_on = 2021-11-06
+timezone = "Europe/Warsaw"
+city = "Gdańsk"
+country = "PL"
+lat = 54.3483
+lng = 18.6540
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["menno", "sarah-bee", "kleju", "beta", "el-nino"]
+mcs = ["amjad"]
+djs = ["dj-plash-one"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "tawfiq", b = "gun", winner = "tawfiq", votes = [3, 2] },
+  { round = "top16", a = "xak", b = "lee", winner = "lee", votes = [1, 4] },
+  { round = "top16", a = "lagaet", b = "bart", winner = "bart", votes = [2, 3] },
+  { round = "top16", a = "phil-wizard", b = "nori", winner = "phil-wizard", votes = [5, 0] },
+  { round = "top16", a = "zoopreme", b = "wild-jerry", winner = "zoopreme", votes = [3, 2] },
+  { round = "top16", a = "sunni", b = "amir", winner = "amir", votes = [0, 5] },
+  { round = "top16", a = "flea-rock", b = "thomaz", winner = "flea-rock", votes = [5, 0] },
+  { round = "top16", a = "shigekix", b = "johnny-fox", winner = "shigekix", votes = [5, 0] },
+  { round = "top8", a = "tawfiq", b = "lee", winner = "lee", votes = [0, 5] },
+  { round = "top8", a = "bart", b = "phil-wizard", winner = "phil-wizard", votes = [0, 5] },
+  { round = "top8", a = "zoopreme", b = "amir", winner = "amir", votes = [0, 5] },
+  { round = "top8", a = "flea-rock", b = "shigekix", winner = "flea-rock", votes = [4, 1] },
+  { round = "top4", a = "lee", b = "phil-wizard", winner = "phil-wizard", votes = [1, 4] },
+  { round = "top4", a = "amir", b = "flea-rock", winner = "amir", votes = [5, 0] },
+  { round = "final", a = "phil-wizard", b = "amir", winner = "amir", votes = [2, 3] },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "logistx", b = "yell", winner = "logistx", votes = [5, 0] },
+  { round = "top16", a = "san-andrea", b = "ayumi", winner = "ayumi", votes = [0, 5] },
+  { round = "top16", a = "ami", b = "nadia", winner = "nadia", votes = [0, 5] },
+  { round = "top16", a = "sidi", b = "fanny", winner = "sidi", votes = [3, 2] },
+  { round = "top16", a = "kastet", b = "carito", winner = "kastet", votes = [5, 0] },
+  { round = "top16", a = "ram", b = "stefani", winner = "ram", votes = [4, 1] },
+  { round = "top16", a = "paulina", b = "luma", winner = "paulina", votes = [3, 2] },
+  { round = "top16", a = "madmax", b = "vavi", winner = "vavi", votes = [0, 5] },
+  { round = "top8", a = "logistx", b = "ayumi", winner = "logistx", votes = [4, 1] },
+  { round = "top8", a = "nadia", b = "sidi", winner = "nadia", votes = [5, 0] },
+  { round = "top8", a = "kastet", b = "ram", winner = "kastet", votes = [5, 0] },
+  { round = "top8", a = "paulina", b = "vavi", winner = "vavi", votes = [2, 3] },
+  { round = "top4", a = "logistx", b = "nadia", winner = "logistx", votes = [5, 0] },
+  { round = "top4", a = "kastet", b = "vavi", winner = "vavi", votes = [2, 3] },
+  { round = "final", a = "logistx", b = "vavi", winner = "logistx", votes = [5, 0] },
+]

@@ -12,6 +12,7 @@ axum = "0.8"
 chrono = { version = "0.4", default-features = false, features = ["serde", "std"] }
 dotenvy = "0.15"
 oauth2 = { version = "5", default-features = false, features = ["reqwest", "rustls-tls"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
 resvg = { version = "0.48", default-features = false, features = ["text"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -19,9 +20,11 @@ sha1 = "0.11"
 sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "uuid", "chrono"] }
 thiserror = "2"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal"] }
+toml = { version = "1", default-features = false, features = ["std", "parse", "serde"] }
 tower-http = { version = "0.6", features = ["trace", "request-id"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+unicode-normalization = "0.1"
 url = "2"
 utoipa = { version = "6", features = ["chrono", "uuid", "preserve_order", "preserve_path_order"] }
 utoipa-axum = "0.3"

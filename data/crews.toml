@@ -1,0 +1,300 @@
+# Every crew the jams name, by key (data/README.md).
+formless-corp = { name = "Formless Corp", aliases = ["Formless Corps"] }
+super-kidz = { name = "Super Kidz" }
+all-area-crew = { name = "All Area Crew", country = "JP" }
+always-rockin-tuff = { name = "Always Rockin Tuff", country = "GB" }
+artistreet = { name = "Artistreet", country = "KR" }
+b-town-all-stars = { name = "B-Town All Stars", country = "DE" }
+b-town-allstars = { name = "B-Town Allstars", country = "DE" }
+bag-of-trix = { name = "Bag of Trix", country = "CA" }
+battle-born = { name = "Battle Born", country = "US" }
+battle-squad = { name = "Battle Squad", country = "DE" }
+black-noise = { name = "Black Noise", country = "ZA" }
+body-carnival = { name = "Body Carnival", country = "JP" }
+break-the-funk = { name = "Break the Funk", country = "IT" }
+city-rockers = { name = "City Rockers", country = "DE" }
+crazy-force-crew = { name = "Crazy Force Crew", country = "CH" }
+deep-trip = { name = "Deep Trip", country = "CH" }
+doble-k-o = { name = "Doble K.O.", country = "ES" }
+drifterz = { name = "Drifterz", country = "KR" }
+enemy-squad = { name = "Enemy Squad", country = "HU" }
+expression-crew = { name = "Expression Crew", country = "KR" }
+extreme-crew = { name = "Extreme Crew", country = "KR" }
+fantastik-armada = { name = "Fantastik Armada", country = "FR" }
+fire-works = { name = "Fire Works", country = "JP" }
+flooriorz = { name = "Flooriorz", country = "JP" }
+flow-xl = { name = "Flow XL", country = "KR" }
+flying-steps = { name = "Flying Steps", country = "DE" }
+formosa = { name = "Formosa", country = "TW" }
+foundnation = { name = "Foundnation", country = "JP" }
+fresh-force = { name = "Fresh Force", country = "DE" }
+funk-fellaz = { name = "Funk Fellaz", country = "DE" }
+fusion-mc = { name = "Fusion MC", country = "KR" }
+gamblerz = { name = "Gamblerz", country = "KR" }
+havikoro = { name = "HaviKoro", country = "US" }
+ichigeki = { name = "Ichigeki", country = "JP" }
+jinjo-crew = { name = "Jinjo Crew", country = "KR" }
+kienjuice = { name = "Kienjuice", country = "BY" }
+la-smala = { name = "La Smala", country = "FR" }
+last-for-one = { name = "Last For One", country = "KR" }
+last-squad = { name = "Last Squad", country = "FR" }
+legiteam-obstruxion = { name = "Legiteam Obstruxion", country = "FR", aliases = ["LO"] }
+melting-force = { name = "Melting Force", country = "FR" }
+morning-of-owl = { name = "Morning of Owl", country = "KR" }
+mortal-combat = { name = "Mortal Combat", country = "JP" }
+nine-state-b-boyz = { name = "Nine State B-boyz", country = "JP" }
+out-of-control = { name = "Out of Control", country = "DK" }
+passo-sul-tempo = { name = "Passo Sul Tempo", country = "IT" }
+phase-2 = { name = "Phase 2", country = "US" }
+phase-t = { name = "Phase-T", country = "FR" }
+pockemon = { name = "Pockémon", country = "FR" }
+predatorz = { name = "Predatorz", country = "RU" }
+quite-boom = { name = "Quite Boom", country = "CN" }
+robot-force = { name = "Robot Force", country = "CN" }
+rock-force = { name = "Rock Force", country = "US" }
+rock-force-crew = { name = "Rock Force Crew", country = "US" }
+s-i-n-e-crew = { name = "S.I.N.E. Crew", country = "VN" }
+scrambling-feet = { name = "Scrambling Feet", country = "CH" }
+second-2-none = { name = "Second 2 None", country = "GB" }
+smokemon = { name = "Smokémon", country = "FR" }
+south-african-allstars = { name = "South African Allstars", country = "ZA" }
+south-side-rockers = { name = "South Side Rockers", country = "DE" }
+squadron = { name = "Squadron", country = "US" }
+stuttguard = { name = "Stuttguard", country = "DE" }
+style-elements = { name = "Style Elements", country = "US" }
+suicidal-lifestyle = { name = "Suicidal Lifestyle", country = "HU" }
+t-i-p-crew = { name = "T.I.P. Crew", country = "KR" }
+tdb = { name = "TDB", country = "DE" }
+team-ohh = { name = "Team Ohh", country = "JP" }
+team-vinotinto = { name = "Team Vinotinto", country = "VE" }
+the-family = { name = "The Family", country = "FR" }
+the-ruggeds = { name = "The Ruggeds", country = "NL" }
+top-9 = { name = "Top 9", country = "RU" }
+top-coalition = { name = "Top Coalition", country = "TW" }
+toys-in-effect = { name = "Toys in Effect", country = "CH" }
+tpec = { name = "TPEC", country = "TW" }
+turn-phrase-crew = { name = "Turn Phrase Crew", country = "JP" }
+u-taipei = { name = "U-Taipei", country = "TW" }
+vagabonds = { name = "Vagabonds", country = "FR" }
+visual-shock = { name = "Visual Shock", country = "KR" }
+vlinke-vuesse = { name = "Vlinke Vuesse", country = "DE" }
+wanted = { name = "Wanted", country = "FR" }
+waseda-breakers = { name = "Waseda Breakers", country = "JP" }
+wedding-b-boys-flying-steps = { name = "Wedding B-Boys & Flying Steps", country = "DE" }
+anormal = { name = "Anormal" }
+antithesis-x-vissick-stylez = { name = "Antithesis x Vissick Stylez" }
+averages-joes = { name = "Averages Joes" }
+battle-droids = { name = "Battle Droids", country = "BE", aliases = ["Battledroids"] }
+belchina = { name = "BelChina" }
+breaknuts = { name = "Breaknuts", aliases = ["BREAKNUTS"] }
+ccu7 = { name = "CCU7" }
+chasseurs2primes = { name = "Chasseurs2primes" }
+fresh-allstars = { name = "Fresh Allstars" }
+from-downtown = { name = "From DownTown" }
+from-favela = { name = "From Favela" }
+funky-belgianz = { name = "FUNKY BELGIANZ" }
+gimmicks = { name = "Gimmicks" }
+grimy-miners = { name = "Grimy Miners" }
+hfc = { name = "HFC" }
+hidden-artifacts = { name = "HIDDEN ARTIFACTS" }
+hidden-trip = { name = "HIDDEN TRIP" }
+infilaskills = { name = "INFILASKILLS" }
+legacy = { name = "Legacy" }
+los-crapulos = { name = "Los Crapulos" }
+peek-a-boo = { name = "Peek A Boo" }
+primal-instincts = { name = "Primal Instincts" }
+pura-vida-maes = { name = "Pura Vida Maes" }
+ruffneck-attack-x-doomsday = { name = "Ruffneck Attack x Doomsday" }
+shin-sedai = { name = "Shin Sedaï" }
+shmetta-skwad = { name = "Shmetta Skwad", country = "BE", aliases = ["Team Shmetta"] }
+stardust = { name = "Stardust" }
+sul-clan = { name = "Sul Clan" }
+tutejsyja = { name = "Tutejsyja" }
+uncontrolled-substance = { name = "Uncontrolled Substance" }
+unexpected = { name = "Unexpected" }
+xvii-generation = { name = "XVII Generation" }
+young-villains = { name = "Young Villains" }
+13-26-11 = { name = "13:26:11" }
+3-16 = { name = "3:16" }
+7-commandoz = { name = "7 Commandoz" }
+808-breakers = { name = "808 Breakers", aliases = ["808 BREAKERS"] }
+airheads = { name = "Airheads" }
+alvin-jeffro-gravity = { name = "Alvin, Jeffro, Gravity" }
+ariras = { name = "Ariras" }
+ariya = { name = "ARIYA" }
+assassins = { name = "Assassins" }
+babylon = { name = "Babylon" }
+belgians-with-attitude = { name = "BELGIANS WITH ATTITUDE" }
+belgium-with-attitude = { name = "Belgium With Attitude" }
+berry-groove = { name = "BERRY GROOVE" }
+blacklist = { name = "Blacklist", country = "FR" }
+boogie-burrito = { name = "Boogie Burrito" }
+boogie-renaissance = { name = "BOOGIE RENAISSANCE" }
+break-syndicate = { name = "BREAK SYNDICATE" }
+breakinmia = { name = "BreakinMIA" }
+breakmatic = { name = "Breakmatic" }
+brickheadz = { name = "Brickheadz" }
+bring-it-back-squad = { name = "BRING IT BACK SQUAD" }
+cali-seoul = { name = "Cali Seoul" }
+ceanne = { name = "CEANNE" }
+charlie-chill-out = { name = "Charlie Chill-Out", aliases = ["Charlie Chill Out"] }
+charlie-chillout = { name = "Charlie Chillout" }
+concrete-all-stars = { name = "Concrete All Stars", aliases = ["Concrete All-Stars"] }
+concrete-force-kingz = { name = "Concrete Force Kingz" }
+corrupt-path = { name = "Corrupt Path" }
+crazystan = { name = "CRAZYSTAN" }
+crew-peligrosos = { name = "CREW PELIGROSOS" }
+crossover = { name = "CROSSOVER" }
+danzel = { name = "Danzel" }
+das-flavour = { name = "Das Flavour" }
+data = { name = "Data" }
+doa = { name = "DOA" }
+dol = { name = "Dol" }
+double-dragon = { name = "Double Dragon" }
+drifterz-crew = { name = "DRIFTERZ CREW" }
+el-nino = { name = "El Nino" }
+elusive-fenz = { name = "Elusive Fenz" }
+flexible-flav = { name = "Flexible Flav" }
+floor-gangz = { name = "Floor Gangz", aliases = ["FLOOR GANGZ"] }
+floorriorz = { name = "Floorriorz" }
+florida-h-town = { name = "FLORIDA H TOWN" }
+flow-killerz = { name = "Flow Killerz" }
+flow-mo = { name = "Flow Mo" }
+flowxl-kingz = { name = "FlowXL Kingz" }
+flxible-flav = { name = "Flxible Flav" }
+fnc = { name = "FNC" }
+formless = { name = "Formless" }
+found-carnival = { name = "Found Carnival" }
+found-nation = { name = "Found Nation" }
+fresh-all-stars = { name = "Fresh All Stars" }
+full-force = { name = "Full Force" }
+furious-styles-crew = { name = "Furious Styles Crew" }
+german-ingenuity = { name = "GERMAN INGENUITY" }
+good-foot = { name = "Good Foot" }
+gq = { name = "GQ" }
+gravity = { name = "Gravity" }
+green-panda = { name = "Green Panda" }
+gun-smoke-by-nature = { name = "Gun Smoke By Nature" }
+gunsmoke-breakers = { name = "Gunsmoke Breakers" }
+gunsmoke-by-nature = { name = "Gunsmoke By Nature" }
+hazardous-beings = { name = "Hazardous Beings" }
+holookunz-rhythm-invade = { name = "HOLOOKUNZ RHYTHM INVADE" }
+hype-battle-rugged-squadron = { name = "HYPE BATTLE 🔥 Rugged Squadron" }
+icey-ives = { name = "Icey Ives" }
+ill-abilities = { name = "Ill Abilities" }
+illusion-of-exist = { name = "ILLUSION OF EXIST" }
+illz = { name = "Illz" }
+immigradz = { name = "Immigradz", country = "FR" }
+intact-den-kate = { name = "Intact, Den, Kate" }
+issei = { name = "Issei" }
+jamal = { name = "Jamal" }
+jayfancy = { name = "JAYFANCY" }
+juanito = { name = "JUANITO" }
+juice-crew = { name = "JUICE CREW" }
+junior = { name = "Junior" }
+kadetes-del-toke = { name = "Kadetes Del Toke" }
+kareem = { name = "Kareem" }
+killafornia = { name = "Killafornia" }
+killafornia-monsta-squad = { name = "Killafornia Monsta Squad" }
+kitchy-rock = { name = "Kitchy Rock" }
+kleju = { name = "Kleju" }
+kmel = { name = "Kmel" }
+knucklehead-zoo = { name = "KNUCKLEHEAD ZOO", aliases = ["Knucklehead Zoo"] }
+knuckleheads-cali = { name = "Knuckleheads-Cali" }
+kosher-bullz = { name = "Kosher Bullz" }
+kuzya = { name = "Kuzya" }
+lil-g = { name = "Lil G" }
+lil-killaz = { name = "Lil Killaz" }
+lily = { name = "Lily" }
+lion-city-bboys = { name = "Lion City Bboys" }
+lussy-sky = { name = "Lussy Sky" }
+marvelous = { name = "Marvelous" }
+matadors = { name = "Matadors" }
+mels = { name = "Mels" }
+mighty-zulu-kings = { name = "Mighty Zulu Kings" }
+mighty-zulu-kingz = { name = "Mighty Zulu Kingz" }
+miss-funk = { name = "MISS FUNK" }
+mn-joe = { name = "MN Joe" }
+modd-squad = { name = "Modd Squad" }
+momentum = { name = "Momentum" }
+momentum-crew = { name = "Momentum Crew" }
+monster = { name = "MONSTER" }
+monster-energy = { name = "Monster Energy" }
+monster-energy-bboys = { name = "Monster Energy Bboys" }
+monster-mzk = { name = "MONSTER MZK" }
+morris = { name = "Morris" }
+motion-disorderz = { name = "MOTION DISORDERZ" }
+narek-the-show-jeff-mic-shaggy = { name = "Narek the Show, Jeff, Mic-Shaggy" }
+nasty-ray = { name = "Nasty Ray" }
+nero-the-professor = { name = "Nero The Professor" }
+nothing-2-lose = { name = "NOTHING 2 LOSE" }
+paco = { name = "Paco" }
+passion = { name = "PASSION" }
+phil = { name = "Phil" }
+phil-wizard-lil-zoo-sunni = { name = "Phil Wizard, Lil Zoo, Sunni" }
+pocket = { name = "Pocket" }
+polskee-flavour = { name = "Polskee Flavour", country = "PL" }
+precise = { name = "PRECISE" }
+rad = { name = "RAD" }
+raw-adikts = { name = "Raw Adikts" }
+raw-materials = { name = "Raw Materials" }
+raw-minds = { name = "RAW MINDS" }
+recon = { name = "Recon" }
+red-bull-bc-one-all-stars = { name = "Red Bull BC One All Stars", aliases = ["RED BULL BC ONE ALL-STARS"] }
+redwan = { name = "REDWAN" }
+renegade-lords = { name = "RENEGADE LORDS" }
+renegades = { name = "Renegades" }
+renegades-crew = { name = "Renegades Crew" }
+reunion = { name = "Reunion" }
+robin = { name = "Robin" }
+rugged-squadron = { name = "Rugged Squadron" }
+rugged-squadron-x-stance = { name = "Rugged Squadron  x stance" }
+ruggeds = { name = "Ruggeds" }
+skb = { name = "SKB", country = "AU" }
+skechers-all-stars = { name = "Skechers All Stars" }
+skilluminated = { name = "Skilluminated" }
+skitzo-flex = { name = "Skitzo Flex" }
+smac-19 = { name = "SMAC 19" }
+sopitas-con-huevos = { name = "Sopitas Con Huevos" }
+styx = { name = "Styx" }
+super-poderosas-crew = { name = "Super Poderosas Crew" }
+supernaturalz = { name = "Supernaturalz" }
+swiss-knife-crew = { name = "Swiss Knife Crew" }
+tata = { name = "Tata" }
+team-ukraine = { name = "Team Ukraine" }
+the-saxonz = { name = "The Saxonz" }
+thesis = { name = "Thesis" }
+tmb = { name = "TMB" }
+top9 = { name = "Top9" }
+total-feeling = { name = "Total Feeling", country = "FR" }
+tru-crew = { name = "Tru Crew" }
+tru-cru = { name = "Tru Cru" }
+ufa = { name = "UFA" }
+underground-flow = { name = "UNDERGROUND FLOW" }
+united-rivals = { name = "UNITED RIVALS" }
+unstoppabullz = { name = "Unstoppabullz" }
+vicious-by-nature = { name = "Vicious By Nature", aliases = ["Vicious by Nature"] }
+victor = { name = "Victor" }
+weezy-the-phoenix = { name = "Weezy The Phoenix" }
+windbreakers = { name = "WINDBREAKERS" }
+wingzero = { name = "Wingzero" }
+x-fenz = { name = "X Fenz" }
+xii-after-ours = { name = "XII After Ours" }
+yan-the-shrimp = { name = "Yan The Shrimp" }
+zeku = { name = "Zeku" }
+zeshen = { name = "Zeshen" }
+zh-finest = { name = "ZH-FINEST", aliases = ["ZH Finest"] }
+hoochen-crew = { name = "Hoochen Crew", country = "BE" }
+hustle-kidz = { name = "Hustle Kidz", country = "NL" }
+need-for-speed = { name = "Need For Speed", country = "FR" }
+rugged-manouvres = { name = "Rugged Manouvres", country = "NL" }
+rugged-solutions = { name = "Rugged Solutions", country = "NL" }
+soul-mavericks = { name = "Soul Mavericks", country = "GB" }
+back2school = { name = "Back2School", country = "RU" }
+psychos = { name = "Psycho's", country = "BE" }
+the-unbreakable-crew = { name = "The Unbreakable crew" }
+grafters = { name = "Grafters", country = "DE" }
+eastside-kingz = { name = "Eastside Kingz", country = "PL" }
+brits-abroad = { name = "Brits Abroad", country = "GB" }
+ukrazy = { name = "UKrazy", country = "GB", aliases = ["Ukkrazy"] }
+wallifornia = { name = "Wallifornia" }

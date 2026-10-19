@@ -53,6 +53,8 @@ jobs:
         env:
           SEED_PASSWORD: ci-only
       - run: cargo sqlx prepare --check -- --all-targets
+      # The curated jams in data/ (data/README.md).
+      - run: cargo run --bin data -- check
 
   frontend:
     runs-on: ubuntu-latest

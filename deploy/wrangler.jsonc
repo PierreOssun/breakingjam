@@ -43,5 +43,31 @@
     "RUST_LOG": "breakingjam=info,tower_http=info",
     "API_INSTANCES": "2"
   },
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // The top level above is production. UAT (`--env uat`) is the Worker "breakingjam-uat" with its
+  // own database and secrets; routes, containers, bindings and vars are not inherited, so they
+  // are repeated here.
+  "env": {
+    "uat": {
+      "routes": [{ "pattern": "uat.breakingjam.com", "custom_domain": true }],
+      "containers": [
+        {
+          "class_name": "Api",
+          "image": "../backend/Dockerfile",
+          "image_build_context": "../backend",
+          "instance_type": "basic",
+          "max_instances": 2
+        }
+      ],
+      "durable_objects": {
+        "bindings": [{ "name": "API", "class_name": "Api" }]
+      },
+      "vars": {
+        "APP_BASE_URL": "https://uat.breakingjam.com",
+        "GOOGLE_REDIRECT_URL": "https://uat.breakingjam.com/api/auth/google/callback",
+        "RUST_LOG": "breakingjam=debug,tower_http=info",
+        "API_INSTANCES": "1"
+      }
+    }
+  }
 }

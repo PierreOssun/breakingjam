@@ -4,6 +4,7 @@ pub mod battles;
 pub mod claims;
 pub mod crews;
 pub mod dancers;
+pub mod dataset;
 pub mod events;
 pub mod organizers;
 pub mod sessions;

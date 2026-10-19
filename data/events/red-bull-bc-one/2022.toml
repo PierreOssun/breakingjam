@@ -1,0 +1,57 @@
+name = "Red Bull BC One World Final 2022"
+starts_on = 2022-11-12
+timezone = "America/New_York"
+city = "New York"
+country = "US"
+lat = 40.7127
+lng = -74.0060
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["sick", "ayumi", "jey", "fabgirl", "kid-glyde"]
+mcs = ["wicket", "myverse"]
+djs = ["dj-skeme-richards"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "alvin", b = "quake", winner = "alvin", votes = [5, 0] },
+  { round = "top16", a = "issin", b = "lorenzo", winner = "issin", votes = [5, 0] },
+  { round = "top16", a = "amir", b = "mighty-jimm", winner = "amir", votes = [4, 1] },
+  { round = "top16", a = "lee", b = "illz", winner = "lee", votes = [4, 1] },
+  { round = "top16", a = "lil-zoo", b = "wildchild", winner = "lil-zoo", votes = [5, 0] },
+  { round = "top16", a = "wigor", b = "yu-ki", winner = "yu-ki", votes = [1, 4] },
+  { round = "top16", a = "phil-wizard", b = "mini-joe", winner = "phil-wizard", votes = [5, 0] },
+  { round = "top16", a = "victor", b = "marlone", winner = "victor", votes = [5, 0] },
+  { round = "top8", a = "alvin", b = "issin", winner = "issin", votes = [0, 5] },
+  { round = "top8", a = "amir", b = "lee", winner = "lee", votes = [2, 3] },
+  { round = "top8", a = "lil-zoo", b = "yu-ki", winner = "yu-ki", votes = [1, 4] },
+  { round = "top8", a = "phil-wizard", b = "victor", winner = "victor", votes = [1, 4] },
+  { round = "top4", a = "issin", b = "lee", winner = "lee", votes = [1, 4] },
+  { round = "top4", a = "yu-ki", b = "victor", winner = "victor", votes = [0, 5] },
+  { round = "final", a = "lee", b = "victor", winner = "victor", votes = [2, 3] },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "671", b = "alessandrina", winner = "671", votes = [4, 1] },
+  { round = "top16", a = "isis", b = "vanessa", winner = "vanessa", votes = [0, 5] },
+  { round = "top16", a = "swami", b = "carlota", winner = "swami", votes = [4, 1] },
+  { round = "top16", a = "india", b = "luma", winner = "india", votes = [5, 0] },
+  { round = "top16", a = "sunny", b = "fresh-bella", winner = "sunny", votes = [3, 2] },
+  { round = "top16", a = "kimie", b = "paulina", winner = "kimie", votes = [3, 2] },
+  { round = "top16", a = "yuika", b = "anti", winner = "anti", votes = [2, 3] },
+  { round = "top16", a = "logistx", b = "emma", winner = "logistx", votes = [5, 0] },
+  { round = "top8", a = "671", b = "vanessa", winner = "671", votes = [5, 0] },
+  { round = "top8", a = "swami", b = "india", winner = "india", votes = [0, 5] },
+  { round = "top8", a = "sunny", b = "kimie", winner = "sunny", votes = [5, 0] },
+  { round = "top8", a = "anti", b = "logistx", winner = "logistx", votes = [2, 3] },
+  { round = "top4", a = "671", b = "india", winner = "india", votes = [1, 4] },
+  { round = "top4", a = "sunny", b = "logistx", winner = "logistx", votes = [2, 3] },
+  { round = "final", a = "india", b = "logistx", winner = "india", votes = [3, 2] },
+]

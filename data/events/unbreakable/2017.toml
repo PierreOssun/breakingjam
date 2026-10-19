@@ -1,0 +1,69 @@
+name = "Unbreakable 2017"
+starts_on = 2017-04-22
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2211
+lng = 4.3997
+venue = "Parkspoor Noord"
+sources = ["https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCySwo6Ue4QxxsYDvIBdwynw", "https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/921"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "yosh", b = "drud", winner = "yosh", video = "https://youtu.be/LzvZzX4I9Dw" },
+  { round = "top16", a = "kacyo", b = "hill", winner = "hill", video = "https://youtu.be/_p1vGs2F24s" },
+  { round = "top8", a = "lussy-sky", b = "mey", winner = "TODO", video = "https://youtu.be/Rrfzw55qqwM" },
+  { round = "top8", a = "hill", b = "kuzya", winner = "kuzya", video = "https://youtu.be/D2l2eVZjU-k" },
+  { round = "top8", a = "kill", b = "roxrite", winner = "kill", video = "https://youtu.be/qOI7XrVztV8" },
+  { round = "top8", a = "zooty-zoot", b = "tawfiq", winner = "zooty-zoot", video = "https://youtu.be/72WYtSw2C9A" },
+  { round = "top8", a = "kimbo", b = "kuzya", winner = "kuzya", video = "https://youtu.be/IVTI3UIouik" },
+  { round = "top8", a = "lussy-sky", b = "zooty-zoot", winner = "zooty-zoot", video = "https://youtu.be/ws0G7m16XJg" },
+  { round = "top8", a = "ratin", b = "kid-karam", winner = "TODO", video = "https://youtu.be/fN2TNeipMgQ" },
+  { round = "top8", a = "twister", b = "kill", winner = "kill", video = "https://youtu.be/3QM72i38v6M" },
+  { round = "top8", a = "deeogo", b = "roxrite", winner = "TODO", video = "https://youtu.be/HwFwiHDHx4Q" },
+  { round = "top8", a = "kid-karam", b = "yosh", winner = "yosh", video = "https://youtu.be/WffAiuQyCoY" },
+  { round = "top4", a = "kill", b = "yosh", winner = "kill", video = "https://youtu.be/-XYLdoLz2Yc" },
+  { round = "top4", a = "kuzya", b = "zooty-zoot", winner = "kuzya", video = "https://youtu.be/SzLXifCboRQ" },
+  { round = "final", a = "kuzya", b = "kill", winner = "kill", video = "https://youtu.be/koAMqr9ScrQ" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "ukrazy", reached = "winner", video = "https://youtu.be/IybgbsJOyQw" },
+  { entrant = "the-ruggeds", reached = "top2", video = "https://youtu.be/IybgbsJOyQw" },
+]
+
+[battles.teams]
+ukrazy = { crew = "ukrazy" }
+the-ruggeds = { crew = "the-ruggeds" }
+
+[[battles]]
+key = "kids-crew"
+name = "Kids crew battle"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "battle-droids", reached = "winner", video = "https://youtu.be/hwdrNL_Nw8U" },
+  { entrant = "wallifornia", reached = "top2", video = "https://youtu.be/hwdrNL_Nw8U" },
+]
+
+[battles.teams]
+battle-droids = { crew = "battle-droids" }
+wallifornia = { crew = "wallifornia" }
+
+[[battles]]
+key = "bgirl"
+name = "Bgirl 7 to smoke"
+gender = "bgirl"
+format = "seven_to_smoke"
+results = [
+  { entrant = "jilou", reached = "winner" },
+]

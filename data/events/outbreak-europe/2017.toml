@@ -1,0 +1,64 @@
+name = "Outbreak Europe 2017"
+starts_on = 2017-07-28
+ends_on = 2017-07-30
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7354
+lng = 19.1457
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+judges = ["poe-one", "yan", "casper", "reveal", "renegade"]
+mcs = ["ivan-urban-action-figure", "lil-pablo", "osto"]
+djs = ["lean-rock", "fleg", "ervin-arana", "renegade", "scream", "plash", "smirnoff"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "victor", b = "kido", winner = "victor" },
+  { round = "top16", a = "twister", b = "t-rock", winner = "twister" },
+  { round = "top16", a = "thomaz", b = "shigekix", winner = "thomaz" },
+  { round = "top16", a = "the-wolfer", b = "spin", winner = "the-wolfer" },
+  { round = "top16", a = "uzee-rock", b = "roxrite", winner = "uzee-rock" },
+  { round = "top16", a = "lussy-sky", b = "admiracles", winner = "lussy-sky" },
+  { round = "top16", a = "kuzya", b = "snake", winner = "kuzya" },
+  { round = "top16", a = "lb", b = "grin", winner = "lb" },
+  { round = "top8", a = "victor", b = "twister", winner = "victor" },
+  { round = "top8", a = "thomaz", b = "the-wolfer", winner = "thomaz" },
+  { round = "top8", a = "uzee-rock", b = "lussy-sky", winner = "uzee-rock" },
+  { round = "top8", a = "kuzya", b = "lb", winner = "kuzya" },
+  { round = "top4", a = "victor", b = "thomaz", winner = "victor" },
+  { round = "top4", a = "uzee-rock", b = "kuzya", winner = "uzee-rock" },
+  { round = "final", a = "victor", b = "uzee-rock", winner = "victor" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "kate", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "ayumi-thesis", reached = "winner" },
+]
+
+[battles.teams]
+ayumi-thesis = { members = ["thesis", "ayumi"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "grom-shasty-rock", reached = "winner" },
+]

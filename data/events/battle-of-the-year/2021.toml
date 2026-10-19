@@ -1,0 +1,29 @@
+name = "Battle of the Year 2021"
+starts_on = 2021-11-21
+timezone = "Europe/Paris"
+city = "Montpellier"
+country = "FR"
+lat = 43.6131
+lng = 3.9309
+venue = "Zénith Sud Montpellier"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/editions/2021", "https://and8.dance/de/e/3745"]
+judges = ["narumi", "jey", "storm", "katsu1", "ronnie"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "jinjo-crew", reached = "winner" },
+  { entrant = "squadron", reached = "top4" },
+  { entrant = "flooriorz", reached = "top4" },
+  { entrant = "the-ruggeds", reached = "top2" },
+]
+
+[battles.teams]
+flooriorz = { crew = "flooriorz" }
+jinjo-crew = { crew = "jinjo-crew" }
+squadron = { crew = "squadron" }
+the-ruggeds = { crew = "the-ruggeds" }

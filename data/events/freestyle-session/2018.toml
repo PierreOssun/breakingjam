@@ -1,0 +1,81 @@
+name = "Freestyle Session 2018"
+starts_on = 2018-11-10
+ends_on = 2018-11-11
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://web.archive.org/web/20210621103548/https://www.probreakingtour.com/2018/11/13/freestyle-session-world-finals-2018-2/"]
+judges = []
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "angry-boy-grom", b = "babalu-ricky-jr", winner = "angry-boy-grom", video = "https://youtu.be/fSNfXHfGanU" },
+  { round = "top4", a = "doug-nelzwon", b = "cis-logistx", winner = "cis-logistx", video = "https://youtu.be/S0cLYBvQkMI" },
+  { round = "final", a = "angry-boy-grom", b = "cis-logistx", winner = "TODO", video = "https://youtu.be/JYOX114g7y0" },
+]
+
+[battles.teams]
+angry-boy-grom = { members = ["angry-boy", "grom"] }
+babalu-ricky-jr = { members = ["babalu", "ricky-jr"] }
+cis-logistx = { members = ["logistx", "cis"] }
+doug-nelzwon = { members = ["doug", "nelzwon"] }
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "bop-n-andre-gadget", b = "poppin-c-poppin-prince", winner = "poppin-c-poppin-prince", video = "https://youtu.be/8KViZml7a4g" },
+  { round = "top16", a = "baby-g-efro", b = "greenteck-jrock", winner = "greenteck-jrock", video = "https://youtu.be/bFmXvoJx5-c" },
+  { round = "top16", a = "cali-seoul", b = "breeze-lee-precise", winner = "breeze-lee-precise", video = "https://youtu.be/g31OPmvMI3Y" },
+  { round = "top16", a = "dnoi-soul", b = "jenes-yuta", winner = "dnoi-soul", video = "https://youtu.be/j0aXxD9xmKk" },
+  { round = "top16", a = "armani-sweepy", b = "furious-styles-crew", winner = "armani-sweepy", video = "https://youtu.be/vPtLASMhPSM" },
+  { round = "top16", a = "boogie-burrito", b = "skitzo-flex", winner = "boogie-burrito", video = "https://youtu.be/8FZBIsqTKIY" },
+  { round = "top16", a = "inox-jsmooth", b = "dsoul-fishboy", winner = "inox-jsmooth", video = "https://youtu.be/PsMBPShOXe8" },
+  { round = "top16", a = "artillery-hackerman", b = "renegades-crew", winner = "artillery-hackerman", video = "https://youtu.be/xIyHTqN3opA" },
+  { round = "top8", a = "artillery-hackerman", b = "greenteck-jrock", winner = "greenteck-jrock", video = "https://youtu.be/HiQKZqxpJNc" },
+  { round = "top8", a = "boogie-burrito", b = "dnoi-soul", winner = "boogie-burrito", video = "https://youtu.be/rS5iAybUPbU" },
+  { round = "top8", a = "armani-sweepy", b = "poppin-c-poppin-prince", winner = "poppin-c-poppin-prince", video = "https://youtu.be/0TreWKSHPlI" },
+  { round = "top8", a = "inox-jsmooth", b = "breeze-lee-precise", winner = "inox-jsmooth", video = "https://youtu.be/8NVtUogbOhI" },
+  { round = "top4", a = "boogie-burrito", b = "poppin-c-poppin-prince", winner = "TODO", video = "https://youtu.be/6LuKxj3SCZc" },
+  { round = "top4", a = "inox-jsmooth", b = "greenteck-jrock", winner = "TODO", video = "https://youtu.be/9aE89ZTeCT0" },
+  { round = "final", a = "yan-the-shrimp", b = "charlie-chill-out", winner = "TODO", video = "https://youtu.be/CayOYpoIXU0" },
+  { round = "final", a = "weezy-the-phoenix", b = "gq", winner = "TODO", video = "https://youtu.be/aUnw41KWzl4" },
+  { round = "final", a = "kosi-outrage", b = "double-dragon", winner = "TODO", video = "https://youtu.be/MHi_iDODCqw" },
+  { round = "final", a = "red-bull-bc-one-all-stars", b = "robin-yan", winner = "TODO", video = "https://youtu.be/lC8q0kEisJc" },
+]
+
+[battles.teams]
+armani-sweepy = { members = ["sweepy", "armani"] }
+artillery-hackerman = { members = ["artillery", "hackerman"] }
+baby-g-efro = { members = ["baby-g", "efro"] }
+boogie-burrito = { crew = "boogie-burrito" }
+bop-n-andre-gadget = { members = ["bop-n-andre", "gadget"] }
+breeze-lee-precise = { members = ["precise", "breeze-lee"] }
+cali-seoul = { crew = "cali-seoul" }
+charlie-chill-out = { crew = "charlie-chill-out" }
+dnoi-soul = { members = ["soul", "dnoi"] }
+double-dragon = { crew = "double-dragon" }
+dsoul-fishboy = { members = ["dsoul", "fishboy"] }
+furious-styles-crew = { crew = "furious-styles-crew" }
+gq = { crew = "gq" }
+greenteck-jrock = { members = ["greenteck", "jrock"] }
+inox-jsmooth = { members = ["inox", "jsmooth"] }
+jenes-yuta = { members = ["jenes", "yuta"] }
+kosi-outrage = { members = ["outrage", "kosi"] }
+poppin-c-poppin-prince = { members = ["poppin-c", "poppin-prince"] }
+red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars" }
+renegades-crew = { crew = "renegades-crew" }
+robin-yan = { members = ["yan", "robin"] }
+skitzo-flex = { crew = "skitzo-flex" }
+weezy-the-phoenix = { crew = "weezy-the-phoenix" }
+yan-the-shrimp = { crew = "yan-the-shrimp" }

@@ -1,0 +1,64 @@
+name = "Battle of the Year 2014"
+starts_on = 2014-10-18
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20140807000133/http://www.battleoftheyear.de/final-2014/program/the-grand-final.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "predatorz", reached = "winner" },
+  { entrant = "body-carnival", reached = "top4" },
+  { entrant = "s-i-n-e-crew", reached = "top4" },
+  { entrant = "fusion-mc", reached = "top2" },
+]
+
+[battles.teams]
+body-carnival = { crew = "body-carnival" }
+fusion-mc = { crew = "fusion-mc" }
+predatorz = { crew = "predatorz" }
+s-i-n-e-crew = { crew = "s-i-n-e-crew" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "gravity", b = "hugga", winner = "gravity" },
+  { round = "top16", a = "alkolil", b = "kacyo", winner = "alkolil" },
+  { round = "top16", a = "kazuki-roc", b = "ziprock", winner = "kazuki-roc" },
+  { round = "top16", a = "kid-columbia", b = "rafastil", winner = "kid-columbia" },
+  { round = "top16", a = "noe", b = "trock", winner = "trock" },
+  { round = "top16", a = "benny", b = "onel", winner = "benny" },
+  { round = "top16", a = "kleju", b = "mini-joe", winner = "kleju" },
+  { round = "top16", a = "lil-zoo", b = "khalil", winner = "lil-zoo" },
+  { round = "top8", a = "gravity", b = "alkolil", winner = "alkolil" },
+  { round = "top8", a = "kazuki-roc", b = "kid-columbia", winner = "kazuki-roc" },
+  { round = "top8", a = "trock", b = "benny", winner = "benny" },
+  { round = "top8", a = "kleju", b = "lil-zoo", winner = "kleju" },
+  { round = "top4", a = "alkolil", b = "kazuki-roc", winner = "alkolil" },
+  { round = "top4", a = "benny", b = "kleju", winner = "kleju" },
+  { round = "final", a = "alkolil", b = "kleju", winner = "alkolil" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "nagi-shie-chan", reached = "winner" },
+]
+
+[battles.teams]
+nagi-shie-chan = { members = ["shie-chan", "nagi"] }

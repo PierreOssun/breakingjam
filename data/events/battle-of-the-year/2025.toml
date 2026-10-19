@@ -1,0 +1,30 @@
+name = "Battle of the Year 2025"
+starts_on = 2025-09-20
+ends_on = 2025-09-21
+timezone = "Asia/Seoul"
+city = "Hwaseong"
+country = "KR"
+lat = 37.1995
+lng = 126.8313
+venue = "Hwaseong Sports Complex Indoor Arena"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/editions/2025", "https://sbsstar.net/article/N1008270165/battle-of-the-year-world-final-makes-historic-korea-debut-wraps-tv-broadcast-set-for-sept-29-on-sbs-sports"]
+judges = ["babyson", "phil-wizard", "differ", "kid-david", "storm"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "the-ruggeds", reached = "winner" },
+  { entrant = "body-carnival", reached = "top4" },
+  { entrant = "quite-boom", reached = "top4" },
+  { entrant = "foundnation", reached = "top2" },
+]
+
+[battles.teams]
+body-carnival = { crew = "body-carnival" }
+foundnation = { crew = "foundnation" }
+quite-boom = { crew = "quite-boom" }
+the-ruggeds = { crew = "the-ruggeds" }

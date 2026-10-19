@@ -1,0 +1,29 @@
+name = "Battle of the Year 1999"
+starts_on = 1999-09-18
+timezone = "Europe/Berlin"
+city = "Leipzig"
+country = "DE"
+lat = 51.3166
+lng = 12.4018
+venue = "Messehalle 7, Alte Messe"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20020131235247/http://www.battleoftheyear.net/pastevents/boty99.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "suicidal-lifestyle", reached = "winner" },
+  { entrant = "the-family", reached = "top4", rank = 4 },
+  { entrant = "rock-force", reached = "top2" },
+  { entrant = "bag-of-trix", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+bag-of-trix = { crew = "bag-of-trix" }
+rock-force = { crew = "rock-force" }
+suicidal-lifestyle = { crew = "suicidal-lifestyle" }
+the-family = { crew = "the-family" }

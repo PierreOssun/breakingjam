@@ -1,0 +1,34 @@
+name = "Red Bull BC One World Final 2008"
+starts_on = 2008-11-05
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8535
+lng = 2.3484
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["ivan", "extremo", "hong-10", "lilou", "storm"]
+mcs = ["rakaa-iriscience"]
+djs = ["dj-tee"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "cico", b = "niek", winner = "cico", votes = [4, 1] },
+  { round = "top16", a = "taisuke", b = "lil-g", winner = "taisuke", votes = [5, 0] },
+  { round = "top16", a = "lil-ceng", b = "kid-david", winner = "lil-ceng", votes = [3, 2] },
+  { round = "top16", a = "baek", b = "pelezinho", winner = "pelezinho", votes = [2, 3] },
+  { round = "top16", a = "wing", b = "benny", winner = "wing", votes = [4, 1] },
+  { round = "top16", a = "nasa", b = "mounir", winner = "mounir", votes = [0, 5] },
+  { round = "top16", a = "menno", b = "lil-kev", winner = "menno", votes = [5, 0] },
+  { round = "top16", a = "ronnie", b = "kolobok", winner = "kolobok", votes = [2, 3] },
+  { round = "top8", a = "cico", b = "taisuke", winner = "taisuke", votes = [0, 5] },
+  { round = "top8", a = "lil-ceng", b = "pelezinho", winner = "lil-ceng", votes = [5, 0] },
+  { round = "top8", a = "wing", b = "mounir", winner = "wing", votes = [4, 1] },
+  { round = "top8", a = "menno", b = "kolobok", winner = "kolobok", votes = [2, 3] },
+  { round = "top4", a = "taisuke", b = "lil-ceng", winner = "taisuke", votes = [4, 1] },
+  { round = "top4", a = "wing", b = "kolobok", winner = "wing", votes = [5, 0] },
+  { round = "final", a = "taisuke", b = "wing", winner = "wing", votes = [2, 3] },
+]

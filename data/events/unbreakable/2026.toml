@@ -1,0 +1,105 @@
+name = "Unbreakable 2026"
+starts_on = 2026-09-04
+ends_on = 2026-09-06
+timezone = "Europe/Brussels"
+city = "Ostend"
+country = "BE"
+lat = 51.2354
+lng = 2.9187
+venue = "Zeeheldenplein"
+sources = ["https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCySwo6Ue4QxxsYDvIBdwynw", "https://and8.dance/en/e/5353", "https://www.vrt.be/vrtnws/en/2026/07/01/international-breakdance-competition-unbreakable-heads-for-osten/"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "cyz", b = "ra1on", winner = "TODO", video = "https://youtu.be/Nno6xqAhq4w" },
+  { round = "top16", a = "nabs", b = "play-rock", winner = "nabs", video = "https://youtu.be/LopzcvVc4oE" },
+  { round = "top16", a = "shahi", b = "raptor", winner = "TODO", video = "https://youtu.be/gduRAeJuw44" },
+  { round = "top16", a = "guss", b = "victor", winner = "victor", video = "https://youtu.be/9MSk9IA35Y4" },
+  { round = "top16", a = "ramy", b = "damani", winner = "TODO", video = "https://youtu.be/3KQ-f6FCwAo" },
+  { round = "top16", a = "litefoot", b = "hiro10", winner = "TODO", video = "https://youtu.be/OC3n1nk9C5Q" },
+  { round = "top16", a = "rhythm-box", b = "boxwon", winner = "boxwon", video = "https://youtu.be/csk18Kbcz8o" },
+  { round = "top16", a = "gera", b = "tiro", winner = "tiro", video = "https://youtu.be/ED5arRGRthI" },
+  { round = "top8", a = "cyz", b = "victor", winner = "victor", video = "https://youtu.be/jinuIhQzDio" },
+  { round = "top8", a = "nabs", b = "ra1on", winner = "ra1on", video = "https://youtu.be/OFEWHR5agL8" },
+  { round = "top8", a = "tiro", b = "boxwon", winner = "tiro", video = "https://youtu.be/tjcTYRgss5w" },
+  { round = "top4", a = "victor", b = "ra1on", winner = "ra1on", video = "https://youtu.be/itE5Y9GtgPw" },
+  { round = "top4", a = "tiro", b = "hiro10", winner = "hiro10", video = "https://youtu.be/q-32n1yWmL0" },
+  { round = "final", a = "hiro10", b = "ra1on", winner = "hiro10", video = "https://youtu.be/LXIi_E_1uN8" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "pura-vida-maes", b = "from-downtown", winner = "from-downtown", video = "https://youtu.be/SOHpEV5jyHI" },
+  { round = "top8", a = "from-favela", b = "los-crapulos", winner = "los-crapulos", video = "https://youtu.be/4qfTb5rmPF4" },
+  { round = "top8", a = "stardust", b = "young-villains", winner = "young-villains", video = "https://youtu.be/f-uby5R5gQw" },
+  { round = "top8", a = "primal-instincts", b = "ccu7", winner = "ccu7", video = "https://youtu.be/07RcX2h6IYo" },
+  { round = "top4", a = "los-crapulos", b = "young-villains", winner = "los-crapulos", video = "https://youtu.be/t_lcORwFp7k" },
+  { round = "top4", a = "from-downtown", b = "ccu7", winner = "ccu7", video = "https://youtu.be/WjkuyyZDSR4" },
+  { round = "final", a = "los-crapulos", b = "ccu7", winner = "TODO", video = "https://youtu.be/p7l83s6oGp0" },
+]
+
+[battles.teams]
+ccu7 = { crew = "ccu7" }
+from-downtown = { crew = "from-downtown" }
+from-favela = { crew = "from-favela" }
+los-crapulos = { crew = "los-crapulos" }
+primal-instincts = { crew = "primal-instincts" }
+pura-vida-maes = { crew = "pura-vida-maes" }
+stardust = { crew = "stardust" }
+young-villains = { crew = "young-villains" }
+
+[[battles]]
+key = "kids-crew"
+name = "Kids crew battle"
+gender = "mixed"
+age = "kids"
+bracket_size = 2
+matches = [
+  { round = "final", a = "peek-a-boo", b = "tutejsyja", winner = "TODO", video = "https://youtu.be/5mlP2Ee9nHM" },
+]
+
+[battles.teams]
+peek-a-boo = { crew = "peek-a-boo" }
+tutejsyja = { crew = "tutejsyja" }
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "orelia", b = "nicka", winner = "nicka", video = "https://youtu.be/XGpHHGlSBCg" },
+  { round = "top16", a = "stefani", b = "sarah", winner = "stefani", video = "https://youtu.be/cBUT21dl_Mc" },
+  { round = "top16", a = "salala", b = "saretta", winner = "saretta", video = "https://youtu.be/hJ_rpR0sIw0" },
+  { round = "top16", a = "strawbie", b = "syssy", winner = "syssy", video = "https://youtu.be/8KPWcV8wSBM" },
+  { round = "top16", a = "mona", b = "india", winner = "india", video = "https://youtu.be/HzZMptMEPXY" },
+  { round = "top16", a = "a-l-t", b = "matea", winner = "matea", video = "https://youtu.be/6lfpIH4d5gc" },
+  { round = "top16", a = "jana", b = "riko", winner = "riko", video = "https://youtu.be/_v9fs-SodZs" },
+  { round = "top16", a = "naviu", b = "emmaaaa", winner = "emmaaaa", video = "https://youtu.be/_tkc-SIJ_T0" },
+  { round = "top8", a = "saretta", b = "syssy", winner = "syssy", video = "https://youtu.be/DxkZC0SBXyc" },
+  { round = "top8", a = "emmaaaa", b = "india", winner = "india", video = "https://youtu.be/WR2ivbjdYhw" },
+  { round = "top8", a = "matea", b = "nicka", winner = "nicka", video = "https://youtu.be/lQNyhDFKR4c" },
+  { round = "top8", a = "riko", b = "stefani", winner = "stefani", video = "https://youtu.be/TuxE9BVg9y0" },
+  { round = "top4", a = "stefani", b = "syssy", winner = "syssy", video = "https://youtu.be/dorFiFokAkw" },
+  { round = "top4", a = "india", b = "nicka", winner = "india", video = "https://youtu.be/iYDknmTcdQc" },
+  { round = "final", a = "india", b = "syssy", winner = "TODO", video = "https://youtu.be/QMVA03LvDS4" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+bracket_size = 2
+matches = [
+  { round = "final", a = "gera", b = "seigo", winner = "TODO", video = "https://youtu.be/_D5X31_ru20" },
+]

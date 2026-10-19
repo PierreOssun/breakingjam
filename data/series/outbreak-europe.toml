@@ -1,0 +1,15 @@
+name = "Outbreak Europe"
+city = "Banská Bystrica"
+country = "SK"
+timezone = "Europe/Bratislava"
+
+[wikipedia]
+page = "https://en.wikipedia.org/wiki/Outbreak_Europe"
+untitled = "bboy"   # 2014–2018 put the 1v1 bracket straight under the year
+# Brackets: 1v1 (2014–2018 under no heading, then "B-Boys"/"B-Girls"); winners of every category in "Winners".
+battles = [
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["b-boy"], table = "Winners", places = { "1vs1 Breaking" = "winner" } },
+  { key = "bgirl", name = "1v1 Bgirl", gender = "bgirl", words = ["b-girl"], table = "Winners", places = { "1vs1 B-Girl" = "winner" } },
+  { key = "2v2", name = "2v2", team_size = 2, table = "Winners", places = { "2vs2 Breaking" = "winner" } },
+  { key = "kids", name = "Kids", age = "kids", table = "Winners", places = { "Kid" = "winner" } },
+]

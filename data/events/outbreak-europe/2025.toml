@@ -1,0 +1,112 @@
+name = "Outbreak Europe 2025"
+starts_on = 2025-07-24
+ends_on = 2025-07-27
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7309
+lng = 19.1375
+venue = "Europa SC"
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.teraz.sk/regiony/na-sutaz-outbreak-europe-pricestuje-e/893137-clanok.html", "https://and8.dance/en/e/4832"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 32
+matches = [
+  { round = "top32", a = "ouki", b = "allef", winner = "allef", votes = [1, 4] },
+  { round = "top32", a = "mace", b = "jasper", winner = "mace", votes = [4, 1] },
+  { round = "top32", a = "beetle", b = "isaki", winner = "isaki", votes = [2, 3] },
+  { round = "top32", a = "ziprock", b = "ryoga", winner = "ziprock", votes = [4, 1] },
+  { round = "top32", a = "killian", b = "nicolas", winner = "killian", votes = [3, 2] },
+  { round = "top32", a = "sunni", b = "cyga", winner = "cyga", votes = [2, 3] },
+  { round = "top32", a = "tabrin", b = "shiny", winner = "tabrin", votes = [4, 1] },
+  { round = "top32", a = "onel", b = "quake", winner = "quake", votes = [2, 3] },
+  { round = "top32", a = "lion", b = "gimnast", winner = "gimnast", votes = [0, 5] },
+  { round = "top32", a = "johnny-fox", b = "andy", winner = "johnny-fox", votes = [5, 0] },
+  { round = "top32", a = "jeian", b = "djibril", winner = "jeian", votes = [4, 1] },
+  { round = "top32", a = "hiro10", b = "millie-mil", winner = "hiro10", votes = [5, 0] },
+  { round = "top32", a = "grom", b = "emilio", winner = "grom", votes = [5, 0] },
+  { round = "top32", a = "louis", b = "twister", winner = "twister", votes = [0, 5] },
+  { round = "top32", a = "amaro", b = "ceebri", winner = "amaro", votes = [3, 2] },
+  { round = "top32", a = "yu-ki", b = "marlone", winner = "marlone", votes = [0, 5] },
+  { round = "top16", a = "allef", b = "mace", winner = "mace" },
+  { round = "top16", a = "isaki", b = "ziprock", winner = "ziprock" },
+  { round = "top16", a = "killian", b = "cyga", winner = "killian" },
+  { round = "top16", a = "tabrin", b = "quake", winner = "quake" },
+  { round = "top16", a = "gimnast", b = "johnny-fox", winner = "gimnast" },
+  { round = "top16", a = "jeian", b = "hiro10", winner = "hiro10" },
+  { round = "top16", a = "grom", b = "twister", winner = "grom" },
+  { round = "top16", a = "amaro", b = "marlone", winner = "marlone" },
+  { round = "top8", a = "mace", b = "ziprock", winner = "ziprock" },
+  { round = "top8", a = "killian", b = "quake", winner = "quake" },
+  { round = "top8", a = "gimnast", b = "hiro10", winner = "hiro10" },
+  { round = "top8", a = "grom", b = "marlone", winner = "grom" },
+  { round = "top4", a = "ziprock", b = "quake", winner = "ziprock" },
+  { round = "top4", a = "hiro10", b = "grom", winner = "hiro10" },
+  { round = "final", a = "ziprock", b = "hiro10", winner = "hiro10" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 32
+matches = [
+  { round = "top32", a = "starry", b = "ram", winner = "starry", votes = [3, 2] },
+  { round = "top32", a = "kimie", b = "emka", winner = "kimie", votes = [5, 0] },
+  { round = "top32", a = "alesandrina", b = "syssy", winner = "syssy", votes = [0, 5] },
+  { round = "top32", a = "spidergirl", b = "karla", winner = "spidergirl", votes = [4, 1] },
+  { round = "top32", a = "stefani", b = "kristina", winner = "stefani", votes = [5, 0] },
+  { round = "top32", a = "posya-rock", b = "tata", winner = "tata", votes = [2, 3] },
+  { round = "top32", a = "nika", b = "chimpa", winner = "nika", votes = [4, 1] },
+  { round = "top32", a = "ayane", b = "badli", winner = "ayane", votes = [4, 1] },
+  { round = "top32", a = "kotya", b = "chris", winner = "chris", votes = [1, 4] },
+  { round = "top32", a = "yuina", b = "sonya", winner = "yuina", votes = [5, 0] },
+  { round = "top32", a = "la-vix", b = "swami", winner = "swami", votes = [2, 3] },
+  { round = "top32", a = "kate", b = "izanami", winner = "kate", votes = [5, 0] },
+  { round = "top32", a = "hami", b = "mery-berry", winner = "hami", votes = [3, 2] },
+  { round = "top32", a = "carla", b = "yuika", winner = "yuika", votes = [1, 4] },
+  { round = "top32", a = "mia", b = "jazzy", winner = "jazzy", votes = [2, 3] },
+  { round = "top32", a = "masha-uragan", b = "nicka", winner = "nicka", votes = [0, 5] },
+  { round = "top16", a = "starry", b = "kimie", winner = "kimie" },
+  { round = "top16", a = "syssy", b = "spidergirl", winner = "syssy" },
+  { round = "top16", a = "stefani", b = "tata", winner = "stefani" },
+  { round = "top16", a = "nika", b = "ayane", winner = "ayane" },
+  { round = "top16", a = "chris", b = "yuina", winner = "yuina" },
+  { round = "top16", a = "swami", b = "kate", winner = "kate" },
+  { round = "top16", a = "hami", b = "yuika", winner = "hami" },
+  { round = "top16", a = "jazzy", b = "nicka", winner = "nicka" },
+  { round = "top8", a = "kimie", b = "syssy", winner = "kimie" },
+  { round = "top8", a = "stefani", b = "ayane", winner = "ayane" },
+  { round = "top8", a = "yuina", b = "kate", winner = "kate" },
+  { round = "top8", a = "hami", b = "nicka", winner = "nicka" },
+  { round = "top4", a = "kimie", b = "ayane", winner = "kimie" },
+  { round = "top4", a = "kate", b = "nicka", winner = "nicka" },
+  { round = "final", a = "kimie", b = "nicka", winner = "nicka" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "ra1on-shigekix", reached = "winner" },
+]
+
+[battles.teams]
+ra1on-shigekix = { members = ["shigekix", "ra1on"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "saturn", reached = "winner" },
+]

@@ -148,7 +148,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Upcoming public jams with coordinates, for the world map. */
+        /** Public jams with coordinates, upcoming and past, for the world map. */
         get: operations["events_geojson"];
         put?: never;
         post?: never;
@@ -1240,6 +1240,10 @@ export interface components {
             instagram_handle?: string | null;
             /** @description Whether an approved claim links the page to its owner. */
             verified: boolean;
+            /** @description Uploaded picture, which replaces the generated avatar. */
+            avatar_url?: string | null;
+            /** @description The generated avatar's chosen parts; seeded from the id when null. */
+            avatar_parts?: string | null;
             /** @description Current crews. */
             crews: components["schemas"]["CrewRef"][];
         };
@@ -1765,6 +1769,10 @@ export interface components {
                 instagram_handle?: string | null;
                 /** @description Whether an approved claim links the page to its owner. */
                 verified: boolean;
+                /** @description Uploaded picture, which replaces the generated avatar. */
+                avatar_url?: string | null;
+                /** @description The generated avatar's chosen parts; seeded from the id when null. */
+                avatar_parts?: string | null;
                 /** @description Current crews. */
                 crews: components["schemas"]["CrewRef"][];
             }[];

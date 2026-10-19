@@ -2,7 +2,8 @@
   "nav": {
     "home": "BreakingJam home",
     "findJam": "Find a jam",
-    "forOrganisers": "For organisers",
+    "findSomeone": "Find someone",
+    "myJams": "My jams",
     "registerJam": "Register a jam",
     "logIn": "Log in",
     "logOut": "Log out",
@@ -59,6 +60,7 @@
   },
   "pages": {
     "map": "Find a jam",
+    "people": "Find someone",
     "orgJams": "Your jams",
     "orgJamNew": "Register a jam",
     "orgJamEdit": "Edit jam"
@@ -193,6 +195,7 @@
     "battles": "Battles",
     "weekend": "This weekend",
     "month": "Next 30 days",
+    "past": "Past jams",
     "categories": {
       "one_v_one": "1v1",
       "two_v_two": "2v2",
@@ -574,5 +577,11 @@
     "verify": "Verify Instagram",
     "noUpcoming": "No upcoming jams.",
     "noPast": "No past jams yet."
+  },
+  "people": {
+    "search": "Name, alias or @handle",
+    "hint": "Bboys, bgirls, DJs, MCs, judges.",
+    "empty": "No one matches “{{q}}”.",
+    "showMore": "Show more"
   }
 }

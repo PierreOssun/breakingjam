@@ -2,7 +2,8 @@
   "nav": {
     "home": "BreakingJam Startseite",
     "findJam": "Jam finden",
-    "forOrganisers": "Für Veranstalter",
+    "findSomeone": "Jemanden finden",
+    "myJams": "Meine Jams",
     "registerJam": "Jam eintragen",
     "logIn": "Anmelden",
     "logOut": "Abmelden",
@@ -59,6 +60,7 @@
   },
   "pages": {
     "map": "Jam finden",
+    "people": "Jemanden finden",
     "orgJams": "Deine Jams",
     "orgJamNew": "Jam eintragen",
     "orgJamEdit": "Jam bearbeiten"
@@ -193,6 +195,7 @@
     "battles": "Battles",
     "weekend": "Dieses Wochenende",
     "month": "Nächste 30 Tage",
+    "past": "Vergangene Jams",
     "categories": {
       "one_v_one": "1v1",
       "two_v_two": "2v2",
@@ -574,5 +577,11 @@
     "verify": "Instagram bestätigen",
     "noUpcoming": "Keine kommenden Jams.",
     "noPast": "Noch keine vergangenen Jams."
+  },
+  "people": {
+    "search": "Name, Alias oder @Handle",
+    "hint": "Bboys, Bgirls, DJs, MCs, Judges.",
+    "empty": "Niemand passt zu „{{q}}“.",
+    "showMore": "Mehr anzeigen"
   }
 }

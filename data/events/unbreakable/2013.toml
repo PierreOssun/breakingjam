@@ -1,0 +1,66 @@
+name = "Unbreakable 2013"
+starts_on = 2013-04-20
+timezone = "Europe/Brussels"
+city = "Antwerp"
+country = "BE"
+lat = 51.2301
+lng = 4.4418
+venue = "Lotto Arena"
+sources = ["https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCySwo6Ue4QxxsYDvIBdwynw", "https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/934"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kid-colombia", b = "kid-david", winner = "kid-david", video = "https://youtu.be/xURg8iAn2zE" },
+  { round = "top16", a = "lil-g", b = "chakal", winner = "lil-g", video = "https://youtu.be/4yI2YdHpp7Q" },
+  { round = "top16", a = "kimbo", b = "wilfried", winner = "wilfried", video = "https://youtu.be/2ZAW0smsee8" },
+  { round = "top16", a = "bruce-almighty", b = "lussy-sky", winner = "bruce-almighty", video = "https://youtu.be/O7PmTHzxveY" },
+  { round = "top16", a = "vados", b = "menno", winner = "menno", video = "https://youtu.be/kHXShTN-418" },
+  { round = "top16", a = "junior", b = "stripes", winner = "junior", video = "https://youtu.be/W8u2rVOzuUM" },
+  { round = "top16", a = "issue", b = "lagaet", winner = "lagaet", video = "https://youtu.be/gYpGMWu8Po8" },
+  { round = "top16", a = "fe", b = "admir", winner = "admir", video = "https://youtu.be/_zm3uiRgx3A" },
+  { round = "top8", a = "lil-g", b = "kid-david", winner = "lil-g", video = "https://youtu.be/Ex3bwe9ZOtI" },
+  { round = "top8", a = "bruce-almighty", b = "wilfried", winner = "bruce-almighty", video = "https://youtu.be/Z1itXjuZdNQ" },
+  { round = "top8", a = "lagaet", b = "admir", winner = "lagaet", video = "https://youtu.be/3qLaR5t1Xiw" },
+  { round = "top8", a = "junior", b = "menno", winner = "menno", video = "https://youtu.be/BiXctMZhapY" },
+  { round = "top4", a = "bruce-almighty", b = "lil-g", winner = "bruce-almighty", video = "https://youtu.be/eB_9eYv8TiY" },
+  { round = "top4", a = "menno", b = "lagaet", winner = "menno", video = "https://youtu.be/s_OD9hft0UI" },
+  { round = "final", a = "menno", b = "bruce-almighty", winner = "menno", video = "https://youtu.be/L3ap-5E1PTw" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "averages-joes", b = "legiteam-obstruxion", winner = "legiteam-obstruxion", video = "https://youtu.be/hwYCm7R8zWw" },
+  { round = "final", a = "the-ruggeds", b = "legiteam-obstruxion", winner = "legiteam-obstruxion", video = "https://youtu.be/RO7N4icqZbc" },
+]
+
+[battles.teams]
+averages-joes = { crew = "averages-joes" }
+legiteam-obstruxion = { crew = "legiteam-obstruxion" }
+the-ruggeds = { crew = "the-ruggeds" }
+
+[[battles]]
+key = "kids-u14"
+name = "Kids under 14"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "louis-dk", reached = "winner" },
+]
+
+[[battles]]
+key = "kids-u18"
+name = "Kids under 18"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "mighty-jimm", reached = "winner" },
+]

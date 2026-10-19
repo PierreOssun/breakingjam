@@ -1,0 +1,12 @@
+name = "Battle of the Year"
+
+[wikipedia]
+page = "https://en.wikipedia.org/wiki/Battle_of_the_Year"
+# The crew battle's placings come from its table; the 1v1 has brackets in some years, champions in others.
+battles = [
+  # Until 2006 a small final ranked 3rd and 4th; from 2006 the losing semi-finalists share the top 4.
+  { key = "crew", name = "Crew battle", sides = "crews", table = "Past Battle of the Year results", places = { "First place" = "winner", "Second place" = "top2", "Losing Semifinalists" = "top4", "Third place" = "third", "Fourth place" = "fourth" } },
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["1 on 1"], table = "Solo Champions", places = { "Winner" = "winner", "Runner-up" = "top2" } },
+  # A 2v2 most years; a lone name (2019's Lil Mami) is drafted as a team name.
+  { key = "bgirl", name = "2v2 Bgirl", gender = "bgirl", team_size = 2, table = "Bgirl Champions", places = { "Winners" = "winner" } },
+]

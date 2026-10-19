@@ -1,0 +1,57 @@
+name = "Red Bull BC One World Final 2025"
+starts_on = 2025-11-09
+timezone = "Asia/Tokyo"
+city = "Tokyo"
+country = "JP"
+lat = 35.6769
+lng = 139.7639
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["luma", "kill", "ronnie-ruen", "cloud", "ata"]
+mcs = ["amjad", "kensaku"]
+djs = ["dj-khanfu"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "jet-leg", b = "lee", winner = "lee", votes = [1, 4] },
+  { round = "top16", a = "djibril", b = "shigekix", winner = "shigekix", votes = [1, 4] },
+  { round = "top16", a = "issin", b = "amir", winner = "issin", votes = [5, 0] },
+  { round = "top16", a = "alvin", b = "icey-ives", winner = "icey-ives", votes = [1, 4] },
+  { round = "top16", a = "fleau", b = "pesto", winner = "pesto", votes = [2, 3] },
+  { round = "top16", a = "mighty-jake", b = "lorenzo", winner = "mighty-jake", votes = [5, 0] },
+  { round = "top16", a = "griimsen", b = "fe", winner = "fe", votes = [1, 4] },
+  { round = "top16", a = "hiro-10", b = "haruto", winner = "haruto", votes = [0, 5] },
+  { round = "top8", a = "lee", b = "shigekix", winner = "shigekix", votes = [1, 4] },
+  { round = "top8", a = "issin", b = "icey-ives", winner = "issin", votes = [4, 1] },
+  { round = "top8", a = "pesto", b = "mighty-jake", winner = "mighty-jake", votes = [2, 3] },
+  { round = "top8", a = "fe", b = "haruto", winner = "haruto", votes = [1, 4] },
+  { round = "top4", a = "shigekix", b = "issin", winner = "issin", votes = [0, 5] },
+  { round = "top4", a = "mighty-jake", b = "haruto", winner = "haruto", votes = [0, 5] },
+  { round = "final", a = "issin", b = "haruto", winner = "issin", votes = [3, 2] },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "riko", b = "swami", winner = "riko", votes = [5, 0] },
+  { round = "top16", a = "leona", b = "starry", winner = "starry", votes = [0, 5] },
+  { round = "top16", a = "julianna", b = "syssy", winner = "syssy", votes = [0, 5] },
+  { round = "top16", a = "fresh-bella", b = "jazzy", winner = "jazzy", votes = [0, 5] },
+  { round = "top16", a = "stefani", b = "ayu", winner = "stefani", votes = [3, 2] },
+  { round = "top16", a = "sayora", b = "logistx", winner = "logistx", votes = [0, 5] },
+  { round = "top16", a = "nicka", b = "carla", winner = "nicka", votes = [5, 0] },
+  { round = "top16", a = "firebird", b = "kimie", winner = "kimie", votes = [1, 4] },
+  { round = "top8", a = "riko", b = "starry", winner = "riko", votes = [5, 0] },
+  { round = "top8", a = "syssy", b = "jazzy", winner = "syssy", votes = [5, 0] },
+  { round = "top8", a = "stefani", b = "logistx", winner = "logistx", votes = [1, 4] },
+  { round = "top8", a = "nicka", b = "kimie", winner = "nicka", votes = [3, 2] },
+  { round = "top4", a = "riko", b = "syssy", winner = "riko", votes = [5, 0] },
+  { round = "top4", a = "logistx", b = "nicka", winner = "nicka", votes = [0, 5] },
+  { round = "final", a = "riko", b = "nicka", winner = "riko", votes = [4, 1] },
+]

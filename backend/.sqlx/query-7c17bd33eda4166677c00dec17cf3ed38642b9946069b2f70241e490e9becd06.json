@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, name, slug, starts_on, ends_on, status as \"status: EventStatus\", city,\n                  country, lat as \"lat!\", lng as \"lng!\"\n           from events\n           where deleted_at is null and status in ('published', 'registration_closed')\n             and lat is not null and lng is not null\n           order by starts_on, id",
+  "query": "select id, name, slug, starts_on, ends_on, status as \"status: EventStatus\", city,\n                  country, lat as \"lat!\", lng as \"lng!\"\n           from events\n           where deleted_at is null and status in ('published', 'registration_closed', 'completed')\n             and lat is not null and lng is not null\n           order by starts_on, id",
   "describe": {
     "columns": [
       {
@@ -144,5 +144,5 @@
       true
     ]
   },
-  "hash": "3e21d09e68c433ca5b39533e164b3836153eed2432f9dfc45102e042524f1f68"
+  "hash": "7c17bd33eda4166677c00dec17cf3ed38642b9946069b2f70241e490e9becd06"
 }

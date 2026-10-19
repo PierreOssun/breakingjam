@@ -55,7 +55,7 @@ just check      # everything CI runs
 
 ## Deploying
 
-Production runs on Cloudflare. Pushing a `v*` tag runs CI, migrates Neon and deploys. The one-time setup, secrets and operations are in [`deploy/README.md`](deploy/README.md).
+Production and UAT run on Cloudflare. `main` is for development; pushing to the `uat` or `prod` branch runs CI, snapshots and migrates Neon and deploys that target. The one-time setup, secrets and operations are in [`deploy/README.md`](deploy/README.md).
 
 ## Repository
 

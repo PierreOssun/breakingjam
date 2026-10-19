@@ -1,0 +1,29 @@
+name = "Battle of the Year 2004"
+starts_on = 2004-10-23
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://web.archive.org/web/20060422182751/http://www.battleoftheyear.net/worldwide/boty2004/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "gamblerz", reached = "winner" },
+  { entrant = "break-the-funk", reached = "top4", rank = 4 },
+  { entrant = "fantastik-armada", reached = "top2" },
+  { entrant = "stuttguard", reached = "top4", rank = 3 },
+]
+
+[battles.teams]
+break-the-funk = { crew = "break-the-funk" }
+fantastik-armada = { crew = "fantastik-armada" }
+gamblerz = { crew = "gamblerz" }
+stuttguard = { crew = "stuttguard" }

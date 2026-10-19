@@ -1,0 +1,68 @@
+name = "Battle of Sun 2026"
+starts_on = 2026-09-19
+timezone = "Europe/Paris"
+city = "Saint-Louis"
+country = "FR"
+lat = 47.5894
+lng = 7.5647
+venue = "Forum Jean-Marie Zoellé"
+sources = ["https://www.youtube.com/channel/UCBDSkBbTmI63mIp6UNt09vA", "https://and8.dance/en/e/5597"]
+judges = ["bartek", "zouza", "jockoss", "shisha", "yu-seng", "sabri"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "the-cave", b = "saison-2", winner = "saison-2", video = "https://youtu.be/k3LROdW7dVM" },
+  { round = "top16", a = "classic-squad", b = "new-youth-posse", winner = "new-youth-posse", video = "https://youtu.be/iBFiAnYUvSU" },
+  { round = "top16", a = "toxic-crew", b = "chaos-delivery", winner = "chaos-delivery", video = "https://youtu.be/F1twr1zJseM" },
+  { round = "top16", a = "nike-noemi", b = "gatling-logghy", winner = "gatling-logghy", video = "https://youtu.be/_X3617F3TUk" },
+  { round = "top16", a = "micha-nog", b = "shake-style-crew", winner = "shake-style-crew", video = "https://youtu.be/46mCu__xLQw" },
+  { round = "top16", a = "illusion", b = "fresh-mob-crew", winner = "fresh-mob-crew", video = "https://youtu.be/xcLgoPWYCk8" },
+  { round = "top16", a = "toxic", b = "pura-vida-mae", winner = "pura-vida-mae", video = "https://youtu.be/i6XjiyOEI3A" },
+  { round = "top16", a = "dynamo", b = "das-flavour", winner = "das-flavour", video = "https://youtu.be/D5c83H-1MqU" },
+  { round = "top8", a = "saison-2", b = "new-youth-posse", winner = "saison-2", video = "https://youtu.be/HlD6xCCB6nY" },
+  { round = "top8", a = "gatling-logghy", b = "chaos-delivery", winner = "gatling-logghy", video = "https://youtu.be/eRpr7hisXPk" },
+  { round = "top8", a = "fresh-mob-crew", b = "shake-style-crew", winner = "fresh-mob-crew", video = "https://youtu.be/8LbAbt--UW4" },
+  { round = "top8", a = "das-flavour", b = "pura-vida-mae", winner = "pura-vida-mae", video = "https://youtu.be/drfu5AiUTrA" },
+  { round = "top4", a = "saison-2", b = "gatling-logghy", winner = "saison-2", video = "https://youtu.be/LRMlNtLp3G8" },
+  { round = "top4", a = "fresh-mob-crew", b = "pura-vida-mae", winner = "fresh-mob-crew", video = "https://youtu.be/pmJwwUlu1WU" },
+  { round = "final", a = "saison-2", b = "fresh-mob-crew", winner = "TODO", video = "https://youtu.be/fxTaOzH-xmA" },
+]
+
+[battles.teams]
+chaos-delivery = { name = "Chaos Delivery" }
+classic-squad = { name = "Classic Squad" }
+das-flavour = { name = "Das Flavour" }
+dynamo = { name = "Dynamo" }
+fresh-mob-crew = { name = "Fresh Mob Crew" }
+gatling-logghy = { members = ["logghy", "gatling"] }
+illusion = { name = "Illusion" }
+micha-nog = { members = ["nog", "micha"] }
+new-youth-posse = { name = "New Youth Posse" }
+nike-noemi = { members = ["nike", "noemi"] }
+pura-vida-mae = { name = "Pura Vida Mae" }
+saison-2 = { name = "Saison 2" }
+shake-style-crew = { name = "Shake Style Crew" }
+the-cave = { name = "The Cave" }
+toxic = { name = "Toxic" }
+toxic-crew = { name = "Toxic Crew" }
+
+[[battles]]
+key = "kids"
+name = "1v1 Under 18"
+gender = "mixed"
+age = "kids"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "kalouna", b = "moise", winner = "moise", video = "https://youtu.be/floFcNCG2B4" },
+  { round = "top8", a = "reverse", b = "spin", winner = "spin", video = "https://youtu.be/ZCASHKiOrWo" },
+  { round = "top8", a = "la-fraise", b = "loterie", winner = "la-fraise", video = "https://youtu.be/x4gxv_prSv8" },
+  { round = "top8", a = "just-one", b = "buch", winner = "buch", video = "https://youtu.be/Kh3MLGcyUfw" },
+  { round = "top4", a = "moise", b = "spin", winner = "spin", video = "https://youtu.be/UuZfnkmxXyU" },
+  { round = "top4", a = "la-fraise", b = "buch", winner = "buch", video = "https://youtu.be/2ignXkvW-N8" },
+  { round = "final", a = "buch", b = "spin", winner = "TODO", video = "https://youtu.be/HMCRqWVTXIw" },
+]

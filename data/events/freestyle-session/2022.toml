@@ -1,0 +1,92 @@
+name = "Freestyle Session 2022"
+starts_on = 2022-11-19
+ends_on = 2022-11-20
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://www.eventbrite.com/e/freestyle-session-2022-25th-anniversary-los-angeles-ca-tickets-401813423767"]
+judges = []
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "shuffles-and-flow", b = "we-re-the-future", winner = "shuffles-and-flow", video = "https://youtu.be/Y-y2CXiX9-8" },
+  { round = "top4", a = "reformerz", b = "team-first-class", winner = "team-first-class", video = "https://youtu.be/ejy-CgDlDtg" },
+  { round = "final", a = "shuffles-and-flow", b = "team-first-class", winner = "TODO", video = "https://youtu.be/JR9Y4kayDS0" },
+]
+
+[battles.teams]
+reformerz = { name = "Reformerz" }
+shuffles-and-flow = { name = "Shuffles and Flow" }
+team-first-class = { name = "Team First Class" }
+we-re-the-future = { name = "We're The Future" }
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "red-bull-bc-one-all-stars", b = "x-fenz", winner = "TODO", video = "https://youtu.be/Kd68VWtDlYI" },
+  { round = "top16", a = "vicious-by-nature", b = "immigradz", winner = "vicious-by-nature", video = "https://youtu.be/G3Qtc1moQDc" },
+  { round = "top16", a = "rugged-squadron", b = "knucklehead-zoo", winner = "TODO", video = "https://youtu.be/51uJhjtpdXQ" },
+  { round = "top16", a = "renegades", b = "skb", winner = "TODO", video = "https://youtu.be/zjDbf716XVo" },
+  { round = "top16", a = "full-force", b = "maroners", winner = "TODO", video = "https://youtu.be/Q_Lq6R2mw64" },
+  { round = "top16", a = "breakinmia", b = "blacklist", winner = "breakinmia", video = "https://youtu.be/CY1K8bOsCLc" },
+  { round = "top16", a = "zh-finest", b = "super-poderosas-crew", winner = "zh-finest", video = "https://youtu.be/RARwPbWPjSA" },
+  { round = "top16", a = "das-flavour", b = "ruggeds", winner = "ruggeds", video = "https://youtu.be/ENceBhWGVDk" },
+  { round = "top16", a = "skilluminated", b = "ariras", winner = "skilluminated", video = "https://youtu.be/k8QVNSO-AHw" },
+  { round = "top16", a = "swiss-knife-crew", b = "tru-cru", winner = "TODO", video = "https://youtu.be/ubASIujXm7Y" },
+  { round = "top16", a = "from-downtown", b = "ufa", winner = "from-downtown", video = "https://youtu.be/z92iFFsUQrY" },
+  { round = "top8", a = "vicious-by-nature", b = "maroner", winner = "vicious-by-nature", video = "https://youtu.be/wg9EZM09PXI" },
+  { round = "top8", a = "hype-battle-rugged-squadron", b = "breakinmia", winner = "TODO", video = "https://youtu.be/KAT63ECjyuQ" },
+  { round = "top8", a = "skilluminated", b = "formless", winner = "formless", video = "https://youtu.be/SaVCgUp83wI" },
+  { round = "top8", a = "last-squad", b = "belgium-with-attitude", winner = "belgium-with-attitude", video = "https://youtu.be/QA7yvTeOrAc" },
+  { round = "top8", a = "zh-finest", b = "ruggeds", winner = "ruggeds", video = "https://youtu.be/7ReimrDVehE" },
+  { round = "top8", a = "from-downtown", b = "tru-crew", winner = "from-downtown", video = "https://youtu.be/vbvVFhz9DTE" },
+  { round = "top4", a = "red-bull-bc-one-all-stars", b = "vicious-by-nature", winner = "red-bull-bc-one-all-stars", video = "https://youtu.be/0B9dfp3PzGs" },
+  { round = "top4", a = "rugged-squadron", b = "flowxl-kingz", winner = "TODO", video = "https://youtu.be/myBe_-bCFZg" },
+  { round = "top4", a = "ruggeds", b = "formless", winner = "ruggeds", video = "https://youtu.be/Z38qKh0JYc4" },
+  { round = "top4", a = "from-downtown", b = "belgium-with-attitude", winner = "belgium-with-attitude", video = "https://youtu.be/9xhsdYCsueQ" },
+  { round = "final", a = "red-bull-bc-one-all-stars", b = "rugged-squadron-x-stance", winner = "TODO", video = "https://youtu.be/xRaGlqEt8pY" },
+  { round = "final", a = "ruggeds", b = "belgium-with-attitude", winner = "TODO", video = "https://youtu.be/P8UEIX37FEo" },
+]
+
+[battles.teams]
+ariras = { crew = "ariras" }
+belgium-with-attitude = { crew = "belgium-with-attitude" }
+blacklist = { crew = "blacklist" }
+breakinmia = { crew = "breakinmia" }
+das-flavour = { crew = "das-flavour" }
+flowxl-kingz = { crew = "flowxl-kingz" }
+formless = { crew = "formless" }
+from-downtown = { crew = "from-downtown" }
+full-force = { crew = "full-force" }
+hype-battle-rugged-squadron = { crew = "hype-battle-rugged-squadron" }
+immigradz = { crew = "immigradz" }
+knucklehead-zoo = { crew = "knucklehead-zoo" }
+last-squad = { crew = "last-squad" }
+maroner = { crew = "reunion" }
+maroners = { crew = "reunion" }
+red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars" }
+renegades = { crew = "renegades" }
+rugged-squadron = { crew = "rugged-squadron" }
+rugged-squadron-x-stance = { crew = "rugged-squadron-x-stance" }
+ruggeds = { crew = "ruggeds" }
+skb = { crew = "skb" }
+skilluminated = { crew = "skilluminated" }
+super-poderosas-crew = { crew = "super-poderosas-crew" }
+swiss-knife-crew = { crew = "swiss-knife-crew" }
+tru-crew = { crew = "tru-crew" }
+tru-cru = { crew = "tru-cru" }
+ufa = { crew = "ufa" }
+vicious-by-nature = { crew = "vicious-by-nature" }
+x-fenz = { crew = "x-fenz" }
+zh-finest = { crew = "zh-finest" }

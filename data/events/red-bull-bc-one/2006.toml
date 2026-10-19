@@ -1,0 +1,36 @@
+name = "Red Bull BC One World Final 2006"
+starts_on = 2006-11-25
+timezone = "America/Sao_Paulo"
+city = "São Paulo"
+country = "BR"
+lat = -23.5275
+lng = -46.6654
+venue = "Memorial da América Latina"
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://and8.dance/en/e/326"]
+judges = ["storm", "rokafella", "andrezinho", "sonic", "junior"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "do-knock", b = "kaku", winner = "kaku", votes = [2, 3] },
+  { round = "top16", a = "hong-10", b = "lil-ceng", winner = "hong-10", votes = [5, 0] },
+  { round = "top16", a = "crazy-monkey", b = "pelezinho", winner = "pelezinho", votes = [1, 4] },
+  { round = "top16", a = "roxrite", b = "jed", winner = "roxrite", votes = [5, 0] },
+  { round = "top16", a = "muxibinha", b = "lilou", winner = "muxibinha" },
+  { round = "top16", a = "salo", b = "the-end", winner = "the-end", votes = [0, 5] },
+  { round = "top16", a = "mouse", b = "alex", winner = "mouse" },
+  { round = "top16", a = "ronnie", b = "bootuz", winner = "ronnie", votes = [4, 1] },
+  { round = "top8", a = "kaku", b = "hong-10", winner = "hong-10", votes = [0, 5] },
+  { round = "top8", a = "pelezinho", b = "roxrite", winner = "roxrite", votes = [1, 3] },
+  { round = "top8", a = "muxibinha", b = "the-end", winner = "the-end", votes = [0, 5] },
+  { round = "top8", a = "mouse", b = "ronnie", winner = "ronnie", votes = [0, 5] },
+  { round = "top4", a = "hong-10", b = "roxrite", winner = "hong-10", votes = [4, 1] },
+  { round = "top4", a = "the-end", b = "ronnie", winner = "ronnie", votes = [1, 4] },
+  { round = "final", a = "hong-10", b = "ronnie", winner = "hong-10", votes = [5, 0] },
+  { round = "third", a = "roxrite", b = "the-end", winner = "roxrite", votes = [5, 0] },
+]

@@ -1,0 +1,13 @@
+name = "Battle of Sun"
+city = "Saint-Louis"
+country = "FR"
+timezone = "Europe/Paris"
+
+[youtube]
+channels = ["UCBDSkBbTmI63mIp6UNt09vA"]   # Skillzoo Production
+title = "Battle of Sun"
+battles = [
+  { key = "2v2", name = "2v2", team_size = 2, words = ["2v2"] },
+  # A 1v1 for under-18s (and8.dance/en/e/5597).
+  { key = "kids", name = "1v1 Under 18", age = "kids", words = ["kids"] },
+]

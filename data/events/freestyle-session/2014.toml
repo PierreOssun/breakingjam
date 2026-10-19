@@ -1,0 +1,35 @@
+name = "Freestyle Session 2014"
+starts_on = 2014-11-08
+ends_on = 2014-11-09
+timezone = "America/Los_Angeles"
+city = "San Diego"
+country = "US"
+lat = 32.7157
+lng = -117.1638
+venue = "World Beat Center"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://web.archive.org/web/20210307145030/https://www.probreakingtour.com/2014/11/08/freestyle-session-world-finals-14-recap-monster-energy/"]
+judges = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 32
+matches = [
+  { round = "top32", a = "illz", b = "thesis", winner = "TODO", video = "https://youtu.be/6Jk7eOYasRI" },
+  { round = "final", a = "gravity", b = "el-nino", winner = "TODO", video = "https://youtu.be/mu7aEyp3x1k" },
+  { round = "final", a = "wealthy", b = "mn-joe", winner = "TODO", video = "https://youtu.be/NFMKJ8qDKJo" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 2
+matches = [
+  { round = "final", a = "squadron", b = "top9", winner = "TODO", video = "https://youtu.be/fLY_6nKGGYw" },
+]
+
+[battles.teams]
+squadron = { crew = "squadron" }
+top9 = { crew = "top9" }

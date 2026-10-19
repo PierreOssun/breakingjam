@@ -1,0 +1,52 @@
+name = "DPC Jam 2025"
+starts_on = 2025-10-25
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+lat = 47.3673
+lng = 8.5038
+venue = "GZ Heuried"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://and8.dance/en/e/4973"]
+judges = []
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "holy-rain-saturn", b = "hulk-undr", winner = "holy-rain-saturn", video = "https://youtu.be/suB2Qfxmuy8" },
+  { round = "top16", a = "kaneki-laziness", b = "madmax-wigor", winner = "madmax-wigor", video = "https://youtu.be/iX682JvklqA" },
+  { round = "top16", a = "buch-maceo", b = "mighty-jim-pesto", winner = "mighty-jim-pesto", video = "https://youtu.be/U9sqeN08DSs" },
+  { round = "top16", a = "nova", b = "kid-mario-killian", winner = "kid-mario-killian", video = "https://youtu.be/USRryto0pOw" },
+  { round = "top16", a = "kelava-tasic", b = "ami-sunni", winner = "ami-sunni", video = "https://youtu.be/PbObcB-DAHs" },
+  { round = "top16", a = "alvin-grom", b = "bazuka-jesse-john", winner = "alvin-grom", video = "https://youtu.be/O1OWtC0nuiI" },
+  { round = "top16", a = "gekkon-tiger", b = "dare-to-dance", winner = "gekkon-tiger", video = "https://youtu.be/Gf7Wr3JGhyI" },
+  { round = "top16", a = "liam-zealuss", b = "lorenzo-rick-zhou", winner = "lorenzo-rick-zhou", video = "https://youtu.be/1txALH1koNQ" },
+  { round = "top8", a = "holy-rain-saturn", b = "kid-mario-killian", winner = "holy-rain-saturn", video = "https://youtu.be/UlFaHMiqRRA" },
+  { round = "top8", a = "ami-sunni", b = "gekkon-tiger", winner = "gekkon-tiger", video = "https://youtu.be/TE2WLZdA9zE" },
+  { round = "top8", a = "alvin-grom", b = "madmax-wigor", winner = "alvin-grom", video = "https://youtu.be/HXb1aIgMlQU" },
+  { round = "top8", a = "lorenzo-rick-zhou", b = "mighty-jim-pesto", winner = "lorenzo-rick-zhou", video = "https://youtu.be/0Ss1kxLyzsQ" },
+  { round = "top4", a = "alvin-grom", b = "holy-rain-saturn", winner = "alvin-grom", video = "https://youtu.be/n4DD-yBP2N0" },
+  { round = "top4", a = "lorenzo-rick-zhou", b = "gekkon-tiger", winner = "gekkon-tiger", video = "https://youtu.be/so9VwUyGIoI" },
+  { round = "final", a = "gekkon-tiger", b = "alvin-grom", winner = "alvin-grom", video = "https://youtu.be/P_UiHV_rs7E" },
+]
+
+[battles.teams]
+alvin-grom = { crew = "formless-corp", members = ["grom", "alvin"] }
+ami-sunni = { members = ["sunni", "ami"] }
+bazuka-jesse-john = { members = ["bazuka", "jesse-john"] }
+buch-maceo = { members = ["buch", "maceo"] }
+dare-to-dance = { name = "Dare To Dance" }
+gekkon-tiger = { members = ["tiger", "gekkon"] }
+holy-rain-saturn = { crew = "super-kidz", members = ["holy-rain", "saturn"] }
+hulk-undr = { members = ["hulk", "undr"] }
+kaneki-laziness = { members = ["kaneki", "laziness"] }
+kelava-tasic = { members = ["tasic", "kelava"] }
+kid-mario-killian = { members = ["kid-mario", "killian"] }
+liam-zealuss = { members = ["liam", "zealuss"] }
+lorenzo-rick-zhou = { members = ["rick-zhou", "lorenzo"] }
+madmax-wigor = { members = ["madmax", "wigor"] }
+mighty-jim-pesto = { members = ["pesto", "mighty-jim"] }
+nova = { name = "Nova" }

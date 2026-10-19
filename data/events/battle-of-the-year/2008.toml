@@ -1,0 +1,29 @@
+name = "Battle of the Year 2008"
+starts_on = 2008-10-18
+timezone = "Europe/Berlin"
+city = "Braunschweig"
+country = "DE"
+lat = 52.2571
+lng = 10.5181
+venue = "Volkswagenhalle"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://jungefreiheit.de/?p=73259"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "top-9", reached = "winner" },
+  { entrant = "formosa", reached = "top4" },
+  { entrant = "smokemon", reached = "top4" },
+  { entrant = "t-i-p-crew", reached = "top2" },
+]
+
+[battles.teams]
+formosa = { crew = "formosa" }
+smokemon = { crew = "smokemon" }
+t-i-p-crew = { crew = "t-i-p-crew" }
+top-9 = { crew = "top-9" }

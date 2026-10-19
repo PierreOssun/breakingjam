@@ -1,0 +1,64 @@
+name = "Outbreak Europe 2014"
+starts_on = 2014-07-25
+ends_on = 2014-07-27
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7354
+lng = 19.1457
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+judges = ["poe-one", "hong-10", "neguin"]
+mcs = ["mario-bee", "lil-pablo", "niko", "osto"]
+djs = ["renegade", "scream", "plash", "smirnoff", "fleg", "felix", "skizo", "rawkuts"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kleju", b = "tonio", winner = "kleju" },
+  { round = "top16", a = "tyson", b = "tony-tbags", winner = "tyson" },
+  { round = "top16", a = "kosto", b = "kapon", winner = "kosto" },
+  { round = "top16", a = "alkolil", b = "spin", winner = "alkolil" },
+  { round = "top16", a = "greku", b = "chereb", winner = "greku" },
+  { round = "top16", a = "killa-kolya", b = "sapa", winner = "killa-kolya" },
+  { round = "top16", a = "twister", b = "milky-rock", winner = "twister" },
+  { round = "top16", a = "kuzya", b = "freeman", winner = "kuzya" },
+  { round = "top8", a = "kleju", b = "tyson", winner = "kleju" },
+  { round = "top8", a = "kosto", b = "alkolil", winner = "kosto" },
+  { round = "top8", a = "greku", b = "killa-kolya", winner = "killa-kolya" },
+  { round = "top8", a = "twister", b = "kuzya", winner = "kuzya" },
+  { round = "top4", a = "kleju", b = "kosto", winner = "kleju" },
+  { round = "top4", a = "killa-kolya", b = "kuzya", winner = "killa-kolya" },
+  { round = "final", a = "kleju", b = "killa-kolya", winner = "kleju" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "paulina", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "fleau-vicious", reached = "winner" },
+]
+
+[battles.teams]
+fleau-vicious = { members = ["vicious", "fleau"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "nick", reached = "winner" },
+]

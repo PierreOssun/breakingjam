@@ -1,0 +1,34 @@
+name = "Red Bull BC One World Final 2010"
+starts_on = 2010-11-27
+timezone = "Asia/Tokyo"
+city = "Tokyo"
+country = "JP"
+lat = 35.6769
+lng = 139.7639
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+judges = ["ken-swift", "born", "storm", "roxrite", "lilou"]
+mcs = ["rahzel"]
+djs = ["dj-mar-ski"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "gravity", b = "lil-g", winner = "lil-g", votes = [2, 3] },
+  { round = "top16", a = "thesis", b = "toshiki", winner = "toshiki", votes = [1, 4] },
+  { round = "top16", a = "kleju", b = "marcio", winner = "marcio", votes = [2, 3] },
+  { round = "top16", a = "keyz", b = "neguin", winner = "neguin", votes = [1, 4] },
+  { round = "top16", a = "airdit", b = "beast", winner = "airdit", votes = [5, 0] },
+  { round = "top16", a = "kill", b = "niek", winner = "niek", votes = [1, 3] },
+  { round = "top16", a = "pluto", b = "taisuke", winner = "pluto", votes = [4, 1] },
+  { round = "top16", a = "kapu", b = "luigi", winner = "luigi", votes = [2, 3] },
+  { round = "top8", a = "lil-g", b = "toshiki", winner = "lil-g", votes = [5, 0] },
+  { round = "top8", a = "marcio", b = "neguin", winner = "neguin", votes = [0, 5] },
+  { round = "top8", a = "airdit", b = "niek", winner = "niek", votes = [2, 3] },
+  { round = "top8", a = "pluto", b = "luigi", winner = "luigi", votes = [0, 5] },
+  { round = "top4", a = "lil-g", b = "neguin", winner = "neguin", votes = [2, 3] },
+  { round = "top4", a = "niek", b = "luigi", winner = "niek", votes = [3, 2] },
+  { round = "final", a = "neguin", b = "niek", winner = "neguin", votes = [4, 1] },
+]

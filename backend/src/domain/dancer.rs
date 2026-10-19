@@ -116,6 +116,10 @@ pub struct DancerSummary {
     pub instagram_handle: Option<String>,
     /// Whether an approved claim links the page to its owner.
     pub verified: bool,
+    /// Uploaded picture, which replaces the generated avatar.
+    pub avatar_url: Option<String>,
+    /// The generated avatar's chosen parts; seeded from the id when null.
+    pub avatar_parts: Option<String>,
     /// Current crews.
     pub crews: Vec<CrewRef>,
 }

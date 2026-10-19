@@ -35,6 +35,7 @@ reset-db: db
 check:
     cd backend && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
     cd backend && cargo sqlx prepare --check -- --all-targets
+    cd backend && cargo run --bin data -- check
     cd frontend && npx prettier --check . && npm run lint && npm run typecheck && npm test && npm run build
     cd deploy && npm run typecheck && npm test
 

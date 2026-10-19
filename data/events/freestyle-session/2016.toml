@@ -1,0 +1,100 @@
+name = "Freestyle Session 2016"
+starts_on = 2016-11-12
+ends_on = 2016-11-13
+timezone = "America/Los_Angeles"
+city = "Huntington Park"
+country = "US"
+lat = 33.9794
+lng = -118.2363
+venue = "La Boom"
+sources = ["https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA", "https://web.archive.org/web/20210302203605/https://www.probreakingtour.com/2016/11/14/freestyle-session-world-finals-16/"]
+judges = []
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "narumi", b = "paulina", winner = "narumi", video = "https://youtu.be/0DtAgnTEIy4" },
+  { round = "top4", a = "yasmin", b = "ayumi", winner = "yasmin", video = "https://youtu.be/cXcaSUYa4Fo" },
+  { round = "final", a = "narumi", b = "yasmin", winner = "TODO", video = "https://youtu.be/twfhjDMSwvs" },
+]
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+bracket_size = 2
+matches = [
+  { round = "final", a = "masta-mace-weapon-x", b = "cis-lorenzo", winner = "TODO", video = "https://youtu.be/C_5aZTcA-1I" },
+]
+
+[battles.teams]
+cis-lorenzo = { members = ["lorenzo", "cis"] }
+masta-mace-weapon-x = { members = ["masta-mace", "weapon-x"] }
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 32
+matches = [
+  { round = "top32", a = "dol", b = "lussy-sky", winner = "dol", video = "https://youtu.be/jSqAD9TpKhc" },
+  { round = "top32", a = "gravity", b = "morris", winner = "gravity", video = "https://youtu.be/HxA7mEqFlN4" },
+  { round = "top32", a = "illz", b = "kareem", winner = "kareem", video = "https://youtu.be/_JADQPOzQZM" },
+  { round = "top32", a = "mn-joe", b = "jamal", winner = "mn-joe", video = "https://youtu.be/I0OzwR9nqN8" },
+  { round = "top32", a = "robin", b = "icey-ives", winner = "robin", video = "https://youtu.be/t9QjDj6AgbI" },
+  { round = "top32", a = "styx", b = "issei", winner = "issei", video = "https://youtu.be/nZlRcV-twt8" },
+  { round = "top32", a = "thesis", b = "wingzero", winner = "thesis", video = "https://youtu.be/d4BbxwbpsCs" },
+  { round = "top32", a = "zeku", b = "kuzya", winner = "zeku", video = "https://youtu.be/V95rcKFp1so" },
+  { round = "top32", a = "zeshen", b = "kleju", winner = "kleju", video = "https://youtu.be/0u8PGgaDDGI" },
+  { round = "top32", a = "pocket", b = "tata", winner = "pocket", video = "https://youtu.be/Ug-6CAGOLF0" },
+  { round = "top16", a = "thesis", b = "dol", winner = "dol", video = "https://youtu.be/4VdXn8744Ks" },
+  { round = "top16", a = "nasty-ray", b = "robin", winner = "nasty-ray", video = "https://youtu.be/Vn4n3VXHLiM" },
+  { round = "top16", a = "kleju", b = "pocket", winner = "pocket", video = "https://youtu.be/Booy-IonP7Y" },
+  { round = "top16", a = "lil-g", b = "victor", winner = "lil-g", video = "https://youtu.be/b9VP3ntXwLE" },
+  { round = "top16", a = "gravity", b = "mn-joe", winner = "gravity", video = "https://youtu.be/8qoXe84E5wk" },
+  { round = "top16", a = "issei", b = "paco", winner = "issei", video = "https://youtu.be/GemAljCnYww" },
+  { round = "top16", a = "el-nino", b = "phil", winner = "el-nino", video = "https://youtu.be/QM9NvIGxsQw" },
+  { round = "top16", a = "kareem", b = "zeku", winner = "kareem", video = "https://youtu.be/AkY4Gpzf-_8" },
+  { round = "top8", a = "issei", b = "kareem", winner = "issei", video = "https://youtu.be/8dG7kKZc4U0" },
+  { round = "top8", a = "lil-g", b = "el-nino", winner = "el-nino", video = "https://youtu.be/9i2DrP6VrbM" },
+  { round = "top8", a = "gravity", b = "nasty-ray", winner = "nasty-ray", video = "https://youtu.be/bCA4CPti0p8" },
+  { round = "top8", a = "dol", b = "pocket", winner = "pocket", video = "https://youtu.be/k8-QW5hC7gA" },
+  { round = "top4", a = "pocket", b = "el-nino", winner = "el-nino", video = "https://youtu.be/bxRQhBGOflk" },
+  { round = "top4", a = "issei", b = "nasty-ray", winner = "issei", video = "https://youtu.be/h_xaDv7AdEs" },
+  { round = "final", a = "foundnation", b = "polskee-flavour", winner = "TODO", video = "https://youtu.be/m0_rUbJdQXY" },
+  { round = "final", a = "issei", b = "el-nino", winner = "TODO", video = "https://youtu.be/gLbmzbWl0Zk" },
+]
+
+[battles.teams]
+dol = { crew = "dol" }
+el-nino = { crew = "el-nino" }
+foundnation = { crew = "foundnation" }
+gravity = { crew = "gravity" }
+icey-ives = { crew = "icey-ives" }
+illz = { crew = "illz" }
+issei = { crew = "issei" }
+jamal = { crew = "jamal" }
+kareem = { crew = "kareem" }
+kleju = { crew = "kleju" }
+kuzya = { crew = "kuzya" }
+lil-g = { crew = "lil-g" }
+lussy-sky = { crew = "lussy-sky" }
+mn-joe = { crew = "mn-joe" }
+morris = { crew = "morris" }
+nasty-ray = { crew = "nasty-ray" }
+paco = { crew = "paco" }
+phil = { crew = "phil" }
+pocket = { crew = "pocket" }
+polskee-flavour = { crew = "polskee-flavour" }
+robin = { crew = "robin" }
+styx = { crew = "styx" }
+tata = { crew = "tata" }
+thesis = { crew = "thesis" }
+victor = { crew = "victor" }
+wingzero = { crew = "wingzero" }
+zeku = { crew = "zeku" }
+zeshen = { crew = "zeshen" }

@@ -1,0 +1,50 @@
+name = "Battle of the Year 2012"
+starts_on = 2012-11-17
+timezone = "Europe/Paris"
+city = "Montpellier"
+country = "FR"
+lat = 43.5733
+lng = 3.9517
+venue = "Park & Suites Arena"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/history", "https://www.neo2.com/?p=54765"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "vagabonds", reached = "winner" },
+  { entrant = "pockemon", reached = "top4" },
+  { entrant = "morning-of-owl", reached = "top4" },
+  { entrant = "flooriorz", reached = "top2" },
+]
+
+[battles.teams]
+flooriorz = { crew = "flooriorz" }
+morning-of-owl = { crew = "morning-of-owl" }
+pockemon = { crew = "pockemon" }
+vagabonds = { crew = "vagabonds" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "hill", reached = "top2" },
+  { entrant = "niek", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "nagi-nao", reached = "winner" },
+]
+
+[battles.teams]
+nagi-nao = { members = ["nao", "nagi"] }

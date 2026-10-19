@@ -2,6 +2,7 @@ import {
   type MapJam,
   NO_FILTERS,
   boundsOf,
+  byDate,
   clusterLabel,
   distanceKm,
   featuredJams,
@@ -92,6 +93,29 @@ describe("map jams", () => {
       ),
     ).toBe(true);
     expect(matchesFilters(jam(), NO_FILTERS, thursday)).toBe(true);
+  });
+
+  it("keeps the jams over before today for 'past jams'", () => {
+    const past = { ...NO_FILTERS, when: "past" as const };
+    expect(matchesFilters(jam(), past, sunday)).toBe(true);
+    expect(matchesFilters(jam(), past, saturday)).toBe(false);
+  });
+
+  it("orders upcoming jams soonest first, then past ones most recent first", () => {
+    const named = (name: string, day: string) =>
+      jam({ name, starts_on: day, ends_on: day });
+    const jams = [
+      named("old", "2026-10-01"),
+      named("later", "2026-11-01"),
+      named("recent", "2026-10-17"),
+      named("soon", "2026-10-20"),
+    ];
+    expect(jams.sort(byDate(sunday)).map((j) => j.name)).toEqual([
+      "soon",
+      "later",
+      "recent",
+      "old",
+    ]);
   });
 
   it("searches name, city and country, ignoring case and accents", () => {

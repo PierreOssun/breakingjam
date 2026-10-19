@@ -1,0 +1,64 @@
+name = "Outbreak Europe 2018"
+starts_on = 2018-07-27
+ends_on = 2018-07-29
+timezone = "Europe/Bratislava"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7354
+lng = 19.1457
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+judges = ["float", "wing", "poe-one", "felix", "hatsolo", "renegade"]
+mcs = ["ivan-urban-action-figure", "lil-pablo", "max", "johnny-mecoch"]
+djs = ["lean-rock", "fleg", "ervin-arana", "renegade", "scream", "plash", "smirnoff", "felix", "bj-piggo"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kid-karam", b = "gun", winner = "kid-karam" },
+  { round = "top16", a = "ayumi", b = "beetle", winner = "ayumi" },
+  { round = "top16", a = "dany", b = "nord-diamond", winner = "dany" },
+  { round = "top16", a = "kuzya", b = "kae", winner = "kuzya" },
+  { round = "top16", a = "lb", b = "sheku", winner = "lb" },
+  { round = "top16", a = "illz", b = "lil-g", winner = "illz" },
+  { round = "top16", a = "phil-wizzard", b = "gieras", winner = "phil-wizzard" },
+  { round = "top16", a = "cheerito", b = "mini-joe", winner = "cheerito" },
+  { round = "top8", a = "kid-karam", b = "ayumi", winner = "kid-karam" },
+  { round = "top8", a = "kuzya", b = "dany", winner = "kuzya" },
+  { round = "top8", a = "illz", b = "lb", winner = "illz" },
+  { round = "top8", a = "cheerito", b = "phill-wizard", winner = "cheerito" },
+  { round = "top4", a = "kuzya", b = "kid-karam", winner = "kuzya" },
+  { round = "top4", a = "cheerito", b = "illz", winner = "cheerito" },
+  { round = "final", a = "cheerito", b = "kuzya", winner = "cheerito" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "kate", reached = "winner" },
+]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "den-intact", reached = "winner" },
+]
+
+[battles.teams]
+den-intact = { members = ["intact", "den"] }
+
+[[battles]]
+key = "kids"
+name = "Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "malik-raptor", reached = "winner" },
+]
