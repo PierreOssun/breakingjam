@@ -2,13 +2,11 @@
 formless-corp = { name = "Formless Corp", aliases = ["Formless Corps"] }
 super-kidz = { name = "Super Kidz" }
 all-area-crew = { name = "All Area Crew", country = "JP" }
-always-rockin-tuff = { name = "Always Rockin Tuff", country = "GB" }
 artistreet = { name = "Artistreet", country = "KR" }
 b-town-all-stars = { name = "B-Town All Stars", country = "DE" }
 b-town-allstars = { name = "B-Town Allstars", country = "DE" }
 bag-of-trix = { name = "Bag of Trix", country = "CA" }
 battle-born = { name = "Battle Born", country = "US" }
-battle-squad = { name = "Battle Squad", country = "DE" }
 black-noise = { name = "Black Noise", country = "ZA" }
 body-carnival = { name = "Body Carnival", country = "JP" }
 break-the-funk = { name = "Break the Funk", country = "IT" }
@@ -17,7 +15,6 @@ crazy-force-crew = { name = "Crazy Force Crew", country = "CH" }
 deep-trip = { name = "Deep Trip", country = "CH" }
 doble-k-o = { name = "Doble K.O.", country = "ES" }
 drifterz = { name = "Drifterz", country = "KR" }
-enemy-squad = { name = "Enemy Squad", country = "HU" }
 expression-crew = { name = "Expression Crew", country = "KR" }
 extreme-crew = { name = "Extreme Crew", country = "KR" }
 fantastik-armada = { name = "Fantastik Armada", country = "FR" }
@@ -27,7 +24,6 @@ flow-xl = { name = "Flow XL", country = "KR" }
 flying-steps = { name = "Flying Steps", country = "DE" }
 formosa = { name = "Formosa", country = "TW" }
 foundnation = { name = "Foundnation", country = "JP" }
-fresh-force = { name = "Fresh Force", country = "DE" }
 funk-fellaz = { name = "Funk Fellaz", country = "DE" }
 fusion-mc = { name = "Fusion MC", country = "KR" }
 gamblerz = { name = "Gamblerz", country = "KR" }
@@ -43,8 +39,6 @@ melting-force = { name = "Melting Force", country = "FR" }
 morning-of-owl = { name = "Morning of Owl", country = "KR" }
 mortal-combat = { name = "Mortal Combat", country = "JP" }
 nine-state-b-boyz = { name = "Nine State B-boyz", country = "JP" }
-out-of-control = { name = "Out of Control", country = "DK" }
-passo-sul-tempo = { name = "Passo Sul Tempo", country = "IT" }
 phase-2 = { name = "Phase 2", country = "US" }
 phase-t = { name = "Phase-T", country = "FR" }
 pockemon = { name = "Pockémon", country = "FR" }
@@ -55,7 +49,6 @@ rock-force = { name = "Rock Force", country = "US" }
 rock-force-crew = { name = "Rock Force Crew", country = "US" }
 s-i-n-e-crew = { name = "S.I.N.E. Crew", country = "VN" }
 scrambling-feet = { name = "Scrambling Feet", country = "CH" }
-second-2-none = { name = "Second 2 None", country = "GB" }
 smokemon = { name = "Smokémon", country = "FR" }
 south-african-allstars = { name = "South African Allstars", country = "ZA" }
 south-side-rockers = { name = "South Side Rockers", country = "DE" }
@@ -71,16 +64,13 @@ the-family = { name = "The Family", country = "FR" }
 the-ruggeds = { name = "The Ruggeds", country = "NL" }
 top-9 = { name = "Top 9", country = "RU" }
 top-coalition = { name = "Top Coalition", country = "TW" }
-toys-in-effect = { name = "Toys in Effect", country = "CH" }
 tpec = { name = "TPEC", country = "TW" }
 turn-phrase-crew = { name = "Turn Phrase Crew", country = "JP" }
 u-taipei = { name = "U-Taipei", country = "TW" }
 vagabonds = { name = "Vagabonds", country = "FR" }
 visual-shock = { name = "Visual Shock", country = "KR" }
-vlinke-vuesse = { name = "Vlinke Vuesse", country = "DE" }
 wanted = { name = "Wanted", country = "FR" }
 waseda-breakers = { name = "Waseda Breakers", country = "JP" }
-wedding-b-boys-flying-steps = { name = "Wedding B-Boys & Flying Steps", country = "DE" }
 anormal = { name = "Anormal" }
 antithesis-x-vissick-stylez = { name = "Antithesis x Vissick Stylez" }
 averages-joes = { name = "Averages Joes" }
@@ -284,7 +274,6 @@ yan-the-shrimp = { name = "Yan The Shrimp" }
 zeku = { name = "Zeku" }
 zeshen = { name = "Zeshen" }
 zh-finest = { name = "ZH-FINEST", aliases = ["ZH Finest"] }
-hoochen-crew = { name = "Hoochen Crew", country = "BE" }
 hustle-kidz = { name = "Hustle Kidz", country = "NL" }
 need-for-speed = { name = "Need For Speed", country = "FR" }
 rugged-manouvres = { name = "Rugged Manouvres", country = "NL" }

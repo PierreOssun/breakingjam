@@ -1,12 +1,12 @@
 name = "Unbreakable 2007"
-# starts_on = YYYY-MM-DD  (not on the hall of fame)
+starts_on = 2007-10-31  # a Wednesday, 20:00
 timezone = "Europe/Brussels"
 city = "Leuven"
 country = "BE"
 lat = 50.8815
 lng = 4.7138
 venue = "Het Depot"
-sources = ["https://unbreakable.be/20-years/#hall-of-fame"]
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://www.hetdepot.be/concert/unbreakable-2007"]
 judges = []
 
 [[battles]]

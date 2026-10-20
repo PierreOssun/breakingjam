@@ -139,7 +139,24 @@ Sign up on the site, then in Neon's SQL editor:
 update app_users set role = 'admin' where email = 'you@example.com';
 ```
 
-Admins see **Claims** in the header (Instagram verification queue) and the merge tool on dancer pages. On UAT the seed already created admin accounts.
+Admins see **Admin** in the header (`/admin`: an overview, the jam review queue and the Instagram claims) and the merge tool on dancer pages. On UAT the seed already created admin accounts.
+
+## Costs
+
+**Workers Paid**, as shown at sign-up on 2026-10-20: $5 a month, plus usage beyond what it includes. One plan covers both Workers (production and UAT) on the account.
+
+| | Included each month | Beyond that |
+|---|---|---|
+| Workers requests | 10M | $0.30 per million |
+| Workers CPU time | 30M ms (30 s per request at most) | |
+| Durable Objects requests | 1M | $0.15 per million |
+| Durable Objects duration | 400K GB-s | |
+| Durable Objects storage | 1 GB | |
+| Workers Builds | 6 build slots, 6,000 minutes | $0.005 per minute |
+| KV operations | | $0.50 per million |
+| D1 rows | | $0.001 per million |
+
+The sign-up page listed five more overage rates without showing them. The API container's own usage isn't in this table: check the Containers pricing page. Neon is billed separately.
 
 ## Operating
 

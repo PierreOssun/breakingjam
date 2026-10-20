@@ -137,7 +137,7 @@ cargo run --bin data -- draft-wikipedia red-bull-bc-one /tmp/bc-one.wikitext
 - **Results tables** give placings for years without a bracket. Where both exist, the champions are compared.
 - **Dates, places and staff** come from the text: "took place on November 9", `Location:` lines, and `'''Judges:'''` lists.
 
-The draft writes the editions that have no file yet and appends the dancers and crews the files lack. It never overwrites a file: once written, a file is yours. It prints what it couldn't read: a missing date, an unclear winner, an unknown flag, a cell with no Latin name. Go through the files, fix what the sources got wrong (citing extra sources in `sources`), and run `check` until it passes.
+The draft writes the editions that have no file yet, leaving out those whose date it can't find, and appends the dancers and crews the files lack. It never overwrites a file: once written, a file is yours. It prints what it couldn't read: a missing date, an unclear winner, an unknown flag, a cell with no Latin name. Go through the files, fix what the sources got wrong (citing extra sources in `sources`), and run `check` until it passes.
 
 ## Drafting from YouTube
 

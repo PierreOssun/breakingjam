@@ -1,5 +1,5 @@
 name = "Battle of the Year 2001"
-# starts_on = 2001-11-??  (battleoftheyear.net says 11 November, a Sunday; its programme 17 November)
+starts_on = 2001-11-17  # the programme's Saturday; the results page says "Nov. 11th", a Sunday
 timezone = "Europe/Berlin"
 city = "Braunschweig"
 country = "DE"

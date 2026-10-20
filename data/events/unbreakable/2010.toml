@@ -1,12 +1,12 @@
 name = "Unbreakable 2010"
-# starts_on = YYYY-MM-DD  (not on the hall of fame)
+starts_on = 2010-03-20  # the Saturday before the battle videos, uploaded from 00:39 on Sunday 21 March
 timezone = "Europe/Brussels"
 city = "Leuven"
 country = "BE"
 lat = 50.9283
 lng = 4.7247
 venue = "Sportoase"
-sources = ["https://unbreakable.be/20-years/#hall-of-fame"]
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://www.youtube.com/watch?v=nX9bAOmqHhk"]
 judges = []
 
 [[battles]]

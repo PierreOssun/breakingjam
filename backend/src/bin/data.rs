@@ -103,13 +103,16 @@ fn run_fetch(dir: &Path, series: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Writes the editions that have no file yet and appends the dancers and crews the files lack.
+/// Writes the dated editions that have no file yet and appends the dancers and crews the files lack.
 fn write_draft(dir: &Path, series: &str, draft: Draft) -> anyhow::Result<()> {
     let events = dir.join("events").join(series);
     fs::create_dir_all(&events)?;
     for (edition, toml) in &draft.events {
         let path = events.join(format!("{edition}.toml"));
-        if path.exists() {
+        // Without a date the file can't be read, and would stop `check` and CI.
+        if !toml.lines().any(|line| line.starts_with("starts_on = ")) {
+            println!("skipped {edition}: no date found; write its file once you know it");
+        } else if path.exists() {
             println!("kept {} (yours now; not redrafted)", path.display());
         } else {
             fs::write(&path, toml)?;

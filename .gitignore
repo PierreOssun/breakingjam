@@ -10,3 +10,4 @@ dist/
 
 # The data/ tools' YouTube listings (data/README.md).
 data/.cache/
+.neon
