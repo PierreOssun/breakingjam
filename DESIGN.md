@@ -326,6 +326,7 @@ One component that changes shape by viewport.
 - `inline-flex items-center gap-1.5 h-7 pl-[7px] pr-2.5 rounded-full border border-border bg-bg text-caption font-extrabold tracking-[0.04em]` containing a flag plus the ISO alpha-2 code ("FR").
 - Flag images: [`flag-icons`](https://github.com/lipis/flag-icons) 4:3 SVGs at 20×14, `rounded-[3px]`, with a 1px `ring-black/20`. Never use emoji flags, because Windows shows them as letters.
 - The flag has `aria-label` set to the country name.
+- **Unknown country** (`ZZ`): a Phosphor `Globe` in the flag's place, and no code in the chip.
 - Show at most 2 per dancer.
 - Not interactive. A flag sits next to a name, never inside an avatar.
 - In list rows, use the bare 16×11 flag before the city, with no chip.

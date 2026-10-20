@@ -32,6 +32,7 @@ hiro-10 = { name = "Hiro 10", country = "JP", aliases = ["Hiro10"] }
 - **Two spellings of one dancer:** keep one key, put the other spelling in `aliases`, and replace the old key in the jam files.
 - **Two dancers with one name** get two keys and the same `name`, e.g. `benny` and `benny-flying-steps`.
 - **Crews:** `crews = ["formless-corp"]` lists a dancer's crews; a dancer may have none, one or several.
+- **Unknown country:** `country = "ZZ"` (the ISO code for an unknown region). The site shows a globe instead of a flag.
 
 **`crews.toml`**, the same way:
 
@@ -184,7 +185,7 @@ cargo run --bin data -- draft-youtube unbreakable   # drafts from those lists, a
 **What drafts can't know, and leave for you:**
 - **The date:** `starts_on` is the Saturday before the first battle video went up, marked `check`.
 - **Missing matches:** every battle not on YouTube. `check` reports incomplete rounds until they're filled in, or until the battle switches to `results`.
-- **Countries:** dancers' countries, unless a title tags them.
+- **Countries:** dancers' countries, unless a title tags them. Set `ZZ` for one you can't find.
 - **Homonyms:** whether a reused key is the same dancer or a homonym.
 
 ## Red Bull BC One

@@ -1,5 +1,6 @@
+import { Globe } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
-import { countryName } from "../lib/countries";
+import { UNKNOWN_COUNTRY, countryName } from "../lib/countries";
 
 // One file per flag, fetched only when shown; vite.config.ts keeps them out of the bundle.
 const FLAGS = import.meta.glob<string>(
@@ -26,6 +27,17 @@ export function Flag({
   size?: "chip" | "bare";
 }) {
   const { i18n } = useTranslation();
+  if (code === UNKNOWN_COUNTRY) {
+    return (
+      <Globe
+        size={size === "chip" ? 14 : 11}
+        weight="bold"
+        role="img"
+        aria-label={countryName(code, i18n.language)}
+        className="shrink-0 text-muted"
+      />
+    );
+  }
   const url = flagUrl(code);
   if (!url) return null;
   return (
@@ -43,7 +55,7 @@ export function FlagChip({ code }: { code: string }) {
   return (
     <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-border bg-bg pr-2.5 pl-[7px] text-caption font-extrabold tracking-[0.04em]">
       <Flag code={code} />
-      {code}
+      {code !== UNKNOWN_COUNTRY && code}
     </span>
   );
 }
