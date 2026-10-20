@@ -30,7 +30,7 @@ matches = [
   { round = "top8", a = "das-flavour", b = "pura-vida-mae", winner = "pura-vida-mae", video = "https://youtu.be/drfu5AiUTrA" },
   { round = "top4", a = "saison-2", b = "gatling-logghy", winner = "saison-2", video = "https://youtu.be/LRMlNtLp3G8" },
   { round = "top4", a = "fresh-mob-crew", b = "pura-vida-mae", winner = "fresh-mob-crew", video = "https://youtu.be/pmJwwUlu1WU" },
-  { round = "final", a = "saison-2", b = "fresh-mob-crew", winner = "TODO", video = "https://youtu.be/fxTaOzH-xmA" },
+  { round = "final", a = "saison-2", b = "fresh-mob-crew", winner = "saison-2", video = "https://youtu.be/fxTaOzH-xmA" },
 ]
 
 [battles.teams]
@@ -64,5 +64,5 @@ matches = [
   { round = "top8", a = "just-one", b = "buch", winner = "buch", video = "https://youtu.be/Kh3MLGcyUfw" },
   { round = "top4", a = "moise", b = "spin", winner = "spin", video = "https://youtu.be/UuZfnkmxXyU" },
   { round = "top4", a = "la-fraise", b = "buch", winner = "buch", video = "https://youtu.be/2ignXkvW-N8" },
-  { round = "final", a = "buch", b = "spin", winner = "TODO", video = "https://youtu.be/HMCRqWVTXIw" },
+  { round = "final", a = "buch", b = "spin", winner = "spin", video = "https://youtu.be/HMCRqWVTXIw" },
 ]
