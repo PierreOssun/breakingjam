@@ -1,6 +1,6 @@
 # Milestone 5 — Events CRUD + status transitions + `events.geojson`
 
-Build order point 5 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 5 of `ARCHITECTURE.md` §11.
 
 ## Decisions (asked at the start, recorded in §5 of the architecture doc)
 

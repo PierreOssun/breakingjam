@@ -50,6 +50,13 @@
   "env": {
     "uat": {
       "routes": [{ "pattern": "uat.breakingjam.com", "custom_domain": true }],
+      "assets": {
+        "directory": "../frontend/dist",
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application",
+        // Every response goes through the Worker, so each one carries the noindex header.
+        "run_worker_first": true
+      },
       "containers": [
         {
           "class_name": "Api",
@@ -66,7 +73,9 @@
         "APP_BASE_URL": "https://uat.breakingjam.com",
         "GOOGLE_REDIRECT_URL": "https://uat.breakingjam.com/api/auth/google/callback",
         "RUST_LOG": "breakingjam=debug,tower_http=info",
-        "API_INSTANCES": "1"
+        "API_INSTANCES": "1",
+        // Demo data: noindex on every response, robots.txt disallows all, a banner on every page.
+        "TEST_SITE": "true"
       }
     }
   }

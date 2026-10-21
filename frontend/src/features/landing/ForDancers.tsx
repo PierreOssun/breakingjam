@@ -85,7 +85,6 @@ function FeaturedDancer({ dancer }: { dancer: Schemas["DancerSummary"] }) {
         flags={[dancer.country, dancer.country2]}
         aliases={dancer.aliases}
         instagram={dancer.instagram_handle}
-        path={`/dancers/${dancer.id}`}
         avatar={<DancerAvatar dancer={dancer} />}
       />
       {past && <StatsStrip stats={statsOf(past)} />}

@@ -48,5 +48,5 @@ mauricio-ibz-nambrandzz = { members = ["nambrandzz", "mauricio-ibz"] }
 nori-ryoga = { members = ["nori", "ryoga"] }
 phumlailai-titan-zehr = { members = ["phumlailai", "titan-zehr"] }
 primal-instincts = { name = "Primal Instincts" }
-skilluminated = { name = "Skilluminated" }
+skilluminated = { crew = "skilluminated", members = ["moa"] }
 yugoslavian-bboys = { name = "Yugoslavian Bboys" }

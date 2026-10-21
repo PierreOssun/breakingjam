@@ -54,7 +54,6 @@ function OrganizerDetail({
             verified={Boolean(organizer.verified_at)}
             flags={[organizer.country]}
             instagram={organizer.instagram_handle}
-            path={`/organizers/${organizer.id}`}
             avatar={
               <DancerAvatar
                 dancer={{

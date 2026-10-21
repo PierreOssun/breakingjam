@@ -1,6 +1,6 @@
 # BreakingJam — rules for Claude Code
 
-Read `ARCHITECTURE_v0.1.md` first; it is the source of truth for scope, schema and routes. `DESIGN.md` is the source of truth for UI. This file is about how code is written.
+Read `ARCHITECTURE.md` first; it is the source of truth for scope, schema and routes. `DESIGN.md` is the source of truth for UI. This file is about how code is written.
 
 ## Principles
 - Stupid simple. The simplest code that passes the tests and reads top to bottom. If a reviewer needs a diagram, it is too complex.

@@ -94,7 +94,6 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
             flags={[dancer.country, dancer.country2]}
             aliases={dancer.aliases}
             instagram={dancer.instagram_handle}
-            path={`/dancers/${dancer.id}`}
             avatar={<DancerAvatar dancer={dancer} />}
           />
           {(dancer.crews.length > 0 || dancer.city) && (

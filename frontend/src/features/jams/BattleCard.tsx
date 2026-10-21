@@ -203,7 +203,8 @@ function EntryWho({ entry, status }: { entry: Entry; status: boolean }) {
         <p className="text-body font-extrabold">{entry.team_name}</p>
       )}
       {meta && <p className="text-caption text-muted">{meta}</p>}
-      <ul className="flex flex-wrap gap-1.5">
+      {/* One member per line on phones: a wrapping row splits some duos and not others. */}
+      <ul className="flex flex-col items-start gap-1.5 sm:flex-row sm:flex-wrap">
         {entry.members.map((member) => (
           <li key={member.id}>
             <DancerChip dancer={member} />

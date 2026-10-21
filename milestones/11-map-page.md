@@ -1,6 +1,6 @@
 # Milestone 11 — Map page
 
-Build order point 11 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 11 of `ARCHITECTURE.md` §11.
 
 ## Decisions (asked at the start)
 

@@ -1,6 +1,6 @@
 # Milestone 8 — utoipa doc for everything above; generate TS client
 
-Build order point 8 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 8 of `ARCHITECTURE.md` §11.
 
 ## Done
 

@@ -1,6 +1,6 @@
 # Milestone 1 — Repo skeleton, compose, CI, health endpoint, Dockerfile
 
-Build order point 1 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 1 of `ARCHITECTURE.md` §11.
 
 ## Done
 

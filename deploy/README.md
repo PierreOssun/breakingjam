@@ -5,7 +5,7 @@ Two copies of the same stack, each one Cloudflare Worker (ARCHITECTURE §9):
 | | Production | UAT |
 |---|---|---|
 | Branch | `prod` | `uat` |
-| Site | `breakingjam.com` (public) | `uat.breakingjam.com` (behind Cloudflare Access) |
+| Site | `breakingjam.com` (public) | `uat.breakingjam.com` (not indexed; optionally behind Cloudflare Access) |
 | Worker | `breakingjam` (top level of `wrangler.jsonc`) | `breakingjam-uat` (`env.uat`) |
 | Database | Neon project `breakingjam`, real data | Neon project `breakingjam-uat`, seeded demo data only |
 | GitHub environment | `prod` (a reviewer approves each deploy) | `uat` |
@@ -26,6 +26,10 @@ browser ──▶ Worker (deploy/src/index.ts)
   - The API uses the role `breakingjam_app`, which reads and writes rows but can't change the schema. Migrations use the owner role.
 - `frontend/public/_headers` sets the security headers (CSP, HSTS…) and the long cache for `/assets/*`.
 - The Worker passes the visitor's country (`request.cf.country`) to the API as `cf-ipcountry`, replacing any value the client sent. The map starts on that country (`GET /api/geo`).
+- UAT sets `TEST_SITE = "true"` in `env.uat` (production never has it). It runs the Worker for every request, and the Worker then:
+  - adds `X-Robots-Tag: noindex, nofollow` to every response;
+  - answers `/robots.txt` with `Disallow: /`;
+  - shows a "Test site — demo data, not real jams" badge on every page, fixed in a corner and click-through, so UAT keeps production's layout.
 
 ## One-time setup
 
@@ -78,7 +82,7 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
    - Variables: `NEON_PROJECT_ID`, `VITE_PROTOMAPS_KEY`, and `VITE_TILES_URL` only with self-hosted tiles.
    - `prod` only: required reviewers, so each production deploy waits for an approval.
    - Settings → Rules: a ruleset on `uat` and `prod` blocking force pushes and deletion.
-8. **UAT only: Cloudflare Access** (Zero Trust → Access → Applications, free up to 50 users). It keeps UAT private and out of search engines.
+8. **UAT only, optional: Cloudflare Access** (Zero Trust → Access → Applications, free up to 50 users). It keeps UAT private; without it UAT is public, but `TEST_SITE` keeps it out of search engines and labels it.
    - A self-hosted application for `uat.breakingjam.com`, policy *Allow* with your testers' emails (login with a one-time PIN).
    - A second application for `uat.breakingjam.com/api/health`, policy *Bypass* for *Everyone*, so the deploy's check gets through. The more specific path wins.
 9. **UAT only: demo data.** After the first UAT deploy, from `backend/` with the UAT **owner** string:

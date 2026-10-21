@@ -418,7 +418,6 @@ One component that changes shape by viewport.
   2. name `font-display text-display-lg` + tick + flag chips (`flex flex-wrap items-center gap-2`; chips wrap under long names)
   3. aliases `text-body-sm font-semibold text-muted` ("aka …", joined with " · ")
   4. Instagram handle: Phosphor `InstagramLogo` 20 + `@handle` in `text-body font-extrabold text-text`, 44px min height. It opens `https://instagram.com/<handle>`, which the OS hands to the app.
-  5. the canonical URL in `text-caption text-muted` (`breakingjam.com/d/<slug>`)
 - It has to look complete when cropped on its own (screenshots). Nothing inside it depends on the page around it.
 - The **OG image** for `/d/<slug>` renders this same card at 1200×630.
 

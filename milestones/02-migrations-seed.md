@@ -1,6 +1,6 @@
 # Milestone 2 — Migrations (all tables), seed binary
 
-Build order point 2 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 2 of `ARCHITECTURE.md` §11.
 
 ## Done
 
