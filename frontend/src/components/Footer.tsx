@@ -19,7 +19,7 @@ export function Footer() {
           aria-label={t("footer.links")}
           className="-mx-[18px] flex flex-col items-start lg:mx-0 lg:flex-row lg:items-center lg:gap-1"
         >
-          <Link to="/map" className={link}>
+          <Link to="/jams" className={link}>
             {t("nav.findJam")}
           </Link>
           <Link to="/dancers" className={link}>

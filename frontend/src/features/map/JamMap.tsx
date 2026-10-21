@@ -15,13 +15,12 @@ import MapView, {
 } from "react-map-gl/maplibre";
 import { dayAndMonth, formatDateRange } from "../../lib/dates";
 import { useMediaQuery } from "../../lib/useMediaQuery";
-import { CLUSTER_MAX_ZOOM, useClusteredJams } from "./clustered";
+import { CLUSTER_MAX_ZOOM, SOURCE, useClusteredJams } from "./clustered";
 import { ClusterDot } from "./ClusterDot";
 import { type Bounds, boundsOf, isPast, type MapJam } from "./jams";
 import { maplibre, useMapStyle } from "./maplibre";
 import { type Box, normalizeBounds, panToReveal } from "./view";
 
-const SOURCE = "jams";
 const DATE_TAGS_FROM = CLUSTER_MAX_ZOOM;
 // Where the anchored popup's caret ends: 14px (half the selected marker) plus an 8px gap.
 const POPUP_LIFT = 22;
@@ -63,7 +62,7 @@ export function JamMap(props: JamMapProps) {
   const popupRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const [zoom, setZoom] = useState(0);
-  const clustered = useClusteredJams(mapRef, SOURCE, jams);
+  const clustered = useClusteredJams(mapRef, jams);
   const style = useMapStyle();
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 

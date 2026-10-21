@@ -42,8 +42,6 @@ pub struct ListQuery {
     pub q: Option<String>,
     /// Matches the first or second flag.
     pub country: Option<String>,
-    /// Only verified (`true`) or only unverified (`false`) dancers.
-    pub verified: Option<bool>,
     /// `next_cursor` of the previous page.
     pub cursor: Option<String>,
     /// Page size, defaulted and clamped by `page::limit`.
@@ -128,7 +126,6 @@ async fn list(
     let filter = db::dancers::DancerFilter {
         query: q,
         country: query.country.as_deref(),
-        verified: query.verified,
     };
     let rows = db::dancers::search(&state.pool, &filter, page::window(limit, offset)).await?;
     Ok(Json(Page::from_offset(rows, limit, offset)))

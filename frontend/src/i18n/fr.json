@@ -12,7 +12,9 @@
     "closeMenu": "Fermer le menu",
     "skipToContent": "Aller au contenu",
     "language": "Langue : {{name}}",
-    "admin": "Admin"
+    "admin": "Admin",
+    "jamMap": "Carte des jams",
+    "account": "Compte"
   },
   "footer": {
     "links": "Liens du site"
@@ -59,11 +61,13 @@
     "handle": "Lettres, chiffres, . ou _ (30 au maximum)."
   },
   "pages": {
-    "map": "Trouver une jam",
+    "map": "Carte des jams",
     "people": "Trouver quelqu'un",
     "orgJams": "Vos jams",
     "orgJamNew": "Inscrire une jam",
-    "orgJamEdit": "Modifier la jam"
+    "orgJamEdit": "Modifier la jam",
+    "jams": "Trouver une jam",
+    "search": "Recherche"
   },
   "notFound": {
     "title": "Page introuvable",
@@ -74,25 +78,6 @@
     "generic": "Une erreur s’est produite. Rechargez la page pour réessayer."
   },
   "landing": {
-    "overline": "La carte mondiale des jams de breaking",
-    "title": "Toutes les jams. Une seule <pill>carte.</pill>",
-    "pitch": "Le point central des jams de breaking. Trouvez-en une près de chez vous, ou mettez la vôtre sur la carte.",
-    "mapPreview": "Ouvrir la carte",
-    "organisers": {
-      "title": "Mets ta jam là où les danseurs cherchent.",
-      "body": "Gratuit, et ta jam arrive sur la carte et sur la page de chaque danseur qui y participe.",
-      "step1Title": "Créez votre jam",
-      "step1Body": "Nom, dates et lieu. Elle reste en brouillon jusqu’à ce que vous l’envoyiez en vérification.",
-      "step2Title": "Ajoutez battles et line-up",
-      "step2Body": "1v1, crews, seven-to-smoke, et vos juges, DJ et MC.",
-      "step3Title": "Envoyez-la",
-      "step3Body": "Un·e admin BreakingJam la vérifie, puis elle apparaît sur la carte et sur la page de chaque danseur·se inscrit·e.",
-      "overline": "Pour les orgas"
-    },
-    "preview": {
-      "upcoming_one": "{{count}} jam à venir",
-      "upcoming_other": "{{count}} jams à venir"
-    },
     "next": {
       "title": "Bientôt près de chez toi",
       "around": "Autour de : {{place}}",
@@ -100,15 +85,6 @@
       "worldwide": "Partout dans le monde",
       "change": "changer",
       "map": "Tout voir sur la carte"
-    },
-    "dancers": {
-      "overline": "Pour les danseurs",
-      "title": "Toutes tes battles, sur une seule page.",
-      "body": "Tes jams, tes rounds et tes résultats, tels que les orgas les publient.",
-      "search": "Trouver ta page de danseur",
-      "placeholder": "Ton nom de danseur",
-      "submit": "Me trouver",
-      "notThere": "Pas encore là ? Tu apparais automatiquement dès qu’un orga t’ajoute."
     },
     "scene": {
       "title": "La scène jusqu’ici",
@@ -121,7 +97,12 @@
       "byCountry": "Battles par pays",
       "more_one": "+{{count}} autre",
       "more_other": "+{{count}} autres"
-    }
+    },
+    "heading": "Trouvez votre prochaine jam",
+    "search": "Chercher des jams et des personnes",
+    "searchPlaceholder": "Jam, battle, bgirl, bboy, DJ…",
+    "searchSubmit": "Rechercher",
+    "subtitle": "Tout le breaking, en une recherche"
   },
   "status": {
     "draft": "Brouillon",
@@ -614,6 +595,19 @@
     "hint": "Bboys, bgirls, DJs, MCs, juges.",
     "empty": "Personne ne correspond à « {{q}} ».",
     "nobody": "Personne n’est encore inscrit.",
+    "showMore": "Voir plus"
+  },
+  "search": {
+    "jams": "Jams",
+    "people": "Personnes",
+    "noJams": "Aucune jam ne correspond à « {{q}} ».",
+    "noUpcoming": "Pas encore de jam à venir.",
+    "allOnMap": "Tout voir sur la carte"
+  },
+  "jams": {
+    "count_one": "{{count}} jam",
+    "count_other": "{{count}} jams",
+    "empty": "Aucune jam ne correspond à votre recherche et à vos filtres.",
     "showMore": "Voir plus"
   }
 }

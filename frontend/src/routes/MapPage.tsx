@@ -22,7 +22,6 @@ import { type Camera, JamMap } from "../features/map/JamMap";
 import {
   type Bounds,
   boundsOf,
-  byDate,
   distanceKm,
   type Filters,
   firstView,
@@ -30,8 +29,7 @@ import {
   isFiltered,
   isPast,
   type MapJam,
-  matchesFilters,
-  matchesSearch,
+  narrow,
   NO_FILTERS,
 } from "../features/map/jams";
 import { MapEmpty } from "../features/map/MapEmpty";
@@ -42,28 +40,6 @@ import { currentPosition, type LngLat } from "../lib/position";
 import { useMediaQuery } from "../lib/useMediaQuery";
 
 type Selection = { id: string; trigger: HTMLElement | null };
-
-/**
- * The jams that pass the filters and a search, judged from today: upcoming ones unless the
- * "Past jams" filter is on or a search looks through every jam.
- */
-function narrow(
-  jams: MapJam[],
-  filters: Filters,
-  search: string,
-  language: string,
-): MapJam[] {
-  const today = new Date();
-  const upcomingOnly = filters.when === null && search === "";
-  return jams
-    .filter(
-      (jam) =>
-        !(upcomingOnly && isPast(jam, today)) &&
-        matchesFilters(jam, filters, today) &&
-        matchesSearch(jam, search, language),
-    )
-    .sort(byDate(today));
-}
 
 /**
  * A callback ref and the rendered height of its element, kept live as the element comes,
@@ -94,7 +70,7 @@ export function MapPage() {
   const all = jams.data;
   const country = useVisitorCountry();
 
-  // The landing page's search arrives as `?q=` (DESIGN.md §4.26).
+  // A search arrives as `?q=`, from the search page's "See all on the map" (DESIGN.md §6).
   const [params] = useSearchParams();
   const asked = params.get("q")?.trim() ?? "";
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
@@ -108,7 +84,7 @@ export function MapPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const matching = useMemo(
-    () => narrow(all ?? [], filters, search, i18n.language),
+    () => narrow(all ?? [], filters, search, i18n.language, new Date()),
     [all, filters, search, i18n.language],
   );
   const inView = bounds
@@ -178,7 +154,7 @@ export function MapPage() {
       document.activeElement.blur(); // closes the phone keyboard
     }
     if (!value) return;
-    const found = narrow(all ?? [], filters, value, i18n.language);
+    const found = narrow(all ?? [], filters, value, i18n.language, new Date());
     const box = boundsOf(found);
     if (box)
       setCamera({ kind: "fit", bounds: box, maxZoom: 13, animate: true });

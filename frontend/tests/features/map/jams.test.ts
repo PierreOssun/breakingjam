@@ -11,6 +11,7 @@ import {
   jamsOf,
   matchesFilters,
   matchesSearch,
+  narrow,
   rangeOf,
 } from "../../../src/features/map/jams";
 
@@ -116,6 +117,22 @@ describe("map jams", () => {
       "recent",
       "old",
     ]);
+  });
+
+  it("narrows to upcoming jams, unless 'past jams' or a search looks further", () => {
+    const named = (name: string, day: string) =>
+      jam({ id: name, name, starts_on: day, ends_on: day });
+    const jams = [
+      named("Old Zurich", "2026-10-01"),
+      named("New Zurich", "2026-10-20"),
+    ];
+    const names = (filters = NO_FILTERS, search = "") =>
+      narrow(jams, filters, search, "en", sunday).map((j) => j.name);
+
+    expect(names()).toEqual(["New Zurich"]);
+    expect(names({ ...NO_FILTERS, when: "past" })).toEqual(["Old Zurich"]);
+    // A search looks through every jam, upcoming first.
+    expect(names(NO_FILTERS, "zurich")).toEqual(["New Zurich", "Old Zurich"]);
   });
 
   it("searches name, city and country, ignoring case and accents", () => {

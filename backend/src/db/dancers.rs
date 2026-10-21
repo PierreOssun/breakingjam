@@ -22,8 +22,6 @@ pub struct DancerFilter<'a> {
     pub query: Option<&'a str>,
     /// The first or second flag.
     pub country: Option<&'a str>,
-    /// Only verified (`true`) or only unverified (`false`) dancers.
-    pub verified: Option<bool>,
 }
 
 /// Search by name, alias or handle (case-insensitive substring), notable dancers first.
@@ -43,12 +41,10 @@ pub async fn search(
                   or instagram_handle ilike $1
                   or exists (select 1 from unnest(aliases) a where a ilike $1))
              and ($2::text is null or country = $2 or country2 = $2)
-             and ($3::bool is null or (verified_at is not null) = $3)
            order by notable desc, lower(dancer_name), id
-           limit $4 offset $5"#,
+           limit $3 offset $4"#,
         pattern,
         filter.country,
-        filter.verified,
         window.limit,
         window.offset,
     )

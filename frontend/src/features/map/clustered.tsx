@@ -6,6 +6,8 @@ import { type MarkerItem, toMarkers } from "./view";
 
 // §7: clusters up to zoom 12, so from 12 up every marker has its date tag.
 export const CLUSTER_MAX_ZOOM = 12;
+/** The map's one GeoJSON source of jams. */
+export const SOURCE = "jams";
 
 /**
  * A map's clustered GeoJSON source and what to draw from it: the cluster bubbles and the
@@ -13,7 +15,6 @@ export const CLUSTER_MAX_ZOOM = 12;
  */
 export function useClusteredJams(
   mapRef: RefObject<MapRef | null>,
-  sourceId: string,
   jams: MapJam[],
 ) {
   const [markers, setMarkers] = useState<MarkerItem[]>([]);
@@ -31,16 +32,16 @@ export function useClusteredJams(
   const byId = useMemo(() => new Map(jams.map((jam) => [jam.id, jam])), [jams]);
   const refresh = useCallback(() => {
     const map = mapRef.current?.getMap();
-    if (map?.getSource(sourceId))
-      setMarkers(toMarkers(map.querySourceFeatures(sourceId)));
-  }, [mapRef, sourceId]);
+    if (map?.getSource(SOURCE))
+      setMarkers(toMarkers(map.querySourceFeatures(SOURCE)));
+  }, [mapRef]);
   const clusters = markers.filter((m) => m.kind === "cluster");
   const single = markers.flatMap((m) =>
     m.kind === "jam" ? (byId.get(m.id) ?? []) : [],
   );
   const source = (
     <Source
-      id={sourceId}
+      id={SOURCE}
       type="geojson"
       data={data}
       cluster
@@ -49,7 +50,7 @@ export function useClusteredJams(
     >
       {/* Draws nothing; a source without a layer never loads its tiles. */}
       <Layer
-        id={`${sourceId}-hidden`}
+        id={`${SOURCE}-hidden`}
         type="circle"
         paint={{ "circle-radius": 0, "circle-opacity": 0 }}
       />

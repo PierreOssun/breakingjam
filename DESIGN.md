@@ -266,13 +266,15 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
 - **Home link:** the **logo mark plus the wordmark**, `flex items-center gap-2 lg:gap-2.5`, `aria-label="BreakingJam home"`, linking to `/`. The same on every page, including the map and jam pages.
   - **Mark:** the Bounce "J" (`frontend/public/favicon.svg`, J only, as §10 requires below 48px), `size-8` on mobile and `size-9` from `lg`, decorative (`alt=""`).
   - **Wordmark:** `font-display font-extrabold` at 16px (mobile) or 18px (desktop), "Breaking" plus "Jam" in a `bg-primary text-on-primary rounded-full px-[.35em]` pill.
-- **≥ lg**, left to right:
+- **≥ xl** (below that, French and German labels or a long name don't fit), left to right:
   1. Home link (mark + wordmark)
-  2. Nav: ghost sm links "Find a jam", "Find someone" and, once logged in, "My jams" (`/org/jams`). The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
+  2. Nav: ghost sm links **Jam map** (`/map`), **Find a jam** (`/jams`), **Find someone** (`/dancers`). The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
   3. Spacer
   4. Language switch: ghost sm with `Globe` + ISO code + `CaretDown`
-  5. Primary sm **Register a jam**
-- **< lg:** the home link, then the language switch (`Globe` + code), then a menu icon button. The menu opens a full-height sheet with the nav links (`h-14 text-title`) and a full-width primary **Register a jam**.
+  5. Account: ghost sm muted **Log in** when logged out; when logged in, the **account menu**, a ghost sm button with the display name and `CaretDown`
+  6. Primary sm **Register a jam** with `Plus` 16
+- **Account menu:** the language menu's box and options (`role="menu"`, `menuitem`s): **My jams** (`/org/jams`), **Admin** (`/admin`, admins only), **Log out**. Arrow keys move, Esc closes. It keeps the bar at four items whoever is logged in.
+- **< xl:** the home link, then the language switch (`Globe` + code), then a menu icon button. The menu opens a full-height sheet with the three nav links (`h-14 text-title`), then My jams, Admin and Log in or Log out, and a full-width primary **Register a jam**.
 - **Language menu:**
   - Menu box: `w-[200px] rounded-lg border border-border-strong bg-surface-raised shadow-lg p-1`, `role="listbox"`.
   - Options: `h-11 px-3 rounded-md`, each named in its own language with its own `lang` attribute (English, Français, Deutsch, Español, Português, Italiano, 日本語, 한국어).
@@ -563,12 +565,18 @@ handstand            toprock
   - Input in `text-body`, with a muted placeholder.
   - An inline primary sm button at the end.
 - **Mobile:** `h-14`, with no inline button; the CTAs sit below.
-- **Behaviour (v1):**
-  - The landing search submits to `/map?q=`.
-  - The dancer search submits to `/dancers?q=`.
+- **Hero search (landing):** the same pill, bigger, alone in the hero (§6).
+  - **Desktop:** `max-w-[760px] h-20 pl-[30px] pr-2 gap-3.5`, `MagnifyingGlass` 24, input at 20px.
+  - **Mobile:** full width, `h-16`, input at 16px.
+  - **Submit:** the round J Bounce logo (`favicon.svg`) as the button, 64px on desktop and 52px on mobile, `aria-label="Search"`. Hover scales it to 1.04; focus gets the standard ring.
+  - **Placeholder:** "Jam, battle, bgirl, bboy, DJ…".
+- **Behaviour:**
+  - The landing search submits to `/search?q=`, which lists matching jams and people (§6).
   - No typeahead yet.
 
 ### 4.27 Map preview
+
+*Unused since landing v3; kept as the spec for a future map teaser.*
 
 - **Container:** `relative h-[260px] lg:h-[560px] rounded-[28px] overflow-hidden border border-border`.
   - The whole card is a link to `/map`.
@@ -586,7 +594,7 @@ handstand            toprock
 ## 5. Layout rules
 
 - **Container:** `mx-auto max-w-content px-4 md:px-6 lg:px-8` (1200px including padding). Reading column: `max-w-prose` (640px).
-- **Breakpoints:** design at **375** (support down to 320) · `sm` 640 · `md` 768 · `lg` 1024, where the side panel, anchored popups and desktop header switch on · `xl` 1280.
+- **Breakpoints:** design at **375** (support down to 320) · `sm` 640 · `md` 768 · `lg` 1024, where the side panel and anchored popups switch on · `xl` 1280, where the full header bar switches on (§4.6).
 - **Header:** 56px below `lg`, 64px from `lg` up.
 - **Vertical rhythm:**
   - Sections: `py-10` on mobile, `py-20` on desktop, separated by a `border-t border-border`.
@@ -609,17 +617,13 @@ handstand            toprock
 
 **Landing** (order is the same on every viewport):
 
-1. **Header.**
-2. **Hero.**
-   - **Desktop:** `grid grid-cols-[5fr_7fr] gap-14 items-center py-20`. One `.rings` (900px) sits behind the map, bleeding off the top right.
-     - Left column, top to bottom:
-       1. overline `text-label text-primary-text` "The world map of breaking jams"
-       2. `display-3xl` "Every jam. One **map.**", with "map." in the blue pill
-       3. `body-lg muted` pitch, max 440px
-       4. hero search (§4.26) with an inline primary **Find a jam**
-       5. secondary **Register a jam**
-     - Right column: map preview (§4.27) at 560px.
-   - **Mobile:** the same stack with a `display-xl` headline. The search has no inline button. Below it, **Find a jam** (primary) and **Register a jam** (secondary) are full width, then the map preview at 260px.
+1. **Header** (§4.6).
+2. **Hero: title, subtitle and the search.** No pitch paragraph, map preview or second button. Everything is centred.
+   - **Title**, the page's only `<h1>`: "Find your next jam", `font-display` (Unbounded 800), 56px / 62px on desktop and 32px / 38px on mobile, with `text-wrap: balance` so mobile breaks as "Find your / next jam".
+   - **Subtitle** (`<p>`, right under it): "All of breaking, in one search", Manrope 500 (not bold), `muted`, 20px / 30px on desktop and 17px / 26px on mobile.
+   - The hero search (§4.26, landing size).
+   - Spacing: 12px between title and subtitle (8px on mobile), 36px between subtitle and search (24px on mobile). `pt-24 pb-28` on desktop, `pt-12 pb-16` on mobile, so the hero is no taller than with the search alone.
+   - One `.rings` (1120px desktop, 560px mobile) is centred behind the whole block.
 3. **Next up near you.**
    - **Title row:**
      - Title: `display-xl` on desktop, `display-md` on mobile.
@@ -629,32 +633,31 @@ handstand            toprock
      - Desktop: 4 columns, first 4 jams.
      - Mobile: horizontal scroll-snap row of 240px cards, up to 6.
    - Hide the section when there are no upcoming jams.
-4. **For dancers.** A `bg-surface` band.
-   - **Left:**
-     1. overline "For dancers"
-     2. title "Every battle you've entered, on one page."
-     3. one line of copy
-     4. dancer search (§4.26, placeholder "Your dancer name", inline button **Find me** → `/dancers?q=`)
-     5. `caption` "Not there yet? You appear automatically once an organiser lists you."
-   - **Right** (max 440px): a featured verified dancer's identity card (§4.17), their stats strip (§4.15) and their 2 latest past rows (§4.14). Hide this column if no featured dancer exists.
-   - Desktop: `grid-cols-[6fr_5fr]`. Mobile: stacked.
-5. **The scene so far.** Replaces "BreakingJam in numbers" and "Battles by country".
+   - On desktop (1440×900) it starts above the fold.
+4. **The scene so far.**
    - Overline, then the counters.
      - Desktop: inline, each counter a `display-xl` number + `body-lg muted` label, separated by a muted "·".
      - Mobile: a 3-cell stats strip.
      - Counters: battles, countries, dancers.
    - Then the 10 busiest countries as country chips (§4.10), plus a muted "+N more" chip.
-6. **For organisers.**
-   - **Desktop:** `grid-cols-[4fr_5fr_3fr]`.
-     - Column 1: overline, title "Put your jam where dancers look.", one line, primary **Register a jam**.
-     - Column 2: steps 01–03 as rows with `border-b` dividers.
-     - Column 3: a generated flyer at 4:5.
-   - **Mobile:** stacked, with the flyer at 112×140 and a full-width primary CTA at the end.
-7. **Footer.**
+5. **Footer.**
    - The round Bounce logo at 56px next to the wordmark.
    - Links: Find a jam, Find someone, Register a jam, Instagram.
    - Language switch.
    - Desktop: one row. Mobile: stacked.
+
+The organisers' pitch moves to a future `/register` landing; dancers find themselves through the main search.
+
+**Search** (`/search?q=`): what the hero search submits to.
+- Reading column (`max-w-prose`): the visually hidden `<h1>` "Search", the hero search pill at its standard size (§4.26), prefilled.
+- **Jams:** a `display-md` title, then the jams the words match (same matching as the map: name, city, country), upcoming first, as jam rows (§4.14). Up to 10, then **See all on the map →** (`/map?q=`).
+- **People:** a `display-md` title, then person rows (§4.25), paged with **Show more**.
+- Each part has its own inline empty state (§4.22). A blank search shows the upcoming jams and the notable people.
+
+**Find a jam** (`/jams`): every jam as a list, for those who don't want the map.
+- Reading column (`max-w-prose`): `display-lg`/`display-xl` title, the search field, the filter chips (§5, wrapped as in the side panel), the result count.
+- Jam rows (§4.14), upcoming soonest first; **Past jams** shows the completed ones, most recent first. 30 at a time, then **Show more**.
+- The search lives in the URL (`?q=`), like the map's.
 
 **Map with a popup open.**
 - **Mobile:** a dark full-bleed map under a 56px header, with the floating search pill, a filter button (dot when filters are active) and the chip row. The selected marker is 28px with a date tag. The bottom sheet is up, showing the flyer, date, title, distance, badge, categories, **View jam** and Share. **List** and locate float above the sheet.

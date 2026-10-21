@@ -17,6 +17,18 @@ export const routes: RouteObject[] = [
     children: [
       { path: "/", element: <LandingPage /> },
       {
+        path: "/jams",
+        lazy: async () => ({
+          Component: (await import("./routes/JamsPage")).JamsPage,
+        }),
+      },
+      {
+        path: "/search",
+        lazy: async () => ({
+          Component: (await import("./routes/SearchPage")).SearchPage,
+        }),
+      },
+      {
         path: "/jams/:slug",
         lazy: async () => ({
           Component: (await import("./routes/JamPage")).JamPage,

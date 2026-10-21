@@ -1,8 +1,8 @@
 import { CaretDown, Check, Globe } from "@phosphor-icons/react";
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { LANGUAGES, setLanguage, type Language } from "../i18n";
+import { LANGUAGES, setLanguage } from "../i18n";
 import { buttonClasses } from "./buttonClasses";
+import { useMenu } from "./useMenu";
 
 /**
  * Globe + code button opening a listbox of languages, each named in its own language
@@ -16,70 +16,22 @@ export function LanguageSwitch({
   const { t, i18n } = useTranslation();
   const current =
     LANGUAGES.find((l) => l.code === i18n.resolvedLanguage) ?? LANGUAGES[0];
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const optionRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const listId = useId();
-
-  useEffect(() => {
-    if (open) optionRefs.current[active]?.focus();
-  }, [open, active]);
-
-  useEffect(() => {
-    if (!open) return;
-    const closeOutside = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", closeOutside);
-    return () => document.removeEventListener("pointerdown", closeOutside);
-  }, [open]);
-
-  function close() {
-    setOpen(false);
-    buttonRef.current?.focus();
-  }
-
-  function choose(language: Language) {
-    setLanguage(language);
-    close();
-  }
-
-  function onKeyDown(event: KeyboardEvent) {
-    const last = LANGUAGES.length - 1;
-    const keys: Record<string, () => void> = {
-      ArrowDown: () => setActive((i) => (i === last ? 0 : i + 1)),
-      ArrowUp: () => setActive((i) => (i === 0 ? last : i - 1)),
-      Home: () => setActive(0),
-      End: () => setActive(last),
-      Enter: () => choose(LANGUAGES[active]?.code ?? current.code),
-      " ": () => choose(LANGUAGES[active]?.code ?? current.code),
-      Escape: close,
-    };
-    const action = keys[event.key];
-    if (action) {
-      event.preventDefault();
-      action();
-    } else if (event.key === "Tab") {
-      setOpen(false);
-    }
-  }
+  const menu = useMenu(LANGUAGES.length, (index) =>
+    setLanguage(LANGUAGES[index]?.code ?? current.code),
+  );
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={menu.rootRef} className="relative">
       <button
-        ref={buttonRef}
+        ref={menu.buttonRef}
         type="button"
         aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={open ? listId : undefined}
+        aria-expanded={menu.open}
+        aria-controls={menu.open ? menu.id : undefined}
         aria-label={t("nav.language", { name: current.name })}
-        onClick={() => {
-          if (open) return setOpen(false);
-          setActive(LANGUAGES.findIndex((l) => l.code === current.code));
-          setOpen(true);
-        }}
+        onClick={() =>
+          menu.toggle(LANGUAGES.findIndex((l) => l.code === current.code))
+        }
         className={buttonClasses("ghost", "sm")}
       >
         <Globe size={16} weight="bold" aria-hidden />
@@ -91,12 +43,13 @@ export function LanguageSwitch({
           aria-hidden
         />
       </button>
-      {open && (
+      {menu.open && (
         <ul
-          id={listId}
+          id={menu.id}
           role="listbox"
           aria-label={t("nav.language", { name: current.name })}
-          onKeyDown={onKeyDown}
+          onKeyDown={menu.onKeyDown}
+          onKeyUp={menu.onKeyUp}
           className={`absolute right-0 z-50 w-[200px] rounded-lg border border-border-strong bg-surface-raised p-1 shadow-lg ${
             placement === "up" ? "bottom-full mb-2" : "top-full mt-2"
           }`}
@@ -107,13 +60,13 @@ export function LanguageSwitch({
               <li
                 key={language.code}
                 ref={(element) => {
-                  optionRefs.current[index] = element;
+                  menu.itemRefs.current[index] = element;
                 }}
                 role="option"
                 lang={language.code}
                 aria-selected={selected}
-                tabIndex={index === active ? 0 : -1}
-                onClick={() => choose(language.code)}
+                tabIndex={index === menu.active ? 0 : -1}
+                onClick={() => menu.pick(index)}
                 className={`flex h-11 cursor-pointer items-center justify-between rounded-md px-3 text-body transition-colors duration-fast ${
                   selected ? "bg-surface font-bold" : "hover:bg-surface"
                 }`}

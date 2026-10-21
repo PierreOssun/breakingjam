@@ -119,6 +119,28 @@ const fold = (text: string) =>
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
 
+/**
+ * The jams that pass the filters and a search, judged from `today`: upcoming ones unless the
+ * "Past jams" filter is on or a search looks through every jam.
+ */
+export function narrow(
+  jams: MapJam[],
+  filters: Filters,
+  search: string,
+  language: string,
+  today: Date,
+): MapJam[] {
+  const upcomingOnly = filters.when === null && search === "";
+  return jams
+    .filter(
+      (jam) =>
+        !(upcomingOnly && isPast(jam, today)) &&
+        matchesFilters(jam, filters, today) &&
+        matchesSearch(jam, search, language),
+    )
+    .sort(byDate(today));
+}
+
 /** Every word of the query appears in the name, city, country code or country name. */
 export function matchesSearch(
   jam: MapJam,

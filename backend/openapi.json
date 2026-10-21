@@ -935,15 +935,6 @@
             }
           },
           {
-            "name": "verified",
-            "in": "query",
-            "description": "Only verified (`true`) or only unverified (`false`) dancers.",
-            "required": false,
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
             "name": "cursor",
             "in": "query",
             "description": "`next_cursor` of the previous page.",
