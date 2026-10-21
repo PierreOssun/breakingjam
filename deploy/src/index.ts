@@ -3,6 +3,13 @@
 // pages their Open Graph tags.
 import { Container, getRandom } from "@cloudflare/containers";
 import { type JamSummary, openGraphTags } from "./openGraph";
+import {
+  bannerClosed,
+  CLOSE_PATH,
+  closeBanner,
+  TEST_BANNER,
+  withoutRevalidation,
+} from "./testSite";
 
 /** Bindings and vars from wrangler.jsonc, and the secrets set with `wrangler secret put`. */
 export interface Env {
@@ -53,31 +60,30 @@ function api(env: Env) {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (env.TEST_SITE !== "true") return route(request, env);
-    if (new URL(request.url).pathname === "/robots.txt") {
+    const { pathname } = new URL(request.url);
+    if (pathname === "/robots.txt") {
       return new Response("User-agent: *\nDisallow: /\n", {
         headers: { "content-type": "text/plain", "x-robots-tag": NO_INDEX },
       });
     }
-    return asTestSite(await route(request, env));
+    if (pathname === CLOSE_PATH) return closeBanner(request);
+    const page = await route(withoutRevalidation(request), env);
+    return asTestSite(page, !bannerClosed(request));
   },
 } satisfies ExportedHandler<Env>;
 
 const NO_INDEX = "noindex, nofollow";
 
-// Inline styles from the theme's tokens: the banner is not part of the app's build. Fixed and
-// click-through, so UAT keeps production's layout (the map fills the screen exactly).
-const TEST_BANNER =
-  '<div role="note" style="position:fixed;left:12px;bottom:max(12px,env(safe-area-inset-bottom));' +
-  "z-index:2147483647;pointer-events:none;max-width:calc(100% - 24px);border-radius:999px;" +
-  "padding:0.75rem 1.5rem;background:var(--color-accent);color:var(--color-on-primary);" +
-  'font:600 1.625rem/1.3 var(--font-body);box-shadow:0 2px 8px rgb(0 0 0 / 0.3)">' +
-  "Test site — demo data, not real jams</div>";
-
-/** The response marked noindex, and its pages given the test-site banner. */
-function asTestSite(response: Response) {
+/** The response marked noindex, and its pages given the test-site banner unless it was closed. */
+function asTestSite(response: Response, banner: boolean) {
   const marked = new Response(response.body, response);
   marked.headers.set("x-robots-tag", NO_INDEX);
   if (!marked.headers.get("content-type")?.includes("text/html")) return marked;
+  // Pages differ by the banner cookie: no validator to revalidate with, nothing to cache.
+  marked.headers.delete("etag");
+  marked.headers.delete("last-modified");
+  marked.headers.set("cache-control", "no-store");
+  if (!banner) return marked;
   return new HTMLRewriter()
     .on("body", {
       element: (body) => {
