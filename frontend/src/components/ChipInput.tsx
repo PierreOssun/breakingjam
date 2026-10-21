@@ -1,6 +1,5 @@
-import { X } from "@phosphor-icons/react";
 import { type KeyboardEvent, type ReactNode, useId, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { RemovableChip } from "./RemovableChip";
 
 type ChipInputProps = {
   label: ReactNode;
@@ -21,7 +20,6 @@ export function ChipInput({
   max,
   hint,
 }: ChipInputProps) {
-  const { t } = useTranslation();
   const id = useId();
   const [draft, setDraft] = useState("");
 
@@ -48,20 +46,11 @@ export function ChipInput({
       </label>
       <div className="flex min-h-12 flex-wrap items-center gap-1.5 rounded-md border border-border-strong bg-surface p-2 focus-within:border-text has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus has-focus-visible:outline-solid">
         {values.map((value) => (
-          <span
+          <RemovableChip
             key={value}
-            className="inline-flex h-8 items-center gap-1 rounded-full border border-border bg-surface-raised pr-1 pl-3 text-body-sm font-bold"
-          >
-            {value}
-            <button
-              type="button"
-              aria-label={t("picker.remove", { name: value })}
-              onClick={() => onChange(values.filter((v) => v !== value))}
-              className="grid size-7 cursor-pointer place-items-center rounded-full hover:bg-surface"
-            >
-              <X size={14} weight="bold" aria-hidden />
-            </button>
-          </span>
+            name={value}
+            onRemove={() => onChange(values.filter((v) => v !== value))}
+          />
         ))}
         {values.length < max && (
           <input

@@ -33,6 +33,7 @@ hiro-10 = { name = "Hiro 10", country = "JP", aliases = ["Hiro10"] }
 - **Two dancers with one name** get two keys and the same `name`, e.g. `benny` and `benny-flying-steps`.
 - **Crews:** `crews = ["formless-corp"]` lists a dancer's crews; a dancer may have none, one or several.
 - **Unknown country:** `country = "ZZ"` (the ISO code for an unknown region). The site shows a globe instead of a flag.
+- **Look:** `look = "bboy"` or `look = "bgirl"` picks the generated avatar. Without it, the dancer's first bboy or bgirl battle picks it; mixed battles leave it random.
 
 **`crews.toml`**, the same way:
 

@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useId, useLayoutEffect, useMemo } from "react";
+import { useId, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
-import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
+import { FormError } from "../../components/FormError";
 import { OptionalLabel } from "../../components/OptionalLabel";
 import { SelectField } from "../../components/SelectField";
 import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
-import { splitFieldErrors } from "../../lib/apiErrors";
+import { applyFieldErrors } from "../../lib/apiErrors";
 import { formatShortDateRange } from "../../lib/dates";
 import {
   type AgePreset,
@@ -46,7 +46,6 @@ type BattleDialogProps = {
   days: string[];
   /** The battle to edit; a new one when absent. */
   battle?: Schemas["Battle"];
-  open: boolean;
   onClose: () => void;
 };
 
@@ -55,7 +54,6 @@ export function BattleDialog({
   jamId,
   days,
   battle,
-  open,
   onClose,
 }: BattleDialogProps) {
   const { t, i18n } = useTranslation();
@@ -66,16 +64,10 @@ export function BattleDialog({
     () => currencies(i18n.language, battle?.prize_currency),
     [i18n.language, battle?.prize_currency],
   );
-  const firstDay = days[0] ?? "";
   const form = useForm<BattleFormValues>({
-    defaultValues: battleValues(firstDay),
+    defaultValues: battleValues(days[0] ?? "", battle),
   });
-  const { register, handleSubmit, setError, setValue, watch, reset } = form;
-  // Each opening starts from the battle being edited. A layout effect, so the reset lands
-  // before the dialog shows and can never wipe what was just typed into it.
-  useLayoutEffect(() => {
-    if (open) reset(battleValues(firstDay, battle));
-  }, [open, battle, reset, firstDay]);
+  const { register, handleSubmit, setError, setValue, watch } = form;
   const { errors, isDirty } = form.formState;
   const values = watch();
 
@@ -92,11 +84,8 @@ export function BattleDialog({
           }),
     onSuccess: ({ data, error }) => {
       if (!data) {
-        const { fields, rest } = splitFieldErrors(error, FIELDS);
         // The day and time are one field to the server.
-        for (const [field, message] of fields)
-          setError(field === "starts_at" ? "start_time" : field, { message });
-        if (rest) setError("root", { message: rest });
+        applyFieldErrors(setError, error, FIELDS, { starts_at: "start_time" });
         return;
       }
       void queryClient.invalidateQueries({
@@ -116,30 +105,11 @@ export function BattleDialog({
 
   return (
     <Dialog
-      open={open}
       onClose={onClose}
       size="form"
       title={battle ? t("org.battles.edit") : t("org.battles.add")}
       confirmClose={isDirty ? t("form.discard") : undefined}
-      footer={(close) => (
-        <>
-          <Button
-            variant="ghost"
-            className="flex-1 lg:flex-none"
-            onClick={close}
-          >
-            {t("form.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form={formId}
-            className="flex-[2] lg:flex-none"
-            loading={save.isPending}
-          >
-            {t("form.save")}
-          </Button>
-        </>
-      )}
+      action={{ label: t("form.save"), form: formId, loading: save.isPending }}
     >
       <form
         id={formId}
@@ -280,11 +250,7 @@ export function BattleDialog({
           error={errors.name?.message}
           {...register("name")}
         />
-        {errors.root?.message && (
-          <p role="alert" className="text-body-sm font-bold text-danger">
-            {errors.root.message}
-          </p>
-        )}
+        <FormError message={errors.root?.message} />
       </form>
     </Dialog>
   );

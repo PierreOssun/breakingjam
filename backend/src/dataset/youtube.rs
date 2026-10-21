@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use super::{
-    Round, SeriesRecord,
+    ROUNDS, Round, SeriesRecord,
     draft::{BattleSpec, Draft, DraftMatch, Member, Side, quoted},
     spelling,
     wikitext::country_code,
@@ -221,8 +221,9 @@ fn vs_segment(title: &str) -> Option<(String, Option<Round>)> {
     let segment = parts(title).find(|s| split_vs(s).is_some())?;
     let mut segment = remove_tags(segment);
     // Some titles append the round bare: `… [japan] final`.
+    // ASCII lower-casing keeps byte offsets, so positions found in it hold in `segment`.
     for (phrase, _) in ROUND_WORDS {
-        if let Some(at) = segment.to_lowercase().rfind(phrase)
+        if let Some(at) = segment.to_ascii_lowercase().rfind(phrase)
             && segment[at + phrase.len()..].trim().is_empty()
         {
             segment.truncate(at);
@@ -323,7 +324,8 @@ fn remove_tags(segment: &str) -> String {
 }
 
 fn split_vs(segment: &str) -> Option<(&str, &str)> {
-    let lower = segment.to_lowercase();
+    // ASCII lower-casing keeps byte offsets, so positions found in it hold in `segment`.
+    let lower = segment.to_ascii_lowercase();
     let at = [" vs. ", " vs "]
         .iter()
         .find_map(|sep| lower.find(sep).map(|at| (at, sep.len())))?;
@@ -551,26 +553,11 @@ fn saturday_before(day: &str) -> Option<NaiveDate> {
     Some(date)
 }
 
-/// The order matches are written in.
-const ROUNDS_IN_ORDER: [Round; 7] = [
-    Round::Top64,
-    Round::Top32,
-    Round::Top16,
-    Round::Top8,
-    Round::Top4,
-    Round::Third,
-    Round::Final,
-];
-
-/// The order winners advance in: semi-final winners go to the final, not the small final.
-const ADVANCING: [Round; 6] = [
-    Round::Top64,
-    Round::Top32,
-    Round::Top16,
-    Round::Top8,
-    Round::Top4,
-    Round::Final,
-];
+/// The order matches are written in: the small final before the final.
+const ROUNDS_IN_ORDER: [Round; 7] = {
+    let [a, b, c, d, e, last] = ROUNDS;
+    [a, b, c, d, e, Round::Third, last]
+};
 
 /// Titles that name no battle go where their entrants play, else to `default`.
 fn assign_battles(games: &mut [Game], default: usize) {
@@ -604,11 +591,7 @@ fn winner(game: &Game, games: &[&Game], wins: &[&str]) -> Option<usize> {
     let keys = game.sides.each_ref().map(Side::key);
     let next = match game.round {
         Round::Final | Round::Third => None,
-        round => ADVANCING
-            .iter()
-            .skip_while(|r| **r != round)
-            .nth(1)
-            .copied(),
+        round => ROUNDS.iter().skip_while(|r| **r != round).nth(1).copied(),
     };
     let candidates: Vec<usize> = match next {
         Some(next) => {

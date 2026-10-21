@@ -20,7 +20,7 @@ function isLanguage(value: string | null | undefined): value is Language {
 }
 
 /** The saved choice, else the first browser language we support, else English (§6). */
-export function detectLanguage(): Language {
+function detectLanguage(): Language {
   let saved: string | null = null;
   try {
     saved = localStorage.getItem(STORAGE_KEY);

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { api, type Schemas } from "../../api/client";
+import { api, type Schemas, unwrap } from "../../api/client";
 import { HeroSearch } from "../../components/HeroSearch";
 import { DancerAvatar } from "../dancers/DancerAvatar";
 import { IdentityCard } from "../dancers/IdentityCard";
@@ -16,11 +16,13 @@ function useFeaturedDancer() {
   return useQuery({
     queryKey: ["dancers", "featured"],
     queryFn: async () => {
-      const { data, response } = await api.GET("/api/dancers", {
-        params: { query: { verified: true, limit: 1 } },
-      });
-      if (!data) throw new Error(`featured dancer: ${response.status}`);
-      return data.items[0] ?? null;
+      const page = unwrap(
+        await api.GET("/api/dancers", {
+          params: { query: { verified: true, limit: 1 } },
+        }),
+        "featured dancer",
+      );
+      return page.items[0] ?? null;
     },
     staleTime: 5 * 60_000,
   });
@@ -68,11 +70,13 @@ function FeaturedDancer({ dancer }: { dancer: Schemas["DancerSummary"] }) {
   const past = useQuery({
     queryKey: ["dancer", dancer.id, "events", "past"],
     queryFn: async () => {
-      const { data, response } = await api.GET("/api/dancers/{id}/events", {
-        params: { path: { id: dancer.id }, query: { scope: "past" } },
-      });
-      if (!data) throw new Error(`dancer events: ${response.status}`);
-      return data.past;
+      const events = unwrap(
+        await api.GET("/api/dancers/{id}/events", {
+          params: { path: { id: dancer.id }, query: { scope: "past" } },
+        }),
+        "dancer events",
+      );
+      return events.past;
     },
     staleTime: 5 * 60_000,
   }).data;

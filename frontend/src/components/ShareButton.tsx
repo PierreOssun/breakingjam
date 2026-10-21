@@ -1,6 +1,7 @@
 import { Export } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { copyText } from "../lib/clipboard";
 import { Button } from "./Button";
 
 type ShareButtonProps = {
@@ -33,11 +34,7 @@ export function ShareButton({
       await navigator.share({ title, url: link }).catch(() => undefined);
       return;
     }
-    // No clipboard outside secure contexts; a refused write is not a copy either.
-    await navigator.clipboard?.writeText(link).then(
-      () => setCopied(true),
-      () => undefined,
-    );
+    if (await copyText(link)) setCopied(true);
   }
 
   const icon = <Export size={iconOnly ? 20 : 16} weight="bold" aria-hidden />;

@@ -1,0 +1,41 @@
+name: Seed UAT
+
+# Fills the UAT database with the demo data: admin accounts, the data/ jams, demo dancers and crews.
+# The only way to seed UAT, so its owner credentials stay in GitHub, never on a laptop. Run it by
+# hand from the `uat` branch (Actions → Seed UAT → Run workflow); it does nothing once seeded.
+on:
+  workflow_dispatch:
+
+# Shares the UAT deploy's group: never seeds while a deploy migrates.
+concurrency:
+  group: deploy-uat
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    # The `uat` environment only accepts the `uat` branch too; production has no seed.
+    if: github.ref_name == 'uat'
+    runs-on: ubuntu-latest
+    environment: uat
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # Queries compile against the committed .sqlx data, not the database.
+      SQLX_OFFLINE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      # rust-toolchain.toml pins the version; rustup installs it on first use.
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - name: Seed the database
+        env:
+          # The owner role, as for migrations.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SEED_PASSWORD: ${{ secrets.SEED_PASSWORD }}
+          # Set apart from the secret: the seed refuses any other host, so a production string
+          # pasted into the secret by mistake is refused, not seeded.
+          SEED_ALLOW_HOST: ${{ vars.SEED_ALLOW_HOST }}
+        run: cargo run --release --bin seed

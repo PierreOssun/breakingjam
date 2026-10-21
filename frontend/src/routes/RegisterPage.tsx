@@ -8,6 +8,7 @@ import { z } from "zod";
 import { api } from "../api/client";
 import { Button } from "../components/Button";
 import { TextField } from "../components/TextField";
+import { splitFieldErrors } from "../lib/apiErrors";
 import { AuthShell } from "../features/auth/AuthShell";
 import { safeNext, withNext } from "../features/auth/safeNext";
 import { ME_KEY } from "../features/auth/useMe";
@@ -57,16 +58,15 @@ export function RegisterPage() {
         setError("email", { message: t("auth.errors.emailTaken") });
         return;
       }
-      // Rules the client missed: show the server's per-field messages where they belong.
-      const known = ["display_name", "email", "password"] as const;
-      const fields = error?.error.fields ?? [];
-      for (const field of fields) {
-        const name = known.find((k) => k === field.field);
-        if (name) setError(name, { message: field.message });
-      }
-      if (!fields.some((f) => known.some((k) => k === f.field))) {
+      // Rules the client missed go on their fields; anything else gets the generic message.
+      const { fields } = splitFieldErrors(error, [
+        "display_name",
+        "email",
+        "password",
+      ] as const);
+      for (const [name, message] of fields) setError(name, { message });
+      if (fields.length === 0)
         setError("root", { message: t("auth.errors.generic") });
-      }
     } catch {
       setError("root", { message: t("auth.errors.generic") });
     }

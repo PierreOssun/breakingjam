@@ -49,6 +49,8 @@ pub struct DancerRecord {
     /// Crew keys; a dancer may be in none, one or several.
     #[serde(default)]
     pub crews: Vec<String>,
+    /// `bboy` or `bgirl`: the avatar's look, before any battle suggests one.
+    pub look: Option<BattleGender>,
 }
 
 /// One line of `crews.toml`.
@@ -214,7 +216,8 @@ pub enum Round {
     Third,
 }
 
-const ROUNDS: [Round; 6] = [
+/// The rounds of a full bracket, in the order winners advance: semi-final winners play the final, not the small final.
+pub(super) const ROUNDS: [Round; 6] = [
     Round::Top64,
     Round::Top32,
     Round::Top16,

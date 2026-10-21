@@ -61,9 +61,9 @@ async fn spec_and_swagger_ui_are_served() {
     assert_eq!(spec.json["openapi"], "3.1.0");
     assert!(spec.json["paths"]["/api/events"]["get"].is_object());
 
-    // Swagger UI is mounted in debug builds only.
+    // Swagger UI is mounted only with the `swagger` feature.
     let docs = send(&app, get("/api/docs/", None)).await;
-    let expected = if cfg!(debug_assertions) {
+    let expected = if cfg!(feature = "swagger") {
         StatusCode::OK
     } else {
         StatusCode::NOT_FOUND

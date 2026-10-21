@@ -10,7 +10,7 @@ use validator::Validate;
 
 use super::{
     BattleRecord, Dataset, EventRecord, Standing,
-    check::{Problem, Subject, check},
+    check::{Kind, Problem, check},
 };
 use crate::{
     db,
@@ -105,34 +105,18 @@ pub async fn insert_all(
 
 /// The jams with no broken rule, naming no dancer or crew with one; the others, with why.
 fn importable<'a>(data: &'a Dataset, problems: &[Problem]) -> (Vec<&'a str>, Vec<String>) {
-    let broken = |kind: fn(&Subject) -> Option<&String>| -> BTreeSet<&str> {
+    let broken = |kind: Kind| -> BTreeSet<&str> {
         problems
             .iter()
-            .filter_map(|p| kind(&p.subject))
-            .map(String::as_str)
+            .filter(|p| p.kind == kind)
+            .map(|p| p.key.as_str())
             .collect()
     };
-    let bad_events = broken(|s| {
-        if let Subject::Event(key) = s {
-            Some(key)
-        } else {
-            None
-        }
-    });
-    let bad_dancers = broken(|s| {
-        if let Subject::Dancer(key) = s {
-            Some(key)
-        } else {
-            None
-        }
-    });
-    let bad_crews = broken(|s| {
-        if let Subject::Crew(key) = s {
-            Some(key)
-        } else {
-            None
-        }
-    });
+    let (bad_events, bad_dancers, bad_crews) = (
+        broken(Kind::Event),
+        broken(Kind::Dancer),
+        broken(Kind::Crew),
+    );
     let (mut events, mut skipped) = (Vec::new(), Vec::new());
     for (key, event) in &data.events {
         let bad_dancer = dancers_of(event).find(|d| bad_dancers.contains(d));
@@ -223,7 +207,7 @@ async fn insert_event(
             "refused by the jam rules: {errors}"
         )));
     }
-    let id = db::events::insert(conn, Uuid::now_v7(), cx.organizer, &fields)
+    let id = db::events::insert(&mut *conn, Uuid::now_v7(), cx.organizer, &fields)
         .await?
         .id;
     let status = if fields.ends_on < cx.today {
@@ -251,7 +235,7 @@ async fn insert_event(
             ));
             continue;
         }
-        let battle_id = db::battles::insert(conn, id, &battle.name, &fields)
+        let battle_id = db::battles::insert(&mut *conn, id, &battle.name, &fields)
             .await?
             .id;
         // `check` passed, so the bracket holds.

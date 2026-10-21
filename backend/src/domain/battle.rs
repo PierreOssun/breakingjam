@@ -47,7 +47,7 @@ pub enum BattleAge {
 
 /// Furthest stage an entry reached; `Winner` is first place.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+    Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
 )]
 #[sqlx(type_name = "bracket_stage", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -60,16 +60,18 @@ pub enum BracketStage {
     Top4,
     Top2,
     Winner,
+    #[default]
     Na,
 }
 
 /// Registration state of an entry.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+    Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
 )]
 #[sqlx(type_name = "entry_status", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum EntryStatus {
+    #[default]
     Pending,
     Confirmed,
     Withdrawn,
@@ -286,19 +288,7 @@ pub fn starts_during(
     start.is_none_or(|at| (first_day..=last_day).contains(&at.date()))
 }
 
-impl Battle {
-    /// Whether the start, if any, falls on one of the jam's days.
-    pub fn starts_during(&self, first_day: NaiveDate, last_day: NaiveDate) -> bool {
-        starts_during(self.starts_at, first_day, last_day)
-    }
-}
-
 impl BattleFields {
-    /// Whether the start, if any, falls on one of the jam's days.
-    pub fn starts_during(&self, first_day: NaiveDate, last_day: NaiveDate) -> bool {
-        starts_during(self.starts_at, first_day, last_day)
-    }
-
     /// The organiser's name, or one built from the structured fields (§4: "2v2 Mixed Kids").
     pub fn display_name(&self) -> String {
         if let Some(name) = self
@@ -340,10 +330,10 @@ pub struct EntryFields {
     #[validate(length(min = 1, max = 10))]
     pub dancer_ids: Vec<Uuid>,
     /// Registration state; `pending` when omitted.
-    #[serde(default = "pending")]
+    #[serde(default)]
     pub status: EntryStatus,
     /// Furthest stage reached; `na` when omitted.
-    #[serde(default = "not_applicable")]
+    #[serde(default)]
     pub reached: BracketStage,
     /// Exact placement when known; filled from `reached` for `winner` (1) and `top2` (2).
     #[validate(range(min = 1))]
@@ -353,14 +343,6 @@ pub struct EntryFields {
     pub video_url: Option<String>,
     #[validate(range(min = 0))]
     pub video_offset_seconds: Option<i32>,
-}
-
-fn pending() -> EntryStatus {
-    EntryStatus::Pending
-}
-
-fn not_applicable() -> BracketStage {
-    BracketStage::Na
 }
 
 impl EntryFields {

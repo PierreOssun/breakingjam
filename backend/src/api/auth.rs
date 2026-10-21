@@ -20,7 +20,7 @@ use crate::{
     },
     db,
     domain::user::{Role, User},
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, InvalidFields, Unauthorized},
     state::AppState,
 };
 
@@ -115,7 +115,7 @@ type WithCookie<T> = ([(axum::http::HeaderName, HeaderValue); 1], T);
     responses(
         (status = CREATED, body = UserResponse, headers(("set-cookie" = String, description = "`bj_session`, HttpOnly, 30 days"))),
         (status = CONFLICT, description = "Email already registered", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn register(
@@ -153,14 +153,18 @@ async fn login(
     State(state): State<AppState>,
     ValidJson(req): ValidJson<LoginRequest>,
 ) -> Result<WithCookie<Json<UserResponse>>, AppError> {
-    // Unknown email, Google-only account and wrong password all look the same to the client.
-    let (user, hash) = db::users::find_with_password(&state.pool, req.email.trim())
-        .await?
+    // Unknown email, Google-only account and wrong password all look the same to the client,
+    // in timing too: every attempt verifies against some hash.
+    let found = db::users::find_with_password(&state.pool, req.email.trim()).await?;
+    let hash = found
+        .as_ref()
+        .and_then(|(_, hash)| hash.clone())
+        .unwrap_or_else(|| password::NO_PASSWORD.to_owned());
+    let ok = password::verify(req.password, hash).await?;
+    // A Google-only account has no hash of its own: matching the stand-in must not log in.
+    let (user, _) = found
+        .filter(|(_, own)| ok && own.is_some())
         .ok_or(AppError::Unauthorized)?;
-    let hash = hash.ok_or(AppError::Unauthorized)?;
-    if !password::verify(req.password, hash).await? {
-        return Err(AppError::Unauthorized);
-    }
     let cookie = session::start(&state, user.id).await?;
     Ok(([(SET_COOKIE, cookie)], Json(user.into())))
 }
@@ -198,7 +202,7 @@ async fn logout(
     security(("session" = [])),
     responses(
         (status = OK, body = UserResponse, headers(("set-cookie" = String, description = "`bj_session`, HttpOnly, 30 days"))),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
     )
 )]
 async fn me(

@@ -1,7 +1,7 @@
 //! `events` queries; soft-deleted rows are invisible everywhere.
 
 use chrono::NaiveDate;
-use sqlx::{PgConnection, PgPool};
+use sqlx::{PgConnection, PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{
@@ -54,7 +54,7 @@ pub struct MapPoint {
 
 /// Inserts a draft jam; optional text fields are trimmed and `""` becomes null.
 pub async fn insert(
-    conn: &mut PgConnection,
+    db: impl PgExecutor<'_>,
     id: Uuid,
     organizer_id: Uuid,
     fields: &EventFields,
@@ -91,7 +91,7 @@ pub async fn insert(
         fields.website_url,
         fields.contact_email,
     )
-    .fetch_one(conn)
+    .fetch_one(db)
     .await
 }
 

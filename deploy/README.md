@@ -79,17 +79,15 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
 7. **GitHub:** repository Settings → Environments → `prod` and `uat`.
    - Deployment branches: only `prod` for `prod`, only `uat` for `uat`.
    - Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` (the **owner** string, for migrations), `NEON_API_KEY`.
+   - `uat` only: secret `SEED_PASSWORD`, the seeded accounts' password (`openssl rand -hex 16`), and variable `SEED_ALLOW_HOST`, UAT's database host (`ep-….neon.tech`, no `-pooler`). The seed refuses any other host.
    - Variables: `NEON_PROJECT_ID`, `VITE_PROTOMAPS_KEY`, and `VITE_TILES_URL` only with self-hosted tiles.
    - `prod` only: required reviewers, so each production deploy waits for an approval.
    - Settings → Rules: a ruleset on `uat` and `prod` blocking force pushes and deletion.
 8. **UAT only, optional: Cloudflare Access** (Zero Trust → Access → Applications, free up to 50 users). It keeps UAT private; without it UAT is public, but `TEST_SITE` keeps it out of search engines and labels it.
    - A self-hosted application for `uat.breakingjam.com`, policy *Allow* with your testers' emails (login with a one-time PIN).
    - A second application for `uat.breakingjam.com/api/health`, policy *Bypass* for *Everyone*, so the deploy's check gets through. The more specific path wins.
-9. **UAT only: demo data.** After the first UAT deploy, from `backend/` with the UAT **owner** string:
-   ```sh
-   DATABASE_URL='<UAT owner string>' SEED_ALLOW_HOST='<its host, ep-….neon.tech>' SEED_PASSWORD='<password>' cargo run --bin seed
-   ```
-   The seed refuses any remote host that `SEED_ALLOW_HOST` doesn't name exactly. Never point it at production.
+9. **UAT only: demo data.** After the first UAT deploy: Actions → **Seed UAT** → Run workflow, on the `uat` branch (`.github/workflows/seed-uat.yml`). It does nothing once the database is seeded.
+   - UAT is seeded only from GitHub, so its owner string never sits on a laptop. Production has no seed.
 10. **Production only: backups.** See [Backups](#backups).
 
 ## Releasing

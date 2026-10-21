@@ -2,7 +2,7 @@ import { X } from "@phosphor-icons/react";
 import { useEffect, useId, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { embedUrl, youtubeId } from "../lib/youtube";
-import { Button } from "./Button";
+import { IconButton } from "./IconButton";
 
 export type Video = { url: string; offset?: number | null; name: string };
 
@@ -37,14 +37,12 @@ export function VideoDialog({
         <h2 id={titleId} className="font-display text-display-sm">
           {title}
         </h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("video.close")}
+        <IconButton
+          label={t("video.close")}
           onClick={() => ref.current?.close()}
         >
           <X size={20} weight="bold" aria-hidden />
-        </Button>
+        </IconButton>
       </div>
       <div className="aspect-video overflow-hidden rounded-md bg-bg">
         <iframe

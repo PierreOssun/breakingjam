@@ -1,3 +1,7 @@
+# Every recipe uses the compose Postgres, whatever the shell exports: a Neon URL left in the
+# environment must never reach `reset-db` or `seed`.
+export DATABASE_URL := "postgres://breakingjam:breakingjam@localhost:5432/breakingjam"
+
 # `just` lists these recipes.
 default:
     @just --list
@@ -8,7 +12,7 @@ db:
 
 # Backend on :8080 (migrates on start in debug builds).
 backend: db
-    cd backend && cargo run
+    cd backend && cargo run --features swagger
 
 # Frontend on :5173, proxying /api to :8080.
 frontend:
@@ -21,7 +25,7 @@ dev target="": db
     case "{{target}}" in
       "")
         trap 'kill 0' EXIT
-        (cd backend && cargo run) &
+        (cd backend && cargo run --features swagger) &
         (cd frontend && npm run dev) &
         wait ;;
       uat|prod)
@@ -45,7 +49,7 @@ reset-db: db
 
 # Everything CI runs.
 check:
-    cd backend && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
+    cd backend && cargo fmt --check && cargo clippy --all-targets --all-features -- -D warnings && cargo test
     cd backend && cargo sqlx prepare --check -- --all-targets
     cd backend && cargo run --bin data -- check
     cd frontend && npx prettier --check . && npm run lint && npm run typecheck && npm test && npm run build

@@ -1,7 +1,7 @@
 //! `crews` and `crew_memberships` queries; soft-deleted crews are invisible.
 
 use chrono::NaiveDate;
-use sqlx::PgPool;
+use sqlx::{PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::crew::{Crew, CrewFields, Member};
@@ -41,7 +41,7 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Crew>> {
 }
 
 /// Inserts a crew; text is trimmed, blanks become null, the handle is stored lower case without `@`.
-pub async fn insert(pool: &PgPool, fields: &CrewFields) -> sqlx::Result<Crew> {
+pub async fn insert(db: impl PgExecutor<'_>, fields: &CrewFields) -> sqlx::Result<Crew> {
     sqlx::query_as!(
         Crew,
         "insert into crews (id, name, country, city, instagram_handle)
@@ -53,7 +53,7 @@ pub async fn insert(pool: &PgPool, fields: &CrewFields) -> sqlx::Result<Crew> {
         fields.city,
         fields.instagram_handle,
     )
-    .fetch_one(pool)
+    .fetch_one(db)
     .await
 }
 
@@ -120,22 +120,24 @@ pub async fn is_current_member(
     .await
 }
 
-/// Adds a membership starting `since` (null = unknown).
+/// Adds a membership starting `since` (null = unknown); `false` when the dancer is already a
+/// current member, or a past membership already starts then.
 pub async fn add_member(
     pool: &PgPool,
     crew_id: Uuid,
     dancer_id: Uuid,
     since: Option<NaiveDate>,
-) -> sqlx::Result<()> {
-    sqlx::query!(
-        "insert into crew_memberships (dancer_id, crew_id, since) values ($1, $2, $3)",
+) -> sqlx::Result<bool> {
+    let result = sqlx::query!(
+        "insert into crew_memberships (dancer_id, crew_id, since) values ($1, $2, $3)
+         on conflict do nothing",
         dancer_id,
         crew_id,
         since,
     )
     .execute(pool)
     .await?;
-    Ok(())
+    Ok(result.rows_affected() > 0)
 }
 
 /// Ends the current membership today; `false` when there was none.

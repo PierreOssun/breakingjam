@@ -1686,7 +1686,7 @@
             }
           },
           "409": {
-            "description": "Already a current member",
+            "description": "Already a current member, or a past membership with the same `since`",
             "content": {
               "application/json": {
                 "schema": {

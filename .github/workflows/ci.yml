@@ -46,7 +46,7 @@ jobs:
       - run: cargo install sqlx-cli --locked --version 0.9.0 --no-default-features --features rustls,postgres
       - run: sqlx migrate run
       - run: cargo fmt --check
-      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo clippy --all-targets --all-features -- -D warnings
       - run: cargo test
       # Second run must be a no-op. Runs before `prepare --check`, which touches sources and would force a rebuild.
       - run: cargo run --bin seed && cargo run --bin seed

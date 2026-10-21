@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { api, type Schemas } from "../../api/client";
+import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
 import { InlineNotice } from "../../components/InlineNotice";
@@ -42,13 +42,13 @@ export function StatusActions({ jam }: { jam: Jam }) {
   );
 
   const move = useMutation({
-    mutationFn: async (transition: Transition) => {
-      const { data, error } = await api.POST("/api/events/{id}/{transition}", {
-        params: { path: { id: jam.id, transition } },
-      });
-      if (!data) throw new Error(error?.error.message ?? "transition failed");
-      return data;
-    },
+    mutationFn: async (transition: Transition) =>
+      unwrap(
+        await api.POST("/api/events/{id}/{transition}", {
+          params: { path: { id: jam.id, transition } },
+        }),
+        "transition",
+      ),
     onSuccess: (event, transition) => {
       queryClient.setQueryData<Jam | null>(["event", jam.id], (old) =>
         old ? { ...old, ...event } : old,
@@ -123,46 +123,32 @@ export function StatusActions({ jam }: { jam: Jam }) {
           {t("org.status.delete")}
         </Button>
       </div>
-      <Dialog
-        open={confirming !== null}
-        onClose={() => setConfirming(null)}
-        title={
-          confirming === "delete"
-            ? t("org.status.deleteTitle")
-            : t("org.status.cancelTitle")
-        }
-        footer={(close) => (
-          <>
-            <Button
-              variant="ghost"
-              className="flex-1 lg:flex-none"
-              onClick={close}
-            >
-              {t("org.status.keep")}
-            </Button>
-            <Button
-              data-autofocus
-              className="flex-[2] lg:flex-none"
-              loading={move.isPending || remove.isPending}
-              onClick={() =>
-                confirming === "delete"
-                  ? remove.mutate()
-                  : move.mutate("cancel")
-              }
-            >
-              {confirming === "delete"
+      {confirming && (
+        <Dialog
+          onClose={() => setConfirming(null)}
+          title={
+            confirming === "delete"
+              ? t("org.status.deleteTitle")
+              : t("org.status.cancelTitle")
+          }
+          action={{
+            label:
+              confirming === "delete"
                 ? t("org.status.delete")
-                : t("org.status.action.cancel")}
-            </Button>
-          </>
-        )}
-      >
-        <p className="text-body text-muted">
-          {confirming === "delete"
-            ? t("org.status.deleteBody", { name: jam.name })
-            : t("org.status.cancelBody", { name: jam.name })}
-        </p>
-      </Dialog>
+                : t("org.status.action.cancel"),
+            cancel: t("org.status.keep"),
+            loading: move.isPending || remove.isPending,
+            onClick: () =>
+              confirming === "delete" ? remove.mutate() : move.mutate("cancel"),
+          }}
+        >
+          <p className="text-body text-muted">
+            {confirming === "delete"
+              ? t("org.status.deleteBody", { name: jam.name })
+              : t("org.status.cancelBody", { name: jam.name })}
+          </p>
+        </Dialog>
+      )}
     </section>
   );
 }

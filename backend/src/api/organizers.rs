@@ -23,7 +23,7 @@ use crate::{
         organizer::{Organizer, OrganizerClaim, OrganizerClaimForReview, OrganizerFields},
         user::Role,
     },
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, InvalidCursor, InvalidFields, NotAdmin, Unauthorized},
     state::AppState,
 };
 
@@ -96,11 +96,11 @@ async fn show(
     security(("session" = [])),
     responses(
         (status = OK, body = OrganizerResponse),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Someone else's page", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No organiser page", body = ErrorEnvelope),
         (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn update(
@@ -159,7 +159,7 @@ async fn events(
     security(("session" = [])),
     responses(
         (status = OK, body = OrganizerClaim),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Someone else's page", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No organiser page", body = ErrorEnvelope),
         (status = CONFLICT, description = "Already verified", body = ErrorEnvelope),
@@ -196,7 +196,7 @@ async fn open(
     security(("session" = [])),
     responses(
         (status = OK, body = OrganizerClaim),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Someone else's page", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No claim yet", body = ErrorEnvelope),
     )
@@ -223,9 +223,9 @@ async fn mine(
     security(("session" = [])),
     responses(
         (status = OK, body = Page<OrganizerClaimForReview>),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
+        InvalidCursor,
     )
 )]
 async fn queue(
@@ -252,8 +252,8 @@ async fn queue(
     security(("session" = [])),
     responses(
         (status = OK, body = OrganizerClaim),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
         (status = NOT_FOUND, description = "No such claim", body = ErrorEnvelope),
         (status = CONFLICT, description = "Already reviewed, or the handle changed since", body = ErrorEnvelope),
     )
@@ -276,8 +276,8 @@ async fn approve(
     security(("session" = [])),
     responses(
         (status = OK, body = OrganizerClaim),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
         (status = NOT_FOUND, description = "No such claim", body = ErrorEnvelope),
         (status = CONFLICT, description = "Already reviewed", body = ErrorEnvelope),
     )

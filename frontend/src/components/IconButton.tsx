@@ -6,11 +6,13 @@ export function IconButton({
   label,
   onClick,
   disabled,
+  className = "",
   children,
 }: {
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  className?: string;
   children: ReactNode;
 }) {
   return (
@@ -20,7 +22,7 @@ export function IconButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="shrink-0"
+      className={`shrink-0 ${className}`}
     >
       {children}
     </Button>

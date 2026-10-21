@@ -90,7 +90,7 @@ def fit_name(name, width=344, sizes=(46, 40, 34, 28, 24), max_lines=4, room=None
         if ok and len(lines) <= lim and fits_room:
             return fs, lines
     fs, lines = best
-    n = 1
+    n = 1 if room is not None else lim
     while room is not None and n < len(lines) and n * fs * 1.08 + fs * 0.8 <= room: n += 1
     out = lines[:n]
     if len(lines) > n: out[-1] = out[-1].rstrip('.,') + '…'

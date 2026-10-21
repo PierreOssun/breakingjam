@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { api } from "../../api/client";
+import { api, unwrap } from "../../api/client";
 import type { Language } from "../../i18n";
 import { useNearViewport } from "../../lib/useNearViewport";
 
@@ -35,15 +35,14 @@ export function JamFlyer({
   const flyer = useQuery({
     // `updated_at` changes when the name, date or place does.
     queryKey: ["flyer", jam.id, jam.updated_at, lang, compact],
-    queryFn: async () => {
-      const { data, response } = await api.GET("/api/events/{id}/flyer.svg", {
-        params: { path: { id: jam.id }, query: { compact, lang } },
-        parseAs: "text",
-      });
-      if (!response.ok || data === undefined)
-        throw new Error(`flyer: ${response.status}`);
-      return data;
-    },
+    queryFn: async () =>
+      unwrap(
+        await api.GET("/api/events/{id}/flyer.svg", {
+          params: { path: { id: jam.id }, query: { compact, lang } },
+          parseAs: "text",
+        }),
+        "flyer",
+      ),
     staleTime: 5 * 60_000,
     enabled: near,
   });

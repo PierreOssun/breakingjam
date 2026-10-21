@@ -13,7 +13,8 @@ use breakingjam::{
             EntryStatus,
             StaffRole::{self, Dj, Judge, Mc},
         },
-        event::{EventStatus, slug},
+        crew::CrewFields,
+        event::{EventFields, EventStatus},
         user::Role,
     },
 };
@@ -476,17 +477,13 @@ async fn insert_user(conn: &mut PgConnection, user: &User, password: &str) -> an
 async fn insert_crews(conn: &mut PgConnection) -> sqlx::Result<Vec<Uuid>> {
     let mut ids = Vec::with_capacity(CREWS.len());
     for crew in CREWS {
-        let id = Uuid::now_v7();
-        sqlx::query!(
-            "insert into crews (id, name, country, city) values ($1, $2, $3, $4)",
-            id,
-            crew.name,
-            crew.country,
-            crew.city,
-        )
-        .execute(&mut *conn)
-        .await?;
-        ids.push(id);
+        let fields = CrewFields {
+            name: crew.name.into(),
+            country: Some(crew.country.into()),
+            city: Some(crew.city.into()),
+            instagram_handle: None,
+        };
+        ids.push(db::crews::insert(&mut *conn, &fields).await?.id);
     }
     Ok(ids)
 }
@@ -563,9 +560,10 @@ async fn insert_events(
                 ..battle.fields()
             };
             fields.validate()?;
-            let battle_id = db::battles::insert(conn, event_id, &fields.display_name(), &fields)
-                .await?
-                .id;
+            let battle_id =
+                db::battles::insert(&mut *conn, event_id, &fields.display_name(), &fields)
+                    .await?
+                    .id;
             for entrant in battle.entrants {
                 let entry = ids.entry(battle, entrant)?;
                 db::battles::insert_entry(conn, battle_id, fields.gender, &entry).await?;
@@ -588,33 +586,29 @@ async fn insert_event(
     conn: &mut PgConnection,
     organizer: Uuid,
     event: &Event,
-) -> sqlx::Result<(Uuid, NaiveDate)> {
+) -> anyhow::Result<(Uuid, NaiveDate)> {
     let id = Uuid::now_v7();
-    let first_day = sqlx::query_scalar!(
-        "insert into events
-           (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country, lat, lng,
-            description, website_url, contact_email)
-         values ($1, $2, $3, $4, $5,
-                 current_date + $6::int, current_date + $6::int + $7::int - 1,
-                 $8, $9, $10, $11, $12, $13, $14, $15)
-         returning starts_on",
-        id,
-        organizer,
-        event.name,
-        slug(event.name, id),
-        event.status as _,
-        event.starts_in_days,
-        event.length_days,
-        event.timezone,
-        event.city,
-        event.country,
-        event.lat,
-        event.lng,
-        event.about.description,
-        event.about.website,
-        event.about.email,
-    )
-    .fetch_one(conn)
-    .await?;
-    Ok((id, first_day))
+    let today = chrono::Utc::now().date_naive();
+    let starts_on = today + Days::new(u64::try_from(event.starts_in_days)?);
+    let fields = EventFields {
+        name: event.name.into(),
+        description: Some(event.about.description.into()),
+        starts_on,
+        ends_on: starts_on + Days::new(u64::try_from(event.length_days - 1)?),
+        timezone: event.timezone.into(),
+        venue_name: None,
+        address: None,
+        city: event.city.into(),
+        country: event.country.into(),
+        lat: Some(event.lat),
+        lng: Some(event.lng),
+        registration_url: None,
+        instagram_url: None,
+        website_url: Some(event.about.website.into()),
+        contact_email: Some(event.about.email.into()),
+    };
+    fields.validate()?;
+    db::events::insert(&mut *conn, id, organizer, &fields).await?;
+    db::dataset::set_status(conn, id, event.status).await?;
+    Ok((id, starts_on))
 }

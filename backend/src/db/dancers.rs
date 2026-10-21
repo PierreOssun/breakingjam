@@ -215,20 +215,23 @@ pub async fn log_edits(
     user_id: Uuid,
     changes: &[FieldChange],
 ) -> sqlx::Result<()> {
-    for (field, old_value, new_value) in changes {
-        sqlx::query!(
-            "insert into dancer_edits (id, dancer_id, user_id, field, old_value, new_value)
-             values ($1, $2, $3, $4, $5, $6)",
-            Uuid::now_v7(),
-            dancer_id,
-            user_id,
-            field,
-            old_value.as_deref(),
-            new_value.as_deref(),
-        )
-        .execute(&mut *conn)
-        .await?;
-    }
+    let ids: Vec<Uuid> = changes.iter().map(|_| Uuid::now_v7()).collect();
+    let fields: Vec<&str> = changes.iter().map(|(field, ..)| *field).collect();
+    let old_values: Vec<Option<&str>> = changes.iter().map(|(_, old, _)| old.as_deref()).collect();
+    let new_values: Vec<Option<&str>> = changes.iter().map(|(_, _, new)| new.as_deref()).collect();
+    sqlx::query!(
+        "insert into dancer_edits (id, dancer_id, user_id, field, old_value, new_value)
+         select i, $1, $2, f, o, n
+         from unnest($3::uuid[], $4::text[], $5::text[], $6::text[]) as t(i, f, o, n)",
+        dancer_id,
+        user_id,
+        &ids,
+        &fields as &[&str],
+        &old_values as &[Option<&str>],
+        &new_values as &[Option<&str>],
+    )
+    .execute(conn)
+    .await?;
     Ok(())
 }
 

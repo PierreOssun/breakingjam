@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { api } from "../../api/client";
+import { api, unwrap } from "../../api/client";
 import { Flag } from "../../components/Flag";
 import { countryName } from "../../lib/countries";
 
@@ -10,11 +10,7 @@ const TOP_COUNTRIES = 10;
 function useSiteStats() {
   return useQuery({
     queryKey: ["stats"],
-    queryFn: async () => {
-      const { data, response } = await api.GET("/api/stats");
-      if (!data) throw new Error(`stats: ${response.status}`);
-      return data;
-    },
+    queryFn: async () => unwrap(await api.GET("/api/stats"), "stats"),
     staleTime: 5 * 60_000,
   });
 }

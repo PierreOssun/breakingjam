@@ -3,11 +3,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
-import { api } from "../api/client";
+import { api, unwrap } from "../api/client";
 import { withNext } from "../features/auth/safeNext";
 import { ME_KEY, useMe } from "../features/auth/useMe";
-import { Button } from "./Button";
 import { buttonClasses } from "./buttonClasses";
+import { IconButton } from "./IconButton";
 import { LanguageSwitch } from "./LanguageSwitch";
 import { Wordmark } from "./Wordmark";
 
@@ -46,15 +46,13 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
             {t("nav.registerJam")}
           </Link>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("nav.openMenu")}
+        <IconButton
+          label={t("nav.openMenu")}
           className="lg:hidden"
           onClick={() => menuRef.current?.showModal()}
         >
           <List size={22} weight="bold" aria-hidden />
-        </Button>
+        </IconButton>
       </div>
 
       {/* Below lg: a full-height sheet; the native dialog traps focus and closes on Esc. */}
@@ -65,14 +63,9 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
       >
         <div className="flex h-full flex-col gap-2">
           <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t("nav.closeMenu")}
-              onClick={closeMenu}
-            >
+            <IconButton label={t("nav.closeMenu")} onClick={closeMenu}>
               <X size={22} weight="bold" aria-hidden />
-            </Button>
+            </IconButton>
           </div>
           <nav className="flex flex-col">
             <NavLink to="/map" className={sheetLink} onClick={closeMenu}>
@@ -142,12 +135,9 @@ function AccountAction({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const logout = useMutation({
-    mutationFn: async () => {
-      // openapi-fetch resolves on 4xx/5xx; only a 2xx means the session is gone.
-      const { response } = await api.POST("/api/auth/logout");
-      if (!response.ok)
-        throw new Error(`POST /api/auth/logout: ${response.status}`);
-    },
+    // Only a 2xx means the session is gone.
+    mutationFn: async () =>
+      unwrap(await api.POST("/api/auth/logout"), "logout"),
     onSuccess: () => {
       queryClient.setQueryData(ME_KEY, null);
       onDone?.();

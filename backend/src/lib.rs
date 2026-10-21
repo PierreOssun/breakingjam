@@ -15,7 +15,12 @@ pub mod state;
 #[path = "../tests/unit/mod.rs"]
 mod unit_tests;
 
-use axum::{Json, Router, http::Request, routing::get};
+use axum::{
+    Router,
+    body::Bytes,
+    http::{Request, header::CONTENT_TYPE},
+    routing::get,
+};
 use tower_http::{
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, RequestId, SetRequestIdLayer},
     trace::{DefaultOnResponse, TraceLayer},
@@ -42,20 +47,22 @@ pub fn openapi() -> utoipa::openapi::OpenApi {
     openapi::router().into_openapi()
 }
 
-/// Builds the full application router.
-pub fn app(state: AppState) -> Router {
+/// Builds the full application router; fails only if the OpenAPI document can't be serialised.
+pub fn app(state: AppState) -> Result<Router, serde_json::Error> {
     let (router, spec) = openapi::router().split_for_parts();
+    // Serialised once: the document is ~100 KB and never changes; `Bytes` clones share it.
+    let spec = Bytes::from(spec.to_json()?);
     let router = router.route(
         "/api/openapi.json",
-        get(move || std::future::ready(Json(spec.clone()))),
+        get(move || std::future::ready(([(CONTENT_TYPE, "application/json")], spec.clone()))),
     );
-    // Swagger UI is a dev tool (§5 Routes); release builds only serve the JSON.
-    #[cfg(debug_assertions)]
+    // Swagger UI is a dev tool (§5 Routes): `cargo run --features swagger` serves it.
+    #[cfg(feature = "swagger")]
     let router = router.merge(
         utoipa_swagger_ui::SwaggerUi::new("/api/docs")
             .config(utoipa_swagger_ui::Config::new(["/api/openapi.json"])),
     );
-    router
+    Ok(router
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|req: &Request<_>| {
@@ -80,5 +87,5 @@ pub fn app(state: AppState) -> Router {
         )
         .layer(PropagateRequestIdLayer::x_request_id())
         .layer(SetRequestIdLayer::x_request_id(MakeRequestUuid))
-        .with_state(state)
+        .with_state(state))
 }

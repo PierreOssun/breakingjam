@@ -20,29 +20,42 @@ pub struct Report {
 /// A broken rule; it prints as `<file>: <message>`, e.g. `dancers.toml: menno: name is blank`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Problem {
-    /// The dancer, crew or jam the rule is broken in.
-    pub subject: Subject,
+    /// Which file the rule is broken in.
+    pub kind: Kind,
+    /// The dancer or crew key, or the jam's `<series>/<edition>`.
+    pub key: String,
     /// What is wrong.
     pub message: String,
 }
 
 /// What a problem is about, so an import can leave out just that.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Subject {
-    /// A line of `dancers.toml`, by key.
-    Dancer(String),
-    /// A line of `crews.toml`, by key.
-    Crew(String),
-    /// A jam file, by `<series>/<edition>`.
-    Event(String),
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Kind {
+    /// A line of `dancers.toml`.
+    Dancer,
+    /// A line of `crews.toml`.
+    Crew,
+    /// A jam file under `events/`.
+    Event,
+}
+
+impl Kind {
+    /// The file a dancer's or crew's line is in; each jam has its own, `events/<key>.toml`.
+    fn file(self) -> &'static str {
+        match self {
+            Kind::Dancer => "dancers.toml",
+            Kind::Crew => "crews.toml",
+            Kind::Event => "events",
+        }
+    }
 }
 
 impl fmt::Display for Problem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self.subject {
-            Subject::Dancer(key) => write!(f, "dancers.toml: {key}: {}", self.message),
-            Subject::Crew(key) => write!(f, "crews.toml: {key}: {}", self.message),
-            Subject::Event(key) => write!(f, "events/{key}.toml: {}", self.message),
+        let Problem { key, message, .. } = self;
+        match self.kind {
+            Kind::Event => write!(f, "events/{key}.toml: {message}"),
+            kind => write!(f, "{}: {key}: {message}", kind.file()),
         }
     }
 }
@@ -58,16 +71,8 @@ struct Identity<'a> {
 /// Checks every rule over the whole dataset.
 pub fn check(data: &Dataset) -> Report {
     let mut report = Report::default();
-    check_identities(
-        ("dancers.toml", Subject::Dancer),
-        dancer_identities(data),
-        &mut report,
-    );
-    check_identities(
-        ("crews.toml", Subject::Crew),
-        crew_identities(data),
-        &mut report,
-    );
+    check_identities(Kind::Dancer, dancer_identities(data), &mut report);
+    check_identities(Kind::Crew, crew_identities(data), &mut report);
     for (key, dancer) in &data.dancers {
         for crew in dancer
             .crews
@@ -75,7 +80,8 @@ pub fn check(data: &Dataset) -> Report {
             .filter(|crew| !data.crews.contains_key(*crew))
         {
             report.errors.push(Problem {
-                subject: Subject::Dancer(key.clone()),
+                kind: Kind::Dancer,
+                key: key.clone(),
                 message: format!("crew {crew} is not in crews.toml"),
             });
         }
@@ -86,7 +92,8 @@ pub fn check(data: &Dataset) -> Report {
         report
             .errors
             .extend(errors.into_iter().map(|message| Problem {
-                subject: Subject::Event(key.clone()),
+                kind: Kind::Event,
+                key: key.clone(),
                 message,
             }));
     }
@@ -116,15 +123,17 @@ fn crew_identities(data: &Dataset) -> impl Iterator<Item = Identity<'_>> {
 }
 
 fn check_identities<'a>(
-    (file, subject): (&str, fn(String) -> Subject),
+    kind: Kind,
     identities: impl Iterator<Item = Identity<'a>>,
     report: &mut Report,
 ) {
+    let file = kind.file();
     let mut spellings: BTreeMap<String, BTreeSet<(&str, &str)>> = BTreeMap::new();
     for identity in identities {
         let mut fail = |message: String| {
             report.errors.push(Problem {
-                subject: subject(identity.key.to_owned()),
+                kind,
+                key: identity.key.to_owned(),
                 message,
             })
         };

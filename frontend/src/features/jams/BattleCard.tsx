@@ -9,7 +9,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
-import { Button } from "../../components/Button";
 import { IconButton } from "../../components/IconButton";
 import { ResultBadge } from "../../components/ResultBadge";
 import { useToast } from "../../components/useToast";
@@ -116,10 +115,8 @@ export function BattleCard({ jam, battle, entries, onPlay }: BattleCardProps) {
                 status={jam.can_edit && entry.status !== "confirmed"}
               />
               {entry.video_url && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={t("jam.watch", { name: entryLabel(entry) })}
+                <IconButton
+                  label={t("jam.watch", { name: entryLabel(entry) })}
                   onClick={() =>
                     onPlay({
                       url: entry.video_url ?? "",
@@ -129,7 +126,7 @@ export function BattleCard({ jam, battle, entries, onPlay }: BattleCardProps) {
                   }
                 >
                   <Play size={20} weight="fill" aria-hidden />
-                </Button>
+                </IconButton>
               )}
               <ResultBadge
                 finalRank={entry.final_rank}
@@ -176,12 +173,13 @@ export function BattleCard({ jam, battle, entries, onPlay }: BattleCardProps) {
               onClick={() => setEditing("new")}
             />
           </div>
-          <EntryDialog
-            battle={battle}
-            entry={editing === "new" || editing === null ? undefined : editing}
-            open={editing !== null}
-            onClose={() => setEditing(null)}
-          />
+          {editing !== null && (
+            <EntryDialog
+              battle={battle}
+              entry={editing === "new" ? undefined : editing}
+              onClose={() => setEditing(null)}
+            />
+          )}
         </>
       )}
     </li>

@@ -1,20 +1,17 @@
-import type { FeatureCollection, Point } from "geojson";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import MapView, {
   AttributionControl,
-  Layer,
   type MapRef,
   Marker,
-  Source,
 } from "react-map-gl/maplibre";
 import { formatShortDateRange } from "../../lib/dates";
 import { useMediaQuery } from "../../lib/useMediaQuery";
 import { JamFlyer } from "../jams/JamFlyer";
+import { useClusteredJams } from "./clustered";
 import { ClusterDot } from "./ClusterDot";
 import type { Bounds, MapJam } from "./jams";
 import { maplibre, useMapStyle } from "./maplibre";
-import { type MarkerItem, toMarkers } from "./view";
 
 const SOURCE = "preview";
 // From lg the soonest jam carries a 300px popup above it: frame the jams so it never
@@ -36,27 +33,10 @@ export default function PreviewMap({ jams, bounds, soonest }: PreviewMapProps) {
   const mapRef = useRef<MapRef>(null);
   const style = useMapStyle();
   const wide = useMediaQuery("(min-width: 1024px)");
-  const [markers, setMarkers] = useState<MarkerItem[]>([]);
-  const data = useMemo<FeatureCollection<Point>>(
-    () => ({
-      type: "FeatureCollection",
-      features: jams.map((jam) => ({
-        type: "Feature",
-        geometry: { type: "Point", coordinates: [jam.lng, jam.lat] },
-        properties: { id: jam.id },
-      })),
-    }),
-    [jams],
-  );
-  const byId = useMemo(() => new Map(jams.map((jam) => [jam.id, jam])), [jams]);
-  const refresh = useCallback(() => {
-    const map = mapRef.current?.getMap();
-    if (map?.getSource(SOURCE))
-      setMarkers(toMarkers(map.querySourceFeatures(SOURCE)));
-  }, []);
-
-  const shown = markers.flatMap((m) =>
-    m.kind === "jam" ? (byId.get(m.id) ?? []) : [],
+  const { source, clusters, single, refresh } = useClusteredJams(
+    mapRef,
+    SOURCE,
+    jams,
   );
 
   return (
@@ -83,31 +63,14 @@ export default function PreviewMap({ jams, bounds, soonest }: PreviewMapProps) {
         if (e.sourceId === SOURCE && e.isSourceLoaded) refresh();
       }}
     >
-      <Source
-        id={SOURCE}
-        type="geojson"
-        data={data}
-        cluster
-        clusterRadius={48}
-        clusterMaxZoom={12}
-      >
-        {/* Draws nothing; a source without a layer never loads its tiles. */}
-        <Layer
-          id={`${SOURCE}-hidden`}
-          type="circle"
-          paint={{ "circle-radius": 0, "circle-opacity": 0 }}
-        />
-      </Source>
+      {source}
       <AttributionControl position="bottom-right" compact={false} />
-      {markers.map(
-        (m) =>
-          m.kind === "cluster" && (
-            <Marker key={m.key} longitude={m.lng} latitude={m.lat}>
-              <ClusterDot count={m.count} />
-            </Marker>
-          ),
-      )}
-      {shown.map((jam) => (
+      {clusters.map((m) => (
+        <Marker key={m.key} longitude={m.lng} latitude={m.lat}>
+          <ClusterDot count={m.count} />
+        </Marker>
+      ))}
+      {single.map((jam) => (
         <Marker key={jam.id} longitude={jam.lng} latitude={jam.lat}>
           <span
             aria-hidden

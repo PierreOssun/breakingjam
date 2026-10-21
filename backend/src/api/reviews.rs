@@ -23,7 +23,7 @@ use crate::{
         not_blank,
         user::Role,
     },
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, InvalidCursor, NotAdmin, Unauthorized},
     state::AppState,
 };
 
@@ -63,9 +63,9 @@ pub struct RejectRequest {
     security(("session" = [])),
     responses(
         (status = OK, body = Page<EventResponse>),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
+        InvalidCursor,
     )
 )]
 async fn queue(
@@ -100,8 +100,8 @@ async fn queue(
     security(("session" = [])),
     responses(
         (status = OK, body = Event),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
         (status = NOT_FOUND, description = "No such jam", body = ErrorEnvelope),
         (status = CONFLICT, description = "Not in review", body = ErrorEnvelope),
     )
@@ -125,8 +125,8 @@ async fn approve(
     security(("session" = [])),
     responses(
         (status = OK, body = Event),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
         (status = NOT_FOUND, description = "No such jam", body = ErrorEnvelope),
         (status = CONFLICT, description = "Not in review", body = ErrorEnvelope),
         (status = UNPROCESSABLE_ENTITY, description = "Blank or too long note", body = ErrorEnvelope),

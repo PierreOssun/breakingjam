@@ -1,39 +1,28 @@
 import { Crosshair, Minus, Plus } from "@phosphor-icons/react";
-import type { FeatureCollection, Point } from "geojson";
 import {
   type ReactNode,
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
 import MapView, {
   AttributionControl,
-  Layer,
   type MapRef,
   Marker,
-  Source,
 } from "react-map-gl/maplibre";
 import { dayAndMonth, formatDateRange } from "../../lib/dates";
 import { useMediaQuery } from "../../lib/useMediaQuery";
+import { CLUSTER_MAX_ZOOM, useClusteredJams } from "./clustered";
 import { ClusterDot } from "./ClusterDot";
 import { type Bounds, boundsOf, isPast, type MapJam } from "./jams";
 import { maplibre, useMapStyle } from "./maplibre";
-import {
-  type Box,
-  type MarkerItem,
-  normalizeBounds,
-  panToReveal,
-  toMarkers,
-} from "./view";
+import { type Box, normalizeBounds, panToReveal } from "./view";
 
 const SOURCE = "jams";
-// §7: clusters up to zoom 12, so from 12 up every marker has its date tag.
-const CLUSTER_MAX_ZOOM = 12;
-const DATE_TAGS_FROM = 12;
+const DATE_TAGS_FROM = CLUSTER_MAX_ZOOM;
 // Where the anchored popup's caret ends: 14px (half the selected marker) plus an 8px gap.
 const POPUP_LIFT = 22;
 const MOVE_MS = 600;
@@ -73,8 +62,8 @@ export function JamMap(props: JamMapProps) {
   const mapRef = useRef<MapRef>(null);
   const popupRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
-  const [markers, setMarkers] = useState<MarkerItem[]>([]);
   const [zoom, setZoom] = useState(0);
+  const clustered = useClusteredJams(mapRef, SOURCE, jams);
   const style = useMapStyle();
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
@@ -97,30 +86,18 @@ export function JamMap(props: JamMapProps) {
     };
   }, []);
 
-  const data = useMemo<FeatureCollection<Point>>(
-    () => ({
-      type: "FeatureCollection",
-      features: jams.map((jam) => ({
-        type: "Feature",
-        geometry: { type: "Point", coordinates: [jam.lng, jam.lat] },
-        properties: { id: jam.id },
-      })),
-    }),
-    [jams],
-  );
-  const byId = useMemo(() => new Map(jams.map((jam) => [jam.id, jam])), [jams]);
-
   /** Redraws markers from the clustered source and reports the visible box. */
+  const redraw = clustered.refresh;
   const refresh = useCallback(() => {
     const map = mapRef.current?.getMap();
     if (!map?.getSource(SOURCE)) return;
-    setMarkers(toMarkers(map.querySourceFeatures(SOURCE)));
+    redraw();
     setZoom(map.getZoom());
     const b = map.getBounds();
     latest.current.props.onBoundsChange(
       normalizeBounds([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]),
     );
-  }, []);
+  }, [redraw]);
 
   useEffect(() => {
     const map = mapRef.current?.getMap();
@@ -231,13 +208,11 @@ export function JamMap(props: JamMapProps) {
     }
   }
 
-  const shown = markers.flatMap((m) =>
-    m.kind === "jam" ? (byId.get(m.id) ?? []) : [],
-  );
   // The selected jam keeps its marker even when it sits inside a cluster.
-  if (selected && !shown.some((jam) => jam.id === selected.id)) {
-    shown.push(selected);
-  }
+  const shown =
+    selected && !clustered.single.some((jam) => jam.id === selected.id)
+      ? [...clustered.single, selected]
+      : clustered.single;
 
   return (
     <div className="absolute inset-0 touch-none">
@@ -270,33 +245,17 @@ export function JamMap(props: JamMapProps) {
           props.onClear();
         }}
       >
-        <Source
-          id={SOURCE}
-          type="geojson"
-          data={data}
-          cluster
-          clusterRadius={48}
-          clusterMaxZoom={CLUSTER_MAX_ZOOM}
-        >
-          {/* Draws nothing; a source without a layer never loads its tiles. */}
-          <Layer
-            id={`${SOURCE}-hidden`}
-            type="circle"
-            paint={{ "circle-radius": 0, "circle-opacity": 0 }}
-          />
-        </Source>
+        {clustered.source}
         <AttributionControl position="bottom-right" compact={false} />
 
-        {markers.map((m) =>
-          m.kind === "cluster" ? (
-            <Marker key={m.key} longitude={m.lng} latitude={m.lat}>
-              <ClusterButton
-                count={m.count}
-                onClick={() => void zoomToCluster(m.clusterId)}
-              />
-            </Marker>
-          ) : null,
-        )}
+        {clustered.clusters.map((m) => (
+          <Marker key={m.key} longitude={m.lng} latitude={m.lat}>
+            <ClusterButton
+              count={m.count}
+              onClick={() => void zoomToCluster(m.clusterId)}
+            />
+          </Marker>
+        ))}
         {shown.map((jam) => {
           const isSelected = jam.id === selected?.id;
           return (

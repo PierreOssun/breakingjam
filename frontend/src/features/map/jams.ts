@@ -38,7 +38,7 @@ export function jamsOf(collection: Schemas["FeatureCollection"]): MapJam[] {
 }
 
 /** A local calendar date as `YYYY-MM-DD`. */
-export function isoDate(date: Date): string {
+function isoDate(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
@@ -65,7 +65,7 @@ export function rangeOf(
 }
 
 /** Whether a jam runs on at least one day of `[from, to]`. */
-export function overlaps(
+function overlaps(
   jam: Pick<MapJam, "starts_on" | "ends_on">,
   [from, to]: [string, string],
 ): boolean {

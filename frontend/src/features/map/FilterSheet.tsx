@@ -2,6 +2,7 @@ import { X } from "@phosphor-icons/react";
 import { useEffect, useId, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../components/Button";
+import { IconButton } from "../../components/IconButton";
 import { FilterChips } from "./FilterChips";
 import { type Filters, NO_FILTERS } from "./jams";
 
@@ -61,14 +62,12 @@ export function FilterSheet({
           <h2 id={titleId} className="font-display text-display-md">
             {t("map.filters")}
           </h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={t("map.close")}
+          <IconButton
+            label={t("map.close")}
             onClick={() => dialog.current?.close()}
           >
             <X size={20} weight="bold" aria-hidden />
-          </Button>
+          </IconButton>
         </div>
         <FilterChips filters={filters} onChange={onChange} variant="sheet" />
         <div className="mt-2 flex gap-3">

@@ -17,7 +17,7 @@ use crate::{
         claim::{Claim, ClaimForReview, ClaimStatus},
         user::Role,
     },
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, InvalidCursor, NotAdmin, Unauthorized},
     state::AppState,
 };
 
@@ -62,7 +62,7 @@ pub struct MyClaim {
     security(("session" = [])),
     responses(
         (status = OK, body = MyClaim),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = NOT_FOUND, description = "No such dancer, or merged away", body = ErrorEnvelope),
         (status = CONFLICT, description = "Dancer already verified, or you already own a page", body = ErrorEnvelope),
     )
@@ -96,7 +96,7 @@ async fn open(
     security(("session" = [])),
     responses(
         (status = OK, body = MyClaim),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = NOT_FOUND, description = "No claim yet", body = ErrorEnvelope),
     )
 )]
@@ -130,9 +130,9 @@ async fn with_others(state: &AppState, claim: Claim) -> Result<Json<MyClaim>, Ap
     security(("session" = [])),
     responses(
         (status = OK, body = Page<ClaimForReview>),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
+        InvalidCursor,
     )
 )]
 async fn queue(
@@ -158,8 +158,8 @@ async fn queue(
     security(("session" = [])),
     responses(
         (status = OK, body = Claim),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
         (status = NOT_FOUND, description = "No such claim, or its dancer is gone", body = ErrorEnvelope),
         (status = CONFLICT, description = "Already reviewed, or the dancer is already verified", body = ErrorEnvelope),
     )
@@ -182,8 +182,8 @@ async fn approve(
     security(("session" = [])),
     responses(
         (status = OK, body = Claim),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
         (status = NOT_FOUND, description = "No such claim", body = ErrorEnvelope),
         (status = CONFLICT, description = "Already reviewed", body = ErrorEnvelope),
     )
@@ -218,13 +218,15 @@ async fn decide(
         if dancer.verified_at.is_some() {
             return Err(AppError::Conflict("this dancer is already verified".into()));
         }
-        // `dancers.user_id` is unique; checked here so the answer is readable, not a constraint name.
-        if db::users::owns_dancer(&state.pool, claim.user_id).await? {
-            return Err(AppError::Conflict(
-                "this user already owns a dancer page".into(),
-            ));
-        }
-        db::claims::grant_ownership(&mut tx, &claim, current.user.id).await?;
+        // `dancers.user_id` is unique; the database decides so two approvals cannot both pass.
+        db::claims::grant_ownership(&mut tx, &claim, current.user.id)
+            .await
+            .map_err(|err| match err {
+                sqlx::Error::Database(db) if db.constraint() == Some("dancers_user_id_key") => {
+                    AppError::Conflict("this user already owns a dancer page".into())
+                }
+                other => other.into(),
+            })?;
     }
     let claim = db::claims::decide(&mut tx, id, decision, current.user.id).await?;
     tx.commit().await?;

@@ -23,7 +23,7 @@ pub fn app(pool: PgPool) -> Router {
         _ => Some(format!("test-{name}")),
     })
     .unwrap();
-    breakingjam::app(AppState::new(pool, config).unwrap())
+    breakingjam::app(AppState::new(pool, config).unwrap()).unwrap()
 }
 
 pub struct TestResponse {

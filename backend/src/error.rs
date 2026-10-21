@@ -7,7 +7,7 @@ use axum::{
 };
 use serde::Serialize;
 use thiserror::Error;
-use utoipa::ToSchema;
+use utoipa::{IntoResponses, ToSchema};
 
 /// Every error a handler can return; maps 1:1 to an HTTP status.
 #[derive(Debug, Error)]
@@ -31,6 +31,39 @@ pub enum AppError {
     #[error(transparent)]
     Internal(#[from] anyhow::Error),
 }
+
+/// 401 of every route behind a session.
+#[derive(IntoResponses)]
+#[response(status = 401, description = "No valid session")]
+pub struct Unauthorized(pub ErrorEnvelope);
+
+/// 403 of the admin-only routes.
+#[derive(IntoResponses)]
+#[response(status = 403, description = "Not an admin")]
+pub struct NotAdmin(pub ErrorEnvelope);
+
+/// 422 of every route with a validated body.
+#[derive(IntoResponses)]
+#[response(status = 422, description = "Invalid fields")]
+pub struct InvalidFields(pub ErrorEnvelope);
+
+/// 422 of every paginated route.
+#[derive(IntoResponses)]
+#[response(status = 422, description = "Invalid cursor")]
+pub struct InvalidCursor(pub ErrorEnvelope);
+
+/// 404 of every route under a jam.
+#[derive(IntoResponses)]
+#[response(status = 404, description = "No such jam, or a draft you can't see")]
+pub struct JamNotVisible(pub ErrorEnvelope);
+
+/// 403 of every route that edits a jam.
+#[derive(IntoResponses)]
+#[response(
+    status = 403,
+    description = "Not the jam's organiser nor `seed_admin`+"
+)]
+pub struct NotJamWriter(pub ErrorEnvelope);
 
 /// One invalid input field.
 #[derive(Debug, Serialize, ToSchema)]

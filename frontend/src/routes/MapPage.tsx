@@ -118,10 +118,9 @@ export function MapPage() {
   const selected = selection
     ? (matching.find((jam) => jam.id === selection.id) ?? null)
     : null;
-  // A jam the filters or search hide is no longer selected: it must not pop back later.
-  useEffect(() => {
-    if (selection && !selected) setSelection(null);
-  }, [selection, selected]);
+  // Whatever hides the selected jam (filters, search, a refetch, the language) unselects it,
+  // so it can't pop back later. Set during render: React redoes it before painting.
+  if (selection && !selected) setSelection(null);
 
   // The first view is what a `?q=` search matches, else the visitor's country; later loads
   // (refetches) leave the camera alone.

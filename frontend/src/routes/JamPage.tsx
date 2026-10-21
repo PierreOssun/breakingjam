@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import type { Schemas } from "../api/client";
 import { buttonClasses } from "../components/buttonClasses";
+import { ExternalLink } from "../components/ExternalLink";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { ShareButton } from "../components/ShareButton";
 import { StatusBadge } from "../components/StatusBadge";
@@ -122,8 +123,8 @@ function JamDetail({ jam }: { jam: Jam }) {
                 icon={<Globe size={20} weight="bold" />}
                 label={t("jam.website")}
               >
-                <ExternalLink href={jam.website_url}>
-                  {hostOf(jam.website_url)}
+                <ExternalLink variant="fact" href={jam.website_url}>
+                  {instagramLabel(jam.website_url)}
                 </ExternalLink>
               </Fact>
             )}
@@ -134,7 +135,7 @@ function JamDetail({ jam }: { jam: Jam }) {
               >
                 <a
                   href={`mailto:${jam.contact_email}`}
-                  className={`${factLink} break-all`}
+                  className="inline-flex min-h-11 items-center self-start font-bold break-all text-primary-text underline-offset-2 hover:underline"
                 >
                   {jam.contact_email}
                 </a>
@@ -145,7 +146,7 @@ function JamDetail({ jam }: { jam: Jam }) {
                 icon={<InstagramLogo size={20} weight="bold" />}
                 label={t("jam.instagram")}
               >
-                <ExternalLink href={jam.instagram_url}>
+                <ExternalLink variant="fact" href={jam.instagram_url}>
                   {instagramLabel(jam.instagram_url)}
                 </ExternalLink>
               </Fact>
@@ -199,6 +200,7 @@ function JamDetail({ jam }: { jam: Jam }) {
               </address>
               {jam.lat != null && jam.lng != null && (
                 <ExternalLink
+                  variant="fact"
                   href={`https://www.openstreetmap.org/?mlat=${jam.lat}&mlon=${jam.lng}#map=16/${jam.lat}/${jam.lng}`}
                 >
                   {t("jam.openInMaps")}
@@ -309,39 +311,6 @@ function RegisterLink({
     >
       {t("jam.register")}
       <ArrowSquareOut size={20} weight="bold" aria-hidden />
-    </a>
-  );
-}
-
-/** "pariscypher.com" for `https://www.pariscypher.com/`; the link itself when it won't parse. */
-function hostOf(link: string): string {
-  try {
-    return new URL(link).hostname.replace(/^www\./, "");
-  } catch {
-    return link;
-  }
-}
-
-// A link in a fact row: a 44px touch target, underlined on hover.
-const factLink =
-  "inline-flex min-h-11 items-center gap-1.5 self-start font-bold text-primary-text underline-offset-2 hover:underline";
-
-function ExternalLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: ReactNode;
-}) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={factLink}
-    >
-      {children}
-      <ArrowSquareOut size={16} weight="bold" aria-hidden />
     </a>
   );
 }

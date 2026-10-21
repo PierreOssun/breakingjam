@@ -21,7 +21,7 @@ export type JamFormValues = {
 };
 
 /** The browser's timezone: the organiser is usually where the jam is. */
-export function localTimezone(): string {
+function localTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 }
 
