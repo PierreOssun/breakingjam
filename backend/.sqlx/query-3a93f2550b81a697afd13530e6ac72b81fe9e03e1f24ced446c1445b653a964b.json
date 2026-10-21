@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, dancer_name, aliases, country, country2, city, instagram_handle,\n                  verified_at is not null as \"verified!\", avatar_url, avatar_parts\n           from dancers\n           where deleted_at is null and merged_into_id is null\n             and ($1::text is null\n                  or dancer_name ilike $1\n                  or instagram_handle ilike $1\n                  or exists (select 1 from unnest(aliases) a where a ilike $1))\n             and ($2::text is null or country = $2 or country2 = $2)\n             and ($3::bool is null or (verified_at is not null) = $3)\n           order by notable desc, lower(dancer_name), id\n           limit $4 offset $5",
+  "query": "select id, dancer_name, aliases, country, country2, city, instagram_handle,\n                  verified_at is not null as \"verified!\", avatar_url, avatar_parts\n           from dancers\n           where deleted_at is null and merged_into_id is null\n             and ($1::text is null\n                  or dancer_name ilike $1\n                  or instagram_handle ilike $1\n                  or exists (select 1 from unnest(aliases) a where a ilike $1))\n             and ($2::text is null or country = $2 or country2 = $2)\n           order by notable desc, lower(dancer_name), id\n           limit $3 offset $4",
   "describe": {
     "columns": [
       {
@@ -113,7 +113,6 @@
       "Left": [
         "Text",
         "Text",
-        "Bool",
         "Int8",
         "Int8"
       ]
@@ -131,5 +130,5 @@
       true
     ]
   },
-  "hash": "4a89d918e55a7d76242632b0ff1c6b7dfae536508d698f75bb377f25ed4d8225"
+  "hash": "3a93f2550b81a697afd13530e6ac72b81fe9e03e1f24ced446c1445b653a964b"
 }

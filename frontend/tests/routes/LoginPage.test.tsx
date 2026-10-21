@@ -74,7 +74,7 @@ describe("LoginPage", () => {
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: "Every jam. One map.",
+        name: "Find your next jam",
       }),
     ).toBeInTheDocument();
   });

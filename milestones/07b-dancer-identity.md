@@ -1,6 +1,6 @@
 # Milestone 7b — Dancer identity: claims, admin review, `dancer_edits`, merge (avatar deferred)
 
-Build order point 7b of `ARCHITECTURE_v0.1.md` §11.
+Build order point 7b of `ARCHITECTURE.md` §11.
 
 ## Decisions (asked at the start, recorded in §1/§4/§5 of the architecture doc)
 

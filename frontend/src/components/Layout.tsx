@@ -23,7 +23,7 @@ export function PageLayout() {
       <div className="flex min-h-dvh flex-col">
         <SkipLink />
         <Header />
-        <main id="main" className="flex-1">
+        <main id="main" tabIndex={-1} className="focus:outline-none flex-1">
           <Outlet />
         </main>
         <Footer />
@@ -39,7 +39,11 @@ export function AppLayout() {
       <div className="flex h-dvh flex-col overflow-hidden">
         <SkipLink />
         <Header sticky={false} />
-        <main id="main" className="relative flex-1">
+        <main
+          id="main"
+          tabIndex={-1}
+          className="focus:outline-none relative flex-1"
+        >
           <Outlet />
         </main>
       </div>

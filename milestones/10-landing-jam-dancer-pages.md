@@ -1,6 +1,6 @@
 # Milestone 10 — Landing page (two CTAs), jam detail page, dancer page (upcoming / past jams)
 
-Build order point 10 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 10 of `ARCHITECTURE.md` §11.
 
 ## Decisions (asked at the start)
 

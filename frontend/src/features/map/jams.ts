@@ -38,7 +38,7 @@ export function jamsOf(collection: Schemas["FeatureCollection"]): MapJam[] {
 }
 
 /** A local calendar date as `YYYY-MM-DD`. */
-export function isoDate(date: Date): string {
+function isoDate(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
@@ -65,7 +65,7 @@ export function rangeOf(
 }
 
 /** Whether a jam runs on at least one day of `[from, to]`. */
-export function overlaps(
+function overlaps(
   jam: Pick<MapJam, "starts_on" | "ends_on">,
   [from, to]: [string, string],
 ): boolean {
@@ -118,6 +118,28 @@ const fold = (text: string) =>
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
+
+/**
+ * The jams that pass the filters and a search, judged from `today`: upcoming ones unless the
+ * "Past jams" filter is on or a search looks through every jam.
+ */
+export function narrow(
+  jams: MapJam[],
+  filters: Filters,
+  search: string,
+  language: string,
+  today: Date,
+): MapJam[] {
+  const upcomingOnly = filters.when === null && search === "";
+  return jams
+    .filter(
+      (jam) =>
+        !(upcomingOnly && isPast(jam, today)) &&
+        matchesFilters(jam, filters, today) &&
+        matchesSearch(jam, search, language),
+    )
+    .sort(byDate(today));
+}
 
 /** Every word of the query appears in the name, city, country code or country name. */
 export function matchesSearch(

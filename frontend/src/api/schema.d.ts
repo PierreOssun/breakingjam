@@ -2693,8 +2693,6 @@ export interface operations {
                 q?: string;
                 /** @description Matches the first or second flag. */
                 country?: string;
-                /** @description Only verified (`true`) or only unverified (`false`) dancers. */
-                verified?: boolean;
                 /** @description `next_cursor` of the previous page. */
                 cursor?: string;
                 /** @description Page size, defaulted and clamped by `page::limit`. */
@@ -3236,7 +3234,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Already a current member */
+            /** @description Already a current member, or a past membership with the same `since` */
             409: {
                 headers: {
                     [name: string]: unknown;

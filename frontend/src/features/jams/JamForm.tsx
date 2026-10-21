@@ -5,12 +5,13 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { Schemas } from "../../api/client";
 import { Button } from "../../components/Button";
+import { CountrySelect } from "../../components/CountrySelect";
+import { FormError } from "../../components/FormError";
 import { OptionalLabel } from "../../components/OptionalLabel";
 import { SelectField } from "../../components/SelectField";
 import { TextAreaField } from "../../components/TextAreaField";
 import { TextField } from "../../components/TextField";
-import { splitFieldErrors } from "../../lib/apiErrors";
-import { countryOptions } from "../../lib/countries";
+import { applyFieldErrors } from "../../lib/apiErrors";
 import { jamBody, type JamFormValues, timezones } from "./jamFields";
 import { LocationField } from "./LocationField";
 
@@ -43,7 +44,7 @@ type JamFormProps = {
 
 /** A jam's details, for registering one and for editing it (§6 Forms). */
 export function JamForm({ initial, submitLabel, onSubmit }: JamFormProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const schema = useJamSchema();
   const form = useForm<JamFormValues>({
     resolver: zodResolver(schema),
@@ -61,18 +62,11 @@ export function JamForm({ initial, submitLabel, onSubmit }: JamFormProps) {
     "description",
     "timezone",
   ]);
-  const countries = useMemo(
-    () => countryOptions(i18n.language),
-    [i18n.language],
-  );
 
   const submit = handleSubmit(async (values) => {
     try {
       const failure = await onSubmit(jamBody(values));
-      if (!failure) return;
-      const { fields, rest } = splitFieldErrors(failure, FIELDS);
-      for (const [field, message] of fields) setError(field, { message });
-      if (rest) setError("root", { message: rest });
+      if (failure) applyFieldErrors(setError, failure, FIELDS);
     } catch {
       setError("root", { message: t("errors.generic") });
     }
@@ -133,18 +127,12 @@ export function JamForm({ initial, submitLabel, onSubmit }: JamFormProps) {
           error={errors.city?.message}
           {...register("city")}
         />
-        <SelectField
+        <CountrySelect
           label={t("org.fields.country")}
+          blank={t("org.fields.choose")}
           error={errors.country?.message}
           {...register("country")}
-        >
-          <option value="">{t("org.fields.choose")}</option>
-          {countries.map(([code, name]) => (
-            <option key={code} value={code}>
-              {name}
-            </option>
-          ))}
-        </SelectField>
+        />
       </div>
       <LocationField
         address={address}
@@ -199,11 +187,7 @@ export function JamForm({ initial, submitLabel, onSubmit }: JamFormProps) {
         error={errors.contact_email?.message}
         {...register("contact_email")}
       />
-      {errors.root?.message && (
-        <p role="alert" className="text-body-sm font-bold text-danger">
-          {errors.root.message}
-        </p>
-      )}
+      <FormError message={errors.root?.message} />
       {/* §5: forms keep their action in a sticky bar on phones. */}
       <div className="sticky bottom-0 -mx-4 border-t border-border bg-bg px-4 py-3 md:-mx-6 md:px-6 lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0">
         <Button

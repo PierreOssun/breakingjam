@@ -6,11 +6,12 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { api, type Schemas } from "../api/client";
+import { api, type Schemas, unwrap } from "../api/client";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { ExternalLink } from "../components/ExternalLink";
 import { InlineEmpty } from "../components/InlineEmpty";
+import { MoreList } from "../components/MoreList";
 import { TextAreaField } from "../components/TextAreaField";
 import { useToast } from "../components/useToast";
 import { VerifiedTick } from "../components/VerifiedTick";
@@ -27,17 +28,16 @@ export function AdminJamsPage() {
   const { t } = useTranslation();
   const queue = useInfiniteQuery({
     queryKey: ["admin", "jams"],
-    queryFn: async ({ pageParam }) => {
-      const { data, response } = await api.GET("/api/admin/events", {
-        params: { query: { cursor: pageParam } },
-      });
-      if (!data) throw new Error(`jams in review: ${response.status}`);
-      return data;
-    },
+    queryFn: async ({ pageParam }) =>
+      unwrap(
+        await api.GET("/api/admin/events", {
+          params: { query: { cursor: pageParam } },
+        }),
+        "jams in review",
+      ),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
   });
-  const jams = queue.data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
     <section aria-labelledby="jams-title" className="flex flex-col gap-6">
@@ -50,25 +50,14 @@ export function AdminJamsPage() {
           {t("admin.jams.intro")}
         </p>
       </div>
-      {queue.isError && <p className="text-danger">{t("errors.generic")}</p>}
-      {queue.isSuccess && jams.length === 0 && (
-        <InlineEmpty>{t("admin.jams.none")}</InlineEmpty>
-      )}
-      <ul className="flex flex-col gap-3">
-        {jams.map((jam) => (
-          <JamToReview key={jam.id} jam={jam} />
-        ))}
-      </ul>
-      {queue.hasNextPage && (
-        <Button
-          variant="secondary"
-          className="self-start"
-          loading={queue.isFetchingNextPage}
-          onClick={() => void queue.fetchNextPage()}
-        >
-          {t("org.showMore")}
-        </Button>
-      )}
+      <MoreList
+        query={queue}
+        empty={<InlineEmpty>{t("admin.jams.none")}</InlineEmpty>}
+        more={t("org.showMore")}
+        className="flex flex-col gap-3"
+      >
+        {(jam) => <JamToReview jam={jam} />}
+      </MoreList>
     </section>
   );
 }
@@ -108,7 +97,7 @@ function JamToReview({ jam }: { jam: Jam }) {
   const { organizer } = jam;
 
   return (
-    <li className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 lg:flex-row lg:items-center">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 lg:flex-row lg:items-center">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <Link
           to={`/jams/${jam.slug}`}
@@ -160,40 +149,28 @@ function JamToReview({ jam }: { jam: Jam }) {
           {t("admin.jams.sendBack")}
         </Button>
       </div>
-      <Dialog
-        open={sendingBack}
-        onClose={() => setSendingBack(false)}
-        title={t("admin.jams.sendBackTitle", { name: jam.name })}
-        footer={(close) => (
-          <>
-            <Button
-              variant="ghost"
-              className="flex-1 lg:flex-none"
-              onClick={close}
-            >
-              {t("form.cancel")}
-            </Button>
-            <Button
-              className="flex-[2] lg:flex-none"
-              disabled={note.trim() === ""}
-              loading={decide.isPending}
-              onClick={() => decide.mutate({ approve: false, note })}
-            >
-              {t("admin.jams.sendBack")}
-            </Button>
-          </>
-        )}
-      >
-        <TextAreaField
-          data-autofocus
-          label={t("admin.jams.note")}
-          hint={t("admin.jams.noteHint")}
-          rows={4}
-          maxLength={1000}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-        />
-      </Dialog>
-    </li>
+      {sendingBack && (
+        <Dialog
+          onClose={() => setSendingBack(false)}
+          title={t("admin.jams.sendBackTitle", { name: jam.name })}
+          action={{
+            label: t("admin.jams.sendBack"),
+            disabled: note.trim() === "",
+            loading: decide.isPending,
+            onClick: () => decide.mutate({ approve: false, note }),
+          }}
+        >
+          <TextAreaField
+            data-autofocus
+            label={t("admin.jams.note")}
+            hint={t("admin.jams.noteHint")}
+            rows={4}
+            maxLength={1000}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </Dialog>
+      )}
+    </div>
   );
 }

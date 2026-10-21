@@ -1,9 +1,8 @@
 import { ArrowLeft, MapPin } from "@phosphor-icons/react";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
-import { api, type Schemas } from "../api/client";
+import type { Schemas } from "../api/client";
 import { Button } from "../components/Button";
 import { ShareButton } from "../components/ShareButton";
 import { VideoDialog, type Video } from "../components/VideoDialog";
@@ -11,6 +10,7 @@ import { DancerActions } from "../features/dancers/DancerActions";
 import { DancerAvatar } from "../features/dancers/DancerAvatar";
 import { IdentityCard } from "../features/dancers/IdentityCard";
 import { JamList } from "../features/dancers/JamList";
+import { useDancer, useDancerEvents } from "../features/dancers/queries";
 import { StatsStrip } from "../features/dancers/StatsStrip";
 import { statsOf } from "../features/dancers/stats";
 import { NotFoundPage } from "./NotFoundPage";
@@ -19,18 +19,7 @@ import { NotFoundPage } from "./NotFoundPage";
 export function DancerPage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
-  const page = useQuery({
-    queryKey: ["dancer", id],
-    queryFn: async () => {
-      const { data, response } = await api.GET("/api/dancers/{id}", {
-        params: { path: { id } },
-      });
-      // 400: not a uuid at all; either way there is no such dancer.
-      if (response.status === 404 || response.status === 400) return null;
-      if (!data) throw new Error(`GET /api/dancers/${id}: ${response.status}`);
-      return data;
-    },
-  });
+  const page = useDancer(id);
 
   if (page.isPending) return null;
   if (page.isError)
@@ -51,16 +40,7 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [video, setVideo] = useState<Video | null>(null);
-  const events = useQuery({
-    queryKey: ["dancer", dancer.id, "events"],
-    queryFn: async () => {
-      const { data, response } = await api.GET("/api/dancers/{id}/events", {
-        params: { path: { id: dancer.id } },
-      });
-      if (!data) throw new Error(`dancer events: ${response.status}`);
-      return data;
-    },
-  });
+  const events = useDancerEvents(dancer.id);
   const play = (p: Schemas["Participation"]) =>
     p.video_url &&
     setVideo({
@@ -94,7 +74,6 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
             flags={[dancer.country, dancer.country2]}
             aliases={dancer.aliases}
             instagram={dancer.instagram_handle}
-            path={`/dancers/${dancer.id}`}
             avatar={<DancerAvatar dancer={dancer} />}
           />
           {(dancer.crews.length > 0 || dancer.city) && (

@@ -1,25 +1,27 @@
-import { List, X } from "@phosphor-icons/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { List, Plus, X } from "@phosphor-icons/react";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, NavLink, useLocation, useNavigate } from "react-router";
-import { api } from "../api/client";
+import { Link, NavLink, useLocation } from "react-router";
 import { withNext } from "../features/auth/safeNext";
-import { ME_KEY, useMe } from "../features/auth/useMe";
-import { Button } from "./Button";
+import { useLogout } from "../features/auth/useLogout";
+import { useMe } from "../features/auth/useMe";
+import { AccountMenu } from "./AccountMenu";
 import { buttonClasses } from "./buttonClasses";
+import { IconButton } from "./IconButton";
 import { LanguageSwitch } from "./LanguageSwitch";
 import { Wordmark } from "./Wordmark";
 
 // Active nav link: a 2px primary-text underline inset at the bottom (DESIGN.md §4.6).
+// The full bar needs xl: from lg, French and German labels or a long name overflow it.
 const navLink = `${buttonClasses("ghost", "sm")} relative aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-[18px] aria-[current=page]:after:bottom-1 aria-[current=page]:after:h-0.5 aria-[current=page]:after:bg-primary-text`;
 
 const sheetLink =
   "flex h-14 items-center rounded-md px-3 text-title transition-colors duration-fast hover:bg-surface-raised aria-[current=page]:text-primary-text";
 
-/** Site header: wordmark, nav, language, account, and the "Register a jam" call to action. */
+/** Site header: wordmark, the three nav links, language, account, and "Register a jam". */
 export function Header({ sticky = true }: { sticky?: boolean }) {
   const { t } = useTranslation();
+  const me = useMe();
   const menuRef = useRef<HTMLDialogElement>(null);
   const closeMenu = () => menuRef.current?.close();
 
@@ -29,32 +31,33 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
     >
       <div className="mx-auto flex h-full max-w-content items-center gap-2 px-4 md:px-6 lg:px-8">
         <Wordmark logo="mark" />
-        <nav aria-label={t("nav.menu")} className="ml-4 hidden gap-1 lg:flex">
-          <NavLink to="/map" className={navLink}>
-            {t("nav.findJam")}
-          </NavLink>
-          <NavLink to="/dancers" end className={navLink}>
-            {t("nav.findSomeone")}
-          </NavLink>
-          <AccountLinks className={navLink} />
+        <nav aria-label={t("nav.menu")} className="ml-4 hidden gap-1 xl:flex">
+          <NavLinks className={navLink} />
         </nav>
         <div className="flex-1" />
         <LanguageSwitch />
-        <div className="hidden items-center gap-2 lg:flex">
-          <AccountAction className={buttonClasses("ghost", "sm")} />
+        <div className="hidden items-center gap-2 xl:flex">
+          {me.data ? (
+            <AccountMenu me={me.data} />
+          ) : (
+            !me.isPending && (
+              <LogIn
+                className={`${buttonClasses("ghost", "sm")} text-muted!`}
+              />
+            )
+          )}
           <Link to="/org/jams/new" className={buttonClasses("primary", "sm")}>
+            <Plus size={16} weight="bold" aria-hidden />
             {t("nav.registerJam")}
           </Link>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("nav.openMenu")}
-          className="lg:hidden"
+        <IconButton
+          label={t("nav.openMenu")}
+          className="xl:hidden"
           onClick={() => menuRef.current?.showModal()}
         >
           <List size={22} weight="bold" aria-hidden />
-        </Button>
+        </IconButton>
       </div>
 
       {/* Below lg: a full-height sheet; the native dialog traps focus and closes on Esc. */}
@@ -65,29 +68,13 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
       >
         <div className="flex h-full flex-col gap-2">
           <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t("nav.closeMenu")}
-              onClick={closeMenu}
-            >
+            <IconButton label={t("nav.closeMenu")} onClick={closeMenu}>
               <X size={22} weight="bold" aria-hidden />
-            </Button>
+            </IconButton>
           </div>
           <nav className="flex flex-col">
-            <NavLink to="/map" className={sheetLink} onClick={closeMenu}>
-              {t("nav.findJam")}
-            </NavLink>
-            <NavLink
-              to="/dancers"
-              end
-              className={sheetLink}
-              onClick={closeMenu}
-            >
-              {t("nav.findSomeone")}
-            </NavLink>
-            <AccountLinks className={sheetLink} onClick={closeMenu} />
-            <AccountAction className={sheetLink} onDone={closeMenu} />
+            <NavLinks className={sheetLink} onClick={closeMenu} />
+            <SheetAccount onDone={closeMenu} />
           </nav>
           <div className="flex-1" />
           <Link
@@ -95,6 +82,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
             className={`${buttonClasses("primary", "lg")} w-full`}
             onClick={closeMenu}
           >
+            <Plus size={20} weight="bold" aria-hidden />
             {t("nav.registerJam")}
           </Link>
         </div>
@@ -103,8 +91,8 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
   );
 }
 
-/** "My jams" once logged in, and the admin area for admins. */
-function AccountLinks({
+/** Jam map, Find a jam, Find someone. */
+function NavLinks({
   className,
   onClick,
 }: {
@@ -112,65 +100,63 @@ function AccountLinks({
   onClick?: () => void;
 }) {
   const { t } = useTranslation();
-  const me = useMe().data;
-  if (!me) return null;
   return (
     <>
-      <NavLink to="/org/jams" end className={className} onClick={onClick}>
-        {t("nav.myJams")}
+      <NavLink to="/map" className={className} onClick={onClick}>
+        {t("nav.jamMap")}
       </NavLink>
-      {me.role === "admin" && (
-        <NavLink to="/admin" className={className} onClick={onClick}>
-          {t("nav.admin")}
-        </NavLink>
-      )}
+      <NavLink to="/jams" end className={className} onClick={onClick}>
+        {t("nav.findJam")}
+      </NavLink>
+      <NavLink to="/dancers" end className={className} onClick={onClick}>
+        {t("nav.findSomeone")}
+      </NavLink>
     </>
   );
 }
 
-/** "Log in" (back to this page afterwards) or "Log out", once the session is known. */
-function AccountAction({
+/** "Log in", back to this page afterwards. */
+function LogIn({
   className,
-  onDone,
+  onClick,
 }: {
   className: string;
-  onDone?: () => void;
+  onClick?: () => void;
 }) {
   const { t } = useTranslation();
-  const me = useMe();
   const location = useLocation();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const logout = useMutation({
-    mutationFn: async () => {
-      // openapi-fetch resolves on 4xx/5xx; only a 2xx means the session is gone.
-      const { response } = await api.POST("/api/auth/logout");
-      if (!response.ok)
-        throw new Error(`POST /api/auth/logout: ${response.status}`);
-    },
-    onSuccess: () => {
-      queryClient.setQueryData(ME_KEY, null);
-      onDone?.();
-      navigate("/");
-    },
-  });
+  const here = location.pathname + location.search;
+  return (
+    <Link to={withNext("/login", here)} className={className} onClick={onClick}>
+      {t("nav.logIn")}
+    </Link>
+  );
+}
 
+/** The menu sheet's account part: My jams, Admin, Log out, or Log in once the session is known. */
+function SheetAccount({ onDone }: { onDone: () => void }) {
+  const { t } = useTranslation();
+  const me = useMe();
+  const logout = useLogout(onDone);
   if (me.isPending) return null;
-  if (me.data) {
-    return (
+  if (!me.data) return <LogIn className={sheetLink} onClick={onDone} />;
+  return (
+    <>
+      <NavLink to="/org/jams" end className={sheetLink} onClick={onDone}>
+        {t("nav.myJams")}
+      </NavLink>
+      {me.data.role === "admin" && (
+        <NavLink to="/admin" className={sheetLink} onClick={onDone}>
+          {t("nav.admin")}
+        </NavLink>
+      )}
       <button
         type="button"
-        className={className}
+        className={sheetLink}
         onClick={() => logout.mutate()}
       >
         {t("nav.logOut")}
       </button>
-    );
-  }
-  const here = location.pathname + location.search;
-  return (
-    <Link to={withNext("/login", here)} className={className} onClick={onDone}>
-      {t("nav.logIn")}
-    </Link>
+    </>
   );
 }

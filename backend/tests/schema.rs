@@ -112,6 +112,31 @@ async fn crew_membership_allows_unknown_since_once(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn crew_membership_is_current_once(pool: PgPool) {
+    let dancer = dancer(&pool, None).await;
+    let crew = Uuid::now_v7();
+    sqlx::query!("insert into crews (id, name) values ($1, 'Crew')", crew)
+        .execute(&pool)
+        .await
+        .unwrap();
+
+    let insert = |year: i32| {
+        sqlx::query!(
+            "insert into crew_memberships (dancer_id, crew_id, since) values ($1, $2, $3)",
+            dancer,
+            crew,
+            chrono::NaiveDate::from_ymd_opt(year, 1, 1),
+        )
+        .execute(&pool)
+    };
+    insert(2020).await.unwrap();
+    assert!(
+        unique_violation(&insert(2024).await),
+        "a second current membership must conflict, whatever its `since`"
+    );
+}
+
+#[sqlx::test]
 async fn only_one_pending_claim_per_dancer_and_user(pool: PgPool) {
     let user = user(&pool).await;
     let dancer = dancer(&pool, None).await;

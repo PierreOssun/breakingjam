@@ -1,6 +1,6 @@
 # Milestone 12 — Organiser jam form; dancer and crew pickers with search-before-create
 
-Build order point 12 of `ARCHITECTURE_v0.1.md` §11. Built in one session with 12b and 12c, at the author's request.
+Build order point 12 of `ARCHITECTURE.md` §11. Built in one session with 12b and 12c, at the author's request.
 
 ## Decision (asked at the start)
 

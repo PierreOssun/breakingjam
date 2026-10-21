@@ -1,6 +1,6 @@
 # Milestone 6 — Dancers CRUD + search + `dancers/{id}/events`; crews + memberships
 
-Build order point 6 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 6 of `ARCHITECTURE.md` §11.
 
 ## Routes
 

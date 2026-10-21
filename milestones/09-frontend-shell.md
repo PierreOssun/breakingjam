@@ -1,6 +1,6 @@
 # Milestone 9 — Frontend shell: routing, i18n, auth pages, header with language switch; Tailwind from `DESIGN.md` tokens
 
-Build order point 9 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 9 of `ARCHITECTURE.md` §11.
 
 ## Decisions (recorded in §2/§6 of the architecture doc)
 

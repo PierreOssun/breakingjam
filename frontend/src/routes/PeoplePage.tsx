@@ -1,38 +1,16 @@
-import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router";
-import { Button } from "../components/Button";
 import { InlineEmpty } from "../components/InlineEmpty";
+import { MoreList } from "../components/MoreList";
 import { TextField } from "../components/TextField";
 import { PersonRow } from "../features/dancers/PersonRow";
 import { useDancerSearch } from "../features/dancers/search";
+import { useSearchText } from "../lib/useSearchText";
 
 /** `/dancers`, "Find someone": bboys, bgirls, DJs and MCs by name, alias or handle, notable first. */
 export function PeoplePage() {
   const { t } = useTranslation();
-  const [params, setParams] = useSearchParams();
-  const q = params.get("q") ?? "";
-  const [text, setText] = useState(q);
-  // Search once typing pauses; the URL keeps the search, so back and shared links return to it.
-  const pushed = useRef(q);
-  useEffect(() => {
-    const next = text.trim();
-    if (next === q) return;
-    const timer = setTimeout(() => {
-      pushed.current = next;
-      setParams(next ? { q: next } : {}, { replace: true });
-    }, 250);
-    return () => clearTimeout(timer);
-  }, [text, q, setParams]);
-  // A `q` this page did not push (back, forward, the header's link) replaces what was typed.
-  useEffect(() => {
-    if (q !== pushed.current) {
-      pushed.current = q;
-      setText(q);
-    }
-  }, [q]);
+  const [text, setText, q] = useSearchText();
   const people = useDancerSearch(q);
-  const items = people.data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
     <section className="mx-auto flex max-w-prose flex-col gap-6 px-4 py-10 md:px-6 lg:py-20">
@@ -48,28 +26,18 @@ export function PeoplePage() {
         value={text}
         onChange={(event) => setText(event.target.value)}
       />
-      {people.isError && <p className="text-danger">{t("errors.generic")}</p>}
-      {people.isSuccess && items.length === 0 && (
-        <InlineEmpty>
-          {q ? t("people.empty", { q }) : t("people.nobody")}
-        </InlineEmpty>
-      )}
-      <ul aria-label={t("pages.people")}>
-        {items.map((person) => (
-          <li key={person.id}>
-            <PersonRow person={person} />
-          </li>
-        ))}
-      </ul>
-      {people.hasNextPage && (
-        <Button
-          variant="secondary"
-          loading={people.isFetchingNextPage}
-          onClick={() => void people.fetchNextPage()}
-        >
-          {t("people.showMore")}
-        </Button>
-      )}
+      <MoreList
+        query={people}
+        empty={
+          <InlineEmpty>
+            {q ? t("people.empty", { q }) : t("people.nobody")}
+          </InlineEmpty>
+        }
+        more={t("people.showMore")}
+        label={t("pages.people")}
+      >
+        {(person) => <PersonRow person={person} />}
+      </MoreList>
     </section>
   );
 }

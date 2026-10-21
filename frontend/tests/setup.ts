@@ -19,6 +19,7 @@ if (!HTMLDialogElement.prototype.showModal) {
 
 afterEach(async () => {
   vi.unstubAllGlobals();
+  vi.useRealTimers();
   localStorage.clear();
   await i18n.changeLanguage("en");
 });

@@ -22,8 +22,6 @@ pub struct DancerFilter<'a> {
     pub query: Option<&'a str>,
     /// The first or second flag.
     pub country: Option<&'a str>,
-    /// Only verified (`true`) or only unverified (`false`) dancers.
-    pub verified: Option<bool>,
 }
 
 /// Search by name, alias or handle (case-insensitive substring), notable dancers first.
@@ -43,12 +41,10 @@ pub async fn search(
                   or instagram_handle ilike $1
                   or exists (select 1 from unnest(aliases) a where a ilike $1))
              and ($2::text is null or country = $2 or country2 = $2)
-             and ($3::bool is null or (verified_at is not null) = $3)
            order by notable desc, lower(dancer_name), id
-           limit $4 offset $5"#,
+           limit $3 offset $4"#,
         pattern,
         filter.country,
-        filter.verified,
         window.limit,
         window.offset,
     )
@@ -215,20 +211,23 @@ pub async fn log_edits(
     user_id: Uuid,
     changes: &[FieldChange],
 ) -> sqlx::Result<()> {
-    for (field, old_value, new_value) in changes {
-        sqlx::query!(
-            "insert into dancer_edits (id, dancer_id, user_id, field, old_value, new_value)
-             values ($1, $2, $3, $4, $5, $6)",
-            Uuid::now_v7(),
-            dancer_id,
-            user_id,
-            field,
-            old_value.as_deref(),
-            new_value.as_deref(),
-        )
-        .execute(&mut *conn)
-        .await?;
-    }
+    let ids: Vec<Uuid> = changes.iter().map(|_| Uuid::now_v7()).collect();
+    let fields: Vec<&str> = changes.iter().map(|(field, ..)| *field).collect();
+    let old_values: Vec<Option<&str>> = changes.iter().map(|(_, old, _)| old.as_deref()).collect();
+    let new_values: Vec<Option<&str>> = changes.iter().map(|(_, _, new)| new.as_deref()).collect();
+    sqlx::query!(
+        "insert into dancer_edits (id, dancer_id, user_id, field, old_value, new_value)
+         select i, $1, $2, f, o, n
+         from unnest($3::uuid[], $4::text[], $5::text[], $6::text[]) as t(i, f, o, n)",
+        dancer_id,
+        user_id,
+        &ids,
+        &fields as &[&str],
+        &old_values as &[Option<&str>],
+        &new_values as &[Option<&str>],
+    )
+    .execute(conn)
+    .await?;
     Ok(())
 }
 

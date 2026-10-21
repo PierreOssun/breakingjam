@@ -299,73 +299,23 @@ pub fn seed(jam_id: &str) -> (Palette, Pose) {
 }
 
 /// Breaks a name into lines that fit (character-width estimate), trying the sizes in order;
-/// when none fits, the most lines that fit the room are kept and the last one gets "…".
+/// when none fits, the most lines within both the room and the line limit are kept and the last one gets "…".
 pub(crate) fn fit_name(name: &str, fit: NameFit) -> (u32, Vec<String>) {
-    let NameFit {
-        width,
-        sizes,
-        max_lines,
-        room,
-    } = fit;
     let words: Vec<&str> = name.split_whitespace().collect();
-    let len = |s: &str| s.chars().count() as f64;
-    let mut best = (sizes[0], Vec::new());
-    for &fs in sizes {
-        let cw = f64::from(fs) * 0.8;
-        let mut lines: Vec<String> = Vec::new();
-        let mut cur = String::new();
-        let mut ok = true;
-        for word in &words {
-            let candidate = if cur.is_empty() {
-                (*word).to_owned()
-            } else {
-                format!("{cur} {word}")
-            };
-            if len(&candidate) * cw <= width {
-                cur = candidate;
-            } else {
-                if !cur.is_empty() {
-                    lines.push(std::mem::take(&mut cur));
-                }
-                cur = (*word).to_owned();
-                if len(word) * cw > width {
-                    ok = false;
-                }
-            }
-        }
-        if !cur.is_empty() {
-            lines.push(cur);
-        }
-        // Avoid a lonely short last word: pull the previous word down when it fits.
-        let n = lines.len();
-        if n >= 2 && len(&lines[n - 1]) <= 3.0 && lines[n - 2].contains(' ') {
-            let (a, b) = lines[n - 2]
-                .rsplit_once(' ')
-                .map(|(a, b)| (a.to_owned(), b.to_owned()))
-                .unwrap_or_default();
-            let joined = format!("{b} {}", lines[n - 1]);
-            if len(&joined) * cw <= width {
-                lines[n - 2] = a;
-                lines[n - 1] = joined;
-            }
-        }
-        let limit = if fs <= 30 { max_lines } else { 3 };
-        let fits_room = room.is_none_or(|room| {
-            (lines.len() as f64 - 1.0) * f64::from(fs) * 1.08 + f64::from(fs) * 0.8 <= room
-        });
-        let fits = ok && lines.len() <= limit && fits_room;
+    let mut best = (fit.sizes[0], Vec::new());
+    for &fs in fit.sizes {
+        let (lines, all_words_fit) = wrap(&words, f64::from(fs) * 0.8, fit.width);
+        let fits = all_words_fit && lines.len() <= fit.line_limit(fs) && fits_room(&lines, fs, fit);
         best = (fs, lines);
         if fits {
             return best;
         }
     }
     let (fs, lines) = best;
-    let mut n = 1;
-    if let Some(room) = room {
-        while n < lines.len() && n as f64 * f64::from(fs) * 1.08 + f64::from(fs) * 0.8 <= room {
-            n += 1;
-        }
-    }
+    let n = (1..=fit.line_limit(fs).min(lines.len()))
+        .rev()
+        .find(|&n| fits_room(&lines[..n], fs, fit))
+        .unwrap_or(1);
     let mut out: Vec<String> = lines.iter().take(n).cloned().collect();
     if lines.len() > n
         && let Some(last) = out.last_mut()
@@ -373,6 +323,63 @@ pub(crate) fn fit_name(name: &str, fit: NameFit) -> (u32, Vec<String>) {
         *last = format!("{}…", last.trim_end_matches(['.', ',']));
     }
     (fs, out)
+}
+
+impl NameFit {
+    /// Lines allowed at `fs`: the block's own limit below 30px, else 3.
+    fn line_limit(self, fs: u32) -> usize {
+        if fs <= 30 { self.max_lines } else { 3 }
+    }
+}
+
+/// Whether `lines` at `fs` stay within the block's room, from the first cap height to the last baseline.
+fn fits_room(lines: &[String], fs: u32, fit: NameFit) -> bool {
+    fit.room.is_none_or(|room| {
+        (lines.len() as f64 - 1.0) * f64::from(fs) * 1.08 + f64::from(fs) * 0.8 <= room
+    })
+}
+
+/// Greedy word wrap at `cw` per character; `false` when a single word is wider than `width`.
+fn wrap(words: &[&str], cw: f64, width: f64) -> (Vec<String>, bool) {
+    let len = |s: &str| s.chars().count() as f64;
+    let mut lines: Vec<String> = Vec::new();
+    let mut cur = String::new();
+    let mut all_words_fit = true;
+    for word in words {
+        let candidate = if cur.is_empty() {
+            (*word).to_owned()
+        } else {
+            format!("{cur} {word}")
+        };
+        if len(&candidate) * cw <= width {
+            cur = candidate;
+        } else {
+            if !cur.is_empty() {
+                lines.push(std::mem::take(&mut cur));
+            }
+            cur = (*word).to_owned();
+            if len(word) * cw > width {
+                all_words_fit = false;
+            }
+        }
+    }
+    if !cur.is_empty() {
+        lines.push(cur);
+    }
+    // Avoid a lonely short last word: pull the previous word down when it fits.
+    let n = lines.len();
+    if n >= 2 && len(&lines[n - 1]) <= 3.0 && lines[n - 2].contains(' ') {
+        let (a, b) = lines[n - 2]
+            .rsplit_once(' ')
+            .map(|(a, b)| (a.to_owned(), b.to_owned()))
+            .unwrap_or_default();
+        let joined = format!("{b} {}", lines[n - 1]);
+        if len(&joined) * cw <= width {
+            lines[n - 2] = a;
+            lines[n - 1] = joined;
+        }
+    }
+    (lines, all_words_fit)
 }
 
 /// Keeps as many category names as fit in `max_chars` (joined with " · "), then "+N".

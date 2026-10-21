@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../api/client";
+import { api, unwrap } from "../../api/client";
 
 export const ME_KEY = ["me"] as const;
 
@@ -8,10 +8,9 @@ export function useMe() {
   return useQuery({
     queryKey: ME_KEY,
     queryFn: async () => {
-      const { data, response } = await api.GET("/api/auth/me");
-      if (response.status === 401) return null;
-      if (!data) throw new Error(`GET /api/auth/me: ${response.status}`);
-      return data;
+      const reply = await api.GET("/api/auth/me");
+      if (reply.response.status === 401) return null;
+      return unwrap(reply, "me");
     },
     // `me` also slides the session forward, so one call per visit is enough.
     staleTime: Infinity,

@@ -22,7 +22,7 @@ use crate::{
         dancer::{self, Dancer, DancerFields, DancerSource, DancerSummary, Participation},
         user::Role,
     },
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, InvalidCursor, InvalidFields, Unauthorized},
     state::AppState,
 };
 
@@ -42,8 +42,6 @@ pub struct ListQuery {
     pub q: Option<String>,
     /// Matches the first or second flag.
     pub country: Option<String>,
-    /// Only verified (`true`) or only unverified (`false`) dancers.
-    pub verified: Option<bool>,
     /// `next_cursor` of the previous page.
     pub cursor: Option<String>,
     /// Page size, defaulted and clamped by `page::limit`.
@@ -110,7 +108,7 @@ pub struct DancerEvents {
     params(ListQuery),
     responses(
         (status = OK, body = Page<DancerSummary>),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+        InvalidCursor,
     )
 )]
 async fn list(
@@ -128,7 +126,6 @@ async fn list(
     let filter = db::dancers::DancerFilter {
         query: q,
         country: query.country.as_deref(),
-        verified: query.verified,
     };
     let rows = db::dancers::search(&state.pool, &filter, page::window(limit, offset)).await?;
     Ok(Json(Page::from_offset(rows, limit, offset)))
@@ -172,9 +169,9 @@ async fn show(
     security(("session" = [])),
     responses(
         (status = CREATED, body = DancerResponse),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn create(
@@ -199,11 +196,11 @@ async fn create(
     security(("session" = [])),
     responses(
         (status = OK, body = DancerResponse),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Not the creator (unverified), the owner (verified) nor `seed_admin`+", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such dancer, or merged away", body = ErrorEnvelope),
         (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn update(
@@ -212,13 +209,15 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<DancerFields>,
 ) -> Result<Json<DancerResponse>, AppError> {
-    let old = db::dancers::find_live(&state.pool, id)
+    // Locked, so the logged change is against the version the update replaces.
+    let mut tx = state.pool.begin().await?;
+    let old = db::dancers::find_for_update(&mut tx, id)
         .await?
+        .filter(|d| d.merged_into_id.is_none())
         .ok_or(AppError::NotFound)?;
     if !old.can_edit(&current.user) {
         return Err(AppError::Forbidden);
     }
-    let mut tx = state.pool.begin().await?;
     let new = db::dancers::update(&mut tx, id, &fields).await?;
     // §4: every change to an unverified dancer is kept in `dancer_edits`.
     if old.verified_at.is_none() {
@@ -239,7 +238,7 @@ async fn update(
     security(("session" = [])),
     responses(
         (status = NO_CONTENT, description = "Deleted"),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Below `seed_admin`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such dancer", body = ErrorEnvelope),
     )

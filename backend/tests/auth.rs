@@ -225,6 +225,10 @@ async fn google_takes_over_an_unverified_password_account(pool: PgPool) {
         StatusCode::UNAUTHORIZED,
         "squatter's session is gone"
     );
+    // The account is Google-only now: no password logs into it.
+    let login = json!({ "email": "lilg@gmail.com", "password": "squatter pass" });
+    let response = send(&app, post("/api/auth/login", login, None)).await;
+    assert_eq!(response.status, StatusCode::UNAUTHORIZED);
 }
 
 #[sqlx::test]

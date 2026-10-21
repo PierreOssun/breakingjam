@@ -1,48 +1,55 @@
 import { X } from "@phosphor-icons/react";
-import { type ReactNode, useEffect, useId, useRef } from "react";
+import { type ReactNode, useId, useLayoutEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
+import { IconButton } from "./IconButton";
+
+/** The footer's primary button: what it says and what it does; Cancel beside it closes. */
+export type DialogAction = {
+  label: string;
+  /** The Cancel button's text when not "Cancel". */
+  cancel?: string;
+  loading?: boolean;
+  disabled?: boolean;
+} & ({ form: string } | { onClick: () => void });
 
 type DialogProps = {
-  open: boolean;
   onClose: () => void;
   title: string;
   /** `short`: auto height, 480px wide from lg · `form`: tall sheet, 560px wide from lg. */
   size?: "short" | "form";
   /** Asked before closing with unsaved edits (§4.9); the dialog stays open when declined. */
   confirmClose?: string;
-  /** Sticks to the bottom, under a border; a function gets `close`, which asks first too. */
-  footer?: ReactNode | ((close: () => void) => ReactNode);
+  /** Sticks to the bottom, under a border. */
+  action?: DialogAction;
   children: ReactNode;
 };
 
 /**
  * One component that changes shape by viewport (DESIGN.md §4.9): a bottom sheet below lg,
- * a centred dialog from lg. The native `<dialog>` traps focus and restores it on close;
- * focus starts on `[data-autofocus]` when a child has it.
+ * a centred dialog from lg. Open while mounted; the native `<dialog>` traps focus and
+ * restores it on close. Focus starts on `[data-autofocus]` when a child has it.
  */
 export function Dialog({
-  open,
   onClose,
   title,
   size = "short",
   confirmClose,
-  footer,
+  action,
   children,
 }: DialogProps) {
   const { t } = useTranslation();
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
-  useEffect(() => {
+  // A layout effect, so the dialog also closes (and gives focus back) before it is removed.
+  useLayoutEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) {
-      dialog.showModal();
-      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
-    }
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
+    dialog.showModal();
+    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    return () => dialog.close();
+  }, []);
 
   const requestClose = () => {
     if (confirmClose && !window.confirm(confirmClose)) return;
@@ -57,7 +64,11 @@ export function Dialog({
     <dialog
       ref={ref}
       aria-labelledby={titleId}
-      onClose={onClose}
+      onClose={(e) => {
+        // StrictMode and Fast Refresh close and reopen on mount; that stale `close` event
+        // arrives once the dialog is open again and must not close it for good.
+        if (!e.currentTarget.open) onClose();
+      }}
       onCancel={(e) => {
         // Esc: same question as the close button.
         e.preventDefault();
@@ -73,22 +84,32 @@ export function Dialog({
         <h2 id={titleId} className="font-display text-display-md">
           {title}
         </h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("dialog.close")}
-          onClick={requestClose}
-          className="shrink-0"
-        >
+        <IconButton label={t("dialog.close")} onClick={requestClose}>
           <X size={20} weight="bold" aria-hidden />
-        </Button>
+        </IconButton>
       </div>
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pt-2 pb-6 lg:px-6">
         {children}
       </div>
-      {footer && (
+      {action && (
         <div className="flex gap-3 border-t border-border px-4 pt-3 pb-[max(16px,env(safe-area-inset-bottom))] lg:justify-end lg:px-6 lg:pb-6">
-          {typeof footer === "function" ? footer(requestClose) : footer}
+          <Button
+            variant="ghost"
+            className="flex-1 lg:flex-none"
+            onClick={requestClose}
+          >
+            {action.cancel ?? t("form.cancel")}
+          </Button>
+          <Button
+            {...("form" in action
+              ? { type: "submit", form: action.form }
+              : { onClick: action.onClick, "data-autofocus": true })}
+            className="flex-[2] lg:flex-none"
+            loading={action.loading}
+            disabled={action.disabled}
+          >
+            {action.label}
+          </Button>
         </div>
       )}
     </dialog>

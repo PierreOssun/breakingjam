@@ -1,6 +1,6 @@
 # Milestone 12b — Generated avatars, "Verify me", dancer edit form, admin claims and merge
 
-Build order point 12b of `ARCHITECTURE_v0.1.md` §11.
+Build order point 12b of `ARCHITECTURE.md` §11.
 
 ## Decision (asked at the start)
 

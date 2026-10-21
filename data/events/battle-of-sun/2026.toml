@@ -37,7 +37,7 @@ matches = [
 chaos-delivery = { name = "Chaos Delivery" }
 classic-squad = { name = "Classic Squad" }
 das-flavour = { name = "Das Flavour" }
-dynamo = { name = "Dynamo" }
+dynamo = { crew = "dynamo", members = ["frank", "iki"] }
 fresh-mob-crew = { name = "Fresh Mob Crew" }
 gatling-logghy = { members = ["logghy", "gatling"] }
 illusion = { name = "Illusion" }

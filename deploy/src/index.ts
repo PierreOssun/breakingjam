@@ -17,6 +17,8 @@ export interface Env {
   DATABASE_URL: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
+  /** "true" on UAT only: kept out of search engines, with a banner saying its jams are demo data. */
+  TEST_SITE?: string;
 }
 
 /** The API: `backend/Dockerfile`, configured from the Worker's vars and secrets. */
@@ -50,16 +52,52 @@ function api(env: Env) {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-    if (url.pathname.startsWith("/api/")) {
-      return (await api(env)).fetch(withCountry(request));
+    if (env.TEST_SITE !== "true") return route(request, env);
+    if (new URL(request.url).pathname === "/robots.txt") {
+      return new Response("User-agent: *\nDisallow: /\n", {
+        headers: { "content-type": "text/plain", "x-robots-tag": NO_INDEX },
+      });
     }
-    // The segment stays as the browser encoded it: decoding could throw on a malformed one.
-    const jam = /^\/jams\/([^/]+)\/?$/.exec(url.pathname);
-    if (jam?.[1]) return jamPage(request, env, jam[1]);
-    return env.ASSETS.fetch(request);
+    return asTestSite(await route(request, env));
   },
 } satisfies ExportedHandler<Env>;
+
+const NO_INDEX = "noindex, nofollow";
+
+// Inline styles from the theme's tokens: the banner is not part of the app's build. Fixed and
+// click-through, so UAT keeps production's layout (the map fills the screen exactly).
+const TEST_BANNER =
+  '<div role="note" style="position:fixed;left:12px;bottom:max(12px,env(safe-area-inset-bottom));' +
+  "z-index:2147483647;pointer-events:none;max-width:calc(100% - 24px);border-radius:999px;" +
+  "padding:0.75rem 1.5rem;background:var(--color-accent);color:var(--color-on-primary);" +
+  'font:600 1.625rem/1.3 var(--font-body);box-shadow:0 2px 8px rgb(0 0 0 / 0.3)">' +
+  "Test site — demo data, not real jams</div>";
+
+/** The response marked noindex, and its pages given the test-site banner. */
+function asTestSite(response: Response) {
+  const marked = new Response(response.body, response);
+  marked.headers.set("x-robots-tag", NO_INDEX);
+  if (!marked.headers.get("content-type")?.includes("text/html")) return marked;
+  return new HTMLRewriter()
+    .on("body", {
+      element: (body) => {
+        body.prepend(TEST_BANNER, { html: true });
+      },
+    })
+    .transform(marked);
+}
+
+/** The API, a jam page with its Open Graph tags, or a file of the built site. */
+async function route(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  if (url.pathname.startsWith("/api/")) {
+    return (await api(env)).fetch(withCountry(request));
+  }
+  // The segment stays as the browser encoded it: decoding could throw on a malformed one.
+  const jam = /^\/jams\/([^/]+)\/?$/.exec(url.pathname);
+  if (jam?.[1]) return jamPage(request, env, jam[1]);
+  return env.ASSETS.fetch(request);
+}
 
 /** The request with the visitor's country (`GET /api/geo`), replacing any the client sent. */
 function withCountry(request: Request) {

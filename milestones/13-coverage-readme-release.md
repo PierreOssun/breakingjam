@@ -1,6 +1,6 @@
 # Milestone 13 — Coverage pass, README, production deploy, v0.1.0
 
-Build order point 13 of `ARCHITECTURE_v0.1.md` §11, plus two requests from the author: tests out of the source files, and everything needed to deploy to production on Cloudflare.
+Build order point 13 of `ARCHITECTURE.md` §11, plus two requests from the author: tests out of the source files, and everything needed to deploy to production on Cloudflare.
 
 ## Decisions (asked at the start)
 

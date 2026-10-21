@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "./Button";
+import { IconButton } from "./IconButton";
 import { ToastContext, type ToastMessage } from "./useToast";
 
 const ICONS = {
@@ -66,14 +66,9 @@ function Toast({
         {ICONS[toast.kind]}
       </span>
       <p className="flex-1 text-body-sm font-bold">{toast.message}</p>
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={t("dialog.dismiss")}
-        onClick={onDismiss}
-      >
+      <IconButton label={t("dialog.dismiss")} onClick={onDismiss}>
         <X size={20} weight="bold" aria-hidden />
-      </Button>
+      </IconButton>
     </div>
   );
 }

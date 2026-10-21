@@ -14,7 +14,7 @@ export type MarkerItem =
   | { kind: "jam"; key: string; id: string };
 
 /** The parts of a source feature `toMarkers` reads. */
-export type SourceFeature = {
+type SourceFeature = {
   properties: Record<string, unknown> | null;
   geometry: { type: string; coordinates?: unknown };
 };

@@ -1,6 +1,6 @@
 # Milestone 12c — Organiser page, verified by Instagram
 
-Build order point 12c of `ARCHITECTURE_v0.1.md` §11: "Organiser should have a page like a dancer page (without battles) so he can verify with insta as well".
+Build order point 12c of `ARCHITECTURE.md` §11: "Organiser should have a page like a dancer page (without battles) so he can verify with insta as well".
 
 ## Decision (asked at the start)
 

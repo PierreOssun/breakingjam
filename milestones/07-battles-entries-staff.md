@@ -1,6 +1,6 @@
 # Milestone 7 — Battles, entries, staff
 
-Build order point 7 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 7 of `ARCHITECTURE.md` §11.
 
 ## Routes (`backend/src/api/battles.rs`)
 

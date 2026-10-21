@@ -5,10 +5,11 @@ import {
 } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { api, type Schemas } from "../api/client";
+import { api, type Schemas, unwrap } from "../api/client";
 import { Button } from "../components/Button";
 import { ExternalLink } from "../components/ExternalLink";
 import { InlineEmpty } from "../components/InlineEmpty";
+import { MoreList } from "../components/MoreList";
 import { useToast } from "../components/useToast";
 import { BREAKINGJAM_INSTAGRAM } from "../lib/instagram";
 
@@ -38,10 +39,12 @@ type DecideFn = (
 export function AdminClaimsPage() {
   const { t } = useTranslation();
   const dancers = useQueue("dancers", async (cursor) => {
-    const { data } = await api.GET("/api/admin/claims", {
-      params: { query: { status: "pending", cursor } },
-    });
-    if (!data) throw new Error("dancer claims");
+    const data = unwrap(
+      await api.GET("/api/admin/claims", {
+        params: { query: { status: "pending", cursor } },
+      }),
+      "dancer claims",
+    );
     return {
       next_cursor: data.next_cursor,
       items: data.items.map((c) => ({
@@ -53,10 +56,12 @@ export function AdminClaimsPage() {
     };
   });
   const organizers = useQueue("organizers", async (cursor) => {
-    const { data } = await api.GET("/api/admin/organizer-claims", {
-      params: { query: { status: "pending", cursor } },
-    });
-    if (!data) throw new Error("organiser claims");
+    const data = unwrap(
+      await api.GET("/api/admin/organizer-claims", {
+        params: { query: { status: "pending", cursor } },
+      }),
+      "organiser claims",
+    );
     return {
       next_cursor: data.next_cursor,
       items: data.items.map((c) => ({
@@ -125,29 +130,17 @@ function Queue({
   decide: DecideFn;
 }) {
   const { t } = useTranslation();
-  const items = queue.data?.pages.flatMap((page) => page.items) ?? [];
   return (
     <section className="flex flex-col gap-3">
       <h3 className="font-display text-display-sm">{title}</h3>
-      {queue.isError && <p className="text-danger">{t("errors.generic")}</p>}
-      {queue.isSuccess && items.length === 0 && (
-        <InlineEmpty>{t("admin.claims.none")}</InlineEmpty>
-      )}
-      <ul className="flex flex-col gap-3">
-        {items.map((review) => (
-          <ClaimRow key={review.id} review={review} decide={decide} />
-        ))}
-      </ul>
-      {queue.hasNextPage && (
-        <Button
-          variant="secondary"
-          className="self-start"
-          loading={queue.isFetchingNextPage}
-          onClick={() => void queue.fetchNextPage()}
-        >
-          {t("org.showMore")}
-        </Button>
-      )}
+      <MoreList
+        query={queue}
+        empty={<InlineEmpty>{t("admin.claims.none")}</InlineEmpty>}
+        more={t("org.showMore")}
+        className="flex flex-col gap-3"
+      >
+        {(review) => <ClaimRow review={review} decide={decide} />}
+      </MoreList>
     </section>
   );
 }
@@ -182,7 +175,7 @@ function ClaimRow({ review, decide }: { review: Review; decide: DecideFn }) {
   }).format(new Date(review.created_at));
 
   return (
-    <li className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 lg:flex-row lg:items-center">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 lg:flex-row lg:items-center">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <Link to={review.to} className="text-body font-extrabold underline">
@@ -229,6 +222,6 @@ function ClaimRow({ review, decide }: { review: Review; decide: DecideFn }) {
           {t("admin.claims.reject")}
         </Button>
       </div>
-    </li>
+    </div>
   );
 }

@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use sqlx::{PgConnection, PgPool};
+use sqlx::{PgConnection, PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{
@@ -68,7 +68,7 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Battle>> {
 
 /// Adds a battle at the end of the jam's list.
 pub async fn insert(
-    conn: &mut PgConnection,
+    db: impl PgExecutor<'_>,
     event_id: Uuid,
     name: &str,
     fields: &BattleFields,
@@ -102,7 +102,7 @@ pub async fn insert(
         fields.prize_third,
         fields.starts_at,
     )
-    .fetch_one(conn)
+    .fetch_one(db)
     .await
 }
 

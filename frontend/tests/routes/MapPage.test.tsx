@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";
 import type { JamMap } from "../../src/features/map/JamMap";
 import { LOGGED_OUT, mockApi, renderApp } from "../support/app";
+import { freezeToday, geojson, jamFeature } from "../support/jams";
 
 // jsdom has no WebGL: the map is a list of marker buttons that drives the same callbacks.
 vi.mock("../../src/features/map/JamMap", () => ({
@@ -28,81 +29,37 @@ vi.mock("../../src/features/map/JamMap", () => ({
   ),
 }));
 
-const feature = (
-  n: number,
-  jam: {
-    name: string;
-    starts_on: string;
-    ends_on: string;
-    status: string;
-    city: string;
-    country: string;
-    battles: string[];
-    categories: string[];
-  },
-  [lng, lat]: [number, number],
-) => ({
-  type: "Feature",
-  geometry: { type: "Point", coordinates: [lng, lat] },
-  properties: {
-    id: `01920000-0000-7000-8000-00000000e00${n}`,
-    slug: `${jam.name.toLowerCase().replaceAll(" ", "-")}-00e00${n}`,
-    ...jam,
-  },
-});
-
-const GEOJSON = {
-  type: "FeatureCollection",
-  features: [
-    feature(
-      1,
-      {
-        name: "Berlin Breaks",
-        starts_on: "2030-07-20",
-        ends_on: "2030-07-20",
-        status: "published",
-        city: "Berlin",
-        country: "DE",
-        battles: ["2v2 Mixed"],
-        categories: ["two_v_two"],
-      },
-      [13.4, 52.52],
-    ),
-    feature(
-      2,
-      {
-        name: "Concrete Cypher",
-        starts_on: "2030-06-08",
-        ends_on: "2030-06-08",
-        status: "published",
-        city: "Zurich",
-        country: "CH",
-        battles: ["1v1 Bboy", "1v1 Bgirl"],
-        categories: ["one_v_one", "bgirl"],
-      },
-      [8.54, 47.37],
-    ),
-    feature(
-      3,
-      {
-        name: "Kids Jam Paris",
-        starts_on: "2030-06-15",
-        ends_on: "2030-06-16",
-        status: "registration_closed",
-        city: "Paris",
-        country: "FR",
-        battles: ["3v3 Crew", "1v1 Kids"],
-        categories: ["crew", "kids"],
-      },
-      [2.35, 48.86],
-    ),
-  ],
-};
+const GEOJSON = geojson(
+  jamFeature(1, "Berlin Breaks", {
+    country: "DE",
+    coordinates: [13.4, 52.52],
+    day: "2030-07-20",
+    battles: ["2v2 Mixed"],
+    categories: ["two_v_two"],
+  }),
+  jamFeature(2, "Concrete Cypher", {
+    city: "Zurich",
+    coordinates: [8.54, 47.37],
+    day: "2030-06-08",
+    battles: ["1v1 Bboy", "1v1 Bgirl"],
+    categories: ["one_v_one", "bgirl"],
+  }),
+  jamFeature(3, "Kids Jam Paris", {
+    city: "Paris",
+    country: "FR",
+    coordinates: [2.35, 48.86],
+    day: "2030-06-15",
+    until: "2030-06-16",
+    status: "registration_closed",
+    battles: ["3v3 Crew", "1v1 Kids"],
+    categories: ["crew", "kids"],
+  }),
+);
 
 function api() {
   return mockApi({
     "GET /api/auth/me": LOGGED_OUT,
-    "GET /api/events.geojson": { status: 200, body: GEOJSON },
+    "GET /api/events.geojson": GEOJSON,
   });
 }
 
@@ -132,6 +89,8 @@ afterEach(() => {
 });
 
 describe("MapPage", () => {
+  beforeEach(() => freezeToday());
+
   it("lists the jams in view, soonest first, and counts them", async () => {
     desktop();
     api();
@@ -164,7 +123,7 @@ describe("MapPage", () => {
     desktop();
     mockApi({
       "GET /api/auth/me": LOGGED_OUT,
-      "GET /api/events.geojson": { status: 200, body: GEOJSON },
+      "GET /api/events.geojson": GEOJSON,
       "GET /api/geo": { status: 200, body: { country: "CH" } },
     });
     renderApp("/map");
@@ -285,7 +244,7 @@ describe("MapPage", () => {
     desktop();
     mockApi({
       "GET /api/auth/me": LOGGED_OUT,
-      "GET /api/events.geojson": { status: 200, body: GEOJSON },
+      "GET /api/events.geojson": GEOJSON,
       "GET /api/geo": { status: 200, body: { country: "CH" } },
     });
     renderApp("/map?q=nowhere");
@@ -345,7 +304,7 @@ describe("MapPage", () => {
     expect(within(popup).getByText("Published")).toBeInTheDocument();
     expect(
       within(popup).getByRole("link", { name: "View jam" }),
-    ).toHaveAttribute("href", "/jams/concrete-cypher-00e002");
+    ).toHaveAttribute("href", "/jams/concrete-cypher-2");
 
     await userEvent.keyboard("{Escape}");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -378,7 +337,7 @@ describe("MapPage", () => {
     expect(within(sheet).getByRole("button", { name: "Share" })).toBeVisible();
     expect(
       within(sheet).getByRole("link", { name: "View jam" }),
-    ).toHaveAttribute("href", "/jams/concrete-cypher-00e002");
+    ).toHaveAttribute("href", "/jams/concrete-cypher-2");
 
     await userEvent.click(within(sheet).getByRole("button", { name: "Close" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -396,7 +355,7 @@ describe("MapPage", () => {
     expect(count()).toBe("3 jams in this area");
     expect(
       screen.getByRole("link", { name: /^Kids Jam Paris ?, / }),
-    ).toHaveAttribute("href", "/jams/kids-jam-paris-00e003");
+    ).toHaveAttribute("href", "/jams/kids-jam-paris-3");
 
     await userEvent.click(screen.getByRole("button", { name: "Map" }));
     expect(

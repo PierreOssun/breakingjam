@@ -935,15 +935,6 @@
             }
           },
           {
-            "name": "verified",
-            "in": "query",
-            "description": "Only verified (`true`) or only unverified (`false`) dancers.",
-            "required": false,
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
             "name": "cursor",
             "in": "query",
             "description": "`next_cursor` of the previous page.",
@@ -1686,7 +1677,7 @@
             }
           },
           "409": {
-            "description": "Already a current member",
+            "description": "Already a current member, or a past membership with the same `since`",
             "content": {
               "application/json": {
                 "schema": {

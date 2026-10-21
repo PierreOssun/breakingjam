@@ -1,13 +1,14 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { api, type Schemas } from "../api/client";
+import { api, type Schemas, unwrap } from "../api/client";
 import { Button } from "../components/Button";
 import { Flag } from "../components/Flag";
 import { InlineNotice } from "../components/InlineNotice";
 import { SearchPicker } from "../components/SearchPicker";
 import { useToast } from "../components/useToast";
+import { useDancer } from "../features/dancers/queries";
 import { searchDancers } from "../features/dancers/search";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -20,17 +21,7 @@ type Summary = Pick<
 export function AdminMergePage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
-  const dancer = useQuery({
-    queryKey: ["dancer", id],
-    queryFn: async () => {
-      const { data, response } = await api.GET("/api/dancers/{id}", {
-        params: { path: { id } },
-      });
-      if (response.status === 404 || response.status === 400) return null;
-      if (!data) throw new Error(`dancer: ${response.status}`);
-      return data;
-    },
-  });
+  const dancer = useDancer(id);
   if (dancer.isPending) return null;
   if (dancer.isError)
     return <p className="px-4 py-10 text-danger">{t("errors.generic")}</p>;
@@ -45,11 +36,13 @@ function Merge({ loser }: { loser: Summary }) {
   const [into, setInto] = useState<Summary | null>(null);
   const merge = useMutation({
     mutationFn: async (survivor: Summary) => {
-      const { data, error } = await api.POST("/api/admin/dancers/{id}/merge", {
-        params: { path: { id: loser.id } },
-        body: { into: survivor.id },
-      });
-      if (!data) throw new Error(error?.error.message ?? t("errors.generic"));
+      unwrap(
+        await api.POST("/api/admin/dancers/{id}/merge", {
+          params: { path: { id: loser.id } },
+          body: { into: survivor.id },
+        }),
+        "merge",
+      );
       return survivor;
     },
     onSuccess: (survivor) => {
@@ -62,7 +55,7 @@ function Merge({ loser }: { loser: Summary }) {
       });
       navigate(`/dancers/${survivor.id}`, { replace: true });
     },
-    onError: (error) => toast({ kind: "error", message: error.message }),
+    onError: () => toast({ kind: "error", message: t("errors.generic") }),
   });
 
   return (

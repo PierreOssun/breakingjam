@@ -5,5 +5,5 @@ GOOGLE_REDIRECT_URL=http://localhost:8787/api/auth/google/callback
 API_INSTANCES=1
 # The compose Postgres, seen from inside the container.
 DATABASE_URL=postgres://breakingjam:breakingjam@host.docker.internal:5432/breakingjam
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
+GOOGLE_CLIENT_ID=placeholder
+GOOGLE_CLIENT_SECRET=placeholder

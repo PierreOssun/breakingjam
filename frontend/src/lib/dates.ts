@@ -13,7 +13,7 @@ export function localeOf(language: string): string {
 }
 
 /** `"2026-11-14"` as a Date at UTC midnight. */
-export function calendarDate(iso: string): Date {
+function calendarDate(iso: string): Date {
   const [year = 1970, month = 1, day = 1] = iso.split("-").map(Number);
   return new Date(Date.UTC(year, month - 1, day));
 }

@@ -1,6 +1,6 @@
 # Milestone 4 — Auth (register/login/logout/me, session extractor), then Google OAuth
 
-Build order point 4 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 4 of `ARCHITECTURE.md` §11.
 
 ## Done
 

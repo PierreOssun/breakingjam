@@ -1,17 +1,14 @@
-# BreakingJam — Architecture v0.1
+# BreakingJam — Architecture
 
 Domain: **breakingjam.com**. The central place for breaking jams: a world map of jams, jam registration for organisers, and a dancer/crew database behind it.
 
 Vocabulary: in UI copy, i18n keys and product docs the word is **jam** (not "event", not "battle"). In code, DB and API paths the entity stays `event`/`events` to avoid a rename later; the mapping is 1:1.
-This document is the source of truth for v0.1. Anything not listed under *Scope* is out of scope — do not build it, but do not block it either.
+This document is the source of truth for the project and evolves with it. Anything not listed under *Scope* is out of scope — do not build it, but do not block it either.
 
 ## 1. Scope
 
-### In v0.1
-- Public landing page: a single screen explaining that BreakingJam is the central place for breaking jams, with exactly two primary actions:
-  - **Find a jam** → opens the world map (`/map`).
-  - **Register a jam** → create a jam to put on the map (`/org/jams/new`; login required, redirect back after auth).
-  Above them, "Featured near you" lists up to six upcoming jams for the visitor's country (M15); below, the site's counts. The map stays the browse experience.
+### In scope
+- Public landing page: a title, a subtitle and one search for jams and people (`/search`), then the next jams near the visitor and the site's counts (M18). **Register a jam** (`/org/jams/new`; login required, redirect back after auth) is in the header on every page. The map (`/map`) and the jam list (`/jams`) are the browse experiences.
 - World map of published jams (MapLibre GL); clicking a point opens a popup → jam detail page.
 - Jam (event) CRUD for authenticated organisers. An admin approves each organiser's jam before it goes public (M14).
 - Admin area (`/admin`, M14): counts of jams, dancers, organisers and accounts with verification rates, the jams waiting for review, and the Instagram claims. One tab per tool, so new tools join as tabs.
@@ -27,14 +24,14 @@ This document is the source of truth for v0.1. Anything not listed under *Scope*
 - UI in English, French, German (UI strings only — user content is stored as written).
 
 ### Deferred (do not build, keep the schema open for it)
-- Live battle management: `rounds` and `matches` tables under `battles` (match = entry A vs entry B at a `bracket_stage`, with judge decisions and a `video_url`), prelims scoring, seeding, live view. In v0.1 the organiser only records `entries.reached` / `final_rank` by hand; the manager will compute them.
-- Dancer merge tool (soft dedupe only in v0.1).
+- Live battle management: `rounds` and `matches` tables under `battles` (match = entry A vs entry B at a `bracket_stage`, with judge decisions and a `video_url`), prelims scoring, seeding, live view. For now the organiser only records `entries.reached` / `final_rank` by hand; the manager will compute them.
+- Dancer merge tool (soft dedupe only for now).
 - Payments / organiser billing.
 - Instagram or Apple login.
 - Native apps.
-- **Video index (v0.2 direction, decided Oct 2026)**: BreakingJam is the index, not the studio. Every battle video that exists on YouTube gets attached to its bracket slot and shows on the jam page and both dancers' pages, via the official YouTube embed, never self-hosted. Organisers and logged-in users paste a URL with an optional timestamp; one livestream URL + per-battle offsets turns into "watch this battle" buttons. Keep the schema open now: `video_url text` + `video_offset_seconds int` on `entries` (v0.1, cheap, organiser-filled) and later on `matches`; a `video_sources` table (channel name, URL) when the index grows. No DMCA/hosting machinery until video is self-hosted, which is not planned.
+- **Video index (next direction, decided Oct 2026)**: BreakingJam is the index, not the studio. Every battle video that exists on YouTube gets attached to its bracket slot and shows on the jam page and both dancers' pages, via the official YouTube embed, never self-hosted. Organisers and logged-in users paste a URL with an optional timestamp; one livestream URL + per-battle offsets turns into "watch this battle" buttons. Keep the schema open now: `video_url text` + `video_offset_seconds int` on `entries` (now, cheap, organiser-filled) and later on `matches`; a `video_sources` table (channel name, URL) when the index grows. No DMCA/hosting machinery until video is self-hosted, which is not planned.
 - A public crew directory or search page (crews render inline; dancers have Find someone).
-- Win/loss records on the dancer page (needs the battle manager); v0.1 shows participation and `final_rank` when an organiser filled it in.
+- Win/loss records on the dancer page (needs the battle manager); for now the page shows participation and `final_rank` when an organiser filled it in.
 - Event list on the landing page.
 
 ## 2. Stack
@@ -57,7 +54,7 @@ Pin crate and npm versions in lockfiles. Check axum's version-specific syntax (0
 
 ```
 breakingjam/
-├── ARCHITECTURE_v0.1.md
+├── ARCHITECTURE.md
 ├── DESIGN.md                   # visual system, produced with Claude Design (see §6)
 ├── CONVENTIONS.md              # short, derived from this file
 ├── docker-compose.yml          # postgres:17
@@ -98,7 +95,7 @@ breakingjam/
 ├── deploy/                     # Cloudflare Worker, wrangler.jsonc, deploy guide (M13)
 ```
 
-Single backend crate for v0.1. Split into a Cargo workspace only when compile times or module boundaries hurt.
+Single backend crate for now. Split into a Cargo workspace only when compile times or module boundaries hurt.
 
 ## 4. Data model
 
@@ -109,7 +106,7 @@ Single backend crate for v0.1. Split into a Cargo workspace only when compile ti
 - Soft delete: `deleted_at timestamptz null` on `events`, `dancers`, `crews` only. All public queries filter `deleted_at is null`.
 - Enums: Postgres `enum` types, mirrored as Rust enums with `#[sqlx(type_name = "...", rename_all = "snake_case")]`.
 - Timestamps in UTC. Event dates are calendar dates (`date`) with a separate `timezone` text column (IANA name).
-- Coordinates: `lat double precision`, `lng double precision`. No PostGIS in v0.1.
+- Coordinates: `lat double precision`, `lng double precision`. No PostGIS for now.
 
 ### Tables
 
@@ -252,7 +249,7 @@ create table events (
   country char(2) not null,
   lat double precision,
   lng double precision,
-  registration_url text,              -- external link allowed in v0.1
+  registration_url text,              -- external link allowed for now
   instagram_url text,
   website_url text,                   -- the jam's own site, http(s) (M15)
   contact_email text,                 -- public: shown on the jam page as a mailto: link (M15)
@@ -330,7 +327,7 @@ create table event_staff (
 Notes:
 - `citext` requires `create extension if not exists citext;` in the first migration.
 - `entry_members` row count must equal `battles.team_size` for a `confirmed` entry when `format = 'team'`; for `seven_to_smoke` an entry is always one dancer — enforced in domain code, not DB.
-- One dancer may appear in only one entry per battle — enforce in code in v0.1.
+- One dancer may appear in only one entry per battle — enforce in code for now.
 - `reached` vs `final_rank`: `reached` is what organisers actually know the night of the jam ("he went out in top 8"); `final_rank` is set when there is a real placement (1st, 2nd, and 3rd/4th when a small final is held). The dancer page shows `final_rank` as "1st/2nd/3rd" when set, otherwise `reached` as "Top 8" / "Prelims". Rule: `reached = 'winner'` ⇔ `final_rank = 1`; `reached = 'top2'` ⇒ `final_rank = 2`.
 - `battles.name` is free text so organisers keep their own wording; the structured fields (`format`, `team_size`, `gender`, `age`) are what search, filters and dancer stats use. The UI pre-fills `name` from the structured fields ("1v1 Bboy", "2v2 Mixed Kids", "Seven to Smoke Bgirl") and lets the organiser override it.
 - Age presets in the UI: Kids (8–17, editable lower bound), Adult (18+), Masters (40+). Stored as `age` + `age_min`/`age_max`.
@@ -394,7 +391,7 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
   - Crew write: `organizer`+ (membership self-service later).
   - Jam review, claims review, merge, role changes, overview counts: `admin` only.
 
-### Routes (v0.1)
+### Routes
 ```
 GET    /api/health
 GET    /api/openapi.json
@@ -493,16 +490,18 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Vite + React + TS strict. ESLint + Prettier with defaults.
 - Data fetching: TanStack Query only. No global state library. Auth state = `useQuery(['me'])`.
 - API client: `openapi-typescript` generates `src/api/schema.d.ts` from `backend` OpenAPI (`npm run gen:api` fetches `http://localhost:8080/api/openapi.json`). Calls go through `openapi-fetch`.
-- Routing: `/` (landing), `/map`, `/jams/{slug}`, `/dancers` (Find someone), `/dancers/{id}`, `/login`, `/register`, `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review), `/admin/claims` and `/admin/dancers/{id}/merge`. No `/crews` routes in v0.1; crews render inline.
+- Routing: `/` (landing), `/map`, `/jams` (Find a jam, the list), `/jams/{slug}`, `/search` (jams and people), `/dancers` (Find someone), `/dancers/{id}`, `/login`, `/register`, `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review), `/admin/claims` and `/admin/dancers/{id}/merge`. No `/crews` routes yet; crews render inline.
 - Dancer page (`/dancers/{id}`): header (avatar, dancer name, one or two country flags, city, current crews, Instagram link, verified tick when `verified_at` is set, "Verify me" button for logged-in non-owners while unverified, "Edit" for whoever is allowed), then two lists from `GET /api/dancers/{id}/events` — **Upcoming** (jams with `starts_on >= today`, link to `/jams/{slug}`) and **Past** (reverse chronological, with battle name, role, a result badge (`final_rank` as "1st/2nd/3rd", else `reached` as "Top 8"…), and a play icon when the entry has a `video_url`). Empty states for each. This page is the seed of the "where does this bboy go / what did he do" feature; the only edit affordances are those in §4 "Dancer identity".
 - Video embeds: a play icon on an entry (jam page or dancer page) opens a modal with the official YouTube iframe (`youtube-nocookie.com/embed/{id}?start={offset}&rel=0`). Only YouTube URLs are accepted, validated server-side (`youtube.com/watch`, `youtu.be`, `youtube.com/live`); the video id is parsed once on save. Nothing is ever downloaded or hosted.
-- Landing page (`/`), in order (M16, DESIGN.md §6 Landing):
-  - The hero: the one-line pitch, a jam search that hands its words to `/map?q=` (the map searches and frames them on load), primary **Find a jam**, secondary **Register a jam** → `/org/jams/new` (redirects to `/login?next=/org/jams/new` when logged out), and the map preview: a non-interactive MapLibre map of the upcoming jams from `GET /api/events.geojson`, framed like the map's first view, the whole card a link to `/map`. MapLibre loads lazily, once the card nears the screen.
+- Landing page (`/`), in order (M18, DESIGN.md §6 Landing):
+  - The hero: the title "Find your next jam" (the page's only `<h1>`), the subtitle, and the search, whose round J logo button hands the words to `/search?q=`.
   - **Next up near you**: up to six upcoming jams as grid cards. By the visitor's position when they already allowed it (or tap "change" to share it): the nearest, soonest first. Else by their country (`GET /api/geo`): that country's jams first, soonest first, then the nearest others measured from the centre of its box (§6 Map); with an unknown country, the soonest anywhere. Hidden when nothing is upcoming.
-  - **For dancers**: a search that goes to `/dancers?q=`, next to a verified dancer's identity card, stats and two latest past jams (`GET /api/dancers?verified=true&limit=1`, then its events); that column is hidden while nobody is verified.
   - **The scene so far**: battles, countries and dancers from `GET /api/stats`, then the 10 busiest countries as chips and "+N more". Public jams count, cancelled ones don't.
-  - **For organisers**: the three steps and a generated flyer as the example. Then the footer: round logo, tagline, links, Instagram, language switch.
-  M10 decided "no data fetching on this page"; M15 reverses that at the author's request.
+  - Then the footer: round logo, tagline, links, Instagram, language switch.
+  M10 decided "no data fetching on this page"; M15 reverses that at the author's request. The map preview and the For dancers and For organisers bands are gone since M18; the organisers' pitch moves to a future `/register` landing.
+- Search (`/search?q=`): the jams the words match, matched in the browser like the map's search (name, city, country), upcoming first, up to 10 then "See all on the map" (`/map?q=`); and the people from `GET /api/dancers?q=`, paged. A blank search shows the upcoming jams and the notable people.
+- Find a jam (`/jams`): every jam from `GET /api/events.geojson` as a list, with the map's search and filter chips, upcoming first (past ones with the "Past jams" chip), 30 at a time. The search is kept in `?q=`.
+- Header: Jam map, Find a jam, Find someone, then the language switch, Log in or the account menu (My jams, Admin for admins, Log out) and **Register a jam**. The full bar shows from `xl`; below, a menu sheet holds the same items.
 - Visual system: follow `DESIGN.md` (tokens, components, states). Tailwind v4: its tokens live in the `@theme` of `src/styles/index.css` (the default palette, type scale, radii and shadows are removed), and `src/styles/tokens.test.ts` fails when they drift from `DESIGN.md` §2; do not hard-code colours or spacing outside it. Where `DESIGN.md` differs from this file on scope or routes (8 languages, `/en/…` prefixes, a cookie, `/d/<slug>`), this file wins: EN/FR/DE, unprefixed routes, `localStorage`.
 - Forms: `react-hook-form` + `zod`. Validation mirrors backend validators; backend remains authoritative.
 - i18n: `react-i18next`, language detected from browser, switchable in header, persisted in `localStorage`. Keys namespaced by feature (`events.form.name`). All three JSON files must have identical key sets (add a test).
@@ -517,7 +516,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
   - Data source: `GET /api/events.geojson`. Cluster at low zoom (`cluster: true` on the GeoJSON source).
   - First view: the visitor's country from `GET /api/geo`, framed by a bounding box from Natural Earth (main landmass and nearby islands, `features/map/countryBounds.ts`). A country without upcoming jams is widened to its three nearest jams; an unknown country frames every jam. In development, `DEV_COUNTRY` in `frontend/.env` stands in for Cloudflare.
   - Click a point → popup with name, dates, city → link to `/jams/{slug}`.
-  - Filters and search (decided in M11), all client-side over the one GeoJSON download: **When** (this weekend, next 30 days, past jams; one at a time) and **battle categories** (1v1, 2v2, crews, 7 to smoke, bgirl, kids; any one matches), combined with AND. Search matches every word against name, city, country code and country name (accents ignored); Enter fits the map to the matches and opens the jam when there is one. Without a time filter the map shows upcoming jams; **Past jams** shows the completed ones, most recent first, and a search looks through both, so "red bull" finds every BC One. No Cancelled filter in v0.1.
+  - Filters and search (decided in M11), all client-side over the one GeoJSON download: **When** (this weekend, next 30 days, past jams; one at a time) and **battle categories** (1v1, 2v2, crews, 7 to smoke, bgirl, kids; any one matches), combined with AND. Search matches every word against name, city, country code and country name (accents ignored); Enter fits the map to the matches and opens the jam when there is one. Without a time filter the map shows upcoming jams; **Past jams** shows the completed ones, most recent first, and a search looks through both, so "red bull" finds every BC One. No Cancelled filter yet.
   - Container: `height: 100dvh` minus header, `touch-action: none`.
 - Dancer picker (used in entry and staff editing): debounced search on `dancer_name` showing existing matches; "create new dancer" is only enabled after a search has run (search-before-create). The crew picker works the same way.
 - Jam location (decided in M12): the organiser types the address, city and country; **Find on the map** searches them with OpenStreetMap's Nominatim from the browser (on that click only, never as-you-type, at most once a second, attributed under the field), drops the pin on the best match and lists the others; the pin can then be tapped or dragged. Without a pin a jam is published but stays off the map.
@@ -525,7 +524,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Jam page facts (M15): dates, venue, then the optional website (its host as the label, e.g. "pariscypher.com", opening in a new tab), contact email (a `mailto:` link, public by the organiser's choice) and Instagram. The description is a short pitch of at most 200 characters (About). Each of these shows only when set; the dev seed fills them on its invented jams, the imported historical jams leave them empty.
 - People are managed on the jam page, not in the editor: its organiser sees **Add a dancer** (or **Add a team**) under each battle, an add chip per lineup role (judge, DJ, MC, host, staff), and edit and delete on each entry and person, withdrawn entries included. `/org/jams/{id}/edit` keeps the status, details and battles (with their prizes).
 - Generated avatars (decided in M12b, following DESIGN.md §4.16 rather than DiceBear): the pixel 2D-HD bust, a 32×32 sprite drawn in code (`features/dancers/avatarParts.ts`) from six parts (hair, skin, hair colour, hoodie, extra, backdrop) plus optional details (lash flicks, lip tint, hoops; M17) and rendered as inline SVG with crisp edges plus the glow and vignette layer. Parts are seeded from `dancer.id` (same id → same face, no network call) unless `avatar_parts` holds a choice made in the edit sheet. Entering a dancer nobody has drawn into a bgirl or bboy battle stores a fitting default look (`domain::dancer::default_look`, M17). The sprites are a first pass that an illustrator may redraw. Flags are separate chips next to the avatar, never drawn into it. Uploaded avatars (verified dancers) override the generated one. Organiser pages use the same bust, seeded by the account id.
-- Admin screens (`/admin/*`, `/admin/dancers/{id}/merge`): minimal tables and forms, `admin` role only, no design polish required. `/admin` has a tab per tool (Overview, Jams, Claims) carrying the size of its queue; the header's **Admin** link leads there.
+- Admin screens (`/admin/*`, `/admin/dancers/{id}/merge`): minimal tables and forms, `admin` role only, no design polish required. `/admin` has a tab per tool (Overview, Jams, Claims) carrying the size of its queue; the account menu's **Admin** item leads there.
 
 ## 7. Testing
 
@@ -557,7 +556,7 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 
 ## 9. Deployment (built in M13; guide in `deploy/README.md`)
 
-- **Targets**: production (`breakingjam.com`, branch `prod`) and UAT (`uat.breakingjam.com`, branch `uat`, the `env.uat` Worker `breakingjam-uat`). Same code, separate Neon projects, secrets and Google OAuth clients. UAT holds seeded demo data only, never production data, and sits behind Cloudflare Access. `main` is the development branch and deploys nowhere.
+- **Targets**: production (`breakingjam.com`, branch `prod`) and UAT (`uat.breakingjam.com`, branch `uat`, the `env.uat` Worker `breakingjam-uat`). Same code, separate Neon projects, secrets and Google OAuth clients. UAT holds seeded demo data only, never production data; its Worker (`TEST_SITE`) marks every response noindex, disallows all in robots.txt and badges every page as a test site, and Cloudflare Access can keep it private. `main` is the development branch and deploys nowhere.
 - **Domain**: `breakingjam.com` on Cloudflare DNS. One Worker per target (`deploy/`) serves the site at the apex and the API same-origin under `/api/*` (session cookies stay first-party; no CORS in prod). `www` redirects to the apex with a zone Redirect Rule.
 - **Frontend**: Workers static assets from `frontend/dist` with the SPA fallback, not Cloudflare Pages (Cloudflare's current recommendation; one Worker, one deploy). Built with `VITE_API_URL` empty (same origin). `frontend/public/_headers` sets CSP, HSTS and the immutable cache for `/assets/*`.
 - **Visitor country**: the Worker sets `cf-ipcountry` on every `/api/*` request from `request.cf.country`, replacing any value the client sent; `GET /api/geo` reads it for the map's first view.
@@ -575,7 +574,7 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 - SQL: compile-time checked `sqlx::query!`/`query_as!` only; no string-built SQL.
 - API: JSON snake_case, RFC 3339 timestamps, ISO 3166-1 alpha-2 countries, error envelope `{ "error": { code, message, fields? } }`.
 - Git: trunk-based, PRs into `main`, conventional commits (`feat:`, `fix:`, `chore:`…).
-- Versioning: `v0.1.0` tag when §1 scope is complete and CI is green.
+- Versioning: release tags follow the `Cargo.toml` version and are cut when CI is green.
 - Language: code, comments, commits and docs in English.
 
 ## 11. Suggested build order
@@ -595,7 +594,7 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 12. Organiser jam form; dancer/crew pickers with search-before-create inside entries and staff editing.
 12b. Generated avatars, "Verify me" flow, dancer edit form, admin claims/merge screens.
 12c. Organiser should have a page like a dancer page (without battles) so he can verify with insta as well
-13. Integration test coverage pass, README, tag `v0.1.0`.
+13. Integration test coverage pass, README, first release tag.
 14. Admin area: jams reviewed before going public, overview counts, claims under the same tabs.
 15. Jam contact email and website; landing page "Featured near you" and site counts.
 

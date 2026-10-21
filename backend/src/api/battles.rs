@@ -18,11 +18,11 @@ use crate::{
     domain::{
         battle::{
             Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, StaffList,
-            StaffMember,
+            StaffMember, starts_during,
         },
         event::Event,
     },
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, InvalidFields, JamNotVisible, NotJamWriter, Unauthorized},
     state::AppState,
 };
 
@@ -47,7 +47,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     security((), ("session" = [])),
     responses(
         (status = OK, body = Vec<Battle>),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        JamNotVisible,
     )
 )]
 async fn list(
@@ -70,10 +70,10 @@ async fn list(
     security(("session" = [])),
     responses(
         (status = CREATED, body = Battle),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        Unauthorized,
+        NotJamWriter,
+        JamNotVisible,
+        InvalidFields,
     )
 )]
 async fn create(
@@ -84,8 +84,8 @@ async fn create(
 ) -> Result<(StatusCode, Json<Battle>), AppError> {
     let event = writable(&state, &current, event_id).await?;
     check_start(&fields, &event)?;
-    let mut conn = state.pool.acquire().await?;
-    let battle = db::battles::insert(&mut conn, event_id, &fields.display_name(), &fields).await?;
+    let battle =
+        db::battles::insert(&state.pool, event_id, &fields.display_name(), &fields).await?;
     Ok((StatusCode::CREATED, Json(battle)))
 }
 
@@ -100,10 +100,10 @@ async fn create(
     security(("session" = [])),
     responses(
         (status = OK, body = Battle),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        Unauthorized,
+        NotJamWriter,
         (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn update(
@@ -128,8 +128,8 @@ async fn update(
     security(("session" = [])),
     responses(
         (status = NO_CONTENT, description = "Deleted"),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        Unauthorized,
+        NotJamWriter,
         (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
     )
 )]
@@ -154,9 +154,9 @@ async fn remove(
     security(("session" = [])),
     responses(
         (status = OK, body = Vec<Battle>),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        Unauthorized,
+        NotJamWriter,
+        JamNotVisible,
         (status = UNPROCESSABLE_ENTITY, description = "Not exactly the jam's battles", body = ErrorEnvelope),
     )
 )]
@@ -221,11 +221,11 @@ async fn list_entries(
     security(("session" = [])),
     responses(
         (status = CREATED, body = Entry),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        Unauthorized,
+        NotJamWriter,
         (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
         (status = CONFLICT, description = "A dancer is already entered in this battle, or the battle is full", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn create_entry(
@@ -256,11 +256,11 @@ async fn create_entry(
     security(("session" = [])),
     responses(
         (status = OK, body = Entry),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        Unauthorized,
+        NotJamWriter,
         (status = NOT_FOUND, description = "No such entry, or its jam is a draft you can't see", body = ErrorEnvelope),
         (status = CONFLICT, description = "A dancer is already entered in this battle, or the battle is full", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn update_entry(
@@ -293,8 +293,8 @@ async fn update_entry(
     security(("session" = [])),
     responses(
         (status = NO_CONTENT, description = "Deleted"),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
+        Unauthorized,
+        NotJamWriter,
         (status = NOT_FOUND, description = "No such entry, or its jam is a draft you can't see", body = ErrorEnvelope),
     )
 )]
@@ -321,7 +321,7 @@ async fn remove_entry(
     security((), ("session" = [])),
     responses(
         (status = OK, body = Vec<StaffMember>),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        JamNotVisible,
     )
 )]
 async fn list_staff(
@@ -344,10 +344,10 @@ async fn list_staff(
     security(("session" = [])),
     responses(
         (status = OK, body = Vec<StaffMember>),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not the jam's organiser nor `seed_admin`+", body = ErrorEnvelope),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        Unauthorized,
+        NotJamWriter,
+        JamNotVisible,
+        InvalidFields,
     )
 )]
 async fn replace_staff(
@@ -384,7 +384,7 @@ async fn writable_battle(
 
 /// A battle starts on one of its jam's days, or has no start yet.
 fn check_start(fields: &BattleFields, event: &Event) -> Result<(), AppError> {
-    if fields.starts_during(event.starts_on, event.ends_on) {
+    if starts_during(fields.starts_at, event.starts_on, event.ends_on) {
         Ok(())
     } else {
         Err(AppError::invalid(

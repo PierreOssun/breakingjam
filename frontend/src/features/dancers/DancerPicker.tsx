@@ -1,15 +1,14 @@
-import { X } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
 import { Button } from "../../components/Button";
+import { CountrySelect } from "../../components/CountrySelect";
 import { Flag } from "../../components/Flag";
 import { OptionalLabel } from "../../components/OptionalLabel";
+import { RemovableChip } from "../../components/RemovableChip";
 import { SearchPicker } from "../../components/SearchPicker";
-import { SelectField } from "../../components/SelectField";
 import { TextField } from "../../components/TextField";
 import { VerifiedTick } from "../../components/VerifiedTick";
-import { countryOptions } from "../../lib/countries";
 import { toHandle } from "../../lib/instagram";
 import { searchDancers } from "./search";
 
@@ -37,22 +36,16 @@ export function DancerPicker({
       {selected.length > 0 && (
         <ul aria-label={label} className="flex flex-wrap gap-1.5">
           {selected.map((dancer) => (
-            <li
-              key={dancer.id}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-surface-raised pr-1 pl-3 text-body-sm font-bold"
-            >
-              <Flag code={dancer.country} size="bare" />
-              {dancer.dancer_name}
-              <button
-                type="button"
-                aria-label={t("picker.remove", { name: dancer.dancer_name })}
-                onClick={() =>
+            <li key={dancer.id}>
+              <RemovableChip
+                name={dancer.dancer_name}
+                onRemove={() =>
                   onChange(selected.filter((d) => d.id !== dancer.id))
                 }
-                className="grid size-7 cursor-pointer place-items-center rounded-full hover:bg-surface"
               >
-                <X size={14} weight="bold" aria-hidden />
-              </button>
+                <Flag code={dancer.country} size="bare" />
+                {dancer.dancer_name}
+              </RemovableChip>
             </li>
           ))}
         </ul>
@@ -118,16 +111,12 @@ function NewDancer({
   onCreated: (dancer: DancerRef) => void;
   onCancel: () => void;
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [name, setName] = useState(initialName);
   const [country, setCountry] = useState("");
   const [handle, setHandle] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const countries = useMemo(
-    () => countryOptions(i18n.language),
-    [i18n.language],
-  );
 
   async function create() {
     if (!name.trim() || !country) {
@@ -163,18 +152,12 @@ function NewDancer({
         onChange={(e) => setName(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
       />
-      <SelectField
+      <CountrySelect
         label={t("org.fields.country")}
+        blank={t("org.fields.choose")}
         value={country}
         onChange={(e) => setCountry(e.target.value)}
-      >
-        <option value="">{t("org.fields.choose")}</option>
-        {countries.map(([code, label]) => (
-          <option key={code} value={code}>
-            {label}
-          </option>
-        ))}
-      </SelectField>
+      />
       <TextField
         label={<OptionalLabel label={t("picker.instagram")} />}
         value={handle}

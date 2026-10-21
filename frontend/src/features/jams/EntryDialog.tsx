@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLayoutEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
-import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
+import { FormError } from "../../components/FormError";
 import { OptionalLabel } from "../../components/OptionalLabel";
 import { SelectField } from "../../components/SelectField";
 import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
-import { splitFieldErrors } from "../../lib/apiErrors";
+import { applyFieldErrors } from "../../lib/apiErrors";
 import { CrewPicker } from "../crews/CrewPicker";
 import { DancerPicker } from "../dancers/DancerPicker";
 import { membersPerEntry } from "./battleFields";
@@ -38,35 +38,21 @@ type EntryDialogProps = {
   battle: Schemas["Battle"];
   /** The entry to edit; a new one when absent. */
   entry?: Schemas["Entry"];
-  open: boolean;
   onClose: () => void;
 };
 
 /** Register an entry, or record how it did: members, team, status, result and video. */
-export function EntryDialog({
-  battle,
-  entry,
-  open,
-  onClose,
-}: EntryDialogProps) {
+export function EntryDialog({ battle, entry, onClose }: EntryDialogProps) {
   const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const formId = useId();
   const size = membersPerEntry(battle);
-  const [members, setMembers] = useState<Schemas["DancerRef"][]>([]);
-  const [crew, setCrew] = useState<Schemas["CrewName"] | null>(null);
-  const form = useForm<EntryFormValues>({ defaultValues: entryValues() });
-  const { register, handleSubmit, setError, reset, formState } = form;
+  const [members, setMembers] = useState(entry?.members ?? []);
+  const [crew, setCrew] = useState(entry?.crew ?? null);
+  const form = useForm<EntryFormValues>({ defaultValues: entryValues(entry) });
+  const { register, handleSubmit, setError, formState } = form;
   const { errors, isDirty } = formState;
-  // Each opening starts from the entry being edited. A layout effect, so the reset lands
-  // before the dialog shows and can never wipe what was just typed into it.
-  useLayoutEffect(() => {
-    if (!open) return;
-    reset(entryValues(entry));
-    setMembers(entry?.members ?? []);
-    setCrew(entry?.crew ?? null);
-  }, [open, entry, reset]);
 
   const save = useMutation({
     mutationFn: async (body: Schemas["EntryFields"]) =>
@@ -81,9 +67,7 @@ export function EntryDialog({
           }),
     onSuccess: ({ data, error }) => {
       if (!data) {
-        const { fields, rest } = splitFieldErrors(error, FIELDS);
-        for (const [field, message] of fields) setError(field, { message });
-        if (rest) setError("root", { message: rest });
+        applyFieldErrors(setError, error, FIELDS);
         return;
       }
       void queryClient.invalidateQueries({
@@ -110,30 +94,11 @@ export function EntryDialog({
 
   return (
     <Dialog
-      open={open}
       onClose={onClose}
       size="form"
       title={entry ? t("org.entries.edit") : t("org.entries.add")}
       confirmClose={isDirty ? t("form.discard") : undefined}
-      footer={(close) => (
-        <>
-          <Button
-            variant="ghost"
-            className="flex-1 lg:flex-none"
-            onClick={close}
-          >
-            {t("form.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form={formId}
-            className="flex-[2] lg:flex-none"
-            loading={save.isPending}
-          >
-            {t("form.save")}
-          </Button>
-        </>
-      )}
+      action={{ label: t("form.save"), form: formId, loading: save.isPending }}
     >
       <p className="text-body-sm text-muted">{battle.name}</p>
       <form
@@ -216,11 +181,7 @@ export function EntryDialog({
           inputMode="numeric"
           {...register("video_start")}
         />
-        {errors.root?.message && (
-          <p role="alert" className="text-body-sm font-bold text-danger">
-            {errors.root.message}
-          </p>
-        )}
+        <FormError message={errors.root?.message} />
       </form>
     </Dialog>
   );

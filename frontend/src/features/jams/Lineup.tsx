@@ -96,20 +96,20 @@ export function Lineup({ jamId, staff, canEdit }: LineupProps) {
           </div>
         );
       })}
-      {canEdit && (
+      {adding && (
         <Dialog
-          open={adding !== null}
           onClose={() => setAdding(null)}
           size="form"
-          title={adding ? t(`org.staff.addRole.${adding}`) : ""}
+          title={t(`org.staff.addRole.${adding}`)}
         >
           <DancerPicker
             label={t("org.entries.dancer")}
             selected={[]}
             max={1}
             onChange={([dancer]) =>
+              // The picker stays open while the save runs: one pick, one save.
               dancer &&
-              adding &&
+              !save.isPending &&
               save.mutate([
                 ...assignments,
                 { dancer_id: dancer.id, role: adding },

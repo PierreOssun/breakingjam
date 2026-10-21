@@ -26,7 +26,7 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!(%addr, "listening");
 
     let state = AppState::new(pool, config)?;
-    axum::serve(listener, breakingjam::app(state))
+    axum::serve(listener, breakingjam::app(state)?)
         .with_graceful_shutdown(shutdown_signal())
         .await?;
     Ok(())

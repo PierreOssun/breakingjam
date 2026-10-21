@@ -164,7 +164,7 @@ const OG: [(&str, &str); 6] = [
     ("kids", "d7efe1e31db53a226de4df4acaf58d5c378f240e"),
     ("under", "26259070fdaa4435463d76e049521511df5b5d92"),
     ("seven", "458dc3422d521f9bb7907ec7fa090b1d05ade357"),
-    ("long", "64421720c80dd8865326d151a317f5c6aa58c7d9"),
+    ("long", "285c516ad00774110220afc7f569c9c1e83bbd31"),
 ];
 
 #[test]
@@ -267,12 +267,12 @@ fn fit_name_matches_the_reference() {
                     "the Alps",
                 ],
             ),
-            (50, &["The…"]),
+            (50, &["The", "International", "Breaking…"]),
         ),
         (
             "Supercalifragilisticexpialidocious Jam",
             (24, &["Supercalifragilisticexpialidocious", "Jam"]),
-            (50, &["Supercalifragilisticexpialidocious…"]),
+            (50, &["Supercalifragilisticexpialidocious", "Jam"]),
         ),
         (
             "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Jam",
@@ -285,7 +285,10 @@ fn fit_name_matches_the_reference() {
                     "Y Z Jam",
                 ],
             ),
-            (50, &["A B C D E F G H…"]),
+            (
+                50,
+                &["A B C D E F G H", "I J K L M N O P", "Q R S T U V W X…"],
+            ),
         ),
         ("Jam", (46, &["Jam"]), (84, &["Jam"])),
         (
@@ -404,4 +407,14 @@ fn embedded_fonts_are_the_brand_fonts() {
         .collect();
     assert!(families.contains(&"Unbounded".to_owned()), "{families:?}");
     assert!(families.contains(&"Manrope".to_owned()), "{families:?}");
+}
+
+#[test]
+fn a_name_that_fits_at_no_size_keeps_to_the_line_limit() {
+    // A word wider than the block at every size, then enough short words for six lines at 24px.
+    let name = "Supercalifragilisticexpialidocious aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp qq rr ss tt uu vv ww xx";
+    let (size, lines) = fit_name(name, FLYER_NAME);
+    assert_eq!(size, 24);
+    assert_eq!(lines.len(), 4);
+    assert!(lines[3].ends_with('…'));
 }

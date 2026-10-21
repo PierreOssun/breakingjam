@@ -59,13 +59,13 @@ pub fn bracket(chunk: &str) -> Option<Result<Bracket, String>> {
             || (digits > 0 && rest[digits..].starts_with("TeamBracket"))
     })?;
     let body = template_body(&chunk[start..]);
-    let params = split_params(body);
+    let params = split_outside(body, "|");
     let name = params.first().map_or("", |p| p.trim());
     Some(if name.starts_with("Round") {
         // Some years separate cells with `{{!}}`, which other years use inside a cell.
         positional_bracket(name, &params[1..]).or_else(|first| {
             let body = body.replace("{{!}}", "|");
-            positional_bracket(name, &split_params(&body)[1..]).map_err(|_| first)
+            positional_bracket(name, &split_outside(&body, "|")[1..]).map_err(|_| first)
         })
     } else {
         named_bracket(&params)
@@ -177,7 +177,7 @@ fn row_cells(row: &str) -> Vec<String> {
                 .flat_map(|c| split_outside(c, "!!"))
         })
         .map(|cell| {
-            let parts = split_params(cell);
+            let parts = split_outside(cell, "|");
             match parts[..] {
                 [attributes, ..] if parts.len() > 1 && attributes.contains("=\"") => {
                     parts[1..].join("|")
@@ -190,7 +190,7 @@ fn row_cells(row: &str) -> Vec<String> {
 }
 
 /// The inside of the template starting at `text`, up to its matching `}}`.
-pub fn template_body(text: &str) -> &str {
+pub(crate) fn template_body(text: &str) -> &str {
     let mut depth = 0;
     let mut i = 0;
     while i + 1 < text.len() {
@@ -212,13 +212,8 @@ pub fn template_body(text: &str) -> &str {
     &text[2.min(text.len())..]
 }
 
-/// Splits template parameters on the `|` that are not inside `{{…}}` or `[[…]]`.
-pub fn split_params(body: &str) -> Vec<&str> {
-    split_outside(body, "|")
-}
-
 /// Splits `text` on `separator` (ASCII) wherever it is not inside `{{…}}` or `[[…]]`.
-pub fn split_outside<'a>(text: &'a str, separator: &str) -> Vec<&'a str> {
+pub(crate) fn split_outside<'a>(text: &'a str, separator: &str) -> Vec<&'a str> {
     let (bytes, separator) = (text.as_bytes(), separator.as_bytes());
     let (mut depth, mut start, mut i, mut parts) = (0i32, 0, 0, Vec::new());
     while i < bytes.len() {

@@ -28,9 +28,13 @@ unicode-normalization = "0.1"
 url = "2"
 utoipa = { version = "6", features = ["chrono", "uuid", "preserve_order", "preserve_path_order"] }
 utoipa-axum = "0.3"
-utoipa-swagger-ui = { version = "10", features = ["axum", "vendored"] }
+utoipa-swagger-ui = { version = "10", features = ["axum", "vendored"], optional = true }
 uuid = { version = "1", features = ["serde", "v4", "v7"] }
 validator = { version = "0.21", features = ["derive"] }
+
+[features]
+# Serves Swagger UI at /api/docs; a dev tool, so off in tests and the image (clippy still checks it).
+swagger = ["dep:utoipa-swagger-ui"]
 
 [dev-dependencies]
 http-body-util = "0.1"

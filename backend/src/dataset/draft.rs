@@ -384,7 +384,7 @@ fn battle_header(spec: &BattleSpec, first_round: Option<Round>) -> String {
         "\n[[battles]]\nkey = {}\nname = {}\ngender = \"{}\"\n",
         quoted(&spec.key),
         quoted(&spec.name),
-        gender_word(spec.gender)
+        gender_word(spec.gender.unwrap_or(BattleGender::Mixed))
     );
     if let Some(age) = spec.age {
         toml += &format!("age = \"{}\"\n", age_word(age));
@@ -416,11 +416,12 @@ fn team_line(side: &Side, crew: Option<&str>, members: &[String]) -> String {
     fields.join(", ")
 }
 
-fn gender_word(gender: Option<BattleGender>) -> &'static str {
+/// The words the files spell these with, e.g. `top8`; a new variant fails to compile here.
+fn gender_word(gender: BattleGender) -> &'static str {
     match gender {
-        Some(BattleGender::Bboy) => "bboy",
-        Some(BattleGender::Bgirl) => "bgirl",
-        _ => "mixed",
+        BattleGender::Bboy => "bboy",
+        BattleGender::Bgirl => "bgirl",
+        BattleGender::Mixed => "mixed",
     }
 }
 

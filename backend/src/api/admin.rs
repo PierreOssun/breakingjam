@@ -20,7 +20,7 @@ use crate::{
         dancer::{Dancer, merged_aliases},
         user::Role,
     },
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, NotAdmin, Unauthorized},
     state::AppState,
 };
 
@@ -66,8 +66,8 @@ pub struct MergeResponse {
     security(("session" = [])),
     responses(
         (status = OK, body = Stats),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
     )
 )]
 async fn stats(
@@ -89,8 +89,8 @@ async fn stats(
     security(("session" = [])),
     responses(
         (status = OK, body = MergeResponse),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
         (status = NOT_FOUND, description = "No such dancer", body = ErrorEnvelope),
         (status = CONFLICT, description = "Already merged, or `{id}` is verified", body = ErrorEnvelope),
         (status = UNPROCESSABLE_ENTITY, description = "`into` is `{id}` or unknown", body = ErrorEnvelope),
@@ -162,8 +162,8 @@ async fn lock_pair(
     security(("session" = [])),
     responses(
         (status = OK, body = UserResponse),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = FORBIDDEN, description = "Not an admin", body = ErrorEnvelope),
+        Unauthorized,
+        NotAdmin,
         (status = NOT_FOUND, description = "No such user", body = ErrorEnvelope),
         (status = UNPROCESSABLE_ENTITY, description = "Your own role", body = ErrorEnvelope),
     )

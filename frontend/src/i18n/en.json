@@ -12,7 +12,9 @@
     "closeMenu": "Close menu",
     "skipToContent": "Skip to content",
     "language": "Language: {{name}}",
-    "admin": "Admin"
+    "admin": "Admin",
+    "jamMap": "Jam map",
+    "account": "Account"
   },
   "footer": {
     "links": "Site links"
@@ -59,11 +61,13 @@
     "handle": "Use letters, digits, . or _ (30 at most)."
   },
   "pages": {
-    "map": "Find a jam",
+    "map": "Jam map",
     "people": "Find someone",
     "orgJams": "Your jams",
     "orgJamNew": "Register a jam",
-    "orgJamEdit": "Edit jam"
+    "orgJamEdit": "Edit jam",
+    "jams": "Find a jam",
+    "search": "Search"
   },
   "notFound": {
     "title": "Page not found",
@@ -74,25 +78,6 @@
     "generic": "Something went wrong. Reload the page to try again."
   },
   "landing": {
-    "overline": "The world map of breaking jams",
-    "title": "Every jam. One <pill>map.</pill>",
-    "pitch": "The central place for breaking jams. Find one near you, or put yours on the map.",
-    "mapPreview": "Open the map",
-    "organisers": {
-      "title": "Put your jam where dancers look.",
-      "body": "Free to list, and it lands on the map and on the page of every dancer in it.",
-      "step1Title": "Create your jam",
-      "step1Body": "Name, dates and place. It stays a draft until you submit it.",
-      "step2Title": "Add battles and lineup",
-      "step2Body": "1v1s, crews, seven-to-smoke, and your judges, DJ and MC.",
-      "step3Title": "Submit it",
-      "step3Body": "A BreakingJam admin checks it, then it goes on the map and on the page of every dancer in it.",
-      "overline": "For organisers"
-    },
-    "preview": {
-      "upcoming_one": "{{count}} upcoming jam",
-      "upcoming_other": "{{count}} upcoming jams"
-    },
     "next": {
       "title": "Next up near you",
       "around": "Around {{place}}",
@@ -100,15 +85,6 @@
       "worldwide": "Worldwide",
       "change": "change",
       "map": "See all on the map"
-    },
-    "dancers": {
-      "overline": "For dancers",
-      "title": "Every battle you've entered, on one page.",
-      "body": "Your jams, rounds and results, as organisers list them.",
-      "search": "Find your dancer page",
-      "placeholder": "Your dancer name",
-      "submit": "Find me",
-      "notThere": "Not there yet? You appear automatically once an organiser lists you."
     },
     "scene": {
       "title": "The scene so far",
@@ -121,7 +97,12 @@
       "byCountry": "Battles by country",
       "more_one": "+{{count}} more",
       "more_other": "+{{count}} more"
-    }
+    },
+    "heading": "Find your next jam",
+    "search": "Search jams and people",
+    "searchPlaceholder": "Jam, battle, bgirl, bboy, DJ…",
+    "searchSubmit": "Search",
+    "subtitle": "All of breaking, in one search"
   },
   "status": {
     "draft": "Draft",
@@ -614,6 +595,19 @@
     "hint": "Bboys, bgirls, DJs, MCs, judges.",
     "empty": "No one matches “{{q}}”.",
     "nobody": "Nobody is listed yet.",
+    "showMore": "Show more"
+  },
+  "search": {
+    "jams": "Jams",
+    "people": "People",
+    "noJams": "No jam matches “{{q}}”.",
+    "noUpcoming": "No upcoming jams yet.",
+    "allOnMap": "See all on the map"
+  },
+  "jams": {
+    "count_one": "{{count}} jam",
+    "count_other": "{{count}} jams",
+    "empty": "No jam matches your search and filters.",
     "showMore": "Show more"
   }
 }

@@ -11,8 +11,6 @@ type IdentityCardProps = {
   flags: (string | null | undefined)[];
   aliases?: string[];
   instagram?: string | null;
-  /** The page's own path, printed as its canonical URL. */
-  path: string;
   avatar: ReactNode;
   /** The name's heading: the page title on the dancer's own page, a sub-head elsewhere. */
   heading?: "h1" | "h3";
@@ -23,7 +21,7 @@ type IdentityCardProps = {
  * cropped from a screenshot.
  */
 export function IdentityCard(props: IdentityCardProps) {
-  const { name, verified, aliases = [], instagram, path, avatar } = props;
+  const { name, verified, aliases = [], instagram, avatar } = props;
   const Heading = props.heading ?? "h1";
   const { t } = useTranslation();
   const flags = props.flags.filter((c): c is string => Boolean(c)).slice(0, 2);
@@ -57,10 +55,6 @@ export function IdentityCard(props: IdentityCardProps) {
           <InstagramLogo size={20} weight="bold" aria-hidden />@{instagram}
         </a>
       )}
-      <p className="relative text-caption break-all text-muted">
-        {window.location.host}
-        {path}
-      </p>
     </section>
   );
 }

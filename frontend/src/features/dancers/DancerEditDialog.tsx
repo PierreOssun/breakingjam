@@ -1,13 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLayoutEffect, useId, useMemo, useRef } from "react";
+import { useId, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { api, type Schemas } from "../../api/client";
-import { Button } from "../../components/Button";
 import { ChipInput } from "../../components/ChipInput";
+import { CountrySelect } from "../../components/CountrySelect";
 import { Dialog } from "../../components/Dialog";
+import { FormError } from "../../components/FormError";
 import { HandleField } from "../../components/HandleField";
 import { InlineNotice } from "../../components/InlineNotice";
 import { OptionalLabel } from "../../components/OptionalLabel";
@@ -15,8 +16,7 @@ import { SelectField } from "../../components/SelectField";
 import { TextAreaField } from "../../components/TextAreaField";
 import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
-import { splitFieldErrors } from "../../lib/apiErrors";
-import { countryOptions } from "../../lib/countries";
+import { applyFieldErrors } from "../../lib/apiErrors";
 import { toHandle } from "../../lib/instagram";
 import {
   type AvatarParts,
@@ -64,16 +64,18 @@ function valuesOf(dancer: Dancer): Values {
 
 type DancerEditDialogProps = {
   dancer: Dancer;
-  open: boolean;
   onClose: () => void;
   /** Opened from "Add Instagram": focus starts on the handle (§4.23). */
   focusHandle?: boolean;
 };
 
 /** The edit sheet (DESIGN.md §6): profile, flags, handle, bio and the avatar's parts. */
-export function DancerEditDialog(props: DancerEditDialogProps) {
-  const { dancer, open, onClose, focusHandle = false } = props;
-  const { t, i18n } = useTranslation();
+export function DancerEditDialog({
+  dancer,
+  onClose,
+  focusHandle = false,
+}: DancerEditDialogProps) {
+  const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const formId = useId();
@@ -83,23 +85,11 @@ export function DancerEditDialog(props: DancerEditDialogProps) {
     mode: "onTouched",
     defaultValues: valuesOf(dancer),
   });
-  const { register, control, handleSubmit, setError, reset, watch } = form;
+  const { register, control, handleSubmit, setError, watch } = form;
   const { errors, isDirty } = form.formState;
-  // Each opening starts from the saved page. A layout effect, so the reset lands before
-  // the dialog shows and can never wipe what was just typed into it.
   // Null parts mean nobody has drawn the dancer yet (a battle may then suggest a look); once
   // the picker is touched, the parts are a choice, even when they match the seed.
   const drawn = useRef(false);
-  useLayoutEffect(() => {
-    if (open) {
-      reset(valuesOf(dancer));
-      drawn.current = false;
-    }
-  }, [open, dancer, reset]);
-  const countries = useMemo(
-    () => countryOptions(i18n.language),
-    [i18n.language],
-  );
   const [parts, bio] = watch(["parts", "bio"]);
 
   const save = useMutation({
@@ -127,66 +117,22 @@ export function DancerEditDialog(props: DancerEditDialogProps) {
         queryClient.setQueryData(["dancer", dancer.id], data);
         toast({ kind: "success", message: t("dancerEdit.saved") });
         onClose();
-        return;
-      }
-      if (response.status === 409) {
+      } else if (response.status === 409) {
         setError("instagram_handle", { message: t("picker.handleTaken") });
-        return;
+      } else {
+        applyFieldErrors(setError, error, FIELDS);
       }
-      const { fields, rest } = splitFieldErrors(error, FIELDS);
-      for (const [field, message] of fields) setError(field, { message });
-      if (rest) setError("root", { message: rest });
     },
     onError: () => setError("root", { message: t("errors.generic") }),
   });
 
-  const countrySelect = (name: "country" | "country2", optional: boolean) => (
-    <SelectField
-      label={
-        optional ? (
-          <OptionalLabel label={t("dancerEdit.country2")} />
-        ) : (
-          t("dancerEdit.country")
-        )
-      }
-      error={errors[name]?.message}
-      {...register(name)}
-    >
-      <option value="">{optional ? "—" : t("org.fields.choose")}</option>
-      {countries.map(([code, label]) => (
-        <option key={code} value={code}>
-          {label}
-        </option>
-      ))}
-    </SelectField>
-  );
-
   return (
     <Dialog
-      open={open}
       onClose={onClose}
       size="form"
       title={t("dancerEdit.title")}
       confirmClose={isDirty ? t("form.discard") : undefined}
-      footer={(close) => (
-        <>
-          <Button
-            variant="ghost"
-            className="flex-1 lg:flex-none"
-            onClick={close}
-          >
-            {t("form.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form={formId}
-            className="flex-[2] lg:flex-none"
-            loading={save.isPending}
-          >
-            {t("form.save")}
-          </Button>
-        </>
-      )}
+      action={{ label: t("form.save"), form: formId, loading: save.isPending }}
     >
       {!dancer.verified_at && (
         <InlineNotice>{t("dancerEdit.logged")}</InlineNotice>
@@ -217,8 +163,17 @@ export function DancerEditDialog(props: DancerEditDialogProps) {
           )}
         />
         <div className="grid gap-6 lg:grid-cols-2">
-          {countrySelect("country", false)}
-          {countrySelect("country2", true)}
+          <CountrySelect
+            label={t("dancerEdit.country")}
+            blank={t("org.fields.choose")}
+            error={errors.country?.message}
+            {...register("country")}
+          />
+          <CountrySelect
+            label={<OptionalLabel label={t("dancerEdit.country2")} />}
+            error={errors.country2?.message}
+            {...register("country2")}
+          />
         </div>
         <TextField
           label={<OptionalLabel label={t("org.fields.city")} />}
@@ -245,11 +200,7 @@ export function DancerEditDialog(props: DancerEditDialogProps) {
             form.setValue("parts", next, { shouldDirty: true });
           }}
         />
-        {errors.root?.message && (
-          <p role="alert" className="text-body-sm font-bold text-danger">
-            {errors.root.message}
-          </p>
-        )}
+        <FormError message={errors.root?.message} />
       </form>
     </Dialog>
   );

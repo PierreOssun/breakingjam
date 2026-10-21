@@ -1,6 +1,6 @@
 # Milestone 3 — `AppError`, `AppState`, config, tracing
 
-Build order point 3 of `ARCHITECTURE_v0.1.md` §11.
+Build order point 3 of `ARCHITECTURE.md` §11.
 
 ## Done
 

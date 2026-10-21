@@ -16,6 +16,7 @@ fn dancer(name: &str, country: &str) -> DancerRecord {
         country2: None,
         aliases: Vec::new(),
         crews: Vec::new(),
+        look: None,
     }
 }
 

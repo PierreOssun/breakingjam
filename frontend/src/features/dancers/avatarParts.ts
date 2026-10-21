@@ -64,7 +64,7 @@ export const DETAILS = [
   { name: "hoops", bit: 4 },
 ] as const;
 
-export type Detail = (typeof DETAILS)[number]["name"];
+type Detail = (typeof DETAILS)[number]["name"];
 
 /** Whether the avatar has that detail on. */
 export function hasDetail(parts: AvatarParts, name: Detail): boolean {

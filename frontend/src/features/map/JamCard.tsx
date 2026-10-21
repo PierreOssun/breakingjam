@@ -2,9 +2,9 @@ import { ArrowRight, X } from "@phosphor-icons/react";
 import { useEffect, useId, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Button } from "../../components/Button";
 import { buttonClasses } from "../../components/buttonClasses";
 import { Flag } from "../../components/Flag";
+import { IconButton } from "../../components/IconButton";
 import { ShareButton } from "../../components/ShareButton";
 import { StatusBadge } from "../../components/StatusBadge";
 import { formatShortDateRange, localeOf } from "../../lib/dates";
@@ -89,15 +89,13 @@ export function JamSheet({
 function CloseButton({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      aria-label={t("map.close")}
+    <IconButton
+      label={t("map.close")}
       onClick={onClose}
       className="absolute top-1 right-1"
     >
       <X size={20} weight="bold" aria-hidden />
-    </Button>
+    </IconButton>
   );
 }
 

@@ -18,3 +18,21 @@ export const api = createClient<paths>({
 });
 
 export type Schemas = components["schemas"];
+
+/** The body of a 2xx reply; any other status becomes an error, named by `what`. */
+export function unwrap<T>(
+  reply: { data?: T; error?: Schemas["ErrorEnvelope"]; response: Response },
+  what: string,
+): T {
+  if (!reply.response.ok) {
+    // A proxy's HTML page or an empty body arrives as text, not as the envelope.
+    const body = reply.error as unknown;
+    const message =
+      typeof body === "object" && body !== null
+        ? (body as Partial<Schemas["ErrorEnvelope"]>).error?.message
+        : undefined;
+    throw new Error(message ?? `${what}: ${reply.response.status}`);
+  }
+  // A 204 has no body; its `T` is `undefined` too.
+  return reply.data as T;
+}

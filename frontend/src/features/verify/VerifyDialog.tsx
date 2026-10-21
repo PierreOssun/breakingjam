@@ -12,16 +12,14 @@ import { BREAKINGJAM_INSTAGRAM } from "../../lib/instagram";
 const DM = `https://ig.me/m/${BREAKINGJAM_INSTAGRAM}`;
 
 /** What the modal needs from a dancer or organiser claim. */
-export type CodeClaim = { code: string; others_pending?: boolean };
+type CodeClaim = { code: string; others_pending?: boolean };
 
 /** The verify modal (DESIGN.md §6): the code, and where to put it. */
 export function VerifyDialog({
   claim,
-  open,
   onClose,
 }: {
   claim: CodeClaim | null;
-  open: boolean;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
@@ -40,7 +38,7 @@ export function VerifyDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} title={t("verify.title")}>
+    <Dialog onClose={onClose} title={t("verify.title")}>
       <div className="flex flex-col gap-2 text-body text-muted">
         <p>{t("verify.how", { account: BREAKINGJAM_INSTAGRAM })}</p>
         <p>{t("verify.then")}</p>

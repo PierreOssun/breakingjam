@@ -1,14 +1,13 @@
 # BreakingJam
 
-> For now, only the test version is deployed: [uat.breakingjam.com](https://uat.breakingjam.com).
+For now, only the test version is deployed: [uat.breakingjam.com](https://uat.breakingjam.com).
 
-- **Find a jam:** a map of upcoming jams, filtered by date and battle category, searchable by name, city or country.
-- **Register a jam:** organisers create a jam, submit it for review, and run its battles, entries, results and lineup once a BreakingJam admin has approved it.
+- **Map of all events:** a map of upcoming jams, filtered by date and battle category, searchable by name, city or country.
+- **Register and manage an event:** organisers create a jam, submit it for review, and run its battles, entries, results and lineup once a BreakingJam admin has approved it.
 - **Dancer pages:** every dancer's upcoming and past jams, results and battle videos, with a generated pixel avatar. Dancers verify their page through Instagram.
 - **Organiser pages:** the jams an organiser runs, verified the same way.
-- **Admin area:** counts of jams, dancers and accounts, the jams waiting for approval and the Instagram claims.
 
-UI in English, French and German. Scope, data model and decisions are in [`ARCHITECTURE_v0.1.md`](ARCHITECTURE_v0.1.md); the visual system is in [`DESIGN.md`](DESIGN.md).
+UI in English, French and German. Scope, data model and decisions are in [`ARCHITECTURE.md`](ARCHITECTURE.md); the visual system is in [`DESIGN.md`](DESIGN.md).
 
 ## Stack
 
@@ -31,6 +30,8 @@ just seed                                    # admin accounts and demo jams, bat
 ```
 
 Without `just`: `docker compose up -d`, then `cargo run` in `backend/` (it migrates on start in debug builds) and `npm i && npm run dev` in `frontend/` (Vite proxies `/api` to `:8080`). `just --list` shows the other recipes (`reset-db`, `openapi`, `check`…).
+
+To see a deployed target as it runs on Cloudflare, `just dev uat` or `just dev prod` builds the site and runs that target's Worker and API container on `:8787` (Docker; copy `deploy/.dev.vars.example` to `deploy/.dev.vars` first). UAT adds the test-site banner and `noindex`; production doesn't. Both use your local database.
 
 The map starts on the visitor's country, which Cloudflare provides in production. Locally, set `DEV_COUNTRY=CH` (any ISO code) in `frontend/.env`; without it the map frames every jam.
 

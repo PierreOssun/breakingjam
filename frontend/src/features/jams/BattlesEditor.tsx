@@ -8,7 +8,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Schemas } from "../../api/client";
+import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
 import { IconButton } from "../../components/IconButton";
@@ -37,16 +37,16 @@ export function BattlesEditor({
   const key = ["event", jamId, "battles"];
 
   const reorder = useMutation({
-    mutationFn: async (ids: string[]) => {
-      const { data } = await api.PUT("/api/events/{id}/battles/order", {
-        params: { path: { id: jamId } },
-        body: ids,
-      });
-      if (!data) throw new Error(t("errors.generic"));
-      return data;
-    },
+    mutationFn: async (ids: string[]) =>
+      unwrap(
+        await api.PUT("/api/events/{id}/battles/order", {
+          params: { path: { id: jamId } },
+          body: ids,
+        }),
+        "battle order",
+      ),
     onSuccess: (data) => queryClient.setQueryData(key, data),
-    onError: (error) => toast({ kind: "error", message: error.message }),
+    onError: () => toast({ kind: "error", message: t("errors.generic") }),
   });
   const remove = useMutation({
     mutationFn: async (battle: Battle) => {
@@ -133,41 +133,29 @@ export function BattlesEditor({
         {t("org.battles.add")}
       </Button>
 
-      <BattleDialog
-        jamId={jamId}
-        days={daysOf(jam.starts_on, jam.ends_on)}
-        battle={editing === "new" || editing === null ? undefined : editing}
-        open={editing !== null}
-        onClose={() => setEditing(null)}
-      />
-      <Dialog
-        open={deleting !== null}
-        onClose={() => setDeleting(null)}
-        title={t("org.battles.deleteTitle")}
-        footer={(close) => (
-          <>
-            <Button
-              variant="ghost"
-              className="flex-1 lg:flex-none"
-              onClick={close}
-            >
-              {t("form.cancel")}
-            </Button>
-            <Button
-              data-autofocus
-              className="flex-[2] lg:flex-none"
-              loading={remove.isPending}
-              onClick={() => deleting && remove.mutate(deleting)}
-            >
-              {t("org.battles.deleteConfirm")}
-            </Button>
-          </>
-        )}
-      >
-        <p className="text-body text-muted">
-          {t("org.battles.deleteBody", { name: deleting?.name ?? "" })}
-        </p>
-      </Dialog>
+      {editing !== null && (
+        <BattleDialog
+          jamId={jamId}
+          days={daysOf(jam.starts_on, jam.ends_on)}
+          battle={editing === "new" ? undefined : editing}
+          onClose={() => setEditing(null)}
+        />
+      )}
+      {deleting && (
+        <Dialog
+          onClose={() => setDeleting(null)}
+          title={t("org.battles.deleteTitle")}
+          action={{
+            label: t("org.battles.deleteConfirm"),
+            loading: remove.isPending,
+            onClick: () => remove.mutate(deleting),
+          }}
+        >
+          <p className="text-body text-muted">
+            {t("org.battles.deleteBody", { name: deleting.name })}
+          </p>
+        </Dialog>
+      )}
     </section>
   );
 }

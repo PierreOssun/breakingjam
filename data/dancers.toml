@@ -209,6 +209,7 @@ flying-buddha = { name = "Flying Buddha", country = "RU" }
 flying-machine = { name = "Flying Machine", country = "IN" }
 focus = { name = "Focus", country = "FI" }
 found-kid = { name = "Found Kid", country = "PT" }
+frank = { name = "Frank", country = "CH", crews = ["dynamo"], look = "bboy" }
 freeman = { name = "Freeman", country = "MX" }
 freeze = { name = "Freeze", country = "SE" }
 fresh-bella = { name = "Fresh Bella", country = "KR", aliases = ["Freshbella"] }
@@ -254,7 +255,7 @@ hurricane = { name = "Hurricane", country = "NL" }
 husky-husk = { name = "Husky Husk", country = "ES" }
 icey-ives = { name = "Icey Ives", country = "US" }
 ichigo = { name = "Ichigo", country = "JP" }
-iki = { name = "Iki", country = "FR", crews = ["ossun"] }
+iki = { name = "Iki", country = "FR", crews = ["ossun", "dynamo"], look = "bboy" }
 illest-foe = { name = "Illest Foe", country = "NL" }
 illz = { name = "Illz", country = "CA" }
 india = { name = "India", country = "NL" }

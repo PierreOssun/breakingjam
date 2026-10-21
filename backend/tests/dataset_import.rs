@@ -1,6 +1,9 @@
 use std::fs;
 
-use breakingjam::dataset::{import::insert_all, load};
+use breakingjam::{
+    dataset::{import::insert_all, load},
+    domain::{battle::BattleGender, dancer::default_look},
+};
 use chrono::NaiveDate;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -203,5 +206,44 @@ async fn a_jam_whose_dancer_dances_for_a_crew_with_a_broken_rule_is_left_out(poo
             "bc-one/2023: crew flow breaks a rule",
             "bc-one/2024: breaks a rule of `data check`",
         ]
+    );
+}
+
+#[sqlx::test]
+async fn a_dancers_look_wins_over_their_battles(pool: PgPool) {
+    let dir = data_dir();
+    let dancers = fs::read_to_string(dir.join("dancers.toml")).unwrap();
+    fs::write(
+        dir.join("dancers.toml"),
+        dancers.replace(
+            "lee = { name = \"Lee\", country = \"NL\" }",
+            "lee = { name = \"Lee\", country = \"NL\", look = \"bgirl\" }",
+        ),
+    )
+    .unwrap();
+    let (data, unreadable) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    assert!(unreadable.is_empty(), "{unreadable:?}");
+    let owner = organizer(&pool).await;
+    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
+
+    let mut tx = pool.begin().await.unwrap();
+    insert_all(&mut tx, &data, owner, today).await.unwrap();
+    tx.commit().await.unwrap();
+
+    let looks = sqlx::query!(
+        "select id, avatar_parts from dancers where dancer_name in ('Lee', 'Menno') order by dancer_name"
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    // Both dance the bboy battle: Lee keeps the look from dancers.toml, Menno takes the battle's.
+    assert_eq!(
+        looks[0].avatar_parts,
+        default_look(looks[0].id, BattleGender::Bgirl)
+    );
+    assert_eq!(
+        looks[1].avatar_parts,
+        default_look(looks[1].id, BattleGender::Bboy)
     );
 }

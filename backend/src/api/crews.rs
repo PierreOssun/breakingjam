@@ -23,7 +23,7 @@ use crate::{
         crew::{Crew, CrewFields, Member},
         user::Role,
     },
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, InvalidCursor, InvalidFields, Unauthorized},
     state::AppState,
 };
 
@@ -76,7 +76,7 @@ pub struct AddMemberRequest {
     params(ListQuery),
     responses(
         (status = OK, body = Page<Crew>),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+        InvalidCursor,
     )
 )]
 async fn list(
@@ -122,9 +122,9 @@ async fn show(
     security(("session" = [])),
     responses(
         (status = CREATED, body = CrewDetail),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn create(
@@ -154,10 +154,10 @@ async fn create(
     security(("session" = [])),
     responses(
         (status = OK, body = CrewDetail),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such crew", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn update(
@@ -182,7 +182,7 @@ async fn update(
     security(("session" = [])),
     responses(
         (status = NO_CONTENT, description = "Deleted"),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such crew", body = ErrorEnvelope),
     )
@@ -210,10 +210,10 @@ async fn remove(
     security(("session" = [])),
     responses(
         (status = CREATED, body = CrewDetail),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such crew or dancer", body = ErrorEnvelope),
-        (status = CONFLICT, description = "Already a current member", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Already a current member, or a past membership with the same `since`", body = ErrorEnvelope),
     )
 )]
 async fn add_member(
@@ -229,10 +229,15 @@ async fn add_member(
     db::dancers::find_live(&state.pool, req.dancer_id)
         .await?
         .ok_or(AppError::NotFound)?;
-    if db::crews::is_current_member(&state.pool, id, req.dancer_id).await? {
-        return Err(AppError::Conflict("already a current member".into()));
+    // The schema refuses both conflicts, so racing adds can't slip past a check made first.
+    if !db::crews::add_member(&state.pool, id, req.dancer_id, req.since).await? {
+        let message = if db::crews::is_current_member(&state.pool, id, req.dancer_id).await? {
+            "already a current member"
+        } else {
+            "a past membership already starts on this `since`; give the date they rejoined"
+        };
+        return Err(AppError::Conflict(message.into()));
     }
-    db::crews::add_member(&state.pool, id, req.dancer_id, req.since).await?;
     Ok((StatusCode::CREATED, Json(detail(&state, crew).await?)))
 }
 
@@ -246,7 +251,7 @@ async fn add_member(
     security(("session" = [])),
     responses(
         (status = NO_CONTENT, description = "Membership ended"),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No current membership", body = ErrorEnvelope),
     )

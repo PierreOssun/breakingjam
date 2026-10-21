@@ -1,6 +1,6 @@
 import type { Schemas } from "../../api/client";
 
-export type ResultKind = "podium" | "top" | "prelims";
+type ResultKind = "podium" | "top" | "prelims";
 
 /** Badge of a result (DESIGN.md §4.13): `final_rank` 1–3 first, else the stage reached. */
 export function resultOf(

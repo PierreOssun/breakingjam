@@ -1,19 +1,19 @@
-import { X } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Schemas } from "../../api/client";
+import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
+import { RemovableChip } from "../../components/RemovableChip";
 import { SearchPicker } from "../../components/SearchPicker";
 import { TextField } from "../../components/TextField";
 
 type CrewName = Schemas["CrewName"];
 
 async function searchCrews(q: string) {
-  const { data, response } = await api.GET("/api/crews", {
-    params: { query: { q, limit: 8 } },
-  });
-  if (!data) throw new Error(`search crews: ${response.status}`);
-  return data.items;
+  const page = unwrap(
+    await api.GET("/api/crews", { params: { query: { q, limit: 8 } } }),
+    "search crews",
+  );
+  return page.items;
 }
 
 /** The crew an entry represents, if any: one chip, or search-before-create (§6). */
@@ -31,17 +31,11 @@ export function CrewPicker({
     return (
       <div className="flex flex-col gap-2">
         <p className="text-label text-text uppercase">{label}</p>
-        <span className="inline-flex h-8 items-center gap-1.5 self-start rounded-full border border-border bg-surface-raised pr-1 pl-3 text-body-sm font-bold">
-          {value.name}
-          <button
-            type="button"
-            aria-label={t("picker.remove", { name: value.name })}
-            onClick={() => onChange(null)}
-            className="grid size-7 cursor-pointer place-items-center rounded-full hover:bg-surface"
-          >
-            <X size={14} weight="bold" aria-hidden />
-          </button>
-        </span>
+        <RemovableChip
+          name={value.name}
+          onRemove={() => onChange(null)}
+          className="self-start"
+        />
       </div>
     );
   }

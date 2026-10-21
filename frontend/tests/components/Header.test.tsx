@@ -79,23 +79,47 @@ describe("Header", () => {
       "GET /api/auth/me": { status: 200, body: LIL_G },
       "POST /api/auth/logout": { status: 204 },
     });
-    renderApp("/jams/paris-cypher-3f9a1c");
-    // Logged in, an organiser finds their jams in the header.
-    expect(
-      await (await header()).findByRole("link", { name: "My jams" }),
-    ).toHaveAttribute("href", "/org/jams");
+    const router = renderApp("/jams/paris-cypher-3f9a1c");
+    // Logged in, the account menu holds My jams and Log out.
+    await userEvent.click(
+      await (await header()).findByRole("button", { name: "Lil G" }),
+    );
+    const menu = within(screen.getByRole("menu", { name: "Account" }));
+    expect(menu.queryByRole("menuitem", { name: "Admin" })).toBeNull();
+    await userEvent.click(menu.getByRole("menuitem", { name: "My jams" }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe("/org/jams"),
+    );
 
     await userEvent.click(
-      await (await header()).findByRole("button", { name: "Log out" }),
+      await (await header()).findByRole("button", { name: "Lil G" }),
     );
+    await userEvent.keyboard("{ArrowDown}{Enter}");
 
     expect(
       await (await header()).findByRole("link", { name: "Log in" }),
     ).toBeInTheDocument();
-    expect(
-      (await header()).queryByRole("link", { name: "My jams" }),
-    ).not.toBeInTheDocument();
     expect(calls(fetch)).toContain("POST /api/auth/logout");
+  });
+
+  it("shows the three nav links, then language, log in and Register a jam", async () => {
+    mockApi({ "GET /api/auth/me": LOGGED_OUT });
+    renderApp("/");
+    const bar = await header();
+
+    const nav = within(bar.getByRole("navigation", { name: "Menu" }));
+    expect(
+      nav.getAllByRole("link").map((link) => link.getAttribute("href")),
+    ).toEqual(["/map", "/jams", "/dancers"]);
+    expect(nav.getByRole("link", { name: "Jam map" })).toBeInTheDocument();
+    expect(nav.getByRole("link", { name: "Find a jam" })).toBeInTheDocument();
+    expect(
+      await bar.findByRole("link", { name: "Log in" }),
+    ).toBeInTheDocument();
+    expect(
+      bar.getAllByRole("link", { name: "Register a jam" })[0],
+    ).toHaveAttribute("href", "/org/jams/new");
+    expect(bar.queryByRole("link", { name: "My jams" })).toBeNull();
   });
 
   it("sends the log-in link back to the current page", async () => {

@@ -7,6 +7,9 @@ use argon2::{
 
 use crate::error::AppError;
 
+/// A hash no password matches: a login with no stored hash still pays for a verification.
+pub const NO_PASSWORD: &str = "$argon2id$v=19$m=19456,t=2,p=1$ALj5DAocdl+FjiyMu0SW/A$nuQb+Ay+PU5PB4aogFIV+I+3PIKCNTN8NCgz//2qxlE";
+
 /// Hashes a password into a PHC string with a random salt.
 pub async fn hash(password: String) -> Result<String, AppError> {
     // Argon2 is deliberately slow (tens of ms); keep it off the request threads.

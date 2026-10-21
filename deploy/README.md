@@ -5,7 +5,7 @@ Two copies of the same stack, each one Cloudflare Worker (ARCHITECTURE §9):
 | | Production | UAT |
 |---|---|---|
 | Branch | `prod` | `uat` |
-| Site | `breakingjam.com` (public) | `uat.breakingjam.com` (behind Cloudflare Access) |
+| Site | `breakingjam.com` (public) | `uat.breakingjam.com` (not indexed; optionally behind Cloudflare Access) |
 | Worker | `breakingjam` (top level of `wrangler.jsonc`) | `breakingjam-uat` (`env.uat`) |
 | Database | Neon project `breakingjam`, real data | Neon project `breakingjam-uat`, seeded demo data only |
 | GitHub environment | `prod` (a reviewer approves each deploy) | `uat` |
@@ -26,6 +26,10 @@ browser ──▶ Worker (deploy/src/index.ts)
   - The API uses the role `breakingjam_app`, which reads and writes rows but can't change the schema. Migrations use the owner role.
 - `frontend/public/_headers` sets the security headers (CSP, HSTS…) and the long cache for `/assets/*`.
 - The Worker passes the visitor's country (`request.cf.country`) to the API as `cf-ipcountry`, replacing any value the client sent. The map starts on that country (`GET /api/geo`).
+- UAT sets `TEST_SITE = "true"` in `env.uat` (production never has it). It runs the Worker for every request, and the Worker then:
+  - adds `X-Robots-Tag: noindex, nofollow` to every response;
+  - answers `/robots.txt` with `Disallow: /`;
+  - shows a "Test site — demo data, not real jams" badge on every page, fixed in a corner and click-through, so UAT keeps production's layout.
 
 ## One-time setup
 
@@ -75,17 +79,15 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
 7. **GitHub:** repository Settings → Environments → `prod` and `uat`.
    - Deployment branches: only `prod` for `prod`, only `uat` for `uat`.
    - Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` (the **owner** string, for migrations), `NEON_API_KEY`.
+   - `uat` only: secret `SEED_PASSWORD`, the seeded accounts' password (`openssl rand -hex 16`), and variable `SEED_ALLOW_HOST`, UAT's database host (`ep-….neon.tech`, no `-pooler`). The seed refuses any other host.
    - Variables: `NEON_PROJECT_ID`, `VITE_PROTOMAPS_KEY`, and `VITE_TILES_URL` only with self-hosted tiles.
    - `prod` only: required reviewers, so each production deploy waits for an approval.
    - Settings → Rules: a ruleset on `uat` and `prod` blocking force pushes and deletion.
-8. **UAT only: Cloudflare Access** (Zero Trust → Access → Applications, free up to 50 users). It keeps UAT private and out of search engines.
+8. **UAT only, optional: Cloudflare Access** (Zero Trust → Access → Applications, free up to 50 users). It keeps UAT private; without it UAT is public, but `TEST_SITE` keeps it out of search engines and labels it.
    - A self-hosted application for `uat.breakingjam.com`, policy *Allow* with your testers' emails (login with a one-time PIN).
    - A second application for `uat.breakingjam.com/api/health`, policy *Bypass* for *Everyone*, so the deploy's check gets through. The more specific path wins.
-9. **UAT only: demo data.** After the first UAT deploy, from `backend/` with the UAT **owner** string:
-   ```sh
-   DATABASE_URL='<UAT owner string>' SEED_ALLOW_HOST='<its host, ep-….neon.tech>' SEED_PASSWORD='<password>' cargo run --bin seed
-   ```
-   The seed refuses any remote host that `SEED_ALLOW_HOST` doesn't name exactly. Never point it at production.
+9. **UAT only: demo data.** After the first UAT deploy: Actions → **Seed UAT** → Run workflow, on the `uat` branch (`.github/workflows/seed-uat.yml`). It does nothing once the database is seeded.
+   - UAT is seeded only from GitHub, so its owner string never sits on a laptop. Production has no seed.
 10. **Production only: backups.** See [Backups](#backups).
 
 ## Releasing

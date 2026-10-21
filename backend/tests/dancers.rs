@@ -151,14 +151,6 @@ async fn search_matches_name_alias_and_handle_notable_first(pool: PgPool) {
     assert_eq!(names(&by_handle), ["Hong 10"]);
     let by_second_flag = send(&app, get("/api/dancers?country=KR", None)).await;
     assert_eq!(names(&by_second_flag), ["Hong 10"]);
-    sqlx::query!("update dancers set verified_at = now() where dancer_name = 'Hong 10'")
-        .execute(&pool)
-        .await
-        .unwrap();
-    let verified = send(&app, get("/api/dancers?verified=true", None)).await;
-    assert_eq!(names(&verified), ["Hong 10"]);
-    let unverified = send(&app, get("/api/dancers?q=kid&verified=false", None)).await;
-    assert_eq!(names(&unverified), ["Kid Rocket", "Kid Rockett"]);
     let wildcard = send(&app, get("/api/dancers?q=_", None)).await;
     assert!(names(&wildcard).is_empty(), "_ is literal, not a wildcard");
     let bare_at = send(&app, get("/api/dancers?q=%40", None)).await;

@@ -23,11 +23,11 @@ use crate::{
     auth::session::{CurrentUser, MaybeUser},
     db::{self, events::MapPoint},
     domain::{
-        battle::{Battle, Category},
+        battle::{Battle, Category, starts_during},
         event::{Event, EventFields, EventStatus, Transition, can_write},
         organizer::OrganizerRef,
     },
-    error::{AppError, ErrorEnvelope},
+    error::{AppError, ErrorEnvelope, InvalidCursor, InvalidFields, JamNotVisible, Unauthorized},
     flyer::{self, FlyerOptions, FlyerText, Lang},
     state::AppState,
 };
@@ -167,7 +167,7 @@ pub struct MapJam {
     responses(
         (status = OK, body = Page<Event>),
         (status = UNAUTHORIZED, description = "`mine=true` without a session", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid cursor", body = ErrorEnvelope),
+        InvalidCursor,
     )
 )]
 async fn list(
@@ -269,7 +269,7 @@ pub struct EventResponse {
     security((), ("session" = [])),
     responses(
         (status = OK, body = EventResponse),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        JamNotVisible,
     )
 )]
 async fn show(
@@ -299,8 +299,8 @@ async fn show(
     security(("session" = [])),
     responses(
         (status = CREATED, body = Event),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        Unauthorized,
+        InvalidFields,
     )
 )]
 async fn create(
@@ -311,7 +311,7 @@ async fn create(
     let mut tx = state.pool.begin().await?;
     // Registering a first jam makes a plain user an organiser (decided in M5).
     db::users::promote_to_organizer(&mut tx, current.user.id).await?;
-    let event = db::events::insert(&mut tx, Uuid::now_v7(), current.user.id, &fields).await?;
+    let event = db::events::insert(&mut *tx, Uuid::now_v7(), current.user.id, &fields).await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(event)))
 }
@@ -327,10 +327,10 @@ async fn create(
     security(("session" = [])),
     responses(
         (status = OK, body = Event),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields", body = ErrorEnvelope),
+        JamNotVisible,
+        InvalidFields,
     )
 )]
 async fn update(
@@ -349,7 +349,7 @@ async fn check_days(state: &AppState, id: Uuid, fields: &EventFields) -> Result<
     let battles = db::battles::list(&state.pool, id).await?;
     let outside = battles
         .iter()
-        .find(|b| !b.starts_during(fields.starts_on, fields.ends_on))
+        .find(|b| !starts_during(b.starts_at, fields.starts_on, fields.ends_on))
         .and_then(|b| b.starts_at);
     match outside {
         None => Ok(()),
@@ -374,9 +374,9 @@ async fn check_days(state: &AppState, id: Uuid, fields: &EventFields) -> Result<
     security(("session" = [])),
     responses(
         (status = NO_CONTENT, description = "Deleted"),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        JamNotVisible,
     )
 )]
 async fn delete(
@@ -403,9 +403,9 @@ async fn delete(
     security(("session" = [])),
     responses(
         (status = OK, body = Event),
-        (status = UNAUTHORIZED, description = "No valid session", body = ErrorEnvelope),
+        Unauthorized,
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+, or `publish` by an organiser", body = ErrorEnvelope),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        JamNotVisible,
         (status = CONFLICT, description = "The current status does not allow it", body = ErrorEnvelope),
     )
 )]
@@ -436,7 +436,7 @@ async fn transition(
     security((), ("session" = [])),
     responses(
         (status = OK, description = "SVG document: `role=\"img\"` with a localised label, or `aria-hidden` when compact", content_type = "image/svg+xml", body = String),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        JamNotVisible,
     )
 )]
 async fn flyer_svg(
@@ -473,7 +473,7 @@ async fn flyer_svg(
     security((), ("session" = [])),
     responses(
         (status = OK, description = "PNG, 1200×630", content_type = "image/png", body = Png),
-        (status = NOT_FOUND, description = "No such jam, or a draft you can't see", body = ErrorEnvelope),
+        JamNotVisible,
     )
 )]
 async fn og_png(

@@ -1,21 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLayoutEffect, useId, useMemo } from "react";
+import { useId, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { api, type Schemas } from "../../api/client";
-import { Button } from "../../components/Button";
+import { CountrySelect } from "../../components/CountrySelect";
 import { Dialog } from "../../components/Dialog";
+import { FormError } from "../../components/FormError";
 import { HandleField } from "../../components/HandleField";
 import { InlineNotice } from "../../components/InlineNotice";
 import { OptionalLabel } from "../../components/OptionalLabel";
-import { SelectField } from "../../components/SelectField";
 import { TextAreaField } from "../../components/TextAreaField";
 import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
-import { splitFieldErrors } from "../../lib/apiErrors";
-import { countryOptions } from "../../lib/countries";
+import { applyFieldErrors } from "../../lib/apiErrors";
 import { toHandle } from "../../lib/instagram";
 import { ME_KEY } from "../auth/useMe";
 
@@ -46,16 +45,15 @@ const valuesOf = (o: Organizer): Values => ({
 /** Edit your organiser page; a new handle needs verifying again (M12c). */
 export function OrganizerEditDialog({
   organizer,
-  open,
   onClose,
   focusHandle = false,
 }: {
   organizer: Organizer;
-  open: boolean;
   onClose: () => void;
+  /** Opened from "Add Instagram": focus starts on the handle (§4.23). */
   focusHandle?: boolean;
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const formId = useId();
@@ -81,21 +79,13 @@ export function OrganizerEditDialog({
     mode: "onTouched",
     defaultValues: valuesOf(organizer),
   });
-  const { register, handleSubmit, setError, reset, watch } = form;
+  const { register, handleSubmit, setError, watch } = form;
   const { errors, isDirty } = form.formState;
-  // Each opening starts from the saved page. A layout effect, so the reset lands before
-  // the dialog shows and can never wipe what was just typed into it.
-  useLayoutEffect(() => {
-    if (open) reset(valuesOf(organizer));
-  }, [open, organizer, reset]);
-  const countries = useMemo(
-    () => countryOptions(i18n.language),
-    [i18n.language],
-  );
   const [handle, bio] = watch(["instagram_handle", "bio"]);
+  // Instagram handles are case-insensitive: a change of case is not a new handle.
   const losesTick =
     organizer.verified_at != null &&
-    handle.toLowerCase() !== (organizer.instagram_handle ?? "");
+    handle.toLowerCase() !== (organizer.instagram_handle ?? "").toLowerCase();
 
   const save = useMutation({
     mutationFn: (values: Values) =>
@@ -119,45 +109,22 @@ export function OrganizerEditDialog({
         void queryClient.invalidateQueries({ queryKey: ME_KEY });
         toast({ kind: "success", message: t("organizer.saved") });
         onClose();
-        return;
-      }
-      if (response.status === 409) {
+      } else if (response.status === 409) {
         setError("instagram_handle", { message: t("organizer.handleTaken") });
-        return;
+      } else {
+        applyFieldErrors(setError, error, FIELDS);
       }
-      const { fields, rest } = splitFieldErrors(error, FIELDS);
-      for (const [field, message] of fields) setError(field, { message });
-      if (rest) setError("root", { message: rest });
     },
     onError: () => setError("root", { message: t("errors.generic") }),
   });
 
   return (
     <Dialog
-      open={open}
       onClose={onClose}
       size="form"
       title={t("organizer.edit")}
       confirmClose={isDirty ? t("form.discard") : undefined}
-      footer={(close) => (
-        <>
-          <Button
-            variant="ghost"
-            className="flex-1 lg:flex-none"
-            onClick={close}
-          >
-            {t("form.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form={formId}
-            className="flex-[2] lg:flex-none"
-            loading={save.isPending}
-          >
-            {t("form.save")}
-          </Button>
-        </>
-      )}
+      action={{ label: t("form.save"), form: formId, loading: save.isPending }}
     >
       <form
         id={formId}
@@ -182,17 +149,10 @@ export function OrganizerEditDialog({
           <InlineNotice actionable>{t("organizer.newHandle")}</InlineNotice>
         )}
         <div className="grid gap-6 lg:grid-cols-2">
-          <SelectField
+          <CountrySelect
             label={<OptionalLabel label={t("org.fields.country")} />}
             {...register("country")}
-          >
-            <option value="">—</option>
-            {countries.map(([code, label]) => (
-              <option key={code} value={code}>
-                {label}
-              </option>
-            ))}
-          </SelectField>
+          />
           <TextField
             label={<OptionalLabel label={t("org.fields.city")} />}
             error={errors.city?.message}
@@ -205,11 +165,7 @@ export function OrganizerEditDialog({
           error={errors.bio?.message}
           {...register("bio")}
         />
-        {errors.root?.message && (
-          <p role="alert" className="text-body-sm font-bold text-danger">
-            {errors.root.message}
-          </p>
-        )}
+        <FormError message={errors.root?.message} />
       </form>
     </Dialog>
   );

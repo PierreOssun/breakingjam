@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     dataset::{CrewRecord, DancerRecord},
-    domain::{battle::StaffRole, event::EventStatus},
+    domain::{battle::StaffRole, dancer::default_look, event::EventStatus},
 };
 
 /// A dancer from `dancers.toml`, entered as a seed admin's: notable (§4 "Dancer identity").
@@ -15,14 +15,17 @@ pub async fn insert_dancer(
     created_by: Uuid,
 ) -> sqlx::Result<Uuid> {
     let id = Uuid::now_v7();
+    // Set before any entry, so the battles' suggestion (which fills only empty looks) defers to it.
+    let avatar_parts = dancer.look.and_then(|look| default_look(id, look));
     sqlx::query!(
-        "insert into dancers (id, dancer_name, aliases, country, country2, source, notable, created_by)
-         values ($1, $2, $3, $4, $5, 'seed', true, $6)",
+        "insert into dancers (id, dancer_name, aliases, country, country2, avatar_parts, source, notable, created_by)
+         values ($1, $2, $3, $4, $5, $6, 'seed', true, $7)",
         id,
         dancer.name,
         &dancer.aliases,
         dancer.country,
         dancer.country2,
+        avatar_parts,
         created_by,
     )
     .execute(conn)

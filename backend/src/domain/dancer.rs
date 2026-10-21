@@ -129,35 +129,37 @@ pub type FieldChange = (&'static str, Option<String>, Option<String>);
 
 /// The profile fields that differ between two versions of a dancer.
 pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
-    let aliases = |d: &Dancer| (!d.aliases.is_empty()).then(|| d.aliases.join(", "));
-    let fields: [FieldChange; 9] = [
-        (
-            "dancer_name",
-            Some(old.dancer_name.clone()),
-            Some(new.dancer_name.clone()),
-        ),
-        ("aliases", aliases(old), aliases(new)),
-        ("real_name", old.real_name.clone(), new.real_name.clone()),
-        (
-            "country",
-            Some(old.country.clone()),
-            Some(new.country.clone()),
-        ),
-        ("country2", old.country2.clone(), new.country2.clone()),
-        ("city", old.city.clone(), new.city.clone()),
-        ("bio", old.bio.clone(), new.bio.clone()),
-        (
-            "instagram_handle",
-            old.instagram_handle.clone(),
-            new.instagram_handle.clone(),
-        ),
-        (
-            "avatar_parts",
-            old.avatar_parts.clone(),
-            new.avatar_parts.clone(),
-        ),
+    const FIELDS: [&str; 9] = [
+        "dancer_name",
+        "aliases",
+        "real_name",
+        "country",
+        "country2",
+        "city",
+        "bio",
+        "instagram_handle",
+        "avatar_parts",
     ];
-    fields.into_iter().filter(|(_, a, b)| a != b).collect()
+    let values = |d: &Dancer| -> [Option<String>; 9] {
+        [
+            Some(d.dancer_name.clone()),
+            (!d.aliases.is_empty()).then(|| d.aliases.join(", ")),
+            d.real_name.clone(),
+            Some(d.country.clone()),
+            d.country2.clone(),
+            d.city.clone(),
+            d.bio.clone(),
+            d.instagram_handle.clone(),
+            d.avatar_parts.clone(),
+        ]
+    };
+    FIELDS
+        .into_iter()
+        .zip(values(old))
+        .zip(values(new))
+        .filter(|((_, a), b)| a != b)
+        .map(|((field, a), b)| (field, a, b))
+        .collect()
 }
 
 /// Aliases after merging `loser` into `survivor`: both lists plus the loser's name,
