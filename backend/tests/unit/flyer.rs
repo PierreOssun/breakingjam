@@ -384,6 +384,8 @@ fn categories_fit_their_line() {
     );
     let twice = names(&["1v1 Bboy", "1v1 Bboy"]);
     assert_eq!(fit_categories(&twice, 36), names(&["1v1 Bboy"]));
+    let mixed = names(&["1v1 Bboy", "2v2", "1v1 Bboy", "2v2"]);
+    assert_eq!(fit_categories(&mixed, 36), names(&["1v1 Bboy", "2v2"]));
     let long = names(&["An extremely long battle name that cannot fit"]);
     assert_eq!(fit_categories(&long, 12), names(&["An extremel…"]));
     assert!(fit_categories(&[], 36).is_empty());

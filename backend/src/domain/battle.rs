@@ -279,6 +279,9 @@ fn prizes_have_a_currency(fields: &BattleFields) -> Result<(), ValidationError> 
     }
 }
 
+/// Battles one jam may hold: real jams run a handful, and every flyer lists them all.
+pub const MAX_BATTLES: usize = 32;
+
 /// Whether a start, if any, falls on one of the jam's days.
 pub fn starts_during(
     start: Option<NaiveDateTime>,

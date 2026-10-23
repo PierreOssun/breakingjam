@@ -1,6 +1,7 @@
 mod test_app;
 
 use axum::{Router, http::StatusCode};
+use breakingjam::domain::battle::MAX_BATTLES;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use test_app::{TestResponse, app, delete, get, id_of, post, publish, put, send, sign_up};
@@ -106,6 +107,17 @@ async fn battle_rules_are_422s(pool: PgPool) {
         response.json["error"]["fields"][0]["field"],
         "prize_currency"
     );
+}
+
+#[sqlx::test]
+async fn a_jam_holds_a_bounded_number_of_battles(pool: PgPool) {
+    let jam = jam(pool).await;
+    for _ in 0..MAX_BATTLES {
+        assert_eq!(jam.battle(one_v_one()).await.status, StatusCode::CREATED);
+    }
+    let one_more = jam.battle(one_v_one()).await;
+    assert_eq!(one_more.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(one_more.json["error"]["fields"][0]["field"], "battles");
 }
 
 #[sqlx::test]

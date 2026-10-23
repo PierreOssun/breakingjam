@@ -328,6 +328,7 @@ Notes:
 - `citext` requires `create extension if not exists citext;` in the first migration.
 - `entry_members` row count must equal `battles.team_size` for a `confirmed` entry when `format = 'team'`; for `seven_to_smoke` an entry is always one dancer — enforced in domain code, not DB.
 - One dancer may appear in only one entry per battle — enforce in code for now.
+- A jam holds at most 32 battles (`domain::battle::MAX_BATTLES`, checked when a battle is added); every flyer lists them all.
 - `reached` vs `final_rank`: `reached` is what organisers actually know the night of the jam ("he went out in top 8"); `final_rank` is set when there is a real placement (1st, 2nd, and 3rd/4th when a small final is held). The dancer page shows `final_rank` as "1st/2nd/3rd" when set, otherwise `reached` as "Top 8" / "Prelims". Rule: `reached = 'winner'` ⇔ `final_rank = 1`; `reached = 'top2'` ⇒ `final_rank = 2`.
 - `battles.name` is free text so organisers keep their own wording; the structured fields (`format`, `team_size`, `gender`, `age`) are what search, filters and dancer stats use. The UI pre-fills `name` from the structured fields ("1v1 Bboy", "2v2 Mixed Kids", "Seven to Smoke Bgirl") and lets the organiser override it.
 - Age presets in the UI: Kids (8–17, editable lower bound), Adult (18+), Masters (40+). Stored as `age` + `age_min`/`age_max`.

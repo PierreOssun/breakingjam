@@ -17,8 +17,8 @@ use crate::{
     db,
     domain::{
         battle::{
-            Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, StaffList,
-            StaffMember, starts_during,
+            Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, MAX_BATTLES,
+            StaffList, StaffMember, starts_during,
         },
         event::Event,
     },
@@ -84,6 +84,7 @@ async fn create(
 ) -> Result<(StatusCode, Json<Battle>), AppError> {
     let event = writable(&state, &current, event_id).await?;
     check_start(&fields, &event)?;
+    check_room(&state, event_id).await?;
     let battle =
         db::battles::insert(&state.pool, event_id, &fields.display_name(), &fields).await?;
     Ok((StatusCode::CREATED, Json(battle)))
@@ -390,6 +391,18 @@ fn check_start(fields: &BattleFields, event: &Event) -> Result<(), AppError> {
         Err(AppError::invalid(
             "starts_at",
             "must be on one of the jam's days",
+        ))
+    }
+}
+
+/// 422 once the jam already holds `MAX_BATTLES`.
+async fn check_room(state: &AppState, event_id: Uuid) -> Result<(), AppError> {
+    if db::battles::list(&state.pool, event_id).await?.len() < MAX_BATTLES {
+        Ok(())
+    } else {
+        Err(AppError::invalid(
+            "battles",
+            &format!("a jam has at most {MAX_BATTLES} battles"),
         ))
     }
 }

@@ -122,14 +122,17 @@ async fn register(
     State(state): State<AppState>,
     ValidJson(req): ValidJson<RegisterRequest>,
 ) -> Result<(StatusCode, WithCookie<Json<UserResponse>>), AppError> {
+    let email = req.email.trim();
+    // Replaying a taken email must not cost a hash; the unique index still settles races.
+    if db::users::find_with_password(&state.pool, email)
+        .await?
+        .is_some()
+    {
+        return Err(AppError::Conflict("email already registered".into()));
+    }
     let hash = password::hash(req.password).await?;
-    let user = db::users::insert_with_password(
-        &state.pool,
-        req.email.trim(),
-        req.display_name.trim(),
-        &hash,
-    )
-    .await?;
+    let user =
+        db::users::insert_with_password(&state.pool, email, req.display_name.trim(), &hash).await?;
     let cookie = session::start(&state, user.id).await?;
     Ok((
         StatusCode::CREATED,

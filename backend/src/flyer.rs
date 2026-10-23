@@ -8,6 +8,7 @@
 // the accessible label is localised while compact flyers are always `aria-hidden`.
 
 use std::{
+    collections::HashSet,
     fmt::Write,
     sync::{Arc, LazyLock},
 };
@@ -384,12 +385,8 @@ fn wrap(words: &[&str], cw: f64, width: f64) -> (Vec<String>, bool) {
 
 /// Keeps as many category names as fit in `max_chars` (joined with " · "), then "+N".
 pub fn fit_categories(names: &[String], max_chars: usize) -> Vec<String> {
-    let mut unique: Vec<&String> = Vec::new();
-    for name in names {
-        if !unique.contains(&name) {
-            unique.push(name);
-        }
-    }
+    let mut seen = HashSet::new();
+    let unique: Vec<&String> = names.iter().filter(|name| seen.insert(*name)).collect();
     let joined_len = |items: &[String]| {
         items.iter().map(|s| s.chars().count()).sum::<usize>() + 3 * items.len().saturating_sub(1)
     };
