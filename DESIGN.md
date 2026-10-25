@@ -466,9 +466,9 @@ One component that changes shape by viewport.
 - It opens the edit sheet focused on that field.
 - Show it only to logged-in users. Visitors see nothing in that spot.
 
-### 4.24 Generated flyer *(v0.1: jams have no image upload)*
+### 4.24 Generated flyer
 
-Every jam gets a 4:5 poster built from its own data: the palette's background with a soft HD glow, and the jam's details set in type. No pixel art (decided after M15); the share image keeps the pixel rings, floor and dancer. It's used wherever a flyer appears: the jam page hero, cards, popup and list thumbnails, and the share image. When uploads arrive, an uploaded image replaces it, and the generated one stays as the fallback and the OG image. See the "Generated flyer" artboard; `generated-flyer-reference.py` is a reference implementation that outputs SVG.
+Every jam gets a 4:5 poster built from its own data: the palette's background with a soft HD glow, and the jam's details set in type. No pixel art (decided after M15); the share image keeps the pixel rings, floor and dancer. It's used wherever a flyer appears: the jam page hero, cards, popup and list thumbnails, and the share image. An uploaded flyer (§4.28) replaces it, and the generated one stays as the fallback and the OG image. See the "Generated flyer" artboard; `generated-flyer-reference.py` is a reference implementation that outputs SVG.
 
 - **Inputs:** name, date (weekday, day, month), start time, city, country code, categories. Nothing else.
 - **Rendering:** a single SVG with `viewBox="0 0 400 500"`, `preserveAspectRatio="xMidYMid slice"` and `shape-rendering="crispEdges"`. It scales to any size.
@@ -545,7 +545,7 @@ handstand            toprock
                      ..XXXX.........XXXX.
 ```
 
-- **On the jam page:** the flyer is the hero exactly as an uploaded flyer would be (mobile full-bleed 375×469; desktop left column, `rounded-lg`). The `<h1>` and fact rows stay below it, so the layout doesn't change when uploads ship.
+- **On the jam page:** the flyer is the hero exactly as an uploaded flyer is (mobile full-bleed 375×469; desktop left column, `rounded-lg`). The `<h1>` and fact rows stay below it, so the layout is the same with either.
 
 ### 4.25 Person list row ("Find someone")
 
@@ -588,6 +588,28 @@ handstand            toprock
 - **Overlays:**
   - Top-left chip: `h-9 px-3.5 rounded-full bg-bg border border-border shadow-md text-[13px] font-extrabold`, with an 8px `success` dot and "N upcoming jams".
   - Bottom-left: secondary sm **Open the map →** on `bg-bg`.
+
+### 4.28 Flyer upload and crop *(M19)*
+
+Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; https://claude.ai/artifact/26hnHfNDk6NGqUF2aMkB3i).
+
+- **Field:** its own "Flyer" section in the jam editor, after Details.
+  - **Empty:** a dashed drop target, `rounded-md border-2 border-dashed border-border-strong bg-surface px-4 py-6`, centred. Inside: `UploadSimple` 28 in `primary-text`, "Upload a flyer" in `body` bold, and "PNG or JPEG, up to 20 MB. Portrait 4:5 fits best." in `caption muted`.
+    - It is a button that opens the file picker (the file input itself stays hidden), and it also takes a dropped file.
+    - Under it: "Until you add one, the jam uses a flyer made from its details."
+  - **Uploaded:** the card-size image at 120×150 `rounded-md border border-border`. Beside it, a secondary sm **Replace flyer** (`UploadSimple`) and a ghost sm **Remove flyer** (`Trash`). Under it: "Shown on the jam page, cards and the map. Remove it to go back to the generated flyer."
+  - **Error:** the drop target's border turns `danger`, and the field error of §4.2 replaces the helper: not a PNG or JPEG, over 20 MB, under 540 × 675 px, or unreadable.
+- **On the jam page**, for whoever may edit the jam (its organiser, the BreakingJam team, admins): right under the flyer, a secondary sm **Upload a flyer**, or **Replace flyer** and a ghost sm **Remove flyer** once there is one. They open the same picker and crop dialog as the editor, and a file problem shows under them as the field error. Below lg the row takes the content's side padding, as the flyer is full-bleed.
+- **Crop dialog:** §4.9 in its `form` shape (a sheet below lg, a 560px dialog from lg), titled "Crop your flyer". In order:
+  1. **Crop area:** full-bleed in the sheet, `h-[382px] bg-bg`. The image sits under a fixed 280×350 frame with a 2px `text` border, and the `scrim` covers what's outside the frame.
+     - Drag to move, pinch to zoom. Arrow keys move the image 16px, `+` and `-` zoom. The cursor is `grab`, `grabbing` while dragging.
+  2. **Zoom row:** `Minus` and `Plus` icon buttons around a range slider (`accent-primary`), then a ghost sm **Reset** (`ArrowCounterClockwise`).
+     - Zoom 1 is the largest 4:5 crop. Zoom stops where the crop holds 540 image pixels (the card image), or at 4×.
+     - Under the row: "Drag to move. Pinch or slide to zoom." in `caption muted`.
+  3. **Soft warning:** an actionable inline notice (§4.21) when the crop is under 900 px wide: "This crop is N px wide, so it will look soft. Zoom out, or pick a bigger image: 1080 × 1350 is ideal."
+  4. **"On cards and lists":** the crop at 96×120, and a row card (§4.3) with the crop at 64×80 beside the jam's date, name and city.
+  5. **Footer:** ghost **Cancel**, primary **Use this flyer** (loading while it uploads). On success the dialog closes, with the toast "Flyer updated."
+- **Showing it:** an uploaded flyer takes the generated one's place everywhere, with the same shell (`aspect-[4/5] overflow-hidden`, `object-cover`). The jam page uses the 1080×1350 image; cards, rows and popups use the 540×675 one. Its alt text is "Flyer of <name>", empty on compact thumbnails, as they sit next to the name.
 
 ---
 
@@ -666,7 +688,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 **Jam detail.**
 - **Mobile:**
   1. Back bar (← Map, Share).
-  2. Full-bleed 4:5 flyer.
+  2. Full-bleed 4:5 flyer, with the flyer buttons under it for the jam's writers (§4.28).
   3. Badge and deadline caption, then the `display-lg` title.
   4. Fact rows for date/time, venue, fees, website (`Globe`, the host as label, ↗) and email (`EnvelopeSimple`, a `mailto:` link), then Instagram, each with a `primary-text` icon.
   5. **Battles** list: category, format and spots, or "Full" in muted; the start under the name when set (`Clock` 16 in `primary-text`, "Starts 14:30" muted, or "Starts Sat 23 Sept, 14:30" when the jam runs several days); cash prizes under the name (`Trophy` 16 in `primary-text`, "1st CHF 1,000 · 2nd CHF 500" muted); entries as dancer chips, best result first.

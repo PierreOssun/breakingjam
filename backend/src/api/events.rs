@@ -154,6 +154,8 @@ pub struct MapJam {
     pub battles: Vec<String>,
     /// What the map's category chips match, from all battles, without repeats.
     pub categories: Vec<Category>,
+    /// The uploaded flyer at 540×675; null means the generated one.
+    pub flyer_card_url: Option<String>,
 }
 
 /// List public jams, or your own with `mine=true`.
@@ -242,6 +244,7 @@ fn feature(p: MapPoint, battles: Vec<Battle>) -> Feature {
             country: p.country,
             battles: battles.into_iter().map(|b| b.name).collect(),
             categories,
+            flyer_card_url: p.flyer_card_url,
         },
     }
 }
@@ -385,7 +388,9 @@ async fn delete(
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, AppError> {
     writable(&state, &current, id).await?;
-    db::events::soft_delete(&state.pool, id).await?;
+    let flyer = db::events::soft_delete(&state.pool, id).await?;
+    // Nothing edits a deleted jam, so its flyer goes now or stays public for good.
+    super::flyers::discard(&state.media, flyer);
     Ok(StatusCode::NO_CONTENT)
 }
 

@@ -1,6 +1,13 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { LIL_G, LOGGED_OUT, bodyOf, mockApi, renderApp } from "../support/app";
+import {
+  LIL_G,
+  LOGGED_OUT,
+  bodyOf,
+  calls,
+  mockApi,
+  renderApp,
+} from "../support/app";
 
 const at = "2026-10-01T10:00:00Z";
 const JAM = {
@@ -130,6 +137,14 @@ function mockJam(
   });
 }
 
+/** A jam as write routes return it: without `can_edit` and `organizer`, which only GET adds. */
+const asWritten = (jam: object) =>
+  Object.fromEntries(
+    Object.entries(jam).filter(
+      ([key]) => !["can_edit", "organizer"].includes(key),
+    ),
+  );
+
 /** The jam as its organiser sees it. */
 const asOrganiser = (replies: Parameters<typeof mockApi>[0] = {}) =>
   mockJam(
@@ -190,8 +205,64 @@ describe("JamPage", () => {
     expect(
       within(organiser).getByRole("link", { name: "Contact" }),
     ).toHaveAttribute("href", "https://ig.me/m/floor.lords");
-    // Only its writers get the edit link.
+    // Only its writers get the edit link and the flyer buttons.
     expect(main.queryByRole("link", { name: "Edit jam" })).toBeNull();
+    expect(main.queryByRole("button", { name: "Upload a flyer" })).toBeNull();
+  });
+
+  it("shows the organiser's flyer instead of the generated one", async () => {
+    const fetch = mockJam({
+      flyer_url: "https://media.breakingjam.com/flyers/e001/f.jpg",
+      flyer_card_url: "https://media.breakingjam.com/flyers/e001/f-card.jpg",
+    });
+    renderApp(`/jams/${JAM.slug}`);
+    const main = within(await screen.findByRole("main"));
+
+    const flyer = await main.findByRole("img", {
+      name: "Flyer of Paris Cypher Sessions",
+    });
+    // The jam page takes the full size; cards and lists the card one.
+    expect(flyer).toHaveAttribute(
+      "src",
+      "https://media.breakingjam.com/flyers/e001/f.jpg",
+    );
+    expect(calls(fetch)).not.toContain(`GET /api/events/${JAM.id}/flyer.svg`);
+  });
+
+  it("gives its organiser the flyer buttons under the flyer", async () => {
+    // Admins and the BreakingJam team get them too: `can_edit` covers every writer.
+    mockJam(
+      {
+        can_edit: true,
+        flyer_url: "https://media.breakingjam.com/flyers/e001/f.jpg",
+        flyer_card_url: "https://media.breakingjam.com/flyers/e001/f-card.jpg",
+      },
+      {
+        "GET /api/auth/me": { status: 200, body: LIL_G },
+        [`DELETE /api/events/${JAM.id}/flyer`]: {
+          status: 200,
+          body: asWritten({ ...JAM, flyer_url: null, flyer_card_url: null }),
+        },
+      },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+    const main = within(await screen.findByRole("main"));
+
+    expect(
+      await main.findByRole("button", { name: "Replace flyer" }),
+    ).toBeInTheDocument();
+    await userEvent.click(main.getByRole("button", { name: "Remove flyer" }));
+
+    // Back to the generated flyer, and to a button that adds one.
+    expect(
+      await main.findByRole("img", {
+        name: "Generated flyer: Paris Cypher Sessions, Sat 01 Jun, Paris",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      main.getByRole("button", { name: "Upload a flyer" }),
+    ).toBeInTheDocument();
+    expect(main.queryByRole("button", { name: "Remove flyer" })).toBeNull();
   });
 
   it("lists battles with results first, links every dancer and hides withdrawn entries", async () => {

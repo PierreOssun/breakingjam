@@ -255,6 +255,19 @@ async fn writes_on_someone_elses_things_are_forbidden(pool: PgPool) {
             json!([]),
             &w.other_organizer,
         ),
+        // The writer check comes before the upload is read, so no images are needed here.
+        (
+            "post",
+            format!("/api/events/{jam_id}/flyer"),
+            json!({}),
+            &w.other_organizer,
+        ),
+        (
+            "delete",
+            format!("/api/events/{jam_id}/flyer"),
+            json!({}),
+            &w.other_organizer,
+        ),
         (
             "put",
             format!("/api/battles/{battle_id}"),

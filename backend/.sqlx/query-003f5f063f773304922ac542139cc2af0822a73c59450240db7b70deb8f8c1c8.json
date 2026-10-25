@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "update events set status = $2, review_note = $3\n           where id = $1 and status = 'in_review' and deleted_at is null\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at",
+  "query": "update events set status = $3, review_note = null\n           where id = $1 and status = $2 and deleted_at is null\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -228,6 +228,28 @@
       },
       {
         "ordinal": 19,
+        "name": "flyer_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "flyer_url"
+          }
+        }
+      },
+      {
+        "ordinal": 20,
+        "name": "flyer_card_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "flyer_card_url"
+          }
+        }
+      },
+      {
+        "ordinal": 21,
         "name": "review_note",
         "type_info": "Text",
         "origin": {
@@ -238,7 +260,7 @@
         }
       },
       {
-        "ordinal": 20,
+        "ordinal": 22,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -249,7 +271,7 @@
         }
       },
       {
-        "ordinal": 21,
+        "ordinal": 23,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -278,7 +300,21 @@
             }
           }
         },
-        "Text"
+        {
+          "Custom": {
+            "name": "event_status",
+            "kind": {
+              "Enum": [
+                "draft",
+                "in_review",
+                "published",
+                "registration_closed",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        }
       ]
     },
     "nullable": [
@@ -302,9 +338,11 @@
       true,
       true,
       true,
+      true,
+      true,
       false,
       false
     ]
   },
-  "hash": "f8de928c65cd188991c4491999fcabb2aa1dfe2f9935fc9118fdeeb2eff9de9a"
+  "hash": "003f5f063f773304922ac542139cc2af0822a73c59450240db7b70deb8f8c1c8"
 }

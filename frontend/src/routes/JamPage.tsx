@@ -20,6 +20,7 @@ import { StatusBadge } from "../components/StatusBadge";
 import { VerifiedTick } from "../components/VerifiedTick";
 import { VideoDialog, type Video } from "../components/VideoDialog";
 import { BattleCard } from "../features/jams/BattleCard";
+import { FlyerActions } from "../features/jams/FlyerEditor";
 import { JamFlyer } from "../features/jams/JamFlyer";
 import { Lineup } from "../features/jams/Lineup";
 import {
@@ -86,8 +87,11 @@ function JamDetail({ jam }: { jam: Jam }) {
 
       <div className="mx-auto max-w-content lg:grid lg:grid-cols-[440px_1fr] lg:gap-16 lg:px-8">
         <aside className="flex flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
-          {/* Full-bleed below lg, a rounded card beside the content from lg. */}
-          <JamFlyer jam={jam} className="lg:rounded-lg" />
+          <div className="flex flex-col gap-3">
+            {/* Full-bleed below lg, a rounded card beside the content from lg. */}
+            <JamFlyer jam={jam} className="lg:rounded-lg" />
+            {jam.can_edit && <FlyerActions jam={jam} />}
+          </div>
           {registration && (
             <div className="hidden flex-col gap-4 rounded-lg border border-border bg-surface p-5 lg:flex">
               <p className="text-label text-primary-text uppercase">{dates}</p>

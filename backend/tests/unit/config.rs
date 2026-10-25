@@ -12,6 +12,8 @@ fn full_env() -> HashMap<&'static str, String> {
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "GOOGLE_REDIRECT_URL",
+        "MEDIA_STORE_URL",
+        "MEDIA_PUBLIC_URL",
     ]
     .into_iter()
     .map(|name| (name, format!("{name}-value")))

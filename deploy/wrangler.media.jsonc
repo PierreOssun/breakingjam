@@ -1,0 +1,10 @@
+// `just media` (src/mediaDev.ts): a local R2 bucket for uploads in development, kept in
+// .wrangler/state between runs. Never deployed.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "breakingjam-media-dev",
+  "main": "src/mediaDev.ts",
+  "compatibility_date": "2026-10-15",
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "breakingjam-media-dev" }],
+  "dev": { "port": 8788 }
+}

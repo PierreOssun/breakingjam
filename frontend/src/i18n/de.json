@@ -142,7 +142,8 @@
     "edit": "Jam bearbeiten",
     "website": "Website",
     "email": "E-Mail",
-    "battleStart": "Beginn {{when}}"
+    "battleStart": "Beginn {{when}}",
+    "flyerAlt": "Flyer von {{name}}"
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -439,7 +440,37 @@
         "other": "Team-Mitglied hinzufügen"
       }
     },
-    "peopleOnJamPage": "Tänzer:innen, Judges, DJ und MC fügst du auf der Jam-Seite hinzu."
+    "peopleOnJamPage": "Tänzer:innen, Judges, DJ und MC fügst du auf der Jam-Seite hinzu.",
+    "flyer": {
+      "title": "Flyer",
+      "upload": "Flyer hochladen",
+      "formats": "PNG oder JPEG, bis 20 MB. Hochformat 4:5 passt am besten.",
+      "generated": "Bis du einen hinzufügst, nutzt der Jam einen Flyer aus seinen Angaben.",
+      "shown": "Zu sehen auf der Jam-Seite, in Karten und auf der Karte. Entferne ihn, um zum erzeugten Flyer zurückzukehren.",
+      "current": "Dein Flyer",
+      "replace": "Flyer ersetzen",
+      "remove": "Flyer entfernen",
+      "updated": "Flyer aktualisiert.",
+      "removed": "Flyer entfernt: Der erzeugte ist zurück.",
+      "problem": {
+        "type": "Diese Datei ist weder PNG noch JPEG.",
+        "size": "Diese Datei ist größer als 20 MB. Exportiere sie kleiner und versuche es erneut.",
+        "small": "Dieses Bild ist zu klein: Es braucht mindestens 540 × 675 px.",
+        "unreadable": "Dieses Bild ließ sich nicht öffnen. Versuche eine andere Datei."
+      },
+      "crop": {
+        "title": "Flyer zuschneiden",
+        "area": "Flyer-Zuschnitt. Ziehe das Bild oder bewege es mit den Pfeiltasten, Plus und Minus zoomen.",
+        "zoom": "Zoom",
+        "zoomIn": "Vergrößern",
+        "zoomOut": "Verkleinern",
+        "reset": "Zurücksetzen",
+        "hint": "Zum Verschieben ziehen. Zum Zoomen mit zwei Fingern ziehen oder den Regler nutzen.",
+        "soft": "Dieser Zuschnitt ist {{width}} px breit und wirkt daher unscharf. Verkleinere oder wähle ein größeres Bild: 1080 × 1350 ist ideal.",
+        "previews": "In Karten und Listen",
+        "use": "Diesen Flyer verwenden"
+      }
+    }
   },
   "verify": {
     "thisIsMe": "Das bin ich",

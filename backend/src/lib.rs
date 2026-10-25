@@ -8,6 +8,7 @@ pub mod db;
 pub mod domain;
 pub mod error;
 pub mod flyer;
+pub mod media;
 pub mod openapi;
 pub mod state;
 

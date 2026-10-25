@@ -15,8 +15,10 @@ Two copies of the same stack, each one Cloudflare Worker (ARCHITECTURE §9):
 ```
 browser ──▶ Worker (deploy/src/index.ts)
               ├─ /api/*     ──▶ API container (backend/Dockerfile, Rust) ──▶ Neon Postgres
+              │                   └─ http://media.internal ──▶ Worker media handler ──▶ R2 bucket
               ├─ /jams/{slug} ─▶ index.html + Open Graph tags (jam read from the API)
               └─ anything else ─▶ static assets (frontend/dist, SPA fallback)
+browser ──▶ media.breakingjam.com ──▶ R2 bucket (uploaded flyers)
 ```
 
 - The site and the API share one origin, so session cookies stay first-party and CORS never applies. Cookies have no `Domain`, so a UAT session is never sent to production.
@@ -25,6 +27,9 @@ browser ──▶ Worker (deploy/src/index.ts)
 - The database is [Neon](https://neon.tech). The container connects to it directly over TLS. Hyperdrive [can't be reached from containers](https://github.com/cloudflare/containers/issues/97), so this differs from the original plan in §9.
   - The API uses the role `breakingjam_app`, which reads and writes rows but can't change the schema. Migrations use the owner role.
 - `frontend/public/_headers` sets the security headers (CSP, HSTS…) and the long cache for `/assets/*`.
+- **Uploaded flyers** go to an R2 bucket per target (`breakingjam-media`, `breakingjam-media-uat`), served on its own domain (`media.breakingjam.com`, `media-uat.breakingjam.com`).
+  - The API writes them with plain HTTP to `http://media.internal`. The Worker intercepts that host (`Api.outboundByHost`, through the exported `ContainerProxy`) and puts or deletes the object with its R2 binding, so the API holds no R2 keys.
+  - Each upload gets a new key, so objects are cached for a year (`immutable`).
 - The Worker passes the visitor's country (`request.cf.country`) to the API as `cf-ipcountry`, replacing any value the client sent. The map starts on that country (`GET /api/geo`).
 - UAT sets `TEST_SITE = "true"` in `env.uat` (production never has it). It runs the Worker for every request, and the Worker then:
   - adds `X-Robots-Tag: noindex, nofollow` to every response;
@@ -89,6 +94,12 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
 9. **UAT only: demo data.** After the first UAT deploy: Actions → **Seed UAT** → Run workflow, on the `uat` branch (`.github/workflows/seed-uat.yml`). It does nothing once the database is seeded.
    - UAT is seeded only from GitHub, so its owner string never sits on a laptop. Production has no seed.
 10. **Production only: backups.** See [Backups](#backups).
+11. **Media bucket**, before the first deploy that has it (the deploy fails on a missing bucket). From `deploy/`, with UAT's names for UAT:
+    ```sh
+    npx wrangler r2 bucket create breakingjam-media
+    npx wrangler r2 bucket domain add breakingjam-media --domain media.breakingjam.com --zone-id <breakingjam.com zone id>
+    ```
+    UAT uses `breakingjam-media-uat` on `media-uat.breakingjam.com`: one level under the zone, as the free certificate doesn't cover `media.uat.…`. Never use the bucket's `r2.dev` address; it is rate-limited and meant for development. If the deploy says the API token lacks R2 access, give it *Workers R2 Storage: Edit*.
 
 ## Releasing
 
@@ -158,6 +169,8 @@ Admins see **Admin** in the header (`/admin`: an overview, the jam review queue 
 | KV operations | | $0.50 per million |
 | D1 rows | | $0.001 per million |
 
+**R2** (the media bucket) includes 10 GB of storage, 1M writes and 10M reads a month, with no egress fee. A flyer is two JPEGs of about 0.5 MB together, and reads served from Cloudflare's cache don't reach R2.
+
 The sign-up page listed five more overage rates without showing them. The API container's own usage isn't in this table: check the Containers pricing page. Neon is billed separately.
 
 ## Operating
@@ -165,6 +178,7 @@ The sign-up page listed five more overage rates without showing them. The API co
 - **Logs:** `npx wrangler tail` (`--env uat` for UAT) for the Worker, or the Containers page of the dashboard (API, JSON lines with request ids).
 - **Rollback:** `npx wrangler rollback` returns the Worker and site to the previous version; whether it also restores the container image is not yet verified (try it on UAT first). Migrations are not reverted.
 - **Health:** `https://breakingjam.com/api/health` answers `{"status":"ok","version":"…"}` when the API reaches the database.
+- **Taking a flyer down:** an admin opens the jam's editor and removes the flyer, which deletes both images. Cloudflare's cache may keep serving them at their old URLs, which no page links to any more; to make them go at once, purge those two URLs (Caching → Configuration → Custom Purge).
 - **Self-hosted tiles later:**
   - Upload a `.pmtiles` extract to R2 behind a public bucket domain and set `VITE_TILES_URL=pmtiles://https://tiles.breakingjam.com/world.pmtiles`.
   - Add that host to `connect-src` in `frontend/public/_headers`.
@@ -180,3 +194,5 @@ cp deploy/.dev.vars.example deploy/.dev.vars       # local database, local URLs
 ```
 
 The first start builds the API image for linux/amd64, which is slow on Apple silicon (emulated). Later starts reuse the cache.
+
+Uploads land in a local R2 bucket here, but nothing serves it, and `MEDIA_PUBLIC_URL` still names the real domain: try flyers with `just dev` instead, whose `just media` bucket on :8788 both stores and serves them.

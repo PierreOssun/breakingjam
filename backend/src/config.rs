@@ -21,6 +21,10 @@ pub struct Config {
     pub google_client_secret: String,
     /// Google OAuth redirect URL, must match the Google console.
     pub google_redirect_url: String,
+    /// Where the API writes uploaded images: the Worker's R2 handler in production.
+    pub media_store_url: String,
+    /// Public base URL of uploaded images, e.g. `https://media.breakingjam.com`.
+    pub media_public_url: String,
 }
 
 /// Why the configuration could not be built.
@@ -71,6 +75,8 @@ impl Config {
             google_client_id: required("GOOGLE_CLIENT_ID"),
             google_client_secret: required("GOOGLE_CLIENT_SECRET"),
             google_redirect_url: required("GOOGLE_REDIRECT_URL"),
+            media_store_url: required("MEDIA_STORE_URL"),
+            media_public_url: required("MEDIA_PUBLIC_URL"),
         };
 
         if missing.is_empty() {

@@ -34,6 +34,8 @@
   "durable_objects": {
     "bindings": [{ "name": "API", "class_name": "Api" }]
   },
+  // Uploaded flyers. The bucket and its domain are created once by hand (deploy/README.md).
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "breakingjam-media" }],
   "exports": {
     "Api": { "type": "durable-object", "storage": "sqlite" }
   },
@@ -41,7 +43,8 @@
     "APP_BASE_URL": "https://breakingjam.com",
     "GOOGLE_REDIRECT_URL": "https://breakingjam.com/api/auth/google/callback",
     "RUST_LOG": "breakingjam=info,tower_http=info",
-    "API_INSTANCES": "2"
+    "API_INSTANCES": "2",
+    "MEDIA_PUBLIC_URL": "https://media.breakingjam.com"
   },
   "observability": { "enabled": true },
   // The top level above is production. UAT (`--env uat`) is the Worker "breakingjam-uat" with its
@@ -69,11 +72,16 @@
       "durable_objects": {
         "bindings": [{ "name": "API", "class_name": "Api" }]
       },
+      "r2_buckets": [
+        { "binding": "MEDIA", "bucket_name": "breakingjam-media-uat" }
+      ],
       "vars": {
         "APP_BASE_URL": "https://uat.breakingjam.com",
         "GOOGLE_REDIRECT_URL": "https://uat.breakingjam.com/api/auth/google/callback",
         "RUST_LOG": "breakingjam=debug,tower_http=info",
         "API_INSTANCES": "1",
+        // One subdomain level, as `media.uat.…` is beyond the free certificate.
+        "MEDIA_PUBLIC_URL": "https://media-uat.breakingjam.com",
         // Demo data: noindex on every response, robots.txt disallows all, a banner on every page.
         "TEST_SITE": "true"
       }

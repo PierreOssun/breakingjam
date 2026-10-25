@@ -7,6 +7,7 @@ mod claims;
 mod crews;
 mod dancers;
 mod events;
+mod flyers;
 pub(crate) mod geo;
 mod health;
 mod json;
@@ -25,6 +26,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .merge(health::router())
         .merge(auth::router())
         .merge(events::router())
+        .merge(flyers::router())
         .merge(geo::router())
         .merge(dancers::router())
         .merge(crews::router())

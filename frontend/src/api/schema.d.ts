@@ -231,6 +231,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/events/{id}/flyer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Replace the jam's flyer, generated or uploaded, with this one; it shows at once, with no
+         *     review, and admins can remove it.
+         */
+        post: operations["upload_event_flyer"];
+        /** Go back to the generated flyer; also how admins take down an unsuitable one. */
+        delete: operations["remove_event_flyer"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/geo": {
         parameters: {
             query?: never;
@@ -1403,6 +1424,10 @@ export interface components {
             website_url?: string | null;
             /** @description Where to write to the organisers; public. */
             contact_email?: string | null;
+            /** @description The organiser's 1080×1350 flyer; null means the generated one. */
+            flyer_url?: string | null;
+            /** @description The same flyer at 540×675, for cards, lists and the map; set with `flyer_url`. */
+            flyer_card_url?: string | null;
             /** @description Why an admin sent it back to draft; null otherwise. */
             review_note?: string | null;
             /**
@@ -1523,6 +1548,19 @@ export interface components {
             /** @description Human-readable reason. */
             message: string;
         };
+        /** @description `POST /events/{id}/flyer` body: one 4:5 crop, cropped and encoded in the browser. */
+        FlyerUpload: {
+            /**
+             * Format: binary
+             * @description 1080×1350 JPEG of at most 2 MB, for the jam page.
+             */
+            flyer: string;
+            /**
+             * Format: binary
+             * @description 540×675 JPEG of at most 400 KB, for cards, lists and the map.
+             */
+            card: string;
+        };
         /** @description Body of `GET /geo`. */
         Geo: {
             /** @description ISO 3166-1 alpha-2 of the visitor's country; null when unknown. */
@@ -1573,6 +1611,8 @@ export interface components {
             battles: string[];
             /** @description What the map's category chips match, from all battles, without repeats. */
             categories: components["schemas"]["Category"][];
+            /** @description The uploaded flyer at 540×675; null means the generated one. */
+            flyer_card_url?: string | null;
         };
         /** @description A current member as shown on a crew. */
         Member: {
@@ -1848,6 +1888,10 @@ export interface components {
                 website_url?: string | null;
                 /** @description Where to write to the organisers; public. */
                 contact_email?: string | null;
+                /** @description The organiser's 1080×1350 flyer; null means the generated one. */
+                flyer_url?: string | null;
+                /** @description The same flyer at 540×675, for cards, lists and the map; set with `flyer_url`. */
+                flyer_card_url?: string | null;
                 /** @description Why an admin sent it back to draft; null otherwise. */
                 review_note?: string | null;
                 /**
@@ -2654,6 +2698,117 @@ export interface operations {
                 };
                 content: {
                     "image/png": components["schemas"]["Png"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    upload_event_flyer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["FlyerUpload"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Event"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not the jam's organiser nor `seed_admin`+ */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    remove_event_flyer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Event"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not the jam's organiser nor `seed_admin`+ */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
             /** @description No such jam, or a draft you can't see */

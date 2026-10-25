@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select flyer_url, flyer_card_url from events\n         where id = $1 and deleted_at is null for update",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "flyer_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "flyer_url"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "flyer_card_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "flyer_card_url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true,
+      true
+    ]
+  },
+  "hash": "0be878c85528cfecc5ff3f9d57686feef22936b71907317b60f063668484684d"
+}

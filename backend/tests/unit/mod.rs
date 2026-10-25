@@ -9,3 +9,4 @@ mod db;
 mod domain;
 mod error;
 mod flyer;
+mod media;

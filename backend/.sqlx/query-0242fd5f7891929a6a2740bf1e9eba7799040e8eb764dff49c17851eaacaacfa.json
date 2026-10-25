@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, name, slug, starts_on, ends_on, status as \"status: EventStatus\", city,\n                  country, lat as \"lat!\", lng as \"lng!\"\n           from events\n           where deleted_at is null and status in ('published', 'registration_closed', 'completed')\n             and lat is not null and lng is not null\n           order by starts_on, id",
+  "query": "select id, name, slug, starts_on, ends_on, status as \"status: EventStatus\", city,\n                  country, lat as \"lat!\", lng as \"lng!\", flyer_card_url\n           from events\n           where deleted_at is null and status in ('published', 'registration_closed', 'completed')\n             and lat is not null and lng is not null\n           order by starts_on, id",
   "describe": {
     "columns": [
       {
@@ -126,6 +126,17 @@
             "name": "lng"
           }
         }
+      },
+      {
+        "ordinal": 10,
+        "name": "flyer_card_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "flyer_card_url"
+          }
+        }
       }
     ],
     "parameters": {
@@ -141,8 +152,9 @@
       false,
       false,
       true,
+      true,
       true
     ]
   },
-  "hash": "7c17bd33eda4166677c00dec17cf3ed38642b9946069b2f70241e490e9becd06"
+  "hash": "0242fd5f7891929a6a2740bf1e9eba7799040e8eb764dff49c17851eaacaacfa"
 }

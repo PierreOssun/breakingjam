@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LIL_G, bodyOf, calls, mockApi, renderApp } from "../support/app";
 
@@ -16,6 +16,36 @@ vi.mock("../../src/features/map/PinMap", () => ({
     </button>
   ),
 }));
+
+// jsdom has no canvas: the two encoded JPEGs are stand-ins.
+vi.mock(import("../../src/features/jams/flyerCrop"), async (original) => ({
+  ...(await original()),
+  flyerImages: async () => ({
+    flyer: new Blob(["flyer"], { type: "image/jpeg" }),
+    card: new Blob(["card"], { type: "image/jpeg" }),
+  }),
+}));
+
+/** jsdom decodes no images: every picked file opens as a `width`×`height` image. */
+function pickedImagesAre(width: number, height: number) {
+  URL.createObjectURL = () => "blob:flyer";
+  URL.revokeObjectURL = () => undefined;
+  Object.defineProperties(HTMLImageElement.prototype, {
+    decode: { configurable: true, value: () => Promise.resolve() },
+    naturalWidth: { configurable: true, get: () => width },
+    naturalHeight: { configurable: true, get: () => height },
+  });
+}
+
+const FLYER = "https://media.breakingjam.com/flyers/e001/f.jpg";
+const CARD = "https://media.breakingjam.com/flyers/e001/f-card.jpg";
+const png = () => new File(["png"], "flyer.png", { type: "image/png" });
+
+/** The hidden file input the flyer buttons open, once the editor shows its drop target. */
+async function flyerInput() {
+  await screen.findByRole("button", { name: /Upload a flyer/ });
+  return document.querySelector<HTMLInputElement>('input[type="file"]')!;
+}
 
 const ME = { status: 200, body: { ...LIL_G, role: "organizer" } };
 const at = "2026-10-01T10:00:00Z";
@@ -332,5 +362,101 @@ describe("organiser pages", () => {
       prize_third: null,
       starts_at: "2030-06-02T14:30:00",
     });
+  });
+
+  it("refuses a file that isn't a PNG or JPEG, and a tiny image", async () => {
+    editApi();
+    renderApp(`/org/jams/${ID}/edit`);
+    // The picker filters by type; a drop or another picker may not.
+    const user = userEvent.setup({ applyAccept: false });
+    const field = await flyerInput();
+
+    const gif = new File(["GIF89a"], "flyer.gif", { type: "image/gif" });
+    await user.upload(field, gif);
+    expect(
+      await screen.findByText("That file isn’t a PNG or JPEG."),
+    ).toBeInTheDocument();
+
+    pickedImagesAre(500, 600);
+    await user.upload(field, png());
+    expect(
+      await screen.findByText(
+        "That image is too small: it needs at least 540 × 675 px.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("crops a picked image and uploads it in both sizes", async () => {
+    pickedImagesAre(3000, 2000);
+    const fetch = editApi({
+      [`POST /api/events/${ID}/flyer`]: {
+        status: 200,
+        body: jam({ flyer_url: FLYER, flyer_card_url: CARD }),
+      },
+    });
+    const appended = vi.spyOn(FormData.prototype, "append");
+    renderApp(`/org/jams/${ID}/edit`);
+    const user = userEvent.setup();
+    await user.upload(await flyerInput(), png());
+
+    const dialog = await screen.findByRole("dialog", {
+      name: "Crop your flyer",
+    });
+    // 3000 × 2000 shows 1600 px across at first: sharp, so no warning yet.
+    expect(within(dialog).queryByText(/will look soft/)).toBeNull();
+    // Four steps of 0.25 halve it to 800 px: soft on the jam page.
+    const zoom = within(dialog).getByRole("button", { name: "Zoom in" });
+    for (let step = 0; step < 4; step++) await user.click(zoom);
+    expect(within(dialog).getByText(/This crop is 800 px wide/)).toBeVisible();
+    await user.click(
+      within(dialog).getByRole("button", { name: "Use this flyer" }),
+    );
+
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    const upload = fetch.mock.calls
+      .map(([input]) => input as Request)
+      .find((r) => r.method === "POST" && r.url.endsWith("/flyer"));
+    expect(upload!.headers.get("content-type")).toMatch(
+      /^multipart\/form-data; boundary=/,
+    );
+    // The parts as added: jsdom's blobs can't be read back through Node's fetch.
+    expect(appended.mock.calls).toEqual([
+      ["flyer", expect.any(Blob), "flyer.jpg"],
+      ["card", expect.any(Blob), "card.jpg"],
+    ]);
+    expect(
+      await screen.findByRole("img", { name: "Your flyer" }),
+    ).toHaveAttribute("src", CARD);
+    expect(screen.getByText("Flyer updated.")).toBeInTheDocument();
+    appended.mockRestore();
+  });
+
+  it("removes the uploaded flyer to go back to the generated one", async () => {
+    const fetch = editApi({
+      [`GET /api/events/${ID}`]: {
+        status: 200,
+        body: {
+          ...jam({ flyer_url: FLYER, flyer_card_url: CARD }),
+          can_edit: true,
+        },
+      },
+      [`DELETE /api/events/${ID}/flyer`]: {
+        status: 200,
+        body: jam({ flyer_url: null, flyer_card_url: null }),
+      },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Remove flyer" }),
+    );
+    expect(
+      await screen.findByRole("button", { name: /Upload a flyer/ }),
+    ).toBeInTheDocument();
+    expect(calls(fetch)).toContain(`DELETE /api/events/${ID}/flyer`);
+    expect(
+      screen.getByText("Flyer removed: the generated one is back."),
+    ).toBeInTheDocument();
   });
 });

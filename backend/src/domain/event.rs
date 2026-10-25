@@ -178,12 +178,25 @@ pub struct Event {
     pub website_url: Option<String>,
     /// Where to write to the organisers; public.
     pub contact_email: Option<String>,
+    /// The organiser's 1080×1350 flyer; null means the generated one.
+    pub flyer_url: Option<String>,
+    /// The same flyer at 540×675, for cards, lists and the map; set with `flyer_url`.
+    pub flyer_card_url: Option<String>,
     /// Why an admin sent it back to draft; null otherwise.
     pub review_note: Option<String>,
     /// Row creation time.
     pub created_at: DateTime<Utc>,
     /// Last write, maintained by a trigger.
     pub updated_at: DateTime<Utc>,
+}
+
+/// Where an uploaded flyer is read from, in both sizes.
+#[derive(Debug)]
+pub struct UploadedFlyer {
+    /// The 1080×1350 image of the jam page.
+    pub url: String,
+    /// The 540×675 image of cards, lists and the map.
+    pub card_url: String,
 }
 
 /// Whether `user` may edit, delete or change the status of a jam owned by `organizer_id`.

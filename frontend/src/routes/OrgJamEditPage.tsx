@@ -7,13 +7,14 @@ import { api, type Schemas } from "../api/client";
 import { buttonClasses } from "../components/buttonClasses";
 import { useToast } from "../components/useToast";
 import { BattlesEditor } from "../features/jams/BattlesEditor";
+import { FlyerEditor } from "../features/jams/FlyerEditor";
 import { jamValues } from "../features/jams/jamFields";
 import { JamForm } from "../features/jams/JamForm";
 import { useJam } from "../features/jams/queries";
 import { StatusActions } from "../features/jams/StatusActions";
 import { NotFoundPage } from "./NotFoundPage";
 
-/** `/org/jams/:id/edit`: status, details and battles; people are managed on the jam page. */
+/** `/org/jams/:id/edit`: status, details, flyer and battles; people are managed on the jam page. */
 export function OrgJamEditPage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
@@ -76,6 +77,7 @@ function JamEditor({ jam }: { jam: Schemas["EventResponse"] }) {
           }}
         />
       </section>
+      <FlyerEditor jam={jam} />
       <BattlesEditor jam={jam} />
       <p className="text-body-sm text-muted">
         {t("org.peopleOnJamPage")}{" "}

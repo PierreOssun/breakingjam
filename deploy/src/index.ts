@@ -1,7 +1,8 @@
 // The production edge (ARCHITECTURE §9): one Worker serves the built frontend as static
-// assets, forwards /api/* to the Rust API running as a Cloudflare Container, and gives jam
-// pages their Open Graph tags.
-import { Container, getRandom } from "@cloudflare/containers";
+// assets, forwards /api/* to the Rust API running as a Cloudflare Container, gives jam
+// pages their Open Graph tags and stores the images the API uploads.
+import { Container, ContainerProxy, getRandom } from "@cloudflare/containers";
+import { MEDIA_STORE_HOST, storeMedia } from "./media";
 import { type JamSummary, openGraphTags } from "./openGraph";
 import {
   bannerClosed,
@@ -15,12 +16,16 @@ import {
 export interface Env {
   API: DurableObjectNamespace<Api>;
   ASSETS: Fetcher;
+  /** Uploaded images (flyers), served by the bucket's own domain. */
+  MEDIA: R2Bucket;
   /** `https://breakingjam.com`: the one public origin. */
   APP_BASE_URL: string;
   GOOGLE_REDIRECT_URL: string;
   RUST_LOG: string;
   /** How many API containers share the traffic. */
   API_INSTANCES: string;
+  /** `https://media.breakingjam.com`: where uploaded images are read from. */
+  MEDIA_PUBLIC_URL: string;
   DATABASE_URL: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
@@ -48,9 +53,21 @@ export class Api extends Container<Env> {
       GOOGLE_REDIRECT_URL: env.GOOGLE_REDIRECT_URL,
       RUST_LOG: env.RUST_LOG,
       LOG_FORMAT: "json",
+      MEDIA_STORE_URL: `http://${MEDIA_STORE_HOST}`,
+      MEDIA_PUBLIC_URL: env.MEDIA_PUBLIC_URL,
     };
   }
 }
+
+// Assigned, not a `static` field: the library's setter registers the handler, and a class
+// field would bypass it. The API's media writes land here instead of on the network.
+Api.outboundByHost = {
+  [MEDIA_STORE_HOST]: (request: Request, env: Env) =>
+    storeMedia(request, env.MEDIA),
+};
+
+// The entrypoint the container's outbound requests go through, for the handler above.
+export { ContainerProxy };
 
 /** One of the API instances; they hold no state, sessions live in Postgres. */
 function api(env: Env) {

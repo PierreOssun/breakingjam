@@ -142,7 +142,8 @@
     "edit": "Edit jam",
     "website": "Website",
     "email": "Email",
-    "battleStart": "Starts {{when}}"
+    "battleStart": "Starts {{when}}",
+    "flyerAlt": "Flyer of {{name}}"
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -439,7 +440,37 @@
         "other": "Add staff"
       }
     },
-    "peopleOnJamPage": "Dancers, judges, DJ and MC are added on the jam page."
+    "peopleOnJamPage": "Dancers, judges, DJ and MC are added on the jam page.",
+    "flyer": {
+      "title": "Flyer",
+      "upload": "Upload a flyer",
+      "formats": "PNG or JPEG, up to 20 MB. Portrait 4:5 fits best.",
+      "generated": "Until you add one, the jam uses a flyer made from its details.",
+      "shown": "Shown on the jam page, cards and the map. Remove it to go back to the generated flyer.",
+      "current": "Your flyer",
+      "replace": "Replace flyer",
+      "remove": "Remove flyer",
+      "updated": "Flyer updated.",
+      "removed": "Flyer removed: the generated one is back.",
+      "problem": {
+        "type": "That file isn’t a PNG or JPEG.",
+        "size": "That file is over 20 MB. Export it smaller and try again.",
+        "small": "That image is too small: it needs at least 540 × 675 px.",
+        "unreadable": "That image couldn’t be opened. Try another file."
+      },
+      "crop": {
+        "title": "Crop your flyer",
+        "area": "Flyer crop. Drag to move the image, arrow keys move it, plus and minus zoom.",
+        "zoom": "Zoom",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "reset": "Reset",
+        "hint": "Drag to move. Pinch or slide to zoom.",
+        "soft": "This crop is {{width}} px wide, so it will look soft. Zoom out, or pick a bigger image: 1080 × 1350 is ideal.",
+        "previews": "On cards and lists",
+        "use": "Use this flyer"
+      }
+    }
   },
   "verify": {
     "thisIsMe": "This is me",

@@ -142,7 +142,8 @@
     "edit": "Modifier la jam",
     "website": "Site web",
     "email": "E-mail",
-    "battleStart": "Début {{when}}"
+    "battleStart": "Début {{when}}",
+    "flyerAlt": "Flyer de {{name}}"
   },
   "dancer": {
     "aka": "alias {{names}}",
@@ -439,7 +440,37 @@
         "other": "Ajouter du staff"
       }
     },
-    "peopleOnJamPage": "Les danseur·ses, juges, DJ et MC s’ajoutent sur la page du jam."
+    "peopleOnJamPage": "Les danseur·ses, juges, DJ et MC s’ajoutent sur la page du jam.",
+    "flyer": {
+      "title": "Flyer",
+      "upload": "Importer un flyer",
+      "formats": "PNG ou JPEG, 20 Mo maximum. Le format portrait 4:5 convient le mieux.",
+      "generated": "Tant que vous n’en ajoutez pas, le jam utilise un flyer créé à partir de ses infos.",
+      "shown": "Affiché sur la page du jam, les cartes et la carte. Supprimez-le pour revenir au flyer généré.",
+      "current": "Votre flyer",
+      "replace": "Remplacer le flyer",
+      "remove": "Supprimer le flyer",
+      "updated": "Flyer mis à jour.",
+      "removed": "Flyer supprimé : le flyer généré est de retour.",
+      "problem": {
+        "type": "Ce fichier n’est ni un PNG ni un JPEG.",
+        "size": "Ce fichier dépasse 20 Mo. Exportez-le plus léger et réessayez.",
+        "small": "Cette image est trop petite : il faut au moins 540 × 675 px.",
+        "unreadable": "Impossible d’ouvrir cette image. Essayez un autre fichier."
+      },
+      "crop": {
+        "title": "Recadrer votre flyer",
+        "area": "Recadrage du flyer. Faites glisser l’image ou utilisez les flèches pour la déplacer, plus et moins pour zoomer.",
+        "zoom": "Zoom",
+        "zoomIn": "Zoomer",
+        "zoomOut": "Dézoomer",
+        "reset": "Réinitialiser",
+        "hint": "Faites glisser pour déplacer. Pincez ou utilisez le curseur pour zoomer.",
+        "soft": "Ce cadrage fait {{width}} px de large : il paraîtra flou. Dézoomez ou choisissez une image plus grande : 1080 × 1350 est idéal.",
+        "previews": "Sur les cartes et les listes",
+        "use": "Utiliser ce flyer"
+      }
+    }
   },
   "verify": {
     "thisIsMe": "C’est moi",

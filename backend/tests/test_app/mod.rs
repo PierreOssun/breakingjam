@@ -4,10 +4,17 @@
     reason = "shared by several test crates, each using a subset"
 )]
 
+use std::{
+    collections::BTreeMap,
+    sync::{Arc, Mutex},
+};
+
 use axum::{
     Router,
-    body::Body,
+    body::{Body, Bytes},
+    extract::Path,
     http::{HeaderMap, Request, StatusCode, header, request::Builder},
+    routing,
 };
 use breakingjam::{config::Config, state::AppState};
 use http_body_util::BodyExt;
@@ -15,15 +22,49 @@ use serde_json::Value;
 use sqlx::PgPool;
 use tower::ServiceExt;
 
+/// Where the test app says uploaded images are served from.
+pub const MEDIA_URL: &str = "https://media.example.com";
+
 pub fn app(pool: PgPool) -> Router {
+    // Nothing listens there: tests that upload use `app_with_media`.
+    app_storing_at(pool, "http://127.0.0.1:9")
+}
+
+fn app_storing_at(pool: PgPool, media_store_url: &str) -> Router {
     let config = Config::from_lookup(|name| match name {
         "APP_PORT" => None,
         "FRONTEND_ORIGIN" => Some("http://localhost:5173".into()),
         "GOOGLE_REDIRECT_URL" => Some("http://localhost:8080/api/auth/google/callback".into()),
+        "MEDIA_STORE_URL" => Some(media_store_url.into()),
+        "MEDIA_PUBLIC_URL" => Some(MEDIA_URL.into()),
         _ => Some(format!("test-{name}")),
     })
     .unwrap();
     breakingjam::app(AppState::new(pool, config).unwrap()).unwrap()
+}
+
+/// What the stand-in store holds: each key's request headers and body.
+pub type Objects = Arc<Mutex<BTreeMap<String, (HeaderMap, Bytes)>>>;
+
+/// The app, with a stand-in for the Worker's R2 handler on a local port.
+pub async fn app_with_media(pool: PgPool) -> (Router, Objects) {
+    let objects = Objects::default();
+    let (stored, deleted) = (objects.clone(), objects.clone());
+    let store = Router::new().route(
+        "/{*key}",
+        routing::put(
+            |Path(key): Path<String>, headers: HeaderMap, body: Bytes| async move {
+                stored.lock().unwrap().insert(key, (headers, body));
+            },
+        )
+        .delete(|Path(key): Path<String>| async move {
+            deleted.lock().unwrap().remove(&key);
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let url = format!("http://{}", listener.local_addr().unwrap());
+    tokio::spawn(async move { axum::serve(listener, store).await.unwrap() });
+    (app_storing_at(pool, &url), objects)
 }
 
 pub struct TestResponse {
@@ -122,6 +163,45 @@ pub async fn set_role(pool: &PgPool, email: &str, role: &str) {
     .execute(pool)
     .await
     .unwrap();
+}
+
+/// The file parts of a multipart body, as `(name, bytes)`.
+pub type Files<'a> = [(&'a str, &'a [u8])];
+
+/// A `multipart/form-data` POST with one file part per `(name, bytes)`.
+pub fn post_files(uri: &str, parts: &Files, cookie: Option<&str>) -> Request<Body> {
+    const BOUNDARY: &str = "bj-test-boundary";
+    let mut body = Vec::new();
+    for (name, bytes) in parts {
+        body.extend_from_slice(
+            format!(
+                "--{BOUNDARY}\r\nContent-Disposition: form-data; name=\"{name}\"; filename=\"{name}.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n"
+            )
+            .as_bytes(),
+        );
+        body.extend_from_slice(bytes);
+        body.extend_from_slice(b"\r\n");
+    }
+    body.extend_from_slice(format!("--{BOUNDARY}--\r\n").as_bytes());
+    request("POST", uri, cookie)
+        .header(
+            header::CONTENT_TYPE,
+            format!("multipart/form-data; boundary={BOUNDARY}"),
+        )
+        .body(Body::from(body))
+        .unwrap()
+}
+
+/// The start of a JPEG of `width`×`height`: enough for the API's checks, not a viewable image.
+pub fn jpeg(width: u16, height: u16) -> Vec<u8> {
+    let [w_hi, w_lo] = width.to_be_bytes();
+    let [h_hi, h_lo] = height.to_be_bytes();
+    let mut bytes = vec![0xFF, 0xD8];
+    // An APP0 segment first, as browsers write one, then the baseline frame header.
+    bytes.extend_from_slice(&[0xFF, 0xE0, 0x00, 0x04, 0x4A, 0x46]);
+    bytes.extend_from_slice(&[0xFF, 0xC0, 0x00, 0x0B, 0x08, h_hi, h_lo, w_hi, w_lo, 0x01]);
+    bytes.extend_from_slice(&[0x01, 0x11, 0x00, 0xFF, 0xD9]);
+    bytes
 }
 
 fn request(method: &str, uri: &str, cookie: Option<&str>) -> Builder {

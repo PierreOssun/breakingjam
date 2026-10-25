@@ -888,6 +888,158 @@
         ]
       }
     },
+    "/api/events/{id}/flyer": {
+      "post": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Replace the jam's flyer, generated or uploaded, with this one; it shows at once, with no\nreview, and admins can remove it.",
+        "operationId": "upload_event_flyer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/FlyerUpload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Go back to the generated flyer; also how admins take down an unsuitable one.",
+        "operationId": "remove_event_flyer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/geo": {
       "get": {
         "tags": [
@@ -5398,6 +5550,20 @@
             ],
             "description": "Where to write to the organisers; public."
           },
+          "flyer_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The organiser's 1080×1350 flyer; null means the generated one."
+          },
+          "flyer_card_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The same flyer at 540×675, for cards, lists and the map; set with `flyer_url`."
+          },
           "review_note": {
             "type": [
               "string",
@@ -5679,6 +5845,26 @@
           }
         }
       },
+      "FlyerUpload": {
+        "type": "object",
+        "description": "`POST /events/{id}/flyer` body: one 4:5 crop, cropped and encoded in the browser.",
+        "required": [
+          "flyer",
+          "card"
+        ],
+        "properties": {
+          "flyer": {
+            "type": "string",
+            "format": "binary",
+            "description": "1080×1350 JPEG of at most 2 MB, for the jam page."
+          },
+          "card": {
+            "type": "string",
+            "format": "binary",
+            "description": "540×675 JPEG of at most 400 KB, for cards, lists and the map."
+          }
+        }
+      },
       "Geo": {
         "type": "object",
         "description": "Body of `GET /geo`.",
@@ -5792,6 +5978,13 @@
               "$ref": "#/components/schemas/Category"
             },
             "description": "What the map's category chips match, from all battles, without repeats."
+          },
+          "flyer_card_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The uploaded flyer at 540×675; null means the generated one."
           }
         }
       },
@@ -6486,6 +6679,20 @@
                     "null"
                   ],
                   "description": "Where to write to the organisers; public."
+                },
+                "flyer_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The organiser's 1080×1350 flyer; null means the generated one."
+                },
+                "flyer_card_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The same flyer at 540×675, for cards, lists and the map; set with `flyer_url`."
                 },
                 "review_note": {
                   "type": [

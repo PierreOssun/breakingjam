@@ -7,7 +7,7 @@ use uuid::Uuid;
 use crate::domain::{
     battle::{StaffAssignment, StaffMember, StaffRole},
     dancer::DancerRef,
-    event::{Event, EventFields, EventStatus},
+    event::{Event, EventFields, EventStatus, UploadedFlyer},
 };
 
 /// Filters for `list`; `None` means "any".
@@ -50,6 +50,8 @@ pub struct MapPoint {
     pub lat: f64,
     /// Longitude.
     pub lng: f64,
+    /// The uploaded flyer at card size; null means the generated one.
+    pub flyer_card_url: Option<String>,
 }
 
 /// Inserts a draft jam; optional text fields are trimmed and `""` becomes null.
@@ -71,7 +73,7 @@ pub async fn insert(
                    nullif(btrim($18), ''))
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at"#,
+                     registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         organizer_id,
         crate::domain::event::slug(&fields.name, id),
@@ -108,7 +110,7 @@ pub async fn update(pool: &PgPool, id: Uuid, fields: &EventFields) -> sqlx::Resu
            where id = $1 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at"#,
+                     registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         fields.name,
         fields.description,
@@ -137,7 +139,7 @@ pub async fn find(pool: &PgPool, id_or_slug: &str) -> sqlx::Result<Option<Event>
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
                   starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                  registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at
+                  registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at
            from events
            where deleted_at is null and (id = $1 or slug = $2)"#,
         id,
@@ -154,7 +156,7 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
                   starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                  registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at
+                  registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at
            from events
            where deleted_at is null
              and ($1::event_status is null or status = $1)
@@ -184,7 +186,7 @@ pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
     sqlx::query_as!(
         MapPoint,
         r#"select id, name, slug, starts_on, ends_on, status as "status: EventStatus", city,
-                  country, lat as "lat!", lng as "lng!"
+                  country, lat as "lat!", lng as "lng!", flyer_card_url
            from events
            where deleted_at is null and status in ('published', 'registration_closed', 'completed')
              and lat is not null and lng is not null
@@ -209,7 +211,7 @@ pub async fn set_status(
            where id = $1 and status = $2 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at"#,
+                     registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         from as EventStatus,
         to as EventStatus,
@@ -232,7 +234,7 @@ pub async fn review(
            where id = $1 and status = 'in_review' and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                     registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at"#,
+                     registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         to as EventStatus,
         note,
@@ -247,7 +249,7 @@ pub async fn in_review(pool: &PgPool, window: super::Window) -> sqlx::Result<Vec
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
                   starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
-                  registration_url, instagram_url, website_url, contact_email, review_note, created_at, updated_at
+                  registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at
            from events
            where deleted_at is null and status = 'in_review'
            order by starts_on, id
@@ -259,15 +261,58 @@ pub async fn in_review(pool: &PgPool, window: super::Window) -> sqlx::Result<Vec
     .await
 }
 
-/// Soft-deletes a jam.
-pub async fn soft_delete(pool: &PgPool, id: Uuid) -> sqlx::Result<()> {
-    sqlx::query!(
-        "update events set deleted_at = now() where id = $1 and deleted_at is null",
+/// Sets the uploaded flyer, or clears it with `None` to go back to the generated one; returns
+/// the jam and the flyer this replaced.
+pub async fn set_flyer(
+    pool: &PgPool,
+    id: Uuid,
+    flyer: Option<&UploadedFlyer>,
+) -> sqlx::Result<(Event, Option<UploadedFlyer>)> {
+    let (url, card_url) = flyer.map(|f| (&f.url, &f.card_url)).unzip();
+    let mut tx = pool.begin().await?;
+    // Read under the row lock: of two concurrent uploads, each learns the flyer it replaced.
+    let old = sqlx::query!(
+        "select flyer_url, flyer_card_url from events
+         where id = $1 and deleted_at is null for update",
         id
     )
-    .execute(pool)
+    .fetch_one(&mut *tx)
     .await?;
-    Ok(())
+    let event = sqlx::query_as!(
+        Event,
+        r#"update events set flyer_url = $2, flyer_card_url = $3
+           where id = $1 and deleted_at is null
+           returning id, organizer_id, name, slug, description, status as "status: EventStatus",
+                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                     registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
+        id,
+        url,
+        card_url,
+    )
+    .fetch_one(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    Ok((event, uploaded(old.flyer_url, old.flyer_card_url)))
+}
+
+/// Soft-deletes a jam; returns its uploaded flyer, whose images must go with it.
+pub async fn soft_delete(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<UploadedFlyer>> {
+    let row = sqlx::query!(
+        "update events set deleted_at = now() where id = $1 and deleted_at is null
+         returning flyer_url, flyer_card_url",
+        id
+    )
+    .fetch_optional(pool)
+    .await?;
+    Ok(row.and_then(|r| uploaded(r.flyer_url, r.flyer_card_url)))
+}
+
+/// The uploaded flyer of the two columns, which are set together or not at all.
+fn uploaded(url: Option<String>, card_url: Option<String>) -> Option<UploadedFlyer> {
+    Some(UploadedFlyer {
+        url: url?,
+        card_url: card_url?,
+    })
 }
 
 /// A jam's staff, by role then name.
