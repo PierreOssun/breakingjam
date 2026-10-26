@@ -4,9 +4,10 @@ ends_on = 2021-11-06
 timezone = "Europe/Warsaw"
 city = "Gdańsk"
 country = "PL"
-lat = 54.3483
-lng = 18.6540
-sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+lat = 54.4258
+lng = 18.5803
+venue = "Ergo Arena"
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://thesource.com/?p=630815"]
 judges = ["menno", "sarah-bee", "kleju", "beta", "el-nino"]
 mcs = ["amjad"]
 djs = ["dj-plash-one"]

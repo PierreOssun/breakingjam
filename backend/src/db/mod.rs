@@ -7,6 +7,7 @@ pub mod dancers;
 pub mod dataset;
 pub mod events;
 pub mod organizers;
+pub mod places;
 pub mod sessions;
 pub mod stats;
 pub mod users;

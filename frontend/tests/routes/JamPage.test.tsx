@@ -10,7 +10,7 @@ import {
 } from "../support/app";
 
 // jsdom has no WebGL: the venue's mini map is a stand-in.
-vi.mock("../../src/features/jams/VenueMap", () => ({
+vi.mock("../../src/features/map/StaticMap", () => ({
   default: () => <div>Venue map</div>,
 }));
 

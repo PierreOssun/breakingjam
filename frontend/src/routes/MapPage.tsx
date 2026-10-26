@@ -20,6 +20,7 @@ import { FilterSheet } from "../features/map/FilterSheet";
 import { JamPopup, JamSheet } from "../features/map/JamCard";
 import { type Camera, JamMap } from "../features/map/JamMap";
 import {
+  askedView,
   type Bounds,
   boundsOf,
   distanceKm,
@@ -98,11 +99,22 @@ export function MapPage() {
   // so it can't pop back later. Set during render: React redoes it before painting.
   if (selection && !selected) setSelection(null);
 
-  // The first view is what a `?q=` search matches, else the visitor's country; later loads
-  // (refetches) leave the camera alone.
+  // The first view is what a link asks for (`?fit=`, `?lat=&lng=`), else what a `?q=` search
+  // matches, else the visitor's country; later loads (refetches) leave the camera alone.
   const framed = useRef(false);
+  const link = useMemo(() => askedView(params), [params]);
   useEffect(() => {
-    if (framed.current || !all || country.isPending) return;
+    if (framed.current) return;
+    if (link) {
+      framed.current = true;
+      setCamera(
+        "bounds" in link
+          ? { kind: "fit", bounds: link.bounds, maxZoom: 10, animate: false }
+          : { kind: "center", lng: link.lng, lat: link.lat, zoom: 9 },
+      );
+      return;
+    }
+    if (!all || country.isPending) return;
     framed.current = true;
     const today = new Date();
     const upcoming = all.filter((jam) => !isPast(jam, today));
@@ -111,7 +123,7 @@ export function MapPage() {
       firstView(upcoming, country.data ?? null);
     if (box)
       setCamera({ kind: "fit", bounds: box, maxZoom: 10, animate: false });
-  }, [all, country.isPending, country.data, asked, matching]);
+  }, [link, all, country.isPending, country.data, asked, matching]);
 
   const select = useCallback((jam: MapJam, trigger: HTMLElement | null) => {
     setSelection({ id: jam.id, trigger });

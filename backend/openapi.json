@@ -4213,6 +4213,37 @@
           }
         ]
       }
+    },
+    "/api/places": {
+      "get": {
+        "tags": [
+          "places"
+        ],
+        "summary": "The city a search names, case and accents aside: an exact name or alternate name first,\nelse one starting with the search; the most populated when several match.",
+        "operationId": "find_place",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "What was searched, e.g. \"Mulhouse\".",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaceMatch"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6949,6 +6980,59 @@
           "other"
         ]
       },
+      "Place": {
+        "type": "object",
+        "description": "A city that \"Near <Place>\" centres on.",
+        "required": [
+          "name",
+          "country",
+          "lat",
+          "lng",
+          "population"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "As GeoNames writes it, e.g. \"Zürich\"."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2."
+          },
+          "lat": {
+            "type": "number",
+            "format": "double",
+            "description": "Latitude."
+          },
+          "lng": {
+            "type": "number",
+            "format": "double",
+            "description": "Longitude."
+          },
+          "population": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Inhabitants; ranks places that share a name."
+          }
+        }
+      },
+      "PlaceMatch": {
+        "type": "object",
+        "description": "`GET /places` body.",
+        "properties": {
+          "place": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Place",
+                "description": "The city the search names; null when none does."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
       "Png": {
         "type": "string",
         "format": "binary",
@@ -7296,6 +7380,10 @@
     {
       "name": "geo",
       "description": "Where the visitor is"
+    },
+    {
+      "name": "places",
+      "description": "The cities a search can name"
     },
     {
       "name": "stats",

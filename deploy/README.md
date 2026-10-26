@@ -35,7 +35,7 @@ browser ──▶ media.breakingjam.com ──▶ R2 bucket (uploaded flyers)
 - UAT sets `TEST_SITE = "true"` in `env.uat` (production never has it). It runs the Worker for every request, and the Worker then:
   - adds `X-Robots-Tag: noindex, nofollow` to every response;
   - answers `/robots.txt` with `Disallow: /`;
-  - shows a "Test site — demo data, not real jams" badge on every page, fixed in a corner and click-through, so UAT keeps production's layout.
+  - adds `<meta name="test-site">` to every page, so the app shows a "Test site — demo data, not real jams" banner above the header until the visitor closes it (remembered in that browser).
 
 ## One-time setup
 
@@ -101,6 +101,7 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
     npx wrangler r2 bucket domain add breakingjam-media --domain media.breakingjam.com --zone-id <breakingjam.com zone id>
     ```
     UAT uses `breakingjam-media-uat` on `media-uat.breakingjam.com`: one level under the zone, as the free certificate doesn't cover `media.uat.…`. Never use the bucket's `r2.dev` address; it is rate-limited and meant for development. If the deploy says the API token lacks R2 access, give it *Workers R2 Storage: Edit*.
+12. **Places**, after the first deploy with the `places` tables (M22), and again whenever `data/places/` changes: Actions → **Import places** → Run workflow, from `uat` or `prod`. It loads the GeoNames cities that "Near <Place>" on `/search` needs, replacing them in one transaction, as the owner role (the target's `DATABASE_URL` secret).
 
 ## Releasing
 

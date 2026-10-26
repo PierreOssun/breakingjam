@@ -157,6 +157,7 @@ djibril = { name = "Djibril", country = "BE" }
 dnoi = { name = "Dnoi", country = "ZZ" }
 do-knock = { name = "Do Knock", country = "US" }
 dol = { name = "Dol", country = "ZZ" }
+dom-k = { name = "Dom:k", country = "FR" }
 domkey = { name = "DOMkey", country = "US" }
 doug = { name = "Doug", country = "ZZ" }
 dr-hill = { name = "Dr. Hill", country = "MX" }
@@ -213,6 +214,7 @@ frank = { name = "Frank", country = "CH", crews = ["dynamo"], look = "bboy" }
 freeman = { name = "Freeman", country = "MX" }
 freeze = { name = "Freeze", country = "SE" }
 fresh-bella = { name = "Fresh Bella", country = "KR", aliases = ["Freshbella"] }
+frost = { name = "Frost", country = "DE" }
 froz = { name = "Froz", country = "IT" }
 furia = { name = "Furia", country = "ES" }
 fuzion = { name = "Fuzion", country = "ZZ" }
@@ -292,6 +294,7 @@ jeian = { name = "Jeian", country = "BE" }
 jenes = { name = "Jenes", country = "ZZ" }
 jeromeskee = { name = "Jeromeskee", country = "US" }
 jeskilz = { name = "Jeskilz", country = "US" }
+jess = { name = "Jess", country = "ES" }
 jesse-john = { name = "Jesse John", country = "ZZ" }
 jet-leg = { name = "Jet Leg", country = "IT" }
 jey = { name = "Jey", country = "FR" }
@@ -376,6 +379,7 @@ kosto = { name = "Kosto", country = "RU" }
 kosuke = { name = "Kosuke", country = "JP" }
 kotya = { name = "Kotya", country = "BY" }
 kousuke = { name = "Kousuke", country = "JP" }
+kowloon = { name = "Kowloon", country = "CN" }
 kristina = { name = "Kristina", country = "ZZ" }
 krs-one = { name = "KRS-One", country = "US" }
 kujo = { name = "Kujo", country = "US" }
@@ -465,6 +469,7 @@ mey = { name = "Mey", country = "ZZ" }
 mia = { name = "Mia", country = "FR" }
 micchan = { name = "Micchan", country = "ZZ" }
 micha = { name = "Micha", country = "ZZ" }
+migaz = { name = "Migaz", country = "BR" }
 mighty-jake = { name = "Mighty Jake", country = "VE" }
 mighty-jim = { name = "Mighty Jim", country = "ZZ" }
 mighty-jimm = { name = "Mighty Jimm", country = "GR" }
@@ -743,6 +748,7 @@ victor = { name = "Victor", country = "US" }
 vika-wins = { name = "Vika Wins", country = "UA" }
 viktor-manoel = { name = "Viktor Manoel", country = "ZZ" }
 vint = { name = "Vint", country = "RU" }
+virus = { name = "Virus", country = "KR" }
 vlad = { name = "Vlad", country = "RU" }
 waackeisha = { name = "Waackeisha", country = "ZZ" }
 waackxxxy = { name = "Waackxxxy", country = "ZZ" }

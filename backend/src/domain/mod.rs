@@ -6,9 +6,29 @@ pub mod crew;
 pub mod dancer;
 pub mod event;
 pub mod organizer;
+pub mod place;
 pub mod user;
 
+use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};
 use validator::ValidationError;
+
+/// Lower case without accents (`é` → `e`, `ń` → `n`); the few letters with no accent to drop are mapped by hand.
+pub fn fold(name: &str) -> String {
+    name.nfd()
+        .filter(|c| !is_combining_mark(*c))
+        .flat_map(char::to_lowercase)
+        .map(|c| match c {
+            'ł' => 'l',
+            'đ' => 'd',
+            'ø' => 'o',
+            'ß' => 's',
+            'æ' => 'a',
+            'œ' => 'o',
+            'ı' => 'i',
+            other => other,
+        })
+        .collect()
+}
 
 /// A failed struct-level rule; `code` carries the field name, which `AppError` reports.
 pub fn rule(field: &'static str, message: &'static str) -> ValidationError {

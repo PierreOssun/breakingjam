@@ -113,7 +113,8 @@ export function isFiltered(filters: Filters): boolean {
   return filters.when !== null || filters.categories.length > 0;
 }
 
-const fold = (text: string) =>
+/** Lower case without accents, for matching what people type. */
+export const fold = (text: string) =>
   text
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
@@ -289,4 +290,37 @@ export function distanceKm(
     Math.sin(dLat / 2) ** 2 +
     Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
   return 2 * 6371 * Math.asin(Math.sqrt(h));
+}
+
+/** A number from the URL; `NaN` when absent or blank (`Number("")` would be 0). */
+const urlNumber = (value: string | null) =>
+  value === null || value.trim() === "" ? Number.NaN : Number(value);
+const isLng = (n: number) => n >= -180 && n <= 180;
+const isLat = (n: number) => n >= -90 && n <= 90;
+
+/**
+ * The first view a link asks `/map` for: `?fit=west,south,east,north` ("Open the map around
+ * <Place>"), else `?lat=&lng=`; null when neither is there and well formed.
+ */
+export function askedView(
+  params: URLSearchParams,
+): { bounds: Bounds } | { lng: number; lat: number } | null {
+  const fit = (params.get("fit") ?? "").split(",").map(urlNumber);
+  const [west, south, east, north] = fit;
+  if (
+    fit.length === 4 &&
+    west !== undefined &&
+    south !== undefined &&
+    east !== undefined &&
+    north !== undefined &&
+    isLng(west) &&
+    isLng(east) &&
+    isLat(south) &&
+    isLat(north) &&
+    south <= north
+  )
+    return { bounds: [west, south, east, north] };
+  const lng = urlNumber(params.get("lng"));
+  const lat = urlNumber(params.get("lat"));
+  return isLng(lng) && isLat(lat) ? { lng, lat } : null;
 }

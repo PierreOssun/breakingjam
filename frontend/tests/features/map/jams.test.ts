@@ -1,4 +1,5 @@
 import {
+  askedView,
   type MapJam,
   NO_FILTERS,
   boundsOf,
@@ -287,5 +288,26 @@ describe("more jams coming up", () => {
   it("shows at most four", () => {
     const many = Array.from({ length: 6 }, (_, i) => jam({ id: `j${i}` }));
     expect(otherJams(many, zurich, thursday)).toHaveLength(4);
+  });
+});
+
+describe("the view a link asks for", () => {
+  const view = (search: string) => askedView(new URLSearchParams(search));
+
+  it("frames the bounds of ?fit=, else centres on ?lat=&lng=", () => {
+    expect(view("lat=47.75&lng=7.33&fit=2.35,45.76,8.54,48.86")).toEqual({
+      bounds: [2.35, 45.76, 8.54, 48.86],
+    });
+    expect(view("lat=47.75&lng=7.33")).toEqual({ lng: 7.33, lat: 47.75 });
+  });
+
+  it("ignores what is missing or out of range", () => {
+    expect(view("")).toBeNull();
+    expect(view("q=paris")).toBeNull();
+    expect(view("lat=&lng=")).toBeNull();
+    expect(view("lat=95&lng=7")).toBeNull();
+    // A broken fit falls back to the point.
+    expect(view("lat=47&lng=7&fit=1,2,3")).toEqual({ lng: 7, lat: 47 });
+    expect(view("fit=0,50,1,40")).toBeNull();
   });
 });

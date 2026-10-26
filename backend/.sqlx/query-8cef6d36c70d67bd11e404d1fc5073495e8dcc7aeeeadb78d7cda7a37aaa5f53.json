@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into place_names (place_id, name, own)\n             select * from unnest($1::uuid[], $2::text[], $3::bool[])",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "UuidArray",
+        "TextArray",
+        "BoolArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8cef6d36c70d67bd11e404d1fc5073495e8dcc7aeeeadb78d7cda7a37aaa5f53"
+}

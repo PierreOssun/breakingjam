@@ -3,9 +3,10 @@ starts_on = 2023-10-21
 timezone = "Europe/Paris"
 city = "Paris"
 country = "FR"
-lat = 48.8535
-lng = 2.3484
-sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
+lat = 48.8472
+lng = 2.2464
+venue = "Roland-Garros"
+sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://thesource.com/?p=695134"]
 judges = ["flea-rock", "movie-one", "dr-hill", "babyson", "kill"]
 mcs = ["amjad", "myverse"]
 djs = ["dj-one-up"]

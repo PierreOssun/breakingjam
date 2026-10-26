@@ -13,12 +13,13 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use crate::domain::{
+    battle::{BattleAge, BattleFormat, BattleGender, BracketStage},
+    fold,
+};
 use chrono::NaiveDate;
 use serde::{Deserialize, Deserializer, de::Error as _};
 use thiserror::Error;
-use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};
-
-use crate::domain::battle::{BattleAge, BattleFormat, BattleGender, BracketStage};
 
 /// Every file under `data/`, parsed; the keys are the stable ids the import will use.
 #[derive(Debug, Default)]
@@ -576,23 +577,5 @@ pub fn spelling(name: &str) -> String {
     fold(name)
         .chars()
         .filter(char::is_ascii_alphanumeric)
-        .collect()
-}
-
-/// Lower case without accents (`é` → `e`, `ń` → `n`); the few letters with no accent to drop are mapped by hand.
-fn fold(name: &str) -> String {
-    name.nfd()
-        .filter(|c| !is_combining_mark(*c))
-        .flat_map(char::to_lowercase)
-        .map(|c| match c {
-            'ł' => 'l',
-            'đ' => 'd',
-            'ø' => 'o',
-            'ß' => 's',
-            'æ' => 'a',
-            'œ' => 'o',
-            'ı' => 'i',
-            other => other,
-        })
         .collect()
 }

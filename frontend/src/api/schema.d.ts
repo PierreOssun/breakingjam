@@ -810,6 +810,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The city a search names, case and accents aside: an exact name or alternate name first,
+         *     else one starting with the search; the most populated when several match.
+         */
+        get: operations["find_place"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1973,6 +1993,32 @@ export interface components {
          * @enum {string}
          */
         ParticipationRole: "competitor" | "judge" | "dj" | "mc" | "organizer" | "other";
+        /** @description A city that "Near <Place>" centres on. */
+        Place: {
+            /** @description As GeoNames writes it, e.g. "Zürich". */
+            name: string;
+            /** @description ISO 3166-1 alpha-2. */
+            country: string;
+            /**
+             * Format: double
+             * @description Latitude.
+             */
+            lat: number;
+            /**
+             * Format: double
+             * @description Longitude.
+             */
+            lng: number;
+            /**
+             * Format: int32
+             * @description Inhabitants; ranks places that share a name.
+             */
+            population: number;
+        };
+        /** @description `GET /places` body. */
+        PlaceMatch: {
+            place?: components["schemas"]["Place"] | null;
+        };
         /**
          * Format: binary
          * @description A PNG body: `image/png` on the wire, binary in the OpenAPI document.
@@ -5124,6 +5170,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    find_place: {
+        parameters: {
+            query: {
+                /** @description What was searched, e.g. "Mulhouse". */
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceMatch"];
                 };
             };
         };

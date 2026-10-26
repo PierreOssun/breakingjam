@@ -1,0 +1,37 @@
+name: Import places
+
+# Loads the GeoNames cities of data/places into a target's database: "Near <Place>" on /search
+# needs them. Run it by hand from `uat` or `prod` (Actions → Import places → Run workflow) after
+# the migration that creates the tables, and again whenever data/places changes. It replaces
+# every place in one transaction, so searches keep working while it runs.
+on:
+  workflow_dispatch:
+
+# Shares the target's deploy group: never imports while a deploy migrates.
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: github.ref_name == 'uat' || github.ref_name == 'prod'
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # Queries compile against the committed .sqlx data, not the database.
+      SQLX_OFFLINE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      # rust-toolchain.toml pins the version; rustup installs it on first use.
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - name: Import the places
+        env:
+          # The owner role, as for migrations.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: cargo run --release --bin data -- places

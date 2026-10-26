@@ -50,10 +50,15 @@ dev target="": db
 seed: db
     cd backend && cargo run --bin seed
 
-# Drop and recreate the local database, migrate and seed it, closing connections that hold it (the IDE's).
+# Load the GeoNames cities of data/places into the local database ("Near <Place>" on /search), migrating it first.
+places: db
+    cd backend && cargo sqlx migrate run && cargo run --release --bin data -- places
+
+# Drop and recreate the local database, migrate, seed it and load the places, closing connections that hold it (the IDE's).
 reset-db: db
     cd backend && cargo sqlx database reset -y --force
     just seed
+    just places
 
 # Everything CI runs.
 check:

@@ -13,6 +13,7 @@ mod health;
 mod json;
 mod organizers;
 pub(crate) mod page;
+mod places;
 mod reviews;
 mod stats;
 
@@ -36,4 +37,5 @@ pub fn router() -> OpenApiRouter<AppState> {
         .merge(reviews::router())
         .merge(stats::router())
         .merge(organizers::router())
+        .merge(places::router())
 }

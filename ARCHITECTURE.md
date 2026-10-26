@@ -11,6 +11,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 - Public landing page: a title, a subtitle and one search for jams and people (`/search`), then the next jams near the visitor and the site's counts (M18). **Register a jam** (`/org/jams/new`; login required, redirect back after auth) is in the header on every page. The map (`/map`) and the jam list (`/jams`) are the browse experiences.
 - World map of published jams (MapLibre GL); clicking a point opens a popup → jam detail page.
 - Jam (event) CRUD for authenticated organisers. An admin approves each organiser's jam before it goes public (M14).
+- Search near a place (M22): when a search names a city, `/search` shows the closest upcoming jams to it ("Near <Place>"), even where no jam is registered, from the GeoNames cities of 15,000+ people (CC BY 4.0) loaded into `places`.
 - Jam flyer upload (M19): whoever may edit a jam uploads a flyer that replaces the generated one everywhere (jam page, cards, lists, map). The browser crops it to 4:5 and encodes it; it goes live at once, without review, and admins remove unsuitable ones (decided in M19). The generated flyer stays the fallback and the share image.
 - Admin area (`/admin`, M14): counts of jams, dancers, organisers and accounts with verification rates, the jams waiting for review, and the Instagram claims. One tab per tool, so new tools join as tabs.
 - Dancer CRUD via the API, used inside the jam flows (search-before-create when adding entry members or staff).
@@ -326,6 +327,27 @@ create table event_staff (
   role staff_role not null,
   primary key (event_id, dancer_id, role)
 );
+
+-- M22: GeoNames cities of 15,000+ people, loaded by `cargo run --bin data -- places` (data/places/).
+create table places (
+  id uuid primary key,
+  geonames_id integer not null unique,
+  name text not null,                 -- as GeoNames writes it, e.g. "Zürich"
+  ascii_name text not null,
+  country char(2) not null,
+  lat double precision not null,
+  lng double precision not null,
+  population integer not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create table place_names (            -- every name a place answers to, folded (no case, accents or punctuation)
+  place_id uuid not null references places(id) on delete cascade,
+  name text collate "C" not null,     -- "C": the key's index serves exact and prefix lookups
+  own boolean not null default false, -- its name or ASCII name, not an alternate
+  primary key (name, place_id)
+);
+create index on place_names (place_id); -- each import deletes the places, cascading here
 ```
 
 Notes:
@@ -411,6 +433,7 @@ GET    /api/auth/google/callback
 
 GET    /api/stats                        public counts for the landing page: countries with public jams, battles (total and per country, busiest first), dancers
 GET    /api/geo                          {country}: the visitor's ISO 3166-1 alpha-2 country from the `cf-ipcountry` header (set by the Worker), null when unknown
+GET    /api/places                       ?q=   {place: {name, country, lat, lng, population} | null}: the city a search names, case and accents aside; an exact name or alternate name first (own names before alternates), then a prefix, the most populated when several match; no lookup under 3 letters, no prefix under 4 nor of a name more than twice as long; under 50,000 people only the place's own name finds it; codes like "ZRH" are no names (M22)
 
 GET    /api/events                       ?status=published&country=&from=&to=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required)
 GET    /api/events.geojson               published, registration_closed and completed events with coordinates, as FeatureCollection (id, name, slug, starts_on, ends_on, status, city, country, battles: names in display order, categories: what the map's chips match, flyer_card_url)
@@ -509,7 +532,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
   - **The scene so far**: battles, countries and dancers from `GET /api/stats`, then the 10 busiest countries as chips and "+N more". Public jams count, cancelled ones don't.
   - Then the footer: round logo, tagline, links, Instagram, language switch.
   M10 decided "no data fetching on this page"; M15 reverses that at the author's request. The map preview and the For dancers and For organisers bands are gone since M18; the organisers' pitch moves to a future `/register` landing.
-- Search (`/search?q=`): the jams the words match, matched in the browser like the map's search (name, city, country), upcoming first, up to 10 then "See all on the map" (`/map?q=`); and the people from `GET /api/dancers?q=`, paged. A blank search shows the upcoming jams and the notable people.
+- Search (`/search?q=`): first "Near <Place>" when `GET /api/places` finds a city (M22, DESIGN.md §4.33): the 3 nearest upcoming jams within 500 km of it, by great-circle distance in the browser over the map's GeoJSON, on a static mini map, with "Open the map around <Place>" (`/map?lat=&lng=&fit=`). Then the jams the words match, matched in the browser like the map's search (name, city, country), upcoming first, up to 10 then "See all on the map" (`/map?q=`); and the people from `GET /api/dancers?q=`, paged. A section with nothing in it hides while another has results; with nothing anywhere, one empty state. A blank search shows the upcoming jams and the notable people.
 - Find a jam (`/jams`): every jam from `GET /api/events.geojson` as a list, with the map's search and filter chips, upcoming first (past ones with the "Past jams" chip), 30 at a time. The search is kept in `?q=`.
 - Header: Jam map, Find a jam, Find someone, then the language switch, Log in or the account menu (My jams, Admin for admins, Log out) and **Register a jam**. The full bar shows from `xl`; below, a menu sheet holds the same items.
 - Visual system: follow `DESIGN.md` (tokens, components, states). Tailwind v4: its tokens live in the `@theme` of `src/styles/index.css` (the default palette, type scale, radii and shadows are removed), and `src/styles/tokens.test.ts` fails when they drift from `DESIGN.md` §2; do not hard-code colours or spacing outside it. Where `DESIGN.md` differs from this file on scope or routes (8 languages, `/en/…` prefixes, a cookie, `/d/<slug>`), this file wins: EN/FR/DE, unprefixed routes, `localStorage`.
@@ -524,7 +547,8 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
     - `VITE_TILES_URL=pmtiles://https://tiles.breakingjam.com/world.pmtiles` → self-hosted extract on R2 via the `pmtiles` protocol (production, later).
   - Attribution: Protomaps + OpenStreetMap contributors, always visible (bottom-right), required by both licences.
   - Data source: `GET /api/events.geojson`. Cluster at low zoom (`cluster: true` on the GeoJSON source).
-  - First view: the visitor's country from `GET /api/geo`, framed by a bounding box from Natural Earth (main landmass and nearby islands, `features/map/countryBounds.ts`). A country without upcoming jams is widened to its three nearest jams; an unknown country frames every jam. In development, `DEV_COUNTRY` in `frontend/.env` stands in for Cloudflare.
+  - A link may ask for the first view: `?fit=west,south,east,north` frames that box, else `?lat=&lng=` centres there (M22, from "Open the map around <Place>").
+  - Otherwise the first view: the visitor's country from `GET /api/geo`, framed by a bounding box from Natural Earth (main landmass and nearby islands, `features/map/countryBounds.ts`). A country without upcoming jams is widened to its three nearest jams; an unknown country frames every jam. In development, `DEV_COUNTRY` in `frontend/.env` stands in for Cloudflare.
   - Click a point → popup with name, dates, city → link to `/jams/{slug}`.
   - Filters and search (decided in M11), all client-side over the one GeoJSON download: **When** (this weekend, next 30 days, past jams; one at a time) and **battle categories** (1v1, 2v2, crews, 7 to smoke, bgirl, kids; any one matches), combined with AND. Search matches every word against name, city, country code and country name (accents ignored); Enter fits the map to the matches and opens the jam when there is one. Without a time filter the map shows upcoming jams; **Past jams** shows the completed ones, most recent first, and a search looks through both, so "red bull" finds every BC One. No Cancelled filter yet.
   - Container: `height: 100dvh` minus header, `touch-action: none`.
@@ -564,14 +588,16 @@ cd backend && cp .env.example .env && sqlx database create && sqlx migrate run &
 cd frontend && npm i && npm run gen:api && npm run dev   # vite proxies /api → :8080
 cd deploy && npx wrangler dev -c wrangler.media.jsonc   # uploads: a local R2 bucket on :8788
 ```
-`just dev` starts all three.
+`just dev` starts all three. `just places` loads the GeoNames cities into the local database (`just reset-db` does too).
 Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("BreakingJam Team") and an `organizer` ("Cypher Collective", with two jams waiting for review), then **imports the real past jams of `data/`** (Red Bull BC One, Battle of the Year, Outbreak Europe, Unbreakable…, owned by the `seed_admin`): every jam that passes `data check`, with its dancers, crews, staff and results, completed or published by date; the rest is left out (`RUST_LOG=seed=debug` lists what and why). On top come invented upcoming jams with registrations, drafts and in-review jams, invented dancers (one pair of deliberate near-duplicates for merge testing, DJs and MCs) and 5 crews; a dancer of `data/` they name (Menno, Hong 10…) is the imported row. It refuses any database host other than localhost, except the one `SEED_ALLOW_HOST` names exactly (UAT's). The real ~200 notable dancers are entered by hand through the UI by a `seed_admin`, not by this script.
+
+**Places** (`data/places/`, guide in its README): GeoNames `cities15000` (CC BY 4.0) trimmed to id, name, ASCII name, alternate names, country, coordinates and population, committed so imports never download. `cargo run --bin data -- places` replaces the `places` and `place_names` rows in one transaction; UAT and production run it with the **Import places** workflow.
 
 **Curated data** (`data/`, guide in `data/README.md`): real jams and their results (Red Bull BC One World Finals first) as reviewed TOML files, the source of truth for those jams; the app shows them read-only and fixes are made in the files. `cargo run --bin data -- check` validates them in CI (brackets consistent, every dancer and crew known, codes and links well-formed); `draft-wikipedia` and `draft-youtube` (from a channel's battle videos, through the YouTube Data API) draft new editions for a human to review. Battles are 1v1 or team battles (2v2, crews) whose sides are a crew, a named team and/or members; dancers belong to zero or more crews, as in `crew_memberships`. Each dancer, jam and battle has a stable key; the import (next step) keeps database rows in step with the files.
 
 ## 9. Deployment (built in M13; guide in `deploy/README.md`)
 
-- **Targets**: production (`breakingjam.com`, branch `prod`) and UAT (`uat.breakingjam.com`, branch `uat`, the `env.uat` Worker `breakingjam-uat`). Same code, separate Neon projects, secrets and Google OAuth clients. UAT holds seeded demo data only, never production data; its Worker (`TEST_SITE`) marks every response noindex, disallows all in robots.txt and badges every page as a test site until the visitor closes the badge (a cookie remembers it for a year), and Cloudflare Access can keep it private. `main` is the development branch and deploys nowhere.
+- **Targets**: production (`breakingjam.com`, branch `prod`) and UAT (`uat.breakingjam.com`, branch `uat`, the `env.uat` Worker `breakingjam-uat`). Same code, separate Neon projects, secrets and Google OAuth clients. UAT holds seeded demo data only, never production data; its Worker (`TEST_SITE`) marks every response noindex, disallows all in robots.txt and marks every page so the app shows a test-site banner until the visitor closes it (remembered per browser in `localStorage`), and Cloudflare Access can keep it private. `main` is the development branch and deploys nowhere.
 - **Domain**: `breakingjam.com` on Cloudflare DNS. One Worker per target (`deploy/`) serves the site at the apex and the API same-origin under `/api/*` (session cookies stay first-party; no CORS in prod). `www` redirects to the apex with a zone Redirect Rule.
 - **Frontend**: Workers static assets from `frontend/dist` with the SPA fallback, not Cloudflare Pages (Cloudflare's current recommendation; one Worker, one deploy). Built with `VITE_API_URL` empty (same origin). `frontend/public/_headers` sets CSP, HSTS and the immutable cache for `/assets/*`.
 - **Visitor country**: the Worker sets `cf-ipcountry` on every `/api/*` request from `request.cf.country`, replacing any value the client sent; `GET /api/geo` reads it for the map's first view.

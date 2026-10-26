@@ -19,6 +19,10 @@
   "footer": {
     "links": "Liens du site"
   },
+  "testSite": {
+    "notice": "Site de test — données de démo, pas de vrais jams",
+    "close": "Fermer l’avis du site de test"
+  },
   "auth": {
     "login": {
       "title": "Se connecter",
@@ -681,9 +685,14 @@
   "search": {
     "jams": "Jams",
     "people": "Personnes",
-    "noJams": "Aucune jam ne correspond à « {{q}} ».",
-    "noUpcoming": "Pas encore de jam à venir.",
-    "allOnMap": "Tout voir sur la carte"
+    "allOnMap": "Tout voir sur la carte",
+    "near": {
+      "title": "Près de {{place}}",
+      "closest": "Pas encore de jam à {{place}}. Voici les plus proches.",
+      "none": "Aucune jam à venir à moins de {{km}} km de {{place}}.",
+      "openMap": "Ouvrir la carte autour de {{place}}"
+    },
+    "nothing": "Rien ne correspond à « {{q}} »."
   },
   "jams": {
     "count_one": "{{count}} jam",

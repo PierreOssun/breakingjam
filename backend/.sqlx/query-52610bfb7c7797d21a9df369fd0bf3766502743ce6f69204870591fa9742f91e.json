@@ -1,0 +1,79 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select p.name, p.country, p.lat, p.lng, p.population\n           from place_names n join places p on p.id = n.place_id\n           where (n.name = $1\n                  or ($4 and n.name like $2 and char_length(n.name) < 2 * char_length($1)))\n             and (p.population >= $3 or ($4 and n.own and n.name = $1))\n           order by n.name = $1 desc, n.own desc, p.population desc\n           limit 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "places",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "places",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "lat",
+        "type_info": "Float8",
+        "origin": {
+          "Table": {
+            "table": "places",
+            "name": "lat"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "lng",
+        "type_info": "Float8",
+        "origin": {
+          "Table": {
+            "table": "places",
+            "name": "lng"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "population",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "places",
+            "name": "population"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Int4",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "52610bfb7c7797d21a9df369fd0bf3766502743ce6f69204870591fa9742f91e"
+}

@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into places (id, geonames_id, name, ascii_name, country, lat, lng, population)\n             select * from unnest($1::uuid[], $2::int[], $3::text[], $4::text[], $5::text[],\n                                  $6::float8[], $7::float8[], $8::int[])",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "UuidArray",
+        "Int4Array",
+        "TextArray",
+        "TextArray",
+        "TextArray",
+        "Float8Array",
+        "Float8Array",
+        "Int4Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "156cfbe4375d6768de53bb3880b00968bf69f1de86a8f59b3d025b4969495633"
+}

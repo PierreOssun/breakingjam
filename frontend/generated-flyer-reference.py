@@ -1,59 +1,10 @@
 """Reference implementation of the BreakingJam generated jam flyer (DESIGN.md 4.24). Outputs SVG strings: flyer_svg(jam) for 4:5, og_svg(jam) for 1200x630."""
 import math, hashlib
 
-POSES = {
- 'handstand': [
-  "..XX..........XX....",
-  "..XXX........XXX....",
-  "...XXX......XXX.....",
-  "....XXX....XXX......",
-  ".....XXX..XXX.......",
-  "......XXXXXX........",
-  ".......XXXX.........",
-  ".......XXXX.........",
-  ".......XXXX.........",
-  ".......XXXX.........",
-  ".......XXXX.........",
-  "......XXXXXX........",
-  ".....XXXXXXXX.......",
-  "....XXX.XX.XXX......",
-  "....XX.XXXX.XX......",
-  "...XX..XXXX..XX.....",
-  "...XX..XXXX..XX.....",
-  "..XX....XX....XX....",
-  "..XX..........XX....",
-  ".XXX..........XXX...",
- ],
- 'toprock': [
-  "........XX..........",
-  ".......XXX..........",
-  ".......XX...........",
-  "......XX....XXX.....",
-  "......XX...XXXXX....",
-  ".......XX..XXXXX....",
-  ".......XX..XXXXX....",
-  "........XX..XXX.....",
-  ".........XXXXXX.....",
-  "........XXXXXXXXXX..",
-  "........XXXXXXX..XX.",
-  "........XXXXXXX...XX",
-  ".........XXXXX...XX.",
-  ".........XXXXX..XX..",
-  ".........XXXXX......",
-  "........XXXXXXX.....",
-  ".......XXX...XXX....",
-  "......XXX.....XXX...",
-  ".....XXX.......XX...",
-  "....XXX........XX...",
-  "...XXX.........XXX..",
-  "..XXXX.........XXXX.",
- ],
-}
-
 PAL = {
- 'klein':  dict(bg='#002FA7', ring='#1440BE', text='#FFFFFF', sub='#C7D4FF', body='#0B0D14', rim='#8FAAFF', shadow='#001C6B', floor='#5F80E6'),
- 'violet': dict(bg='#6D3AF5', ring='#7C4FFF', text='#FFFFFF', sub='#E6DDFF', body='#0B0D14', rim='#D6C7FF', shadow='#4818C6', floor='#A88CFF'),
- 'ink':    dict(bg='#0B0D14', ring='#182038', text='#F3F5FA', sub='#8FAAFF', body='#2F5BFF', rim='#B9CAFF', shadow='#111833', floor='#2A3A72'),
+ 'klein':  dict(bg='#002FA7', ring='#1440BE', text='#FFFFFF', sub='#C7D4FF', floor='#5F80E6'),
+ 'violet': dict(bg='#6D3AF5', ring='#7C4FFF', text='#FFFFFF', sub='#E6DDFF', floor='#A88CFF'),
+ 'ink':    dict(bg='#0B0D14', ring='#182038', text='#F3F5FA', sub='#8FAAFF', floor='#2A3A72'),
 }
 DISPLAY = "Unbounded, 'Arial Black', sans-serif"
 BODY = "Manrope, 'Helvetica Neue', Arial, sans-serif"
@@ -63,7 +14,7 @@ def esc(s):
 
 def seed(jam_id):
     h = int(hashlib.sha1(jam_id.encode()).hexdigest(), 16)
-    return ['klein', 'violet', 'ink'][h % 3], ['handstand', 'toprock'][(h // 3) % 2]
+    return ['klein', 'violet', 'ink'][h % 3]
 
 def fit_name(name, width=344, sizes=(46, 40, 34, 28, 24), max_lines=4, room=None):
     words = name.split()
@@ -105,33 +56,12 @@ def pixel_rings(cx, cy, radii, cell, w, h, color):
                 out.append(f'<rect x="{gx}" y="{gy}" width="{cell}" height="{cell}" fill="{color}"></rect>')
     return ''.join(out)
 
-def sprite(pose, x0, y0, cell, p):
-    rows = POSES[pose]
-    out = []
-    # shadow
-    for y, row in enumerate(rows):
-        for x, ch in enumerate(row):
-            if ch == 'X':
-                out.append(f'<rect x="{x0 + (x + 1) * cell}" y="{y0 + (y + 1) * cell}" width="{cell}" height="{cell}" fill="{p["shadow"]}"></rect>')
-    for y, row in enumerate(rows):
-        x = 0
-        while x < len(row):
-            if row[x] != 'X':
-                x += 1; continue
-            x1 = x
-            while x1 + 1 < len(row) and row[x1 + 1] == 'X': x1 += 1
-            out.append(f'<rect x="{x0 + x * cell}" y="{y0 + y * cell}" width="{(x1 - x + 1) * cell}" height="{cell}" fill="{p["body"]}"></rect>')
-            # rim light on right edge
-            out.append(f'<rect x="{x0 + x1 * cell + cell - max(2, cell // 3)}" y="{y0 + y * cell}" width="{max(2, cell // 3)}" height="{cell}" fill="{p["rim"]}"></rect>')
-            x = x1 + 1
-    return ''.join(out)
-
 def flyer_svg(jam, label=True, compact=False, status=None, uid='f'):
-    pal_name, pose = jam.get('palette') or seed(jam['id'])[0], jam.get('pose') or seed(jam['id'])[1]
+    pal_name = jam.get('palette') or seed(jam['id'])
     p = PAL[pal_name]
     W, H = 400, 500
     parts = [f'<rect width="{W}" height="{H}" fill="{p["bg"]}"></rect>']
-    # no pixel art on the flyer (rings, floor and dancer stay on the share image); the name
+    # no pixel art on the flyer (the rings and floor stay on the share image); the name
     # block keeps its room below where the floor was
     floor_y = 270
     # glow + vignette (HD layer)
@@ -160,14 +90,13 @@ def flyer_svg(jam, label=True, compact=False, status=None, uid='f'):
     return f'<svg width="100%" height="100%" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMid slice" shape-rendering="crispEdges" text-rendering="geometricPrecision" {aria} style="display: block">{"".join(parts)}</svg>'
 
 def og_svg(jam, uid='og'):
-    pal_name, pose = jam.get('palette') or seed(jam['id'])[0], jam.get('pose') or seed(jam['id'])[1]
+    pal_name = jam.get('palette') or seed(jam['id'])
     p = PAL[pal_name]
     W, H = 1200, 630
     parts = [f'<rect width="{W}" height="{H}" fill="{p["bg"]}"></rect>', pixel_rings(940, 260, (90, 150, 210, 270, 330, 390), 12, W, H, p['ring'])]
     floor_y = 520
     for gx in range(0, W, 24):
         parts.append(f'<rect x="{gx}" y="{floor_y}" width="12" height="6" fill="{p["floor"]}"></rect>')
-    parts.append(sprite(pose, 800, floor_y - len(POSES[pose]) * 16, 16, p))
     parts.append(f'<defs><linearGradient id="{uid}v" x1="0" y1="0" x2="0" y2="1"><stop offset=".6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity=".4"></stop></linearGradient></defs><rect width="{W}" height="{H}" fill="url(#{uid}v)"></rect>')
     parts.append(f'<text x="64" y="104" font-family="{BODY}" font-weight="800" font-size="26" letter-spacing="3" fill="{p["sub"]}">{esc(jam["dow"].upper())} {esc(jam["day"])} {esc(jam["mon"].upper())} · {esc(jam.get("time", ""))}</text>')
     fs, lines = fit_name(jam['name'], width=660, sizes=(84, 72, 60, 50), max_lines=3)
@@ -180,15 +109,15 @@ def og_svg(jam, uid='og'):
     return f'<svg width="100%" height="100%" viewBox="0 0 {W} {H}" shape-rendering="crispEdges" role="img" aria-label="Share image for {esc(jam["name"])}" style="display: block">{"".join(parts)}</svg>'
 
 JAMS = {
- 'concrete': dict(id='jam_concrete_v3', name='Concrete Cypher Vol. 3', dow='Sat', day='14', mon='Nov', time='13:00', city='Zurich', cc='CH', cats=['1v1 Bboy', '1v1 Bgirl', '2v2'], palette='klein', pose='handstand'),
- 'rooftop':  dict(id='jam_rooftop', name='Rooftop Sessions', dow='Sat', day='21', mon='Nov', time='14:00', city='Lyon', cc='FR', cats=['1v1 Open', '3v3 Crew'], palette='violet', pose='toprock'),
- 'kids':     dict(id='jam_kids', name='Kids Got Flavour', dow='Sun', day='29', mon='Nov', time='12:00', city='Milan', cc='IT', cats=['Kids 1v1', 'Kids 2v2'], palette='ink', pose='toprock'),
- 'under':    dict(id='jam_under', name='Underground Throwdown', dow='Sat', day='05', mon='Dec', time='15:00', city='Berlin', cc='DE', cats=['1v1 Bboy', '1v1 Bgirl'], palette='klein', pose='toprock'),
- 'seven':    dict(id='jam_seven', name='Seven to Smoke Night', dow='Sun', day='15', mon='Nov', time='19:00', city='Winterthur', cc='CH', cats=['7 to Smoke'], palette='violet', pose='handstand'),
- 'lake':     dict(id='jam_lake', name='Lakeside Footwork Jam', dow='Sat', day='21', mon='Nov', time='14:00', city='Zurich', cc='CH', cats=['Footwork 1v1'], palette='ink', pose='handstand'),
- 'basel':    dict(id='jam_basel', name='Basel Bounce', dow='Sat', day='28', mon='Nov', time='13:00', city='Basel', cc='CH', cats=['2v2'], palette='klein', pose='handstand'),
- 'winter':   dict(id='jam_winter', name='Winter Cypher', dow='Sat', day='05', mon='Dec', time='16:00', city='Lucerne', cc='CH', cats=['1v1 Bgirl'], palette='violet', pose='toprock'),
- 'long':     dict(id='jam_long', name='The International Breaking Championship of the Alps', dow='Sat', day='12', mon='Dec', time='11:00', city='Innsbruck', cc='AT', cats=['1v1 Bboy', '1v1 Bgirl', 'Crew 5v5'], palette='ink', pose='toprock'),
+ 'concrete': dict(id='jam_concrete_v3', name='Concrete Cypher Vol. 3', dow='Sat', day='14', mon='Nov', time='13:00', city='Zurich', cc='CH', cats=['1v1 Bboy', '1v1 Bgirl', '2v2'], palette='klein'),
+ 'rooftop':  dict(id='jam_rooftop', name='Rooftop Sessions', dow='Sat', day='21', mon='Nov', time='14:00', city='Lyon', cc='FR', cats=['1v1 Open', '3v3 Crew'], palette='violet'),
+ 'kids':     dict(id='jam_kids', name='Kids Got Flavour', dow='Sun', day='29', mon='Nov', time='12:00', city='Milan', cc='IT', cats=['Kids 1v1', 'Kids 2v2'], palette='ink'),
+ 'under':    dict(id='jam_under', name='Underground Throwdown', dow='Sat', day='05', mon='Dec', time='15:00', city='Berlin', cc='DE', cats=['1v1 Bboy', '1v1 Bgirl'], palette='klein'),
+ 'seven':    dict(id='jam_seven', name='Seven to Smoke Night', dow='Sun', day='15', mon='Nov', time='19:00', city='Winterthur', cc='CH', cats=['7 to Smoke'], palette='violet'),
+ 'lake':     dict(id='jam_lake', name='Lakeside Footwork Jam', dow='Sat', day='21', mon='Nov', time='14:00', city='Zurich', cc='CH', cats=['Footwork 1v1'], palette='ink'),
+ 'basel':    dict(id='jam_basel', name='Basel Bounce', dow='Sat', day='28', mon='Nov', time='13:00', city='Basel', cc='CH', cats=['2v2'], palette='klein'),
+ 'winter':   dict(id='jam_winter', name='Winter Cypher', dow='Sat', day='05', mon='Dec', time='16:00', city='Lucerne', cc='CH', cats=['1v1 Bgirl'], palette='violet'),
+ 'long':     dict(id='jam_long', name='The International Breaking Championship of the Alps', dow='Sat', day='12', mon='Dec', time='11:00', city='Innsbruck', cc='AT', cats=['1v1 Bboy', '1v1 Bgirl', 'Crew 5v5'], palette='ink'),
 }
 
 if __name__ == '__main__':

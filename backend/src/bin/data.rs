@@ -1,4 +1,5 @@
-//! The `data/` tool: `check` validates the files; `draft-*` draft new ones from Wikipedia or YouTube.
+//! The `data/` tool: `check` validates the files; `draft-*` draft new ones from Wikipedia or
+//! YouTube; `places` loads the GeoNames cities into the database.
 
 use std::{
     collections::BTreeMap,
@@ -6,18 +7,24 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{Context, bail};
+use anyhow::{Context, bail, ensure};
 use breakingjam::dataset::{
     self, SeriesRecord, check,
     draft::{Draft, DraftName, crews_toml, dancers_toml},
     wikipedia,
     youtube::{self, Video},
 };
+use breakingjam::{
+    db,
+    domain::place::{NewPlace, parse_geonames_line},
+};
 
 const USAGE: &str = "usage: data check [DIR]
        data draft-wikipedia SERIES WIKITEXT_FILE [DIR]
        data fetch-youtube SERIES [DIR]     list the series' channel into DIR/.cache (needs YOUTUBE_API_KEY in DIR/.env)
        data draft-youtube SERIES [DIR]     draft from that list
+       data places [FILE]                  replace the database's places (DATABASE_URL) with FILE,
+                                           by default data/places/cities15000.tsv
 DIR defaults to the repository's data/.";
 
 fn main() -> anyhow::Result<()> {
@@ -53,8 +60,32 @@ fn main() -> anyhow::Result<()> {
             }
             write_draft(&dir, series, youtube::draft(&videos, &record, source))
         }
+        ["places", ..] if args.len() <= 2 => {
+            let default = repo_data.join("places/cities15000.tsv");
+            import_places(&args.get(1).map_or(default, PathBuf::from))
+        }
         _ => bail!(USAGE),
     }
+}
+
+/// Replaces the places of the database at `DATABASE_URL` (the environment, else `backend/.env`)
+/// with the cities of a GeoNames file.
+fn import_places(file: &Path) -> anyhow::Result<()> {
+    let text = read(file)?;
+    let places: Vec<NewPlace> = text.lines().filter_map(parse_geonames_line).collect();
+    let skipped = text.lines().count() - places.len();
+    ensure!(!places.is_empty(), "no place in {}", file.display());
+    dotenvy::dotenv().ok();
+    let url = std::env::var("DATABASE_URL").context("DATABASE_URL must be set")?;
+    tokio::runtime::Runtime::new()?.block_on(async {
+        let pool = sqlx::PgPool::connect(&url).await?;
+        let names = db::places::replace_all(&pool, &places).await?;
+        println!(
+            "{} places, {names} names ({skipped} lines skipped)",
+            places.len()
+        );
+        anyhow::Ok(())
+    })
 }
 
 fn run_check(dir: &Path) -> anyhow::Result<()> {

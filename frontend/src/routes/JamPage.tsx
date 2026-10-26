@@ -55,7 +55,7 @@ import { instagramLabel } from "../lib/instagram";
 import { NotFoundPage } from "./NotFoundPage";
 
 // MapLibre is heavy: only jam pages with a pin load it.
-const VenueMap = lazy(() => import("../features/jams/VenueMap"));
+const StaticMap = lazy(() => import("../features/map/StaticMap"));
 
 type Jam = Schemas["EventResponse"];
 
@@ -383,7 +383,11 @@ function Venue({ jam }: { jam: Jam }) {
         <Suspense
           fallback={<Skeleton className="h-[170px] rounded-lg lg:h-[220px]" />}
         >
-          <VenueMap lng={pin.lng} lat={pin.lat} />
+          <StaticMap
+            jams={[pin]}
+            marker="selected"
+            className="h-[170px] rounded-lg border border-border lg:h-[220px]"
+          />
         </Suspense>
       )}
       <address className="flex flex-col gap-1 text-body not-italic">

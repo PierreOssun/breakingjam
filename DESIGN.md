@@ -470,7 +470,7 @@ One component that changes shape by viewport.
 
 ### 4.24 Generated flyer
 
-Every jam gets a 4:5 poster built from its own data: the palette's background with a soft HD glow, and the jam's details set in type. No pixel art (decided after M15); the share image keeps the pixel rings, floor and dancer. It's used wherever a flyer appears: the jam page hero, cards, popup and list thumbnails, and the share image. An uploaded flyer (§4.28) replaces it, and the generated one stays as the fallback and the OG image. See the "Generated flyer" artboard; `generated-flyer-reference.py` is a reference implementation that outputs SVG.
+Every jam gets a 4:5 poster built from its own data: the palette's background with a soft HD glow, and the jam's details set in type. No pixel art (decided after M15); the share image keeps the pixel rings and floor, without a dancer. It's used wherever a flyer appears: the jam page hero, cards, popup and list thumbnails, and the share image. An uploaded flyer (§4.28) replaces it, and the generated one stays as the fallback and the OG image. See the "Generated flyer" artboard; `generated-flyer-reference.py` is a reference implementation that outputs SVG.
 
 - **Inputs:** name, date (weekday, day, month), start time, city, country code, categories. Nothing else.
 - **Rendering:** a single SVG with `viewBox="0 0 400 500"`, `preserveAspectRatio="xMidYMid slice"` and `shape-rendering="crispEdges"`. It scales to any size.
@@ -479,15 +479,14 @@ Every jam gets a 4:5 poster built from its own data: the palette's background wi
   - Accessibility: `role="img"` with `aria-label="Generated flyer: <name>, <date>, <city>"`.
 - **Seed:** `h = sha1(jam.id)`.
   - Palette = `["klein","violet","ink"][h % 3]`.
-  - Pose = `["handstand","toprock"][(h / 3) % 2]` (share image only).
   - Stable forever, with no randomness at render time.
-- **Palettes** (theme-independent, the same in dark and light UI; rings, dancer, rim, shadow and floor colour the share image only):
+- **Palettes** (theme-independent, the same in dark and light UI; rings and floor colour the share image only):
 
-| | bg | rings | text | sub | dancer | rim | shadow | floor |
-|---|---|---|---|---|---|---|---|---|
-| klein | `#002FA7` | `#1440BE` | `#FFFFFF` | `#C7D4FF` | `#0B0D14` | `#8FAAFF` | `#001C6B` | `#5F80E6` |
-| violet | `#6D3AF5` | `#7C4FFF` | `#FFFFFF` | `#E6DDFF` | `#0B0D14` | `#D6C7FF` | `#4818C6` | `#A88CFF` |
-| ink | `#0B0D14` | `#182038` | `#F3F5FA` | `#8FAAFF` | `#2F5BFF` | `#B9CAFF` | `#111833` | `#2A3A72` |
+| | bg | rings | text | sub | floor |
+|---|---|---|---|---|---|
+| klein | `#002FA7` | `#1440BE` | `#FFFFFF` | `#C7D4FF` | `#5F80E6` |
+| violet | `#6D3AF5` | `#7C4FFF` | `#FFFFFF` | `#E6DDFF` | `#A88CFF` |
+| ink | `#0B0D14` | `#182038` | `#F3F5FA` | `#8FAAFF` | `#2A3A72` |
 
 - **Layers, back to front** (400×500 units):
   1. Background fill.
@@ -511,42 +510,11 @@ Every jam gets a 4:5 poster built from its own data: the palette's background wi
   - Use an ellipsis only when 4 lines at 24 px still overflow.
 - **Compact** (any render ≤ 120px wide): background, weekday, day and month only. No name, city or categories, and `aria-hidden` (the row next to it carries the text).
 - **Cancelled:** a band rotated −12° across the centre in `#D8354A`, with "CANCELLED" in Unbounded 800 30 white. Other statuses don't touch the flyer.
-- **Share image:** the same seed and palette in 1200×630, with the pixel art the flyer doesn't have.
+- **Share image:** the same seed and palette in 1200×630, with the pixel rings and floor the flyer doesn't have.
   - **Pixel record rings:** 12-unit cells whose centre lies within 6 units of the radii 90, 150, 210, 270, 330 and 390 around (940, 260).
   - **Floor:** dashes 12×6 every 24 units at y = 520.
-  - **Pixel dancer:** the bitmap of its pose (below) at 16 units per cell, x = 800, standing on the floor.
-    - Shadow: the same bitmap offset by one cell, in `shadow`.
-    - Rim light: the right-most third of the last cell in each run, in `rim`.
   - Bottom vignette from 60% down: black from 0% to 40%.
   - Text sits on the left: date line, name at 84 → 50 px over ≤ 3 lines, city, then categories + "BREAKINGJAM.COM".
-- **Pose bitmaps** (`X` = filled, rows top to bottom):
-
-```
-handstand            toprock
-..XX..........XX.... ........XX..........
-..XXX........XXX.... .......XXX..........
-...XXX......XXX..... .......XX...........
-....XXX....XXX...... ......XX....XXX.....
-.....XXX..XXX....... ......XX...XXXXX....
-......XXXXXX........ .......XX..XXXXX....
-.......XXXX......... .......XX..XXXXX....
-.......XXXX......... ........XX..XXX.....
-.......XXXX......... .........XXXXXX.....
-.......XXXX......... ........XXXXXXXXXX..
-.......XXXX......... ........XXXXXXX..XX.
-......XXXXXX........ ........XXXXXXX...XX
-.....XXXXXXXX....... .........XXXXX...XX.
-....XXX.XX.XXX...... .........XXXXX..XX..
-....XX.XXXX.XX...... .........XXXXX......
-...XX..XXXX..XX..... ........XXXXXXX.....
-...XX..XXXX..XX..... .......XXX...XXX....
-..XX....XX....XX.... ......XXX.....XXX...
-..XX..........XX.... .....XXX.......XX...
-.XXX..........XXX... ....XXX........XX...
-                     ...XXX.........XXX..
-                     ..XXXX.........XXXX.
-```
-
 - **On the jam page:** the flyer is the hero exactly as an uploaded flyer is (mobile full-bleed 375×469; desktop left column, `rounded-lg`). The `<h1>` and fact rows stay below it, so the layout is the same with either.
 
 ### 4.25 Person list row ("Find someone")
@@ -654,6 +622,24 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
 
 - **Add to calendar** opens the API's `.ics` (`GET /api/events/{slug}/calendar.ics`): one all-day event over the jam's days, at its venue, with the page's link.
 
+### 4.33 "Near <Place>" card *(M22)*
+
+When a search names a city (GeoNames, §6 Search), the closest upcoming jams to it, even where no jam is registered.
+
+- **Shell:** `max-w-prose overflow-hidden rounded-lg border border-border bg-surface`, at the top of the results.
+- **Header** (`p-4`):
+  - `MapPin` 20 in `accent-text`, "Near <Place>" in `display-sm`, then the country's flag chip (§4.10).
+  - Under it, when no upcoming jam is in that city (by its name, or within 15 km): "No jam in <Place> yet. Here are the closest." in `body-sm muted`.
+- **Mini map:** static and not interactive, the map page's style, 150px tall (200px from lg), between `border-y`.
+  - The place is a violet ring: a 3px `accent` ring on `bg` with an `accent` dot, in a soft `accent/25` halo. The listed jams are the map's upcoming markers (§7).
+  - Framed so the place and the listed jams all show.
+- **Rows:** the 3 nearest upcoming jams by great-circle distance, within 500 km, nearest first, each separated by `border-b`. The whole row links to the jam:
+  - the compact flyer, 52×65, `rounded-[10px]`;
+  - the date (`label`, `primary-text`), the name (`font-extrabold`), the flag and city (muted);
+  - on the right, the distance pill: `h-7 px-2.5 rounded-full bg-surface-raised text-[13px] font-extrabold`, "100 km", rounded to the kilometre.
+- **Footer** (`p-4`): a full-width primary **Open the map around <Place>** with a `MapPin`, to `/map?lat=…&lng=…&fit=west,south,east,north`, the box around the place and those jams.
+- **No upcoming jam within 500 km:** the header (without the "closest" line), the map with only the place, the inline empty state (§4.22) "No upcoming jams within 500 km of <Place>.", then the same map button. Nothing else.
+
 ---
 
 ## 5. Layout rules
@@ -715,9 +701,11 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 
 **Search** (`/search?q=`): what the hero search submits to.
 - Reading column (`max-w-prose`): the visually hidden `<h1>` "Search", the hero search pill at its standard size (§4.26), prefilled.
+- **Near <Place>** (§4.33): first, when the words name a city (case and accents aside; an exact name or alternate name first, then a prefix; the most populated when several match). Words that are also common names don't: short searches ("jam") and alternate names of small towns ("India" for Inđija) find no place.
 - **Jams:** a `display-md` title, then the jams the words match (same matching as the map: name, city, country), upcoming first, as jam rows (§4.14). Up to 10, then **See all on the map →** (`/map?q=`).
 - **People:** a `display-md` title, then person rows (§4.25), paged with **Show more**.
-- Each part has its own inline empty state (§4.22). A blank search shows the upcoming jams and the notable people.
+- A section with nothing in it hides while another has results. When nothing matches anywhere, one inline empty state (§4.22): "Nothing matches “<query>”." A blank search shows the upcoming jams and the notable people.
+- While loading, the sections hold their place with placeholders (§4.29).
 
 **Find a jam** (`/jams`): every jam as a list, for those who don't want the map.
 - Reading column (`max-w-prose`): `display-lg`/`display-xl` title, the search field, the filter chips (§5, wrapped as in the side panel), the result count.

@@ -11,8 +11,8 @@ fn sha(s: &str) -> String {
         .collect()
 }
 
-/// The sample jams of the reference, with their palette and pose overrides.
-fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
+/// The sample jams of the reference, with their palette overrides.
+fn sample(key: &str) -> (FlyerText, Palette) {
     let jam = |name: &str,
                dow: &str,
                day: &str,
@@ -31,7 +31,6 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
         cats: cats.iter().map(|c| (*c).to_owned()).collect(),
     };
     use Palette::*;
-    use Pose::*;
     match key {
         "concrete" => (
             jam(
@@ -44,7 +43,7 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
                 "CH",
                 &["1v1 Bboy", "1v1 Bgirl", "2v2"],
             ),
-            (Klein, Handstand),
+            Klein,
         ),
         "rooftop" => (
             jam(
@@ -57,7 +56,7 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
                 "FR",
                 &["1v1 Open", "3v3 Crew"],
             ),
-            (Violet, Toprock),
+            Violet,
         ),
         "kids" => (
             jam(
@@ -70,7 +69,7 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
                 "IT",
                 &["Kids 1v1", "Kids 2v2"],
             ),
-            (Ink, Toprock),
+            Ink,
         ),
         "under" => (
             jam(
@@ -83,7 +82,7 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
                 "DE",
                 &["1v1 Bboy", "1v1 Bgirl"],
             ),
-            (Klein, Toprock),
+            Klein,
         ),
         "seven" => (
             jam(
@@ -96,7 +95,7 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
                 "CH",
                 &["7 to Smoke"],
             ),
-            (Violet, Handstand),
+            Violet,
         ),
         "long" => (
             jam(
@@ -109,7 +108,7 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
                 "AT",
                 &["1v1 Bboy", "1v1 Bgirl", "Crew 5v5"],
             ),
-            (Ink, Toprock),
+            Ink,
         ),
         _ => unreachable!(),
     }
@@ -118,7 +117,7 @@ fn sample(key: &str) -> (FlyerText, (Palette, Pose)) {
 // SHA-1 of the reference's output (fonts, escaping, xmlns and the §4.24 room patched as in
 // the module docs; labelled except compact), produced by running
 // generated-flyer-reference.py as a test oracle; since the pixel art left the flyer, the
-// same output with the rings, floor and dancer removed.
+// same output with the rings and floor removed.
 const FLYER: [(&str, &str, &str, &str); 6] = [
     (
         "concrete",
@@ -159,18 +158,18 @@ const FLYER: [(&str, &str, &str, &str); 6] = [
 ];
 
 const OG: [(&str, &str); 6] = [
-    ("concrete", "a3b8e848f8692e2d411848a5573cab368341a482"),
-    ("rooftop", "455ed029c83c748acf6303956a861cbc9bc282da"),
-    ("kids", "d7efe1e31db53a226de4df4acaf58d5c378f240e"),
-    ("under", "26259070fdaa4435463d76e049521511df5b5d92"),
-    ("seven", "458dc3422d521f9bb7907ec7fa090b1d05ade357"),
-    ("long", "285c516ad00774110220afc7f569c9c1e83bbd31"),
+    ("concrete", "132ed148285d634a31173e3da788d057bf296da5"),
+    ("rooftop", "434c4d41ed25e03e36e056be79d5a5cd9e79cdb4"),
+    ("kids", "df427911f3ffbaf1f59bef276b2fd27873bc3f11"),
+    ("under", "08b946c9d5a0d74ffb79dad01d5799f2877dfd1d"),
+    ("seven", "7e4484e1fb99dfe1d7e8eaea8ce5a173a9f1b24a"),
+    ("long", "0bd7e75301128e35fe0dc846db33819b8a1223cc"),
 ];
 
 #[test]
 fn flyer_matches_the_reference_byte_for_byte() {
     for (key, full, compact, cancelled) in FLYER {
-        let (text, look) = sample(key);
+        let (text, palette) = sample(key);
         // Compact gets the label too and must still come out `aria-hidden`.
         let options = |compact, cancelled| FlyerOptions {
             compact,
@@ -179,17 +178,21 @@ fn flyer_matches_the_reference_byte_for_byte() {
             uid: "f",
         };
         assert_eq!(
-            sha(&flyer_svg(&text, look, options(false, None))),
+            sha(&flyer_svg(&text, palette, options(false, None))),
             full,
             "{key}"
         );
         assert_eq!(
-            sha(&flyer_svg(&text, look, options(true, None))),
+            sha(&flyer_svg(&text, palette, options(true, None))),
             compact,
             "{key} compact"
         );
         assert_eq!(
-            sha(&flyer_svg(&text, look, options(false, Some("CANCELLED")))),
+            sha(&flyer_svg(
+                &text,
+                palette,
+                options(false, Some("CANCELLED"))
+            )),
             cancelled,
             "{key} cancelled"
         );
@@ -199,24 +202,23 @@ fn flyer_matches_the_reference_byte_for_byte() {
 #[test]
 fn og_matches_the_reference_byte_for_byte() {
     for (key, expected) in OG {
-        let (text, look) = sample(key);
-        assert_eq!(sha(&og_svg(&text, look, "og")), expected, "{key}");
+        let (text, palette) = sample(key);
+        assert_eq!(sha(&og_svg(&text, palette, "og")), expected, "{key}");
     }
 }
 
 #[test]
 fn seed_matches_the_reference() {
     use Palette::*;
-    use Pose::*;
     let cases = [
-        ("jam_concrete_v3", (Violet, Toprock)),
-        ("jam_rooftop", (Ink, Toprock)),
-        ("jam_kids", (Violet, Toprock)),
-        ("01a13b0b-73ad-76c9-891f-8f31857a8fb5", (Klein, Handstand)),
-        ("01920000-0000-7000-8000-0000003f9a1c", (Ink, Handstand)),
-        ("00000000-0000-0000-0000-000000000000", (Ink, Handstand)),
-        ("a", (Violet, Toprock)),
-        ("", (Violet, Handstand)),
+        ("jam_concrete_v3", Violet),
+        ("jam_rooftop", Ink),
+        ("jam_kids", Violet),
+        ("01a13b0b-73ad-76c9-891f-8f31857a8fb5", Klein),
+        ("01920000-0000-7000-8000-0000003f9a1c", Ink),
+        ("00000000-0000-0000-0000-000000000000", Ink),
+        ("a", Violet),
+        ("", Violet),
     ];
     for (id, expected) in cases {
         assert_eq!(seed(id), expected, "{id:?}");
@@ -315,12 +317,12 @@ fn fit_name_matches_the_reference() {
 
 #[test]
 fn text_is_escaped_including_quotes() {
-    let (mut text, look) = sample("concrete");
+    let (mut text, palette) = sample("concrete");
     text.name = r#"Jam" onload="alert(1)"#.into();
     text.city = "<script>".into();
     let svg = flyer_svg(
         &text,
-        look,
+        palette,
         FlyerOptions {
             compact: false,
             label: "Generated flyer:",
@@ -335,11 +337,11 @@ fn text_is_escaped_including_quotes() {
 
 #[test]
 fn missing_time_is_left_out() {
-    let (mut text, look) = sample("concrete");
+    let (mut text, palette) = sample("concrete");
     text.time = None;
     let svg = flyer_svg(
         &text,
-        look,
+        palette,
         FlyerOptions {
             compact: false,
             label: "Generated flyer:",
@@ -348,15 +350,15 @@ fn missing_time_is_left_out() {
         },
     );
     assert!(!svg.contains(r#"y="188""#), "no empty time line");
-    let og = og_svg(&text, look, "og");
+    let og = og_svg(&text, palette, "og");
     assert!(og.contains(">SAT 14 NOV</text>"), "no dangling separator");
 }
 
 #[test]
 fn og_without_battles_has_no_dangling_separator() {
-    let (mut text, look) = sample("concrete");
+    let (mut text, palette) = sample("concrete");
     text.cats.clear();
-    let og = og_svg(&text, look, "og");
+    let og = og_svg(&text, palette, "og");
     assert!(og.contains(">BREAKINGJAM.COM</text>"));
     assert!(!og.contains("·   BREAKINGJAM.COM"));
 }
@@ -393,8 +395,8 @@ fn categories_fit_their_line() {
 
 #[test]
 fn og_png_is_a_1200_by_630_png() {
-    let (text, look) = sample("long");
-    let png = og_png(&og_svg(&text, look, "og")).unwrap();
+    let (text, palette) = sample("long");
+    let png = og_png(&og_svg(&text, palette, "og")).unwrap();
     assert_eq!(&png[..8], b"\x89PNG\r\n\x1a\n");
     // IHDR: width and height as big-endian u32 at bytes 16..24.
     assert_eq!(u32::from_be_bytes(png[16..20].try_into().unwrap()), 1200);

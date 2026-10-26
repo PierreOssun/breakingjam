@@ -4,13 +4,6 @@
 import { Container, ContainerProxy } from "@cloudflare/containers";
 import { MEDIA_STORE_HOST, storeMedia } from "./media";
 import { type JamSummary, openGraphTags } from "./openGraph";
-import {
-  bannerClosed,
-  CLOSE_PATH,
-  closeBanner,
-  TEST_BANNER,
-  withoutRevalidation,
-} from "./testSite";
 
 /** Bindings and vars from wrangler.jsonc, and the secrets set with `wrangler secret put`. */
 export interface Env {
@@ -83,34 +76,30 @@ function api(env: Env) {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (env.TEST_SITE !== "true") return route(request, env);
-    const { pathname } = new URL(request.url);
-    if (pathname === "/robots.txt") {
+    if (new URL(request.url).pathname === "/robots.txt") {
       return new Response("User-agent: *\nDisallow: /\n", {
         headers: { "content-type": "text/plain", "x-robots-tag": NO_INDEX },
       });
     }
-    if (pathname === CLOSE_PATH) return closeBanner(request);
-    const page = await route(withoutRevalidation(request), env);
-    return asTestSite(page, !bannerClosed(request));
+    return asTestSite(await route(request, env));
   },
 } satisfies ExportedHandler<Env>;
 
 const NO_INDEX = "noindex, nofollow";
 
-/** The response marked noindex, and its pages given the test-site banner unless it was closed. */
-function asTestSite(response: Response, banner: boolean) {
+// The app shows its test-site banner when a page has this (frontend TestSiteBanner). The same
+// on every page, so pages stay cacheable; the closed state lives in the browser.
+const TEST_SITE_MARKER = '<meta name="test-site" content="true">';
+
+/** The response marked noindex, and its pages marked for the app's test-site banner. */
+function asTestSite(response: Response) {
   const marked = new Response(response.body, response);
   marked.headers.set("x-robots-tag", NO_INDEX);
   if (!marked.headers.get("content-type")?.includes("text/html")) return marked;
-  // Pages differ by the banner cookie: no validator to revalidate with, nothing to cache.
-  marked.headers.delete("etag");
-  marked.headers.delete("last-modified");
-  marked.headers.set("cache-control", "no-store");
-  if (!banner) return marked;
   return new HTMLRewriter()
-    .on("body", {
-      element: (body) => {
-        body.prepend(TEST_BANNER, { html: true });
+    .on("head", {
+      element: (head) => {
+        head.append(TEST_SITE_MARKER, { html: true });
       },
     })
     .transform(marked);

@@ -1,0 +1,51 @@
+name = "Olympic Games Paris 2024"
+starts_on = 2024-08-09
+ends_on = 2024-08-10
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+venue = "Place de la Concorde"
+lat = 48.8656
+lng = 2.3212
+sources = [
+  "https://en.wikipedia.org/wiki/Breaking_at_the_2024_Summer_Olympics",
+  "https://en.wikipedia.org/wiki/Breaking_at_the_2024_Summer_Olympics_%E2%80%93_B-Boys",
+  "https://en.wikipedia.org/wiki/Breaking_at_the_2024_Summer_Olympics_%E2%80%93_B-Girls",
+  "https://worlddancesport.org/News/olympic-breaking-bboys-paris-2024-road-to-gold-3464",
+  "https://www.olympedia.org/results/2003358",
+  "https://www.dancemagazine.com/olympic-breaking-recap/",
+]
+judges = ["kazuhiro", "frost", "moy", "migaz", "jess", "kowloon", "virus", "dom-k", "intact"]
+djs = ["dj-fleg", "dj-plash-one"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "dany-dann", b = "jeffro", winner = "dany-dann" },
+  { round = "top8", a = "amir", b = "victor", winner = "victor" },
+  { round = "top8", a = "shigekix", b = "menno", winner = "shigekix" },
+  { round = "top8", a = "lee", b = "phil-wizard", winner = "phil-wizard" },
+  { round = "top4", a = "dany-dann", b = "victor", winner = "dany-dann" },
+  { round = "top4", a = "shigekix", b = "phil-wizard", winner = "phil-wizard" },
+  { round = "final", a = "dany-dann", b = "phil-wizard", winner = "phil-wizard" },
+  { round = "third", a = "victor", b = "shigekix", winner = "victor" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "syssy", b = "ami", winner = "ami" },
+  { round = "top8", a = "ayumi", b = "india", winner = "india" },
+  { round = "top8", a = "671", b = "kate", winner = "671" },
+  { round = "top8", a = "yingzi", b = "nicka", winner = "nicka" },
+  { round = "top4", a = "ami", b = "india", winner = "ami" },
+  { round = "top4", a = "671", b = "nicka", winner = "nicka" },
+  { round = "final", a = "ami", b = "nicka", winner = "ami" },
+  { round = "third", a = "india", b = "671", winner = "671" },
+]

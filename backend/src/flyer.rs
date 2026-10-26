@@ -21,54 +21,6 @@ use utoipa::ToSchema;
 
 use crate::domain::event::Event;
 
-const HANDSTAND: [&str; 20] = [
-    "..XX..........XX....",
-    "..XXX........XXX....",
-    "...XXX......XXX.....",
-    "....XXX....XXX......",
-    ".....XXX..XXX.......",
-    "......XXXXXX........",
-    ".......XXXX.........",
-    ".......XXXX.........",
-    ".......XXXX.........",
-    ".......XXXX.........",
-    ".......XXXX.........",
-    "......XXXXXX........",
-    ".....XXXXXXXX.......",
-    "....XXX.XX.XXX......",
-    "....XX.XXXX.XX......",
-    "...XX..XXXX..XX.....",
-    "...XX..XXXX..XX.....",
-    "..XX....XX....XX....",
-    "..XX..........XX....",
-    ".XXX..........XXX...",
-];
-
-const TOPROCK: [&str; 22] = [
-    "........XX..........",
-    ".......XXX..........",
-    ".......XX...........",
-    "......XX....XXX.....",
-    "......XX...XXXXX....",
-    ".......XX..XXXXX....",
-    ".......XX..XXXXX....",
-    "........XX..XXX.....",
-    ".........XXXXXX.....",
-    "........XXXXXXXXXX..",
-    "........XXXXXXX..XX.",
-    "........XXXXXXX...XX",
-    ".........XXXXX...XX.",
-    ".........XXXXX..XX..",
-    ".........XXXXX......",
-    "........XXXXXXX.....",
-    ".......XXX...XXX....",
-    "......XXX.....XXX...",
-    ".....XXX.......XX...",
-    "....XXX........XX...",
-    "...XXX.........XXX..",
-    "..XXXX.........XXXX.",
-];
-
 const DISPLAY: &str = "'Unbounded Variable', Unbounded, 'Arial Black', sans-serif";
 const BODY: &str = "'Manrope Variable', Manrope, 'Helvetica Neue', Arial, sans-serif";
 
@@ -80,21 +32,11 @@ pub enum Palette {
     Ink,
 }
 
-/// The pixel dancer on a flyer, picked from the jam id.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Pose {
-    Handstand,
-    Toprock,
-}
-
 struct Colors {
     bg: &'static str,
     ring: &'static str,
     text: &'static str,
     sub: &'static str,
-    body: &'static str,
-    rim: &'static str,
-    shadow: &'static str,
     floor: &'static str,
 }
 
@@ -106,9 +48,6 @@ impl Palette {
                 ring: "#1440BE",
                 text: "#FFFFFF",
                 sub: "#C7D4FF",
-                body: "#0B0D14",
-                rim: "#8FAAFF",
-                shadow: "#001C6B",
                 floor: "#5F80E6",
             },
             Self::Violet => Colors {
@@ -116,9 +55,6 @@ impl Palette {
                 ring: "#7C4FFF",
                 text: "#FFFFFF",
                 sub: "#E6DDFF",
-                body: "#0B0D14",
-                rim: "#D6C7FF",
-                shadow: "#4818C6",
                 floor: "#A88CFF",
             },
             Self::Ink => Colors {
@@ -126,20 +62,8 @@ impl Palette {
                 ring: "#182038",
                 text: "#F3F5FA",
                 sub: "#8FAAFF",
-                body: "#2F5BFF",
-                rim: "#B9CAFF",
-                shadow: "#111833",
                 floor: "#2A3A72",
             },
-        }
-    }
-}
-
-impl Pose {
-    fn rows(self) -> &'static [&'static str] {
-        match self {
-            Self::Handstand => &HANDSTAND,
-            Self::Toprock => &TOPROCK,
         }
     }
 }
@@ -288,15 +212,13 @@ pub struct FlyerOptions<'a> {
     pub uid: &'a str,
 }
 
-/// Palette and pose seeded from the jam id: `sha1(id)` as an integer, `% 3` and `/ 3 % 2`.
-pub fn seed(jam_id: &str) -> (Palette, Pose) {
-    // Only the value modulo 6 matters: h % 3 == (h % 6) % 3 and (h / 3) % 2 == (h % 6) / 3.
+/// Palette seeded from the jam id: `sha1(id)` as an integer, `% 3`.
+pub fn seed(jam_id: &str) -> Palette {
+    // Only the remainder matters, so the 160-bit integer is never built.
     let rest = Sha1::digest(jam_id.as_bytes())
         .iter()
-        .fold(0u32, |rest, byte| (rest * 256 + u32::from(*byte)) % 6);
-    let palette = [Palette::Klein, Palette::Violet, Palette::Ink][(rest % 3) as usize];
-    let pose = [Pose::Handstand, Pose::Toprock][(rest / 3) as usize];
-    (palette, pose)
+        .fold(0u32, |rest, byte| (rest * 256 + u32::from(*byte)) % 3);
+    [Palette::Klein, Palette::Violet, Palette::Ink][rest as usize]
 }
 
 /// Breaks a name into lines that fit (character-width estimate), trying the sizes in order;
@@ -450,64 +372,8 @@ fn pixel_rings(
     out
 }
 
-fn sprite(pose: Pose, origin: (u32, u32), cell: u32, colors: &Colors) -> String {
-    let (x0, y0) = origin;
-    let rows = pose.rows();
-    let mut out = String::new();
-    // Shadow: the same shape one cell down and right.
-    for (y, row) in rows.iter().enumerate() {
-        for (x, ch) in row.chars().enumerate() {
-            if ch == 'X' {
-                let _ = write!(
-                    out,
-                    r#"<rect x="{}" y="{}" width="{cell}" height="{cell}" fill="{}"></rect>"#,
-                    x0 + (x as u32 + 1) * cell,
-                    y0 + (y as u32 + 1) * cell,
-                    colors.shadow
-                );
-            }
-        }
-    }
-    let rim = (cell / 3).max(2);
-    for (y, row) in rows.iter().enumerate() {
-        let cells: Vec<char> = row.chars().collect();
-        let mut x = 0;
-        while x < cells.len() {
-            if cells[x] != 'X' {
-                x += 1;
-                continue;
-            }
-            let mut x1 = x;
-            while x1 + 1 < cells.len() && cells[x1 + 1] == 'X' {
-                x1 += 1;
-            }
-            let (left, right, top) = (x as u32, x1 as u32, y as u32);
-            let _ = write!(
-                out,
-                r#"<rect x="{}" y="{}" width="{}" height="{cell}" fill="{}"></rect>"#,
-                x0 + left * cell,
-                y0 + top * cell,
-                (right - left + 1) * cell,
-                colors.body
-            );
-            // Rim light on the right edge of each run.
-            let _ = write!(
-                out,
-                r#"<rect x="{}" y="{}" width="{rim}" height="{cell}" fill="{}"></rect>"#,
-                x0 + right * cell + cell - rim,
-                y0 + top * cell,
-                colors.rim
-            );
-            x = x1 + 1;
-        }
-    }
-    out
-}
-
 /// The 4:5 flyer (400×500 viewBox), filling its container.
-pub fn flyer_svg(text: &FlyerText, look: (Palette, Pose), options: FlyerOptions) -> String {
-    // No pixel art on the flyer itself (DESIGN.md §4.24); the pose only draws the share image.
-    let (palette, _) = look;
+pub fn flyer_svg(text: &FlyerText, palette: Palette, options: FlyerOptions) -> String {
     let p = palette.colors();
     let uid = options.uid;
     let (w, h) = (400, 500);
@@ -620,8 +486,7 @@ pub fn flyer_svg(text: &FlyerText, look: (Palette, Pose), options: FlyerOptions)
 }
 
 /// The 1200×630 share image, filling its container.
-pub fn og_svg(text: &FlyerText, look: (Palette, Pose), uid: &str) -> String {
-    let (palette, pose) = look;
+pub fn og_svg(text: &FlyerText, palette: Palette, uid: &str) -> String {
     let p = palette.colors();
     let text = text.with_cats_fitted(OG_CATS_CHARS);
     let (w, h) = (1200, 630);
@@ -646,7 +511,6 @@ pub fn og_svg(text: &FlyerText, look: (Palette, Pose), uid: &str) -> String {
             p.floor
         );
     }
-    s += &sprite(pose, (800, floor_y - pose.rows().len() as u32 * 16), 16, &p);
     let _ = write!(
         s,
         r##"<defs><linearGradient id="{uid}v" x1="0" y1="0" x2="0" y2="1"><stop offset=".6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity=".4"></stop></linearGradient></defs><rect width="{w}" height="{h}" fill="url(#{uid}v)"></rect>"##

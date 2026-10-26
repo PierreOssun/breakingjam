@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { TestSiteBanner } from "./TestSiteBanner";
 import { ToastProvider } from "./Toast";
 
 function SkipLink() {
@@ -22,6 +23,7 @@ export function PageLayout() {
     <ToastProvider>
       <div className="flex min-h-dvh flex-col">
         <SkipLink />
+        <TestSiteBanner />
         <Header />
         <main id="main" tabIndex={-1} className="focus:outline-none flex-1">
           <Outlet />
@@ -38,6 +40,7 @@ export function AppLayout() {
     <ToastProvider>
       <div className="flex h-dvh flex-col overflow-hidden">
         <SkipLink />
+        <TestSiteBanner />
         <Header sticky={false} />
         <main
           id="main"

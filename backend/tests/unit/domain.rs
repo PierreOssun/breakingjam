@@ -4,9 +4,17 @@ mod battle;
 mod claim;
 mod dancer;
 mod event;
+mod place;
 mod user;
 
 use crate::domain::*;
+
+#[test]
+fn fold_drops_case_and_accents() {
+    assert_eq!(fold("Zürich"), "zurich");
+    assert_eq!(fold("Łódź"), "lodz");
+    assert_eq!(fold("GENÈVE"), "geneve");
+}
 
 #[test]
 fn instagram_handle_shapes() {

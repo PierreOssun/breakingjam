@@ -19,6 +19,10 @@
   "footer": {
     "links": "Site links"
   },
+  "testSite": {
+    "notice": "Test site — demo data, not real jams",
+    "close": "Close the test-site notice"
+  },
   "auth": {
     "login": {
       "title": "Log in",
@@ -681,9 +685,14 @@
   "search": {
     "jams": "Jams",
     "people": "People",
-    "noJams": "No jam matches “{{q}}”.",
-    "noUpcoming": "No upcoming jams yet.",
-    "allOnMap": "See all on the map"
+    "allOnMap": "See all on the map",
+    "near": {
+      "title": "Near {{place}}",
+      "closest": "No jam in {{place}} yet. Here are the closest.",
+      "none": "No upcoming jams within {{km}} km of {{place}}.",
+      "openMap": "Open the map around {{place}}"
+    },
+    "nothing": "Nothing matches “{{q}}”."
   },
   "jams": {
     "count_one": "{{count}} jam",
