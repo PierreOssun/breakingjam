@@ -32,7 +32,10 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Organizer>> {
 pub async fn reference(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<OrganizerRef>> {
     sqlx::query_as!(
         OrganizerRef,
-        r#"select id, display_name, instagram_handle, verified_at is not null as "verified!"
+        r#"select id, display_name, instagram_handle, verified_at is not null as "verified!",
+                  (select count(*) from events e
+                   where e.organizer_id = app_users.id and e.deleted_at is null
+                     and e.status not in ('draft', 'in_review')) as "jams!"
            from app_users where id = $1 and role not in ('seed_admin', 'admin')"#,
         id,
     )
@@ -44,7 +47,10 @@ pub async fn reference(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Organizer
 pub async fn references(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, OrganizerRef>> {
     let refs = sqlx::query_as!(
         OrganizerRef,
-        r#"select id, display_name, instagram_handle, verified_at is not null as "verified!"
+        r#"select id, display_name, instagram_handle, verified_at is not null as "verified!",
+                  (select count(*) from events e
+                   where e.organizer_id = app_users.id and e.deleted_at is null
+                     and e.status not in ('draft', 'in_review')) as "jams!"
            from app_users where id = any($1) and role not in ('seed_admin', 'admin')"#,
         ids,
     )

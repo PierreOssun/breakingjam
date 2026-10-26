@@ -247,6 +247,25 @@ export function nearestJams(
     .sort((a, b) => a.starts_on.localeCompare(b.starts_on));
 }
 
+/** The jam page's "More jams coming up": up to 4 upcoming jams other than `jam`, the nearest
+ * first, or the soonest when it has no pin. */
+export function otherJams(
+  jams: MapJam[],
+  jam: { id: string; lng?: number | null; lat?: number | null },
+  today: Date,
+): MapJam[] {
+  const { lng, lat } = jam;
+  const others = jams.filter((j) => j.id !== jam.id && !isPast(j, today));
+  if (lng != null && lat != null) {
+    others.sort(
+      (a, b) => distanceKm({ lng, lat }, a) - distanceKm({ lng, lat }, b),
+    );
+  } else {
+    others.sort(byDate(today));
+  }
+  return others.slice(0, 4);
+}
+
 function centreOf([west, south, east, north]: Bounds) {
   return { lng: (west + east) / 2, lat: (south + north) / 2 };
 }

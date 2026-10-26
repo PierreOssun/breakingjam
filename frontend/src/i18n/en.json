@@ -119,16 +119,12 @@
     "dates": "Dates",
     "venue": "Venue",
     "instagram": "Instagram",
-    "openInMaps": "Open in maps",
     "register": "Register to battle",
     "battles": "Battles",
     "lineup": "Lineup",
     "about": "About",
     "noBattles": "No battles announced yet.",
     "noEntries": "No one has entered yet.",
-    "spotsLeft_one": "{{count}} spot left",
-    "spotsLeft_other": "{{count}} spots left",
-    "full": "Full",
     "watch": "Watch {{name}}",
     "roles": {
       "judge": "Judges",
@@ -143,7 +139,56 @@
     "website": "Website",
     "email": "Email",
     "battleStart": "Starts {{when}}",
-    "flyerAlt": "Flyer of {{name}}"
+    "flyerAlt": "Flyer of {{name}}",
+    "countdown": {
+      "days_one": "In {{count}} day",
+      "days_other": "In {{count}} days",
+      "tomorrow": "Tomorrow",
+      "today": "Today",
+      "live": "Live now"
+    },
+    "startsAt": "from {{time}}",
+    "prizes": "{{amount}} in prizes",
+    "whosIn": {
+      "dancers_one": "{{count}} dancer in",
+      "dancers_other": "{{count}} dancers in",
+      "noDancers": "No dancers in yet",
+      "judges_one": "{{count}} judge",
+      "judges_other": "{{count}} judges",
+      "dj": "DJ {{name}}",
+      "djs": "{{count}} DJs",
+      "mc": "MC {{name}}",
+      "mcs": "{{count}} MCs"
+    },
+    "calendar": "Add to calendar",
+    "results": "See results",
+    "shareJam": "Share this jam",
+    "caption": {
+      "open": "Spectators welcome · registration is open",
+      "closed": "Spectators welcome · registration is closed",
+      "spectators": "Spectators welcome",
+      "cancelled": "This jam is called off."
+    },
+    "when": "When",
+    "where": "Where",
+    "info": "Info",
+    "directions": "Directions",
+    "moreJams": "More jams coming up",
+    "seeMap": "See the map",
+    "organiserJams_one": "{{count}} jam on BreakingJam",
+    "organiserJams_other": "{{count}} jams on BreakingJam",
+    "entrants": {
+      "dancers": "{{count}} / {{max}} dancers",
+      "teams": "{{count}} / {{max}} teams",
+      "dancersNoMax_one": "{{count}} dancer",
+      "dancersNoMax_other": "{{count}} dancers",
+      "teamsNoMax_one": "{{count}} team",
+      "teamsNoMax_other": "{{count}} teams"
+    },
+    "format": {
+      "top": "Top {{n}}",
+      "sevenToSmoke": "7 to Smoke"
+    }
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -265,6 +310,8 @@
     },
     "fields": {
       "name": "Jam name",
+      "oneDay": "One-day jam",
+      "date": "Date",
       "startsOn": "First day",
       "endsOn": "Last day",
       "timezone": "Timezone",

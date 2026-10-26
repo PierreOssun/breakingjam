@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, display_name, instagram_handle, verified_at is not null as \"verified!\"\n           from app_users where id = any($1) and role not in ('seed_admin', 'admin')",
+  "query": "select id, display_name, instagram_handle, verified_at is not null as \"verified!\",\n                  (select count(*) from events e\n                   where e.organizer_id = app_users.id and e.deleted_at is null\n                     and e.status not in ('draft', 'in_review')) as \"jams!\"\n           from app_users where id = any($1) and role not in ('seed_admin', 'admin')",
   "describe": {
     "columns": [
       {
@@ -41,6 +41,12 @@
         "name": "verified!",
         "type_info": "Bool",
         "origin": "Expression"
+      },
+      {
+        "ordinal": 4,
+        "name": "jams!",
+        "type_info": "Int8",
+        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -52,8 +58,9 @@
       false,
       false,
       true,
+      null,
       null
     ]
   },
-  "hash": "80c92d91dfc19a47a4e3d1cfd82ea1be25b7a2fc7b10a83ed056695bd29b7e22"
+  "hash": "a085cd16c46961fddceb7a4945461d31c4a41a8070aca9bf9f3baa18ae74a319"
 }

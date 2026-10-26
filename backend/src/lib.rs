@@ -2,6 +2,7 @@
 
 pub mod api;
 pub mod auth;
+pub mod calendar;
 pub mod config;
 pub mod dataset;
 pub mod db;

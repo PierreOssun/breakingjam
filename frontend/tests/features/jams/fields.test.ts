@@ -12,7 +12,11 @@ import {
   formatOffset,
   parseOffset,
 } from "../../../src/features/jams/entryFields";
-import { emptyJam, jamBody } from "../../../src/features/jams/jamFields";
+import {
+  emptyJam,
+  jamBody,
+  jamValues,
+} from "../../../src/features/jams/jamFields";
 
 describe("jam fields", () => {
   it("trims, and sends blanks as null", () => {
@@ -43,6 +47,31 @@ describe("jam fields", () => {
 });
 
 const DAY = "2030-06-01";
+
+describe("one-day jams", () => {
+  it("send their single date as both days", () => {
+    const body = jamBody({
+      ...emptyJam(),
+      one_day: true,
+      starts_on: "2030-06-08",
+      ends_on: "2030-06-12",
+    });
+    expect([body.starts_on, body.ends_on]).toEqual([
+      "2030-06-08",
+      "2030-06-08",
+    ]);
+  });
+
+  it("open ticked when the stored days are the same", () => {
+    const jam = { ...emptyJam(), starts_on: "2030-06-08" } as never;
+    expect(
+      jamValues({ ...(jam as object), ends_on: "2030-06-08" } as never).one_day,
+    ).toBe(true);
+    expect(
+      jamValues({ ...(jam as object), ends_on: "2030-06-09" } as never).one_day,
+    ).toBe(false);
+  });
+});
 
 describe("battle fields", () => {
   it("sends a start only with a time, on the chosen day", () => {

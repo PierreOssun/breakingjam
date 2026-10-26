@@ -9,6 +9,11 @@ import {
   renderApp,
 } from "../support/app";
 
+// jsdom has no WebGL: the venue's mini map is a stand-in.
+vi.mock("../../src/features/jams/VenueMap", () => ({
+  default: () => <div>Venue map</div>,
+}));
+
 const at = "2026-10-01T10:00:00Z";
 const JAM = {
   id: "01920000-0000-7000-8000-00000000e001",
@@ -36,6 +41,7 @@ const JAM = {
   organizer: {
     id: "01920000-0000-7000-8000-0000000000a1",
     display_name: "Floor Lords e.V.",
+    jams: 3,
     instagram_handle: "floor.lords",
     verified: true,
   },
@@ -170,13 +176,13 @@ describe("JamPage", () => {
       main.getAllByText(/Saturday,? 1.+Sunday,? 2 June 2030/).length,
     ).toBeGreaterThan(0);
     expect(main.getByText("Le Hangar · Paris, France")).toBeInTheDocument();
-    expect(main.getByRole("link", { name: "pariscypher.com" })).toHaveAttribute(
-      "href",
-      "https://www.pariscypher.com/",
-    );
-    expect(
-      main.getByRole("link", { name: "hello@pariscypher.com" }),
-    ).toHaveAttribute("href", "mailto:hello@pariscypher.com");
+    // In the desktop facts grid and under Info on phones; CSS shows one of them.
+    for (const link of main.getAllByRole("link", { name: "pariscypher.com" }))
+      expect(link).toHaveAttribute("href", "https://www.pariscypher.com/");
+    for (const link of main.getAllByRole("link", {
+      name: "hello@pariscypher.com",
+    }))
+      expect(link).toHaveAttribute("href", "mailto:hello@pariscypher.com");
     expect(main.getByText(/Open floor\./)).toBeInTheDocument();
 
     // The inlined SVG names itself (DESIGN.md §4.24); the page adds no second label.
@@ -185,9 +191,15 @@ describe("JamPage", () => {
     });
     expect(flyer.tagName.toLowerCase()).toBe("svg");
 
+    // Not an Apple device in jsdom: Google Maps.
     expect(
-      main.getByRole("link", { name: "Open in maps" }).getAttribute("href"),
-    ).toContain("mlat=48.8566");
+      main.getByRole("link", { name: "Directions" }).getAttribute("href"),
+    ).toContain("destination=48.8566,2.3522");
+
+    // Who's in: four dancers (the withdrawn one left out), a judge and the DJ.
+    const whosIn = await main.findByRole("link", { name: /4 dancers in/ });
+    expect(whosIn).toHaveAttribute("href", "#battles");
+    expect(whosIn).toHaveTextContent("1 judge · DJ Spin");
 
     // DESIGN.md §6 item 9: the organiser, verified, and a way to reach them.
     const organiser = main
@@ -203,8 +215,12 @@ describe("JamPage", () => {
       within(organiser).getByRole("img", { name: "Verified" }),
     ).toBeInTheDocument();
     expect(
+      within(organiser).getByText("3 jams on BreakingJam · @floor.lords"),
+    ).toBeInTheDocument();
+    // The jam's public email, as it has one; an Instagram DM otherwise.
+    expect(
       within(organiser).getByRole("link", { name: "Contact" }),
-    ).toHaveAttribute("href", "https://ig.me/m/floor.lords");
+    ).toHaveAttribute("href", "mailto:hello@pariscypher.com");
     // Only its writers get the edit link and the flyer buttons.
     expect(main.queryByRole("link", { name: "Edit jam" })).toBeNull();
     expect(main.queryByRole("button", { name: "Upload a flyer" })).toBeNull();
@@ -288,19 +304,18 @@ describe("JamPage", () => {
     const solo = (
       await main.findByRole("heading", { name: "1v1 Bboy" })
     ).closest("li")!;
+    // One wrapping row of chips, the winner first with the podium badge inside its chip.
     const names = await within(solo).findAllByRole("link");
-    expect(names.map((a) => a.textContent)).toEqual(["Lil G", "Ventus"]);
+    expect(names.map((a) => a.textContent)).toEqual(["Lil G 1st", "Ventus"]);
     expect(names[0]).toHaveAttribute("href", "/dancers/d1");
-    expect(within(solo).getByText("1st")).toBeInTheDocument();
-    expect(within(solo).getByText("Top 8")).toBeInTheDocument();
-    expect(within(solo).getByText("14 spots left")).toBeInTheDocument();
+    // Only the podium gets a badge on the visitors' chips.
+    expect(within(solo).queryByText("Top 8")).not.toBeInTheDocument();
+    expect(within(solo).getByText("2 / 16 dancers")).toBeInTheDocument();
     expect(within(solo).queryByText("Ghost")).not.toBeInTheDocument();
 
     const duo = main.getByRole("heading", { name: "2v2 Mixed" }).closest("li")!;
-    expect(
-      await within(duo).findByText("Floor Lords", { selector: "p" }),
-    ).toBeInTheDocument();
-    expect(within(duo).getByText("Full")).toBeInTheDocument();
+    expect(await within(duo).findByText("Floor Lords")).toBeInTheDocument();
+    expect(within(duo).getByText("1 / 1 teams")).toBeInTheDocument();
 
     expect(main.getByRole("heading", { name: "Judges" })).toBeInTheDocument();
     expect(main.getByRole("link", { name: "Sensei Kai" })).toHaveAttribute(
@@ -322,6 +337,31 @@ describe("JamPage", () => {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
     }
+  });
+
+  it("offers the calendar once registration closes", async () => {
+    mockJam({ status: "registration_closed" });
+    renderApp(`/jams/${JAM.slug}`);
+    const calendar = await screen.findAllByRole("link", {
+      name: "Add to calendar",
+    });
+    // The action bar on phones and the action card on desktop.
+    expect(calendar).toHaveLength(2);
+    expect(calendar[0]?.getAttribute("href")).toMatch(
+      new RegExp(`/api/events/${JAM.slug}/calendar\\.ics$`),
+    );
+    expect(
+      screen.queryByRole("link", { name: "Register to battle" }),
+    ).toBeNull();
+  });
+
+  it("points to the results once the jam took place", async () => {
+    mockJam({ status: "completed" });
+    renderApp(`/jams/${JAM.slug}`);
+    const results = await screen.findAllByRole("link", { name: "See results" });
+    for (const link of results)
+      expect(link).toHaveAttribute("href", "#battles");
+    expect(document.getElementById("battles")).toBeInTheDocument();
   });
 
   it("leaves out the organiser, the website, the email and the pitch when there are none", async () => {

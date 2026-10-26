@@ -231,6 +231,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/events/{id}/calendar.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The jam as an iCalendar file, for "Add to calendar": one all-day event over its days. */
+        get: operations["event_calendar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/events/{id}/flyer": {
         parameters: {
             query?: never;
@@ -1746,6 +1763,11 @@ export interface components {
             instagram_handle?: string | null;
             /** @description Whether the handle is confirmed. */
             verified: boolean;
+            /**
+             * Format: int64
+             * @description How many public jams they run on BreakingJam.
+             */
+            jams: number;
         };
         /** @description An organiser page, and whether the caller may edit it. */
         OrganizerResponse: components["schemas"]["Organizer"] & {
@@ -2698,6 +2720,38 @@ export interface operations {
                 };
                 content: {
                     "image/png": components["schemas"]["Png"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    event_calendar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id or slug */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description An iCalendar file with one all-day event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/calendar": string;
                 };
             };
             /** @description No such jam, or a draft you can't see */

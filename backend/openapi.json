@@ -888,6 +888,54 @@
         ]
       }
     },
+    "/api/events/{id}/calendar.ics": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "The jam as an iCalendar file, for \"Add to calendar\": one all-day event over its days.",
+        "operationId": "event_calendar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id or slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An iCalendar file with one all-day event",
+            "content": {
+              "text/calendar": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/events/{id}/flyer": {
       "post": {
         "tags": [
@@ -6280,7 +6328,8 @@
         "required": [
           "id",
           "display_name",
-          "verified"
+          "verified",
+          "jams"
         ],
         "properties": {
           "id": {
@@ -6302,6 +6351,11 @@
           "verified": {
             "type": "boolean",
             "description": "Whether the handle is confirmed."
+          },
+          "jams": {
+            "type": "integer",
+            "format": "int64",
+            "description": "How many public jams they run on BreakingJam."
           }
         }
       },

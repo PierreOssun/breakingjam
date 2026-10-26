@@ -1,4 +1,5 @@
 import { Plus, X } from "@phosphor-icons/react";
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 import type { Schemas } from "../../api/client";
 import { DancerAvatar } from "./DancerAvatar";
@@ -7,21 +8,25 @@ type DancerChipProps = {
   dancer: Schemas["DancerRef"];
   /** For the jam's organiser: a remove button named by `label`. */
   remove?: { label: string; onClick: () => void; disabled?: boolean };
+  /** A result badge after the name, for a podium place (§4.13). */
+  badge?: ReactNode;
 };
 
 /** A link chip to a dancer page, with their avatar (DESIGN.md §4.12). */
-export function DancerChip({ dancer, remove }: DancerChipProps) {
+export function DancerChip({ dancer, remove, badge }: DancerChipProps) {
   return (
     <span className="relative inline-flex h-9 items-center rounded-full border border-border-strong text-body-sm font-bold text-text">
       <Link
         to={`/dancers/${dancer.id}`}
-        className={`inline-flex h-full items-center gap-2 rounded-full pl-1 transition-colors duration-fast hover:bg-surface-raised ${remove ? "pr-2" : "pr-3.5 after:absolute after:-inset-1 after:content-['']"}`}
+        className={`inline-flex h-full items-center gap-2 rounded-full pl-1 transition-colors duration-fast hover:bg-surface-raised ${remove ? "pr-2" : badge ? "pr-1 after:absolute after:-inset-1 after:content-['']" : "pr-3.5 after:absolute after:-inset-1 after:content-['']"}`}
       >
         {/* The name says who it is; the avatar is decoration here. */}
         <span aria-hidden className="inline-flex">
           <DancerAvatar dancer={dancer} size="chip" />
         </span>
         {dancer.dancer_name}
+        {badge && " "}
+        {badge}
       </Link>
       {remove && (
         <button

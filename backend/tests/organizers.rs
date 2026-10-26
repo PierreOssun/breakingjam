@@ -62,6 +62,8 @@ async fn organisers_have_a_public_page_with_their_jams(pool: PgPool) {
     let jam_page = send(&app, get(&format!("/api/events/{jam}"), None)).await;
     assert_eq!(jam_page.json["organizer"]["id"], id.as_str());
     assert_eq!(jam_page.json["organizer"]["verified"], false);
+    // "1 jam on BreakingJam": public jams only.
+    assert_eq!(jam_page.json["organizer"]["jams"], 1);
 
     // Accounts that never registered a jam have no page.
     let user = sign_up(&app, "user@example.com").await;

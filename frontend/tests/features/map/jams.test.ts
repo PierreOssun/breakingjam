@@ -12,6 +12,7 @@ import {
   matchesFilters,
   matchesSearch,
   narrow,
+  otherJams,
   rangeOf,
 } from "../../../src/features/map/jams";
 
@@ -239,5 +240,52 @@ describe("map jams", () => {
     expect(
       distanceKm({ lat: 48.8566, lng: 2.3522 }, { lat: 47.3769, lng: 8.5417 }),
     ).toBeCloseTo(487.88, 1);
+  });
+});
+
+describe("more jams coming up", () => {
+  const zurich = jam({ id: "here" });
+  const basel = jam({
+    id: "basel",
+    lng: 7.59,
+    lat: 47.56,
+    starts_on: "2026-11-20",
+    ends_on: "2026-11-20",
+  });
+  const paris = jam({
+    id: "paris",
+    lng: 2.35,
+    lat: 48.86,
+    starts_on: "2026-10-30",
+    ends_on: "2026-10-30",
+  });
+  const past = jam({
+    id: "past",
+    lng: 8.5,
+    lat: 47.4,
+    starts_on: "2026-09-01",
+    ends_on: "2026-09-01",
+  });
+
+  it("lists other upcoming jams, the nearest first", () => {
+    const all = [paris, zurich, past, basel];
+    expect(otherJams(all, zurich, thursday).map((j) => j.id)).toEqual([
+      "basel",
+      "paris",
+    ]);
+  });
+
+  it("falls back to the soonest without a pin", () => {
+    const all = [paris, zurich, past, basel];
+    const unpinned = { id: "here", lng: null, lat: null };
+    expect(otherJams(all, unpinned, thursday).map((j) => j.id)).toEqual([
+      "paris",
+      "basel",
+    ]);
+  });
+
+  it("shows at most four", () => {
+    const many = Array.from({ length: 6 }, (_, i) => jam({ id: `j${i}` }));
+    expect(otherJams(many, zurich, thursday)).toHaveLength(4);
   });
 });

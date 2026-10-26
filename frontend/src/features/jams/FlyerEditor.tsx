@@ -56,7 +56,7 @@ export function FlyerEditor({ jam }: { jam: Jam }) {
 export function FlyerActions({ jam }: { jam: Jam }) {
   const flyer = useFlyerUpload(jam);
   return (
-    <div className="flex flex-col gap-2 px-4 md:px-6 lg:px-0">
+    <div className="flex flex-col gap-2">
       {flyer.input}
       <div className="flex flex-wrap items-center gap-2">
         <FlyerButtons jam={jam} flyer={flyer} />

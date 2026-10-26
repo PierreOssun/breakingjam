@@ -8,6 +8,7 @@ import { IconButton } from "../../components/IconButton";
 import { ShareButton } from "../../components/ShareButton";
 import { StatusBadge } from "../../components/StatusBadge";
 import { formatShortDateRange, localeOf } from "../../lib/dates";
+import { shareTitle } from "../jams/jamDetail";
 import { JamFlyer } from "../jams/JamFlyer";
 import type { MapJam } from "./jams";
 
@@ -54,7 +55,7 @@ export function JamSheet({
   onClose,
   distance,
 }: JamCardProps & { distance: number | null }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const titleId = useId();
   return (
     <section
@@ -77,9 +78,9 @@ export function JamSheet({
           <ArrowRight size={20} weight="bold" aria-hidden />
         </Link>
         <ShareButton
-          title={jam.name}
+          title={shareTitle(jam, i18n.language)}
           url={`${window.location.origin}/jams/${jam.slug}`}
-          iconOnly
+          look="icon"
         />
       </div>
     </section>

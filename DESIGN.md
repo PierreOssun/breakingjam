@@ -346,6 +346,8 @@ One component that changes shape by viewport.
 - Hover: `hover:bg-surface-raised`. Focus: ring.
 - Links to the crew page.
 - **Dancer chip:** the same chip linking to the dancer page, with the 28px avatar (`size-7 rounded-[8px]`, §4.16) at `pl-1 gap-2`. Used for every competitor and lineup member on a jam page. For the jam's organiser it ends with a 28px "Remove …" icon button.
+  - A battle's entries and each lineup group are one **wrapping row** of chips (`flex flex-wrap gap-2`), never a chip per full-width row. A team shows its name, then its members' chips.
+  - A podium place (1st–3rd, §4.13) sits inside the chip after the name, as the result badge at `h-6 px-2`.
 - **Add chip** (organiser only): the same shape with `border-dashed`, a `Plus` 16 and a label ("Add a dancer", "Add a judge"…).
 
 ### 4.13 Result badge
@@ -623,6 +625,35 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
 - **When loading ends:** the content replaces the placeholders, and a section that turns out empty disappears (e.g. Next up with no upcoming jam). On failure the generic error message replaces them, except on the landing, whose sections disappear. A failed refetch never hides content already shown.
 - **Radius:** a placeholder has no default radius; each one sets its own, like the element it stands for.
 
+### 4.30 Countdown chip
+
+- Next to the status badge on the jam page: "In 9 days", "Tomorrow", "Today", "Live now".
+- `inline-flex h-6 items-center rounded-full border border-primary-text/50 bg-primary/[.12] px-2.5 text-caption font-extrabold text-primary-text uppercase`.
+- Counted in the jam's own timezone. **Live now** once its first battle has started, or from its second day when no start is announced. Hidden once the jam is over, completed or cancelled.
+
+### 4.31 "Who's in" card
+
+- Under the meta lines: `flex items-center gap-3 rounded-lg border border-border bg-surface p-3`, the whole card a link down to Battles (to Lineup when only the lineup is known).
+- A stack of the first 6 avatars, 36px rounded squares (`size-9 rounded-[10px]`) overlapping by 10px, each with a 2px `bg` ring.
+- Then "10 dancers in" in bold (each competitor once, withdrawn entries left out) and "2 judges · DJ Krate" in muted (one DJ or MC is named, several are counted), then an `ArrowRight`.
+- Hidden when nobody is listed.
+
+### 4.32 Action bar and action card
+
+- **Action bar** (< lg): along the bottom while the jam is on screen, `bg-bg border-t shadow-lg px-4 pt-3 pb-[max(28px,env(safe-area-inset-bottom))]`. A secondary **Share** (`flex-1`) and the primary action (`flex-[2]`). It is `sticky`, not `fixed`, so it stops before the footer instead of covering it.
+- **Action card** (≥ lg, under the flyer): `bg-surface border rounded-lg p-5 gap-3`: the primary action, a secondary **Share this jam**, and a caption.
+- **The primary action, by the jam's state:**
+
+| State | Primary action | Caption |
+|---|---|---|
+| Registration open (a registration link) | **Register to battle** ↗ | Spectators welcome · registration is open |
+| Announced without a registration link | **Add to calendar** | Spectators welcome |
+| Registration closed | **Add to calendar** | Spectators welcome · registration is closed |
+| Completed | **See results** (to Battles) | — |
+| Cancelled | none, Share only | This jam is called off. |
+
+- **Add to calendar** opens the API's `.ics` (`GET /api/events/{slug}/calendar.ics`): one all-day event over the jam's days, at its venue, with the page's link.
+
 ---
 
 ## 5. Layout rules
@@ -640,10 +671,10 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
   - **≥ lg:** a 400px left panel (`border-r`, scrolls on its own: search, filter chips, result count, row cards) next to the map. Popups are anchored. Zoom and locate controls sit top-right as a 44px icon-button group (`rounded-md shadow-md`).
   - **< lg:** a full-bleed map with floating search and filter button at `top-3 inset-x-4`, plus a horizontally scrolling chip row below. A **List** pill sits bottom-left and locate bottom-right, 16px above the sheet. The popup becomes the bottom sheet. **List** opens a full-screen list that has a **Map** pill to return.
   - Filter chips: `h-11 px-3.5 rounded-full border border-border-strong text-body-sm font-semibold`. Active: `bg-text text-bg border-text`.
-- **Jam detail:** ≥ lg uses `grid grid-cols-[440px_1fr] gap-16`.
-  - Left column: flyer (4:5, `rounded-lg`), then the registration card. Make it `lg:sticky lg:top-24`.
-  - Right column (`max-w-prose`): badge, title, facts, Battles, Lineup, About, Venue, Organiser.
-  - < lg: the flyer runs full-bleed under the back bar, the content follows in one column, and a sticky bottom bar holds the fee and **Register to battle**.
+- **Jam detail:** ≥ lg uses `grid grid-cols-[420px_1fr] gap-14`.
+  - Left column, `lg:sticky lg:top-6`: the flyer (4:5, `rounded-lg`), then the action card (§4.32).
+  - Right column (`max-w-prose`): badges, title, meta, "Who's in", facts, then the sections (§6 Jam detail).
+  - < lg: the flyer sits inset (`mx-4 rounded-lg`) under the back bar, the content follows in one column, and the action bar (§4.32) runs along the bottom.
 
 ---
 
@@ -697,20 +728,29 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Mobile:** a dark full-bleed map under a 56px header, with the floating search pill, a filter button (dot when filters are active) and the chip row. The selected marker is 28px with a date tag. The bottom sheet is up, showing the flyer, date, title, distance, badge, categories, **View jam** and Share. **List** and locate float above the sheet.
 - **Desktop:** the 400px side panel (search set to "Zurich", chips, "6 jams in this area", row cards with the selected one highlighted) next to the map. The anchored 320px popup sits above the selected marker, with zoom and locate top-right and attribution bottom-right.
 
-**Jam detail.**
-- **Mobile:**
-  1. Back bar (← Map, Share).
-  2. Full-bleed 4:5 flyer, with the flyer buttons under it for the jam's writers (§4.28).
-  3. Badge and deadline caption, then the `display-lg` title.
-  4. Fact rows for date/time, venue, fees, website (`Globe`, the host as label, ↗) and email (`EnvelopeSimple`, a `mailto:` link), then Instagram, each with a `primary-text` icon.
-  5. **Battles** list: category, format and spots, or "Full" in muted; the start under the name when set (`Clock` 16 in `primary-text`, "Starts 14:30" muted, or "Starts Sat 23 Sept, 14:30" when the jam runs several days); cash prizes under the name (`Trophy` 16 in `primary-text`, "1st CHF 1,000 · 2nd CHF 500" muted); entries as dancer chips, best result first.
-  6. **Lineup:** dancer chips for judges, DJ and MC.
-  - For the jam's organiser, people are managed here: an add chip under each battle and per lineup role, edit and delete on each entry, remove on each chip. Battles themselves are edited in the jam editor.
-  7. **About:** the organiser's pitch, up to 200 characters.
-  8. **Venue:** mini map and "Open in maps ↗".
-  9. **Organiser** card with **Contact**. Left out when the BreakingJam team entered the jam: the team lists jams it doesn't run.
-  10. Sticky bottom bar: fee and primary **Register to battle**.
-- **Desktop:** two columns. The left holds the flyer and the registration card (fees, deadline, lg primary CTA). The right holds the `display-2xl` title, a 2-column fact grid and the same sections.
+**Jam detail** (`/jams/<slug>`, v2 in M21): the most shared page, built for people arriving from Instagram or WhatsApp on a phone.
+- **Mobile 375:**
+  1. Back bar: ghost **← Map**, **Edit jam** for its writers, and Share as an icon button.
+  2. The 4:5 flyer, inset `mx-4 rounded-lg`, with the flyer buttons under it for the jam's writers (§4.28).
+  3. The status badge and the countdown chip (§4.30).
+  4. The title, `display-lg` (`display-2xl` from lg).
+  5. **Meta lines**, each with a `primary-text` icon: the date, with "from 14:00" when a battle start is announced (jams have days, not times); the flag, city and country; all cash prizes together, "€1,750 in prizes", when there are any.
+  6. **"Who's in"** (§4.31).
+  7. **Battles** (`#battles`): one card per battle, `bg-surface border rounded-lg p-5`.
+     - Header: the name in `display-sm`; "Starts 14:00" (`Clock`) and "8 / 16 dancers" (`UsersThree`, teams for team battles) in muted; the prize line with `Trophy`; the format as a meta tag on the right ("Top 8", "7 to Smoke").
+     - Entries: dancer chips in a wrapping row (§4.12), best result first; the podium gets its badge inside the chip; a play icon button when an entry has a video.
+     - For the jam's organiser: a row per entry instead, withdrawn ones included, with edit, delete and video buttons, and an add chip under each battle.
+  8. **Lineup** (`#lineup`): judges, DJ, MC, hosts, staff, each a `label` and a wrapping row of chips; stacked on phones, side by side from lg. The organiser removes and adds people here.
+  9. **About:** the organiser's pitch, up to 200 characters.
+  10. **Info** (phones only): website (the host as label, ↗), email (`mailto:`) and Instagram; desktop has them in the facts grid.
+  11. **Venue:** a static mini map (MapLibre, not interactive, the map page's style), `rounded-lg`, 170px tall (220px from lg), with the selected marker centred. Under it the address, then a secondary sm **Directions** opening Apple Maps on Apple devices and Google Maps elsewhere. Without a pin: the address only.
+  12. **Organiser:** a card with a 52px rounded-square initials avatar (a logo once organisers have one), the name in bold with the verified tick, "N jams on BreakingJam · @handle" in muted, and a secondary sm **Contact** (the jam's public email, else an Instagram DM). On phones it wraps and the button goes full width. Left out when the BreakingJam team entered the jam: the team lists jams it doesn't run.
+  13. **More jams coming up:** up to 4 other upcoming jams, the nearest first (the soonest when this one has no pin), as grid cards (§4.3): a scroll of 200px cards on phones, 4 columns from lg, with **See the map →**. Hidden when there are none.
+  14. The action bar (§4.32).
+  - At 375×812 the flyer, badges, title, date, city and the action bar show without scrolling.
+- **Desktop:** two columns (§5). Under the flyer, the action card (§4.32). The meta lines run as one inline row, and a facts grid (When, Where, Website, Email, Instagram) follows "Who's in".
+- **Share** (the top bar, the action bar, the action card): the system share sheet with `{ title: "<Jam> · <Wed 4 Nov> · <City>", url }` where there is one (cancelling isn't an error); else the link is copied with the toast "Link copied" (§4.8).
+- **Link previews** (Open Graph, set by the Worker): `og:title` is "<Jam> · <Wed 4 Nov> · <City>", `og:description` the battles + "on BreakingJam", `og:image` the uploaded flyer at card size, else the generated share image.
 
 **Dancer page** (`/d/<slug>`). It's a record, not a social profile: no feed, followers, ratings, rankings or win/loss.
 - **Mobile 375:**

@@ -185,6 +185,39 @@ async fn update_is_for_owner_and_seed_admin_and_keeps_the_slug(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn calendar_file_is_one_all_day_event_over_the_jams_days(pool: PgPool) {
+    let app = app(pool.clone());
+    let cookie = sign_up(&app, "org@example.com").await;
+    let id = draft_id(&app, &cookie, jam("Paris; Cypher, Sessions")).await;
+    let uri = format!("/api/events/{id}/calendar.ics");
+    // A draft is as hidden here as on its page.
+    assert_eq!(
+        send(&app, get(&uri, None)).await.status,
+        StatusCode::NOT_FOUND
+    );
+    publish(&app, &pool, &id, &cookie).await;
+
+    let file = send(&app, get(&uri, None)).await;
+    assert_eq!(file.status, StatusCode::OK);
+    assert_eq!(file.headers["content-type"], "text/calendar; charset=utf-8");
+    assert!(
+        file.headers["content-disposition"]
+            .to_str()
+            .unwrap()
+            .starts_with("attachment")
+    );
+    let ics = String::from_utf8(file.bytes).unwrap();
+    assert!(ics.starts_with("BEGIN:VCALENDAR\r\nVERSION:2.0\r\n"));
+    assert!(ics.contains("\r\nDTSTART;VALUE=DATE:20300601\r\n"));
+    // The end is exclusive: the jam's last day is 2 June.
+    assert!(ics.contains("\r\nDTEND;VALUE=DATE:20300603\r\n"));
+    assert!(ics.contains("\r\nSUMMARY:Paris\\; Cypher\\, Sessions\r\n"));
+    assert!(ics.contains("\r\nLOCATION:Le Hangar\\, Paris\\, FR\r\n"));
+    assert!(ics.contains(&format!("\r\nUID:{id}@breakingjam.com\r\n")));
+    assert!(ics.ends_with("END:VEVENT\r\nEND:VCALENDAR\r\n"));
+}
+
+#[sqlx::test]
 async fn jams_the_team_entered_name_no_organiser(pool: PgPool) {
     let app = app(pool.clone());
     let team = sign_up(&app, "team@example.com").await;

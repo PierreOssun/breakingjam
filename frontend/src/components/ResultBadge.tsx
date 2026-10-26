@@ -2,20 +2,26 @@ import { useTranslation } from "react-i18next";
 import type { Schemas } from "../api/client";
 import { resultOf } from "../features/jams/result";
 
-const base =
-  "inline-flex h-7 min-w-[60px] shrink-0 items-center justify-center rounded-full px-2.5 text-caption font-extrabold";
+const SIZES = {
+  md: "h-7 min-w-[60px] px-2.5",
+  // Inside a dancer chip (§4.12).
+  sm: "h-6 px-2",
+};
 
 /** 1st / 2nd / 3rd filled, Top N outlined, Prelims muted; nothing when unknown (DESIGN.md §4.13). */
 export function ResultBadge({
   finalRank,
   reached,
+  size = "md",
 }: {
   finalRank?: number | null;
   reached?: Schemas["BracketStage"] | null;
+  size?: keyof typeof SIZES;
 }) {
   const { t } = useTranslation();
   const result = resultOf(finalRank, reached);
   if (!result) return null;
+  const base = `inline-flex shrink-0 items-center justify-center rounded-full text-caption font-extrabold ${SIZES[size]}`;
   if (result.kind === "podium") {
     const label = {
       1: t("result.rank1"),

@@ -119,16 +119,12 @@
     "dates": "Daten",
     "venue": "Ort",
     "instagram": "Instagram",
-    "openInMaps": "In Karten öffnen",
     "register": "Zum Battle anmelden",
     "battles": "Battles",
     "lineup": "Line-up",
     "about": "Über die Jam",
     "noBattles": "Noch keine Battles angekündigt.",
     "noEntries": "Noch niemand angemeldet.",
-    "spotsLeft_one": "{{count}} Platz frei",
-    "spotsLeft_other": "{{count}} Plätze frei",
-    "full": "Voll",
     "watch": "{{name}} ansehen",
     "roles": {
       "judge": "Judges",
@@ -143,7 +139,56 @@
     "website": "Website",
     "email": "E-Mail",
     "battleStart": "Beginn {{when}}",
-    "flyerAlt": "Flyer von {{name}}"
+    "flyerAlt": "Flyer von {{name}}",
+    "countdown": {
+      "days_one": "In {{count}} Tag",
+      "days_other": "In {{count}} Tagen",
+      "tomorrow": "Morgen",
+      "today": "Heute",
+      "live": "Läuft gerade"
+    },
+    "startsAt": "ab {{time}}",
+    "prizes": "{{amount}} Preisgeld",
+    "whosIn": {
+      "dancers_one": "{{count}} Tänzer:in dabei",
+      "dancers_other": "{{count}} Tänzer:innen dabei",
+      "noDancers": "Noch niemand angemeldet",
+      "judges_one": "{{count}} Jury-Mitglied",
+      "judges_other": "{{count}} Jury-Mitglieder",
+      "dj": "DJ {{name}}",
+      "djs": "{{count}} DJs",
+      "mc": "MC {{name}}",
+      "mcs": "{{count}} MCs"
+    },
+    "calendar": "Zum Kalender hinzufügen",
+    "results": "Ergebnisse ansehen",
+    "shareJam": "Diesen Jam teilen",
+    "caption": {
+      "open": "Zuschauer:innen willkommen · Anmeldung offen",
+      "closed": "Zuschauer:innen willkommen · Anmeldung geschlossen",
+      "spectators": "Zuschauer:innen willkommen",
+      "cancelled": "Dieser Jam ist abgesagt."
+    },
+    "when": "Wann",
+    "where": "Wo",
+    "info": "Infos",
+    "directions": "Route",
+    "moreJams": "Weitere Jams",
+    "seeMap": "Zur Karte",
+    "organiserJams_one": "{{count}} Jam auf BreakingJam",
+    "organiserJams_other": "{{count}} Jams auf BreakingJam",
+    "entrants": {
+      "dancers": "{{count}} / {{max}} Tänzer:innen",
+      "teams": "{{count}} / {{max}} Teams",
+      "dancersNoMax_one": "{{count}} Tänzer:in",
+      "dancersNoMax_other": "{{count}} Tänzer:innen",
+      "teamsNoMax_one": "{{count}} Team",
+      "teamsNoMax_other": "{{count}} Teams"
+    },
+    "format": {
+      "top": "Top {{n}}",
+      "sevenToSmoke": "7 to Smoke"
+    }
   },
   "dancer": {
     "aka": "aka {{names}}",
@@ -265,6 +310,8 @@
     },
     "fields": {
       "name": "Name der Jam",
+      "oneDay": "Eintägiger Jam",
+      "date": "Datum",
       "startsOn": "Erster Tag",
       "endsOn": "Letzter Tag",
       "timezone": "Zeitzone",

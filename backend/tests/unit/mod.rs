@@ -3,6 +3,7 @@
 
 mod api;
 mod auth;
+mod calendar;
 mod config;
 mod dataset;
 mod db;

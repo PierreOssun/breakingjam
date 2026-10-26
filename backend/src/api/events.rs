@@ -5,11 +5,11 @@ use axum::{
     extract::{Path, Query, State},
     http::{
         StatusCode,
-        header::{CACHE_CONTROL, CONTENT_TYPE},
+        header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE},
     },
     response::{IntoResponse, Response},
 };
-use chrono::NaiveDate;
+use chrono::{NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -21,6 +21,7 @@ use super::{
 };
 use crate::{
     auth::session::{CurrentUser, MaybeUser},
+    calendar,
     db::{self, events::MapPoint},
     domain::{
         battle::{Battle, Category, starts_during},
@@ -41,6 +42,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(transition))
         .routes(routes!(flyer_svg))
         .routes(routes!(og_png))
+        .routes(routes!(calendar_ics))
 }
 
 /// Query of `GET /events`.
@@ -495,6 +497,39 @@ async fn og_png(
         .map_err(|err| AppError::Internal(err.into()))?
         .map_err(|err| AppError::Internal(err.into()))?;
     Ok(([(CACHE_CONTROL, cache_control(&event))], Png(png)).into_response())
+}
+
+/// The jam as an iCalendar file, for "Add to calendar": one all-day event over its days.
+#[utoipa::path(
+    get,
+    path = "/events/{id}/calendar.ics",
+    tag = "events",
+    operation_id = "event_calendar",
+    params(("id" = String, Path, description = "Jam id or slug")),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, description = "An iCalendar file with one all-day event", content_type = "text/calendar", body = String),
+        JamNotVisible,
+    )
+)]
+async fn calendar_ics(
+    State(state): State<AppState>,
+    current: MaybeUser,
+    Path(id_or_slug): Path<String>,
+) -> Result<Response, AppError> {
+    let event = readable(&state, &current, &id_or_slug).await?;
+    let base = state.config.app_base_url.trim_end_matches('/');
+    let page = format!("{base}/jams/{}", event.slug);
+    let headers = [
+        (CONTENT_TYPE, "text/calendar; charset=utf-8"),
+        // A fixed ASCII name: slugs may hold any letter, which a header can't.
+        (
+            CONTENT_DISPOSITION,
+            "attachment; filename=\"breakingjam.ics\"",
+        ),
+        (CACHE_CONTROL, cache_control(&event)),
+    ];
+    Ok((headers, calendar::ics(&event, &page, Utc::now())).into_response())
 }
 
 /// A visible jam and the text of its flyer.

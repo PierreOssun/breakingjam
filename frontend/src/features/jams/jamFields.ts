@@ -4,6 +4,8 @@ import type { Schemas } from "../../api/client";
 /** What the jam form edits: text fields as typed, the pin as numbers. */
 export type JamFormValues = {
   name: string;
+  /** A one-day jam has a single date: `ends_on` follows `starts_on`. */
+  one_day: boolean;
   starts_on: string;
   ends_on: string;
   timezone: string;
@@ -29,6 +31,7 @@ function localTimezone(): string {
 export function emptyJam(): JamFormValues {
   return {
     name: "",
+    one_day: false,
     starts_on: "",
     ends_on: "",
     timezone: localTimezone(),
@@ -50,6 +53,7 @@ export function emptyJam(): JamFormValues {
 export function jamValues(jam: Schemas["Event"]): JamFormValues {
   return {
     name: jam.name,
+    one_day: jam.starts_on === jam.ends_on,
     starts_on: jam.starts_on,
     ends_on: jam.ends_on,
     timezone: jam.timezone,
@@ -74,7 +78,7 @@ export function jamBody(values: JamFormValues): Schemas["EventFields"] {
   return {
     name: values.name.trim(),
     starts_on: values.starts_on,
-    ends_on: values.ends_on,
+    ends_on: values.one_day ? values.starts_on : values.ends_on,
     timezone: values.timezone,
     venue_name: orNull(values.venue_name),
     address: orNull(values.address),

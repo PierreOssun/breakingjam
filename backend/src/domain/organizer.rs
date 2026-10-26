@@ -40,6 +40,8 @@ pub struct OrganizerRef {
     pub instagram_handle: Option<String>,
     /// Whether the handle is confirmed.
     pub verified: bool,
+    /// How many public jams they run on BreakingJam.
+    pub jams: i64,
 }
 
 /// Everything an organiser sets on their page.

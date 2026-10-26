@@ -46,7 +46,8 @@ export function Lineup({ jamId, staff, canEdit }: LineupProps) {
   });
 
   return (
-    <div className="flex flex-col gap-5">
+    // Stacked on phones; side by side from lg (Judges | DJ | MC).
+    <div className="flex flex-col gap-5 lg:flex-row lg:flex-wrap lg:gap-x-10">
       {ROLES.map((role) => {
         const people = staff.filter((s) => s.role === role);
         if (people.length === 0 && !canEdit) return null;

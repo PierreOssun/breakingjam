@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 const shape =
-  "inline-flex h-6 items-center rounded-full border px-2.5 text-caption font-bold";
+  "inline-flex h-6 shrink-0 items-center rounded-full border px-2.5 text-caption font-bold whitespace-nowrap";
 
 /** Category of a battle, e.g. "1v1 Bboy": sentence case, not interactive (DESIGN.md §4.11). */
 export function MetaTag({ children }: { children: ReactNode }) {

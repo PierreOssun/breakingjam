@@ -148,6 +148,7 @@ async function jamPage(request: Request, env: Env, slug: string) {
   if (!jam || !page.headers.get("content-type")?.includes("text/html")) {
     return page;
   }
+  const battles = await publicBattles(request, env, jam.id);
   const origin = new URL(env.APP_BASE_URL).origin;
   return new HTMLRewriter()
     .on("title", {
@@ -157,10 +158,28 @@ async function jamPage(request: Request, env: Env, slug: string) {
     })
     .on("head", {
       element: (head) => {
-        head.append(openGraphTags(jam, origin), { html: true });
+        head.append(openGraphTags(jam, battles, origin), { html: true });
       },
     })
     .transform(page);
+}
+
+/** The jam's battle names in display order; none when the API can't say. */
+async function publicBattles(
+  request: Request,
+  env: Env,
+  id: string,
+): Promise<string[]> {
+  try {
+    const path = `/api/events/${encodeURIComponent(id)}/battles`;
+    const response = await api(env).fetch(
+      new Request(new URL(path, request.url)),
+    );
+    if (!response.ok) return [];
+    return ((await response.json()) as { name: string }[]).map((b) => b.name);
+  } catch {
+    return [];
+  }
 }
 
 /** The jam as an anonymous visitor sees it: null for drafts, unknown slugs or an API error. */

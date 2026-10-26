@@ -53,15 +53,17 @@ export function JamForm({ initial, submitLabel, onSubmit }: JamFormProps) {
   });
   const { register, handleSubmit, setError, setValue, watch } = form;
   const { errors, isSubmitting } = form.formState;
-  const [address, city, country, lat, lng, description, timezone] = watch([
-    "address",
-    "city",
-    "country",
-    "lat",
-    "lng",
-    "description",
-    "timezone",
-  ]);
+  const [oneDay, address, city, country, lat, lng, description, timezone] =
+    watch([
+      "one_day",
+      "address",
+      "city",
+      "country",
+      "lat",
+      "lng",
+      "description",
+      "timezone",
+    ]);
 
   const submit = handleSubmit(async (values) => {
     try {
@@ -83,19 +85,38 @@ export function JamForm({ initial, submitLabel, onSubmit }: JamFormProps) {
         error={errors.name?.message}
         {...register("name")}
       />
-      <div className="grid gap-6 sm:grid-cols-2">
-        <TextField
-          type="date"
-          label={t("org.fields.startsOn")}
-          error={errors.starts_on?.message}
-          {...register("starts_on")}
-        />
-        <TextField
-          type="date"
-          label={t("org.fields.endsOn")}
-          error={errors.ends_on?.message}
-          {...register("ends_on")}
-        />
+      <div className="flex flex-col gap-3">
+        <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 self-start text-body">
+          <input
+            type="checkbox"
+            className="size-5 accent-primary"
+            {...register("one_day")}
+          />
+          {t("org.fields.oneDay")}
+        </label>
+        {oneDay ? (
+          <TextField
+            type="date"
+            label={t("org.fields.date")}
+            error={errors.starts_on?.message}
+            {...register("starts_on")}
+          />
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2">
+            <TextField
+              type="date"
+              label={t("org.fields.startsOn")}
+              error={errors.starts_on?.message}
+              {...register("starts_on")}
+            />
+            <TextField
+              type="date"
+              label={t("org.fields.endsOn")}
+              error={errors.ends_on?.message}
+              {...register("ends_on")}
+            />
+          </div>
+        )}
       </div>
       <SelectField
         label={t("org.fields.timezone")}
@@ -222,8 +243,10 @@ function useJamSchema() {
           .trim()
           .min(1, required)
           .max(200, t("validation.tooLong", { max: 200 })),
+        one_day: z.boolean(),
         starts_on: z.string().min(1, required),
-        ends_on: z.string().min(1, required),
+        // Required unless the jam has a single date (checked below).
+        ends_on: z.string(),
         timezone: z.string().min(1, required),
         venue_name: z.string().max(200, t("validation.tooLong", { max: 200 })),
         address: z.string().max(500, t("validation.tooLong", { max: 500 })),
@@ -248,9 +271,17 @@ function useJamSchema() {
             t("validation.email"),
           ),
       })
-      .refine((v) => !v.starts_on || !v.ends_on || v.ends_on >= v.starts_on, {
+      .refine((v) => v.one_day || v.ends_on !== "", {
         path: ["ends_on"],
-        message: t("validation.endsBeforeStarts"),
-      });
+        message: required,
+      })
+      .refine(
+        (v) =>
+          v.one_day || !v.starts_on || !v.ends_on || v.ends_on >= v.starts_on,
+        {
+          path: ["ends_on"],
+          message: t("validation.endsBeforeStarts"),
+        },
+      );
   }, [t]);
 }
