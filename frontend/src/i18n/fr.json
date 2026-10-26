@@ -31,9 +31,6 @@
     "dark": "Sombre",
     "auto": "Auto"
   },
-  "footer": {
-    "links": "Liens du site"
-  },
   "testSite": {
     "notice": "Site de test — données de démo, pas de vrais jams",
     "close": "Fermer l’avis du site de test"

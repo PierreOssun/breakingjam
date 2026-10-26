@@ -105,6 +105,7 @@ celestia = { name = "Celestia", country = "CO" }
 cetowy = { name = "Cetowy", country = "PL", crews = ["polskee-flavour"] }
 cha-ja = { name = "Cha-Ja", country = "ZZ" }
 chakal = { name = "Chakal", country = "ZZ" }
+chardison = { name = "Chardison", country = "BR" }
 chaubernard = { name = "Chaubernard", country = "FR" }
 cheerito = { name = "Cheerito", country = "RU" }
 chenchen = { name = "Chenchen", country = "TW", aliases = ["Chen Chen"] }
@@ -346,6 +347,7 @@ jsmooth = { name = "JSmooth", country = "ZZ" }
 julianna = { name = "Julianna", country = "PL" }
 jun = { name = "Jun", country = "JP" }
 junior = { name = "Junior", country = "FR" }
+jurskee = { name = "Jurskee", country = "NL" }
 just-a-kid = { name = "Just a Kid", country = "DE" }
 just-one = { name = "Just One", country = "ZZ" }
 justeen = { name = "Justeen", country = "NL" }

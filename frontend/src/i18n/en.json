@@ -31,9 +31,6 @@
     "dark": "Dark",
     "auto": "Auto"
   },
-  "footer": {
-    "links": "Site links"
-  },
   "testSite": {
     "notice": "Test site — demo data, not real jams",
     "close": "Close the test-site notice"

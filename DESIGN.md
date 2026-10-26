@@ -712,11 +712,10 @@ What the avatar pill (≥ xl) or the avatar button (< xl) opens, logged in (§4.
      - Mobile: a 3-cell stats strip.
      - Counters: battles, countries, dancers.
    - Then the 10 busiest countries as country chips (§4.10), plus a muted "+N more" chip.
-5. **Footer.**
-   - The round Bounce logo at 56px next to the wordmark.
-   - Links: Find a jam, Find someone, Register a jam, Instagram.
-   - Language switch.
-   - Desktop: one row. Mobile: stacked.
+5. **Footer** (every content page, the same at every width).
+   - The round Bounce logo at 56px next to the wordmark, then **Instagram** at the far end: `InstagramLogo` 16 + "Instagram", `body-sm font-bold`, a 44px target, underlined on hover, opening in a new tab.
+   - Nothing else: the header holds the links and the language switch.
+   - One row (`justify-between`); below about 360px it wraps, Instagram under the logo. Nothing hangs past the page's side padding.
 
 The organisers' pitch moves to a future `/register` landing; dancers find themselves through the main search.
 

@@ -1,0 +1,51 @@
+name = "Olympic Qualifier Series Budapest 2024"
+starts_on = 2024-06-20
+ends_on = 2024-06-23
+timezone = "Europe/Budapest"
+city = "Budapest"
+country = "HU"
+venue = "Ludovika Campus"
+lat = 47.4817
+lng = 19.0856
+sources = [
+  "https://www.worlddancesport.org/Events/Budapest-Hungary-20062024-23062024-8319",
+  "https://www.worlddancesport.org/Competitions/Ranking/Olympic-Qualifier-Series-Budapest-Adult-Breaking-1-vs-1-B-Boys-61034",
+  "https://www.worlddancesport.org/Competitions/Ranking/Olympic-Qualifier-Series-Budapest-Adult-Breaking-1-vs-1-B-Girls-61035",
+  "https://www.worlddancesport.org/News/breaking-olympic-qualifier-series-budapest-2024-3442",
+  "https://en.wikipedia.org/wiki/2024_Olympic_Qualifier_Series",
+  "https://www.oasport.it/2024/06/break-dance-oqs-budapest-2024-antilai-sandrini-chiude-ottava-e-vola-ai-giochi-di-parigi/",
+]
+judges = ["jurskee", "chardison", "steez", "intact", "jess", "valentine", "virus", "moy", "kowloon"]
+
+# WDSF's final places; the top 8 went from a round robin to a knockout whose pairings aren't published.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 8
+results = [
+  { entrant = "lee", reached = "winner" },
+  { entrant = "amir", reached = "top2" },
+  { entrant = "hong-10", reached = "top4", rank = 3 },
+  { entrant = "issin", reached = "top4", rank = 4 },
+  { entrant = "jeffro", reached = "top8", rank = 5 },
+  { entrant = "hiro-10", reached = "top8", rank = 6 },
+  { entrant = "menno", reached = "top8", rank = 7 },
+  { entrant = "gravity", reached = "top8", rank = 8 },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+results = [
+  { entrant = "ami", reached = "winner" },
+  { entrant = "ayumi", reached = "top2" },
+  { entrant = "riko", reached = "top4", rank = 3 },
+  { entrant = "syssy", reached = "top4", rank = 4 },
+  { entrant = "logistx", reached = "top8", rank = 5 },
+  { entrant = "kate", reached = "top8", rank = 6 },
+  { entrant = "yingzi", reached = "top8", rank = 7 },
+  { entrant = "anti", reached = "top8", rank = 8 },
+]

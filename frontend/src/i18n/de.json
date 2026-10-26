@@ -31,9 +31,6 @@
     "dark": "Dunkel",
     "auto": "Auto"
   },
-  "footer": {
-    "links": "Links der Seite"
-  },
   "testSite": {
     "notice": "Testseite — Demodaten, keine echten Jams",
     "close": "Hinweis zur Testseite schließen"

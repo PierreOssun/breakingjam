@@ -8,11 +8,7 @@ import { useMenu } from "./useMenu";
  * Globe + code button opening a listbox of languages, each named in its own language
  * (DESIGN.md §4.6). Arrows move, Enter or Space picks, Esc closes.
  */
-export function LanguageSwitch({
-  placement = "down",
-}: {
-  placement?: "down" | "up";
-}) {
+export function LanguageSwitch() {
   const { t, i18n } = useTranslation();
   const current =
     LANGUAGES.find((l) => l.code === i18n.resolvedLanguage) ?? LANGUAGES[0];
@@ -50,9 +46,7 @@ export function LanguageSwitch({
           aria-label={t("nav.language", { name: current.name })}
           onKeyDown={menu.onKeyDown}
           onKeyUp={menu.onKeyUp}
-          className={`absolute right-0 z-50 w-[200px] rounded-lg border border-border-strong bg-surface-raised p-1 shadow-lg ${
-            placement === "up" ? "bottom-full mb-2" : "top-full mt-2"
-          }`}
+          className="absolute top-full right-0 z-50 mt-2 w-[200px] rounded-lg border border-border-strong bg-surface-raised p-1 shadow-lg"
         >
           {LANGUAGES.map((language, index) => {
             const selected = language.code === current.code;
