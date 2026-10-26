@@ -1,0 +1,13 @@
+name = "The Notorious IBE 2026"
+# check: only festivalinfo.nl gives the dates; the official site is behind a bot check
+starts_on = 2026-08-07
+ends_on = 2026-08-09
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://www.festivalinfo.nl/festival/36664/The-Notorious-IBE/2026/"]
+judges = []
+mcs = []
+djs = []

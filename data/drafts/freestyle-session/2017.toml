@@ -47,7 +47,7 @@ matches = [
   { round = "top16", a = "found-nation", b = "mighty-zulu-kingz", winner = "found-nation", video = "https://youtu.be/cSNV7uzz1fM" },
   { round = "top16", a = "killafornia", b = "flow-mo", winner = "killafornia", video = "https://youtu.be/joZ600h2Iiw" },
   { round = "top16", a = "ruggeds", b = "supernaturalz", winner = "supernaturalz", video = "https://youtu.be/k80Sm6YXsf0" },
-  { round = "top16", a = "floorriorz", b = "squadron", winner = "squadron", video = "https://youtu.be/l-9eTJugyAs" },
+  { round = "top16", a = "flooriorz", b = "squadron", winner = "squadron", video = "https://youtu.be/l-9eTJugyAs" },
   { round = "top8", a = "concrete-all-stars", b = "monster-energy", winner = "monster-energy", video = "https://youtu.be/1el5J8x6V4Q" },
   { round = "top8", a = "killafornia", b = "team-ukraine", winner = "team-ukraine", video = "https://youtu.be/FOZ5XCMLfXg" },
   { round = "top8", a = "momentum-crew", b = "supernaturalz", winner = "momentum-crew", video = "https://youtu.be/du0gv1nWp8M" },
@@ -65,7 +65,6 @@ concrete-all-stars = { crew = "concrete-all-stars" }
 elusive-fenz = { crew = "elusive-fenz" }
 floor-gangz = { crew = "floor-gangz" }
 flooriorz = { crew = "flooriorz" }
-floorriorz = { crew = "floorriorz" }
 flow-mo = { crew = "flow-mo" }
 found-nation = { crew = "found-nation" }
 fresh-all-stars = { crew = "fresh-all-stars" }

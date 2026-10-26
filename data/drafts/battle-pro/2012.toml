@@ -1,0 +1,37 @@
+name = "Battle Pro 2012"
+# check: the site says March 2012, no day
+starts_on = 2012-03-03
+timezone = "Europe/Paris"
+city = "Chelles"
+country = "FR"
+lat = 48.8811
+lng = 2.5930
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro", "https://web.archive.org/web/20111209/http://www.battle-pro.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "fusion-mc", b = "universo-bboy", winner = "fusion-mc" },
+  { round = "top8", a = "dream-team", b = "body-carnival", winner = "body-carnival" },
+  { round = "top8", a = "havikoro", b = "all-school-team", winner = "havikoro" },
+  { round = "top8", a = "bbf-team", b = "south-front", winner = "bbf-team" },
+  { round = "top4", a = "fusion-mc", b = "body-carnival", winner = "fusion-mc" },
+  { round = "top4", a = "havikoro", b = "bbf-team", winner = "havikoro" },
+  { round = "final", a = "fusion-mc", b = "havikoro", winner = "fusion-mc" },
+]
+
+[battles.teams]
+all-school-team = { crew = "all-school-team" }
+bbf-team = { crew = "bbf-team" }
+body-carnival = { crew = "body-carnival" }
+dream-team = { crew = "dream-team" }
+fusion-mc = { crew = "fusion-mc" }
+havikoro = { crew = "havikoro" }
+south-front = { crew = "south-front" }
+universo-bboy = { crew = "universo-bboy" }

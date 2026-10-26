@@ -1,0 +1,63 @@
+name = "Battle of the Year 2023"
+starts_on = 2023-11-25
+timezone = "Asia/Tokyo"
+city = "Osaka"
+country = "JP"
+lat = 34.6373
+lng = 135.4200
+venue = "INTEX Osaka"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/editions/2023", "https://www.tokyo-sports.co.jp/articles/-/281333", "https://newsmada.com/?p=52224"]
+judges = ["roxrite", "luigi", "kastet", "nori", "at"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "predatorz", reached = "winner" },
+  { entrant = "the-ruggeds", reached = "top4" },
+  { entrant = "foundnation", reached = "top4" },
+  { entrant = "flow-xl", reached = "top2" },
+]
+
+[battles.teams]
+flow-xl = { crew = "flow-xl" }
+foundnation = { crew = "foundnation" }
+predatorz = { crew = "predatorz" }
+the-ruggeds = { crew = "the-ruggeds" }
+
+# Two of the bracket's sixteen are unknown (a "?" and 革命前夜), so its places are listed instead.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "phil-wizard", reached = "winner" },
+  { entrant = "onton", reached = "top2" },
+  { entrant = "kidquick", reached = "top4" },
+  { entrant = "taichi", reached = "top4" },
+  { entrant = "jonlemon", reached = "top8" },
+  { entrant = "m0nm0i", reached = "top8" },
+  { entrant = "nord-diamond", reached = "top8" },
+  { entrant = "sambo", reached = "top16" },
+  { entrant = "ichigo", reached = "top16" },
+  { entrant = "bustabash", reached = "top16" },
+  { entrant = "kossy", reached = "top16" },
+  { entrant = "ouki", reached = "top16" },
+  { entrant = "dblue", reached = "top16" },
+  { entrant = "ryo-g", reached = "top16" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "2v2 Bgirl"
+gender = "bgirl"
+team_size = 2
+results = [
+  { entrant = "ayumi-sarah-bee", reached = "winner" },
+]
+
+[battles.teams]
+ayumi-sarah-bee = { members = ["ayumi", "sarah-bee"] }

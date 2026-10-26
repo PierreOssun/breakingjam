@@ -1,0 +1,60 @@
+name = "Battle Pro 2017"
+starts_on = 2017-03-04
+timezone = "Europe/Paris"
+city = "Toulouse"
+country = "FR"
+lat = 43.6043
+lng = 1.4437
+venue = "Zénith de Toulouse"
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro", "https://web.archive.org/web/20161228/http://www.battle-pro.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "vagabonds", b = "dead-prezz", winner = "vagabonds" },
+  { round = "top8", a = "mos-crew", b = "soul-burnz", winner = "mos-crew" },
+  { round = "top8", a = "red-bull-bc-one-all-stars", b = "too-much-underground", winner = "red-bull-bc-one-all-stars" },
+  { round = "top8", a = "dream-runnerz", b = "obc", winner = "obc" },
+  { round = "top4", a = "vagabonds", b = "mos-crew", winner = "vagabonds" },
+  { round = "top4", a = "red-bull-bc-one-all-stars", b = "obc", winner = "red-bull-bc-one-all-stars" },
+  { round = "final", a = "vagabonds", b = "red-bull-bc-one-all-stars", winner = "vagabonds" },
+]
+
+[battles.teams]
+dead-prezz = { crew = "dead-prezz" }
+dream-runnerz = { crew = "dream-runnerz" }
+mos-crew = { crew = "mos-crew" }
+obc = { crew = "obc" }
+red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars" }
+soul-burnz = { crew = "soul-burnz" }
+too-much-underground = { crew = "too-much-underground" }
+vagabonds = { crew = "vagabonds" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "lussy-sky", b = "onel", winner = "lussy-sky" },
+  { round = "top16", a = "justeen", b = "lunatic", winner = "justeen" },
+  { round = "top16", a = "hill", b = "sniper", winner = "hill" },
+  { round = "top16", a = "kid-karam", b = "sofiane", winner = "kid-karam" },
+  { round = "top16", a = "deny-rock", b = "simo", winner = "deny-rock" },
+  { round = "top16", a = "double-d", b = "eagle-one", winner = "double-d" },
+  { round = "top16", a = "tonio", b = "miracle-smile", winner = "tonio" },
+  { round = "top16", a = "leony", b = "wen", winner = "leony" },
+  { round = "top8", a = "lussy-sky", b = "justeen", winner = "lussy-sky" },
+  { round = "top8", a = "hill", b = "kid-karam", winner = "hill" },
+  { round = "top8", a = "deny-rock", b = "double-d", winner = "deny-rock" },
+  { round = "top8", a = "tonio", b = "leony", winner = "tonio" },
+  { round = "top4", a = "lussy-sky", b = "hill", winner = "lussy-sky" },
+  { round = "top4", a = "deny-rock", b = "tonio", winner = "deny-rock" },
+  { round = "final", a = "lussy-sky", b = "deny-rock", winner = "lussy-sky" },
+]

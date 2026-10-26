@@ -1,0 +1,61 @@
+name = "UK B-Boy Championships World Finals 2017"
+starts_on = 2017-04-08
+ends_on = 2017-04-09
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+lat = 51.5522
+lng = -0.1422
+venue = "O2 Forum Kentish Town"
+sources = ["https://en.wikipedia.org/wiki/UK_B-Boy_Championships", "https://web.archive.org/web/20170814/http://bboychampionships.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "monster-b-boys", b = "hfc", winner = "monster-b-boys" },
+  { round = "top8", a = "everyone-else", b = "the-italians", winner = "the-italians" },
+  { round = "top8", a = "soul-mavericks", b = "skilluminated", winner = "soul-mavericks" },
+  { round = "top8", a = "freestyle-idiot", b = "ariya", winner = "ariya" },
+  { round = "top4", a = "monster-b-boys", b = "the-italians", winner = "monster-b-boys" },
+  { round = "top4", a = "soul-mavericks", b = "ariya", winner = "soul-mavericks" },
+  { round = "final", a = "monster-b-boys", b = "soul-mavericks", winner = "monster-b-boys" },
+]
+
+[battles.teams]
+ariya = { crew = "ariya" }
+everyone-else = { crew = "everyone-else" }
+freestyle-idiot = { crew = "freestyle-idiot" }
+hfc = { crew = "hfc" }
+monster-b-boys = { crew = "monster-b-boys" }
+skilluminated = { crew = "skilluminated" }
+soul-mavericks = { crew = "soul-mavericks" }
+the-italians = { crew = "the-italians" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "sunni", b = "echo", winner = "sunni" },
+  { round = "top16", a = "kacyo", b = "moa", winner = "moa" },
+  { round = "top16", a = "fever", b = "lil-hong", winner = "fever" },
+  { round = "top16", a = "infante", b = "kaneki", winner = "kaneki" },
+  { round = "top16", a = "kid-karam", b = "t-rock", winner = "kid-karam" },
+  { round = "top16", a = "stepper", b = "wen", winner = "stepper" },
+  { round = "top16", a = "mowgly", b = "spin", winner = "spin" },
+  { round = "top16", a = "hayato1", b = "onel", winner = "hayato1" },
+  { round = "top8", a = "sunni", b = "moa", winner = "sunni" },
+  { round = "top8", a = "fever", b = "kaneki", winner = "fever" },
+  { round = "top8", a = "kid-karam", b = "stepper", winner = "kid-karam" },
+  { round = "top8", a = "spin", b = "hayato1", winner = "spin" },
+  { round = "top4", a = "sunni", b = "fever", winner = "sunni" },
+  { round = "top4", a = "kid-karam", b = "spin", winner = "kid-karam" },
+  { round = "final", a = "sunni", b = "kid-karam", winner = "sunni" },
+]

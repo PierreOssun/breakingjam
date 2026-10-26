@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "the-ruggeds", reached = "winner" },
+  { entrant = "the-ruggeds", reached = "winner", video = "https://youtu.be/EyYt4OjyREs" },
   { entrant = "rock-force-crew", reached = "top4" },
-  { entrant = "mortal-combat", reached = "top4" },
-  { entrant = "flooriorz", reached = "top2" },
+  { entrant = "mortal-combat", reached = "top4", video = "https://youtu.be/bhTgSbhV7-0" },
+  { entrant = "flooriorz", reached = "top2", video = "https://youtu.be/EyYt4OjyREs" },
 ]
 
 [battles.teams]

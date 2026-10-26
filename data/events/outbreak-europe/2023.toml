@@ -110,3 +110,30 @@ age = "kids"
 results = [
   { entrant = "jason", reached = "winner" },
 ]
+
+[[battles]]
+key = "rep-your-country"
+name = "Rep Your Country"
+gender = "mixed"
+results = [
+  { entrant = "ukraine", reached = "winner" },
+]
+
+[battles.teams]
+ukraine = { name = "Ukraine" }
+
+[[battles]]
+key = "footwork"
+name = "1v1 Footwork"
+gender = "mixed"
+results = [
+  { entrant = "chaubernard", reached = "winner" },
+]
+
+[[battles]]
+key = "power"
+name = "1v1 Power Move"
+gender = "mixed"
+results = [
+  { entrant = "lion", reached = "winner" },
+]

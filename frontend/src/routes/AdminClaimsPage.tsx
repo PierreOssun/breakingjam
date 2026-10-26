@@ -11,6 +11,7 @@ import { ExternalLink } from "../components/ExternalLink";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { MoreList } from "../components/MoreList";
 import { useToast } from "../components/useToast";
+import { ME_KEY } from "../features/auth/useMe";
 import { BREAKINGJAM_INSTAGRAM } from "../lib/instagram";
 
 type Decision = "approve" | "reject";
@@ -158,6 +159,9 @@ function ClaimRow({ review, decide }: { review: Review; decide: DecideFn }) {
     onSuccess: (_, decision) => {
       // The claim queues and the overview counts.
       void queryClient.invalidateQueries({ queryKey: ["admin"] });
+      // An admin approving their own claim gets the page in their account menu.
+      if (decision === "approve")
+        void queryClient.invalidateQueries({ queryKey: ME_KEY });
       toast({
         kind: "success",
         message: t(

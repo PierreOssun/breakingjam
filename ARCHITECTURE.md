@@ -8,7 +8,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 ## 1. Scope
 
 ### In scope
-- Public landing page: a title, a subtitle and one search for jams and people (`/search`), then the next jams near the visitor and the site's counts (M18). **Register a jam** (`/org/jams/new`; login required, redirect back after auth) is in the header on every page. The map (`/map`) and the jam list (`/jams`) are the browse experiences.
+- Public landing page: a title, a subtitle and one search for jams and people (`/search`), then the next jams near the visitor and the site's counts (M18). **Register a jam** (`/org/jams/new`; login required, back to it after logging in; a new account, by email or Google, lands on the home page instead, as it may not organise; from any other page it returns there) is in the header on every page. The map (`/map`) and the jam list (`/jams`) are the browse experiences.
 - World map of published jams (MapLibre GL); clicking a point opens a popup → jam detail page.
 - Jam (event) CRUD for authenticated organisers. An admin approves each organiser's jam before it goes public (M14).
 - Search near a place (M22): when a search names a city, `/search` shows the closest upcoming jams to it ("Near <Place>"), even where no jam is registered, from the GeoNames cities of 15,000+ people (CC BY 4.0) loaded into `places`.
@@ -427,13 +427,13 @@ GET    /api/docs                         (Swagger UI, dev only)
 POST   /api/auth/register                {email, password, display_name}
 POST   /api/auth/login
 POST   /api/auth/logout
-GET    /api/auth/me
+GET    /api/auth/me                      {id, email, display_name, role, dancer}: dancer = the page an approved claim linked to the account (id, name, avatar), null until then (M23); register, login and role changes return the same
 GET    /api/auth/google                  → redirect
 GET    /api/auth/google/callback
 
 GET    /api/stats                        public counts for the landing page: countries with public jams, battles (total and per country, busiest first), dancers
 GET    /api/geo                          {country}: the visitor's ISO 3166-1 alpha-2 country from the `cf-ipcountry` header (set by the Worker), null when unknown
-GET    /api/places                       ?q=   {place: {name, country, lat, lng, population} | null}: the city a search names, case and accents aside; an exact name or alternate name first (own names before alternates), then a prefix, the most populated when several match; no lookup under 3 letters, no prefix under 4 nor of a name more than twice as long; under 50,000 people only the place's own name finds it; codes like "ZRH" are no names (M22)
+GET    /api/places                       ?q=   {place: {name, country, lat, lng, population} | null}: the city a search names, case and accents aside; an exact name or alternate name first (own names before alternates), then a prefix; when several match, one with a public jam within about 25 km, then the most populated; no lookup under 3 letters, no prefix under 4 nor of a name more than twice as long; under 50,000 people only the place's own name finds it; codes like "ZRH" are no names (M22)
 
 GET    /api/events                       ?status=published&country=&from=&to=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required)
 GET    /api/events.geojson               published, registration_closed and completed events with coordinates, as FeatureCollection (id, name, slug, starts_on, ends_on, status, city, country, battles: names in display order, categories: what the map's chips match, flyer_card_url)
@@ -534,7 +534,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
   M10 decided "no data fetching on this page"; M15 reverses that at the author's request. The map preview and the For dancers and For organisers bands are gone since M18; the organisers' pitch moves to a future `/register` landing.
 - Search (`/search?q=`): first "Near <Place>" when `GET /api/places` finds a city (M22, DESIGN.md §4.33): the 3 nearest upcoming jams within 500 km of it, by great-circle distance in the browser over the map's GeoJSON, on a static mini map, with "Open the map around <Place>" (`/map?lat=&lng=&fit=`). Then the jams the words match, matched in the browser like the map's search (name, city, country), upcoming first, up to 10 then "See all on the map" (`/map?q=`); and the people from `GET /api/dancers?q=`, paged. A section with nothing in it hides while another has results; with nothing anywhere, one empty state. A blank search shows the upcoming jams and the notable people.
 - Find a jam (`/jams`): every jam from `GET /api/events.geojson` as a list, with the map's search and filter chips, upcoming first (past ones with the "Past jams" chip), 30 at a time. The search is kept in `?q=`.
-- Header: Jam map, Find a jam, Find someone, then the language switch, Log in or the account menu (My jams, Admin for admins, Log out) and **Register a jam**. The full bar shows from `xl`; below, a menu sheet holds the same items.
+- Header: Jam map, Find a jam, Find someone, then the language switch, Log in or the avatar pill, and **Register a jam**. The full bar shows from `xl`; below, logged out, a menu sheet holds the same items, and logged in, the avatar button opens the account menu as a top sheet that also holds the nav. The account menu (M23, DESIGN.md §4.34): my dancer page (or the search for it), My jams with its drafts (`GET /api/events?mine=true&status=draft`) once the account has registered a jam (role `organizer` and up), Admin for admins with what waits for review (`GET /api/admin/stats`), the Light / Dark / Auto theme (kept in `localStorage`, `data-theme` on `<html>`), Log out.
 - Visual system: follow `DESIGN.md` (tokens, components, states). Tailwind v4: its tokens live in the `@theme` of `src/styles/index.css` (the default palette, type scale, radii and shadows are removed), and `src/styles/tokens.test.ts` fails when they drift from `DESIGN.md` §2; do not hard-code colours or spacing outside it. Where `DESIGN.md` differs from this file on scope or routes (8 languages, `/en/…` prefixes, a cookie, `/d/<slug>`), this file wins: EN/FR/DE, unprefixed routes, `localStorage`.
 - Forms: `react-hook-form` + `zod`. Validation mirrors backend validators; backend remains authoritative.
 - i18n: `react-i18next`, language detected from browser, switchable in header, persisted in `localStorage`. Keys namespaced by feature (`events.form.name`). All three JSON files must have identical key sets (add a test).

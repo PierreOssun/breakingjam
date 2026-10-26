@@ -1,0 +1,43 @@
+name = "The Notorious IBE 2024"
+starts_on = 2024-08-16
+ends_on = 2024-08-18
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://fujifilm.com/pt/en/news/FUJIFILM-INSTAX-UNDISPUTED-MASTERS-Returns-To-The-Notorious-IBE-This-August", "https://www.fujifilm.com/hr/en/news/FUJIFILM_instax_Undisputed_Masters_Celebrates_Record_Attendance"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Undisputed Masters Crew"
+gender = "mixed"
+results = [
+  { entrant = "green-panda", reached = "winner" },
+  { entrant = "formless", reached = "top2" },
+]
+
+[battles.teams]
+formless = { crew = "formless" }
+green-panda = { crew = "green-panda" }
+
+[[battles]]
+key = "bboy"
+name = "Undisputed Masters Solo Men"
+gender = "bboy"
+results = [
+  { entrant = "alvin", reached = "winner" },
+  { entrant = "quake", reached = "top2" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "Undisputed Masters Solo Women"
+gender = "bgirl"
+results = [
+  { entrant = "syssy", reached = "winner" },
+  { entrant = "stefani", reached = "top2" },
+]

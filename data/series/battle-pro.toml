@@ -1,0 +1,18 @@
+name = "Battle Pro"
+
+[wikipedia]
+page = "https://en.wikipedia.org/wiki/Chelles_Battle_Pro"
+# Brackets under "Crew Battle 8 on 8" and "Undisputed Battle 1 on 1"; champions of other years in "Winners".
+battles = [
+  { key = "crew", name = "Crew battle", sides = "crews", words = ["crew"], table = "Winners", places = { "Crew Winner" = "winner", "Runner-up" = "top2" } },
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["1 on 1"], table = "Winners", places = { "Undisputed Winner" = "winner" } },
+]
+
+[youtube]
+channels = ["UCSl3Ie5Mcf0rea5fEfinO7w"]   # Battle Pro (formerly ChellesBattlePro)
+title = "Battle Pro"
+exclude = ["summer battle pro"]           # a separate event in Spain
+battles = [
+  { key = "crew", name = "Crew battle", sides = "crews", words = ["crew", "8vs8"] },
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["1vs1", "1 vs 1", "bboy", "undisputed"] },
+]

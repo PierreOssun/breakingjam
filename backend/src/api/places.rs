@@ -39,7 +39,8 @@ pub struct PlaceMatch {
 }
 
 /// The city a search names, case and accents aside: an exact name or alternate name first,
-/// else one starting with the search; the most populated when several match.
+/// else one starting with the search; when several match, one with a public jam nearby, then
+/// the most populated.
 #[utoipa::path(
     get,
     path = "/places",

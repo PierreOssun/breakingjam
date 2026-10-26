@@ -14,7 +14,22 @@
     "language": "Sprache: {{name}}",
     "admin": "Admin",
     "jamMap": "Jam-Karte",
-    "account": "Konto"
+    "account": "Konto",
+    "accountMenu": "Kontomenü",
+    "accountMenuOf": "{{name}}, Kontomenü"
+  },
+  "account": {
+    "viewPage": "Meine Tänzer:innen-Seite ansehen",
+    "unclaimedTitle": "Tanzt du?",
+    "unclaimedBody": "Finde deine Seite und beanspruche sie.",
+    "findPage": "Meine Seite finden",
+    "drafts_one": "{{count}} Entwurf",
+    "drafts_other": "{{count}} Entwürfe",
+    "toReview": "{{count}} zu prüfen",
+    "theme": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "auto": "Auto"
   },
   "footer": {
     "links": "Links der Seite"

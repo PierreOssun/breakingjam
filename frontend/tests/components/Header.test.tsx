@@ -76,13 +76,18 @@ describe("Header", () => {
 
   it("offers log in, then log out once logged in", async () => {
     const fetch = mockApi({
-      "GET /api/auth/me": { status: 200, body: LIL_G },
+      "GET /api/auth/me": {
+        status: 200,
+        body: { ...LIL_G, role: "organizer" },
+      },
       "POST /api/auth/logout": { status: 204 },
     });
     const router = renderApp("/jams/paris-cypher-3f9a1c");
     // Logged in, the account menu holds My jams and Log out.
     await userEvent.click(
-      await (await header()).findByRole("button", { name: "Lil G" }),
+      await (
+        await header()
+      ).findByRole("button", { name: "Lil G, account menu" }),
     );
     const menu = within(screen.getByRole("menu", { name: "Account" }));
     expect(menu.queryByRole("menuitem", { name: "Admin" })).toBeNull();
@@ -92,9 +97,11 @@ describe("Header", () => {
     );
 
     await userEvent.click(
-      await (await header()).findByRole("button", { name: "Lil G" }),
+      await (
+        await header()
+      ).findByRole("button", { name: "Lil G, account menu" }),
     );
-    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await userEvent.keyboard("{End}{Enter}");
 
     expect(
       await (await header()).findByRole("link", { name: "Log in" }),

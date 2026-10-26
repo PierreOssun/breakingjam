@@ -1,0 +1,46 @@
+name = "UK B-Boy Championships World Finals 2011"
+starts_on = 2011-10-16
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+lat = 51.4651
+lng = -0.1149
+venue = "O2 Academy Brixton"
+sources = ["https://en.wikipedia.org/wiki/UK_B-Boy_Championships", "https://web.archive.org/web/20111113/http://bboychampionships.com/", "https://www.britishhiphop.co.uk/news/latest/londons-soul-mavericks-to-represent-at-the-2011-b-boy-championships-world-finals.html"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "vagabonds", b = "the-ruggeds", winner = "vagabonds" },
+  { round = "top8", a = "pm-conspiracy", b = "foundnation", winner = "foundnation" },
+  { round = "top8", a = "jinjo-crew", b = "la-smala", winner = "jinjo-crew" },
+  { round = "top8", a = "dynamic-rockers", b = "soul-mavericks", winner = "soul-mavericks" },
+  { round = "top4", a = "vagabonds", b = "foundnation", winner = "vagabonds" },
+  { round = "top4", a = "jinjo-crew", b = "soul-mavericks", winner = "jinjo-crew" },
+  { round = "final", a = "vagabonds", b = "jinjo-crew", winner = "vagabonds" },
+]
+
+[battles.teams]
+dynamic-rockers = { crew = "dynamic-rockers" }
+foundnation = { crew = "foundnation" }
+jinjo-crew = { crew = "jinjo-crew" }
+la-smala = { crew = "la-smala" }
+pm-conspiracy = { crew = "pm-conspiracy" }
+soul-mavericks = { crew = "soul-mavericks" }
+the-ruggeds = { crew = "the-ruggeds" }
+vagabonds = { crew = "vagabonds" }
+
+[[battles]]
+key = "seven-to-smoke"
+name = "Seven to Smoke"
+gender = "bboy"
+format = "seven_to_smoke"
+results = [
+  { entrant = "wallee", reached = "winner" },
+]

@@ -1,0 +1,47 @@
+name = "Battle Pro 2024"
+starts_on = 2024-10-13
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8534
+lng = 2.3488
+sources = ["https://web.archive.org/web/20241112/http://www.battle-pro.com/", "https://www.sortiraparis.com/en/articles/tag/breaking"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "kyusyudanji", reached = "winner" },
+]
+
+[battles.teams]
+kyusyudanji = { crew = "kyusyudanji" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "marlone", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "kimie", reached = "winner" },
+]
+
+[[battles]]
+key = "kids"
+name = "1v1 Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "ren", reached = "winner" },
+]

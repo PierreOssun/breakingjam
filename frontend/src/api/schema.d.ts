@@ -819,7 +819,8 @@ export interface paths {
         };
         /**
          * The city a search names, case and accents aside: an exact name or alternate name first,
-         *     else one starting with the search; the most populated when several match.
+         *     else one starting with the search; when several match, one with a public jam nearby, then
+         *     the most populated.
          */
         get: operations["find_place"];
         put?: never;
@@ -2185,6 +2186,7 @@ export interface components {
             display_name: string;
             /** @description Account role, snake_case. */
             role: components["schemas"]["Role"];
+            dancer?: components["schemas"]["DancerRef"] | null;
         };
     };
     responses: never;
@@ -2384,7 +2386,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Logged in: to `FRONTEND_ORIGIN` + `next`. Failed: to `/login?error=google` */
+            /** @description Logged in: to `FRONTEND_ORIGIN` + `next`, except a new account coming from the jam form, which goes home. Failed: to `/login?error=google` */
             303: {
                 headers: {
                     location?: string;

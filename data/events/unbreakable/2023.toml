@@ -7,23 +7,49 @@ venue = "Monseigneur Ladeuzeplein"  # the Lotto WDSF World Breaking Championship
 country = "BE"
 lat = 50.8788
 lng = 4.7069
-sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/3909"]
-judges = []
+sources = [
+  "https://unbreakable.be/20-years/#hall-of-fame",
+  "https://and8.dance/en/e/3909",
+  "https://www.worlddancesport.org/Events/Leuven-Belgium-23092023-24092023-7959",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/World-Championships-Leuven-Adult-Breaking-1-vs-1-B-Boys-57723",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/World-Championships-Leuven-Adult-Breaking-1-vs-1-B-Girls-58289",
+  "https://www.worlddancesport.org/News/b-girl-nicka-b-boy-victor-win-world-titles-olympic-qualification-paris-2024-3358",
+  "https://en.wikipedia.org/wiki/2023_WDSF_World_Breaking_Championship",
+]
+# The WDSF panel of both 1v1 battles; the open battles' judges are unknown.
+judges = ["jess", "crumbs", "steez", "intact", "dom-k", "manny", "lazylegz", "kim", "vee"]
 
+# The 1v1 battles are the WDSF World Breaking Championship; its round robin before the top 8 is left out.
 [[battles]]
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "victor", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "menno", b = "phil-wizard", winner = "phil-wizard" },
+  { round = "top8", a = "shigekix", b = "kid-karam", winner = "shigekix" },
+  { round = "top8", a = "lithe-ing", b = "mighty-jimm", winner = "lithe-ing" },
+  { round = "top8", a = "victor", b = "alvin", winner = "victor" },
+  { round = "top4", a = "phil-wizard", b = "shigekix", winner = "phil-wizard" },
+  { round = "top4", a = "lithe-ing", b = "victor", winner = "victor" },
+  { round = "final", a = "victor", b = "phil-wizard", winner = "victor" },
+  { round = "third", a = "shigekix", b = "lithe-ing", winner = "shigekix" },
 ]
 
 [[battles]]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "nicka", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "ayumi", b = "stefani", winner = "ayumi" },
+  { round = "top8", a = "anti", b = "kate", winner = "kate" },
+  { round = "top8", a = "nicka", b = "logistx", winner = "nicka" },
+  { round = "top8", a = "671", b = "syssy", winner = "syssy" },
+  { round = "top4", a = "kate", b = "ayumi", winner = "ayumi" },
+  { round = "top4", a = "syssy", b = "nicka", winner = "nicka" },
+  { round = "final", a = "nicka", b = "ayumi", winner = "nicka" },
+  { round = "third", a = "syssy", b = "kate", winner = "syssy" },
 ]
 
 [[battles]]

@@ -1,0 +1,60 @@
+name = "Battle Pro 2016"
+starts_on = 2016-03-05
+timezone = "Europe/Paris"
+city = "Marseille"
+country = "FR"
+lat = 43.3153
+lng = 5.4045
+venue = "Dôme de Marseille"
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro", "https://web.archive.org/web/20160306/http://www.battle-pro.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "momentum-crew", b = "the-future-crew", winner = "momentum-crew" },
+  { round = "top8", a = "body-carnival", b = "ufo-techniques", winner = "body-carnival" },
+  { round = "top8", a = "arabiq-flavour", b = "still-contact-break", winner = "arabiq-flavour" },
+  { round = "top8", a = "awa-crew", b = "mb-crew", winner = "mb-crew" },
+  { round = "top4", a = "momentum-crew", b = "body-carnival", winner = "momentum-crew" },
+  { round = "top4", a = "arabiq-flavour", b = "mb-crew", winner = "arabiq-flavour" },
+  { round = "final", a = "momentum-crew", b = "arabiq-flavour", winner = "momentum-crew" },
+]
+
+[battles.teams]
+arabiq-flavour = { crew = "arabiq-flavour" }
+awa-crew = { crew = "awa-crew" }
+body-carnival = { crew = "body-carnival" }
+mb-crew = { crew = "mb-crew" }
+momentum-crew = { crew = "momentum-crew" }
+still-contact-break = { crew = "still-contact-break" }
+the-future-crew = { crew = "the-future-crew" }
+ufo-techniques = { crew = "ufo-techniques" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "soso", b = "yu-seng", winner = "soso" },
+  { round = "top16", a = "sunni", b = "yaio", winner = "sunni" },
+  { round = "top16", a = "lil-kev", b = "mokhtar", winner = "lil-kev" },
+  { round = "top16", a = "beetle", b = "salo", winner = "beetle" },
+  { round = "top16", a = "flexholik", b = "gimnast", winner = "flexholik" },
+  { round = "top16", a = "pac-pac", b = "daniel", winner = "pac-pac" },
+  { round = "top16", a = "tip-top-t", b = "arthur", winner = "tip-top-t" },
+  { round = "top16", a = "xak", b = "bruce-almighty", winner = "xak" },
+  { round = "top8", a = "soso", b = "sunni", winner = "soso" },
+  { round = "top8", a = "lil-kev", b = "beetle", winner = "lil-kev" },
+  { round = "top8", a = "flexholik", b = "pac-pac", winner = "flexholik" },
+  { round = "top8", a = "tip-top-t", b = "xak", winner = "tip-top-t" },
+  { round = "top4", a = "soso", b = "lil-kev", winner = "soso" },
+  { round = "top4", a = "flexholik", b = "tip-top-t", winner = "flexholik" },
+  { round = "final", a = "soso", b = "flexholik", winner = "soso" },
+]

@@ -56,9 +56,24 @@ ayumi-thesis = { members = ["thesis", "ayumi"] }
 
 [[battles]]
 key = "kids"
-name = "Kids"
+name = "Kids 2v2"
 gender = "mixed"
 age = "kids"
+team_size = 2
 results = [
   { entrant = "grom-shasty-rock", reached = "winner" },
 ]
+
+[battles.teams]
+grom-shasty-rock = { members = ["grom", "shasty-rock"] }
+
+[[battles]]
+key = "rep-your-country"
+name = "Rep Your Country"
+gender = "mixed"
+results = [
+  { entrant = "ukraine", reached = "winner" },
+]
+
+[battles.teams]
+ukraine = { name = "Ukraine" }

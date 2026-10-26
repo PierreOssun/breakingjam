@@ -1,0 +1,33 @@
+name = "Battle Pro 2019"
+starts_on = 2019-02-23
+timezone = "Europe/Paris"
+city = "Boulogne-Billancourt"
+country = "FR"
+lat = 48.8238
+lng = 2.2332
+venue = "La Seine Musicale"
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro", "https://web.archive.org/web/20190607/http://www.battle-pro.com/", "https://www.sortiraparis.com/scenes/articles/186171-battle-pro-2019-worlds-hip-hop-and-breakdance-championship-at-paris-la-seine-mus/lang/en"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "red-bull-bc-one-all-stars", reached = "winner" },
+  { entrant = "obc", reached = "top2" },
+]
+
+[battles.teams]
+obc = { crew = "obc" }
+red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "lil-g", reached = "winner" },
+]

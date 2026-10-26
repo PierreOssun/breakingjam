@@ -23,12 +23,12 @@ matches = [
   { round = "top16", a = "kuzya", b = "kae", winner = "kuzya" },
   { round = "top16", a = "lb", b = "sheku", winner = "lb" },
   { round = "top16", a = "illz", b = "lil-g", winner = "illz" },
-  { round = "top16", a = "phil-wizzard", b = "gieras", winner = "phil-wizzard" },
+  { round = "top16", a = "phil-wizard", b = "gieras", winner = "phil-wizard" },
   { round = "top16", a = "cheerito", b = "mini-joe", winner = "cheerito" },
   { round = "top8", a = "kid-karam", b = "ayumi", winner = "kid-karam" },
   { round = "top8", a = "kuzya", b = "dany", winner = "kuzya" },
   { round = "top8", a = "illz", b = "lb", winner = "illz" },
-  { round = "top8", a = "cheerito", b = "phill-wizard", winner = "cheerito" },
+  { round = "top8", a = "cheerito", b = "phil-wizard", winner = "cheerito" },
   { round = "top4", a = "kuzya", b = "kid-karam", winner = "kuzya" },
   { round = "top4", a = "cheerito", b = "illz", winner = "cheerito" },
   { round = "final", a = "cheerito", b = "kuzya", winner = "cheerito" },
@@ -56,9 +56,24 @@ den-intact = { members = ["intact", "den"] }
 
 [[battles]]
 key = "kids"
-name = "Kids"
+name = "Kids 2v2"
 gender = "mixed"
 age = "kids"
+team_size = 2
 results = [
   { entrant = "malik-raptor", reached = "winner" },
 ]
+
+[battles.teams]
+malik-raptor = { members = ["raptor", "malik"] }
+
+[[battles]]
+key = "rep-your-country"
+name = "Rep Your Country"
+gender = "mixed"
+results = [
+  { entrant = "france", reached = "winner" },
+]
+
+[battles.teams]
+france = { name = "France" }

@@ -180,5 +180,5 @@ async fn set_role(
         return Err(AppError::invalid("role", "you cannot change your own role"));
     }
     let user = db::users::set_role(&state.pool, id, req.role).await?;
-    Ok(Json(user.into()))
+    Ok(Json(UserResponse::load(&state.pool, user).await?))
 }

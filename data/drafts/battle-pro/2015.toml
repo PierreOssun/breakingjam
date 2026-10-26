@@ -1,0 +1,53 @@
+name = "Battle Pro 2015"
+# check: no source gives the day; the Saturday before the first battle video went up
+starts_on = 2015-03-07
+timezone = "Europe/Paris"
+city = "Chelles"
+country = "FR"
+lat = 48.8811
+lng = 2.5930
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "infamous", b = "black-out", winner = "infamous" },
+  { round = "top8", a = "hrc", b = "df-zulu-breakers", winner = "df-zulu-breakers" },
+  { round = "top8", a = "east-side-bboys", b = "tigerz-crew", winner = "east-side-bboys" },
+  { round = "top8", a = "gorilla-legion", b = "fusion-mc", winner = "fusion-mc" },
+  { round = "top4", a = "infamous", b = "df-zulu-breakers", winner = "infamous" },
+  { round = "top4", a = "east-side-bboys", b = "fusion-mc", winner = "east-side-bboys" },
+  { round = "final", a = "infamous", b = "east-side-bboys", winner = "infamous", video = "https://www.youtube.com/watch?v=wdDDEj2HB0M" },
+]
+
+[battles.teams]
+black-out = { crew = "black-out" }
+df-zulu-breakers = { crew = "df-zulu-breakers" }
+east-side-bboys = { crew = "east-side-bboys" }
+fusion-mc = { crew = "fusion-mc" }
+gorilla-legion = { crew = "gorilla-legion" }
+hrc = { crew = "hrc" }
+infamous = { crew = "infamous" }
+tigerz-crew = { crew = "tigerz-crew" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "mounir", b = "v-o", winner = "mounir" },
+  { round = "top8", a = "taz", b = "cherep", winner = "cherep" },
+  { round = "top8", a = "jazzy", b = "chenchen", winner = "jazzy" },
+  { round = "top8", a = "tko", b = "kacyo", winner = "kacyo" },
+  { round = "top4", a = "mounir", b = "cherep", winner = "mounir" },
+  { round = "top4", a = "jazzy", b = "kacyo", winner = "jazzy" },
+  # jazzy: Wikipedia says Jazzy (NL), the video "Mounir vs Jessy"; the existing jazzy is Turkish.
+  { round = "final", a = "mounir", b = "jazzy", winner = "mounir", video = "https://www.youtube.com/watch?v=0F47KJhpAu8" },
+]

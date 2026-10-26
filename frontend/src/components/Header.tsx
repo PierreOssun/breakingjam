@@ -3,7 +3,6 @@ import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router";
 import { withNext } from "../features/auth/safeNext";
-import { useLogout } from "../features/auth/useLogout";
 import { useMe } from "../features/auth/useMe";
 import { AccountMenu } from "./AccountMenu";
 import { buttonClasses } from "./buttonClasses";
@@ -18,7 +17,7 @@ const navLink = `${buttonClasses("ghost", "sm")} relative aria-[current=page]:af
 const sheetLink =
   "flex h-14 items-center rounded-md px-3 text-title transition-colors duration-fast hover:bg-surface-raised aria-[current=page]:text-primary-text";
 
-/** Site header: wordmark, the three nav links, language, account, and "Register a jam". */
+/** Site header: wordmark, the three nav links, language, account, and "Register a jam" (DESIGN.md §4.6). */
 export function Header({ sticky = true }: { sticky?: boolean }) {
   const { t } = useTranslation();
   const me = useMe();
@@ -27,7 +26,8 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
 
   return (
     <header
-      className={`${sticky ? "sticky top-0" : ""} z-40 h-header border-b border-border bg-bg lg:h-header-lg`}
+      // Positioned either way: the account sheet hangs from its bottom edge.
+      className={`${sticky ? "sticky top-0" : "relative"} z-40 h-header border-b border-border bg-bg lg:h-header-lg`}
     >
       <div className="mx-auto flex h-full max-w-content items-center gap-2 px-4 md:px-6 lg:px-8">
         <Wordmark logo="mark" />
@@ -38,7 +38,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
         <LanguageSwitch />
         <div className="hidden items-center gap-2 xl:flex">
           {me.data ? (
-            <AccountMenu me={me.data} />
+            <AccountMenu me={me.data} layout="dropdown" />
           ) : (
             !me.isPending && (
               <LogIn
@@ -51,16 +51,22 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
             {t("nav.registerJam")}
           </Link>
         </div>
-        <IconButton
-          label={t("nav.openMenu")}
-          className="xl:hidden"
-          onClick={() => menuRef.current?.showModal()}
-        >
-          <List size={22} weight="bold" aria-hidden />
-        </IconButton>
+        {me.data ? (
+          <div className="xl:hidden">
+            <AccountMenu me={me.data} layout="sheet" />
+          </div>
+        ) : (
+          <IconButton
+            label={t("nav.openMenu")}
+            className="xl:hidden"
+            onClick={() => menuRef.current?.showModal()}
+          >
+            <List size={22} weight="bold" aria-hidden />
+          </IconButton>
+        )}
       </div>
 
-      {/* Below lg: a full-height sheet; the native dialog traps focus and closes on Esc. */}
+      {/* Logged out, below xl: a full-height sheet; the native dialog traps focus and closes on Esc. */}
       <dialog
         ref={menuRef}
         aria-label={t("nav.menu")}
@@ -74,7 +80,9 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
           </div>
           <nav className="flex flex-col">
             <NavLinks className={sheetLink} onClick={closeMenu} />
-            <SheetAccount onDone={closeMenu} />
+            {!me.isPending && !me.data && (
+              <LogIn className={sheetLink} onClick={closeMenu} />
+            )}
           </nav>
           <div className="flex-1" />
           <Link
@@ -130,33 +138,5 @@ function LogIn({
     <Link to={withNext("/login", here)} className={className} onClick={onClick}>
       {t("nav.logIn")}
     </Link>
-  );
-}
-
-/** The menu sheet's account part: My jams, Admin, Log out, or Log in once the session is known. */
-function SheetAccount({ onDone }: { onDone: () => void }) {
-  const { t } = useTranslation();
-  const me = useMe();
-  const logout = useLogout(onDone);
-  if (me.isPending) return null;
-  if (!me.data) return <LogIn className={sheetLink} onClick={onDone} />;
-  return (
-    <>
-      <NavLink to="/org/jams" end className={sheetLink} onClick={onDone}>
-        {t("nav.myJams")}
-      </NavLink>
-      {me.data.role === "admin" && (
-        <NavLink to="/admin" className={sheetLink} onClick={onDone}>
-          {t("nav.admin")}
-        </NavLink>
-      )}
-      <button
-        type="button"
-        className={sheetLink}
-        onClick={() => logout.mutate()}
-      >
-        {t("nav.logOut")}
-      </button>
-    </>
   );
 }

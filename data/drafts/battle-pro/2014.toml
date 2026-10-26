@@ -1,0 +1,61 @@
+name = "Battle Pro 2014"
+# check: EverybodyWiki says 28 Feb 2014; the Undisputed videos went up from 2 Mar
+starts_on = 2014-03-01
+timezone = "Europe/Paris"
+city = "Chelles"
+country = "FR"
+lat = 48.8811
+lng = 2.5930
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "team-rhone-alpes", b = "east-side-bboys", winner = "team-rhone-alpes" },
+  { round = "top8", a = "team-usa", b = "df-zulu-breakers", winner = "df-zulu-breakers" },
+  { round = "top8", a = "the-future-crew", b = "team-worldwide", winner = "the-future-crew" },
+  { round = "top8", a = "the-ruggeds", b = "gamblerz", winner = "gamblerz" },
+  { round = "top4", a = "team-rhone-alpes", b = "df-zulu-breakers", winner = "team-rhone-alpes" },
+  { round = "top4", a = "the-future-crew", b = "gamblerz", winner = "gamblerz" },
+  { round = "final", a = "team-rhone-alpes", b = "gamblerz", winner = "team-rhone-alpes", video = "https://www.youtube.com/watch?v=A00X1cQkBxA" },
+]
+
+[battles.teams]
+df-zulu-breakers = { crew = "df-zulu-breakers" }
+east-side-bboys = { crew = "east-side-bboys" }
+gamblerz = { crew = "gamblerz" }
+team-rhone-alpes = { crew = "team-rhone-alpes" }
+team-usa = { crew = "team-usa" }
+team-worldwide = { crew = "team-worldwide" }
+the-future-crew = { crew = "the-future-crew" }
+the-ruggeds = { crew = "the-ruggeds" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "menno", b = "benny", winner = "menno" },
+  { round = "top16", a = "cri6", b = "liquid-man", winner = "cri6" },
+  { round = "top16", a = "kolobok", b = "luan", winner = "kolobok" },
+  { round = "top16", a = "chey", b = "azone", winner = "chey" },
+  { round = "top16", a = "zoot", b = "toleek", winner = "zoot" },
+  { round = "top16", a = "kazuki-rock", b = "willy", winner = "kazuki-rock" },
+  # omar: Wikipedia flags him German; the existing omar is American. Same one?
+  { round = "top16", a = "kareem", b = "omar", winner = "kareem" },
+  { round = "top16", a = "lil-g", b = "admiracles", winner = "lil-g" },
+  { round = "top8", a = "menno", b = "cri6", winner = "menno" },
+  { round = "top8", a = "kolobok", b = "chey", winner = "kolobok" },
+  { round = "top8", a = "zoot", b = "kazuki-rock", winner = "zoot" },
+  { round = "top8", a = "kareem", b = "lil-g", winner = "kareem" },
+  { round = "top4", a = "menno", b = "kolobok", winner = "menno" },
+  { round = "top4", a = "zoot", b = "kareem", winner = "kareem" },
+  { round = "final", a = "menno", b = "kareem", winner = "menno" },
+]

@@ -1,0 +1,69 @@
+name = "UK B-Boy Championships World Finals 2012"
+starts_on = 2012-10-14
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+lat = 51.4651
+lng = -0.1149
+venue = "O2 Academy Brixton"
+sources = ["https://en.wikipedia.org/wiki/UK_B-Boy_Championships", "https://web.archive.org/web/20121028/http://bboychampionships.com/", "https://prnewswire.co.uk/news-releases/the-greatest-b-boy-battle---the-ultimate-stage-169735966.html", "https://kyeonggi.com/article/201210170477184"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "jinjo-crew", b = "dead-prezz", winner = "jinjo-crew" },
+  { round = "top8", a = "shmetta-skwad", b = "foundnation", winner = "foundnation" },
+  { round = "top8", a = "soul-meezy", b = "havikoro", winner = "havikoro" },
+  { round = "top8", a = "arcopom", b = "soul-mavericks", winner = "soul-mavericks" },
+  { round = "top4", a = "jinjo-crew", b = "foundnation", winner = "jinjo-crew" },
+  { round = "top4", a = "havikoro", b = "soul-mavericks", winner = "soul-mavericks" },
+  { round = "final", a = "jinjo-crew", b = "soul-mavericks", winner = "jinjo-crew" },
+]
+
+[battles.teams]
+arcopom = { crew = "arcopom" }
+dead-prezz = { crew = "dead-prezz" }
+foundnation = { crew = "foundnation" }
+havikoro = { crew = "havikoro" }
+jinjo-crew = { crew = "jinjo-crew" }
+shmetta-skwad = { crew = "shmetta-skwad" }
+soul-mavericks = { crew = "soul-mavericks" }
+soul-meezy = { crew = "soul-meezy" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kareem", b = "yu-seng", winner = "kareem" },
+  { round = "top16", a = "sunni", b = "hoo-hoo", winner = "sunni" },
+  { round = "top16", a = "moy", b = "tawfiq", winner = "moy" },
+  { round = "top16", a = "spin", b = "darwin", winner = "spin" },
+  { round = "top16", a = "chakal", b = "vicious-victor", winner = "vicious-victor" },
+  { round = "top16", a = "morris", b = "sambo", winner = "morris" },
+  { round = "top16", a = "hill", b = "yuya", winner = "hill" },
+  { round = "top16", a = "roxy", b = "niek", winner = "niek" },
+  { round = "top8", a = "kareem", b = "sunni", winner = "kareem" },
+  { round = "top8", a = "moy", b = "spin", winner = "moy" },
+  { round = "top8", a = "vicious-victor", b = "morris", winner = "morris" },
+  { round = "top8", a = "hill", b = "niek", winner = "niek" },
+  { round = "top4", a = "kareem", b = "moy", winner = "kareem" },
+  { round = "top4", a = "morris", b = "niek", winner = "niek" },
+  { round = "final", a = "kareem", b = "niek", winner = "kareem" },
+]
+
+[[battles]]
+key = "seven-to-smoke"
+name = "Seven to Smoke"
+gender = "bboy"
+format = "seven_to_smoke"
+results = [
+  { entrant = "issei", reached = "winner" },
+]

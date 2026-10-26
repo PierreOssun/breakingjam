@@ -1,0 +1,12 @@
+name = "UK B-Boy Championships World Finals"
+country = "GB"
+timezone = "Europe/London"
+
+[wikipedia]
+page = "https://en.wikipedia.org/wiki/UK_B-Boy_Championships"
+# 2011–2013 hide the crew and solo brackets under one heading; the crew bracket has eight crews, the solo sixteen.
+battles = [
+  { key = "crew", name = "Crew battle", sides = "crews", words = ["crew"], table = "Past UK B-Boy Championship results", places = { "First place" = "winner", "Second place" = "top2", "Third place" = "top4" } },
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["solo"], table = "Past Solo B-Boy Champions results", places = { "Winner" = "winner" } },
+  { key = "seven-to-smoke", name = "Seven to Smoke", gender = "bboy", table = "Past Seven2Smoke results", places = { "Winner" = "winner" } },
+]

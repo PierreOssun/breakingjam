@@ -1,0 +1,69 @@
+name = "UK B-Boy Championships World Finals 2013"
+starts_on = 2013-09-21
+ends_on = 2013-09-22
+timezone = "Europe/London"
+city = "Birmingham"
+country = "GB"
+lat = 52.4814
+lng = -1.8998
+sources = ["https://en.wikipedia.org/wiki/UK_B-Boy_Championships", "https://web.archive.org/web/20130927/http://bboychampionships.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "5-crew-dynasty", b = "originals", winner = "originals" },
+  { round = "top8", a = "smac-19", b = "morning-of-owl", winner = "morning-of-owl" },
+  { round = "top8", a = "the-ruggeds", b = "massive-monkeys", winner = "the-ruggeds" },
+  { round = "top8", a = "rain-crew", b = "flooriorz", winner = "flooriorz" },
+  { round = "top4", a = "originals", b = "morning-of-owl", winner = "morning-of-owl" },
+  { round = "top4", a = "the-ruggeds", b = "flooriorz", winner = "flooriorz" },
+  { round = "final", a = "morning-of-owl", b = "flooriorz", winner = "morning-of-owl" },
+]
+
+[battles.teams]
+5-crew-dynasty = { crew = "5-crew-dynasty" }
+flooriorz = { crew = "flooriorz" }
+massive-monkeys = { crew = "massive-monkeys" }
+morning-of-owl = { crew = "morning-of-owl" }
+originals = { crew = "originals" }
+rain-crew = { crew = "rain-crew" }
+smac-19 = { crew = "smac-19" }
+the-ruggeds = { crew = "the-ruggeds" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "menno", b = "heavy-haiku", winner = "menno" },
+  { round = "top16", a = "sunni", b = "apache", winner = "sunni" },
+  { round = "top16", a = "ryuichu", b = "honza", winner = "honza" },
+  { round = "top16", a = "gravity", b = "wen", winner = "gravity" },
+  { round = "top16", a = "pluto", b = "hamza", winner = "pluto" },
+  { round = "top16", a = "lussy-sky", b = "thesis", winner = "lussy-sky" },
+  { round = "top16", a = "taisuke", b = "tazzmanio", winner = "taisuke" },
+  { round = "top16", a = "nasty-ray", b = "katsuya", winner = "nasty-ray" },
+  { round = "top8", a = "menno", b = "sunni", winner = "menno" },
+  { round = "top8", a = "honza", b = "gravity", winner = "gravity" },
+  { round = "top8", a = "pluto", b = "lussy-sky", winner = "pluto" },
+  { round = "top8", a = "taisuke", b = "nasty-ray", winner = "taisuke" },
+  { round = "top4", a = "menno", b = "gravity", winner = "menno" },
+  { round = "top4", a = "pluto", b = "taisuke", winner = "taisuke" },
+  { round = "final", a = "menno", b = "taisuke", winner = "menno" },
+]
+
+[[battles]]
+key = "seven-to-smoke"
+name = "Seven to Smoke"
+gender = "bboy"
+format = "seven_to_smoke"
+results = [
+  { entrant = "gravity", reached = "winner" },
+]

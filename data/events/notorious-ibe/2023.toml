@@ -1,0 +1,12 @@
+name = "The Notorious IBE 2023"
+starts_on = 2023-08-04
+ends_on = 2023-08-06
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://web.archive.org/web/20230603/http://www.thenotoriousibe.com/", "https://www.fujifilm.com/nl/en/consumer/event/instax_Undisputed_breakdance_contest_in_Heerleen"]
+judges = []
+mcs = []
+djs = []

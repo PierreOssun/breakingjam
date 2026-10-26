@@ -1,0 +1,33 @@
+name = "Battle Pro 2021"
+starts_on = 2021-12-05
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8578
+lng = 2.3464
+venue = "Théâtre du Châtelet"
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro", "https://web.archive.org/web/20211126/http://www.battle-pro.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "body-carnival", reached = "winner" },
+  { entrant = "last-squad", reached = "top2" },
+]
+
+[battles.teams]
+body-carnival = { crew = "body-carnival" }
+last-squad = { crew = "last-squad" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "sho", reached = "winner" },
+]

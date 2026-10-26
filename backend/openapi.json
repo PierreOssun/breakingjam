@@ -269,7 +269,7 @@
         ],
         "responses": {
           "303": {
-            "description": "Logged in: to `FRONTEND_ORIGIN` + `next`. Failed: to `/login?error=google`",
+            "description": "Logged in: to `FRONTEND_ORIGIN` + `next`, except a new account coming from the jam form, which goes home. Failed: to `/login?error=google`",
             "headers": {
               "location": {
                 "schema": {
@@ -4219,7 +4219,7 @@
         "tags": [
           "places"
         ],
-        "summary": "The city a search names, case and accents aside: an exact name or alternate name first,\nelse one starting with the search; the most populated when several match.",
+        "summary": "The city a search names, case and accents aside: an exact name or alternate name first,\nelse one starting with the search; when several match, one with a public jam nearby, then\nthe most populated.",
         "operationId": "find_place",
         "parameters": [
           {
@@ -7328,6 +7328,17 @@
           "role": {
             "$ref": "#/components/schemas/Role",
             "description": "Account role, snake_case."
+          },
+          "dancer": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DancerRef",
+                "description": "The dancer page an approved claim linked to the account, so verified; null until then."
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       }

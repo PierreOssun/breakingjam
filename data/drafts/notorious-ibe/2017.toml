@@ -1,0 +1,33 @@
+name = "The Notorious IBE 2017"
+# check: only the World BBoy Series page gives a day (10 Aug, a Thursday); the festival ran several days
+starts_on = 2017-08-10
+ends_on = 2017-08-10
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://en.wikipedia.org/w/index.php?oldid=1020906746", "https://en.wikipedia.org/wiki/World_BBoy_Series"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "Super Solo Bboy Battle"
+gender = "bboy"
+results = [
+  { entrant = "kuzya", reached = "winner" },
+]
+
+[[battles]]
+key = "seven-to-smoke"
+name = "Seven to Smoke All Star Edition"
+gender = "bboy"
+format = "seven_to_smoke"
+results = [
+  { entrant = "red-bull-bc-one-all-stars", reached = "winner" },
+]
+
+[battles.teams]
+red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars", members = ["hong-10", "wing", "menno", "victor", "lil-g", "issei", "junior"] }

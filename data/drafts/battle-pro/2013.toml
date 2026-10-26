@@ -1,0 +1,37 @@
+name = "Battle Pro 2013"
+# check: no source gives the day; the Saturday before the first battle video went up
+starts_on = 2013-03-02
+timezone = "Europe/Paris"
+city = "Chelles"
+country = "FR"
+lat = 48.8811
+lng = 2.5930
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "jinjo-crew", b = "mafia-13-bmt", winner = "jinjo-crew" },
+  { round = "top8", a = "dreamteam-venezuela", b = "top-eastside-dogz", winner = "top-eastside-dogz", video = "https://www.youtube.com/watch?v=80CmX3Oyk4g" },
+  { round = "top8", a = "momentum-crew", b = "bboyworld-team", winner = "momentum-crew" },
+  { round = "top8", a = "double-kill", b = "ici-c-est-paris", winner = "ici-c-est-paris" },
+  { round = "top4", a = "jinjo-crew", b = "top-eastside-dogz", winner = "jinjo-crew", video = "https://www.youtube.com/watch?v=VwNcW5LGc8I" },
+  { round = "top4", a = "momentum-crew", b = "ici-c-est-paris", winner = "ici-c-est-paris" },
+  { round = "final", a = "jinjo-crew", b = "ici-c-est-paris", winner = "jinjo-crew", video = "https://www.youtube.com/watch?v=_OjfinSNFMM" },
+]
+
+[battles.teams]
+bboyworld-team = { crew = "bboyworld-team" }
+double-kill = { crew = "double-kill" }
+dreamteam-venezuela = { crew = "dreamteam-venezuela" }
+ici-c-est-paris = { crew = "ici-c-est-paris" }
+jinjo-crew = { crew = "jinjo-crew" }
+mafia-13-bmt = { crew = "mafia-13-bmt" }
+momentum-crew = { crew = "momentum-crew" }
+top-eastside-dogz = { crew = "top-eastside-dogz" }

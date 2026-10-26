@@ -10,7 +10,7 @@ import { Button } from "../components/Button";
 import { TextField } from "../components/TextField";
 import { splitFieldErrors } from "../lib/apiErrors";
 import { AuthShell } from "../features/auth/AuthShell";
-import { safeNext, withNext } from "../features/auth/safeNext";
+import { afterSignUp, safeNext, withNext } from "../features/auth/safeNext";
 import { ME_KEY } from "../features/auth/useMe";
 
 export function RegisterPage() {
@@ -51,7 +51,7 @@ export function RegisterPage() {
       });
       if (data) {
         queryClient.setQueryData(ME_KEY, data);
-        navigate(next, { replace: true });
+        navigate(afterSignUp(next), { replace: true });
         return;
       }
       if (response.status === 409) {

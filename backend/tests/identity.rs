@@ -91,9 +91,19 @@ async fn claim_then_approve_hands_the_page_over(pool: PgPool) {
     assert_eq!(items[0]["dancer"]["instagram_handle"], "lilg");
     assert_eq!(items[0]["user"]["email"], "lilg@example.com");
 
+    let me = |cookie: &str| send(&w.app, get("/api/auth/me", Some(cookie)));
+    assert_eq!(me(&lilg).await.json["dancer"], Value::Null);
     let approved = w.review(&claim.json, "approve").await;
     assert_eq!(approved.status, StatusCode::OK);
     assert_eq!(approved.json["status"], "approved");
+    let linked = me(&lilg).await.json;
+    assert_eq!(
+        linked["dancer"]["id"],
+        dancer.as_str(),
+        "the account menu's page"
+    );
+    assert_eq!(linked["dancer"]["dancer_name"], "Lil G");
+    assert_eq!(me(&rival).await.json["dancer"], Value::Null);
     let rival_after = send(
         &w.app,
         get(&format!("/api/dancers/{dancer}/claim"), Some(&rival)),

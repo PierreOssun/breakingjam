@@ -1,0 +1,32 @@
+name = "The Notorious IBE 2015"
+starts_on = 2015-08-01
+ends_on = 2015-08-02
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://en.wikipedia.org/w/index.php?oldid=1020906746", "https://en.wikipedia.org/wiki/World_BBoy_Series", "https://web.archive.org/web/20150703/http://www.thenotoriousibe.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "Super Solo Bboy Battle"
+gender = "bboy"
+results = [
+  { entrant = "sunni", reached = "winner" },
+]
+
+[[battles]]
+key = "seven-to-smoke"
+name = "Seven to Smoke Crew Edition"
+gender = "mixed"
+format = "seven_to_smoke"
+results = [
+  { entrant = "japan", reached = "winner" },
+]
+
+[battles.teams]
+japan = { name = "Japan", members = ["issei", "nori", "katsu", "ami", "shigekix"] }

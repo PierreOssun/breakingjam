@@ -1,0 +1,29 @@
+name = "The Notorious IBE 2012"
+starts_on = 2012-09-07
+ends_on = 2012-09-09
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://en.wikipedia.org/w/index.php?oldid=1020906746", "https://www.festivalinfo.nl/festival/15457/The-Notorious-IBE/2012/", "https://web.archive.org/web/20120918/http://bboychampionships.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "Super Solo Bboy Battle"
+gender = "bboy"
+results = [
+  { entrant = "killa-sebi", reached = "winner" },
+]
+
+[[battles]]
+key = "seven-to-smoke"
+name = "Seven to Smoke"
+gender = "bboy"
+format = "seven_to_smoke"
+results = [
+  { entrant = "blond", reached = "winner" },
+]

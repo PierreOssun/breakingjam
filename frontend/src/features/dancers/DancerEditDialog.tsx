@@ -18,6 +18,7 @@ import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
 import { applyFieldErrors } from "../../lib/apiErrors";
 import { toHandle } from "../../lib/instagram";
+import { ME_KEY } from "../auth/useMe";
 import {
   type AvatarParts,
   DETAILS,
@@ -115,6 +116,8 @@ export function DancerEditDialog({
     onSuccess: ({ data, error, response }) => {
       if (data) {
         queryClient.setQueryData(["dancer", dancer.id], data);
+        // The account menu shows its owner's page: name and avatar.
+        void queryClient.invalidateQueries({ queryKey: ME_KEY });
         toast({ kind: "success", message: t("dancerEdit.saved") });
         onClose();
       } else if (response.status === 409) {

@@ -6,6 +6,7 @@ import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import { Protocol } from "pmtiles";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../../lib/theme";
 import { useMediaQuery } from "../../lib/useMediaQuery";
 import { mapStyle, tileSource } from "./style";
 
@@ -23,18 +24,18 @@ const TILES = tileSource({
 
 export { maplibre };
 
-/** The page's colour scheme: an explicit `data-theme`, else the OS setting (§2.1). */
-function useTheme(): "dark" | "light" {
+/** The page's colour scheme: the account menu's choice, else the OS setting (§2.1). */
+function useScheme(): "dark" | "light" {
   const osLight = useMediaQuery("(prefers-color-scheme: light)");
-  const chosen = document.documentElement.dataset.theme;
-  if (chosen === "dark" || chosen === "light") return chosen;
+  const theme = useTheme();
+  if (theme !== "auto") return theme;
   return osLight ? "light" : "dark";
 }
 
 /** The base map in the page's theme and UI language. */
 export function useMapStyle() {
   const { i18n } = useTranslation();
-  const theme = useTheme();
+  const theme = useScheme();
   return useMemo(
     () => mapStyle(theme, i18n.resolvedLanguage ?? "en", TILES),
     [theme, i18n.resolvedLanguage],

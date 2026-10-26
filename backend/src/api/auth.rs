@@ -7,6 +7,7 @@ use axum::{
     response::{AppendHeaders, IntoResponse, Redirect, Response},
 };
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
@@ -15,11 +16,15 @@ use validator::Validate;
 use super::json::ValidJson;
 use crate::{
     auth::{
-        google, password,
+        google::{self, Account},
+        password,
         session::{self, CurrentUser},
     },
     db,
-    domain::user::{Role, User},
+    domain::{
+        dancer::DancerRef,
+        user::{Role, User},
+    },
     error::{AppError, ErrorEnvelope, InvalidFields, Unauthorized},
     state::AppState,
 };
@@ -72,16 +77,20 @@ pub struct UserResponse {
     pub display_name: String,
     /// Account role, snake_case.
     pub role: Role,
+    /// The dancer page an approved claim linked to the account, so verified; null until then.
+    pub dancer: Option<DancerRef>,
 }
 
-impl From<User> for UserResponse {
-    fn from(user: User) -> Self {
-        Self {
+impl UserResponse {
+    /// The account with its dancer page.
+    pub async fn load(pool: &PgPool, user: User) -> sqlx::Result<Self> {
+        Ok(Self {
+            dancer: db::dancers::of_user(pool, user.id).await?,
             id: user.id,
             email: user.email,
             display_name: user.display_name,
             role: user.role,
-        }
+        })
     }
 }
 
@@ -134,10 +143,8 @@ async fn register(
     let user =
         db::users::insert_with_password(&state.pool, email, req.display_name.trim(), &hash).await?;
     let cookie = session::start(&state, user.id).await?;
-    Ok((
-        StatusCode::CREATED,
-        ([(SET_COOKIE, cookie)], Json(user.into())),
-    ))
+    let user = UserResponse::load(&state.pool, user).await?;
+    Ok((StatusCode::CREATED, ([(SET_COOKIE, cookie)], Json(user))))
 }
 
 /// Log in with email and password.
@@ -169,7 +176,8 @@ async fn login(
         .filter(|(_, own)| ok && own.is_some())
         .ok_or(AppError::Unauthorized)?;
     let cookie = session::start(&state, user.id).await?;
-    Ok(([(SET_COOKIE, cookie)], Json(user.into())))
+    let user = UserResponse::load(&state.pool, user).await?;
+    Ok(([(SET_COOKIE, cookie)], Json(user)))
 }
 
 /// End the current session; succeeds without one too.
@@ -214,7 +222,8 @@ async fn me(
 ) -> Result<WithCookie<Json<UserResponse>>, AppError> {
     // The frontend calls `me` on every load, which makes the 30-day session rolling.
     let cookie = session::extend(&state, current.session_id).await?;
-    Ok(([(SET_COOKIE, cookie)], Json(current.user.into())))
+    let user = UserResponse::load(&state.pool, current.user).await?;
+    Ok(([(SET_COOKIE, cookie)], Json(user)))
 }
 
 /// Start Google sign-in (a browser navigation, not a fetch).
@@ -245,7 +254,7 @@ async fn google_start(
     operation_id = "google_callback",
     params(GoogleCallbackQuery),
     responses(
-        (status = SEE_OTHER, description = "Logged in: to `FRONTEND_ORIGIN` + `next`. Failed: to `/login?error=google`", headers(("location" = String))),
+        (status = SEE_OTHER, description = "Logged in: to `FRONTEND_ORIGIN` + `next`, except a new account coming from the jam form, which goes home. Failed: to `/login?error=google`", headers(("location" = String))),
     )
 )]
 async fn google_callback(
@@ -274,16 +283,25 @@ async fn finish_google(
         .filter(|_| query.state.as_deref() == Some(pending.state.as_str()))
         .ok_or(AppError::Unauthorized)?;
     let profile = google::exchange(&state.config, &state.http, code, pending.verifier).await?;
-    let user = google::find_or_create_user(&state.pool, &profile).await?;
+    let next = safe_next(Some(&pending.next));
+    let (user, next) = match google::find_or_create_user(&state.pool, &profile).await? {
+        Account::Existing(user) => (user, next),
+        Account::New(user) => (user, after_sign_up(next)),
+    };
     let session_cookie = session::start(state, user.id).await?;
     // Two `Set-Cookie` headers: a plain array would `insert` and keep only the last one.
     let cookies = AppendHeaders([
         (SET_COOKIE, session_cookie),
         (SET_COOKIE, google::clear(&state.config)?),
     ]);
-    let next = safe_next(Some(&pending.next));
     let target = format!("{}{next}", state.config.frontend_origin);
     Ok((cookies, Redirect::to(&target)).into_response())
+}
+
+/// Where a new account goes after `next`: anywhere but the jam form, as it may only dance or
+/// watch (mirrored in the frontend's `afterSignUp`).
+pub(crate) fn after_sign_up(next: &str) -> &str {
+    if next == "/org/jams/new" { "/" } else { next }
 }
 
 /// Only same-site paths: `/x` yes, `//evil.com` and `https://evil.com` no.

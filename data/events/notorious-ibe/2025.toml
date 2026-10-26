@@ -1,0 +1,12 @@
+name = "The Notorious IBE 2025"
+starts_on = 2025-08-15
+ends_on = 2025-08-17
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://web.archive.org/web/20250714/http://www.thenotoriousibe.com/"]
+judges = []
+mcs = []
+djs = []

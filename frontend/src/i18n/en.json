@@ -14,7 +14,22 @@
     "language": "Language: {{name}}",
     "admin": "Admin",
     "jamMap": "Jam map",
-    "account": "Account"
+    "account": "Account",
+    "accountMenu": "Account menu",
+    "accountMenuOf": "{{name}}, account menu"
+  },
+  "account": {
+    "viewPage": "View my dancer page",
+    "unclaimedTitle": "Are you a dancer?",
+    "unclaimedBody": "Find your page and claim it.",
+    "findPage": "Find my dancer page",
+    "drafts_one": "{{count}} draft",
+    "drafts_other": "{{count}} drafts",
+    "toReview": "{{count}} to review",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto"
   },
   "footer": {
     "links": "Site links"

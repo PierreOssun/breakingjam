@@ -48,3 +48,14 @@ age = "kids"
 results = [
   { entrant = "point", reached = "winner" },
 ]
+
+[[battles]]
+key = "rep-your-country"
+name = "Rep Your Country"
+gender = "mixed"
+results = [
+  { entrant = "belgium", reached = "winner" },
+]
+
+[battles.teams]
+belgium = { name = "Belgium" }

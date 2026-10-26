@@ -1,0 +1,67 @@
+name = "Battle of the Year 2019"
+starts_on = 2019-10-26
+timezone = "Europe/Paris"
+city = "Montpellier"
+country = "FR"
+lat = 43.5733
+lng = 3.9517
+venue = "Sud de France Arena"
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://battleoftheyear.net/en/editions/2019", "https://web.archive.org/web/20190512221015/http://www.battleoftheyear.net/boty-2019/"]
+judges = ["crumbs", "mounir", "movie-one", "neguin", "wing"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "last-squad", reached = "winner" },
+  { entrant = "body-carnival", reached = "top4" },
+  { entrant = "team-vinotinto", reached = "top4" },
+  { entrant = "artistreet", reached = "top2" },
+]
+
+[battles.teams]
+artistreet = { crew = "artistreet" }
+body-carnival = { crew = "body-carnival" }
+last-squad = { crew = "last-squad" }
+team-vinotinto = { crew = "team-vinotinto" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "pluto", b = "rico", winner = "pluto", video = "https://www.youtube.com/watch?v=7vgccWRZGdU" },
+  { round = "top16", a = "primo", b = "pac-pac", winner = "pac-pac", video = "https://www.youtube.com/watch?v=QiRnNJogX20" },
+  { round = "top16", a = "alvin", b = "man-like-b", winner = "alvin", video = "https://www.youtube.com/watch?v=9tM6VDHPsTU" },
+  { round = "top16", a = "jayson", b = "d-tex", winner = "jayson", video = "https://www.youtube.com/watch?v=tnPMGZnOVvc" },
+  { round = "top16", a = "tricky", b = "onel", winner = "tricky", video = "https://www.youtube.com/watch?v=RJF8HeVDHz0" },
+  { round = "top16", a = "poxy", b = "zeku", winner = "zeku", video = "https://www.youtube.com/watch?v=3Ejwdl1PD2U" },
+  { round = "top16", a = "karajos", b = "shinobi", winner = "shinobi", video = "https://www.youtube.com/watch?v=nb5vgyjAP7U" },
+  { round = "top16", a = "davy", b = "pancho", winner = "davy", video = "https://www.youtube.com/watch?v=dF8WXIuyYLM" },
+  { round = "top8", a = "pluto", b = "pac-pac", winner = "pac-pac", video = "https://www.youtube.com/watch?v=MTbsHH2XqFE" },
+  { round = "top8", a = "alvin", b = "jayson", winner = "jayson", video = "https://www.youtube.com/watch?v=fN1iyyWU0TM" },
+  { round = "top8", a = "tricky", b = "zeku", winner = "zeku", video = "https://www.youtube.com/watch?v=oaji3y_SjaM" },
+  { round = "top8", a = "shinobi", b = "davy", winner = "davy", video = "https://www.youtube.com/watch?v=lorHW859pRg" },
+  { round = "top4", a = "pac-pac", b = "jayson", winner = "pac-pac", video = "https://www.youtube.com/watch?v=Sasj4NdbpRg" },
+  { round = "top4", a = "zeku", b = "davy", winner = "zeku", video = "https://www.youtube.com/watch?v=iEOH0RcDWN0" },
+  { round = "final", a = "pac-pac", b = "zeku", winner = "zeku", video = "https://www.youtube.com/watch?v=YOdruPezaEY" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "lil-mami", b = "fanny", winner = "lil-mami", video = "https://www.youtube.com/watch?v=6gsrPj3pYr8" },
+  { round = "top8", a = "rut", b = "eri-fenesis", winner = "eri-fenesis", video = "https://www.youtube.com/watch?v=SAmjllMhso8" },
+  { round = "top8", a = "karina", b = "firebird", winner = "karina", video = "https://www.youtube.com/watch?v=uLKPK6-xy-8" },
+  { round = "top8", a = "keysha", b = "cc", winner = "cc", video = "https://www.youtube.com/watch?v=v0rOnishkZY" },
+  { round = "top4", a = "eri-fenesis", b = "karina", winner = "eri-fenesis", video = "https://www.youtube.com/watch?v=Bt5hm3RDp5E" },
+  { round = "top4", a = "lil-mami", b = "cc", winner = "lil-mami", video = "https://www.youtube.com/watch?v=xqifgyHKN3U" },
+  { round = "final", a = "eri-fenesis", b = "lil-mami", winner = "lil-mami", video = "https://www.youtube.com/watch?v=dvrSdOHGIVM" },
+]

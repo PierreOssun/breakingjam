@@ -84,4 +84,5 @@ export const LIL_G = {
   email: "lilg@example.com",
   display_name: "Lil G",
   role: "user",
+  dancer: null,
 };

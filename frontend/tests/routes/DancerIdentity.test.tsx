@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   formatParts,
@@ -202,6 +202,12 @@ describe("dancer identity", () => {
     await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("Profile saved.")).toBeInTheDocument();
+    // The account menu shows the owner's name and avatar: the session is read again.
+    await waitFor(() =>
+      expect(
+        calls(fetch).filter((call) => call === "GET /api/auth/me"),
+      ).toHaveLength(2),
+    );
     const body = await bodyOf(fetch, `PUT /api/dancers/${ID}`);
     expect(body).toMatchObject({
       dancer_name: "Ventus",
@@ -297,6 +303,12 @@ describe("dancer identity", () => {
     expect(await screen.findByText("No claims waiting.")).toBeInTheDocument();
     expect(calls(fetch)).toContain(
       `POST /api/admin/claims/${CLAIM.id}/approve`,
+    );
+    // An admin may have approved their own claim: their menu then links the page.
+    await waitFor(() =>
+      expect(
+        calls(fetch).filter((call) => call === "GET /api/auth/me"),
+      ).toHaveLength(2),
     );
   });
 

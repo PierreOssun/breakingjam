@@ -1,0 +1,12 @@
+name = "Battle Pro 2022"
+starts_on = 2022-12-03
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8325
+lng = 2.2861
+venue = "Dôme de Paris"
+sources = ["https://web.archive.org/web/20230130/http://www.battle-pro.com/"]
+judges = []
+mcs = []
+djs = []

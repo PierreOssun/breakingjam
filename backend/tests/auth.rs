@@ -1,7 +1,7 @@
 mod test_app;
 
 use axum::{Router, http::StatusCode};
-use breakingjam::auth::google::{self, Profile};
+use breakingjam::auth::google::{self, Account, Profile};
 use serde_json::json;
 use sqlx::PgPool;
 use test_app::{TestResponse, app, get, post, send};
@@ -181,13 +181,21 @@ fn profile(sub: &str, email: &str, email_verified: bool) -> Profile {
 
 #[sqlx::test]
 async fn google_creates_then_finds_by_subject(pool: PgPool) {
-    let created = google::find_or_create_user(&pool, &profile("g-1", "lilg@gmail.com", true))
-        .await
-        .unwrap();
+    let Account::New(created) =
+        google::find_or_create_user(&pool, &profile("g-1", "lilg@gmail.com", true))
+            .await
+            .unwrap()
+    else {
+        panic!("the first sign-in creates the account");
+    };
     // Same Google account with a changed email still resolves to the same user.
-    let again = google::find_or_create_user(&pool, &profile("g-1", "new@gmail.com", true))
-        .await
-        .unwrap();
+    let Account::Existing(again) =
+        google::find_or_create_user(&pool, &profile("g-1", "new@gmail.com", true))
+            .await
+            .unwrap()
+    else {
+        panic!("the second finds it");
+    };
     assert_eq!(created.id, again.id);
 }
 
@@ -200,9 +208,13 @@ async fn google_takes_over_an_unverified_password_account(pool: PgPool) {
         .cookie("bj_session")
         .unwrap();
 
-    let user = google::find_or_create_user(&pool, &profile("g-1", "lilg@gmail.com", true))
-        .await
-        .unwrap();
+    let Account::Existing(user) =
+        google::find_or_create_user(&pool, &profile("g-1", "lilg@gmail.com", true))
+            .await
+            .unwrap()
+    else {
+        panic!("the registered address is linked, not duplicated");
+    };
 
     let row = sqlx::query!(
         r#"select google_sub, password_hash, email_verified_at is not null as "verified!"
@@ -233,9 +245,13 @@ async fn google_takes_over_an_unverified_password_account(pool: PgPool) {
 
 #[sqlx::test]
 async fn google_unverified_email_creates_an_unverified_account(pool: PgPool) {
-    let user = google::find_or_create_user(&pool, &profile("g-1", "lilg@gmail.com", false))
-        .await
-        .unwrap();
+    let Account::New(user) =
+        google::find_or_create_user(&pool, &profile("g-1", "lilg@gmail.com", false))
+            .await
+            .unwrap()
+    else {
+        panic!("an unknown address makes a new account");
+    };
 
     let verified = sqlx::query_scalar!(
         r#"select email_verified_at is not null as "verified!" from app_users where id = $1"#,

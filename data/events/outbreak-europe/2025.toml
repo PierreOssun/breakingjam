@@ -110,3 +110,39 @@ age = "kids"
 results = [
   { entrant = "saturn", reached = "winner" },
 ]
+
+[[battles]]
+key = "rep-your-country"
+name = "Rep Your Country"
+gender = "mixed"
+results = [
+  { entrant = "japan", reached = "winner" },
+]
+
+[battles.teams]
+japan = { name = "Japan" }
+
+[[battles]]
+key = "footwork"
+name = "1v1 Footwork"
+gender = "mixed"
+format = "seven_to_smoke"
+results = [
+  { entrant = "shynoh", reached = "winner", video = "https://www.youtube.com/watch?v=AjHtEpBZ-V8" },
+]
+
+[[battles]]
+key = "power"
+name = "1v1 Power Move"
+gender = "mixed"
+results = [
+  { entrant = "saturn", reached = "winner" },
+]
+
+[[battles]]
+key = "toprock"
+name = "1v1 Toprock"
+gender = "mixed"
+results = [
+  { entrant = "peaky-rock", reached = "winner" },
+]

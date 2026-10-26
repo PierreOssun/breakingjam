@@ -9,8 +9,8 @@ use crate::domain::{
     battle::{BattleAge, BattleFormat, BattleGender, BracketStage, EntryStatus, StaffRole},
     crew::CrewRef,
     dancer::{
-        BattleRef, Dancer, DancerFields, DancerSource, DancerSummary, EventRef, FieldChange,
-        Participation, default_look,
+        BattleRef, Dancer, DancerFields, DancerRef, DancerSource, DancerSummary, EventRef,
+        FieldChange, Participation, default_look,
     },
     event::EventStatus,
 };
@@ -106,6 +106,18 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
                   created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null"#,
         id,
+    )
+    .fetch_optional(pool)
+    .await
+}
+
+/// The live dancer page an approved claim linked to the account `user_id`, if any.
+pub async fn of_user(pool: &PgPool, user_id: Uuid) -> sqlx::Result<Option<DancerRef>> {
+    sqlx::query_as!(
+        DancerRef,
+        "select id, dancer_name, country, country2, instagram_handle, avatar_url, avatar_parts
+         from dancers where user_id = $1 and deleted_at is null and merged_into_id is null",
+        user_id,
     )
     .fetch_optional(pool)
     .await

@@ -1,0 +1,61 @@
+name = "UK B-Boy Championships World Finals 2014"
+starts_on = 2014-10-25
+ends_on = 2014-10-26
+timezone = "Europe/London"
+city = "Birmingham"
+country = "GB"
+lat = 52.4735
+lng = -1.8999
+venue = "O2 Academy Birmingham"
+sources = ["https://en.wikipedia.org/wiki/UK_B-Boy_Championships", "https://web.archive.org/web/20141018/http://bboychampionships.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "arcopom", b = "gunsmoke-breakers", winner = "arcopom" },
+  { round = "top8", a = "supreme-queenz", b = "pockemon", winner = "pockemon" },
+  { round = "top8", a = "soul-mavericks", b = "bunch-of-guys", winner = "soul-mavericks" },
+  { round = "top8", a = "killa-tactics", b = "the-ruggeds", winner = "the-ruggeds" },
+  { round = "top4", a = "arcopom", b = "pockemon", winner = "arcopom" },
+  { round = "top4", a = "soul-mavericks", b = "the-ruggeds", winner = "the-ruggeds" },
+  { round = "final", a = "the-ruggeds", b = "arcopom", winner = "the-ruggeds" },
+]
+
+[battles.teams]
+arcopom = { crew = "arcopom" }
+bunch-of-guys = { crew = "bunch-of-guys" }
+gunsmoke-breakers = { crew = "gunsmoke-breakers" }
+killa-tactics = { crew = "killa-tactics" }
+pockemon = { crew = "pockemon" }
+soul-mavericks = { crew = "soul-mavericks" }
+supreme-queenz = { crew = "supreme-queenz" }
+the-ruggeds = { crew = "the-ruggeds" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "lilou", b = "kaneki", winner = "lilou" },
+  { round = "top16", a = "the-curse", b = "dr-hill", winner = "dr-hill" },
+  { round = "top16", a = "neepy", b = "victor-j", winner = "neepy" },
+  { round = "top16", a = "arex", b = "yosh", winner = "arex" },
+  { round = "top16", a = "katsuya", b = "amaro-dz", winner = "katsuya" },
+  { round = "top16", a = "spin", b = "omen", winner = "spin" },
+  { round = "top16", a = "boogie", b = "sunni", winner = "sunni" },
+  { round = "top16", a = "kareem", b = "ayumi", winner = "kareem" },
+  { round = "top8", a = "lilou", b = "dr-hill", winner = "lilou" },
+  { round = "top8", a = "neepy", b = "arex", winner = "arex" },
+  { round = "top8", a = "spin", b = "katsuya", winner = "spin" },
+  { round = "top8", a = "sunni", b = "kareem", winner = "kareem" },
+  { round = "top4", a = "lilou", b = "arex", winner = "lilou" },
+  { round = "top4", a = "spin", b = "kareem", winner = "spin" },
+  { round = "final", a = "lilou", b = "spin", winner = "lilou" },
+]

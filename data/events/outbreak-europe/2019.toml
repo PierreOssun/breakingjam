@@ -43,9 +43,24 @@ stripes-vicious = { members = ["stripes", "vicious"] }
 
 [[battles]]
 key = "kids"
-name = "Kids"
+name = "Kids 2v2"
 gender = "mixed"
 age = "kids"
+team_size = 2
 results = [
   { entrant = "angry-boy-grom", reached = "winner" },
 ]
+
+[battles.teams]
+angry-boy-grom = { members = ["grom", "angry-boy"] }
+
+[[battles]]
+key = "rep-your-country"
+name = "Rep Your Country"
+gender = "mixed"
+results = [
+  { entrant = "russia", reached = "winner" },
+]
+
+[battles.teams]
+russia = { name = "Russia" }

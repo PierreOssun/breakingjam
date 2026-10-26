@@ -1,0 +1,45 @@
+name = "Battle Pro 2025"
+starts_on = 2025-10-25
+ends_on = 2025-10-26
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8578
+lng = 2.3464
+venue = "Théâtre du Châtelet"
+sources = ["https://web.archive.org/web/20251104/http://www.battle-pro.com/", "https://www.paris.fr/evenements/copie-de-battle-pro-25th-anniversary-phase-finale-86017", "https://www.iledefrance.fr/tous-les-services/ma-region-pres-de-chez-moi/sport-loisirs/sport/236963-battle-pro-2025-competition-internationale-de-danse-breaking"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "body-carnival", reached = "winner" },
+]
+
+[battles.teams]
+body-carnival = { crew = "body-carnival" }
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "lil-zoo-phil-wizard", reached = "winner" },
+]
+
+[battles.teams]
+lil-zoo-phil-wizard = { members = ["phil-wizard", "lil-zoo"] }
+
+[[battles]]
+key = "kids"
+name = "1v1 Kids"
+gender = "mixed"
+age = "kids"
+results = [
+  { entrant = "third-bro", reached = "winner" },
+]

@@ -13,9 +13,14 @@ const WEAK_MATCH_POPULATION: i32 = 50_000;
 /// name, never by a prefix.
 const MIN_LOOSE: usize = 4;
 
+/// Half the side, in degrees (about 25 km), of the box in which a public jam makes a place the
+/// one a dancer means: the French Saint-Louis of a jam, not the bigger one in Senegal.
+const NEAR_JAM_DEGREES: f64 = 0.25;
+
 /// The place a search key names: an exact name first, a place's own name before an alternate,
-/// else a name starting with the key and less than twice as long, the most populated either way.
-/// `key` comes from `search_key`, so it holds no `%` or `_`.
+/// else a name starting with the key and less than twice as long; among those, one with a
+/// public jam nearby, then the most populated. `key` comes from `search_key`, so it holds no
+/// `%` or `_`.
 pub async fn best_match(pool: &PgPool, key: &str) -> sqlx::Result<Option<Place>> {
     sqlx::query_as!(
         Place,
@@ -24,12 +29,18 @@ pub async fn best_match(pool: &PgPool, key: &str) -> sqlx::Result<Option<Place>>
            where (n.name = $1
                   or ($4 and n.name like $2 and char_length(n.name) < 2 * char_length($1)))
              and (p.population >= $3 or ($4 and n.own and n.name = $1))
-           order by n.name = $1 desc, n.own desc, p.population desc
+           order by n.name = $1 desc, n.own desc,
+                    exists (select 1 from events e
+                            where e.deleted_at is null
+                              and e.status in ('published', 'registration_closed', 'completed')
+                              and abs(e.lat - p.lat) < $5 and abs(e.lng - p.lng) < $5) desc,
+                    p.population desc
            limit 1"#,
         key,
         format!("{key}%"),
         WEAK_MATCH_POPULATION,
         key.chars().count() >= MIN_LOOSE,
+        NEAR_JAM_DEGREES,
     )
     .fetch_optional(pool)
     .await

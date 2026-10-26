@@ -1,0 +1,12 @@
+name = "UK B-Boy Championships World Finals 2026"
+starts_on = 2026-08-16
+timezone = "Europe/London"
+city = "Manchester"
+country = "GB"
+lat = 53.4778
+lng = -2.2576
+venue = "Aviva Studios"
+sources = ["https://groovement.co.uk/listing/uk-b-boy-championships-world-breaking-finals-2026/", "https://happeningnext.com/event/uk-b-boy-championships-world-finals-30th-anniversary-eid3a0doknfac"]
+judges = []
+mcs = []
+djs = []

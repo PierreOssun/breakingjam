@@ -1,0 +1,45 @@
+name = "Battle Pro 2018"
+starts_on = 2018-02-24
+timezone = "Europe/Paris"
+city = "Lille"
+country = "FR"
+lat = 50.6336
+lng = 3.0775
+venue = "Zénith de Lille"
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro", "https://web.archive.org/web/20180203/http://www.battle-pro.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "body-carnival", b = "funky-belgianz", winner = "body-carnival" },
+  { round = "top8", a = "gamblerz", b = "east-side-bboys", winner = "gamblerz" },
+  { round = "top8", a = "predatorz", b = "hfc", winner = "predatorz" },
+  { round = "top8", a = "arabiq-flavour", b = "mega-breaks", winner = "arabiq-flavour" },
+  { round = "top4", a = "body-carnival", b = "gamblerz", winner = "gamblerz" },
+  { round = "top4", a = "predatorz", b = "arabiq-flavour", winner = "arabiq-flavour" },
+  { round = "final", a = "gamblerz", b = "arabiq-flavour", winner = "gamblerz" },
+]
+
+[battles.teams]
+arabiq-flavour = { crew = "arabiq-flavour" }
+body-carnival = { crew = "body-carnival" }
+east-side-bboys = { crew = "east-side-bboys" }
+funky-belgianz = { crew = "funky-belgianz" }
+gamblerz = { crew = "gamblerz" }
+hfc = { crew = "hfc" }
+mega-breaks = { crew = "mega-breaks" }
+predatorz = { crew = "predatorz" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "issei", reached = "winner" },
+]

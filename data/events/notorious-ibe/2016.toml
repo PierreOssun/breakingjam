@@ -1,0 +1,29 @@
+name = "The Notorious IBE 2016"
+starts_on = 2016-08-05
+ends_on = 2016-08-07
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://en.wikipedia.org/w/index.php?oldid=1020906746", "https://en.wikipedia.org/wiki/World_BBoy_Series", "https://www.festivalinfo.nl/festival/22445/The-Notorious-IBE/2016/", "https://web.archive.org/web/20160711/http://www.thenotoriousibe.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "Super Solo Bboy Battle"
+gender = "bboy"
+results = [
+  { entrant = "victor", reached = "winner" },
+]
+
+[[battles]]
+key = "seven-to-smoke"
+name = "Seven to Smoke 30+"
+gender = "bboy"
+format = "seven_to_smoke"
+results = [
+  { entrant = "nabil", reached = "winner" },
+]

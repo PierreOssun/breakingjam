@@ -1,0 +1,60 @@
+name = "UK B-Boy Championships World Finals 2016"
+starts_on = 2016-04-09
+ends_on = 2016-04-10
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+lat = 51.5085
+lng = -0.1257
+sources = ["https://en.wikipedia.org/wiki/UK_B-Boy_Championships", "https://web.archive.org/web/20160805/http://bboychampionships.com/", "https://www.complex.com/music/a/complex/win-tickets-to-the-20th-anniversary-of-the-uk-b-boy-championship-world-finals"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "red-bull-bc-one-all-stars", b = "shmetta-skwad", winner = "red-bull-bc-one-all-stars" },
+  { round = "top8", a = "gully-squad", b = "foundnation", winner = "foundnation" },
+  { round = "top8", a = "dream-team-ru", b = "de-klan", winner = "dream-team-ru" },
+  { round = "top8", a = "23-style", b = "soul-mavericks", winner = "soul-mavericks" },
+  { round = "top4", a = "red-bull-bc-one-all-stars", b = "foundnation", winner = "red-bull-bc-one-all-stars" },
+  { round = "top4", a = "dream-team-ru", b = "soul-mavericks", winner = "dream-team-ru" },
+  { round = "final", a = "red-bull-bc-one-all-stars", b = "dream-team-ru", winner = "red-bull-bc-one-all-stars" },
+]
+
+[battles.teams]
+23-style = { crew = "23-style" }
+de-klan = { crew = "de-klan" }
+dream-team-ru = { crew = "dream-team-ru" }
+foundnation = { crew = "foundnation" }
+gully-squad = { crew = "gully-squad" }
+red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars" }
+shmetta-skwad = { crew = "shmetta-skwad" }
+soul-mavericks = { crew = "soul-mavericks" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "jamal", b = "kacyo", winner = "jamal" },
+  { round = "top16", a = "chenchen", b = "lagaet", winner = "lagaet" },
+  { round = "top16", a = "sunni", b = "aduh", winner = "sunni" },
+  { round = "top16", a = "admir", b = "create", winner = "create" },
+  { round = "top16", a = "roxrite", b = "volt", winner = "roxrite" },
+  { round = "top16", a = "dany", b = "onel", winner = "dany" },
+  { round = "top16", a = "conni", b = "taower", winner = "taower" },
+  { round = "top16", a = "taisuke", b = "t-rock", winner = "taisuke" },
+  { round = "top8", a = "jamal", b = "lagaet", winner = "jamal" },
+  { round = "top8", a = "sunni", b = "create", winner = "sunni" },
+  { round = "top8", a = "roxrite", b = "dany", winner = "roxrite" },
+  { round = "top8", a = "taower", b = "taisuke", winner = "taisuke" },
+  { round = "top4", a = "jamal", b = "sunni", winner = "sunni" },
+  { round = "top4", a = "roxrite", b = "taisuke", winner = "taisuke" },
+  { round = "final", a = "sunni", b = "taisuke", winner = "sunni" },
+]

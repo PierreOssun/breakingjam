@@ -122,11 +122,20 @@ pub async fn exchange(
     serde_json::from_slice(&body).map_err(|err| AppError::Internal(err.into()))
 }
 
+/// The account a Google sign-in lands in.
+#[derive(Debug)]
+pub enum Account {
+    /// Found by Google subject id or by verified email.
+    Existing(User),
+    /// Created by this sign-in.
+    New(User),
+}
+
 /// Finds the account for a Google profile: by subject id, then by verified email, else creates one.
-pub async fn find_or_create_user(pool: &PgPool, profile: &Profile) -> Result<User, AppError> {
+pub async fn find_or_create_user(pool: &PgPool, profile: &Profile) -> Result<Account, AppError> {
     let mut tx = pool.begin().await?;
     if let Some(user) = db::users::find_by_google_sub(&mut tx, &profile.sub).await? {
-        return Ok(user);
+        return Ok(Account::Existing(user));
     }
 
     let existing = if profile.email_verified {
@@ -134,14 +143,14 @@ pub async fn find_or_create_user(pool: &PgPool, profile: &Profile) -> Result<Use
     } else {
         None
     };
-    let user = match existing {
+    let account = match existing {
         Some((user, email_was_verified)) => {
             db::users::link_google(&mut tx, user.id, &profile.sub).await?;
             if !email_was_verified {
                 // Whoever registered the unverified address may hold a live session.
                 db::sessions::delete_for_user(&mut tx, user.id).await?;
             }
-            user
+            Account::Existing(user)
         }
         None => {
             let name = profile
@@ -149,9 +158,9 @@ pub async fn find_or_create_user(pool: &PgPool, profile: &Profile) -> Result<Use
                 .as_deref()
                 .filter(|name| !name.trim().is_empty())
                 .unwrap_or_else(|| profile.email.split('@').next().unwrap_or_default());
-            db::users::insert_with_google(&mut tx, profile, name).await?
+            Account::New(db::users::insert_with_google(&mut tx, profile, name).await?)
         }
     };
     tx.commit().await?;
-    Ok(user)
+    Ok(account)
 }

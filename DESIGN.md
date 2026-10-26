@@ -271,10 +271,11 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
   2. Nav: ghost sm links **Jam map** (`/map`), **Find a jam** (`/jams`), **Find someone** (`/dancers`). The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
   3. Spacer
   4. Language switch: ghost sm with `Globe` + ISO code + `CaretDown`
-  5. Account: ghost sm muted **Log in** when logged out; when logged in, the **account menu**, a ghost sm button with the display name and `CaretDown`
+  5. Account: ghost sm muted **Log in** when logged out; when logged in, the **avatar pill** opening the account menu (§4.34)
   6. Primary sm **Register a jam** with `Plus` 16
-- **Account menu:** the language menu's box and options (`role="menu"`, `menuitem`s): **My jams** (`/org/jams`), **Admin** (`/admin`, admins only), **Log out**. Arrow keys move, Esc closes. It keeps the bar at four items whoever is logged in.
-- **< xl:** the home link, then the language switch (`Globe` + code), then a menu icon button. The menu opens a full-height sheet with the three nav links (`h-14 text-title`), then My jams, Admin and Log in or Log out, and a full-width primary **Register a jam**.
+- **Avatar pill** (logged in, ≥ xl): `h-11 pl-1 pr-3 gap-2 rounded-full border border-border bg-surface`, hover `bg-surface-raised`. The dancer page's avatar (36px, `rounded-[11px]`), else a `User` icon in a `bg-surface-raised` square of the same size; the dancer name, else the account's name or its email's local part (`font-extrabold`, truncated at 14ch); `CaretDown`. Its accessible name is "<name>, account menu", so it starts with what it shows.
+- **< xl, logged out:** the home link, then the language switch (`Globe` + code), then a menu icon button. The menu opens a full-height sheet with the three nav links (`h-14 text-title`), then Log in, and a full-width primary **Register a jam**.
+- **< xl, logged in:** the menu icon button becomes the **avatar button**: the 40px avatar (`rounded-[12px]`) or the `User` square, in a 44px target, named "Account menu". It opens the account menu as a top sheet (§4.34).
 - **Language menu:**
   - Menu box: `w-[200px] rounded-lg border border-border-strong bg-surface-raised shadow-lg p-1`, `role="listbox"`.
   - Options: `h-11 px-3 rounded-md`, each named in its own language with its own `lang` attribute (English, Français, Deutsch, Español, Português, Italiano, 日本語, 한국어).
@@ -639,6 +640,26 @@ When a search names a city (GeoNames, §6 Search), the closest upcoming jams to 
   - on the right, the distance pill: `h-7 px-2.5 rounded-full bg-surface-raised text-[13px] font-extrabold`, "100 km", rounded to the kilometre.
 - **Footer** (`p-4`): a full-width primary **Open the map around <Place>** with a `MapPin`, to `/map?lat=…&lng=…&fit=west,south,east,north`, the box around the place and those jams.
 - **No upcoming jam within 500 km:** the header (without the "closest" line), the map with only the place, the inline empty state (§4.22) "No upcoming jams within 500 km of <Place>.", then the same map button. Nothing else.
+
+### 4.34 Account menu *(M23)*
+
+What the avatar pill (≥ xl) or the avatar button (< xl) opens, logged in (§4.6). One `role="menu"` named "Account", whose items are `menuitem`s.
+
+- **Dropdown (≥ xl):** anchored to the pill's right edge, 8px below it; `w-80 p-2 rounded-[20px] bg-surface-raised border border-border-strong shadow-lg`.
+- **Top sheet (< xl):** hangs from the header's bottom edge, full width, `rounded-b-[28px] bg-surface-raised shadow-lg p-4`, scrolling when taller than the screen, over a `bg-scrim` on the page below. The page doesn't scroll while it is open.
+- **Items, in order** (the sheet adds what the bar holds on desktop):
+  1. **Profile block** → the dancer page (`/dancers/<id>`): 52px avatar, the name in `display-sm` with the verified tick (only an approved claim links a page to an account), "View my dancer page" in `primary-text`, a `CaretRight`. `p-3 rounded-[14px]`, hover and focus `bg-surface`.
+  2. *Sheet only:* **Jam map** (`MapPin`), **Find a jam** (`MagnifyingGlass`), **Find someone** (`User`), then a separator when My jams follows.
+  3. **My jams** (`Ticket`) → `/org/jams`, with "N drafts" when there are drafts. Only for accounts that have registered a jam (the first one makes the account an organiser), the team and admins: a dancer sees their page, the theme and Log out.
+  4. **Admin** (`ShieldCheck`) → `/admin`, **admins only**, with "N to review" (jams in review plus pending dancer and organiser claims).
+  5. Separator, then **Theme**: a `label` "Theme" (muted, upper case) over a three-way segmented control, **Light** (`Sun`) / **Dark** (`Moon`) / **Auto** (`Monitor`), full width: `rounded-full border border-border bg-surface p-1`, options `h-11 rounded-full`, the chosen one `bg-surface-raised border border-border-strong`, the others muted. It is the site's only theme switch.
+  6. Separator, then **Log out** (`SignOut`), in muted text, without confirmation.
+  7. *Sheet only:* a full-width primary lg **Register a jam**.
+- **Items:** `h-11 px-3 rounded-xl gap-3`, a 20px icon, `font-bold`; hover and focus `bg-surface`. Separators: `h-px bg-border` inset 12px.
+- **Badges:** at the item's right end, `h-6 px-2 rounded-full text-caption font-extrabold`. Drafts: muted (`border border-border bg-surface text-muted`); to review: `bg-primary text-on-primary`. Hidden at 0. Each opening fetches the counts again.
+- **No dancer page linked:** in place of the profile block, a dashed card, `border-2 border-dashed border-border-strong rounded-[20px] p-4`: a `User` square, "Are you a dancer?" (`font-extrabold`) over "Find your page and claim it." (muted), then a full-width secondary sm **Find my dancer page** with `MagnifyingGlass`, to Find someone searching the account's name (`/dancers?q=…`), where "This is me" takes over.
+- **Theme:** the choice is kept on the device (`bj.theme`) and set as `data-theme` on `<html>` before the app renders; **Auto** removes it, so the OS setting applies (§2). The maps follow it.
+- **Keyboard and screen readers:** the trigger has `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`. Opening focuses the first item; Up and Down move through every item, the three theme options included (Home, End too); Enter or Space picks; Esc, a click outside, the scrim or the trigger close it, and closing gives focus back to the trigger; Tab leaves. A `radiogroup` can't sit inside a `menu`, so the theme options are `menuitemradio`s with `aria-checked` in a `group` named "Theme". Every target is at least 44px.
 
 ---
 

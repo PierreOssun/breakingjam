@@ -1,0 +1,24 @@
+name = "Battle Pro 2011"
+starts_on = 2011-03-05
+timezone = "Europe/Paris"
+city = "Chelles"
+country = "FR"
+lat = 48.8811
+lng = 2.5930
+sources = ["https://en.wikipedia.org/wiki/Chelles_Battle_Pro", "https://web.archive.org/web/20110203/http://www.battle-pro.com/"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "pockemon", reached = "winner" },
+  { entrant = "top-9", reached = "top2" },
+]
+
+[battles.teams]
+pockemon = { crew = "pockemon" }
+top-9 = { crew = "top-9" }

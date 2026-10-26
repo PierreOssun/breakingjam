@@ -5,6 +5,7 @@ abril = { name = "Abril", country = "ZZ" }
 abstrak = { name = "Abstrak", country = "US" }
 admir = { name = "Admir", country = "ZZ" }
 admiracles = { name = "Admiracles", country = "BE" }
+aduh = { name = "Aduh", country = "RU" }
 agne = { name = "Agne", country = "IT" }
 airdit = { name = "Airdit", country = "DE" }
 akorn = { name = "Akorn", country = "NZ" }
@@ -22,6 +23,7 @@ allef = { name = "Allef", country = "BR" }
 alvin = { name = "Alvin", country = "VE" }
 alyssa = { name = "Alyssa", country = "FR" }
 amaro = { name = "Amaro", country = "IT" }
+amaro-dz = { name = "Amaro", country = "DZ" }
 ami = { name = "Ami", country = "JP" }
 amir = { name = "Amir", country = "KZ" }
 amjad = { name = "Amjad", country = "CH" }
@@ -33,9 +35,11 @@ anita = { name = "Anita", country = "AR" }
 anthony = { name = "Anthony", country = "BE" }
 anti = { name = "Anti", country = "IT" }
 anton = { name = "Anton", country = "ZZ" }
+apache = { name = "Apache", country = "UA" }
 arex = { name = "Arex", country = "CO" }
 armand-the-young-hustler = { name = "Armand The Young Hustler", country = "RO" }
 armani = { name = "Armani", country = "ZZ" }
+arthur = { name = "Arthur", country = "FR" }
 artillery = { name = "Artillery", country = "ZZ" }
 asia-one = { name = "Asia One", country = "US" }
 at = { name = "AT", country = "FI" }
@@ -43,6 +47,7 @@ ata = { name = "Ata", country = "FI" }
 ayane = { name = "Ayane", country = "JP" }
 ayu = { name = "Ayu", country = "JP" }
 ayumi = { name = "Ayumi", country = "JP" }
+azone = { name = "Azone", country = "TW" }
 babalu = { name = "Babalu", country = "ZZ" }
 baby-g = { name = "Baby G", country = "ZZ" }
 babyson = { name = "Babyson", country = "FR" }
@@ -71,6 +76,7 @@ bj-piggo = { name = "BJ Piggo", country = "SK" }
 blanka = { name = "Blanka", country = "ZZ" }
 blaze = { name = "Blaze", country = "IT" }
 blond = { name = "Blond", country = "AU" }
+boogie = { name = "Boogie", country = "IT" }
 bootuz = { name = "Bootuz", country = "RU" }
 bop-n-andre = { name = "Bop'n Andre", country = "ZZ" }
 born = { name = "Born", country = "KR" }
@@ -93,13 +99,17 @@ carito = { name = "Carito", country = "AR" }
 carla = { name = "Carla", country = "RO" }
 carlota = { name = "Carlota", country = "FR" }
 casper = { name = "Casper", country = "US" }
+cc = { name = "CC", country = "ZZ" }
 ceebri = { name = "Ceebri", country = "FR" }
 celestia = { name = "Celestia", country = "CO" }
 cetowy = { name = "Cetowy", country = "PL", crews = ["polskee-flavour"] }
 cha-ja = { name = "Cha-Ja", country = "ZZ" }
 chakal = { name = "Chakal", country = "ZZ" }
+chaubernard = { name = "Chaubernard", country = "FR" }
 cheerito = { name = "Cheerito", country = "RU" }
+chenchen = { name = "Chenchen", country = "TW", aliases = ["Chen Chen"] }
 chereb = { name = "Chereb", country = "UA" }
+cherep = { name = "Cherep", country = "UA" }
 cherry = { name = "Cherry", country = "AT" }
 chey = { name = "Chey", country = "ES" }
 chimpa = { name = "Chimpa", country = "IT" }
@@ -116,6 +126,7 @@ conni = { name = "Conni", country = "DE" }
 crazy-c = { name = "Crazy C", country = "ZZ" }
 crazy-legs = { name = "Crazy Legs", country = "US" }
 crazy-monkey = { name = "Crazy Monkey", country = "FR" }
+create = { name = "Create", country = "KZ" }
 cri6 = { name = "Cri6", country = "MA" }
 crumbs = { name = "Crumbs", country = "US" }
 cyga = { name = "Cyga", country = "ZZ" }
@@ -129,12 +140,14 @@ dany = { name = "Dany", country = "FR" }
 dany-dann = { name = "Dany Dann", country = "FR" }
 danzel = { name = "Danzel", country = "ZZ" }
 dark-marc = { name = "Dark Marc", country = "NO" }
+darwin = { name = "Darwin", country = "FR" }
 david-colas = { name = "David Colas", country = "FR" }
 davy = { name = "Davy", country = "CN" }
 dblue = { name = "Dblue", country = "JP" }
 deeogo = { name = "Deeogo", country = "ZZ" }
 deepfriedtiff = { name = "Deepfriedtiff", country = "ZZ" }
 den = { name = "Den", country = "ZZ" }
+deny-rock = { name = "Deny Rock", country = "RU" }
 dias = { name = "Dias", country = "KZ" }
 differ = { name = "Differ", country = "KR" }
 dj-ace = { name = "DJ Ace", country = "CH" }
@@ -159,6 +172,7 @@ do-knock = { name = "Do Knock", country = "US" }
 dol = { name = "Dol", country = "ZZ" }
 dom-k = { name = "Dom:k", country = "FR" }
 domkey = { name = "DOMkey", country = "US" }
+double-d = { name = "Double D", country = "DE" }
 doug = { name = "Doug", country = "ZZ" }
 dr-hill = { name = "Dr. Hill", country = "MX" }
 drud = { name = "Drud", country = "ZZ" }
@@ -168,6 +182,8 @@ ducky = { name = "Ducky", country = "KR" }
 dughettu = { name = "Dughettu", country = "BR" }
 dyzee = { name = "Dyzee", country = "CA" }
 eagle = { name = "Eagle", country = "KR" }
+eagle-one = { name = "Eagle One", country = "KR" }
+echo = { name = "Echo", country = "GB" }
 efro = { name = "Efro", country = "ZZ" }
 el-nino = { name = "El Niño", country = "US" }
 elettra = { name = "Elettra", country = "IT" }
@@ -197,15 +213,18 @@ federico = { name = "Federico", country = "NL" }
 felix = { name = "Felix", country = "US" }
 fen-qi = { name = "Fen Qi", country = "CN" }
 fernandinho = { name = "Fernandinho", country = "BR" }
+fever = { name = "Fever", country = "FR" }
 firebird = { name = "Firebird", country = "BG" }
 fishboy = { name = "Fishboy", country = "ZZ" }
 flakes = { name = "Flakes", country = "ZZ" }
 flea-rock = { name = "Flea Rock", country = "US" }
 fleau = { name = "Fléau", country = "CA" }
 fleg = { name = "Fleg", country = "US" }
+flexholik = { name = "Flexholik", country = "DE" }
 float = { name = "Float", country = "US" }
 flowolf = { name = "Flowolf", country = "ZZ" }
 fluxa = { name = "Fluxa", country = "AR" }
+fly = { name = "Fly", country = "IL" }
 flying-buddha = { name = "Flying Buddha", country = "RU" }
 flying-machine = { name = "Flying Machine", country = "IN" }
 focus = { name = "Focus", country = "FI" }
@@ -216,6 +235,7 @@ freeze = { name = "Freeze", country = "SE" }
 fresh-bella = { name = "Fresh Bella", country = "KR", aliases = ["Freshbella"] }
 frost = { name = "Frost", country = "DE" }
 froz = { name = "Froz", country = "IT" }
+frozen = { name = "Frozen", country = "AR" }
 furia = { name = "Furia", country = "ES" }
 fuzion = { name = "Fuzion", country = "ZZ" }
 gadget = { name = "Gadget", country = "ZZ" }
@@ -240,9 +260,12 @@ gun = { name = "Gun", country = "RU" }
 guss = { name = "Guss", country = "ZZ" }
 hackerman = { name = "Hackerman", country = "ZZ" }
 hami = { name = "Hami", country = "CN" }
+hamza = { name = "Hamza", country = "AE" }
 haruto = { name = "Haruto", country = "JP" }
 hatsolo = { name = "Hatsolo", country = "FI" }
+hayato1 = { name = "Hayato1", country = "JP" }
 heady = { name = "Heady", country = "KR" }
+heavy-haiku = { name = "Heavy Haiku", country = "FI" }
 hijack = { name = "Hijack", country = "US" }
 hill = { name = "Hill", country = "MX" }
 hiro-10 = { name = "Hiro 10", country = "JP", aliases = ["Hiro10"] }
@@ -251,6 +274,8 @@ hiyo = { name = "Hiyo", country = "JP" }
 hk-marcus = { name = "HK Marcus", country = "ZZ" }
 holy-rain = { name = "Holy Rain", country = "ZZ", crews = ["super-kidz"] }
 hong-10 = { name = "Hong 10", country = "KR" }
+honza = { name = "Honza", country = "CZ" }
+hoo-hoo = { name = "Hoo Hoo", country = "FI" }
 hugga = { name = "Hugga", country = "NZ" }
 hulk = { name = "Hulk", country = "ZZ" }
 hurricane = { name = "Hurricane", country = "NL" }
@@ -261,6 +286,7 @@ iki = { name = "Iki", country = "FR", crews = ["ossun", "dynamo"], look = "bboy"
 illest-foe = { name = "Illest Foe", country = "NL" }
 illz = { name = "Illz", country = "CA" }
 india = { name = "India", country = "NL" }
+infante = { name = "Infante", country = "GB" }
 inox = { name = "Inox", country = "ZZ" }
 inside = { name = "Inside", country = "BY" }
 intact = { name = "Intact", country = "UA" }
@@ -277,6 +303,7 @@ ivan-urban-action-figure = { name = "Ivan Urban Action Figure", country = "US" }
 izanami = { name = "Izanami", country = "LV" }
 j-attack = { name = "J-Attack", country = "AU" }
 jackm8 = { name = "Jackm8", country = "ZZ" }
+jamal = { name = "Jamal", country = "RU" }
 jana = { name = "Jana", country = "ZZ" }
 jason = { name = "Jason", country = "CN" }
 jasper = { name = "Jasper", country = "TW" }
@@ -286,6 +313,7 @@ jayson = { name = "Jayson", country = "CA" }
 jazz = { name = "Jazz", country = "ZZ" }
 jazzbear = { name = "Jazzbear", country = "KR" }
 jazzy = { name = "Jazzy", country = "TR" }
+jazzy-gypz = { name = "Jazzy Gypz", country = "NL" }
 jed = { name = "Jed", country = "ZA" }
 jee-ess = { name = "Jee Ess", country = "PL" }
 jeffro = { name = "Jeffro", country = "US" }
@@ -320,6 +348,7 @@ jun = { name = "Jun", country = "JP" }
 junior = { name = "Junior", country = "FR" }
 just-a-kid = { name = "Just a Kid", country = "DE" }
 just-one = { name = "Just One", country = "ZZ" }
+justeen = { name = "Justeen", country = "NL" }
 justen = { name = "Justen", country = "ZZ" }
 kacyo = { name = "Kacyo", country = "IT" }
 kae = { name = "Kae", country = "FR" }
@@ -342,6 +371,7 @@ kastrito = { name = "Kastrito", country = "MX" }
 kate = { name = "Kate", country = "UA" }
 katsu = { name = "Katsu", country = "JP" }
 katsu1 = { name = "Katsu1", country = "JP" }
+katsuya = { name = "Katsuya", country = "JP" }
 kazuhiro = { name = "Kazuhiro", country = "JP" }
 kazuki-roc = { name = "Kazuki Roc", country = "JP" }
 kazuki-rock = { name = "Kazuki Rock", country = "JP" }
@@ -351,6 +381,7 @@ kelava = { name = "Kelava", country = "ZZ" }
 ken-swift = { name = "Ken Swift", country = "US" }
 kensaku = { name = "Kensaku", country = "JP" }
 kent = { name = "Kent", country = "IT" }
+keysha = { name = "Keysha", country = "ZZ" }
 keyz = { name = "Keyz", country = "FR" }
 khalil = { name = "Khalil", country = "FR" }
 kid-colombia = { name = "Kid Colombia", country = "NL" }
@@ -365,7 +396,9 @@ kidquick = { name = "KidQuick", country = "JP" }
 kill = { name = "Kill", country = "KR" }
 killa-kim = { name = "Killa Kim", country = "UA" }
 killa-kolya = { name = "Killa Kolya", country = "KZ" }
+killa-sebi = { name = "Killa Sebi", country = "DE" }
 killian = { name = "Killian", country = "ZZ" }
+kim = { name = "Kim", country = "CN" }
 kimbo = { name = "Kimbo", country = "ZZ" }
 kimie = { name = "Kimie", country = "FR" }
 klash = { name = "Klash", country = "EG" }
@@ -390,6 +423,7 @@ lagaet = { name = "Lagaet", country = "PT", country2 = "FR" }
 lamine = { name = "Lamine", country = "FR" }
 lawson = { name = "Lawson", country = "BE" }
 laziness = { name = "Laziness", country = "ZZ" }
+lazylegz = { name = "Lazylegz", country = "CA" }
 lb = { name = "LB", country = "GB" }
 leader = { name = "Leader", country = "ZZ" }
 lean-rock = { name = "Lean Rock", country = "US" }
@@ -405,8 +439,10 @@ likai = { name = "Likai", country = "FR", crews = ["ossun"] }
 lil-ceng = { name = "Lil Ceng", country = "DE" }
 lil-dani = { name = "Lil Dani", country = "ES" }
 lil-g = { name = "Lil G", country = "VE" }
+lil-hong = { name = "Lil Hong", country = "TW" }
 lil-john = { name = "Lil John", country = "US" }
 lil-kev = { name = "Lil Kev", country = "FR" }
+lil-mami = { name = "Lil Mami", country = "CL" }
 lil-pablo = { name = "Lil Pablo", country = "SK" }
 lil-tim = { name = "Lil' Tim", country = "GB" }
 lil-wenhao = { name = "Lil Wenhao", country = "CN" }
@@ -415,6 +451,7 @@ lilou = { name = "Lilou", country = "FR", country2 = "DZ" }
 link-le-neil = { name = "Link le Neil", country = "FR" }
 links = { name = "Links", country = "ZZ" }
 lion = { name = "Lion", country = "VE" }
+liquid-man = { name = "Liquid Man", country = "RU" }
 litefoot = { name = "Litefoot", country = "ZZ" }
 lithe-ing = { name = "Lithe-ing", country = "CN" }
 lito = { name = "Lito", country = "GR" }
@@ -434,6 +471,7 @@ lucky = { name = "Lucky", country = "BE" }
 luigi = { name = "Luigi", country = "US" }
 luka = { name = "Luka", country = "BR" }
 luma = { name = "Luma", country = "CO" }
+lunatic = { name = "Lunatic", country = "KR" }
 lussy-sky = { name = "Lussy Sky", country = "UA" }
 m0nm0i = { name = "m0nm0i", country = "JP" }
 m17 = { name = "M17", country = "ZZ" }
@@ -445,6 +483,7 @@ maga-moura = { name = "Magá Moura", country = "BR" }
 maia = { name = "Maia", country = "BR" }
 malik = { name = "Malik", country = "FR" }
 man-like-b = { name = "Man Like B", country = "ZA" }
+manny = { name = "Manny", country = "GB" }
 marcio = { name = "Marcio", country = "FR" }
 mario-bee = { name = "Mario Bee", country = "NL" }
 marlone = { name = "Marlone", country = "FR" }
@@ -485,10 +524,12 @@ mini-japa = { name = "Mini Japa", country = "BR" }
 mini-joe = { name = "Mini Joe", country = "VE" }
 minnesota-joe = { name = "Minnesota Joe", country = "ZZ" }
 miracle = { name = "Miracle", country = "RU" }
+miracle-smile = { name = "Miracle Smile", country = "AT" }
 miyu = { name = "Miyu", country = "ZZ" }
 mn-joe = { name = "mn joe", country = "ZZ" }
 moa = { name = "Moa", country = "ZZ" }
 moise = { name = "Moise", country = "ZZ" }
+mokhtar = { name = "Mokhtar", country = "FR" }
 mona = { name = "Mona", country = "ZZ" }
 monkey-king = { name = "Monkey King", country = "TW" }
 monkey-z = { name = "Monkey Z", country = "CN" }
@@ -505,6 +546,7 @@ moy = { name = "Moy", country = "US" }
 muxibinha = { name = "Muxibinha", country = "BR" }
 myverse = { name = "MyVerse", country = "US" }
 myw = { name = "Myw", country = "ZZ" }
+nabil = { name = "Nabil", country = "FR" }
 nabs = { name = "Nabs", country = "ZZ" }
 nadia = { name = "Nadia", country = "RU" }
 nagi = { name = "Nagi", country = "ZZ" }
@@ -520,6 +562,7 @@ nasty-ray = { name = "Nasty Ray", country = "US" }
 naviu = { name = "Naviu", country = "ZZ" }
 nebulas = { name = "Nebulas", country = "ZZ" }
 nebz = { name = "Nebz", country = "ZZ" }
+neepy = { name = "Neepy", country = "KR" }
 neguin = { name = "Neguin", country = "BR" }
 nelzwhon = { name = "Nelzwhon", country = "US" }
 nelzwon = { name = "Nelzwon", country = "ZZ", aliases = ["NELZWON"] }
@@ -547,6 +590,7 @@ nori = { name = "Nori", country = "JP" }
 nuno = { name = "Nuno", country = "CH" }
 o-d-d = { name = "O.D.D", country = "FR" }
 omar = { name = "Omar", country = "US" }
+omen = { name = "Omen", country = "US" }
 onel = { name = "Onel", country = "GR" }
 onton = { name = "Onton", country = "CA" }
 orelia = { name = "Orélia", country = "ZZ" }
@@ -554,20 +598,18 @@ osto = { name = "Osťo", country = "SK" }
 ouki = { name = "OUKI", country = "JP" }
 outrage = { name = "Outrage", country = "ZZ" }
 p-nut = { name = "P-nut", country = "ZZ" }
-pac-pac = { name = "Pac Pac", country = "FR" }
-pacpac = { name = "PacPac", country = "FR" }
+pac-pac = { name = "Pac Pac", country = "FR", aliases = ["PacPac"] }
 pancho = { name = "Pancho", country = "CL" }
 paulina = { name = "Paulina", country = "PL" }
 pauline = { name = "Pauline", country = "DE" }
+peaky-rock = { name = "Peaky Rock", country = "PS" }
 pekena = { name = "Pekena", country = "BR" }
 pelezinho = { name = "Pelezinho", country = "BR" }
 pep-c = { name = "Pep-C", country = "ZZ", aliases = ["Pep C"] }
 perna = { name = "Perna", country = "BR" }
 pesto = { name = "Pesto", country = "IT" }
 phil-wizard = { name = "Phil Wizard", country = "CA" }
-phil-wizzard = { name = "Phil Wizzard", country = "CA" }
 philip = { name = "Philip", country = "US" }
-phill-wizard = { name = "Phill Wizard", country = "CA" }
 phumlailai = { name = "Phumlailai", country = "ZZ" }
 physicx = { name = "Physicx", country = "KR" }
 piggo = { name = "Piggo", country = "SK" }
@@ -606,6 +648,7 @@ rawgina = { name = "Rawgina", country = "GB" }
 rawkuts = { name = "Rawkuts", country = "GR" }
 red-bull-bc-one-all-stars = { name = "Red Bull BC One All Stars", country = "ZZ" }
 redchild = { name = "Redchild", country = "DE" }
+ren = { name = "Ren", country = "JP" }
 renegade = { name = "Renegade", country = "GB" }
 reveal = { name = "Reveal", country = "US" }
 reverse = { name = "Reverse", country = "ZZ" }
@@ -627,10 +670,12 @@ roxy = { name = "Roxy", country = "GB" }
 royal = { name = "Royal", country = "CN" }
 rubber-legz = { name = "Rubber Legz", country = "DE" }
 rukus = { name = "Rukus", country = "LT" }
+rut = { name = "Rut", country = "ZZ" }
 ryo-g = { name = "Ryo-G", country = "JP" }
 ryoga = { name = "Ryoga", country = "JP" }
 rythymbox = { name = "RythymBox", country = "NO" }
 ryu = { name = "Ryu", country = "ZZ" }
+ryuichu = { name = "Ryuichu", country = "JP" }
 sabri = { name = "Sabri", country = "ZZ" }
 saewl = { name = "Saewl", country = "ZZ" }
 salah = { name = "Salah", country = "FR" }
@@ -662,19 +707,24 @@ shinobi = { name = "Shinobi", country = "KR" }
 shiny = { name = "Shiny", country = "DE" }
 shisha = { name = "Shisha", country = "ZZ" }
 shlag = { name = "Shlag", country = "ZZ" }
+sho = { name = "Sho", country = "JP" }
 shorty-force = { name = "Shorty Force", country = "KR" }
 shun = { name = "Shun", country = "VN" }
+shynoh = { name = "Shynoh", country = "FR" }
 sick = { name = "Sick", country = "KR" }
 sidi = { name = "Sidi", country = "GR" }
 simba = { name = "Simba", country = "FR", crews = ["ossun"] }
+simo = { name = "Simo", country = "MA" }
 sina = { name = "Sina", country = "AT" }
 skizo = { name = "Skizo", country = "ES" }
 slav = { name = "Slav", country = "BG" }
 smirnoff = { name = "Smirnoff", country = "RU" }
 snake = { name = "Snake", country = "RU" }
 snelle-jelle = { name = "Snelle Jelle", country = "BE" }
+sniper = { name = "Sniper", country = "CN" }
 so = { name = "So", country = "ZZ" }
 so-ta = { name = "So-Ta", country = "JP" }
+sofiane = { name = "Sofiane", country = "MD" }
 sona = { name = "Sona", country = "DE" }
 sonic = { name = "Sonic", country = "DK" }
 sonya = { name = "Sonya", country = "UA" }
@@ -686,7 +736,8 @@ spidergirl = { name = "Spidergirl", country = "IT" }
 spin = { name = "Spin", country = "ZZ" }
 spindian = { name = "Spindian", country = "ZZ" }
 starry = { name = "Starry", country = "KR" }
-stefani = { name = "Stefani", country = "GB" }
+steez = { name = "Steez", country = "JP" }
+stefani = { name = "Stefani", country = "UA" }
 stepper = { name = "Stepper", country = "ZZ" }
 stimul = { name = "Stimul", country = "ZZ" }
 storm = { name = "Storm", country = "DE" }
@@ -707,19 +758,26 @@ taower = { name = "Taower", country = "TW" }
 tasic = { name = "Tasic", country = "ZZ" }
 tata = { name = "Tata", country = "ZZ" }
 tawfiq = { name = "Tawfiq", country = "NL" }
+taz = { name = "Taz", country = "BY" }
+tazzmanio = { name = "Tazzmanio", country = "UA" }
 teddy-z = { name = "Teddy Z", country = "CN" }
 tey = { name = "Tey", country = "FR" }
+the-curse = { name = "The Curse", country = "ZA" }
 the-end = { name = "The End", country = "KR" }
 the-wolfer = { name = "The Wolfer", country = "MA" }
 thesis = { name = "Thesis", country = "US" }
+third-bro = { name = "Third Bro", country = "CN" }
 thomaz = { name = "Thomaz", country = "PL" }
 thor = { name = "Thor", country = "ZZ" }
 tiger = { name = "Tiger", country = "ZZ" }
 tiger5 = { name = "Tiger5", country = "ZZ" }
+tip-top-t = { name = "Tip Top T", country = "UA" }
 tiro = { name = "Tiro", country = "BE" }
 titan-zehr = { name = "Titan Zehr", country = "ZZ" }
 titris = { name = "Titris", country = "BE" }
+tko = { name = "TKO", country = "KR" }
 toa = { name = "Toa", country = "JP" }
+toleek = { name = "Toleek", country = "MD" }
 tonio = { name = "Tonio", country = "FR" }
 tony-tbags = { name = "Tony Tbags", country = "US" }
 toquinha = { name = "Toquinha", country = "BR" }
@@ -735,26 +793,32 @@ uncle-will = { name = "Uncle Will", country = "ZZ" }
 undr = { name = "UNDR", country = "ZZ" }
 untied = { name = "Untied", country = "BG" }
 uzee-rock = { name = "Uzee Rock", country = "UA" }
+v-o = { name = "V.O.", country = "ES" }
 vados = { name = "Vados", country = "ZZ" }
 valencio = { name = "Valencio", country = "ZZ" }
 valentine = { name = "Valentine", country = "FR" }
 vanessa = { name = "Vanessa", country = "PT" }
 vavi = { name = "Vavi", country = "RU" }
+vee = { name = "Vee", country = "ZA" }
 vero = { name = "Vero", country = "KR" }
 vicious = { name = "Vicious", country = "CA" }
 vicious-vic = { name = "Vicious Vic", country = "ZZ" }
 vicious-victor = { name = "Vicious Victor", country = "US" }
 victor = { name = "Victor", country = "US" }
+victor-j = { name = "Victor J", country = "GB" }
 vika-wins = { name = "Vika Wins", country = "UA" }
 viktor-manoel = { name = "Viktor Manoel", country = "ZZ" }
 vint = { name = "Vint", country = "RU" }
 virus = { name = "Virus", country = "KR" }
 vlad = { name = "Vlad", country = "RU" }
+volt = { name = "Volt", country = "KZ" }
 waackeisha = { name = "Waackeisha", country = "ZZ" }
 waackxxxy = { name = "Waackxxxy", country = "ZZ" }
 wake-up = { name = "Wake Up", country = "KR" }
+wallee = { name = "Wallee", country = "FR" }
 wealthy = { name = "wealthy", country = "ZZ" }
 weapon-x = { name = "Weapon X", country = "ZZ" }
+wen = { name = "Wen", country = "CH" }
 wess = { name = "Wess", country = "ZZ" }
 wicket = { name = "Wicket", country = "US" }
 wigor = { name = "Wigor", country = "PL" }
@@ -773,6 +837,7 @@ xii-after-ours = { name = "XII After Ours", country = "ZZ" }
 xisco = { name = "Xisco", country = "NL", crews = ["hustle-kidz"] }
 xl = { name = "XL", country = "BE" }
 xueyu = { name = "Xueyu", country = "CN" }
+yaio = { name = "Yaio", country = "IT" }
 yaman = { name = "Yaman", country = "FR" }
 yan = { name = "Yan", country = "RU" }
 yan-the-shrimp = { name = "Yan the Shrimp", country = "RU" }
@@ -790,6 +855,7 @@ yuina = { name = "Yuina", country = "JP" }
 yuri-dominggos = { name = "Yuri Dominggos", country = "BR" }
 yurie = { name = "Yurie", country = "ZZ" }
 yuta = { name = "Yuta", country = "ZZ" }
+yuya = { name = "Yuya", country = "FR" }
 z = { name = "Z", country = "CN" }
 zealuss = { name = "Zealuss", country = "ZZ" }
 zeku = { name = "Zeku", country = "US" }
@@ -798,5 +864,6 @@ ziprock = { name = "ZipRock", country = "ZZ" }
 ziyan = { name = "Ziyan", country = "CN" }
 zoob = { name = "Zoob", country = "GR" }
 zoopreme = { name = "Zoopreme", country = "DK" }
+zoot = { name = "Zoot", country = "KR" }
 zooty-zoot = { name = "Zooty Zoot", country = "KR" }
 zouza = { name = "Zouza", country = "ZZ" }

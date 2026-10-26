@@ -1,0 +1,45 @@
+name = "UK B-Boy Championships World Finals 2019"
+starts_on = 2019-04-14
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+lat = 51.5415
+lng = -0.1025
+venue = "Islington Assembly Hall"
+sources = ["https://en.wikipedia.org/wiki/UK_B-Boy_Championships", "https://web.archive.org/web/20190423/http://bboychampionships.com/", "https://www.iamhiphopmagazine.com/?p=13507", "https://en.wikipedia.org/wiki/World_BBoy_Series"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "soul-mavericks", b = "gunsmoke-breakers", winner = "soul-mavericks" },
+  { round = "top8", a = "ormus", b = "smac-19", winner = "smac-19" },
+  { round = "top8", a = "the-italians", b = "ill-eagles", winner = "the-italians" },
+  { round = "top8", a = "battalions", b = "the-tribe", winner = "the-tribe" },
+  { round = "top4", a = "soul-mavericks", b = "smac-19", winner = "smac-19" },
+  { round = "top4", a = "the-italians", b = "the-tribe", winner = "the-italians" },
+  { round = "final", a = "smac-19", b = "the-italians", winner = "the-italians" },
+]
+
+[battles.teams]
+battalions = { crew = "battalions" }
+gunsmoke-breakers = { crew = "gunsmoke-breakers" }
+ill-eagles = { crew = "ill-eagles" }
+ormus = { crew = "ormus" }
+smac-19 = { crew = "smac-19" }
+soul-mavericks = { crew = "soul-mavericks" }
+the-italians = { crew = "the-italians" }
+the-tribe = { crew = "the-tribe" }
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "kid-karam", reached = "winner" },
+]

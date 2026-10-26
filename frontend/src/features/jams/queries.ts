@@ -72,3 +72,24 @@ export function useMyJams() {
     getNextPageParam: (page) => page.next_cursor ?? undefined,
   });
 }
+
+/** The most drafts one request counts: the API's largest page. */
+const DRAFTS_COUNTED = 200;
+
+/** How many of the caller's jams are drafts, for the account menu's "N drafts". */
+export function useMyDraftCount() {
+  return useQuery({
+    queryKey: ["events", "mine", "drafts"],
+    queryFn: async () => {
+      const page = unwrap(
+        await api.GET("/api/events", {
+          params: {
+            query: { mine: true, status: "draft", limit: DRAFTS_COUNTED },
+          },
+        }),
+        "my drafts",
+      );
+      return page.items.length;
+    },
+  });
+}

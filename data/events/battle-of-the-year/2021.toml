@@ -15,15 +15,23 @@ djs = []
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "jinjo-crew", reached = "winner" },
-  { entrant = "squadron", reached = "top4" },
-  { entrant = "flooriorz", reached = "top4" },
-  { entrant = "the-ruggeds", reached = "top2" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "jinjo-crew", b = "last-alive", winner = "jinjo-crew", video = "https://www.youtube.com/watch?v=CImz_eYvw58" },
+  { round = "top8", a = "flooriorz", b = "tie-break", winner = "flooriorz", video = "https://www.youtube.com/watch?v=EQuG0LmYGAo" },
+  { round = "top8", a = "the-ruggeds", b = "battle-droids", winner = "the-ruggeds", video = "https://www.youtube.com/watch?v=jVfQ35qvXQc" },
+  { round = "top8", a = "flying-steps", b = "squadron", winner = "squadron", video = "https://www.youtube.com/watch?v=yBdXfKxVpV4" },
+  { round = "top4", a = "flooriorz", b = "the-ruggeds", winner = "the-ruggeds", video = "https://www.youtube.com/watch?v=FQTtzWlS43k" },
+  { round = "top4", a = "jinjo-crew", b = "squadron", winner = "jinjo-crew", video = "https://www.youtube.com/watch?v=YPF_P7oTasI" },
+  { round = "final", a = "jinjo-crew", b = "the-ruggeds", winner = "jinjo-crew", video = "https://www.youtube.com/watch?v=jSZ9QB5Myw4" },
 ]
 
 [battles.teams]
+battle-droids = { crew = "battle-droids" }
 flooriorz = { crew = "flooriorz" }
+flying-steps = { crew = "flying-steps" }
 jinjo-crew = { crew = "jinjo-crew" }
+last-alive = { crew = "last-alive" }
 squadron = { crew = "squadron" }
 the-ruggeds = { crew = "the-ruggeds" }
+tie-break = { crew = "tie-break" }

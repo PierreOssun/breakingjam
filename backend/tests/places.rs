@@ -2,9 +2,9 @@ mod test_app;
 
 use axum::{Router, http::StatusCode};
 use breakingjam::{db, domain::place::parse_geonames_line};
-use serde_json::Value;
+use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{app, get, send};
+use test_app::{app, get, id_of, post, publish, send, sign_up};
 
 /// GeoNames lines: id, name, ASCII name, alternate names, country, lat, lng, population.
 const PLACES: &[&str] = &[
@@ -19,6 +19,9 @@ const PLACES: &[&str] = &[
     "4985153\tBattle Creek\tBattle Creek\t\tUS\t42.3173\t-85.17816\t51589",
     // Under 50,000 people: only found by its own name.
     "790015\tInđija\tIngija\tIndia\tRS\t45.04816\t20.08165\t24450",
+    // Namesakes: the French town is smaller but may have a jam.
+    "2246452\tSaint-Louis\tSaint-Louis\tNdar\tSN\t16.01793\t-16.48962\t254171",
+    "2978742\tSaint-Louis\tSaint-Louis\tSaint-Ludwig\tFR\t47.59206\t7.55923\t20871",
 ];
 
 async fn with_places(pool: &PgPool) -> Router {
@@ -70,6 +73,21 @@ async fn exact_names_come_first_then_the_most_populated(pool: PgPool) {
     );
     // Without an exact name, a prefix does.
     assert_eq!(find(&app, "Reykj").await["name"], "Reykjavík");
+}
+
+#[sqlx::test]
+async fn a_town_with_a_public_jam_beats_a_bigger_namesake(pool: PgPool) {
+    let app = with_places(&pool).await;
+    let organizer = sign_up(&app, "org@example.com").await;
+    let body = json!({ "name": "Battle of Sun", "starts_on": "2030-09-19", "ends_on": "2030-09-19",
+                       "timezone": "Europe/Paris", "city": "Saint-Louis", "country": "FR",
+                       "lat": 47.5861, "lng": 7.5626 });
+    let jam = id_of(&send(&app, post("/api/events", body, Some(&organizer))).await);
+    let country = async || find(&app, "saint louis").await["country"].clone();
+    assert_eq!(country().await, "SN", "a draft doesn't count");
+
+    publish(&app, &pool, &jam, &organizer).await;
+    assert_eq!(country().await, "FR");
 }
 
 #[sqlx::test]

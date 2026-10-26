@@ -111,3 +111,38 @@ age = "kids"
 results = [
   { entrant = "xueyu", reached = "winner" },
 ]
+
+[[battles]]
+key = "rep-your-country"
+name = "Rep Your Country"
+gender = "mixed"
+results = [
+  { entrant = "netherlands", reached = "winner" },
+]
+
+[battles.teams]
+netherlands = { name = "Netherlands" }
+
+[[battles]]
+key = "footwork"
+name = "1v1 Footwork"
+gender = "mixed"
+results = [
+  { entrant = "beat-the-young-hustler", reached = "winner" },
+]
+
+[[battles]]
+key = "power"
+name = "1v1 Power Move"
+gender = "mixed"
+results = [
+  { entrant = "fly", reached = "winner" },
+]
+
+[[battles]]
+key = "toprock"
+name = "1v1 Toprock"
+gender = "mixed"
+results = [
+  { entrant = "frozen", reached = "winner" },
+]

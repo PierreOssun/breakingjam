@@ -1,0 +1,13 @@
+name = "The Notorious IBE 2022"
+# check: the dates come from one Fujifilm page (only seen in search results); first Undisputed Masters at IBE
+starts_on = 2022-08-12
+ends_on = 2022-08-14
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://fujifilm.com/lt/en/consumer/events/Undisputed-Masters_Heerlen2022"]
+judges = []
+mcs = []
+djs = []

@@ -14,7 +14,22 @@
     "language": "Langue : {{name}}",
     "admin": "Admin",
     "jamMap": "Carte des jams",
-    "account": "Compte"
+    "account": "Compte",
+    "accountMenu": "Menu du compte",
+    "accountMenuOf": "{{name}}, menu du compte"
+  },
+  "account": {
+    "viewPage": "Voir ma page de danseur·se",
+    "unclaimedTitle": "Tu danses ?",
+    "unclaimedBody": "Trouve ta page et revendique-la.",
+    "findPage": "Trouver ma page",
+    "drafts_one": "{{count}} brouillon",
+    "drafts_other": "{{count}} brouillons",
+    "toReview": "{{count}} à valider",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "auto": "Auto"
   },
   "footer": {
     "links": "Liens du site"
