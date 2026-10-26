@@ -2,6 +2,7 @@ import { InstagramLogo } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { FlagChip } from "../../components/Flag";
+import { Loading, RowSkeleton, Skeleton } from "../../components/Skeleton";
 import { VerifiedTick } from "../../components/VerifiedTick";
 
 type IdentityCardProps = {
@@ -56,5 +57,29 @@ export function IdentityCard(props: IdentityCardProps) {
         </a>
       )}
     </section>
+  );
+}
+
+/** A dancer or organiser page while it loads (DESIGN.md §4.29): the card, then jam rows. */
+export function ProfileSkeleton() {
+  return (
+    <Loading className="mx-auto max-w-content px-4 md:px-6 lg:px-8">
+      <div className="flex justify-end py-2">
+        <Skeleton className="size-11 rounded-full" />
+      </div>
+      <div className="flex flex-col gap-8 pb-10 lg:grid lg:grid-cols-[340px_1fr] lg:items-start lg:gap-12 lg:pb-20">
+        <div className="flex flex-col gap-3 rounded-[28px] border border-border bg-surface p-5">
+          <Skeleton className="size-24 rounded-[28px]" />
+          <Skeleton className="rounded-md h-9 w-2/3" />
+          <Skeleton className="rounded-md h-5 w-1/3" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Skeleton className="rounded-md mb-2 h-7 w-40" />
+          <RowSkeleton />
+          <RowSkeleton />
+          <RowSkeleton />
+        </div>
+      </div>
+    </Loading>
   );
 }

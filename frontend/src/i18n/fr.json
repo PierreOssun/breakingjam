@@ -227,6 +227,9 @@
     "close": "Fermer",
     "dismiss": "Fermer"
   },
+  "skeleton": {
+    "loading": "Chargement…"
+  },
   "form": {
     "cancel": "Annuler",
     "save": "Enregistrer",

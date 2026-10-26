@@ -5,10 +5,14 @@ import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import type { Schemas } from "../api/client";
 import { Button } from "../components/Button";
 import { ShareButton } from "../components/ShareButton";
+import { RowsSkeleton } from "../components/Skeleton";
 import { VideoDialog, type Video } from "../components/VideoDialog";
 import { DancerActions } from "../features/dancers/DancerActions";
 import { DancerAvatar } from "../features/dancers/DancerAvatar";
-import { IdentityCard } from "../features/dancers/IdentityCard";
+import {
+  IdentityCard,
+  ProfileSkeleton,
+} from "../features/dancers/IdentityCard";
 import { JamList } from "../features/dancers/JamList";
 import { useDancer, useDancerEvents } from "../features/dancers/queries";
 import { StatsStrip } from "../features/dancers/StatsStrip";
@@ -21,7 +25,7 @@ export function DancerPage() {
   const { t } = useTranslation();
   const page = useDancer(id);
 
-  if (page.isPending) return null;
+  if (page.isPending) return <ProfileSkeleton />;
   if (page.isError)
     return (
       <p className="mx-auto max-w-content px-4 py-10 text-danger">
@@ -112,6 +116,10 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
             <h2 className="font-display text-display-sm lg:text-display-md">
               {t("dancer.upcoming")}
             </h2>
+            {events.isPending && <RowsSkeleton rows={2} />}
+            {events.isError && (
+              <p className="text-danger">{t("errors.generic")}</p>
+            )}
             {events.data && (
               <JamList
                 items={events.data.upcoming}
@@ -125,6 +133,7 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
             <h2 className="font-display text-display-sm lg:text-display-md">
               {t("dancer.past")}
             </h2>
+            {events.isPending && <RowsSkeleton rows={3} />}
             {events.data && (
               <JamList
                 items={events.data.past}

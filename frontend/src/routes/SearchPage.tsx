@@ -7,6 +7,7 @@ import { HeroSearch } from "../components/HeroSearch";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { JamRow } from "../components/JamRow";
 import { MoreList } from "../components/MoreList";
+import { RowsSkeleton } from "../components/Skeleton";
 import { PersonRow } from "../features/dancers/PersonRow";
 import { useDancerSearch } from "../features/dancers/search";
 import { narrow, NO_FILTERS } from "../features/map/jams";
@@ -43,6 +44,7 @@ export function SearchPage() {
         <h2 id="search-jams" className="font-display text-display-md">
           {t("search.jams")}
         </h2>
+        {jams.isPending && <RowsSkeleton rows={3} />}
         {jams.isError && (
           <p role="alert" className="text-body-sm text-danger">
             {t("map.loadError")}

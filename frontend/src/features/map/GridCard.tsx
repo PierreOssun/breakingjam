@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Flag } from "../../components/Flag";
+import { Skeleton } from "../../components/Skeleton";
 import { CardStatus } from "../../components/StatusBadge";
 import { formatDateRange, formatShortDateRange } from "../../lib/dates";
 import { JamFlyer } from "../jams/JamFlyer";
@@ -35,5 +36,19 @@ export function GridCard({ jam }: { jam: MapJam }) {
         <CardStatus status={jam.status} />
       </div>
     </article>
+  );
+}
+
+/** A grid card's shape while jams load (DESIGN.md §4.29). */
+export function GridCardSkeleton() {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface">
+      <Skeleton className="aspect-[4/5] rounded-none" />
+      <div className="flex flex-col gap-2 p-4">
+        <Skeleton className="rounded-md h-4 w-24" />
+        <Skeleton className="rounded-md h-5 w-3/4" />
+        <Skeleton className="rounded-md h-4 w-1/3" />
+      </div>
+    </div>
   );
 }

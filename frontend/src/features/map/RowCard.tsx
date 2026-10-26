@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Flag } from "../../components/Flag";
+import { Loading, Skeleton } from "../../components/Skeleton";
 import { CardStatus } from "../../components/StatusBadge";
 import { formatDateRange, formatShortDateRange } from "../../lib/dates";
 import { JamFlyer } from "../jams/JamFlyer";
@@ -71,5 +72,26 @@ export function RowCard({ jam, selected = false, onSelect }: RowCardProps) {
         <CardStatus status={jam.status} />
       </div>
     </article>
+  );
+}
+
+/** Row cards while jams load (DESIGN.md §4.29): the 64×80 flyer and three lines of text. */
+export function RowCardsSkeleton({ className = "" }: { className?: string }) {
+  return (
+    <Loading className={`flex flex-col gap-3 ${className}`}>
+      {Array.from({ length: 4 }, (_, i) => (
+        <div
+          key={i}
+          className="flex gap-3 rounded-lg border border-border bg-surface p-3"
+        >
+          <Skeleton className="rounded-md h-20 w-16 shrink-0" />
+          <div className="flex flex-1 flex-col gap-2 pt-0.5">
+            <Skeleton className="rounded-md h-4 w-20" />
+            <Skeleton className="rounded-md h-4 w-3/4" />
+            <Skeleton className="rounded-md h-4 w-1/3" />
+          </div>
+        </div>
+      ))}
+    </Loading>
   );
 }

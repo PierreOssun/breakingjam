@@ -5,6 +5,7 @@ import type {
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
+import { RowsSkeleton } from "./Skeleton";
 
 type MoreListProps<T> = {
   query: UseInfiniteQueryResult<InfiniteData<{ items: T[] }>>;
@@ -18,7 +19,8 @@ type MoreListProps<T> = {
   children: (item: T) => ReactNode;
 };
 
-/** A paged list: its rows, an empty state, the load error, and a full-width "Show more" (§4). */
+/** A paged list: placeholder rows while the first page loads, its rows, an empty state, the
+ * load error, and a full-width "Show more" (§4). */
 export function MoreList<T extends { id: string }>({
   query,
   empty,
@@ -31,6 +33,7 @@ export function MoreList<T extends { id: string }>({
   const items = query.data?.pages.flatMap((page) => page.items) ?? [];
   return (
     <>
+      {query.isPending && <RowsSkeleton />}
       {query.isError && <p className="text-danger">{t("errors.generic")}</p>}
       {query.isSuccess && items.length === 0 && empty}
       <ul aria-label={label} className={className}>

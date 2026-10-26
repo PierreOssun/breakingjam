@@ -227,6 +227,9 @@
     "close": "Schließen",
     "dismiss": "Schließen"
   },
+  "skeleton": {
+    "loading": "Wird geladen…"
+  },
   "form": {
     "cancel": "Abbrechen",
     "save": "Speichern",

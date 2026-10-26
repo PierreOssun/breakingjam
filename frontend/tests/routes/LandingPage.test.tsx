@@ -31,7 +31,8 @@ describe("LandingPage", () => {
     const router = renderApp("/");
     const page = await main();
 
-    // The title, its subtitle, then the search: the page's only heading.
+    // The title, its subtitle, then the search: the page's only heading once the sections
+    // below, which hold their place while loading, find nothing to show.
     const title = page.getByRole("heading", {
       level: 1,
       name: "Find your next jam",
@@ -40,7 +41,7 @@ describe("LandingPage", () => {
     expect(title.nextElementSibling).toHaveTextContent(
       "All of breaking, in one search",
     );
-    expect(page.getAllByRole("heading")).toHaveLength(1);
+    await waitFor(() => expect(page.getAllByRole("heading")).toHaveLength(1));
     expect(page.queryByRole("link", { name: "Register a jam" })).toBeNull();
     expect(document.title).toBe("BreakingJam");
 
@@ -103,6 +104,24 @@ describe("LandingPage", () => {
     ).toHaveAttribute("href", "/map");
   });
 
+  it("keeps its sections' titles in place while their data loads", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise(() => undefined)),
+    );
+    renderApp("/");
+    const page = await main();
+
+    expect(
+      page.getByRole("heading", { name: "Next up near you" }),
+    ).toBeInTheDocument();
+    expect(
+      page.getByRole("heading", { name: "The scene so far" }),
+    ).toBeInTheDocument();
+    // One "Loading…" for the cards, one for the counts.
+    expect(page.getAllByText("Loading…")).toHaveLength(2);
+  });
+
   it("hides Next up when no jam is upcoming", async () => {
     const fetch = mockApi({
       "GET /api/auth/me": LOGGED_OUT,
@@ -153,7 +172,8 @@ describe("LandingPage", () => {
       await screen.findByRole("heading", { name: "The scene so far" })
     ).closest("section")!;
 
-    expect(within(scene).getByText("1,234")).toBeInTheDocument();
+    // The section shows at once, its counts once they arrive.
+    expect(await within(scene).findByText("1,234")).toBeInTheDocument();
     expect(within(scene).getByText("battles")).toBeInTheDocument();
     expect(within(scene).getByText("56")).toBeInTheDocument();
     const chips = within(

@@ -227,6 +227,9 @@
     "close": "Close",
     "dismiss": "Dismiss"
   },
+  "skeleton": {
+    "loading": "Loading…"
+  },
   "form": {
     "cancel": "Cancel",
     "save": "Save",

@@ -34,7 +34,7 @@ import {
 } from "../features/map/jams";
 import { MapEmpty } from "../features/map/MapEmpty";
 import { useMapJams, useVisitorCountry } from "../features/map/queries";
-import { RowCard } from "../features/map/RowCard";
+import { RowCard, RowCardsSkeleton } from "../features/map/RowCard";
 import { SearchForm } from "../features/map/SearchForm";
 import { currentPosition, type LngLat } from "../lib/position";
 import { useMediaQuery } from "../lib/useMediaQuery";
@@ -237,7 +237,9 @@ export function MapPage() {
             {count}
             {loadError}
           </div>
-          {all && inView.length === 0 ? (
+          {jams.isPending ? (
+            <RowCardsSkeleton className="px-4 pb-4" />
+          ) : all && inView.length === 0 ? (
             <MapEmpty onClear={narrowed ? clearAll : null} />
           ) : (
             <ul className="flex flex-col gap-3 px-4 pb-4">
@@ -299,7 +301,9 @@ export function MapPage() {
           >
             {count}
             {loadError}
-            {all && inView.length === 0 ? (
+            {jams.isPending ? (
+              <RowCardsSkeleton />
+            ) : all && inView.length === 0 ? (
               <MapEmpty onClear={narrowed ? clearAll : null} />
             ) : (
               <ul className="flex flex-col gap-3">

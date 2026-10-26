@@ -16,6 +16,7 @@ import { buttonClasses } from "../components/buttonClasses";
 import { ExternalLink } from "../components/ExternalLink";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { ShareButton } from "../components/ShareButton";
+import { Loading, Skeleton } from "../components/Skeleton";
 import { StatusBadge } from "../components/StatusBadge";
 import { VerifiedTick } from "../components/VerifiedTick";
 import { VideoDialog, type Video } from "../components/VideoDialog";
@@ -43,7 +44,7 @@ export function JamPage() {
   const { slug = "" } = useParams();
   const { t } = useTranslation();
   const jam = useJam(slug);
-  if (jam.isPending) return null;
+  if (jam.isPending) return <JamSkeleton />;
   if (jam.isError)
     return (
       <p className="mx-auto max-w-content px-4 py-10 text-danger">
@@ -52,6 +53,30 @@ export function JamPage() {
     );
   if (!jam.data) return <NotFoundPage />;
   return <JamDetail jam={jam.data} />;
+}
+
+/** The jam page's shape while the jam loads (DESIGN.md §4.29): back bar, flyer, title, facts. */
+function JamSkeleton() {
+  return (
+    <Loading className="pb-10 lg:pb-20">
+      <div className="mx-auto flex max-w-content items-center justify-between px-4 py-2 md:px-6 lg:px-8">
+        <Skeleton className="h-11 w-24 rounded-full" />
+        <Skeleton className="size-11 rounded-full" />
+      </div>
+      <div className="mx-auto max-w-content lg:grid lg:grid-cols-[440px_1fr] lg:gap-16 lg:px-8">
+        <Skeleton className="aspect-[4/5] rounded-none lg:rounded-lg" />
+        <div className="flex max-w-prose flex-col gap-4 px-4 pt-6 md:px-6 lg:px-0 lg:pt-0">
+          <Skeleton className="h-6 w-28 rounded-full" />
+          <Skeleton className="rounded-md h-10 w-3/4 lg:h-14" />
+          <div className="mt-6 grid gap-5 lg:grid-cols-2">
+            {Array.from({ length: 4 }, (_, i) => (
+              <Skeleton key={i} className="rounded-md h-12" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </Loading>
+  );
 }
 
 function JamDetail({ jam }: { jam: Jam }) {
@@ -158,7 +183,14 @@ function JamDetail({ jam }: { jam: Jam }) {
           </dl>
 
           <Section title={t("jam.battles")}>
-            {battles.data?.length === 0 ? (
+            {battles.isPending ? (
+              <Loading className="flex flex-col gap-4">
+                <Skeleton className="h-32 rounded-lg" />
+                <Skeleton className="h-32 rounded-lg" />
+              </Loading>
+            ) : battles.isError ? (
+              <p className="text-danger">{t("errors.generic")}</p>
+            ) : battles.data?.length === 0 ? (
               <InlineEmpty>{t("jam.noBattles")}</InlineEmpty>
             ) : (
               <ul className="flex flex-col gap-4">

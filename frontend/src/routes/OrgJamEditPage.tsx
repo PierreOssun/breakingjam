@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import { api, type Schemas } from "../api/client";
 import { buttonClasses } from "../components/buttonClasses";
+import { Loading, Skeleton } from "../components/Skeleton";
 import { useToast } from "../components/useToast";
 import { BattlesEditor } from "../features/jams/BattlesEditor";
 import { FlyerEditor } from "../features/jams/FlyerEditor";
@@ -19,7 +20,7 @@ export function OrgJamEditPage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
   const jam = useJam(id);
-  if (jam.isPending) return null;
+  if (jam.isPending) return <EditorSkeleton />;
   if (jam.isError)
     return (
       <p className="mx-auto max-w-content px-4 py-10 text-danger">
@@ -29,6 +30,23 @@ export function OrgJamEditPage() {
   // Someone else's jam reads as missing here, as drafts do on the API.
   if (!jam.data?.can_edit) return <NotFoundPage />;
   return <JamEditor jam={jam.data} />;
+}
+
+/** The editor's shape while the jam loads (DESIGN.md §4.29): links, title, status, fields. */
+function EditorSkeleton() {
+  return (
+    <Loading className="mx-auto flex max-w-prose flex-col gap-6 px-4 pt-2 pb-10 md:px-6">
+      <div className="flex justify-between">
+        <Skeleton className="h-11 w-28 rounded-full" />
+        <Skeleton className="h-11 w-36 rounded-full" />
+      </div>
+      <Skeleton className="rounded-md h-10 w-2/3" />
+      <Skeleton className="h-28 rounded-lg" />
+      {Array.from({ length: 4 }, (_, i) => (
+        <Skeleton key={i} className="rounded-md h-12" />
+      ))}
+    </Loading>
+  );
 }
 
 function JamEditor({ jam }: { jam: Schemas["EventResponse"] }) {

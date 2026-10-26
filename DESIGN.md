@@ -611,6 +611,18 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
   5. **Footer:** ghost **Cancel**, primary **Use this flyer** (loading while it uploads). On success the dialog closes, with the toast "Flyer updated."
 - **Showing it:** an uploaded flyer takes the generated one's place everywhere, with the same shell (`aspect-[4/5] overflow-hidden`, `object-cover`). The jam page uses the 1080×1350 image; cards, rows and popups use the 540×675 one. Its alt text is "Flyer of <name>", empty on compact thumbnails, as they sit next to the name.
 
+### 4.29 Loading placeholders
+
+- **Never a full-page spinner.** What needs no data shows at once: the header, the landing's hero and search, page and section titles, filters.
+- **Placeholders take the final shape** of what is loading, so nothing moves when it arrives:
+  - Blocks are `rounded-md bg-surface-raised` with `motion-safe:animate-pulse`, sized like the lines, flyers, avatars and cards they stand for. Rounded-full for pills and buttons.
+  - **Lists:** row placeholders (the 52px lead and two lines of §4.14 and §4.25), or card placeholders (§4.3), 2–6 of them.
+  - **Pages that need one request first** show their skeleton: the jam page (back bar, 4:5 flyer, badge, title, facts), dancer and organiser pages (identity card, then rows), the jam editor (links, title, fields).
+  - **Sections** keep their title and their static parts, e.g. "Next up near you" with its "See all on the map" link while its cards load.
+- **Accessibility:** each loading region is `aria-busy` with one visually hidden "Loading…"; the shapes are `aria-hidden`.
+- **When loading ends:** the content replaces the placeholders, and a section that turns out empty disappears (e.g. Next up with no upcoming jam). On failure the generic error message replaces them, except on the landing, whose sections disappear. A failed refetch never hides content already shown.
+- **Radius:** a placeholder has no default radius; each one sets its own, like the element it stands for.
+
 ---
 
 ## 5. Layout rules

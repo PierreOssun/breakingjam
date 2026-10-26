@@ -5,9 +5,13 @@ import type { Schemas } from "../api/client";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { JamRow } from "../components/JamRow";
 import { ShareButton } from "../components/ShareButton";
+import { RowsSkeleton } from "../components/Skeleton";
 import { StatusBadge } from "../components/StatusBadge";
 import { DancerAvatar } from "../features/dancers/DancerAvatar";
-import { IdentityCard } from "../features/dancers/IdentityCard";
+import {
+  IdentityCard,
+  ProfileSkeleton,
+} from "../features/dancers/IdentityCard";
 import { OrganizerActions } from "../features/organizers/OrganizerActions";
 import {
   useOrganizer,
@@ -23,7 +27,7 @@ export function OrganizerPage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
   const organizer = useOrganizer(id);
-  if (organizer.isPending) return null;
+  if (organizer.isPending) return <ProfileSkeleton />;
   if (organizer.isError)
     return (
       <p className="mx-auto max-w-content px-4 py-10 text-danger">
@@ -75,16 +79,22 @@ function OrganizerDetail({
           <OrganizerActions organizer={organizer} />
         </aside>
         <div className="flex flex-col gap-10">
-          <JamSection
-            title={t("dancer.upcoming")}
-            jams={events.data?.upcoming}
-            empty={t("organizer.noUpcoming")}
-          />
-          <JamSection
-            title={t("dancer.past")}
-            jams={events.data?.past}
-            empty={t("organizer.noPast")}
-          />
+          {events.isError ? (
+            <p className="text-danger">{t("errors.generic")}</p>
+          ) : (
+            <>
+              <JamSection
+                title={t("dancer.upcoming")}
+                jams={events.data?.upcoming}
+                empty={t("organizer.noUpcoming")}
+              />
+              <JamSection
+                title={t("dancer.past")}
+                jams={events.data?.past}
+                empty={t("organizer.noPast")}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -97,6 +107,7 @@ function JamSection({
   empty,
 }: {
   title: string;
+  /** Undefined while they load. */
   jams: Schemas["EventRef"][] | undefined;
   empty: string;
 }) {
@@ -105,6 +116,7 @@ function JamSection({
       <h2 className="font-display text-display-sm lg:text-display-md">
         {title}
       </h2>
+      {!jams && <RowsSkeleton rows={2} />}
       {jams?.length === 0 && <InlineEmpty>{empty}</InlineEmpty>}
       <ul>
         {jams?.map((jam) => (

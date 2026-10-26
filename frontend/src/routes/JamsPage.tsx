@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../components/Button";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { JamRow } from "../components/JamRow";
+import { RowsSkeleton } from "../components/Skeleton";
 import { TextField } from "../components/TextField";
 import { FilterChips } from "../features/map/FilterChips";
 import { type Filters, narrow, NO_FILTERS } from "../features/map/jams";
@@ -50,6 +51,7 @@ export function JamsPage() {
         }}
         variant="panel"
       />
+      {jams.isPending && <RowsSkeleton rows={6} />}
       {jams.isError && (
         <p role="alert" className="text-body-sm text-danger">
           {t("map.loadError")}

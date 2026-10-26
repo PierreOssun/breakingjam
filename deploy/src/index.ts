@@ -1,7 +1,7 @@
 // The production edge (ARCHITECTURE §9): one Worker serves the built frontend as static
 // assets, forwards /api/* to the Rust API running as a Cloudflare Container, gives jam
 // pages their Open Graph tags and stores the images the API uploads.
-import { Container, ContainerProxy, getRandom } from "@cloudflare/containers";
+import { Container, ContainerProxy } from "@cloudflare/containers";
 import { MEDIA_STORE_HOST, storeMedia } from "./media";
 import { type JamSummary, openGraphTags } from "./openGraph";
 import {
@@ -69,9 +69,15 @@ Api.outboundByHost = {
 // The entrypoint the container's outbound requests go through, for the handler above.
 export { ContainerProxy };
 
-/** One of the API instances; they hold no state, sessions live in Postgres. */
+/** One of the API instances, next to the database; they hold no state, sessions live in Postgres. */
 function api(env: Env) {
-  return getRandom(env.API, Number(env.API_INSTANCES) || 1);
+  const n = Math.floor(Math.random() * (Number(env.API_INSTANCES) || 1));
+  // An instance's Durable Object stays where it is first created. Without a hint that was near
+  // the first caller, the deploy's check from a US runner, and its container followed, so every
+  // query crossed the Atlantic to Neon in Frankfurt; the old `instance-N` names stay pinned
+  // there. The hint is best effort: wrangler.jsonc also limits the containers to WEUR.
+  const id = env.API.idFromName(`weur-${n}`);
+  return env.API.get(id, { locationHint: "weur" });
 }
 
 export default {
@@ -114,7 +120,7 @@ function asTestSite(response: Response, banner: boolean) {
 async function route(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   if (url.pathname.startsWith("/api/")) {
-    return (await api(env)).fetch(withCountry(request));
+    return api(env).fetch(withCountry(request));
   }
   // The segment stays as the browser encoded it: decoding could throw on a malformed one.
   const jam = /^\/jams\/([^/]+)\/?$/.exec(url.pathname);
@@ -165,9 +171,9 @@ async function publicJam(
 ): Promise<JamSummary | null> {
   try {
     const path = `/api/events/${slug}`;
-    const response = await (
-      await api(env)
-    ).fetch(new Request(new URL(path, request.url)));
+    const response = await api(env).fetch(
+      new Request(new URL(path, request.url)),
+    );
     return response.ok ? ((await response.json()) as JamSummary) : null;
   } catch {
     return null;

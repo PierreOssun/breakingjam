@@ -210,6 +210,21 @@ describe("JamPage", () => {
     expect(main.queryByRole("button", { name: "Upload a flyer" })).toBeNull();
   });
 
+  it("holds the page's shape while the jam loads", async () => {
+    // Every request stays pending.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise(() => undefined)),
+    );
+    renderApp(`/jams/${JAM.slug}`);
+    const main = within(await screen.findByRole("main"));
+
+    // Screen readers hear one "Loading…"; the grey shapes are hidden from them.
+    expect(await main.findByText("Loading…")).toBeInTheDocument();
+    expect(main.getByText("Loading…").closest("[aria-busy]")).toBeTruthy();
+    expect(main.queryByRole("heading")).toBeNull();
+  });
+
   it("shows the organiser's flyer instead of the generated one", async () => {
     const fetch = mockJam({
       flyer_url: "https://media.breakingjam.com/flyers/e001/f.jpg",
