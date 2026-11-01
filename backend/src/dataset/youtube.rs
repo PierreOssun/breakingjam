@@ -103,6 +103,59 @@ pub async fn fetch(channel: &str, api_key: &str) -> Result<Vec<Video>, FetchErro
     }
 }
 
+/// A video found by [`search`].
+#[derive(Debug, PartialEq, Eq)]
+pub struct Found {
+    /// Video id.
+    pub id: String,
+    /// Title.
+    pub title: String,
+    /// Publication day, `YYYY-MM-DD`.
+    pub published: String,
+    /// The uploading channel's id, `UC…`.
+    pub channel_id: String,
+    /// The uploading channel's name.
+    pub channel: String,
+    /// Length, as ISO 8601, e.g. `PT21M4S`.
+    pub duration: String,
+    /// The uploader's description.
+    pub description: String,
+}
+
+/// Up to 50 videos matching `query`, across all of YouTube: 101 quota units.
+pub async fn search(query: &str, api_key: &str) -> Result<Vec<Found>, FetchError> {
+    let client = reqwest::Client::new();
+    let params = [
+        ("part", "id"),
+        ("type", "video"),
+        ("maxResults", "50"),
+        ("q", query),
+    ];
+    let hits: Page<serde_json::Value> = get(&client, "search", &params, api_key).await?;
+    let ids: Vec<&str> = hits
+        .items
+        .iter()
+        .filter_map(|hit| hit["id"]["videoId"].as_str())
+        .collect();
+    let params = [("part", "snippet,contentDetails"), ("id", &ids.join(","))];
+    let videos: Page<serde_json::Value> = get(&client, "videos", &params, api_key).await?;
+    Ok(videos.items.iter().filter_map(found).collect())
+}
+
+/// Reads one item of a `videos.list` answer.
+pub(crate) fn found(item: &serde_json::Value) -> Option<Found> {
+    let snippet = &item["snippet"];
+    Some(Found {
+        id: item["id"].as_str()?.to_owned(),
+        title: snippet["title"].as_str()?.to_owned(),
+        published: snippet["publishedAt"].as_str()?.get(..10)?.to_owned(),
+        channel_id: snippet["channelId"].as_str()?.to_owned(),
+        channel: snippet["channelTitle"].as_str()?.to_owned(),
+        duration: item["contentDetails"]["duration"].as_str()?.to_owned(),
+        description: snippet["description"].as_str()?.to_owned(),
+    })
+}
+
 async fn get<T: serde::de::DeserializeOwned>(
     client: &reqwest::Client,
     resource: &str,

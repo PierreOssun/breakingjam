@@ -247,3 +247,69 @@ async fn a_dancers_look_wins_over_their_battles(pool: PgPool) {
         default_look(looks[1].id, BattleGender::Bboy)
     );
 }
+
+/// A country battle nobody won: both teams stay without a stage and keep the battle's video.
+#[sqlx::test]
+async fn a_battle_nobody_won_leaves_its_teams_unplaced(pool: PgPool) {
+    let dir = data_dir();
+    fs::write(
+        dir.join("events/bc-one/2005.toml"),
+        r#"name = "BC One 2005"
+starts_on = 2005-09-09
+timezone = "Europe/Amsterdam"
+city = "Rotterdam"
+country = "NL"
+
+[[battles]]
+key = "usa-vs-korea"
+name = "USA vs Korea"
+gender = "bboy"
+results = [
+  { entrant = "usa", reached = "na", video = "https://youtu.be/abcdefghijk" },
+  { entrant = "korea", reached = "na", video = "https://youtu.be/abcdefghijk" },
+]
+
+[battles.teams]
+usa = { name = "Team USA" }
+korea = { name = "Team Korea", members = ["menno", "lee"] }
+"#,
+    )
+    .unwrap();
+    let (data, unreadable) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    assert!(unreadable.is_empty(), "{unreadable:?}");
+    let owner = organizer(&pool).await;
+    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
+
+    let mut tx = pool.begin().await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner, today).await.unwrap();
+    tx.commit().await.unwrap();
+
+    assert_eq!(imported.events, 2);
+    let teams = sqlx::query!(
+        r#"select en.team_name as "team!", en.reached::text as "reached!", en.final_rank,
+                  en.video_url, count(m.dancer_id) as "members!"
+           from entries en
+           join battles b on b.id = en.battle_id
+           left join entry_members m on m.entry_id = en.id
+           where b.name = 'USA vs Korea'
+           group by en.id
+           order by 1"#
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    let rows: Vec<(&str, &str, Option<i32>, i64)> = teams
+        .iter()
+        .map(|t| (t.team.as_str(), t.reached.as_str(), t.final_rank, t.members))
+        .collect();
+    assert_eq!(
+        rows,
+        [("Team Korea", "na", None, 2), ("Team USA", "na", None, 0)]
+    );
+    assert!(
+        teams
+            .iter()
+            .all(|t| t.video_url.as_deref() == Some("https://www.youtube.com/watch?v=abcdefghijk"))
+    );
+}

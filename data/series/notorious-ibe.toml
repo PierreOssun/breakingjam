@@ -2,3 +2,10 @@ name = "The Notorious IBE"
 city = "Heerlen"
 country = "NL"
 timezone = "Europe/Amsterdam"
+
+[youtube]
+channels = ["UCyPxlTcF6Fhfw-M808BFmTA"]   # TheNotoriousIBE, the organiser's channel
+title = "IBE"
+battles = [
+  { key = "bboy", name = "Super Solo Bboy Battle", gender = "bboy" },
+]

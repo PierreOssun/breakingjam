@@ -164,6 +164,12 @@ cargo run --bin data -- fetch-youtube unbreakable   # lists the channels into da
 cargo run --bin data -- draft-youtube unbreakable   # drafts from those lists, as often as you like, at no cost
 ```
 
+To find a series' channels, or videos no channel list holds, search all of YouTube (101 quota units a query):
+
+```sh
+cargo run --bin data -- search-youtube "IBE 2005"   # id, day, channel id, channel, title, length, description
+```
+
 **How titles are read:**
 - **Parts:** a title splits into parts at `//`, `|`, arrows (`▶ ◀`), ` / ` and ` - `.
 - **Round:** from words like `top 16`, `semi`, `eight-final` or `final`.

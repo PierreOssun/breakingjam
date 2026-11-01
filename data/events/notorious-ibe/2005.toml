@@ -1,0 +1,116 @@
+name = "The Notorious IBE 2005"
+starts_on = 2005-09-09  # the organiser's trailer says 9-10-11 September; and8.dance says 2-4 September
+ends_on = 2005-09-11
+timezone = "Europe/Amsterdam"
+city = "Rotterdam"
+country = "NL"
+venue = "Nighttown"
+lat = 51.9225
+lng = 4.47917
+sources = [
+  "https://www.youtube.com/watch?v=V9rV4Auul6w",
+  "https://www.youtube.com/watch?v=HFzLeboag8E",
+  "https://en.wikipedia.org/w/index.php?oldid=1020906746",
+  "https://www.youtube.com/watch?v=p-JTTEpoZao",
+  "https://www.templeofdeejays.com/dvd-breakdance/the-notorious-ibe-2005-2dvd-2982.html",
+]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "Super Solo Bboy Battle"
+gender = "bboy"
+results = [
+  { entrant = "menno", reached = "winner" },
+]
+
+[[battles]]
+key = "seven-to-smoke"
+name = "Seven to Smoke"
+gender = "bboy"
+format = "seven_to_smoke"
+results = [
+  { entrant = "kareem", reached = "winner", video = "https://youtu.be/omtWaEIrdic" },
+]
+
+# All Battles All: each country danced every other once and nobody won (Trickx's recap, for Korea),
+# so each pairing is a battle of its own, with no stage reached and its own video.
+[[battles]]
+key = "usa-vs-korea"
+name = "All Battles All: USA vs Korea"
+gender = "bboy"
+results = [
+  { entrant = "usa", reached = "na", video = "https://youtu.be/4f834FGRBNY" },
+  { entrant = "korea", reached = "na", video = "https://youtu.be/4f834FGRBNY" },
+]
+
+[battles.teams]
+usa = { name = "Team USA" }
+korea = { name = "Team Korea", members = ["bangroc", "born", "bruce-lee", "c4", "darkness", "hong-10", "physicx", "rookie", "the-end", "trickx"] }
+
+[[battles]]
+key = "france-vs-korea"
+name = "All Battles All: France vs Korea"
+gender = "bboy"
+results = [
+  { entrant = "france", reached = "na", video = "https://youtu.be/PoXIw0dXm-k" },
+  { entrant = "korea", reached = "na", video = "https://youtu.be/PoXIw0dXm-k" },
+]
+
+[battles.teams]
+france = { name = "Team France" }
+korea = { name = "Team Korea", members = ["bangroc", "born", "bruce-lee", "c4", "darkness", "hong-10", "physicx", "rookie", "the-end", "trickx"] }
+
+[[battles]]
+key = "korea-vs-germany"
+name = "All Battles All: Korea vs Germany"
+gender = "bboy"
+results = [
+  { entrant = "korea", reached = "na", video = "https://youtu.be/pXtjjFTULLo" },
+  { entrant = "germany", reached = "na", video = "https://youtu.be/pXtjjFTULLo" },
+]
+
+[battles.teams]
+korea = { name = "Team Korea", members = ["bangroc", "born", "bruce-lee", "c4", "darkness", "hong-10", "physicx", "rookie", "the-end", "trickx"] }
+germany = { name = "Team Germany" }
+
+[[battles]]
+key = "france-vs-usa"
+name = "All Battles All: France vs USA"
+gender = "bboy"
+results = [
+  { entrant = "france", reached = "na", video = "https://youtu.be/ScuhMXFYeks" },
+  { entrant = "usa", reached = "na", video = "https://youtu.be/ScuhMXFYeks" },
+]
+
+[battles.teams]
+france = { name = "Team France" }
+usa = { name = "Team USA" }
+
+[[battles]]
+key = "germany-vs-france"
+name = "All Battles All: Germany vs France"
+gender = "bboy"
+results = [
+  { entrant = "germany", reached = "na", video = "https://youtu.be/Amc_L-vdb9A" },
+  { entrant = "france", reached = "na", video = "https://youtu.be/Amc_L-vdb9A" },
+]
+
+[battles.teams]
+germany = { name = "Team Germany" }
+france = { name = "Team France" }
+
+[[battles]]
+key = "germany-vs-usa"
+name = "All Battles All: Germany vs USA"
+gender = "bboy"
+results = [
+  { entrant = "germany", reached = "na", video = "https://youtu.be/U5R5RNtNmi4" },
+  { entrant = "usa", reached = "na", video = "https://youtu.be/U5R5RNtNmi4" },
+]
+
+[battles.teams]
+germany = { name = "Team Germany" }
+usa = { name = "Team USA" }

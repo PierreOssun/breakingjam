@@ -63,6 +63,7 @@ babyson = { name = "Babyson", country = "FR" }
 bad-matty = { name = "Bad Matty", country = "IT" }
 badli = { name = "Badli", country = "BE" }
 baek = { name = "Baek", country = "KR" }
+bangroc = { name = "Bangroc", country = "KR" }
 bart = { name = "Bart", country = "BR" }
 bartek = { name = "Bartek", country = "ZZ" }
 bastos = { name = "Bastos", country = "ZZ" }
@@ -100,6 +101,7 @@ bpanther = { name = "Bpanther", country = "ES" }
 brahim = { name = "Brahim", country = "FR" }
 breeze-lee = { name = "Breeze Lee", country = "ZZ" }
 bruce-almighty = { name = "Bruce Almighty", country = "PT", aliases = ["Bruce Allmighty"] }
+bruce-lee = { name = "Bruce Lee", country = "KR", crews = ["gamblerz"] }
 bruce-wayne = { name = "Bruce Wayne", country = "ZZ" }
 brutality = { name = "Brutality", country = "ZZ" }
 buch = { name = "Buch", country = "ZZ" }
@@ -108,6 +110,7 @@ bustabash = { name = "BustaBash", country = "JP" }
 by = { name = "By", country = "FR" }
 c-change = { name = "c-change", country = "CN" }
 c-lil = { name = "C-Lil", country = "ZZ" }
+c4 = { name = "C4", country = "KR" }
 cami = { name = "Cami", country = "IT" }
 camine = { name = "Camine", country = "BE" }
 campanita = { name = "Campanita", country = "FR" }
@@ -162,6 +165,7 @@ dany = { name = "Dany", country = "FR" }
 dany-dann = { name = "Dany Dann", country = "FR" }
 danzel = { name = "Danzel", country = "ZZ" }
 dark-marc = { name = "Dark Marc", country = "NO" }
+darkness = { name = "Darkness", country = "KR", crews = ["gamblerz"] }
 darwin = { name = "Darwin", country = "FR" }
 david-colas = { name = "David Colas", country = "FR" }
 davy = { name = "Davy", country = "CN" }
@@ -755,6 +759,7 @@ rocka = { name = "Rocka", country = "ZZ" }
 rokafella = { name = "Rokafella", country = "US" }
 ronnie = { name = "Ronnie", country = "US" }
 ronnie-ruen = { name = "Ronnie Ruen", country = "US" }
+rookie = { name = "Rookie", country = "KR" }
 roxrite = { name = "Roxrite", country = "US" }
 roxy = { name = "Roxy", country = "GB" }
 royal = { name = "Royal", country = "CN" }
@@ -883,6 +888,7 @@ tonio = { name = "Tonio", country = "FR" }
 tony-tbags = { name = "Tony Tbags", country = "US" }
 toquinha = { name = "Toquinha", country = "BR" }
 toshiki = { name = "Toshiki", country = "JP" }
+trickx = { name = "Trickx", country = "KR", aliases = ["Tricks"] }
 tricky = { name = "Tricky", country = "IL" }
 trock = { name = "TRock", country = "BE" }
 tuff-kid = { name = "Tuff Kid", country = "CH" }

@@ -16,7 +16,8 @@
     "jamMap": "Jam map",
     "account": "Account",
     "accountMenu": "Account menu",
-    "accountMenuOf": "Account menu, {{name}}"
+    "accountMenuOf": "Account menu, {{name}}",
+    "contact": "Contact"
   },
   "account": {
     "viewPage": "View my dancer page",
@@ -83,7 +84,8 @@
     "orgJamNew": "Register a jam",
     "orgJamEdit": "Edit jam",
     "jams": "Find a jam",
-    "search": "Search"
+    "search": "Search",
+    "contact": "Contact"
   },
   "notFound": {
     "title": "Page not found",
@@ -751,5 +753,40 @@
     "count_other": "{{count}} jams",
     "empty": "No jam matches your search and filters.",
     "showMore": "Show more"
+  },
+  "contact": {
+    "title": "Get in touch",
+    "intro": "An idea, a bug, a wrong result, or just hello? Write to us by email or on Instagram.",
+    "email": "Email",
+    "instagram": "Instagram",
+    "copy": "Copy",
+    "copied": "Email copied",
+    "copyFailed": "Couldn’t copy. Select the address instead.",
+    "write": "Write an email",
+    "dm": "Send a DM",
+    "topicsTitle": "What you can write about",
+    "topics": {
+      "idea": {
+        "title": "An idea",
+        "body": "Something you’d love to see on BreakingJam?",
+        "subject": "Idea:"
+      },
+      "bug": {
+        "title": "A bug",
+        "body": "Something broken? Send the page link and what happened. A screenshot helps.",
+        "subject": "Bug:"
+      },
+      "fix": {
+        "title": "Wrong info",
+        "body": "A wrong date, a missing battle, a result to fix? Send the jam or dancer link.",
+        "subject": "Fix:"
+      },
+      "hello": {
+        "title": "Work together",
+        "body": "Organiser, crew, brand or media? Let’s talk.",
+        "subject": "Hello:"
+      }
+    },
+    "caption": "We read every message."
   }
 }

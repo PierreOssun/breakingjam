@@ -728,9 +728,9 @@ The jam page in edit mode is made of blocks, one per part of the page (Venue, Ba
    - Each count is a `display-xl` number (`stat` on phones) + a `body-lg` muted caption (`body-sm` on phones), separated by a muted "·". Numbers use the locale's thousands separator; captions agree with the number.
    - Public jams only, never cancelled ones. A battle is past once its jam ended before today, upcoming from the day it ends; countries are those of the upcoming battles.
 5. **Footer** (every content page, the same at every width).
-   - The round Bounce logo at 56px next to the wordmark, then **Instagram** at the far end: `InstagramLogo` 16 + "Instagram", `body-sm font-bold`, a 44px target, underlined on hover, opening in a new tab.
-   - Nothing else: the header holds the links and the language switch.
-   - One row (`justify-between`); below about 360px it wraps, Instagram under the logo. Nothing hangs past the page's side padding.
+   - The round Bounce logo at 56px next to the wordmark, then at the far end **Contact** and **Instagram** (`InstagramLogo` 16 + "Instagram"), `body-sm font-bold`, 44px targets, underlined on hover. Instagram opens in a new tab.
+   - Nothing else: the header holds the other links and the language switch.
+   - One row (`justify-between`); below about 400px it wraps, the links under the logo. Nothing hangs past the page's side padding.
 
 The organisers' pitch moves to a future `/register` landing; dancers find themselves through the main search.
 
@@ -780,6 +780,12 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Mobile 375:** the editor bar (§4.35), the flyer with its pill, the countdown chip, the title with its Edit pill, the date chips, then the blocks: Venue (required), Battles (required), Lineup, About, Links, the Organiser card ("Your account" · **Change** opens the organiser edit sheet), the eye note "Empty blocks are only visible to you. Visitors see what you fill in.", and a ghost sm **Delete jam** for a draft. The publish bar sticks to the bottom while the jam is a draft.
 - **Desktop:** the jam detail grid (§5): the flyer and the publish checklist card on the left (sticky), the title, chips and blocks on the right. A jam past draft shows its status card (step forward, cancel, delete) instead of the checklist.
 - **After Publish:** an organiser's jam goes to review (badge "In review"); the BreakingJam team's goes live at once. Edits to a live jam are public as soon as they save.
+
+**Contact page** (`/contact`, linked from the footer): one column, `max-w-prose` centred, `px-4 pt-8 pb-16` on phones. No form and no backend.
+- **Title** "Get in touch", `display-lg` (`display-xl` from lg), over the intro in muted `body`, which is also the page's meta description.
+- **Two contact cards** (`bg-surface border rounded-lg p-5 gap-3`), side by side from `sm`, stacked below: Email with the address in bold, selectable and always visible since `mailto:` doesn't work for everyone, a secondary sm **Copy** (toast "Email copied") and a primary sm **Write an email**; Instagram with the handle in bold and a primary sm **Send a DM**, opening `ig.me/m/<handle>` in a new tab.
+- **"What you can write about":** a `label`, then a 2×2 grid of small cards (one column below `sm`), each wholly a `mailto:` link with a prefilled subject, translated with the page: An idea (`Lightbulb`, "Idea:"), A bug (`Bug`, "Bug:"), Wrong info (`PencilSimple`, "Fix:"), Work together (`Handshake`, "Hello:").
+- **Caption** at the end: "We read every message."
 
 **Dancer page** (`/d/<slug>`). It's a record, not a social profile: no feed, followers, ratings, rankings or win/loss.
 - **Mobile 375:**

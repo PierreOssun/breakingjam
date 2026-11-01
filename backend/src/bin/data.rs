@@ -23,6 +23,7 @@ const USAGE: &str = "usage: data check [DIR]
        data draft-wikipedia SERIES WIKITEXT_FILE [DIR]
        data fetch-youtube SERIES [DIR]     list the series' channel into DIR/.cache (needs YOUTUBE_API_KEY in DIR/.env)
        data draft-youtube SERIES [DIR]     draft from that list
+       data search-youtube QUERY           print the videos matching QUERY, across all of YouTube (101 quota units)
        data places [FILE]                  replace the database's places (DATABASE_URL) with FILE,
                                            by default data/places/cities15000.tsv
 DIR defaults to the repository's data/.";
@@ -45,6 +46,7 @@ fn main() -> anyhow::Result<()> {
             write_draft(&dir, series, draft)
         }
         ["fetch-youtube", series, ..] if args.len() <= 3 => run_fetch(&dir(args.get(2)), series),
+        ["search-youtube", query] => run_search(&repo_data, query),
         ["draft-youtube", series, ..] if args.len() <= 3 => {
             let dir = dir(args.get(2));
             let record = series_record(&dir, series)?;
@@ -121,8 +123,7 @@ fn run_check(dir: &Path) -> anyhow::Result<()> {
 fn run_fetch(dir: &Path, series: &str) -> anyhow::Result<()> {
     let record = series_record(dir, series)?;
     let source = record.youtube.context("the series file has no [youtube]")?;
-    dotenvy::from_path(dir.join(".env")).ok();
-    let key = std::env::var("YOUTUBE_API_KEY").context("set YOUTUBE_API_KEY in data/.env")?;
+    let key = youtube_key(dir)?;
     let runtime = tokio::runtime::Runtime::new()?;
     for channel in &source.channels {
         let videos = runtime.block_on(youtube::fetch(channel, &key))?;
@@ -132,6 +133,34 @@ fn run_fetch(dir: &Path, series: &str) -> anyhow::Result<()> {
         println!("listed {} videos into {}", videos.len(), path.display());
     }
     Ok(())
+}
+
+/// Prints what YouTube finds for `query`, one video per line, so a series' channels can be found.
+fn run_search(dir: &Path, query: &str) -> anyhow::Result<()> {
+    let key = youtube_key(dir)?;
+    let videos = tokio::runtime::Runtime::new()?.block_on(youtube::search(query, &key))?;
+    for video in videos {
+        println!(
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}",
+            video.id,
+            video.published,
+            video.channel_id,
+            video.channel,
+            video.title,
+            video.duration,
+            video
+                .description
+                .split_whitespace()
+                .collect::<Vec<_>>()
+                .join(" "),
+        );
+    }
+    Ok(())
+}
+
+fn youtube_key(dir: &Path) -> anyhow::Result<String> {
+    dotenvy::from_path(dir.join(".env")).ok();
+    std::env::var("YOUTUBE_API_KEY").context("set YOUTUBE_API_KEY in data/.env")
 }
 
 /// Writes the dated editions that have no file yet and appends the dancers and crews the files lack.

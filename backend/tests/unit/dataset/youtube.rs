@@ -3,7 +3,7 @@
 use crate::dataset::{
     SeriesRecord,
     draft::{BattleSpec, Sides},
-    youtube::{Source, Video, draft},
+    youtube::{Found, Source, Video, draft, found},
 };
 use crate::domain::battle::BattleAge;
 
@@ -302,4 +302,32 @@ fn tags_arrows_and_excluded_events() {
         bboy.contains("youtu.be/l1") && bboy.contains("youtu.be/l2"),
         "{toml}"
     );
+}
+
+#[test]
+fn found_reads_a_video_item_and_refuses_an_incomplete_one() {
+    let item = serde_json::json!({
+        "id": "abc",
+        "snippet": {
+            "title": "IBE 2005 France vs Korea",
+            "publishedAt": "2007-05-01T10:00:00Z",
+            "channelId": "UCx",
+            "channelTitle": "Someone",
+            "description": "Part 1",
+        },
+        "contentDetails": { "duration": "PT21M4S" },
+    });
+    assert_eq!(
+        found(&item),
+        Some(Found {
+            id: "abc".into(),
+            title: "IBE 2005 France vs Korea".into(),
+            published: "2007-05-01".into(),
+            channel_id: "UCx".into(),
+            channel: "Someone".into(),
+            duration: "PT21M4S".into(),
+            description: "Part 1".into(),
+        })
+    );
+    assert_eq!(found(&serde_json::json!({ "id": "abc" })), None);
 }

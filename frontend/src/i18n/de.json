@@ -16,7 +16,8 @@
     "jamMap": "Jam-Karte",
     "account": "Konto",
     "accountMenu": "Kontomenü",
-    "accountMenuOf": "Kontomenü, {{name}}"
+    "accountMenuOf": "Kontomenü, {{name}}",
+    "contact": "Kontakt"
   },
   "account": {
     "viewPage": "Meine Tänzer:innen-Seite ansehen",
@@ -83,7 +84,8 @@
     "orgJamNew": "Jam eintragen",
     "orgJamEdit": "Jam bearbeiten",
     "jams": "Jam finden",
-    "search": "Suche"
+    "search": "Suche",
+    "contact": "Kontakt"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -751,5 +753,40 @@
     "count_other": "{{count}} Jams",
     "empty": "Keine Jam passt zu deiner Suche und deinen Filtern.",
     "showMore": "Mehr anzeigen"
+  },
+  "contact": {
+    "title": "Schreib uns",
+    "intro": "Eine Idee, ein Bug, ein falsches Ergebnis oder einfach nur Hallo? Schreib uns per E-Mail oder auf Instagram.",
+    "email": "E-Mail",
+    "instagram": "Instagram",
+    "copy": "Kopieren",
+    "copied": "E-Mail kopiert",
+    "copyFailed": "Kopieren nicht möglich. Markiere die Adresse.",
+    "write": "E-Mail schreiben",
+    "dm": "DM senden",
+    "topicsTitle": "Worüber du schreiben kannst",
+    "topics": {
+      "idea": {
+        "title": "Eine Idee",
+        "body": "Etwas, das du gern auf BreakingJam sehen würdest?",
+        "subject": "Idee:"
+      },
+      "bug": {
+        "title": "Ein Bug",
+        "body": "Etwas funktioniert nicht? Schick den Link zur Seite und was passiert ist. Ein Screenshot hilft.",
+        "subject": "Bug:"
+      },
+      "fix": {
+        "title": "Falsche Angaben",
+        "body": "Ein falsches Datum, ein fehlendes Battle, ein Ergebnis zum Korrigieren? Schick den Link zur Jam oder zur Tänzer:innen-Seite.",
+        "subject": "Korrektur:"
+      },
+      "hello": {
+        "title": "Zusammenarbeiten",
+        "body": "Veranstalter:in, Crew, Marke oder Medien? Lass uns reden.",
+        "subject": "Hallo:"
+      }
+    },
+    "caption": "Wir lesen jede Nachricht."
   }
 }
