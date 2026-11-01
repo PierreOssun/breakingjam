@@ -1,0 +1,11 @@
+name = "Red Bull BC One Cypher France"
+country = "FR"
+timezone = "Europe/Paris"
+
+[youtube]
+channels = ["UC9oEzPGZiTE692KucAsTY1g", "UCBDSkBbTmI63mIp6UNt09vA"]   # Red Bull BC One, Skillzoo Production
+title = "France"
+battles = [
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["b-boy", "bboy"] },
+  { key = "bgirl", name = "1v1 Bgirl", gender = "bgirl", words = ["b-girl", "bgirl"] },
+]

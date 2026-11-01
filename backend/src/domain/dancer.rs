@@ -235,10 +235,10 @@ pub struct EventRef {
     pub starts_on: NaiveDate,
     /// Last day.
     pub ends_on: NaiveDate,
-    /// City.
-    pub city: String,
-    /// ISO 3166-1 alpha-2.
-    pub country: String,
+    /// City; null only for a jam cancelled while still a draft.
+    pub city: Option<String>,
+    /// ISO 3166-1 alpha-2; null only for a jam cancelled while still a draft.
+    pub country: Option<String>,
     /// Where it is in its lifecycle.
     pub status: EventStatus,
 }

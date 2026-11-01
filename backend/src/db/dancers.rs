@@ -383,8 +383,8 @@ pub async fn soft_delete(pool: &PgPool, id: Uuid) -> sqlx::Result<bool> {
 pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<Participation>> {
     let rows = sqlx::query!(
         r#"select e.id as "event_id!", e.name as "event_name!", e.slug as "slug!",
-                  e.starts_on as "starts_on!", e.ends_on as "ends_on!", e.city as "city!",
-                  e.country as "country!", e.status as "status!: EventStatus",
+                  e.starts_on as "starts_on!", e.ends_on as "ends_on!", e.city,
+                  e.country, e.status as "status!: EventStatus",
                   e.starts_on >= current_date as "upcoming!",
                   b.id as "battle_id?", b.name as "battle_name?",
                   b.format as "format?: BattleFormat", b.team_size as "team_size?",

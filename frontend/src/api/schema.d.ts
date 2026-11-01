@@ -167,7 +167,7 @@ export interface paths {
         };
         /** One jam, by id or slug. */
         get: operations["get_event"];
-        /** Replace a jam's fields; slug and status never change here. */
+        /** Replace a jam's fields; slug and status never change here, and past draft the place stays. */
         put: operations["update_event"];
         post?: never;
         /** Soft-delete a jam. */
@@ -696,7 +696,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** How far BreakingJam reaches: countries, battles (in total and per country) and dancers. */
+        /** How far BreakingJam reaches: past battles and dancers, upcoming battles and their countries. */
         get: operations["site_stats"];
         put?: never;
         post?: never;
@@ -1093,16 +1093,6 @@ export interface components {
             /** @description Public name. */
             display_name: string;
         };
-        /** @description How many battles a country's public jams hold. */
-        CountryBattles: {
-            /** @description ISO 3166-1 alpha-2. */
-            country: string;
-            /**
-             * Format: int64
-             * @description Battles of its public jams.
-             */
-            battles: number;
-        };
         /** @description A stored crew. */
         Crew: {
             /**
@@ -1436,14 +1426,18 @@ export interface components {
             ends_on: string;
             /** @description IANA name, e.g. `Europe/Zurich`. */
             timezone: string;
+            /** @description When it opens, as wall-clock time in its timezone; null until announced. */
+            opens_at?: string | null;
+            /** @description When it closes, as wall-clock time in its timezone; null until announced. */
+            closes_at?: string | null;
             /** @description Venue, null when blank. */
             venue_name?: string | null;
             /** @description Street address, null when blank. */
             address?: string | null;
-            /** @description City shown on cards and in the map popup. */
-            city: string;
-            /** @description ISO 3166-1 alpha-2. */
-            country: string;
+            /** @description City shown on cards and in the map popup; null while the venue is not set. */
+            city?: string | null;
+            /** @description ISO 3166-1 alpha-2; null while the venue is not set. */
+            country?: string | null;
             /**
              * Format: double
              * @description Latitude; set together with `lng` or not at all.
@@ -1497,14 +1491,18 @@ export interface components {
             ends_on: string;
             /** @description IANA name, e.g. `Europe/Zurich`. */
             timezone: string;
+            /** @description When it opens, `HH:MM` in its timezone; null when not announced. */
+            opens_at?: string | null;
+            /** @description When it closes, `HH:MM` in its timezone; null when not announced. */
+            closes_at?: string | null;
             /** @description Venue; blank is stored as null. */
             venue_name?: string | null;
             /** @description Street address; blank is stored as null. */
             address?: string | null;
-            /** @description City, up to 100 characters. */
-            city: string;
-            /** @description ISO 3166-1 alpha-2, upper case. */
-            country: string;
+            /** @description City, up to 100 characters; blank is stored as null. */
+            city?: string | null;
+            /** @description ISO 3166-1 alpha-2, upper case; null while the venue is not set. */
+            country?: string | null;
             /**
              * Format: double
              * @description Latitude; set together with `lng` or not at all.
@@ -1545,10 +1543,10 @@ export interface components {
              * @description Last day.
              */
             ends_on: string;
-            /** @description City. */
-            city: string;
-            /** @description ISO 3166-1 alpha-2. */
-            country: string;
+            /** @description City; null only for a jam cancelled while still a draft. */
+            city?: string | null;
+            /** @description ISO 3166-1 alpha-2; null only for a jam cancelled while still a draft. */
+            country?: string | null;
             /** @description Where it is in its lifecycle. */
             status: components["schemas"]["EventStatus"];
         };
@@ -1905,14 +1903,18 @@ export interface components {
                 ends_on: string;
                 /** @description IANA name, e.g. `Europe/Zurich`. */
                 timezone: string;
+                /** @description When it opens, as wall-clock time in its timezone; null until announced. */
+                opens_at?: string | null;
+                /** @description When it closes, as wall-clock time in its timezone; null until announced. */
+                closes_at?: string | null;
                 /** @description Venue, null when blank. */
                 venue_name?: string | null;
                 /** @description Street address, null when blank. */
                 address?: string | null;
-                /** @description City shown on cards and in the map popup. */
-                city: string;
-                /** @description ISO 3166-1 alpha-2. */
-                country: string;
+                /** @description City shown on cards and in the map popup; null while the venue is not set. */
+                city?: string | null;
+                /** @description ISO 3166-1 alpha-2; null while the venue is not set. */
+                country?: string | null;
                 /**
                  * Format: double
                  * @description Latitude; set together with `lng` or not at all.
@@ -2060,21 +2062,24 @@ export interface components {
         SiteStats: {
             /**
              * Format: int64
-             * @description Countries with at least one public jam.
+             * @description Battles of public jams that ended before today.
              */
-            countries: number;
-            /**
-             * Format: int64
-             * @description Battles of public jams, past and upcoming.
-             */
-            battles: number;
+            battles_past: number;
             /**
              * Format: int64
              * @description Dancer pages, merged and deleted ones left out.
              */
             dancers: number;
-            /** @description Battles per country, the busiest first. */
-            battles_by_country: components["schemas"]["CountryBattles"][];
+            /**
+             * Format: int64
+             * @description Battles of public jams that end today or later.
+             */
+            battles_upcoming: number;
+            /**
+             * Format: int64
+             * @description Countries those upcoming battles take place in.
+             */
+            countries_upcoming: number;
         };
         /** @description One person on a jam's staff. */
         StaffAssignment: {
@@ -2590,7 +2595,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Invalid fields */
+            /** @description Invalid fields, or a jam past draft losing its city, country or pin (`place`) */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -2700,6 +2705,15 @@ export interface operations {
             };
             /** @description The current status does not allow it */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `submit` or `publish` before the venue is on the map and a battle exists; `fields` names `place` and `battles` */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

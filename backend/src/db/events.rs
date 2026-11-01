@@ -66,13 +66,13 @@ pub async fn insert(
         r#"insert into events
              (id, organizer_id, slug, name, description, starts_on, ends_on, timezone,
               venue_name, address, city, country, lat, lng, registration_url, instagram_url,
-              website_url, contact_email)
+              website_url, contact_email, opens_at, closes_at)
            values ($1, $2, $3, btrim($4), nullif(btrim($5), ''), $6, $7, $8,
-                   nullif(btrim($9), ''), nullif(btrim($10), ''), btrim($11), $12, $13, $14,
-                   nullif(btrim($15), ''), nullif(btrim($16), ''), nullif(btrim($17), ''),
-                   nullif(btrim($18), ''))
+                   nullif(btrim($9), ''), nullif(btrim($10), ''), nullif(btrim($11), ''), $12,
+                   $13, $14, nullif(btrim($15), ''), nullif(btrim($16), ''),
+                   nullif(btrim($17), ''), nullif(btrim($18), ''), $19, $20)
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
-                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                     starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                      registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         organizer_id,
@@ -92,6 +92,8 @@ pub async fn insert(
         fields.instagram_url,
         fields.website_url,
         fields.contact_email,
+        fields.opens_at,
+        fields.closes_at,
     )
     .fetch_one(db)
     .await
@@ -104,12 +106,13 @@ pub async fn update(pool: &PgPool, id: Uuid, fields: &EventFields) -> sqlx::Resu
         r#"update events set
              name = btrim($2), description = nullif(btrim($3), ''), starts_on = $4, ends_on = $5,
              timezone = $6, venue_name = nullif(btrim($7), ''), address = nullif(btrim($8), ''),
-             city = btrim($9), country = $10, lat = $11, lng = $12,
+             city = nullif(btrim($9), ''), country = $10, lat = $11, lng = $12,
              registration_url = nullif(btrim($13), ''), instagram_url = nullif(btrim($14), ''),
-             website_url = nullif(btrim($15), ''), contact_email = nullif(btrim($16), '')
+             website_url = nullif(btrim($15), ''), contact_email = nullif(btrim($16), ''),
+             opens_at = $17, closes_at = $18
            where id = $1 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
-                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                     starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                      registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         fields.name,
@@ -127,6 +130,8 @@ pub async fn update(pool: &PgPool, id: Uuid, fields: &EventFields) -> sqlx::Resu
         fields.instagram_url,
         fields.website_url,
         fields.contact_email,
+        fields.opens_at,
+        fields.closes_at,
     )
     .fetch_one(pool)
     .await
@@ -138,7 +143,7 @@ pub async fn find(pool: &PgPool, id_or_slug: &str) -> sqlx::Result<Option<Event>
     sqlx::query_as!(
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
-                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                  starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                   registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at
            from events
            where deleted_at is null and (id = $1 or slug = $2)"#,
@@ -155,7 +160,7 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
     sqlx::query_as!(
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
-                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                  starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                   registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at
            from events
            where deleted_at is null
@@ -183,13 +188,15 @@ pub async fn list(pool: &PgPool, filter: &ListFilter<'_>) -> sqlx::Result<Vec<Ev
 
 /// Points for the world map: announced or completed jams with coordinates, never cancelled ones.
 pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
+    // The API keeps a jam's place once it is past draft; the filter makes that true here too.
     sqlx::query_as!(
         MapPoint,
-        r#"select id, name, slug, starts_on, ends_on, status as "status: EventStatus", city,
-                  country, lat as "lat!", lng as "lng!", flyer_card_url
+        r#"select id, name, slug, starts_on, ends_on, status as "status: EventStatus",
+                  city as "city!", country as "country!", lat as "lat!", lng as "lng!",
+                  flyer_card_url
            from events
            where deleted_at is null and status in ('published', 'registration_closed', 'completed')
-             and lat is not null and lng is not null
+             and city is not null and country is not null and lat is not null and lng is not null
            order by starts_on, id"#,
     )
     .fetch_all(pool)
@@ -210,7 +217,7 @@ pub async fn set_status(
         r#"update events set status = $3, review_note = null
            where id = $1 and status = $2 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
-                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                     starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                      registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         from as EventStatus,
@@ -233,7 +240,7 @@ pub async fn review(
         r#"update events set status = $2, review_note = $3
            where id = $1 and status = 'in_review' and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
-                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                     starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                      registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         to as EventStatus,
@@ -248,7 +255,7 @@ pub async fn in_review(pool: &PgPool, window: super::Window) -> sqlx::Result<Vec
     sqlx::query_as!(
         Event,
         r#"select id, organizer_id, name, slug, description, status as "status: EventStatus",
-                  starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                  starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                   registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at
            from events
            where deleted_at is null and status = 'in_review'
@@ -283,7 +290,7 @@ pub async fn set_flyer(
         r#"update events set flyer_url = $2, flyer_card_url = $3
            where id = $1 and deleted_at is null
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
-                     starts_on, ends_on, timezone, venue_name, address, city, country, lat, lng,
+                     starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                      registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
         id,
         url,

@@ -30,7 +30,8 @@ import {
   countdown,
   directionsUrl,
   firstStart,
-  initialsOf,
+  openingHours,
+  placeLine,
   shareTitle,
   totalPrizes,
   whoIsIn,
@@ -38,6 +39,7 @@ import {
 import { JamFlyer } from "../features/jams/JamFlyer";
 import { Lineup } from "../features/jams/Lineup";
 import { MoreJams } from "../features/jams/MoreJams";
+import { InitialsAvatar } from "../features/jams/OrganizerCard";
 import {
   useBattles,
   useEntries,
@@ -45,7 +47,6 @@ import {
   useStaff,
 } from "../features/jams/queries";
 import { WhosIn } from "../features/jams/WhosIn";
-import { countryName } from "../lib/countries";
 import {
   formatBattleStart,
   formatDateRange,
@@ -251,10 +252,11 @@ function TopBar({ jam }: { jam: Jam }) {
   );
 }
 
-/** The meta lines: date and first start, city and country, all prizes; one row from lg. */
+/** The meta lines: date and hours, city and country, all prizes; one row from lg. */
 function Meta({ jam, battles }: { jam: Jam; battles: Schemas["Battle"][] }) {
   const { t, i18n } = useTranslation();
   const prizes = totalPrizes(battles, i18n.language);
+  const place = placeLine(jam, i18n.language);
   const line = "flex items-center gap-2 text-body";
   const icon = { size: 20, weight: "bold" as const, "aria-hidden": true };
   return (
@@ -269,10 +271,12 @@ function Meta({ jam, battles }: { jam: Jam; battles: Schemas["Battle"][] }) {
           <When jam={jam} battles={battles} />
         </span>
       </li>
-      <li className={line}>
-        <Flag code={jam.country} size="bare" />
-        {jam.city}, {countryName(jam.country, i18n.language)}
-      </li>
+      {place && (
+        <li className={line}>
+          {jam.country && <Flag code={jam.country} size="bare" />}
+          {place}
+        </li>
+      )}
       {prizes && (
         <li className={line}>
           <Trophy {...icon} className="shrink-0 text-primary-text" />
@@ -283,8 +287,8 @@ function Meta({ jam, battles }: { jam: Jam; battles: Schemas["Battle"][] }) {
   );
 }
 
-/** "Saturday 8 June 2030 · from 14:00", or short ("Sat 8 Jun · from 14:00"): the days, and the
- * first battle's start when known. */
+/** "Saturday 8 June 2030 · 14:00–21:00", or short ("Sat 8 Jun · from 14:00"): the days, then
+ * the jam's own hours, else the first battle's start when known. */
 function When({
   jam,
   battles,
@@ -297,10 +301,12 @@ function When({
   const { t, i18n } = useTranslation();
   const format = style === "short" ? formatShortDateRange : formatDateRange;
   const dates = format(jam.starts_on, jam.ends_on, i18n.language);
+  const hours = openingHours(jam, i18n.language);
+  if (hours?.to) return `${dates} · ${hours.from}–${hours.to}`;
   const start = firstStart(battles);
-  if (!start) return dates;
-  const time = formatBattleStart(start, true, i18n.language);
-  return `${dates} · ${t("jam.startsAt", { time })}`;
+  const time =
+    hours?.from ?? (start && formatBattleStart(start, true, i18n.language));
+  return time ? `${dates} · ${t("jam.startsAt", { time })}` : dates;
 }
 
 /** The facts grid's When and Where (desktop). */
@@ -321,8 +327,9 @@ function WhenWhere({
         <When jam={jam} battles={battles} />
       </Fact>
       <Fact icon={<MapPin size={20} weight="bold" />} label={t("jam.where")}>
-        {[jam.venue_name, jam.city].filter(Boolean).join(" · ")},{" "}
-        {countryName(jam.country, i18n.language)}
+        {[jam.venue_name, placeLine(jam, i18n.language)]
+          .filter(Boolean)
+          .join(" · ")}
       </Fact>
     </>
   );
@@ -393,9 +400,9 @@ function Venue({ jam }: { jam: Jam }) {
       <address className="flex flex-col gap-1 text-body not-italic">
         {jam.venue_name && <span className="font-bold">{jam.venue_name}</span>}
         {jam.address && <span>{jam.address}</span>}
-        <span>
-          {jam.city}, {countryName(jam.country, i18n.language)}
-        </span>
+        {placeLine(jam, i18n.language) && (
+          <span>{placeLine(jam, i18n.language)}</span>
+        )}
       </address>
       {pin && (
         <a
@@ -440,12 +447,7 @@ function OrganizerCard({
       : null;
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface p-4">
-      <span
-        aria-hidden
-        className="grid size-[52px] shrink-0 place-items-center rounded-[16px] bg-primary font-display text-[18px] font-extrabold text-on-primary"
-      >
-        {initialsOf(organizer.display_name)}
-      </span>
+      <InitialsAvatar name={organizer.display_name} />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex items-center gap-1.5">
           <Link

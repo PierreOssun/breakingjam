@@ -32,10 +32,10 @@ const inReview = (count: number) => ({
   },
 });
 
-/** Opens the desktop pill's menu. */
+/** Opens the desktop button's menu. */
 async function openMenu(name: string) {
   await userEvent.click(
-    await screen.findByRole("button", { name: `${name}, account menu` }),
+    await screen.findByRole("button", { name: `Account menu, ${name}` }),
   );
   return within(screen.getByRole("menu", { name: "Account" }));
 }
@@ -88,10 +88,11 @@ describe("AccountMenu", () => {
 
   it("shows admins Admin, with live counts that hide at 0", async () => {
     // Each opening asks again: the second answers say everything was dealt with.
+    let waiting = 3;
     mockApi({
       "GET /api/auth/me": me(ADMIN),
       "GET /api/events": (n) => drafts(n === 0 ? 1 : 0),
-      "GET /api/admin/stats": (n) => inReview(n === 0 ? 3 : 0),
+      "GET /api/admin/stats": () => inReview(waiting),
     });
     renderApp("/nowhere");
     let menu = await openMenu("Lil G");
@@ -104,6 +105,7 @@ describe("AccountMenu", () => {
     ).toHaveAttribute("href", "/admin");
 
     await userEvent.keyboard("{Escape}");
+    waiting = 0;
     menu = await openMenu("Lil G");
     expect(
       await menu.findByRole("menuitem", { name: "Admin" }),
@@ -111,6 +113,67 @@ describe("AccountMenu", () => {
     expect(
       await menu.findByRole("menuitem", { name: "My jams" }),
     ).toBeInTheDocument();
+  });
+
+  it("shows only the avatar on the desktop button, the name in its label and tooltip", async () => {
+    mockApi({ "GET /api/auth/me": me(NOVA), "GET /api/events": drafts(0) });
+    renderApp("/nowhere");
+    const trigger = await screen.findByRole("button", {
+      name: "Account menu, Nova",
+    });
+
+    expect(trigger).toHaveTextContent("");
+    expect(trigger).toHaveAttribute("title", "Nova");
+    expect(trigger).toHaveAttribute("aria-haspopup", "menu");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(
+      within(screen.getByRole("menu", { name: "Account" })).getByRole(
+        "menuitem",
+        { name: /^Nova/ },
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("marks the closed button while an admin has items to review", async () => {
+    mockApi({
+      "GET /api/auth/me": me(ADMIN),
+      "GET /api/events": drafts(0),
+      "GET /api/admin/stats": inReview(2),
+    });
+    renderApp("/nowhere");
+
+    expect(await screen.findByTestId("review-dot")).toBeInTheDocument();
+  });
+
+  it("has no dot with nothing to review", async () => {
+    let asked = false;
+    mockApi({
+      "GET /api/auth/me": me(ADMIN),
+      "GET /api/events": drafts(0),
+      "GET /api/admin/stats": () => {
+        asked = true;
+        return inReview(0);
+      },
+    });
+    renderApp("/nowhere");
+
+    await screen.findByRole("button", { name: "Account menu, Lil G" });
+    await waitFor(() => expect(asked).toBe(true));
+    expect(screen.queryByTestId("review-dot")).toBeNull();
+  });
+
+  it("doesn't ask a non-admin what's to review", async () => {
+    mockApi({
+      "GET /api/auth/me": me(ORGANIZER),
+      "GET /api/events": drafts(0),
+    });
+    renderApp("/nowhere");
+
+    await screen.findByRole("button", { name: "Account menu, Lil G" });
+    expect(screen.queryByTestId("review-dot")).toBeNull();
   });
 
   it("switches the theme from the menu", async () => {
@@ -138,7 +201,7 @@ describe("AccountMenu", () => {
     mockApi({ "GET /api/auth/me": me(NOVA), "GET /api/events": drafts(0) });
     renderApp("/nowhere");
     const trigger = await screen.findByRole("button", {
-      name: "Nova, account menu",
+      name: "Account menu, Nova",
     });
     expect(trigger).toHaveAttribute("aria-haspopup", "menu");
 

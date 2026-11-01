@@ -1,0 +1,31 @@
+name = "Red Bull BC One Cypher Switzerland 2023"
+starts_on = 2023-05-20
+timezone = "Europe/Zurich"
+city = "Zürich"
+country = "CH"
+venue = "Halle 622"
+lat = 47.4134
+lng = 8.5429
+sources = [
+  "https://www.redbull.com/us-en/videos/red-bull-bc-one-cypher-switzerland-2023-b-boy-final",
+  "https://www.redbull.com/us-en/videos/red-bull-bc-one-cypher-switzerland-2023-b-girl-final",
+  "https://www.youtube.com/watch?v=Yy1BshblW8E",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "lotus", reached = "winner" },
+  { entrant = "moa", reached = "top2" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "becca", reached = "winner" },
+  { entrant = "jazzy-jes", reached = "top2" },
+]

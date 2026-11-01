@@ -1,0 +1,32 @@
+name = "Red Bull BC One Cypher France 2022"
+starts_on = 2022-05-22
+timezone = "Europe/Paris"
+city = "Lyon"
+country = "FR"
+venue = "H7"
+lat = 45.7372
+lng = 4.8198
+sources = [
+  "https://www.youtube.com/watch?v=7HtgEZywqXM",
+  "https://www.youtube.com/watch?v=yB_MwzxjNw0",
+  "https://bgirlbboy.com/bgirl-senorita-carlota/",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "mathis", reached = "winner", video = "https://youtu.be/7HtgEZywqXM" },
+  { entrant = "kae", reached = "top2", video = "https://youtu.be/7HtgEZywqXM" },
+  { entrant = "brutality", reached = "top16", video = "https://youtu.be/pc1PfbYjgt8" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "carlota", reached = "winner" },
+  { entrant = "campanita", reached = "top2" },
+]

@@ -4,6 +4,7 @@ import {
   formatBattleStart,
   formatDateRange,
   formatShortDateRange,
+  formatTime,
   yearOf,
 } from "../../src/lib/dates";
 
@@ -56,6 +57,12 @@ describe("dates", () => {
       "2030-07-01",
     ]);
     expect(daysOf("2030-06-01", "2030-06-01")).toEqual(["2030-06-01"]);
+  });
+
+  it("shows a jam's hours as the locale's clock time", () => {
+    expect(formatTime("14:00:00", "en")).toBe("14:00");
+    expect(formatTime("09:05", "de")).toBe("09:05");
+    expect(formatTime("21:30:00", "fr")).toBe("21:30");
   });
 
   it("gives a battle's start as a time, with the day when the jam runs several days", () => {

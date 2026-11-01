@@ -1,0 +1,28 @@
+name = "Red Bull BC One Cypher France 2025"
+starts_on = 2025-04-12
+timezone = "Europe/Paris"
+city = "Bordeaux"
+country = "FR"
+venue = "La Faïencerie"
+lat = 44.8607
+lng = -0.5562
+sources = [
+  "https://www.redbull.com/fr-fr/red-bull-bc-one-cypher-france-2025-vainqueurs",
+  "https://www.aquitaineonline.com/actu-news/france/11867-red-bull-bc-one-cypher-france-syssy-ilyes-zoo-vainqueurs.html",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "ilyes-zoo", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "syssy", reached = "winner" },
+]

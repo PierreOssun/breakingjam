@@ -1,0 +1,31 @@
+name = "Red Bull BC One Cypher France 2023"
+starts_on = 2023-07-08
+timezone = "Europe/Paris"
+city = "Montpellier"
+country = "FR"
+venue = "Opéra Comédie"
+lat = 43.6078
+lng = 3.8787
+sources = [
+  "https://www.redbull.com/ph-en/galleries/red-bull-bc-one-national-winners",
+  "https://www.lejournaltoulousain.fr/occitanie/herault/montpellier/breakdance-montpellier-finale-red-bull-bc-one-217290/",
+  "https://www.jds.fr/montpellier/spectacles/danse/red-bull-bc-one-cypher-france-338893_A",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "khalil", reached = "winner", video = "https://youtu.be/n-suePe47yQ" },
+  { entrant = "shaymin", reached = "top2", video = "https://youtu.be/n-suePe47yQ" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "kimie", reached = "winner", video = "https://youtu.be/x-fkDCpCKmQ" },
+  { entrant = "chris", reached = "top2", video = "https://youtu.be/x-fkDCpCKmQ" },
+]

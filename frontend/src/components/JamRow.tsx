@@ -12,10 +12,11 @@ export function JamRow({
   to,
   trailing,
 }: {
-  jam: Pick<
-    Schemas["EventRef"],
-    "name" | "starts_on" | "ends_on" | "city" | "country"
-  >;
+  // A draft may still lack its place; public jams always have one.
+  jam: Pick<Schemas["EventRef"], "name" | "starts_on" | "ends_on"> & {
+    city?: string | null;
+    country?: string | null;
+  };
   to: string;
   trailing?: ReactNode;
 }) {
@@ -34,7 +35,7 @@ export function JamRow({
           </span>
         </span>
         <span className="flex items-center gap-1.5 text-[13px] leading-[18px] text-muted">
-          <Flag code={jam.country} size="bare" />
+          {jam.country && <Flag code={jam.country} size="bare" />}
           {jam.city}
         </span>
       </span>

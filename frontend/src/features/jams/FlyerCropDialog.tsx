@@ -25,7 +25,12 @@ type FlyerCropDialogProps = {
   /** The picked image, decoded; the caller owns its object URL. */
   image: HTMLImageElement;
   /** What the list preview shows next to the flyer. */
-  jam: { name: string; city: string; starts_on: string; ends_on: string };
+  jam: {
+    name: string;
+    city?: string | null;
+    starts_on: string;
+    ends_on: string;
+  };
   saving: boolean;
   onCrop: (crop: Rect) => void;
   onClose: () => void;

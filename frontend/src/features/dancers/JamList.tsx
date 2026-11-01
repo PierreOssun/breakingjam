@@ -104,7 +104,7 @@ export function JamRow({
           </span>
         </Link>
         <p className="flex items-center gap-1.5 text-[13px] leading-[18px] text-muted">
-          <Flag code={p.event.country} size="bare" />
+          {p.event.country && <Flag code={p.event.country} size="bare" />}
           {p.event.city}
         </p>
         {(p.battle || p.role !== "competitor") && (

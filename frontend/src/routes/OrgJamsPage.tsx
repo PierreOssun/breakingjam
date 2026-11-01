@@ -1,16 +1,23 @@
 import { Plus, Ticket } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { buttonClasses } from "../components/buttonClasses";
 import { JamRow } from "../components/JamRow";
 import { MoreList } from "../components/MoreList";
 import { StatusBadge } from "../components/StatusBadge";
 import { useMe } from "../features/auth/useMe";
 import { useMyJams } from "../features/jams/queries";
+import { StartJamDialog } from "../features/jams/StartJamDialog";
+
+/** `/org/jams/new`: the list with the start sheet open; closing it returns to the list. */
+export function OrgJamNewPage() {
+  return <OrgJamsPage starting />;
+}
 
 /** `/org/jams`: the organiser's jams, drafts included, each opening its edit page. */
-export function OrgJamsPage() {
+export function OrgJamsPage({ starting = false }: { starting?: boolean }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const jams = useMyJams();
   const me = useMe().data;
   const some = (jams.data?.pages[0]?.items.length ?? 0) > 0;
@@ -46,6 +53,7 @@ export function OrgJamsPage() {
           />
         )}
       </MoreList>
+      {starting && <StartJamDialog onClose={() => navigate("/org/jams")} />}
     </section>
   );
 }

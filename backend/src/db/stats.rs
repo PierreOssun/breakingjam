@@ -74,57 +74,31 @@ pub async fn overview(pool: &PgPool) -> sqlx::Result<Stats> {
 /// What the landing page counts; public jams are announced or completed, never cancelled.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct SiteStats {
-    /// Countries with at least one public jam.
-    pub countries: i64,
-    /// Battles of public jams, past and upcoming.
-    pub battles: i64,
+    /// Battles of public jams that ended before today.
+    pub battles_past: i64,
     /// Dancer pages, merged and deleted ones left out.
     pub dancers: i64,
-    /// Battles per country, the busiest first.
-    pub battles_by_country: Vec<CountryBattles>,
+    /// Battles of public jams that end today or later.
+    pub battles_upcoming: i64,
+    /// Countries those upcoming battles take place in.
+    pub countries_upcoming: i64,
 }
 
-/// How many battles a country's public jams hold.
-#[derive(Debug, Serialize, ToSchema)]
-pub struct CountryBattles {
-    /// ISO 3166-1 alpha-2.
-    pub country: String,
-    /// Battles of its public jams.
-    pub battles: i64,
-}
-
-/// The landing page counts, in two round trips.
+/// The landing page counts, in one round trip.
 pub async fn site(pool: &PgPool) -> sqlx::Result<SiteStats> {
-    let totals = sqlx::query!(
-        r#"with public_jams as (
-             select id, country from events
-             where deleted_at is null
-               and status in ('published', 'registration_closed', 'completed')
-           )
-           select
-             (select count(distinct country) from public_jams) as "countries!",
-             (select count(*) from battles where event_id in (select id from public_jams))
-               as "battles!",
+    sqlx::query_as!(
+        SiteStats,
+        r#"select
+             count(*) filter (where e.ends_on < current_date) as "battles_past!",
              (select count(*) from dancers
-              where deleted_at is null and merged_into_id is null) as "dancers!""#,
-    )
-    .fetch_one(pool)
-    .await?;
-    let battles_by_country = sqlx::query_as!(
-        CountryBattles,
-        r#"select e.country, count(*) as "battles!"
+              where deleted_at is null and merged_into_id is null) as "dancers!",
+             count(*) filter (where e.ends_on >= current_date) as "battles_upcoming!",
+             count(distinct e.country) filter (where e.ends_on >= current_date)
+               as "countries_upcoming!"
            from battles b join events e on e.id = b.event_id
            where e.deleted_at is null
-             and e.status in ('published', 'registration_closed', 'completed')
-           group by e.country
-           order by 2 desc, e.country"#,
+             and e.status in ('published', 'registration_closed', 'completed')"#,
     )
-    .fetch_all(pool)
-    .await?;
-    Ok(SiteStats {
-        countries: totals.countries,
-        battles: totals.battles,
-        dancers: totals.dancers,
-        battles_by_country,
-    })
+    .fetch_one(pool)
+    .await
 }

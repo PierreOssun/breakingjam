@@ -1,0 +1,35 @@
+name = "Red Bull BC One Cypher Switzerland 2026"
+starts_on = 2026-04-18
+timezone = "Europe/Zurich"
+city = "Lausanne"
+country = "CH"
+venue = "Palais de Beaulieu"
+lat = 46.5296
+lng = 6.6229
+sources = [
+  "https://www.redbull.com/ch-de/events/bcone",
+  "https://www.redbull.com/ch-fr/events/bcone",
+  "https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA",
+]
+judges = ["menno", "madmax", "ukol"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "liam", reached = "winner", video = "https://youtu.be/hsplPBGc-gQ" },
+  { entrant = "v-nuk", reached = "top2", video = "https://youtu.be/hsplPBGc-gQ" },
+  { entrant = "skip", reached = "top4", video = "https://youtu.be/y0polouWqWk" },
+  { entrant = "misha", reached = "top4", video = "https://youtu.be/FqaoR1OZuqo" },
+  { entrant = "cosmic-astro", reached = "top16", video = "https://youtu.be/BbeGxDAEDE8" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "jin", reached = "winner", video = "https://youtu.be/JFsc68fPkhM" },
+  { entrant = "soong", reached = "top2", video = "https://youtu.be/JFsc68fPkhM" },
+]

@@ -182,7 +182,7 @@ async fn world(pool: PgPool) -> World {
     let owner = sign_up(&app, "owner@example.com").await;
     let owner_id = id_of(&send(&app, get("/api/auth/me", Some(&owner))).await);
     let jam = id_of(&send(&app, post("/api/events", jam(), Some(&owner))).await);
-    publish(&app, &pool, &jam, &owner).await;
+    publish(&pool, &jam).await;
     let battle_uri = format!("/api/events/{jam}/battles");
     let battle = id_of(&send(&app, post(&battle_uri, battle(), Some(&owner))).await);
     let dancer_body = json!({ "dancer_name": "Lil G", "country": "FR" });

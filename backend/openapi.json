@@ -518,7 +518,7 @@
         "tags": [
           "events"
         ],
-        "summary": "Replace a jam's fields; slug and status never change here.",
+        "summary": "Replace a jam's fields; slug and status never change here, and past draft the place stays.",
         "operationId": "update_event",
         "parameters": [
           {
@@ -583,7 +583,7 @@
             }
           },
           "422": {
-            "description": "Invalid fields",
+            "description": "Invalid fields, or a jam past draft losing its city, country or pin (`place`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -737,6 +737,16 @@
           },
           "409": {
             "description": "The current status does not allow it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`submit` or `publish` before the venue is on the map and a battle exists; `fields` names `place` and `battles`",
             "content": {
               "application/json": {
                 "schema": {
@@ -3623,7 +3633,7 @@
         "tags": [
           "stats"
         ],
-        "summary": "How far BreakingJam reaches: countries, battles (in total and per country) and dancers.",
+        "summary": "How far BreakingJam reaches: past battles and dancers, upcoming battles and their countries.",
         "operationId": "site_stats",
         "responses": {
           "200": {
@@ -4729,25 +4739,6 @@
           }
         }
       },
-      "CountryBattles": {
-        "type": "object",
-        "description": "How many battles a country's public jams hold.",
-        "required": [
-          "country",
-          "battles"
-        ],
-        "properties": {
-          "country": {
-            "type": "string",
-            "description": "ISO 3166-1 alpha-2."
-          },
-          "battles": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Battles of its public jams."
-          }
-        }
-      },
       "Crew": {
         "type": "object",
         "description": "A stored crew.",
@@ -5514,8 +5505,6 @@
           "starts_on",
           "ends_on",
           "timezone",
-          "city",
-          "country",
           "created_at",
           "updated_at"
         ],
@@ -5563,6 +5552,20 @@
             "type": "string",
             "description": "IANA name, e.g. `Europe/Zurich`."
           },
+          "opens_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "When it opens, as wall-clock time in its timezone; null until announced."
+          },
+          "closes_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "When it closes, as wall-clock time in its timezone; null until announced."
+          },
           "venue_name": {
             "type": [
               "string",
@@ -5578,12 +5581,18 @@
             "description": "Street address, null when blank."
           },
           "city": {
-            "type": "string",
-            "description": "City shown on cards and in the map popup."
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "City shown on cards and in the map popup; null while the venue is not set."
           },
           "country": {
-            "type": "string",
-            "description": "ISO 3166-1 alpha-2."
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2; null while the venue is not set."
           },
           "lat": {
             "type": [
@@ -5669,9 +5678,7 @@
           "name",
           "starts_on",
           "ends_on",
-          "timezone",
-          "city",
-          "country"
+          "timezone"
         ],
         "properties": {
           "name": {
@@ -5699,6 +5706,20 @@
             "type": "string",
             "description": "IANA name, e.g. `Europe/Zurich`."
           },
+          "opens_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "When it opens, `HH:MM` in its timezone; null when not announced."
+          },
+          "closes_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "When it closes, `HH:MM` in its timezone; null when not announced."
+          },
           "venue_name": {
             "type": [
               "string",
@@ -5714,12 +5735,18 @@
             "description": "Street address; blank is stored as null."
           },
           "city": {
-            "type": "string",
-            "description": "City, up to 100 characters."
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "City, up to 100 characters; blank is stored as null."
           },
           "country": {
-            "type": "string",
-            "description": "ISO 3166-1 alpha-2, upper case."
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2, upper case; null while the venue is not set."
           },
           "lat": {
             "type": [
@@ -5776,8 +5803,6 @@
           "slug",
           "starts_on",
           "ends_on",
-          "city",
-          "country",
           "status"
         ],
         "properties": {
@@ -5805,12 +5830,18 @@
             "description": "Last day."
           },
           "city": {
-            "type": "string",
-            "description": "City."
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "City; null only for a jam cancelled while still a draft."
           },
           "country": {
-            "type": "string",
-            "description": "ISO 3166-1 alpha-2."
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2; null only for a jam cancelled while still a draft."
           },
           "status": {
             "$ref": "#/components/schemas/EventStatus",
@@ -6650,8 +6681,6 @@
                 "starts_on",
                 "ends_on",
                 "timezone",
-                "city",
-                "country",
                 "created_at",
                 "updated_at"
               ],
@@ -6699,6 +6728,20 @@
                   "type": "string",
                   "description": "IANA name, e.g. `Europe/Zurich`."
                 },
+                "opens_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "When it opens, as wall-clock time in its timezone; null until announced."
+                },
+                "closes_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "When it closes, as wall-clock time in its timezone; null until announced."
+                },
                 "venue_name": {
                   "type": [
                     "string",
@@ -6714,12 +6757,18 @@
                   "description": "Street address, null when blank."
                 },
                 "city": {
-                  "type": "string",
-                  "description": "City shown on cards and in the map popup."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "City shown on cards and in the map popup; null while the venue is not set."
                 },
                 "country": {
-                  "type": "string",
-                  "description": "ISO 3166-1 alpha-2."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "ISO 3166-1 alpha-2; null while the venue is not set."
                 },
                 "lat": {
                   "type": [
@@ -7125,33 +7174,31 @@
         "type": "object",
         "description": "What the landing page counts; public jams are announced or completed, never cancelled.",
         "required": [
-          "countries",
-          "battles",
+          "battles_past",
           "dancers",
-          "battles_by_country"
+          "battles_upcoming",
+          "countries_upcoming"
         ],
         "properties": {
-          "countries": {
+          "battles_past": {
             "type": "integer",
             "format": "int64",
-            "description": "Countries with at least one public jam."
-          },
-          "battles": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Battles of public jams, past and upcoming."
+            "description": "Battles of public jams that ended before today."
           },
           "dancers": {
             "type": "integer",
             "format": "int64",
             "description": "Dancer pages, merged and deleted ones left out."
           },
-          "battles_by_country": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CountryBattles"
-            },
-            "description": "Battles per country, the busiest first."
+          "battles_upcoming": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Battles of public jams that end today or later."
+          },
+          "countries_upcoming": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Countries those upcoming battles take place in."
           }
         }
       },

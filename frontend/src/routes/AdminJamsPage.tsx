@@ -15,7 +15,7 @@ import { MoreList } from "../components/MoreList";
 import { TextAreaField } from "../components/TextAreaField";
 import { useToast } from "../components/useToast";
 import { VerifiedTick } from "../components/VerifiedTick";
-import { countryName } from "../lib/countries";
+import { placeLine } from "../features/jams/jamDetail";
 import { formatDateRange } from "../lib/dates";
 import { instagramLabel } from "../lib/instagram";
 
@@ -107,7 +107,7 @@ function JamToReview({ jam }: { jam: Jam }) {
         </Link>
         <p className="text-body-sm text-muted">
           {formatDateRange(jam.starts_on, jam.ends_on, i18n.language)} ·{" "}
-          {jam.city}, {countryName(jam.country, i18n.language)}
+          {placeLine(jam, i18n.language)}
         </p>
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm">
           {/* None when the BreakingJam team entered the jam. */}

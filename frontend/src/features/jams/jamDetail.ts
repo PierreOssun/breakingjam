@@ -1,7 +1,8 @@
 // What the jam page derives from a jam (DESIGN.md §6 Jam detail): its countdown, its primary
 // action, the prizes, who is in. Pure, so it is tested without a page.
 import type { Schemas } from "../../api/client";
-import { formatShortDateRange, localeOf } from "../../lib/dates";
+import { countryName } from "../../lib/countries";
+import { formatShortDateRange, formatTime, localeOf } from "../../lib/dates";
 
 type Jam = Schemas["Event"];
 
@@ -85,15 +86,15 @@ export function primaryAction(
   }
 }
 
-/** The action card's caption, as an i18n key under `jam.caption`; none once it took place. */
+/** The action card's caption, as an i18n key under `jam.caption`; none without one to give. */
 export function actionCaption(
   jam: Pick<Jam, "status" | "registration_url">,
-): "open" | "closed" | "spectators" | "cancelled" | null {
+): "open" | "closed" | "cancelled" | null {
   switch (primaryAction(jam)) {
     case "register":
       return "open";
     case "calendar":
-      return jam.status === "registration_closed" ? "closed" : "spectators";
+      return jam.status === "registration_closed" ? "closed" : null;
     case "results":
       return null;
     case null:
@@ -150,13 +151,35 @@ export function whoIsIn(
   };
 }
 
-/** "Paris Cypher · Sat 14 Nov · Paris": what Share sends, as the link preview titles it. */
+/** "Paris Cypher · Sat 14 Nov · Paris": what Share sends, as the link preview titles it; a
+ * draft without a venue stops at the date. */
 export function shareTitle(
   jam: Pick<Jam, "name" | "starts_on" | "ends_on" | "city">,
   language: string,
 ): string {
   const dates = formatShortDateRange(jam.starts_on, jam.ends_on, language);
-  return `${jam.name} · ${dates} · ${jam.city}`;
+  return [jam.name, dates, jam.city].filter(Boolean).join(" · ");
+}
+
+/** "Zürich, Switzerland", the country alone, or null while a draft has no venue (M24). */
+export function placeLine(
+  jam: Pick<Jam, "city" | "country">,
+  language: string,
+): string | null {
+  const country = jam.country && countryName(jam.country, language);
+  return [jam.city, country].filter(Boolean).join(", ") || null;
+}
+
+/** The jam's own hours as shown, `{ from: "14:00", to: "21:00" | null }`; null until announced. */
+export function openingHours(
+  jam: Pick<Jam, "opens_at" | "closes_at">,
+  language: string,
+): { from: string; to: string | null } | null {
+  if (!jam.opens_at) return null;
+  return {
+    from: formatTime(jam.opens_at, language),
+    to: jam.closes_at ? formatTime(jam.closes_at, language) : null,
+  };
 }
 
 /** Directions to the venue in Apple Maps (Apple devices) or Google Maps (the rest). */

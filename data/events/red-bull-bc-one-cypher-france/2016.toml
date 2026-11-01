@@ -1,0 +1,24 @@
+name = "Red Bull BC One Cypher France 2016"
+starts_on = 2016-07-10
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+venue = "WIP Villette"
+lat = 48.8534  # the city: the venue's position is unknown
+lng = 2.3488
+sources = [
+  "https://hiphopcorner.fr/redbull-bc-one-france-cypher-2016-video-recap/",
+  "https://www.notonlyhiphop.com/danse/red-bull-bc-one-camp-france-le-sacre-du-lyonnais-willy.html",
+]
+judges = ["hong-10", "lilou", "kevo"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "willy", reached = "winner" },
+  { entrant = "lil-kev", reached = "top2" },
+  { entrant = "doudou", reached = "top4" },
+  { entrant = "shlag", reached = "top4" },
+]

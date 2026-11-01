@@ -13,7 +13,7 @@ use std::{
     sync::{Arc, LazyLock},
 };
 
-use chrono::Datelike;
+use chrono::{Datelike, NaiveTime};
 use resvg::{tiny_skia, usvg};
 use serde::Deserialize;
 use sha1::{Digest, Sha1};
@@ -133,13 +133,22 @@ pub struct FlyerText {
     pub day: String,
     /// Month, e.g. `Nov`.
     pub mon: String,
-    /// Start time; v0.1 jams have dates only, so it is `None` for now.
+    /// Opening hours, e.g. `14:00–21:00`; `None` until the jam announces them.
     pub time: Option<String>,
-    pub city: String,
-    /// ISO 3166-1 alpha-2.
-    pub cc: String,
+    /// City and ISO 3166-1 alpha-2 code; `None` while a draft has no venue.
+    pub place: Option<(String, String)>,
     /// Battle names, in display order.
     pub cats: Vec<String>,
+}
+
+/// "14:00–21:00", or just the opening time; nothing without one, as a closing time alone
+/// says little.
+pub(crate) fn times(opens_at: Option<NaiveTime>, closes_at: Option<NaiveTime>) -> Option<String> {
+    let opens = opens_at?.format("%H:%M");
+    Some(match closes_at {
+        Some(closes) => format!("{opens}–{}", closes.format("%H:%M")),
+        None => opens.to_string(),
+    })
 }
 
 // Category line budgets, in characters (uppercase Manrope 700 at 12px / 20px, plus tracking).
@@ -184,9 +193,8 @@ impl FlyerText {
                 .to_owned(),
             day: format!("{:02}", first.day()),
             mon: lang.month(first.month0() as usize).to_owned(),
-            time: None,
-            city: event.city.clone(),
-            cc: event.country.clone(),
+            time: times(event.opens_at, event.closes_at),
+            place: event.city.clone().zip(event.country.clone()),
             cats: battle_names,
         }
     }
@@ -441,13 +449,15 @@ pub fn flyer_svg(text: &FlyerText, palette: Palette, options: FlyerOptions) -> S
                 esc(line)
             );
         }
-        let _ = write!(
-            s,
-            r#"<text x="28" y="452" font-family="{BODY}" font-weight="800" font-size="17" fill="{}">{} · {}</text>"#,
-            p.text,
-            esc(&text.city),
-            esc(&text.cc)
-        );
+        if let Some((city, cc)) = &text.place {
+            let _ = write!(
+                s,
+                r#"<text x="28" y="452" font-family="{BODY}" font-weight="800" font-size="17" fill="{}">{} · {}</text>"#,
+                p.text,
+                esc(city),
+                esc(cc)
+            );
+        }
         let _ = write!(
             s,
             r#"<text x="28" y="478" font-family="{BODY}" font-weight="700" font-size="12" letter-spacing="1.4" fill="{}">{}</text>"#,
@@ -470,14 +480,19 @@ pub fn flyer_svg(text: &FlyerText, palette: Palette, options: FlyerOptions) -> S
     let aria = if options.compact {
         r#"aria-hidden="true""#.to_owned()
     } else {
+        // "Generated flyer: <name>, <date>, <city>"; a draft without a venue stops at the date.
+        let place = text
+            .place
+            .as_ref()
+            .map(|(city, _)| format!(", {}", esc(city)))
+            .unwrap_or_default();
         format!(
-            r#"role="img" aria-label="{} {}, {} {} {}, {}""#,
+            r#"role="img" aria-label="{} {}, {} {} {}{place}""#,
             esc(options.label),
             esc(&text.name),
             esc(&text.dow),
             esc(&text.day),
             esc(&text.mon),
-            esc(&text.city)
         )
     };
     format!(
@@ -540,13 +555,15 @@ pub fn og_svg(text: &FlyerText, palette: Palette, uid: &str) -> String {
             esc(line)
         );
     }
-    let _ = write!(
-        s,
-        r#"<text x="64" y="500" font-family="{BODY}" font-weight="800" font-size="30" fill="{}">{} · {}</text>"#,
-        p.text,
-        esc(&text.city),
-        esc(&text.cc)
-    );
+    if let Some((city, cc)) = &text.place {
+        let _ = write!(
+            s,
+            r#"<text x="64" y="500" font-family="{BODY}" font-weight="800" font-size="30" fill="{}">{} · {}</text>"#,
+            p.text,
+            esc(city),
+            esc(cc)
+        );
+    }
     // With no battles yet, the line is just the site name, without a dangling separator.
     let cats = esc(&text.cats.join(" · ").to_uppercase());
     let footer = if cats.is_empty() {

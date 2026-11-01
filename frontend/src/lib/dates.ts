@@ -106,6 +106,15 @@ export function daysOf(startsOn: string, endsOn: string): string[] {
   return days;
 }
 
+/** `"14:00:00"` (or `"14:00"`) as the locale's clock time, "14:00". */
+export function formatTime(time: string, language: string): string {
+  return new Intl.DateTimeFormat(localeOf(language), {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(new Date(`1970-01-01T${time}Z`));
+}
+
 /**
  * When a battle starts, a wall-clock time in the jam's timezone: "14:30" on a one-day jam,
  * "Sat 23 Sept, 14:30" when the jam runs over several days.

@@ -2,7 +2,37 @@
 
 use sha1::{Digest, Sha1};
 
-use crate::flyer::*;
+use chrono::NaiveTime;
+
+use crate::{flyer::*, unit_tests::bare_draft};
+
+#[test]
+fn flyer_text_prints_place_and_hours_only_once_known() {
+    let mut jam = bare_draft();
+    let text = FlyerText::for_event(&jam, vec!["1v1 Bboy".into()], Lang::En);
+    assert_eq!((text.place, text.time), (None, None));
+    assert_eq!(
+        (text.dow.as_str(), text.day.as_str(), text.mon.as_str()),
+        ("Thu", "12", "Dec")
+    );
+    assert_eq!(text.cats, ["1v1 Bboy"]);
+
+    jam.city = Some("Zürich".into());
+    jam.country = Some("CH".into());
+    jam.opens_at = NaiveTime::from_hms_opt(14, 0, 0);
+    let text = FlyerText::for_event(&jam, vec![], Lang::En);
+    assert_eq!(text.place, Some(("Zürich".into(), "CH".into())));
+    assert_eq!(text.time.as_deref(), Some("14:00"));
+    let options = FlyerOptions {
+        compact: false,
+        label: "Generated flyer:",
+        cancelled: None,
+        uid: "f",
+    };
+    let svg = flyer_svg(&text, Palette::Klein, options);
+    assert!(svg.contains("Zürich · CH") && svg.contains(">14:00</text>"));
+    assert!(svg.contains(r#"aria-label="Generated flyer: Winter Cypher Jam, Thu 12 Dec, Zürich""#));
+}
 
 fn sha(s: &str) -> String {
     Sha1::digest(s.as_bytes())
@@ -26,8 +56,7 @@ fn sample(key: &str) -> (FlyerText, Palette) {
         day: day.into(),
         mon: mon.into(),
         time: Some(time.into()),
-        city: city.into(),
-        cc: cc.into(),
+        place: Some((city.into(), cc.into())),
         cats: cats.iter().map(|c| (*c).to_owned()).collect(),
     };
     use Palette::*;
@@ -316,10 +345,18 @@ fn fit_name_matches_the_reference() {
 }
 
 #[test]
+fn opening_hours_need_an_opening_time() {
+    let at = |h, m| chrono::NaiveTime::from_hms_opt(h, m, 0);
+    assert_eq!(times(at(14, 0), at(21, 30)).as_deref(), Some("14:00–21:30"));
+    assert_eq!(times(at(14, 0), None).as_deref(), Some("14:00"));
+    assert_eq!(times(None, at(21, 0)), None);
+}
+
+#[test]
 fn text_is_escaped_including_quotes() {
     let (mut text, palette) = sample("concrete");
     text.name = r#"Jam" onload="alert(1)"#.into();
-    text.city = "<script>".into();
+    text.place = Some(("<script>".into(), "CH".into()));
     let svg = flyer_svg(
         &text,
         palette,

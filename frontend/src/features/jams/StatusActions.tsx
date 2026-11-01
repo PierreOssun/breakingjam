@@ -1,45 +1,35 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
 import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
 import { InlineNotice } from "../../components/InlineNotice";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/useToast";
-import { useMe } from "../auth/useMe";
+import { DeleteJamButton } from "./DeleteJamButton";
 
 type Jam = Schemas["EventResponse"];
-type Transition =
-  "submit" | "publish" | "close-registration" | "complete" | "cancel";
+type Transition = "close-registration" | "complete" | "cancel";
 
-// §4 "Event status transitions": the one step forward from each status. An organiser's draft
-// goes to review; the BreakingJam team publishes its own directly.
+// §4 "Event status transitions": the one step forward from each public status. A draft goes
+// through the publish checklist instead (PublishPanel).
 const NEXT: Partial<Record<Schemas["EventStatus"], Transition>> = {
-  draft: "submit",
   published: "close-registration",
   registration_closed: "complete",
 };
 const CANCELLABLE: Schemas["EventStatus"][] = [
-  "draft",
   "in_review",
   "published",
   "registration_closed",
 ];
 
-/**
- * Where the jam is in its lifecycle, the step forward (review first, for organisers),
- * cancelling and deleting, and the admin's note when a jam was sent back.
- */
+/** Where a submitted jam is in its lifecycle, the step forward, cancelling and deleting. */
 export function StatusActions({ jam }: { jam: Jam }) {
   const { t } = useTranslation();
   const toast = useToast();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [confirming, setConfirming] = useState<"cancel" | "delete" | null>(
-    null,
-  );
+  const [confirming, setConfirming] = useState(false);
 
   const move = useMutation({
     mutationFn: async (transition: Transition) =>
@@ -55,30 +45,14 @@ export function StatusActions({ jam }: { jam: Jam }) {
       );
       void queryClient.invalidateQueries({ queryKey: ["events"] });
       toast({ kind: "success", message: t(`org.status.done.${transition}`) });
-      setConfirming(null);
-    },
-    onError: (error) => toast({ kind: "error", message: error.message }),
-  });
-  const remove = useMutation({
-    mutationFn: async () => {
-      const { response } = await api.DELETE("/api/events/{id}", {
-        params: { path: { id: jam.id } },
-      });
-      if (!response.ok) throw new Error(t("errors.generic"));
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["events"] });
-      toast({ kind: "success", message: t("org.status.deleted") });
-      navigate("/org/jams", { replace: true });
+      setConfirming(false);
     },
     onError: (error) => toast({ kind: "error", message: error.message }),
   });
 
-  const role = useMe().data?.role;
-  // The BreakingJam team publishes its drafts without review.
-  const teamDraft =
-    jam.status === "draft" && (role === "seed_admin" || role === "admin");
-  const next = teamDraft ? "publish" : NEXT[jam.status];
+  // A draft has the publish checklist instead.
+  if (jam.status === "draft") return null;
+  const next = NEXT[jam.status];
   return (
     <section
       aria-labelledby="status-title"
@@ -91,20 +65,13 @@ export function StatusActions({ jam }: { jam: Jam }) {
         <StatusBadge status={jam.status} />
       </div>
       <p className="text-body-sm text-muted">
-        {teamDraft
-          ? t("org.status.explain.draftTeam")
-          : t(`org.status.explain.${jam.status}`)}
+        {t(`org.status.explain.${jam.status}`)}
       </p>
-      {jam.status === "draft" && jam.review_note && (
+      {jam.review_note && (
         <InlineNotice actionable>
           {t("org.status.sentBack", { note: jam.review_note })}
         </InlineNotice>
       )}
-      {jam.status !== "completed" &&
-        jam.status !== "cancelled" &&
-        jam.lat == null && (
-          <InlineNotice actionable>{t("org.status.noPin")}</InlineNotice>
-        )}
       <div className="flex flex-wrap gap-3">
         {next && (
           <Button
@@ -115,37 +82,25 @@ export function StatusActions({ jam }: { jam: Jam }) {
           </Button>
         )}
         {CANCELLABLE.includes(jam.status) && (
-          <Button variant="ghost" onClick={() => setConfirming("cancel")}>
+          <Button variant="ghost" onClick={() => setConfirming(true)}>
             {t("org.status.action.cancel")}
           </Button>
         )}
-        <Button variant="ghost" onClick={() => setConfirming("delete")}>
-          {t("org.status.delete")}
-        </Button>
+        <DeleteJamButton jam={jam} />
       </div>
       {confirming && (
         <Dialog
-          onClose={() => setConfirming(null)}
-          title={
-            confirming === "delete"
-              ? t("org.status.deleteTitle")
-              : t("org.status.cancelTitle")
-          }
+          onClose={() => setConfirming(false)}
+          title={t("org.status.cancelTitle")}
           action={{
-            label:
-              confirming === "delete"
-                ? t("org.status.delete")
-                : t("org.status.action.cancel"),
+            label: t("org.status.action.cancel"),
             cancel: t("org.status.keep"),
-            loading: move.isPending || remove.isPending,
-            onClick: () =>
-              confirming === "delete" ? remove.mutate() : move.mutate("cancel"),
+            loading: move.isPending,
+            onClick: () => move.mutate("cancel"),
           }}
         >
           <p className="text-body text-muted">
-            {confirming === "delete"
-              ? t("org.status.deleteBody", { name: jam.name })
-              : t("org.status.cancelBody", { name: jam.name })}
+            {t("org.status.cancelBody", { name: jam.name })}
           </p>
         </Dialog>
       )}

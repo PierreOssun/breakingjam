@@ -1,5 +1,4 @@
 import {
-  CaretDown,
   CaretRight,
   MagnifyingGlass,
   MapPin,
@@ -41,8 +40,9 @@ const THEME_ICONS: Record<Theme, Icon> = {
 };
 
 /**
- * The logged-in account's menu (DESIGN.md §4.6, §4.34): from xl a pill opening a dropdown; below,
- * an avatar button opening a sheet under the header that also holds the nav and "Register a jam".
+ * The logged-in account's menu (DESIGN.md §4.6, §4.34): from xl a round avatar button opening a
+ * dropdown; below, an avatar button opening a sheet under the header that also holds the nav and
+ * "Register a jam".
  */
 export function AccountMenu({
   me,
@@ -105,24 +105,21 @@ export function AccountMenu({
         aria-haspopup="menu"
         aria-expanded={menu.open}
         aria-controls={menu.open ? menu.id : undefined}
-        // The pill's visible name starts its accessible one, for voice control (WCAG 2.5.3).
         aria-label={
           sheet ? t("nav.accountMenu") : t("nav.accountMenuOf", { name })
         }
+        title={sheet ? undefined : name}
         onClick={() => menu.toggle(0)}
         className={
           sheet
             ? "grid size-11 shrink-0 place-items-center rounded-[14px]"
-            : "flex h-11 items-center gap-2 rounded-full border border-border bg-surface pr-3 pl-1 transition-colors duration-fast hover:bg-surface-raised"
+            : `relative grid size-11 shrink-0 place-items-center rounded-full border bg-surface transition-colors duration-fast hover:bg-surface-raised ${
+                menu.open ? "border-border-strong" : "border-border"
+              }`
         }
       >
         <Avatar me={me} size={sheet ? "button" : "pill"} />
-        {!sheet && (
-          <>
-            <span className="max-w-[14ch] truncate font-extrabold">{name}</span>
-            <CaretDown size={16} weight="bold" aria-hidden />
-          </>
-        )}
+        {admin && !sheet && <ReviewDot />}
       </button>
       {menu.open && sheet && (
         <div
@@ -380,15 +377,33 @@ function DraftsBadge() {
   return <Badge tone="muted">{t("account.drafts", { count: drafts })}</Badge>;
 }
 
-/** "N to review" (jams and claims), primary; nothing at 0. */
-function ReviewBadge() {
-  const { t } = useTranslation();
+/** Jams and claims waiting for an admin, once they've loaded. */
+function useReviewCount() {
   const stats = useAdminStats().data;
-  const count =
+  return (
     stats &&
     stats.jams_in_review +
       stats.dancer_claims_pending +
-      stats.organizer_claims_pending;
+      stats.organizer_claims_pending
+  );
+}
+
+/** On the closed trigger, so "N to review" still gets noticed; the badge in the menu says it. */
+function ReviewDot() {
+  if (!useReviewCount()) return null;
+  return (
+    <span
+      data-testid="review-dot"
+      aria-hidden
+      className="absolute top-0 right-0 size-2.5 rounded-full bg-primary ring-2 ring-bg"
+    />
+  );
+}
+
+/** "N to review" (jams and claims), primary; nothing at 0. */
+function ReviewBadge() {
+  const { t } = useTranslation();
+  const count = useReviewCount();
   if (!count) return null;
   return <Badge tone="primary">{t("account.toReview", { count })}</Badge>;
 }

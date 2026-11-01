@@ -1,0 +1,14 @@
+name = "The World Battle 2022"
+starts_on = 2022-09-01
+ends_on = 2022-09-04
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+venue = "Coliseu do Porto"  # the Sunday finals; the Hard Club hosted earlier rounds
+lat = 41.1469
+lng = -8.6055
+sources = [
+  "https://www.record.pt/modalidades/desportos-radicais/detalhe/porto-recebe-a-world-battle-2022-onde-o-breaking-vai-ser-o-desporto-rei",
+  "https://www.dnoticias.pt/2022/9/5/326658-breakdancers-de-todo-o-mundo-encheram-coliseu-do-porto-na-world-battle-2022/",
+]
+judges = []

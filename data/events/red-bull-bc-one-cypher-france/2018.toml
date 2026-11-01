@@ -1,0 +1,32 @@
+name = "Red Bull BC One Cypher France 2018"
+starts_on = 2018-07-08
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+venue = "WIP Villette"
+lat = 48.8534  # the city: the venue's position is unknown
+lng = 2.3488
+sources = [
+  "https://www.redbull.com/fr-fr/red-bull-bc-one-cypher-france-2018",
+  "https://viacomit.net/en/2018/07/09/interview-bboy-shlag-champion-red-bull-bc-one-cypher-france-2018/",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "shlag", reached = "winner", video = "https://youtu.be/ByCv7XIw-_A" },
+  { entrant = "demez", reached = "top2", video = "https://youtu.be/ByCv7XIw-_A" },
+  { entrant = "tonio", reached = "top4", video = "https://youtu.be/_RQGZ5o7A9U" },
+  { entrant = "kae", reached = "top4", video = "https://youtu.be/qfBe9caGYGE" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "san-andrea", reached = "winner", video = "https://youtu.be/_5s_F967-u8" },
+  { entrant = "kami", reached = "top2", video = "https://youtu.be/_5s_F967-u8" },
+]

@@ -1,0 +1,51 @@
+name = "European Games Kraków-Małopolska 2023"
+starts_on = 2023-06-26
+ends_on = 2023-06-27
+timezone = "Europe/Warsaw"
+city = "Nowy Sącz"
+country = "PL"
+venue = "Park Strzelecki"
+lat = 49.6218  # the city; no source gives the park's own point
+lng = 20.6971
+sources = [
+  "https://www.worlddancesport.org/Events/Nowy-S%C4%85cz-Poland-26062023-27062023-8106",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/European-Games-Nowy-S%C4%85cz-Adult-Breaking-1-vs-1-B-Boys-58892",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/European-Games-Nowy-S%C4%85cz-Adult-Breaking-1-vs-1-B-Girls-58893",
+  "https://web.archive.org/web/20240422040727/https://european-games.org/sports/breaking/",
+  "https://en.wikipedia.org/wiki/Breaking_at_the_2023_European_Games",
+]
+# The B-Boys panel, plus P, who judged the B-Girls only.
+judges = ["kadoer", "jurskee", "dom-k", "sophiela", "piotr", "p", "surprize", "frost", "xedo", "emmanuel-fox"]
+
+# Both 1v1 battles had a round robin before the top 8, left out.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "dany-dann", b = "kuzya", winner = "dany-dann" },
+  { round = "top8", a = "lee", b = "wigor", winner = "lee" },
+  { round = "top8", a = "menno", b = "kid-karam", winner = "menno" },
+  { round = "top8", a = "lil-zoo", b = "lagaet", winner = "lil-zoo" },
+  { round = "top4", a = "dany-dann", b = "lee", winner = "dany-dann" },
+  { round = "top4", a = "menno", b = "lil-zoo", winner = "menno" },
+  { round = "final", a = "menno", b = "dany-dann", winner = "dany-dann" },
+  { round = "third", a = "lil-zoo", b = "lee", winner = "lil-zoo" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "anti", b = "vanessa", winner = "anti" },
+  { round = "top8", a = "india", b = "jilou", winner = "india" },
+  { round = "top8", a = "nicka", b = "syssy", winner = "nicka" },
+  { round = "top8", a = "stefani", b = "carlota", winner = "stefani" },
+  { round = "top4", a = "anti", b = "india", winner = "india" },
+  { round = "top4", a = "nicka", b = "stefani", winner = "stefani" },
+  { round = "final", a = "stefani", b = "india", winner = "india" },
+  { round = "third", a = "nicka", b = "anti", winner = "nicka" },
+]

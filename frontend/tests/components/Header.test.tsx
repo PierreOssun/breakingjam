@@ -87,7 +87,7 @@ describe("Header", () => {
     await userEvent.click(
       await (
         await header()
-      ).findByRole("button", { name: "Lil G, account menu" }),
+      ).findByRole("button", { name: "Account menu, Lil G" }),
     );
     const menu = within(screen.getByRole("menu", { name: "Account" }));
     expect(menu.queryByRole("menuitem", { name: "Admin" })).toBeNull();
@@ -99,7 +99,7 @@ describe("Header", () => {
     await userEvent.click(
       await (
         await header()
-      ).findByRole("button", { name: "Lil G, account menu" }),
+      ).findByRole("button", { name: "Account menu, Lil G" }),
     );
     await userEvent.keyboard("{End}{Enter}");
 

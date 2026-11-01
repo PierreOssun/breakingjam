@@ -1,13 +1,10 @@
+import { ArrowRight } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { api, unwrap } from "../../api/client";
-import { Flag } from "../../components/Flag";
 import { Loading, Skeleton } from "../../components/Skeleton";
-import { countryName } from "../../lib/countries";
-
-/** How many countries get a chip before "+N more". */
-const TOP_COUNTRIES = 10;
 
 function useSiteStats() {
   return useQuery({
@@ -17,11 +14,12 @@ function useSiteStats() {
   });
 }
 
-// §4.10 country count chip; the "+N more" chip has no flag, so it pads both sides alike.
-const chip =
-  "inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-bg pr-3 text-body-sm";
+const GROUPS = "flex flex-col gap-6 lg:flex-row lg:gap-16";
+const NUMBER = "font-display text-stat lg:text-display-xl";
+// Only the map link is a `group`, so only its captions underline.
+const CAPTION = "text-body-sm text-muted group-hover:underline lg:text-body-lg";
 
-/** "The scene so far": battles, countries and dancers, then the busiest countries (§6). */
+/** "BreakingJam so far": past battles and dancers, then what's coming up (§6). */
 export function SceneSoFar() {
   const { t, i18n } = useTranslation();
   const query = useSiteStats();
@@ -31,80 +29,90 @@ export function SceneSoFar() {
   if (!stats)
     return (
       <Shell>
-        <Loading className="flex flex-col gap-4 lg:gap-8">
-          {/* The 3-cell strip on phones, the line of big numbers from lg. */}
-          <Skeleton className="h-[72px] rounded-lg lg:h-[46px] lg:w-3/4 lg:rounded-md" />
-          <div className="flex flex-wrap gap-2">
-            {Array.from({ length: 6 }, (_, i) => (
-              <Skeleton key={i} className="h-8 w-28 rounded-full" />
-            ))}
-          </div>
+        <Loading className={GROUPS}>
+          <Skeleton className="h-16 w-64 rounded-md lg:h-20 lg:w-96" />
+          <Skeleton className="h-16 w-64 rounded-md lg:h-20 lg:w-96" />
         </Loading>
       </Shell>
     );
   const number = new Intl.NumberFormat(i18n.language);
-  const counts = [
-    {
-      value: stats.battles,
-      label: t("landing.scene.battles", { count: stats.battles }),
-    },
-    {
-      value: stats.countries,
-      label: t("landing.scene.countries", { count: stats.countries }),
-    },
-    {
-      value: stats.dancers,
-      label: t("landing.scene.dancers", { count: stats.dancers }),
-    },
-  ];
-  const top = stats.battles_by_country.slice(0, TOP_COUNTRIES);
-  const more = stats.battles_by_country.length - top.length;
 
   return (
     <Shell>
-      {/* Phones: a 3-cell stats strip (§4.15); from lg, one line of big numbers joined by "·". */}
-      <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-border bg-border lg:flex lg:flex-wrap lg:items-baseline lg:gap-x-5 lg:gap-y-2 lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-transparent">
-        {counts.map((count) => (
-          <div
-            key={count.label}
-            className="flex flex-col items-center bg-surface px-1.5 py-3 text-center lg:flex-row lg:items-baseline lg:gap-3 lg:bg-transparent lg:p-0 lg:not-first:before:mr-2 lg:not-first:before:text-display-xl lg:not-first:before:text-muted lg:not-first:before:content-['·']"
-          >
-            <dt className="order-2 text-caption text-muted lg:text-body-lg">
-              {count.label}
-            </dt>
-            <dd className="font-display text-stat lg:text-display-xl">
-              {number.format(count.value)}
-            </dd>
-          </div>
-        ))}
-      </dl>
-      {top.length > 0 && (
-        <ul
-          aria-label={t("landing.scene.byCountry")}
-          className="flex flex-wrap gap-2"
-        >
-          {top.map(({ country, battles }) => (
-            <li key={country} className={`${chip} pl-2`}>
-              {/* The name follows in text, so the flag stays out of the way. */}
-              <span aria-hidden className="inline-flex">
-                <Flag code={country} size="bare" />
-              </span>
-              <span className="font-extrabold">
-                {countryName(country, i18n.language)}
-              </span>
-              <span className="font-bold text-muted">
-                {number.format(battles)}
-              </span>
-            </li>
-          ))}
-          {more > 0 && (
-            <li className={`${chip} pl-3 font-bold text-muted`}>
-              {t("landing.scene.more", { count: more })}
-            </li>
-          )}
-        </ul>
-      )}
+      <div className={GROUPS}>
+        <div className="flex flex-col gap-2">
+          <p className="text-label text-muted uppercase">
+            {t("landing.scene.past")}
+          </p>
+          <Counts>
+            <Count
+              value={number.format(stats.battles_past)}
+              label={t("landing.scene.battles", { count: stats.battles_past })}
+            />
+            <Dot />
+            <Count
+              value={number.format(stats.dancers)}
+              label={t("landing.scene.dancers", { count: stats.dancers })}
+            />
+          </Counts>
+        </div>
+        {stats.battles_upcoming > 0 && (
+          <Link to="/map" className="group flex flex-col gap-2">
+            <span className="text-label text-primary-text uppercase">
+              {t("landing.scene.upcoming")}
+            </span>
+            <Counts>
+              <Count
+                value={number.format(stats.battles_upcoming)}
+                label={t("landing.scene.battles", {
+                  count: stats.battles_upcoming,
+                })}
+              />
+              <Dot />
+              <span className={CAPTION}>{t("landing.scene.in")}</span>
+              <Count
+                value={number.format(stats.countries_upcoming)}
+                label={t("landing.scene.countries", {
+                  count: stats.countries_upcoming,
+                })}
+              />
+              <ArrowRight
+                size={20}
+                weight="bold"
+                aria-hidden
+                className="self-center text-primary-text"
+              />
+            </Counts>
+          </Link>
+        )}
+      </div>
     </Shell>
+  );
+}
+
+/** One line of counts, wrapping on the narrowest phones. */
+function Counts({ children }: { children: ReactNode }) {
+  return (
+    <span className="flex flex-wrap items-baseline gap-x-2 lg:gap-x-3">
+      {children}
+    </span>
+  );
+}
+
+function Count({ value, label }: { value: string; label: string }) {
+  return (
+    <span className="inline-flex items-baseline gap-2 lg:gap-3">
+      <span className={NUMBER}>{value}</span>
+      <span className={CAPTION}>{label}</span>
+    </span>
+  );
+}
+
+function Dot() {
+  return (
+    <span aria-hidden className={`${NUMBER} text-muted`}>
+      ·
+    </span>
   );
 }
 

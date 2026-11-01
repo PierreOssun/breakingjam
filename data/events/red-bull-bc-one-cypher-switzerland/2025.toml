@@ -1,0 +1,21 @@
+name = "Red Bull BC One Cypher Switzerland 2025"
+starts_on = 2025-05-31
+timezone = "Europe/Zurich"
+city = "Lausanne"
+country = "CH"
+venue = "Palais de Beaulieu"
+lat = 46.5296
+lng = 6.6229
+sources = [
+  "https://www.redbull.com/us-en/events/red-bull-bc-one-cypher-switzerland",
+  "https://www.seetickets.com/ch/event/red-bull-bc-one-switzerland-cypher/beaulieu/3345441?lang=en-US",
+  "https://www.youtube.com/watch?v=d7nq_1GVTSY",
+  "https://www.youtube.com/watch?v=5-dQnQ1r0Bo",
+]
+
+# The bboy battle's winner is unknown, so it has no entry.
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [{ entrant = "jin", reached = "winner" }]

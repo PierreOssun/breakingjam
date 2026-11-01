@@ -86,7 +86,7 @@ async fn a_town_with_a_public_jam_beats_a_bigger_namesake(pool: PgPool) {
     let country = async || find(&app, "saint louis").await["country"].clone();
     assert_eq!(country().await, "SN", "a draft doesn't count");
 
-    publish(&app, &pool, &jam, &organizer).await;
+    publish(&pool, &jam).await;
     assert_eq!(country().await, "FR");
 }
 

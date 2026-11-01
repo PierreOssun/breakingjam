@@ -1,0 +1,135 @@
+name = "The World Battle 2025"
+starts_on = 2025-08-25
+ends_on = 2025-08-31
+timezone = "Europe/Lisbon"
+city = "Matosinhos"  # the festival spread over Matosinhos, Porto and Gaia; the venue of its finals is unknown
+country = "PT"
+lat = 41.1821
+lng = -8.6891
+sources = [
+  "https://web.archive.org/web/20250805111346/https://theworldbattle.com/",
+  "https://www.youtube.com/channel/UCQu4ixtMVb9TFJhZO1A2GpQ",
+  "https://www.worlddancesport.org/Events/Porto-Portugal-28082025-29082025-8595",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/World-Championships-Porto-Youth-Breaking-1-vs-1-B-Boys-64749",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/World-Championships-Porto-Youth-Breaking-1-vs-1-B-Girls-64750",
+  "https://sbsstar.net/article/N1008235454/bboy-wing-dominates-portugals-breaking-gala-shuts-out-japans-shuto-30",
+]
+# Ayumi, Bojin and Amir gave judge demos on the official channel; the rest are the WDSF youth panel.
+judges = ["ayumi", "bojin", "amir", "chuzz", "steez", "kadoer", "den-ruffneck", "babyson", "at", "skim", "kowloon", "kido"]
+
+# Winners and finalists come from the official channel's final videos; earlier rounds aren't published.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "deniz", reached = "winner", video = "https://youtu.be/9PbS481Mo84" },
+  { entrant = "killian", reached = "top2", video = "https://youtu.be/9PbS481Mo84" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "royal", reached = "winner", video = "https://youtu.be/aBoyvxSZ6_A" },
+  { entrant = "syssy", reached = "top2", video = "https://youtu.be/aBoyvxSZ6_A" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "xo-crew", reached = "winner", video = "https://youtu.be/XwCFhe-Of0M" },
+  { entrant = "sul-clan", reached = "top2", video = "https://youtu.be/XwCFhe-Of0M" },
+]
+
+[battles.teams]
+xo-crew = { crew = "xo-crew" }
+sul-clan = { crew = "sul-clan" }
+
+[[battles]]
+key = "footwork"
+name = "Footwork"
+gender = "mixed"
+results = [
+  { entrant = "royal", reached = "winner", video = "https://youtu.be/-Xe6DNcJCko" },
+  { entrant = "emma", reached = "top2", video = "https://youtu.be/-Xe6DNcJCko" },
+]
+
+[[battles]]
+key = "bonnie-and-clyde"
+name = "Bonnie & Clyde"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "ami-nord-diamond", reached = "winner", video = "https://youtu.be/rHEIZFcBgfc" },
+  { entrant = "green-kristina", reached = "top2", video = "https://youtu.be/rHEIZFcBgfc" },
+]
+
+[battles.teams]
+ami-nord-diamond = { members = ["ami", "nord-diamond"] }
+green-kristina = { members = ["green", "kristina"] }
+
+# An invitational of eight on 27 Aug at the Leixões cruise terminal; its quarter-finals aren't published.
+[[battles]]
+key = "breaking-gala"
+name = "Breaking Gala"
+gender = "mixed"
+bracket_size = 8
+results = [
+  { entrant = "wing", reached = "winner", video = "https://youtu.be/vcm5CtntEnE" },
+  { entrant = "shuto", reached = "top2", video = "https://youtu.be/vcm5CtntEnE" },
+  { entrant = "x-rain", reached = "top4", video = "https://youtu.be/I3qDmsrBzXc" },
+  { entrant = "syssy", reached = "top4", video = "https://youtu.be/-K8tlYiJCsg" },
+]
+
+# The WDSF Youth World Championships on 28 Aug at Fábrica Vasco da Gama, Matosinhos; the rounds before the top 16 are left out.
+[[battles]]
+key = "wdsf-youth-bboy"
+name = "WDSF Youth World Championships 1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "lil-kong", b = "holy-rain", winner = "holy-rain" },
+  { round = "top16", a = "edo", b = "littleman", winner = "littleman" },
+  { round = "top16", a = "renren", b = "lilking", winner = "renren" },
+  { round = "top16", a = "wato", b = "purple-one", winner = "purple-one" },
+  { round = "top16", a = "lukas", b = "jason", winner = "lukas" },
+  { round = "top16", a = "yizhu", b = "gera", winner = "yizhu" },
+  { round = "top16", a = "zulu", b = "tjr", winner = "tjr" },
+  { round = "top16", a = "jingyuan", b = "saturn", winner = "saturn" },
+  { round = "top8", a = "holy-rain", b = "littleman", winner = "holy-rain" },
+  { round = "top8", a = "renren", b = "purple-one", winner = "purple-one" },
+  { round = "top8", a = "lukas", b = "yizhu", winner = "lukas" },
+  { round = "top8", a = "tjr", b = "saturn", winner = "tjr" },
+  { round = "top4", a = "holy-rain", b = "purple-one", winner = "holy-rain" },
+  { round = "top4", a = "lukas", b = "tjr", winner = "tjr" },
+  { round = "final", a = "holy-rain", b = "tjr", winner = "holy-rain" },
+  { round = "third", a = "purple-one", b = "lukas", winner = "purple-one" },
+]
+
+[[battles]]
+key = "wdsf-youth-bgirl"
+name = "WDSF Youth World Championships 1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "mira", b = "lola", winner = "lola" },
+  { round = "top16", a = "c-change", b = "yoyo", winner = "c-change" },
+  { round = "top16", a = "firebird", b = "hio", winner = "hio" },
+  { round = "top16", a = "krazy", b = "nikki-v", winner = "krazy" },
+  { round = "top16", a = "mini-ali", b = "queen-lolita", winner = "mini-ali" },
+  { round = "top16", a = "haru", b = "royal", winner = "royal" },
+  { round = "top16", a = "7g", b = "mirei", winner = "7g" },
+  { round = "top16", a = "hiyo", b = "minji", winner = "hiyo" },
+  { round = "top8", a = "lola", b = "c-change", winner = "c-change" },
+  { round = "top8", a = "hio", b = "krazy", winner = "hio" },
+  { round = "top8", a = "mini-ali", b = "royal", winner = "royal" },
+  { round = "top8", a = "7g", b = "hiyo", winner = "hiyo" },
+  { round = "top4", a = "c-change", b = "hio", winner = "c-change" },
+  { round = "top4", a = "royal", b = "hiyo", winner = "royal" },
+  { round = "final", a = "c-change", b = "royal", winner = "royal" },
+  { round = "third", a = "hiyo", b = "hio", winner = "hiyo" },
+]

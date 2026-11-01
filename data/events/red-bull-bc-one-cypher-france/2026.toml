@@ -1,0 +1,58 @@
+name = "Red Bull BC One Cypher France 2026"
+starts_on = 2026-09-12
+timezone = "Europe/Paris"
+city = "Aubervilliers"
+country = "FR"
+venue = "Le Point Fort"
+lat = 48.9118
+lng = 2.4013
+sources = [
+  "https://www.lepointfort.com/evenement/red-bull-bc-one-cypher-france-2026/",
+  "https://laclepublique.fr/seine-saint-denis/articles/2026/2026-09-12-breaking-aubervilliers-finale-france/",
+  "https://www.youtube.com/channel/UCBDSkBbTmI63mIp6UNt09vA",
+]
+
+# Places follow Skillzoo's video titles; neither final's winner is published yet, so the finalists stay top2.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "noe", reached = "top2", video = "https://youtu.be/E1Fbmfm4hWI" },
+  { entrant = "marlone", reached = "top2", video = "https://youtu.be/E1Fbmfm4hWI" },
+  { entrant = "ceebri", reached = "top4", video = "https://youtu.be/crRtnDXsHpc" },
+  { entrant = "zoon", reached = "top4", video = "https://youtu.be/eD88gFFy1qA" },
+  { entrant = "louis", reached = "top8", video = "https://youtu.be/7nMq3cTO4jw" },
+  { entrant = "damani", reached = "top8", video = "https://youtu.be/W81Sd7DTOVw" },
+  { entrant = "mounir", reached = "top8", video = "https://youtu.be/ffeVtj3nBbo" },
+  { entrant = "yung", reached = "top8", video = "https://youtu.be/jeHqN2Sq7sI" },
+  { entrant = "bastos", reached = "top16", video = "https://youtu.be/-o3WZfhKLZQ" },
+  { entrant = "lucky", reached = "top16", video = "https://youtu.be/-tqKTTIrAak" },
+  { entrant = "link", reached = "top16", video = "https://youtu.be/3JR_McJxtmY" },
+  { entrant = "yassif", reached = "top16", video = "https://youtu.be/CC5fbHykWvc" },
+  { entrant = "enzo", reached = "top16", video = "https://youtu.be/Drqnfeik1zI" },
+  { entrant = "nuts", reached = "top16", video = "https://youtu.be/iqtMzKQjCmo" },
+  { entrant = "matheo", reached = "top16", video = "https://youtu.be/lh0MwtCCo3s" },
+  { entrant = "ange", reached = "top32", video = "https://youtu.be/0hkET6MNCV0" },
+  { entrant = "fenixou", reached = "top32", video = "https://youtu.be/BiupmhVgkJE" },
+  { entrant = "jubei", reached = "top32", video = "https://youtu.be/C0YhIfKKUpk" },
+  { entrant = "sekou", reached = "top32", video = "https://youtu.be/E3HMNGf58Pw" },
+  { entrant = "chaubernard", reached = "top32", video = "https://youtu.be/FsPqBnqtAQY" },
+  { entrant = "ervann", reached = "top32", video = "https://youtu.be/NggxuVE0sdE" },
+  { entrant = "arsene", reached = "top32", video = "https://youtu.be/OJOIA8hOowU" },
+  { entrant = "doudou", reached = "top32", video = "https://youtu.be/XlQD8ZrLpA8" },
+  { entrant = "ilyes-zoo", reached = "top32", video = "https://youtu.be/bK-hnjOenK0" },
+  { entrant = "ramy", reached = "top32", video = "https://youtu.be/jlpV-lkOzQY" },
+  { entrant = "neosan", reached = "top32", video = "https://youtu.be/yuxhLv7sjZg" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "mia", reached = "top2", video = "https://youtu.be/x8lVtllGKVk" },
+  { entrant = "kimie", reached = "top2", video = "https://youtu.be/x8lVtllGKVk" },
+  { entrant = "timouna", reached = "top4", video = "https://youtu.be/W54Xhw1v_ps" },
+  { entrant = "coline", reached = "top4", video = "https://youtu.be/vtR85cD3kgo" },
+]

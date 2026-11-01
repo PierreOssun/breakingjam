@@ -1,0 +1,25 @@
+name = "Red Bull BC One Cypher Switzerland 2018"
+starts_on = 2018-08-18
+timezone = "Europe/Zurich"
+city = "Orpund"
+country = "CH"
+venue = "Royal Arena Festival"
+lat = 47.1399  # the village: the festival ground's position is unknown
+lng = 7.3031
+sources = [
+  "https://www.redbull.com/ch-de/events/bc-one-switzerland/switzerland-final-2018",
+  "https://www.bboyevent.com/special/2/red_bull_bc_one",
+  "https://www.redbull.com/ch-de/red-bull-bc-one-switzerland-hall-of-fame",
+  "https://www.nau.ch/ort/baden/red-bull-bc-one-cypher-breakdance-spektakel-im-vollen-trafo-baden-66199553",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "baby-og", reached = "winner", video = "https://youtu.be/Ch6HCqXucak" },
+  { entrant = "shaymin", reached = "top2", video = "https://youtu.be/Ch6HCqXucak" },
+  { entrant = "moa", reached = "top4", video = "https://youtu.be/DXYL-VhQo7Q" },
+  { entrant = "yu-seng", reached = "top4", video = "https://youtu.be/GNh8GDezM2o" },
+]

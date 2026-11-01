@@ -1,0 +1,45 @@
+name = "The World Battle 2024"
+starts_on = 2024-08-28
+ends_on = 2024-09-01
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+venue = "Alfândega do Porto"
+lat = 41.1431
+lng = -8.6216
+sources = [
+  "https://web.archive.org/web/20240714013428/https://theworldbattle.com/",
+  "https://porto.pt/en/news/world-battle-returns-with-1500-athletes-taking-part",
+  "https://www.worlddancesport.org/Events/Porto-Portugal-29082024-8402",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/Open-Porto-Mix-Breaking-Team-3-vs-3-62263",
+]
+# The WDSF panel; the World Battle's own battles' judges are unknown.
+judges = ["jess", "xedo", "babyson", "moy", "intact", "kid-glyde", "skim"]
+
+# Each team is a b-boy, a b-girl and a breaker under 18; the round robin before the top 8 is left out.
+[[battles]]
+key = "wdsf-3v3"
+name = "WDSF Open 3v3"
+gender = "mixed"
+team_size = 3
+bracket_size = 8
+matches = [
+  { round = "top8", a = "straight-outta-taipei", b = "team-germany", winner = "straight-outta-taipei" },
+  { round = "top8", a = "team-japan-a", b = "tabrin-riva-muha", winner = "team-japan-a" },
+  { round = "top8", a = "team-japan-b", b = "il-killa-kim-rubik", winner = "team-japan-b" },
+  { round = "top8", a = "stimul-stefani-raptor", b = "team-spain", winner = "stimul-stefani-raptor" },
+  { round = "top4", a = "straight-outta-taipei", b = "team-japan-a", winner = "team-japan-a" },
+  { round = "top4", a = "team-japan-b", b = "stimul-stefani-raptor", winner = "stimul-stefani-raptor" },
+  { round = "final", a = "team-japan-a", b = "stimul-stefani-raptor", winner = "team-japan-a" },
+  { round = "third", a = "straight-outta-taipei", b = "team-japan-b", winner = "team-japan-b" },
+]
+
+[battles.teams]
+team-japan-a = { name = "Team Japan A" }
+team-japan-b = { name = "Team Japan B" }
+straight-outta-taipei = { name = "Straight Outta TAIPEI" }
+team-germany = { name = "Team Germany" }
+team-spain = { name = "Team Spain" }
+stimul-stefani-raptor = { members = ["stimul", "stefani", "raptor"] }
+il-killa-kim-rubik = { members = ["il", "killa-kim", "rubik"] }
+tabrin-riva-muha = { members = ["tabrin", "riva", "muha"] }

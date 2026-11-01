@@ -16,7 +16,7 @@
     "jamMap": "Jam map",
     "account": "Account",
     "accountMenu": "Account menu",
-    "accountMenuOf": "{{name}}, account menu"
+    "accountMenuOf": "Account menu, {{name}}"
   },
   "account": {
     "viewPage": "View my dancer page",
@@ -103,16 +103,16 @@
       "map": "See all on the map"
     },
     "scene": {
-      "title": "The scene so far",
+      "title": "BreakingJam so far",
+      "past": "Past",
+      "upcoming": "Coming up",
       "battles_one": "battle",
       "battles_other": "battles",
-      "countries_one": "country",
-      "countries_other": "countries",
       "dancers_one": "dancer",
       "dancers_other": "dancers",
-      "byCountry": "Battles by country",
-      "more_one": "+{{count}} more",
-      "more_other": "+{{count}} more"
+      "in": "in",
+      "countries_one": "country",
+      "countries_other": "countries"
     },
     "heading": "Find your next jam",
     "search": "Search jams and people",
@@ -180,9 +180,8 @@
     "results": "See results",
     "shareJam": "Share this jam",
     "caption": {
-      "open": "Spectators welcome · registration is open",
-      "closed": "Spectators welcome · registration is closed",
-      "spectators": "Spectators welcome",
+      "open": "Registration is open",
+      "closed": "Registration is closed",
       "cancelled": "This jam is called off."
     },
     "when": "When",
@@ -314,11 +313,6 @@
   },
   "org": {
     "newIntro": "It stays a draft, visible only to you, until you publish it.",
-    "saveDraft": "Save draft",
-    "draftSaved": "Draft saved. Now add battles and the lineup.",
-    "saved": "Saved.",
-    "details": "Details",
-    "viewPage": "View jam page",
     "showMore": "Show more",
     "empty": {
       "title": "No jams yet",
@@ -326,8 +320,6 @@
     },
     "fields": {
       "name": "Jam name",
-      "oneDay": "One-day jam",
-      "date": "Date",
       "startsOn": "First day",
       "endsOn": "Last day",
       "timezone": "Timezone",
@@ -343,39 +335,24 @@
       "instagramUrl": "Instagram page",
       "websiteUrl": "Website",
       "contactEmail": "Contact email",
-      "contactEmailHint": "Public: shown on the jam page so dancers can write to you."
-    },
-    "location": {
-      "title": "On the map",
-      "hint": "Find the address, then tap or drag the pin to the exact spot.",
-      "find": "Find on the map",
-      "none": "No place found. Check the address, or tap the map to place the pin.",
-      "error": "The address search didn’t work. Try again in a moment.",
-      "others": "Not the right place? Pick another:",
-      "placed": "The pin is set: the jam will show on the map.",
-      "unplaced": "No pin yet: the jam won’t show on the map.",
-      "remove": "Remove pin",
-      "pin": "Jam location",
-      "attribution": "Address search by Nominatim · © OpenStreetMap contributors"
+      "contactEmailHint": "Public: shown on the jam page so dancers can write to you.",
+      "endsOnHint": "Leave it empty for a one-day jam.",
+      "opensAt": "Opens",
+      "closesAt": "Ends"
     },
     "status": {
       "title": "Status",
       "explain": {
-        "draft": "Only you can see it. Submit it for review: a BreakingJam admin checks each jam before it goes on the map.",
         "published": "On the map and open for registration.",
         "registration_closed": "On the map; registration is closed.",
         "completed": "It took place. Record the results in the battles below.",
         "cancelled": "Called off. Its page says so.",
-        "in_review": "A BreakingJam admin is checking it. It goes on the map once approved; you can keep editing meanwhile.",
-        "draftTeam": "Only you can see it. As the BreakingJam team, you publish it directly."
+        "in_review": "A BreakingJam admin is checking it. It goes on the map once approved; you can keep editing meanwhile."
       },
-      "noPin": "Add a pin under “On the map” so dancers find it.",
       "action": {
-        "publish": "Publish",
         "close-registration": "Close registration",
         "complete": "Mark as completed",
-        "cancel": "Cancel jam",
-        "submit": "Submit for review"
+        "cancel": "Cancel jam"
       },
       "done": {
         "publish": "Published. It’s on the map.",
@@ -394,7 +371,6 @@
       "sentBack": "Sent back by BreakingJam: {{note}}"
     },
     "battles": {
-      "none": "No battles yet. Add the first one.",
       "add": "Add a battle",
       "edit": "Edit battle",
       "editOne": "Edit {{name}}",
@@ -506,14 +482,9 @@
         "other": "Add staff"
       }
     },
-    "peopleOnJamPage": "Dancers, judges, DJ and MC are added on the jam page.",
     "flyer": {
-      "title": "Flyer",
       "upload": "Upload a flyer",
-      "formats": "PNG or JPEG, up to 20 MB. Portrait 4:5 fits best.",
-      "generated": "Until you add one, the jam uses a flyer made from its details.",
-      "shown": "Shown on the jam page, cards and the map. Remove it to go back to the generated flyer.",
-      "current": "Your flyer",
+      "generated": "Generated",
       "replace": "Replace flyer",
       "remove": "Remove flyer",
       "updated": "Flyer updated.",
@@ -535,7 +506,76 @@
         "soft": "This crop is {{width}} px wide, so it will look soft. Zoom out, or pick a bigger image: 1080 × 1350 is ideal.",
         "previews": "On cards and lists",
         "use": "Use this flyer"
-      }
+      },
+      "uploaded": "Uploaded"
+    },
+    "start": {
+      "intro": "Two things to start. You fill in the rest on the jam page.",
+      "create": "Create the jam page"
+    },
+    "editor": {
+      "editing": "Editing",
+      "saved": "Saved",
+      "saving": "Saving…",
+      "notSaved": "Not saved",
+      "preview": "Preview",
+      "edit": "Edit",
+      "editName": "Edit the name",
+      "done": "Done",
+      "add": "Add",
+      "required": "Required",
+      "lastDay": "Last day",
+      "times": "Times",
+      "emptyNote": "Empty blocks are only visible to you. Visitors see what you fill in.",
+      "yourAccount": "Your account",
+      "change": "Change",
+      "fix": "Fix",
+      "retry": "Retry",
+      "leftUnsaved": "Your last changes weren’t saved."
+    },
+    "blocks": {
+      "dates": "Dates",
+      "venue": "Venue",
+      "venueHint": "City, address and the pin on the map",
+      "battlesHint": "Categories, format, start time, prizes",
+      "lineupHint": "Judges, DJs and MCs",
+      "aboutHint": "A few lines about your jam",
+      "links": "Links",
+      "linksHint": "Website, Instagram, contact email"
+    },
+    "publish": {
+      "title": "Ready to publish?",
+      "almost": "Almost there",
+      "progress": "{{done}} of {{total}}",
+      "toPublish": "{{done}} of {{total}} to publish",
+      "action": "Publish",
+      "left_one": "Publish · {{count}} left",
+      "left_other": "Publish · {{count}} left",
+      "items": {
+        "name": "Name",
+        "dates": "Dates",
+        "place": "City and map pin",
+        "battle": "At least one battle"
+      },
+      "add": "Add",
+      "private": "Until then only you can see this page.",
+      "review": "A BreakingJam admin checks it before it goes on the map.",
+      "team": "As the BreakingJam team, you publish it directly.",
+      "missing_one": "One thing left before your jam goes on the map.",
+      "missing_other": "{{count}} things left before your jam goes on the map.",
+      "ready": "Everything is in. Publish when you’re ready."
+    },
+    "venue": {
+      "find": "Find the place",
+      "placeholder": "Venue, address or city",
+      "results": "Places found",
+      "none": "No place found. Try the street and city, or tap the map to drop the pin.",
+      "error": "The place search didn’t work. Try again in a moment.",
+      "dragHint": "Drag the pin to the exact door",
+      "tapHint": "Tap the map to drop the pin",
+      "fromAddress": "Filled from the address",
+      "attribution": "Place search by Photon · © OpenStreetMap contributors",
+      "pin": "Jam location"
     }
   },
   "verify": {

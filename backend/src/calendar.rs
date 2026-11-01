@@ -5,7 +5,8 @@ use chrono::{DateTime, Days, Utc};
 use crate::domain::event::Event;
 
 /// The jam as a one-event calendar: all day from its first to its last day, at its venue,
-/// linking to its page. All-day, because a jam has days but no times of its own.
+/// linking to its page. All-day: its opening hours are wall-clock in a timezone this binary
+/// does not embed.
 pub fn ics(event: &Event, page_url: &str, now: DateTime<Utc>) -> String {
     // DTEND is exclusive: the day after the last one.
     let end = event
@@ -15,8 +16,8 @@ pub fn ics(event: &Event, page_url: &str, now: DateTime<Utc>) -> String {
     let place = [
         event.venue_name.as_deref(),
         event.address.as_deref(),
-        Some(event.city.as_str()),
-        Some(event.country.as_str()),
+        event.city.as_deref(),
+        event.country.as_deref(),
     ];
     let location = place.into_iter().flatten().collect::<Vec<_>>().join(", ");
     [

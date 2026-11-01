@@ -1,0 +1,25 @@
+name = "Red Bull BC One Cypher Switzerland 2017"
+starts_on = 2017-06-25
+timezone = "Europe/Zurich"
+city = "Basel"
+country = "CH"
+venue = "Reithalle, Kaserne Basel"
+lat = 47.5634
+lng = 7.5901
+sources = ["https://web.archive.org/web/20170908033010/http://bcone.redbull.com/en_INT/event/red-bull-bc-one-switzerland-cypher-2017"]
+judges = ["taisuke", "poe-one", "at", "lamine", "tuff-kid"]
+djs = ["renegade", "just-a-kid"]
+
+# Mixed: Becca was the first b-girl in the main event, and reached the semi-finals.
+[[battles]]
+key = "open"
+name = "1v1"
+gender = "mixed"
+results = [
+  { entrant = "hill", reached = "winner", video = "https://youtu.be/1Sngs6bi5xM" },
+  { entrant = "baby-og", reached = "top2", video = "https://youtu.be/1Sngs6bi5xM" },
+  { entrant = "t-mo", reached = "top4", video = "https://youtu.be/PWl30pK3GoQ" },
+  { entrant = "becca", reached = "top4", video = "https://youtu.be/9qdPDzLz8wE" },
+  { entrant = "moa", reached = "top8" },
+  { entrant = "ez-mike", reached = "top16" },
+]

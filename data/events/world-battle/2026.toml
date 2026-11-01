@@ -1,0 +1,104 @@
+name = "The World Battle 2026"
+starts_on = 2026-08-24
+ends_on = 2026-08-30
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+venue = "Alfândega do Porto"  # the WDSF battle's venue; the festival spread over several places
+lat = 41.1431
+lng = -8.6216
+sources = [
+  "https://theworldbattle.com/",
+  "https://www.youtube.com/channel/UCQu4ixtMVb9TFJhZO1A2GpQ",
+  "https://www.worlddancesport.org/News/register-porto-2026-max-oliveira-wdsf-breaking-for-gold-3880",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/BfG-International-Series-Porto-Youth-Breaking-1-vs-1-B-Boys-66909",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/BfG-International-Series-Porto-Youth-Breaking-1-vs-1-B-Girls-66910",
+]
+# The WDSF youth panel; the World Battle's own battles' judges are unknown.
+judges = ["steez", "babyson", "madman", "xxl", "poe-one"]
+
+# Places follow the official channel's videos ("Top8", "Top4", "Winner: …"); unlabelled early rounds are left out.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "kalmius", reached = "winner", video = "https://youtu.be/b2lzvZHYW4Q" },
+  { entrant = "deeogo", reached = "top2", video = "https://youtu.be/b2lzvZHYW4Q" },
+  { entrant = "yao", reached = "top4", video = "https://youtu.be/17PCQu6FpBs" },
+  { entrant = "edo", reached = "top8", video = "https://youtu.be/Qs40hgQ4PJI" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "angela", reached = "winner", video = "https://youtu.be/6p-Rv5-9HtY" },
+  { entrant = "alessandrina", reached = "top2", video = "https://youtu.be/6p-Rv5-9HtY" },
+  { entrant = "c-change", reached = "top4", video = "https://youtu.be/ugoclF1Zgzs" },
+  { entrant = "nika-star", reached = "top4", video = "https://youtu.be/K1TGQ42fNXM" },
+  { entrant = "mirei", reached = "top8", video = "https://youtu.be/aRTs6CJSyAA" },
+]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+results = [
+  { entrant = "battle-droids", reached = "winner", video = "https://youtu.be/_T99D3ru_Rg" },
+  { entrant = "from-favela", reached = "top2", video = "https://youtu.be/_T99D3ru_Rg" },
+]
+
+[battles.teams]
+battle-droids = { crew = "battle-droids" }
+from-favela = { crew = "from-favela" }
+
+# The WDSF Breaking for Gold International Series (youth) on 27 Aug; the rounds before the top 16 are left out.
+[[battles]]
+key = "wdsf-youth-bboy"
+name = "WDSF Youth Series 1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "holy-rain", b = "seier", winner = "holy-rain" },
+  { round = "top16", a = "dongyao", b = "b1", winner = "dongyao" },
+  { round = "top16", a = "lei", b = "bilel", winner = "lei" },
+  { round = "top16", a = "danger", b = "tjr", winner = "tjr" },
+  { round = "top16", a = "jiaju", b = "yizhu", winner = "yizhu" },
+  { round = "top16", a = "gera", b = "zulu", winner = "gera" },
+  { round = "top16", a = "lynx", b = "jason", winner = "jason" },
+  { round = "top16", a = "lingo", b = "guankai", winner = "lingo" },
+  { round = "top8", a = "holy-rain", b = "dongyao", winner = "holy-rain" },
+  { round = "top8", a = "lei", b = "tjr", winner = "tjr" },
+  { round = "top8", a = "yizhu", b = "gera", winner = "yizhu" },
+  { round = "top8", a = "jason", b = "lingo", winner = "jason" },
+  { round = "top4", a = "holy-rain", b = "tjr", winner = "holy-rain" },
+  { round = "top4", a = "yizhu", b = "jason", winner = "jason" },
+  { round = "final", a = "holy-rain", b = "jason", winner = "holy-rain" },
+  { round = "third", a = "tjr", b = "yizhu", winner = "tjr" },
+]
+
+[[battles]]
+key = "wdsf-youth-bgirl"
+name = "WDSF Youth Series 1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "c-change", b = "salala", winner = "c-change" },
+  { round = "top16", a = "riva", b = "alexa", winner = "riva" },
+  { round = "top16", a = "freezen", b = "mirei", winner = "mirei" },
+  { round = "top16", a = "mini-ali", b = "aura", winner = "mini-ali" },
+  { round = "top16", a = "melkez", b = "hanko", winner = "melkez" },
+  { round = "top16", a = "yoyo", b = "saretta", winner = "yoyo" },
+  { round = "top16", a = "nika-star", b = "xiaoyou", winner = "nika-star" },
+  { round = "top16", a = "eli", b = "zitian", winner = "zitian" },
+  { round = "top8", a = "c-change", b = "riva", winner = "c-change" },
+  { round = "top8", a = "mirei", b = "mini-ali", winner = "mirei" },
+  { round = "top8", a = "melkez", b = "yoyo", winner = "yoyo" },
+  { round = "top8", a = "nika-star", b = "zitian", winner = "nika-star" },
+  { round = "top4", a = "c-change", b = "mirei", winner = "mirei" },
+  { round = "top4", a = "yoyo", b = "nika-star", winner = "yoyo" },
+  { round = "final", a = "mirei", b = "yoyo", winner = "mirei" },
+  { round = "third", a = "c-change", b = "nika-star", winner = "c-change" },
+]

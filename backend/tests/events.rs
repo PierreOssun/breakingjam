@@ -40,6 +40,14 @@ async fn act(app: &Router, cookie: &str, id: &str, action: &str) -> TestResponse
     send(app, post(&uri, json!({}), Some(cookie))).await
 }
 
+/// Gives the jam the battle it needs to go public.
+async fn add_battle(app: &Router, cookie: &str, id: &str) {
+    let battle = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
+    let uri = format!("/api/events/{id}/battles");
+    let added = send(app, post(&uri, battle, Some(cookie))).await;
+    assert_eq!(added.status, StatusCode::CREATED, "{}", added.json);
+}
+
 async fn make_seed_admin(pool: &PgPool, email: &str) {
     sqlx::query!(
         "update app_users set role = 'seed_admin' where email = $1::text::citext",
@@ -75,6 +83,212 @@ async fn create_makes_a_draft_and_promotes_the_user(pool: PgPool) {
 
     let me = send(&app, get("/api/auth/me", Some(&cookie))).await;
     assert_eq!(me.json["role"], "organizer");
+}
+
+#[sqlx::test]
+async fn a_draft_starts_from_a_name_and_a_day_and_fills_in_later(pool: PgPool) {
+    let app = app(pool);
+    let cookie = sign_up(&app, "org@example.com").await;
+    let start = json!({ "name": "Winter Cypher Jam", "starts_on": "2030-12-12",
+                        "ends_on": "2030-12-12", "timezone": "Europe/Zurich" });
+    let created = create(&app, &cookie, start).await;
+    assert_eq!(created.status, StatusCode::CREATED, "{}", created.json);
+    assert_eq!(created.json["city"], Value::Null);
+    assert_eq!(created.json["country"], Value::Null);
+    assert_eq!(created.json["opens_at"], Value::Null);
+    let id = created.json["id"].as_str().unwrap();
+
+    // Its page and flyer work from that moment, without a place.
+    let page = send(&app, get(&format!("/api/events/{id}"), Some(&cookie))).await;
+    assert_eq!(page.status, StatusCode::OK);
+    let flyer = send(
+        &app,
+        get(&format!("/api/events/{id}/flyer.svg"), Some(&cookie)),
+    )
+    .await;
+    assert!(
+        text(&flyer).contains(r#"aria-label="Generated flyer: Winter Cypher Jam, Thu 12 Dec""#)
+    );
+
+    let mut timed = jam("Winter Cypher Jam");
+    timed["city"] = json!("  ");
+    timed["opens_at"] = json!("14:00");
+    timed["closes_at"] = json!("21:30");
+    let updated = send(
+        &app,
+        put(&format!("/api/events/{id}"), timed, Some(&cookie)),
+    )
+    .await;
+    assert_eq!(updated.status, StatusCode::OK, "{}", updated.json);
+    assert_eq!(updated.json["city"], Value::Null, "a blank city is none");
+    assert_eq!(updated.json["opens_at"], "14:00:00");
+    assert_eq!(updated.json["closes_at"], "21:30:00");
+    let flyer = send(
+        &app,
+        get(&format!("/api/events/{id}/flyer.svg"), Some(&cookie)),
+    )
+    .await;
+    assert!(text(&flyer).contains(">14:00–21:30</text>"));
+}
+
+#[sqlx::test]
+async fn a_jam_past_draft_keeps_its_place(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    let id = draft_id(&app, &owner, jam("Jam")).await;
+    publish(&pool, &id).await;
+    let uri = format!("/api/events/{id}");
+
+    for (field, value) in [
+        ("city", Value::Null),
+        ("city", json!("  ")),
+        ("country", Value::Null),
+        ("lat", Value::Null),
+    ] {
+        let mut body = jam("Jam");
+        body[field] = value;
+        if field == "lat" {
+            body["lng"] = Value::Null;
+        }
+        let refused = send(&app, put(&uri, body, Some(&owner))).await;
+        assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY, "{field}");
+        assert_eq!(
+            refused.json["error"]["fields"][0]["field"], "place",
+            "{field}"
+        );
+    }
+    let moved = send(&app, put(&uri, jam("Jam moved"), Some(&owner))).await;
+    assert_eq!(moved.status, StatusCode::OK);
+
+    // A draft may still lose its place: the checklist catches it before it goes public.
+    let draft = draft_id(&app, &owner, jam("Draft")).await;
+    let mut cleared = jam("Draft");
+    cleared["city"] = Value::Null;
+    let saved = send(
+        &app,
+        put(&format!("/api/events/{draft}"), cleared, Some(&owner)),
+    )
+    .await;
+    assert_eq!(saved.status, StatusCode::OK);
+    assert_eq!(saved.json["city"], Value::Null);
+}
+
+#[sqlx::test]
+async fn a_public_jam_that_never_had_a_place_keeps_saving(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+
+    // Published before the checklist, without a pin.
+    let mut pinless = jam("Old Jam");
+    pinless["lat"] = Value::Null;
+    pinless["lng"] = Value::Null;
+    let old = draft_id(&app, &owner, pinless.clone()).await;
+    publish(&pool, &old).await;
+    let uri = format!("/api/events/{old}");
+    let edited = send(&app, put(&uri, pinless, Some(&owner))).await;
+    assert_eq!(edited.status, StatusCode::OK, "{}", edited.json);
+    let pinned = send(&app, put(&uri, jam("Old Jam"), Some(&owner))).await;
+    assert_eq!(pinned.status, StatusCode::OK, "{}", pinned.json);
+
+    // Called off before it had a venue.
+    let bare = json!({ "name": "Bare", "starts_on": "2030-06-01", "ends_on": "2030-06-01",
+                       "timezone": "Europe/Paris" });
+    let cancelled = draft_id(&app, &owner, bare.clone()).await;
+    act(&app, &owner, &cancelled, "cancel").await;
+    let uri = format!("/api/events/{cancelled}");
+    let edited = send(&app, put(&uri, bare, Some(&owner))).await;
+    assert_eq!(edited.status, StatusCode::OK, "{}", edited.json);
+}
+
+#[sqlx::test]
+async fn a_venue_less_draft_still_has_its_calendar_and_share_image(pool: PgPool) {
+    let app = app(pool);
+    let owner = sign_up(&app, "org@example.com").await;
+    let start = json!({ "name": "Winter Cypher Jam", "starts_on": "2030-12-12",
+                        "ends_on": "2030-12-12", "timezone": "Europe/Zurich", "venue_name": "Dynamo" });
+    let id = draft_id(&app, &owner, start).await;
+
+    let ics = send(
+        &app,
+        get(&format!("/api/events/{id}/calendar.ics"), Some(&owner)),
+    )
+    .await;
+    assert_eq!(ics.status, StatusCode::OK);
+    assert!(
+        text(&ics).contains("\r\nLOCATION:Dynamo\r\n"),
+        "{}",
+        text(&ics)
+    );
+    let png = send(&app, get(&format!("/api/events/{id}/og.png"), Some(&owner))).await;
+    assert_eq!(png.status, StatusCode::OK);
+    assert_eq!(&png.bytes[..8], b"\x89PNG\r\n\x1a\n");
+}
+
+#[sqlx::test]
+async fn opening_hours_are_clock_times(pool: PgPool) {
+    let app = app(pool);
+    let cookie = sign_up(&app, "org@example.com").await;
+    let mut body = jam("Jam");
+    body["opens_at"] = json!("25:00");
+    let response = create(&app, &cookie, body.clone()).await;
+    assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(response.json["error"]["fields"][0]["field"], "body");
+
+    body["opens_at"] = json!("14:00");
+    body["closes_at"] = json!("9pm");
+    let response = create(&app, &cookie, body.clone()).await;
+    assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
+
+    body["closes_at"] = Value::Null;
+    let response = create(&app, &cookie, body).await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.json);
+    assert_eq!(response.json["opens_at"], "14:00:00");
+    assert_eq!(response.json["closes_at"], Value::Null);
+}
+
+#[sqlx::test]
+async fn going_public_needs_the_place_and_a_battle(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    let mut unplaced = jam("Jam");
+    unplaced["city"] = Value::Null;
+    let id = draft_id(&app, &owner, unplaced).await;
+
+    let refused = act(&app, &owner, &id, "submit").await;
+    assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY);
+    let fields: Vec<&str> = refused.json["error"]["fields"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|f| f["field"].as_str().unwrap())
+        .collect();
+    assert_eq!(fields, ["place", "battles"]);
+
+    let placed = send(
+        &app,
+        put(&format!("/api/events/{id}"), jam("Jam"), Some(&owner)),
+    )
+    .await;
+    assert_eq!(placed.status, StatusCode::OK);
+    let still_refused = act(&app, &owner, &id, "submit").await;
+    assert_eq!(still_refused.json["error"]["fields"][0]["field"], "battles");
+
+    add_battle(&app, &owner, &id).await;
+    let submitted = act(&app, &owner, &id, "submit").await;
+    assert_eq!(submitted.status, StatusCode::OK, "{}", submitted.json);
+    assert_eq!(submitted.json["status"], "in_review");
+
+    // The team's direct publish runs the same checklist.
+    let team = sign_up(&app, "team@example.com").await;
+    make_seed_admin(&pool, "team@example.com").await;
+    let mut pinless = jam("Team Jam");
+    pinless["lat"] = Value::Null;
+    pinless["lng"] = Value::Null;
+    let team_id = draft_id(&app, &team, pinless).await;
+    add_battle(&app, &team, &team_id).await;
+    let refused = act(&app, &team, &team_id, "publish").await;
+    assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(refused.json["error"]["fields"][0]["field"], "place");
 }
 
 #[sqlx::test]
@@ -149,7 +363,7 @@ async fn drafts_are_visible_to_writers_only(pool: PgPool) {
     assert_eq!(seen.status, StatusCode::OK);
     assert_eq!(seen.json["can_edit"], true, "seed_admin writes any jam");
 
-    publish(&app, &pool, id, &owner).await;
+    publish(&pool, id).await;
     let public = send(&app, get(&format!("/api/events/{slug}"), None)).await;
     assert_eq!(public.status, StatusCode::OK);
     assert_eq!(public.json["can_edit"], false);
@@ -163,7 +377,7 @@ async fn update_is_for_owner_and_seed_admin_and_keeps_the_slug(pool: PgPool) {
     let owner = sign_up(&app, "org@example.com").await;
     let created = create(&app, &owner, jam("Old Name")).await;
     let id = created.json["id"].as_str().unwrap();
-    publish(&app, &pool, id, &owner).await;
+    publish(&pool, id).await;
     let uri = format!("/api/events/{id}");
 
     let updated = send(&app, put(&uri, jam("New Name"), Some(&owner))).await;
@@ -195,7 +409,7 @@ async fn calendar_file_is_one_all_day_event_over_the_jams_days(pool: PgPool) {
         send(&app, get(&uri, None)).await.status,
         StatusCode::NOT_FOUND
     );
-    publish(&app, &pool, &id, &cookie).await;
+    publish(&pool, &id).await;
 
     let file = send(&app, get(&uri, None)).await;
     assert_eq!(file.status, StatusCode::OK);
@@ -223,6 +437,7 @@ async fn jams_the_team_entered_name_no_organiser(pool: PgPool) {
     let team = sign_up(&app, "team@example.com").await;
     make_seed_admin(&pool, "team@example.com").await;
     let id = draft_id(&app, &team, jam("Imported")).await;
+    add_battle(&app, &team, &id).await;
     act(&app, &team, &id, "publish").await;
 
     let page = send(&app, get(&format!("/api/events/{id}"), None)).await;
@@ -235,7 +450,7 @@ async fn delete_is_soft_and_owner_only(pool: PgPool) {
     let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
-    publish(&app, &pool, &id, &owner).await;
+    publish(&pool, &id).await;
     let uri = format!("/api/events/{id}");
 
     let stranger = sign_up(&app, "other@example.com").await;
@@ -277,7 +492,7 @@ async fn status_transitions_follow_the_machine(pool: PgPool) {
         "an organiser's jam goes through review"
     );
 
-    publish(&app, &pool, &id, &owner).await;
+    publish(&pool, &id).await;
     for (action, status) in [
         ("close-registration", "registration_closed"),
         ("complete", "completed"),
@@ -325,7 +540,7 @@ async fn list_shows_public_jams_with_filters_and_pages(pool: PgPool) {
         body["ends_on"] = json!(starts_on);
         body["country"] = json!(country);
         let id = draft_id(&app, &owner, body).await;
-        publish(&app, &pool, &id, &owner).await;
+        publish(&pool, &id).await;
         ids.push(id);
     }
     create(&app, &owner, jam("Draft")).await;
@@ -376,23 +591,19 @@ async fn geojson_has_public_jams_with_coordinates_past_ones_included(pool: PgPoo
     let owner = sign_up(&app, "org@example.com").await;
     // The BreakingJam team publishes without review.
     set_role(&pool, "org@example.com", "seed_admin").await;
-    let make = async |name: &str, actions: &[&str], coords: bool| {
-        let mut body = jam(name);
-        if !coords {
-            body["lat"] = Value::Null;
-            body["lng"] = Value::Null;
-        }
-        let id = draft_id(&app, &owner, body).await;
+    let make = async |name: &str, actions: &[&str]| {
+        let id = draft_id(&app, &owner, jam(name)).await;
+        add_battle(&app, &owner, &id).await;
         for action in actions {
-            act(&app, &owner, &id, action).await;
+            let moved = act(&app, &owner, &id, action).await;
+            assert_eq!(moved.status, StatusCode::OK, "{name}: {}", moved.json);
         }
     };
-    make("Published", &["publish"], true).await;
-    make("Closed", &["publish", "close-registration"], true).await;
-    make("Draft", &[], true).await;
-    make("In review", &["submit"], true).await;
-    make("Done", &["publish", "close-registration", "complete"], true).await;
-    make("Nowhere", &["publish"], false).await;
+    make("Published", &["publish"]).await;
+    make("Closed", &["publish", "close-registration"]).await;
+    make("Draft", &[]).await;
+    make("In review", &["submit"]).await;
+    make("Done", &["publish", "close-registration", "complete"]).await;
 
     let response = send(&app, get("/api/events.geojson", None)).await;
     assert_eq!(response.status, StatusCode::OK);
@@ -432,7 +643,7 @@ async fn flyer_is_an_inlinable_svg_of_the_jam(pool: PgPool) {
     assert_eq!(own_draft.status, StatusCode::OK);
     assert_eq!(own_draft.headers["cache-control"], "private, no-store");
 
-    publish(&app, &pool, &id, &owner).await;
+    publish(&pool, &id).await;
     let flyer = send(&app, get(&uri, None)).await;
     assert_eq!(flyer.status, StatusCode::OK);
     assert_eq!(
@@ -504,7 +715,7 @@ async fn og_image_is_a_1200_by_630_png(pool: PgPool) {
     let app = app(pool.clone());
     let owner = sign_up(&app, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
-    publish(&app, &pool, &id, &owner).await;
+    publish(&pool, &id).await;
     let slug = send(&app, get(&format!("/api/events/{id}"), None))
         .await
         .json["slug"]
@@ -543,7 +754,7 @@ async fn geojson_carries_what_the_popup_and_filters_need(pool: PgPool) {
         )
         .await;
     }
-    publish(&app, &pool, &id, &owner).await;
+    publish(&pool, &id).await;
 
     let response = send(&app, get("/api/events.geojson", None)).await;
     let properties = &response.json["features"][0]["properties"];

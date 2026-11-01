@@ -18,18 +18,18 @@ gender = "bboy"
 bracket_size = 16
 matches = [
   { round = "top16", a = "issei", b = "luka", winner = "issei", votes = [5, 0] },
-  { round = "top16", a = "cri6", b = "dr-hill", winner = "dr-hill", votes = [1, 4] },
+  { round = "top16", a = "cri6", b = "hill", winner = "hill", votes = [1, 4] },
   { round = "top16", a = "the-wolfer", b = "nori", winner = "the-wolfer", votes = [3, 2] },
   { round = "top16", a = "sunni", b = "luigi", winner = "luigi", votes = [2, 3] },
   { round = "top16", a = "lil-zoo", b = "vero", winner = "lil-zoo", votes = [4, 1] },
   { round = "top16", a = "lil-kev", b = "kid-colombia", winner = "lil-kev", votes = [3, 2] },
   { round = "top16", a = "victor", b = "leony", winner = "victor", votes = [5, 0] },
   { round = "top16", a = "uzee-rock", b = "chey", winner = "uzee-rock", votes = [5, 0] },
-  { round = "top8", a = "issei", b = "dr-hill", winner = "dr-hill", votes = [2, 3] },
+  { round = "top8", a = "issei", b = "hill", winner = "hill", votes = [2, 3] },
   { round = "top8", a = "the-wolfer", b = "luigi", winner = "luigi", votes = [2, 3] },
   { round = "top8", a = "lil-zoo", b = "lil-kev", winner = "lil-zoo", votes = [4, 1] },
   { round = "top8", a = "victor", b = "uzee-rock", winner = "victor", votes = [4, 1] },
-  { round = "top4", a = "dr-hill", b = "luigi", winner = "luigi", votes = [2, 3] },
+  { round = "top4", a = "hill", b = "luigi", winner = "luigi", votes = [2, 3] },
   { round = "top4", a = "lil-zoo", b = "victor", winner = "lil-zoo", votes = [4, 1] },
   { round = "final", a = "luigi", b = "lil-zoo", winner = "lil-zoo", votes = [1, 3] },
 ]

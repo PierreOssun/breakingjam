@@ -1,0 +1,51 @@
+name = "The World Battle 2023"
+starts_on = 2023-08-28
+ends_on = 2023-09-03
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+venue = "Alfândega do Porto"
+lat = 41.1431
+lng = -8.6216
+sources = [
+  "https://www.record.pt/modalidades/jogos-olimpicos/paris2024/detalhe/world-battle-regressa-ao-porto-para-prosseguir-qualificacao-olimpica-do-breaking",
+  "https://www.record.pt/modalidades/desportos-radicais/detalhe/vanessa-marina-conquista-o-bronze-na-world-battle-de-breaking-no-porto",
+  "https://www.worlddancesport.org/Events/Porto-Portugal-30082023-31082023-8116",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/BfG-World-Series-Porto-Adult-Breaking-1-vs-1-B-Boys-58969",
+  "https://www.worlddancesport.org/Competitions/FinalBracket/BfG-World-Series-Porto-Adult-Breaking-1-vs-1-B-Girls-58970",
+]
+# The WDSF panel; the World Battle's own battles' judges are unknown.
+judges = ["emmanuel-fox", "kadoer", "kazuhiro", "dora", "xedo", "intact", "valentine", "frost", "skim"]
+
+# The WDSF Breaking for Gold World Series stop (30–31 Aug), whose round robin is left out.
+[[battles]]
+key = "wdsf-bboy"
+name = "WDSF World Series 1v1 Bboy"
+gender = "bboy"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "amir", b = "wigor", winner = "amir" },
+  { round = "top8", a = "hong-10", b = "lagaet", winner = "lagaet" },
+  { round = "top8", a = "victor", b = "kuzya", winner = "victor" },
+  { round = "top8", a = "issin", b = "shigekix", winner = "shigekix" },
+  { round = "top4", a = "amir", b = "lagaet", winner = "lagaet" },
+  { round = "top4", a = "victor", b = "shigekix", winner = "shigekix" },
+  { round = "final", a = "lagaet", b = "shigekix", winner = "shigekix" },
+  { round = "third", a = "victor", b = "amir", winner = "victor" },
+]
+
+[[battles]]
+key = "wdsf-bgirl"
+name = "WDSF World Series 1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "nicka", b = "riko", winner = "nicka" },
+  { round = "top8", a = "vanessa", b = "anti", winner = "vanessa" },
+  { round = "top8", a = "logistx", b = "fresh-bella", winner = "logistx" },
+  { round = "top8", a = "syssy", b = "ayane", winner = "syssy" },
+  { round = "top4", a = "nicka", b = "vanessa", winner = "nicka" },
+  { round = "top4", a = "logistx", b = "syssy", winner = "logistx" },
+  { round = "final", a = "nicka", b = "logistx", winner = "nicka" },
+  { round = "third", a = "vanessa", b = "syssy", winner = "vanessa" },
+]

@@ -2,7 +2,7 @@
 
 use std::fmt;
 
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use uuid::Uuid;
@@ -103,6 +103,30 @@ impl Transition {
             _ => Role::User,
         }
     }
+
+    /// Whether this is the step that takes a draft towards the public: it needs the checklist.
+    pub fn announces(self) -> bool {
+        matches!(self, Self::Submit | Self::Publish)
+    }
+}
+
+/// What a draft still lacks to go public: the publish checklist, as the API checks it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Missing {
+    /// City, country and the map pin.
+    Place,
+    /// At least one battle.
+    Battle,
+}
+
+impl Missing {
+    /// The field and message the API reports it under.
+    pub fn as_field(self) -> (&'static str, &'static str) {
+        match self {
+            Self::Place => ("place", "add the city and the map pin"),
+            Self::Battle => ("battles", "add at least one battle"),
+        }
+    }
 }
 
 impl EventStatus {
@@ -158,14 +182,18 @@ pub struct Event {
     pub ends_on: NaiveDate,
     /// IANA name, e.g. `Europe/Zurich`.
     pub timezone: String,
+    /// When it opens, as wall-clock time in its timezone; null until announced.
+    pub opens_at: Option<NaiveTime>,
+    /// When it closes, as wall-clock time in its timezone; null until announced.
+    pub closes_at: Option<NaiveTime>,
     /// Venue, null when blank.
     pub venue_name: Option<String>,
     /// Street address, null when blank.
     pub address: Option<String>,
-    /// City shown on cards and in the map popup.
-    pub city: String,
-    /// ISO 3166-1 alpha-2.
-    pub country: String,
+    /// City shown on cards and in the map popup; null while the venue is not set.
+    pub city: Option<String>,
+    /// ISO 3166-1 alpha-2; null while the venue is not set.
+    pub country: Option<String>,
     /// Latitude; set together with `lng` or not at all.
     pub lat: Option<f64>,
     /// Longitude; set together with `lat` or not at all.
@@ -209,6 +237,26 @@ impl Event {
     pub fn visible_to(&self, user: Option<&User>) -> bool {
         self.status.is_public() || user.is_some_and(|u| can_write(u, self.organizer_id))
     }
+
+    /// Whether `fields` would take away the city, country or pin it has; blank counts as none.
+    pub fn loses_place(&self, fields: &EventFields) -> bool {
+        let blank = |value: &Option<String>| value.as_deref().is_none_or(|v| v.trim().is_empty());
+        (self.city.is_some() && blank(&fields.city))
+            || (self.country.is_some() && blank(&fields.country))
+            || (self.lat.is_some() && fields.lat.is_none())
+    }
+
+    /// What keeps the jam from going public, given how many battles it has; empty when ready.
+    pub fn missing(&self, battles: usize) -> Vec<Missing> {
+        let mut missing = Vec::new();
+        if self.city.is_none() || self.country.is_none() || self.lat.is_none() {
+            missing.push(Missing::Place);
+        }
+        if battles == 0 {
+            missing.push(Missing::Battle);
+        }
+        missing
+    }
 }
 
 /// Everything an organiser sets when creating or editing a jam.
@@ -231,18 +279,22 @@ pub struct EventFields {
     /// IANA name, e.g. `Europe/Zurich`.
     #[validate(custom(function = "iana_timezone"))]
     pub timezone: String,
+    /// When it opens, `HH:MM` in its timezone; null when not announced.
+    pub opens_at: Option<NaiveTime>,
+    /// When it closes, `HH:MM` in its timezone; null when not announced.
+    pub closes_at: Option<NaiveTime>,
     /// Venue; blank is stored as null.
     #[validate(length(max = 200))]
     pub venue_name: Option<String>,
     /// Street address; blank is stored as null.
     #[validate(length(max = 500))]
     pub address: Option<String>,
-    /// City, up to 100 characters.
-    #[validate(length(max = 100), custom(function = "not_blank"))]
-    pub city: String,
-    /// ISO 3166-1 alpha-2, upper case.
+    /// City, up to 100 characters; blank is stored as null.
+    #[validate(length(max = 100))]
+    pub city: Option<String>,
+    /// ISO 3166-1 alpha-2, upper case; null while the venue is not set.
     #[validate(custom(function = "country_code"))]
-    pub country: String,
+    pub country: Option<String>,
     /// Latitude; set together with `lng` or not at all.
     #[validate(range(min = -90.0, max = 90.0))]
     pub lat: Option<f64>,

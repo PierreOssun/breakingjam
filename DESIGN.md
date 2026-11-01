@@ -271,9 +271,10 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
   2. Nav: ghost sm links **Jam map** (`/map`), **Find a jam** (`/jams`), **Find someone** (`/dancers`). The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
   3. Spacer
   4. Language switch: ghost sm with `Globe` + ISO code + `CaretDown`
-  5. Account: ghost sm muted **Log in** when logged out; when logged in, the **avatar pill** opening the account menu (§4.34)
+  5. Account: ghost sm muted **Log in** when logged out; when logged in, the **avatar button** opening the account menu (§4.34)
   6. Primary sm **Register a jam** with `Plus` 16
-- **Avatar pill** (logged in, ≥ xl): `h-11 pl-1 pr-3 gap-2 rounded-full border border-border bg-surface`, hover `bg-surface-raised`. The dancer page's avatar (36px, `rounded-[11px]`), else a `User` icon in a `bg-surface-raised` square of the same size; the dancer name, else the account's name or its email's local part (`font-extrabold`, truncated at 14ch); `CaretDown`. Its accessible name is "<name>, account menu", so it starts with what it shows.
+- **Avatar button** (logged in, ≥ xl): a 44px round button, `rounded-full border border-border bg-surface`, hover `bg-surface-raised`, open `border-border-strong`, with the visible focus ring. It holds only the dancer page's avatar (36px, `rounded-[11px]`), else a `User` icon in a `bg-surface-raised` square of the same size, 4px from the button's edge. Without a visible name, its accessible name is "Account menu, <name>" and its `title` is the name: the dancer name, else the account's name or its email's local part. `aria-haspopup="menu"`, `aria-expanded`.
+- **Review dot:** for an admin with items to review, a 10px `bg-primary` dot at the button's top-right with a 2px `bg` ring, so "N to review" (§4.34) still gets noticed with the menu closed. Decorative, hidden from assistive tech: the badge in the menu says the count.
 - **< xl, logged out:** the home link, then the language switch (`Globe` + code), then a menu icon button. The menu opens a full-height sheet with the three nav links (`h-14 text-title`), then Log in, and a full-width primary **Register a jam**.
 - **< xl, logged in:** the menu icon button becomes the **avatar button**: the 40px avatar (`rounded-[12px]`) or the `User` square, in a 44px target, named "Account menu". It opens the account menu as a top sheet (§4.34).
 - **Language menu:**
@@ -333,7 +334,6 @@ One component that changes shape by viewport.
 - Show at most 2 per dancer.
 - Not interactive. A flag sits next to a name, never inside an avatar.
 - In list rows, use the bare 16×11 flag before the city, with no chip.
-- **Country count chip:** `h-8 pl-2 pr-3`, with the flag, the country name in `font-extrabold`, and the count in `text-muted font-bold` ("Belgium 28").
 
 ### 4.11 Meta tag and role tag
 
@@ -615,9 +615,9 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
 
 | State | Primary action | Caption |
 |---|---|---|
-| Registration open (a registration link) | **Register to battle** ↗ | Spectators welcome · registration is open |
-| Announced without a registration link | **Add to calendar** | Spectators welcome |
-| Registration closed | **Add to calendar** | Spectators welcome · registration is closed |
+| Registration open (a registration link) | **Register to battle** ↗ | Registration is open |
+| Announced without a registration link | **Add to calendar** | — |
+| Registration closed | **Add to calendar** | Registration is closed |
 | Completed | **See results** (to Battles) | — |
 | Cancelled | none, Share only | This jam is called off. |
 
@@ -643,9 +643,9 @@ When a search names a city (GeoNames, §6 Search), the closest upcoming jams to 
 
 ### 4.34 Account menu *(M23)*
 
-What the avatar pill (≥ xl) or the avatar button (< xl) opens, logged in (§4.6). One `role="menu"` named "Account", whose items are `menuitem`s.
+What the avatar button opens, logged in (§4.6). One `role="menu"` named "Account", whose items are `menuitem`s.
 
-- **Dropdown (≥ xl):** anchored to the pill's right edge, 8px below it; `w-80 p-2 rounded-[20px] bg-surface-raised border border-border-strong shadow-lg`.
+- **Dropdown (≥ xl):** anchored to the avatar button's right edge, 8px below it; `w-80 p-2 rounded-[20px] bg-surface-raised border border-border-strong shadow-lg`.
 - **Top sheet (< xl):** hangs from the header's bottom edge, full width, `rounded-b-[28px] bg-surface-raised shadow-lg p-4`, scrolling when taller than the screen, over a `bg-scrim` on the page below. The page doesn't scroll while it is open.
 - **Items, in order** (the sheet adds what the bar holds on desktop):
   1. **Profile block** → the dancer page (`/dancers/<id>`): 52px avatar, the name in `display-sm` with the verified tick (only an approved claim links a page to an account), "View my dancer page" in `primary-text`, a `CaretRight`. `p-3 rounded-[14px]`, hover and focus `bg-surface`.
@@ -662,6 +662,21 @@ What the avatar pill (≥ xl) or the avatar button (< xl) opens, logged in (§4.
 - **Keyboard and screen readers:** the trigger has `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`. Opening focuses the first item; Up and Down move through every item, the three theme options included (Home, End too); Enter or Space picks; Esc, a click outside, the scrim or the trigger close it, and closing gives focus back to the trigger; Tab leaves. A `radiogroup` can't sit inside a `menu`, so the theme options are `menuitemradio`s with `aria-checked` in a `group` named "Theme". Every target is at least 44px.
 
 ---
+
+### 4.35 Editor blocks *(M24)*
+
+The jam page in edit mode is made of blocks, one per part of the page (Venue, Battles, Lineup, About, Links; Dates opens from the date chips).
+
+- **Empty:** `flex items-center gap-4 rounded-lg border border-dashed border-border-strong p-4`: a 44px round icon (`border bg-surface text-primary-text`), the title in `body font-extrabold` with a `REQUIRED` chip (`bg-accent/[.14] text-accent-text caption uppercase`) where publishing needs it, a `body-sm muted` hint, and a primary sm **+ Add**. Visitors never see an empty block.
+- **Open:** `rounded-lg border-2 border-primary bg-surface p-4 lg:p-5`, the title as `display-sm` with its icon, the fields (§4.2) at `gap-5`, then a secondary **Done** (full width on phones).
+- **Filled, closed:** the empty shell with a solid dashed border, the summary in `body` (first line bold, the rest muted) and a ghost sm **Edit** with a pencil.
+- **Title:** the `<h1>` in a dashed `rounded-lg` outline; an **Edit** pill (`h-8 rounded-full bg-text text-bg caption`) sits over its top-right corner, always on phones, on hover or focus from lg. Editing swaps it for an input in the same type.
+- **Date chips:** `h-9 rounded-full border border-border-strong body-sm font-bold`; chips that add something ("+ Last day", "+ Times") are dashed and muted.
+- **Editor bar:** under the header, `sticky border-b bg-surface py-2.5`: the status badge (§4.5), "Editing" from sm, the save state (`Check` success "Saved" · spinning `CircleNotch` "Saving…" · `WarningCircle` danger "Not saved" with an underlined **Fix**, or **Retry** when no field is at fault), then a secondary sm **Preview** and, from lg, the primary sm **Publish**.
+- **A refused field:** its block stays open with the error under the field, even after **Done**, and the bar's **Fix** scrolls to it. The other blocks keep saving meanwhile.
+- **Publish checklist:** a card (§4.32 shape) titled "Ready to publish?" with "n of 4", a 6px progress bar (`bg-border`, fill `bg-success`), the four lines with `CheckCircle` (filled, success) or `Circle` (border-strong) and an **Add ›** link for what is missing, the primary **Publish** (disabled while something is missing, "Publish · 2 left"), and the caption "Until then only you can see this page." On phones it is a sticky bottom bar (progress + "n of 4 to publish" + the button) whose button opens the same list as a sheet titled "Almost there".
+- **Venue block, open:** a `label` "Find the place" over a search field (the input shell with a `MagnifyingGlass` at `left-3.5`, placeholder "Venue, address or city"). Suggestions drop below it as a list (`rounded-lg border bg-surface-raised p-1`): rows of a muted `MapPin`, the place in `body font-bold` and its address in `body-sm muted`; the arrow keys move, Enter picks, Esc closes. Then the Venue and Address fields, the pin map (256px, `rounded-md`) with a hint pill at its bottom-left ("Tap the map to drop the pin" · "Drag the pin to the exact door"), and the place: a chip with the flag and "Zürich, Switzerland", the caption "Filled from the address" and a ghost **Edit**, or the City and Country fields while either is blank. The attribution line closes the block.
+- **Flyer pill:** over the flyer's top-right, `rounded-full bg-text text-bg p-1 pl-3 caption`: "Generated" (or "Uploaded"), a `bg-bg text-text h-9` **Upload flyer** button, and a remove icon once there is an upload.
 
 ## 5. Layout rules
 
@@ -706,12 +721,12 @@ What the avatar pill (≥ xl) or the avatar button (< xl) opens, logged in (§4.
      - Mobile: horizontal scroll-snap row of 240px cards, up to 6.
    - Hide the section when there are no upcoming jams.
    - On desktop (1440×900) it starts above the fold.
-4. **The scene so far.**
-   - Overline, then the counters.
-     - Desktop: inline, each counter a `display-xl` number + `body-lg muted` label, separated by a muted "·".
-     - Mobile: a 3-cell stats strip.
-     - Counters: battles, countries, dancers.
-   - Then the 10 busiest countries as country chips (§4.10), plus a muted "+N more" chip.
+4. **BreakingJam so far.**
+   - Overline, then two groups: side by side from 1024px (`gap-16`), stacked below (`gap-6`).
+     - **Past** (`label`, muted): battles · dancers.
+     - **Coming up** (`label`, `primary-text`): battles · in countries, with a trailing `ArrowRight`. The whole group links to the map; on hover its captions underline. Hidden with no upcoming battle.
+   - Each count is a `display-xl` number (`stat` on phones) + a `body-lg` muted caption (`body-sm` on phones), separated by a muted "·". Numbers use the locale's thousands separator; captions agree with the number.
+   - Public jams only, never cancelled ones. A battle is past once its jam ended before today, upcoming from the day it ends; countries are those of the upcoming battles.
 5. **Footer** (every content page, the same at every width).
    - The round Bounce logo at 56px next to the wordmark, then **Instagram** at the far end: `InstagramLogo` 16 + "Instagram", `body-sm font-bold`, a 44px target, underlined on hover, opening in a new tab.
    - Nothing else: the header holds the links and the language switch.
@@ -759,6 +774,12 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Desktop:** two columns (§5). Under the flyer, the action card (§4.32). The meta lines run as one inline row, and a facts grid (When, Where, Website, Email, Instagram) follows "Who's in".
 - **Share** (the top bar, the action bar, the action card): the system share sheet with `{ title: "<Jam> · <Wed 4 Nov> · <City>", url }` where there is one (cancelling isn't an error); else the link is copied with the toast "Link copied" (§4.8).
 - **Link previews** (Open Graph, set by the Worker): `og:title` is "<Jam> · <Wed 4 Nov> · <City>", `og:description` the battles + "on BreakingJam", `og:image` the uploaded flyer at card size, else the generated share image.
+
+**Jam editor** (`/org/jams/<id>/edit`, M24): the jam page in edit mode, so what the organiser edits is what visitors see.
+- **Start sheet** (§4.9, short): from **Register a jam**, over the organiser's list. "Two things to start. You fill in the rest on the jam page.", then Jam name and First day, **Create the jam page**, and the caption "It stays a draft, visible only to you, until you publish it." The draft's URL and generated flyer work from that moment.
+- **Mobile 375:** the editor bar (§4.35), the flyer with its pill, the countdown chip, the title with its Edit pill, the date chips, then the blocks: Venue (required), Battles (required), Lineup, About, Links, the Organiser card ("Your account" · **Change** opens the organiser edit sheet), the eye note "Empty blocks are only visible to you. Visitors see what you fill in.", and a ghost sm **Delete jam** for a draft. The publish bar sticks to the bottom while the jam is a draft.
+- **Desktop:** the jam detail grid (§5): the flyer and the publish checklist card on the left (sticky), the title, chips and blocks on the right. A jam past draft shows its status card (step forward, cancel, delete) instead of the checklist.
+- **After Publish:** an organiser's jam goes to review (badge "In review"); the BreakingJam team's goes live at once. Edits to a live jam are public as soon as they save.
 
 **Dancer page** (`/d/<slug>`). It's a record, not a social profile: no feed, followers, ratings, rankings or win/loss.
 - **Mobile 375:**

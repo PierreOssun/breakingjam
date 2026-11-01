@@ -241,7 +241,7 @@ async fn jam(w: &World) -> (String, String) {
         .as_str()
         .unwrap()
         .to_owned();
-    publish(&w.app, &w.pool, &event, &w.organizer).await;
+    publish(&w.pool, &event).await;
     (event, battle)
 }
 

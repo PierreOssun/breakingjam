@@ -1,0 +1,36 @@
+name = "Red Bull BC One Cypher France 2019"
+starts_on = 2019-03-16
+ends_on = 2019-03-17
+timezone = "Europe/Paris"
+city = "Lyon"
+country = "FR"
+venue = "Les Halles du Faubourg"
+lat = 45.7491  # the city: the venue's position is unknown
+lng = 4.8479
+sources = [
+  "https://viacomit.net/2019/03/04/line-up-red-bull-bc-one-cypher-france-2019/",
+  "https://www.femmesdesport.fr/breaking-news/break-dance-sarah-bee-decroche-le-red-bull-bc-one-cypher-france-et-senvole-pour-linde/35801/",
+  "https://www.youtube.com/watch?v=QpFgiO-qdFo",
+]
+judges = ["junior", "niek", "reveal"]
+
+# The winner of the Pac Pac vs Mehdi final is unconfirmed, so both stay finalists.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "pac-pac", reached = "top2", video = "https://youtu.be/xd77HsoHTb8" },
+  { entrant = "mehdi", reached = "top2", video = "https://youtu.be/xd77HsoHTb8" },
+  { entrant = "lagaet", reached = "top4", video = "https://youtu.be/FsHRM2HK00g" },
+  { entrant = "nasso", reached = "top4", video = "https://youtu.be/yPlv4ExkX9w" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "sarah-bee", reached = "winner", video = "https://youtu.be/87SVRMaSDDY" },
+  { entrant = "labeille", reached = "top2", video = "https://youtu.be/87SVRMaSDDY" },
+]

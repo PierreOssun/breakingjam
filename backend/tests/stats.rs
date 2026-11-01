@@ -30,8 +30,13 @@ async fn admin_stats_count_jams_dancers_accounts_and_queues(pool: PgPool) {
     .execute(&pool)
     .await
     .unwrap();
-    let submit = format!("/api/events/{in_review}/submit");
-    send(&app, post(&submit, json!({}), Some(&organizer))).await;
+    sqlx::query!(
+        "update events set status = 'in_review' where id = $1::text::uuid",
+        in_review
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
 
     for (name, handle) in [("Lil G", Some("lilg")), ("Ventus", None)] {
         let body = json!({ "dancer_name": name, "country": "FR", "instagram_handle": handle });
@@ -61,39 +66,42 @@ async fn admin_stats_count_jams_dancers_accounts_and_queues(pool: PgPool) {
 }
 
 #[sqlx::test]
-async fn site_stats_count_public_jams_battles_and_dancers(pool: PgPool) {
+async fn site_stats_split_battles_at_today_and_leave_out_private_jams(pool: PgPool) {
     let app = app(pool.clone());
     let organizer = sign_up(&app, "org@example.com").await;
     let one_v_one = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
-    let jam = async |name: &str, country: &str, battles: usize| {
-        let body = json!({ "name": name, "starts_on": "2030-06-01", "ends_on": "2030-06-01",
+    // Each jam ends `days` from today, whatever day the test runs.
+    let jam = async |name: &str, country: &str, battles: usize, days: i32, status: &str| {
+        let body = json!({ "name": name, "starts_on": "2020-06-01", "ends_on": "2020-06-01",
                            "timezone": "Europe/Paris", "city": "City", "country": country });
         let id = id_of(&send(&app, post("/api/events", body, Some(&organizer))).await);
         for _ in 0..battles {
             let uri = format!("/api/events/{id}/battles");
             send(&app, post(&uri, one_v_one.clone(), Some(&organizer))).await;
         }
-        id
+        sqlx::query!(
+            "update events
+             set status = $1::text::event_status, starts_on = current_date + $2::int,
+                 ends_on = current_date + $2::int
+             where id = $3::text::uuid",
+            status,
+            days,
+            id
+        )
+        .execute(&pool)
+        .await
+        .unwrap();
     };
-    let paris = jam("Paris", "FR", 2).await;
-    let lyon = jam("Lyon", "FR", 1).await;
-    let zurich = jam("Zurich", "CH", 1).await;
-    jam("Secret draft", "DE", 3).await;
-    let cancelled = jam("Called off", "IT", 1).await;
-    sqlx::query!(
-        "update events set status = 'published' where id = any($1::text[]::uuid[])",
-        &[paris, lyon, zurich] as &[String],
-    )
-    .execute(&pool)
-    .await
-    .unwrap();
-    sqlx::query!(
-        "update events set status = 'cancelled' where id = $1::text::uuid",
-        cancelled
-    )
-    .execute(&pool)
-    .await
-    .unwrap();
+    jam("Yesterday", "FR", 2, -1, "published").await;
+    jam("Long ago", "BE", 1, -400, "completed").await;
+    jam("Today", "FR", 1, 0, "published").await;
+    jam("Tomorrow", "CH", 2, 1, "registration_closed").await;
+    jam("Same country", "CH", 1, 2, "published").await;
+    jam("No battles yet", "ES", 0, 3, "published").await;
+    jam("Called off, past", "IT", 4, -1, "cancelled").await;
+    jam("Called off, upcoming", "IT", 4, 1, "cancelled").await;
+    jam("Draft", "DE", 4, 1, "draft").await;
+    jam("In review", "DE", 4, -1, "in_review").await;
     let dancer = json!({ "dancer_name": "Lil G", "country": "FR" });
     send(&app, post("/api/dancers", dancer, Some(&organizer))).await;
 
@@ -102,12 +110,21 @@ async fn site_stats_count_public_jams_battles_and_dancers(pool: PgPool) {
     assert_eq!(
         stats.json,
         json!({
-            "countries": 2, "battles": 4, "dancers": 1,
-            "battles_by_country": [
-                { "country": "FR", "battles": 3 },
-                { "country": "CH", "battles": 1 }
-            ]
+            "battles_past": 3, "dancers": 1,
+            "battles_upcoming": 4, "countries_upcoming": 2
         }),
-        "drafts and cancelled jams don't count"
+        "yesterday is past, today is upcoming, only public jams count, a jam without battles adds no country"
+    );
+}
+
+#[sqlx::test]
+async fn site_stats_are_zero_on_an_empty_site(pool: PgPool) {
+    let stats = send(&app(pool), get("/api/stats", None)).await;
+    assert_eq!(
+        stats.json,
+        json!({
+            "battles_past": 0, "dancers": 0,
+            "battles_upcoming": 0, "countries_upcoming": 0
+        })
     );
 }

@@ -138,12 +138,9 @@ pub async fn sign_up(app: &Router, email: &str) -> String {
         .unwrap()
 }
 
-/// Makes `owner`'s jam public: submitted through the API, then approved in the DB (the review
-/// itself is tested in `tests/reviews.rs`).
-pub async fn publish(app: &Router, pool: &PgPool, jam: &str, owner: &str) {
-    let uri = format!("/api/events/{jam}/submit");
-    let submitted = send(app, post(&uri, Value::Null, Some(owner))).await;
-    assert_eq!(submitted.status, StatusCode::OK, "{}", submitted.json);
+/// Makes a jam public in the DB, whatever it lacks; the checklist `submit` runs is tested in
+/// `tests/events.rs`, the review in `tests/reviews.rs`.
+pub async fn publish(pool: &PgPool, jam: &str) {
     sqlx::query!(
         "update events set status = 'published' where id = $1::text::uuid",
         jam

@@ -16,7 +16,7 @@
     "jamMap": "Jam-Karte",
     "account": "Konto",
     "accountMenu": "Kontomenü",
-    "accountMenuOf": "{{name}}, Kontomenü"
+    "accountMenuOf": "Kontomenü, {{name}}"
   },
   "account": {
     "viewPage": "Meine Tänzer:innen-Seite ansehen",
@@ -103,16 +103,16 @@
       "map": "Alle auf der Karte"
     },
     "scene": {
-      "title": "Die Szene bisher",
+      "title": "BreakingJam bisher",
+      "past": "Vergangen",
+      "upcoming": "Demnächst",
       "battles_one": "Battle",
       "battles_other": "Battles",
-      "countries_one": "Land",
-      "countries_other": "Länder",
       "dancers_one": "Tänzer",
       "dancers_other": "Tänzer",
-      "byCountry": "Battles nach Land",
-      "more_one": "+{{count}} weiteres",
-      "more_other": "+{{count}} weitere"
+      "in": "in",
+      "countries_one": "Land",
+      "countries_other": "Ländern"
     },
     "heading": "Finde deine nächste Jam",
     "search": "Jams und Leute suchen",
@@ -180,9 +180,8 @@
     "results": "Ergebnisse ansehen",
     "shareJam": "Diesen Jam teilen",
     "caption": {
-      "open": "Zuschauer:innen willkommen · Anmeldung offen",
-      "closed": "Zuschauer:innen willkommen · Anmeldung geschlossen",
-      "spectators": "Zuschauer:innen willkommen",
+      "open": "Anmeldung offen",
+      "closed": "Anmeldung geschlossen",
       "cancelled": "Dieser Jam ist abgesagt."
     },
     "when": "Wann",
@@ -314,11 +313,6 @@
   },
   "org": {
     "newIntro": "Sie bleibt ein Entwurf, nur für dich sichtbar, bis du sie veröffentlichst.",
-    "saveDraft": "Entwurf speichern",
-    "draftSaved": "Entwurf gespeichert. Jetzt Battles und Line-up hinzufügen.",
-    "saved": "Gespeichert.",
-    "details": "Details",
-    "viewPage": "Jam-Seite ansehen",
     "showMore": "Mehr anzeigen",
     "empty": {
       "title": "Noch keine Jams",
@@ -326,8 +320,6 @@
     },
     "fields": {
       "name": "Name der Jam",
-      "oneDay": "Eintägiger Jam",
-      "date": "Datum",
       "startsOn": "Erster Tag",
       "endsOn": "Letzter Tag",
       "timezone": "Zeitzone",
@@ -343,39 +335,24 @@
       "instagramUrl": "Instagram-Seite",
       "websiteUrl": "Website",
       "contactEmail": "Kontakt-E-Mail",
-      "contactEmailHint": "Öffentlich: steht auf der Jam-Seite, damit Tänzer:innen dir schreiben können."
-    },
-    "location": {
-      "title": "Auf der Karte",
-      "hint": "Such die Adresse, dann tippe oder zieh die Nadel an die genaue Stelle.",
-      "find": "Auf der Karte finden",
-      "none": "Kein Ort gefunden. Prüf die Adresse oder tippe auf die Karte, um die Nadel zu setzen.",
-      "error": "Die Adresssuche hat nicht geklappt. Versuch es gleich noch einmal.",
-      "others": "Nicht der richtige Ort? Wähl einen anderen:",
-      "placed": "Die Nadel sitzt: Die Jam erscheint auf der Karte.",
-      "unplaced": "Noch keine Nadel: Die Jam erscheint nicht auf der Karte.",
-      "remove": "Nadel entfernen",
-      "pin": "Ort der Jam",
-      "attribution": "Adresssuche von Nominatim · © OpenStreetMap-Mitwirkende"
+      "contactEmailHint": "Öffentlich: steht auf der Jam-Seite, damit Tänzer:innen dir schreiben können.",
+      "endsOnHint": "Leer lassen für eine eintägige Jam.",
+      "opensAt": "Beginn",
+      "closesAt": "Ende"
     },
     "status": {
       "title": "Status",
       "explain": {
-        "draft": "Nur du siehst sie. Reiche sie zur Prüfung ein: Ein BreakingJam-Admin prüft jede Jam, bevor sie auf der Karte erscheint.",
         "published": "Auf der Karte und offen für Anmeldungen.",
         "registration_closed": "Auf der Karte; die Anmeldung ist geschlossen.",
         "completed": "Sie hat stattgefunden. Trag die Ergebnisse unten in den Battles ein.",
         "cancelled": "Abgesagt. Die Seite zeigt das an.",
-        "in_review": "Ein BreakingJam-Admin prüft sie. Nach der Freigabe erscheint sie auf der Karte; du kannst sie bis dahin weiter bearbeiten.",
-        "draftTeam": "Nur du siehst sie. Als BreakingJam-Team veröffentlichst du sie direkt."
+        "in_review": "Ein BreakingJam-Admin prüft sie. Nach der Freigabe erscheint sie auf der Karte; du kannst sie bis dahin weiter bearbeiten."
       },
-      "noPin": "Setz unter „Auf der Karte“ eine Nadel, damit man sie findet.",
       "action": {
-        "publish": "Veröffentlichen",
         "close-registration": "Anmeldung schließen",
         "complete": "Als abgeschlossen markieren",
-        "cancel": "Jam absagen",
-        "submit": "Zur Prüfung einreichen"
+        "cancel": "Jam absagen"
       },
       "done": {
         "publish": "Veröffentlicht. Sie ist auf der Karte.",
@@ -394,7 +371,6 @@
       "sentBack": "Von BreakingJam zurückgeschickt: {{note}}"
     },
     "battles": {
-      "none": "Noch keine Battles. Leg das erste an.",
       "add": "Battle hinzufügen",
       "edit": "Battle bearbeiten",
       "editOne": "{{name}} bearbeiten",
@@ -506,14 +482,9 @@
         "other": "Team-Mitglied hinzufügen"
       }
     },
-    "peopleOnJamPage": "Tänzer:innen, Judges, DJ und MC fügst du auf der Jam-Seite hinzu.",
     "flyer": {
-      "title": "Flyer",
       "upload": "Flyer hochladen",
-      "formats": "PNG oder JPEG, bis 20 MB. Hochformat 4:5 passt am besten.",
-      "generated": "Bis du einen hinzufügst, nutzt der Jam einen Flyer aus seinen Angaben.",
-      "shown": "Zu sehen auf der Jam-Seite, in Karten und auf der Karte. Entferne ihn, um zum erzeugten Flyer zurückzukehren.",
-      "current": "Dein Flyer",
+      "generated": "Generiert",
       "replace": "Flyer ersetzen",
       "remove": "Flyer entfernen",
       "updated": "Flyer aktualisiert.",
@@ -535,7 +506,76 @@
         "soft": "Dieser Zuschnitt ist {{width}} px breit und wirkt daher unscharf. Verkleinere oder wähle ein größeres Bild: 1080 × 1350 ist ideal.",
         "previews": "In Karten und Listen",
         "use": "Diesen Flyer verwenden"
-      }
+      },
+      "uploaded": "Hochgeladen"
+    },
+    "start": {
+      "intro": "Zwei Angaben zum Start. Den Rest füllst du auf der Jam-Seite aus.",
+      "create": "Jam-Seite erstellen"
+    },
+    "editor": {
+      "editing": "Bearbeiten",
+      "saved": "Gespeichert",
+      "saving": "Speichern…",
+      "notSaved": "Nicht gespeichert",
+      "preview": "Vorschau",
+      "edit": "Bearbeiten",
+      "editName": "Namen bearbeiten",
+      "done": "Fertig",
+      "add": "Hinzufügen",
+      "required": "Pflicht",
+      "lastDay": "Letzter Tag",
+      "times": "Zeiten",
+      "emptyNote": "Leere Blöcke siehst nur du. Besucher sehen, was du ausfüllst.",
+      "yourAccount": "Dein Konto",
+      "change": "Ändern",
+      "fix": "Beheben",
+      "retry": "Erneut versuchen",
+      "leftUnsaved": "Deine letzten Änderungen wurden nicht gespeichert."
+    },
+    "blocks": {
+      "dates": "Daten",
+      "venue": "Ort",
+      "venueHint": "Stadt, Adresse und der Pin auf der Karte",
+      "battlesHint": "Kategorien, Format, Startzeit, Preise",
+      "lineupHint": "Judges, DJs und MCs",
+      "aboutHint": "Ein paar Zeilen über deine Jam",
+      "links": "Links",
+      "linksHint": "Website, Instagram, Kontakt-E-Mail"
+    },
+    "publish": {
+      "title": "Bereit zum Veröffentlichen?",
+      "almost": "Fast geschafft",
+      "progress": "{{done}} von {{total}}",
+      "toPublish": "{{done}} von {{total}} zum Veröffentlichen",
+      "action": "Veröffentlichen",
+      "left_one": "Veröffentlichen · {{count}} offen",
+      "left_other": "Veröffentlichen · {{count}} offen",
+      "items": {
+        "name": "Name",
+        "dates": "Daten",
+        "place": "Stadt und Karten-Pin",
+        "battle": "Mindestens ein Battle"
+      },
+      "add": "Hinzufügen",
+      "private": "Bis dahin siehst nur du diese Seite.",
+      "review": "Ein BreakingJam-Admin prüft sie, bevor sie auf die Karte kommt.",
+      "team": "Als BreakingJam-Team veröffentlichst du direkt.",
+      "missing_one": "Noch eine Sache, bevor deine Jam auf die Karte kommt.",
+      "missing_other": "Noch {{count}} Dinge, bevor deine Jam auf die Karte kommt.",
+      "ready": "Alles da. Veröffentliche, wann du willst."
+    },
+    "venue": {
+      "find": "Ort finden",
+      "placeholder": "Location, Adresse oder Stadt",
+      "results": "Gefundene Orte",
+      "none": "Kein Ort gefunden. Versuch es mit Straße und Stadt, oder tippe auf die Karte, um den Pin zu setzen.",
+      "error": "Die Ortssuche hat nicht geklappt. Versuch es gleich noch einmal.",
+      "dragHint": "Zieh den Pin genau zur Tür",
+      "tapHint": "Tippe auf die Karte, um den Pin zu setzen",
+      "fromAddress": "Aus der Adresse übernommen",
+      "attribution": "Ortssuche von Photon · © OpenStreetMap-Mitwirkende",
+      "pin": "Ort der Jam"
     }
   },
   "verify": {

@@ -1,0 +1,31 @@
+name = "Red Bull BC One Cypher France 2021"
+starts_on = 2021-04-17
+ends_on = 2021-04-18
+# check: Red Bull's listing says 17-18 Apr, while the livestream premiered on 30 May; Lyon comes from Red Bull's report
+timezone = "Europe/Paris"
+city = "Lyon"
+country = "FR"
+lat = 45.7491
+lng = 4.8479
+sources = [
+  "https://www.redbull.com/ch-fr/pac-pac-fanny-red-bull-bc-one-cypher-france-2021",
+  "https://www.youtube.com/watch?v=qAtMwvSgXkE",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "pac-pac", reached = "winner", video = "https://youtu.be/txFvqHCLtW0" },
+  { entrant = "nasty", reached = "top2", video = "https://youtu.be/txFvqHCLtW0" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "fanny", reached = "winner" },
+  { entrant = "campanita", reached = "top2" },
+]

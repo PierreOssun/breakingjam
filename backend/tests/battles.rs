@@ -57,7 +57,7 @@ impl Jam {
     }
 
     async fn publish(&self) {
-        publish(&self.app, &self.pool, &self.event_id, &self.owner).await;
+        publish(&self.pool, &self.event_id).await;
     }
 }
 

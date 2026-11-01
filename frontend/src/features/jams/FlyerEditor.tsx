@@ -17,38 +17,42 @@ import {
 type Jam = Schemas["EventResponse"];
 type Problem = "type" | "size" | "small" | "unreadable";
 
-/** The jam's flyer in the editor: upload one, replace it, or go back to the generated one.
- * A new flyer shows at once; admins can remove it (decided in M19). */
-export function FlyerEditor({ jam }: { jam: Jam }) {
+/**
+ * On the editor's flyer (M24): whether it is the generated one or an upload, and the upload
+ * itself; the pill sits over the flyer's top-right corner.
+ */
+export function FlyerOverlay({ jam }: { jam: Jam }) {
   const { t } = useTranslation();
   const flyer = useFlyerUpload(jam);
+  const uploaded = Boolean(jam.flyer_card_url);
   return (
-    <section aria-labelledby="flyer-title" className="flex flex-col gap-4">
-      <h2 id="flyer-title" className="font-display text-display-md">
-        {t("org.flyer.title")}
-      </h2>
+    <>
       {flyer.input}
-      {jam.flyer_card_url ? (
-        <div className="flex items-start gap-4">
-          <img
-            src={jam.flyer_card_url}
-            alt={t("org.flyer.current")}
-            className="aspect-[4/5] w-[120px] shrink-0 rounded-md border border-border object-cover"
-          />
-          <div className="flex flex-col items-start gap-2">
-            <FlyerButtons jam={jam} flyer={flyer} />
-          </div>
-        </div>
-      ) : (
-        <Dropzone flyer={flyer} />
-      )}
-      {flyer.problem ?? (
-        <p className="text-caption text-muted">
-          {t(jam.flyer_card_url ? "org.flyer.shown" : "org.flyer.generated")}
-        </p>
-      )}
+      <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-text p-1 pl-3 text-caption font-bold text-bg shadow-md">
+        {t(uploaded ? "org.flyer.uploaded" : "org.flyer.generated")}
+        <button
+          type="button"
+          onClick={flyer.choose}
+          className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-bg px-3 text-body-sm font-bold text-text transition-colors duration-fast hover:bg-surface-raised"
+        >
+          <UploadSimple size={16} weight="bold" aria-hidden />
+          {t(uploaded ? "org.flyer.replace" : "org.flyer.upload")}
+        </button>
+        {uploaded && (
+          <button
+            type="button"
+            aria-label={t("org.flyer.remove")}
+            disabled={flyer.removing}
+            onClick={flyer.remove}
+            className="grid size-9 cursor-pointer place-items-center rounded-full text-bg hover:bg-bg/20 disabled:cursor-progress"
+          >
+            <Trash size={16} weight="bold" aria-hidden />
+          </button>
+        )}
+      </div>
+      {flyer.problem}
       {flyer.dialog}
-    </section>
+    </>
   );
 }
 
@@ -91,32 +95,6 @@ function FlyerButtons({ jam, flyer }: { jam: Jam; flyer: FlyerUpload }) {
         </Button>
       )}
     </>
-  );
-}
-
-/** The editor's empty field: a dashed drop target that opens the file picker (DESIGN.md §4.28). */
-function Dropzone({ flyer }: { flyer: FlyerUpload }) {
-  const { t } = useTranslation();
-  return (
-    <button
-      type="button"
-      onClick={flyer.choose}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        void flyer.pick(e.dataTransfer.files[0]);
-      }}
-      className={`flex cursor-pointer flex-col items-center gap-2 rounded-md border-2 border-dashed bg-surface px-4 py-6 text-center transition-colors duration-fast hover:border-text ${flyer.problem ? "border-danger" : "border-border-strong"}`}
-    >
-      <UploadSimple
-        size={28}
-        weight="bold"
-        aria-hidden
-        className="text-primary-text"
-      />
-      <span className="text-body font-bold">{t("org.flyer.upload")}</span>
-      <span className="text-caption text-muted">{t("org.flyer.formats")}</span>
-    </button>
   );
 }
 

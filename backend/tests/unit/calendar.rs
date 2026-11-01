@@ -1,6 +1,23 @@
 //! Unit tests of `crate::calendar`.
 
-use crate::calendar::*;
+use chrono::Utc;
+
+use crate::{calendar::*, unit_tests::bare_draft};
+
+#[test]
+fn location_names_only_what_the_jam_has() {
+    let page = "https://breakingjam.com/jams/winter-cypher-jam-000000";
+    let mut jam = bare_draft();
+    assert!(ics(&jam, page, Utc::now()).contains("\r\nLOCATION:\r\n"));
+    jam.venue_name = Some("Le Hangar".into());
+    jam.city = Some("Paris".into());
+    let file = ics(&jam, page, Utc::now());
+    assert!(
+        file.contains("\r\nLOCATION:Le Hangar\\, Paris\r\n"),
+        "{file}"
+    );
+    assert!(file.contains("\r\nDTSTART;VALUE=DATE:20301212\r\n"));
+}
 
 #[test]
 fn text_escapes_what_ical_reserves() {

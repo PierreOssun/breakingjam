@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher Switzerland 2016"
+starts_on = 2016-05-29
+timezone = "Europe/Zurich"
+city = "Bern"
+country = "CH"
+venue = "Bierhübeli"
+lat = 46.9564
+lng = 7.4379
+sources = ["https://web.archive.org/web/20171001223743/http://bcone.redbull.com/en_INT/event/red-bull-bc-one-switzerland-cypher-2016"]
+judges = ["tuff-kid"]  # the only judge the report names
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "be-nasty", b = "moa", winner = "moa" },
+  { round = "top16", a = "jitsou", b = "nestor", winner = "nestor" },
+  { round = "top16", a = "kyuubi", b = "kiet", winner = "kiet" },
+  { round = "top16", a = "kennex", b = "william-the-third", winner = "kennex" },
+  { round = "top16", a = "wen", b = "rocka", winner = "wen" },
+  { round = "top16", a = "fab-yo", b = "michel", winner = "michel" },
+  { round = "top16", a = "zohair", b = "imran", winner = "zohair" },
+  { round = "top16", a = "hill", b = "dade", winner = "hill" },
+  { round = "top8", a = "moa", b = "nestor", winner = "moa" },
+  { round = "top8", a = "kiet", b = "kennex", winner = "kiet" },
+  { round = "top8", a = "wen", b = "michel", winner = "michel" },
+  { round = "top8", a = "zohair", b = "hill", winner = "hill" },
+  { round = "top4", a = "moa", b = "kiet", winner = "moa" },
+  { round = "top4", a = "michel", b = "hill", winner = "hill" },
+  { round = "final", a = "moa", b = "hill", winner = "hill" },
+]

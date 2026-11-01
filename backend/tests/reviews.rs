@@ -3,7 +3,7 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, get, id_of, post, send, set_role, sign_up};
+use test_app::{TestResponse, app, get, id_of, post, put, send, set_role, sign_up};
 
 struct World {
     app: Router,
@@ -24,12 +24,16 @@ async fn world(pool: PgPool) -> World {
 }
 
 impl World {
-    /// A new draft by `cookie`; returns its id.
+    /// A new draft by `cookie`, with the venue and the battle it needs to go public; returns its id.
     async fn draft(&self, cookie: &str, name: &str) -> String {
         let body = json!({ "name": name, "starts_on": "2030-06-01", "ends_on": "2030-06-01",
                            "timezone": "Europe/Paris", "city": "Paris", "country": "FR",
                            "lat": 48.86, "lng": 2.35 });
-        id_of(&send(&self.app, post("/api/events", body, Some(cookie))).await)
+        let id = id_of(&send(&self.app, post("/api/events", body, Some(cookie))).await);
+        let battle = json!({ "format": "team", "team_size": 1, "gender": "mixed", "age": "adult", "age_min": 18 });
+        self.call(&format!("/api/events/{id}/battles"), battle, Some(cookie))
+            .await;
+        id
     }
 
     async fn call(&self, uri: &str, body: Value, cookie: Option<&str>) -> TestResponse {
@@ -121,6 +125,44 @@ async fn rejected_jams_go_back_to_draft_with_a_note(pool: PgPool) {
     let resubmitted = w.call(&submit, json!({}), Some(&w.organizer)).await;
     assert_eq!(resubmitted.json["status"], "in_review");
     assert_eq!(resubmitted.json["review_note"], Value::Null);
+}
+
+#[sqlx::test]
+async fn a_jam_sent_back_needs_its_venue_to_return(pool: PgPool) {
+    let w = world(pool).await;
+    let jam = w.draft(&w.organizer, "Paris Cypher").await;
+    let submit = format!("/api/events/{jam}/submit");
+    w.call(&submit, json!({}), Some(&w.organizer)).await;
+    let note = json!({ "note": "Add the venue address." });
+    w.call(
+        &format!("/api/admin/events/{jam}/reject"),
+        note,
+        Some(&w.admin),
+    )
+    .await;
+
+    // Clearing the venue while fixing it: the checklist holds the jam back again.
+    let without_place = json!({ "name": "Paris Cypher", "starts_on": "2030-06-01",
+                                "ends_on": "2030-06-01", "timezone": "Europe/Paris" });
+    let cleared = send(
+        &w.app,
+        put(
+            &format!("/api/events/{jam}"),
+            without_place,
+            Some(&w.organizer),
+        ),
+    )
+    .await;
+    assert_eq!(cleared.status, StatusCode::OK, "{}", cleared.json);
+    let refused = w.call(&submit, json!({}), Some(&w.organizer)).await;
+    assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(refused.json["error"]["fields"][0]["field"], "place");
+    // Nothing moved, so the admin's note is still there to read.
+    let seen = w
+        .read(&format!("/api/events/{jam}"), Some(&w.organizer))
+        .await;
+    assert_eq!(seen.json["status"], "draft");
+    assert_eq!(seen.json["review_note"], "Add the venue address.");
 }
 
 #[sqlx::test]

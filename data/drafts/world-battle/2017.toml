@@ -1,0 +1,12 @@
+name = "Porto World Battle 2017"
+# check: only porto.pt's summary gives the dates and the MXM Art Centre; same lineage? Record says Eurobattle took the World Battle name about 2018
+starts_on = 2017-03-17
+ends_on = 2017-03-19
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+venue = "MXM Art Center"
+lat = 41.1485
+lng = -8.6110
+sources = ["https://porto.pt/en/news/urban_dance_battle_in_porto_arrives_march_17th"]
+judges = []

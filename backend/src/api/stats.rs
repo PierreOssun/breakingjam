@@ -14,7 +14,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new().routes(routes!(site))
 }
 
-/// How far BreakingJam reaches: countries, battles (in total and per country) and dancers.
+/// How far BreakingJam reaches: past battles and dancers, upcoming battles and their countries.
 #[utoipa::path(
     get,
     path = "/stats",

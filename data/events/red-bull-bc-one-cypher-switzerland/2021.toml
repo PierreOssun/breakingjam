@@ -1,0 +1,35 @@
+name = "Red Bull BC One Cypher Switzerland 2021"
+starts_on = 2021-10-10
+timezone = "Europe/Zurich"
+city = "Bern"
+country = "CH"
+venue = "Bierhübeli"
+lat = 46.9564
+lng = 7.4379
+sources = [
+  "https://www.youtube.com/watch?v=Fn_EMhz7_tA",
+  "https://www.20min.ch/story/wer-holt-sich-heute-die-schweizer-breakdance-krone-537722050458",
+  "https://www.blick.ch/sport/extremsport/schwindelerregende-moves-das-sind-die-besten-breakdancer-der-schweiz-id16908664.html",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "deijva", reached = "winner", video = "https://youtu.be/kDso94O3C7c" },
+  { entrant = "haku", reached = "top2", video = "https://youtu.be/kDso94O3C7c" },
+  { entrant = "lino", reached = "top4", video = "https://youtu.be/GXl_OQ1fU4k" },
+  { entrant = "nestor", reached = "top4", video = "https://youtu.be/GXl_OQ1fU4k" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "leaf", reached = "winner", video = "https://youtu.be/ex_sc6QtCUo" },
+  { entrant = "jazzy-jes", reached = "top2", video = "https://youtu.be/ex_sc6QtCUo" },
+  { entrant = "becca", reached = "top4", video = "https://youtu.be/m17IPIAMTh0" },
+  { entrant = "anna", reached = "top4", video = "https://youtu.be/m17IPIAMTh0" },
+]

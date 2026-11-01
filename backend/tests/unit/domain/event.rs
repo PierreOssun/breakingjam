@@ -2,10 +2,13 @@
 
 use uuid::Uuid;
 
-use crate::domain::{
-    country_code,
-    event::*,
-    user::{Role, User},
+use crate::{
+    domain::{
+        country_code,
+        event::*,
+        user::{Role, User},
+    },
+    unit_tests::bare_draft,
 };
 use EventStatus::*;
 use Transition::*;
@@ -71,6 +74,72 @@ fn transitions_reject_everything_else() {
     ];
     for (from, transition) in invalid {
         assert!(from.apply(transition).is_err(), "{from:?} + {transition:?}");
+    }
+}
+
+#[test]
+fn the_publish_checklist_wants_a_placed_venue_and_a_battle() {
+    let mut jam = bare_draft();
+    assert_eq!(jam.missing(0), [Missing::Place, Missing::Battle]);
+    assert_eq!(jam.missing(2), [Missing::Place]);
+    jam.city = Some("Zürich".into());
+    jam.country = Some("CH".into());
+    assert_eq!(jam.missing(1), [Missing::Place], "a city without a pin");
+    jam.lat = Some(47.38);
+    jam.lng = Some(8.54);
+    assert_eq!(jam.missing(0), [Missing::Battle]);
+    assert!(jam.missing(1).is_empty());
+    assert_eq!(Missing::Place.as_field().0, "place");
+    assert_eq!(Missing::Battle.as_field().0, "battles");
+}
+
+#[test]
+fn only_a_place_it_has_can_be_lost() {
+    let fields = |city: Option<&str>, country: Option<&str>, lat: Option<f64>| EventFields {
+        name: "Jam".into(),
+        description: None,
+        starts_on: chrono::NaiveDate::from_ymd_opt(2030, 6, 1).unwrap(),
+        ends_on: chrono::NaiveDate::from_ymd_opt(2030, 6, 1).unwrap(),
+        timezone: "Europe/Paris".into(),
+        opens_at: None,
+        closes_at: None,
+        venue_name: None,
+        address: None,
+        city: city.map(Into::into),
+        country: country.map(Into::into),
+        lat,
+        lng: lat,
+        registration_url: None,
+        instagram_url: None,
+        website_url: None,
+        contact_email: None,
+    };
+    let mut jam = bare_draft();
+    assert!(
+        !jam.loses_place(&fields(None, None, None)),
+        "nothing to lose"
+    );
+
+    jam.city = Some("Paris".into());
+    jam.country = Some("FR".into());
+    assert!(
+        !jam.loses_place(&fields(Some("Lyon"), Some("FR"), None)),
+        "never had a pin"
+    );
+    assert!(jam.loses_place(&fields(None, Some("FR"), None)));
+    assert!(jam.loses_place(&fields(Some("  "), Some("FR"), None)));
+    assert!(jam.loses_place(&fields(Some("Paris"), None, None)));
+
+    jam.lat = Some(48.86);
+    assert!(jam.loses_place(&fields(Some("Paris"), Some("FR"), None)));
+    assert!(!jam.loses_place(&fields(Some("Paris"), Some("FR"), Some(45.7))));
+}
+
+#[test]
+fn submitting_and_publishing_announce_a_jam() {
+    assert!(Submit.announces() && Publish.announces());
+    for transition in [CloseRegistration, Complete, Cancel] {
+        assert!(!transition.announces(), "{transition:?}");
     }
 }
 

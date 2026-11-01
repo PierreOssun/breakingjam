@@ -4,6 +4,8 @@ import {
   directionsUrl,
   firstStart,
   initialsOf,
+  openingHours,
+  placeLine,
   primaryAction,
   shareTitle,
   totalPrizes,
@@ -87,9 +89,9 @@ describe("the primary action", () => {
     expect(
       actionCaption({ status: "registration_closed", registration_url: url }),
     ).toBe("closed");
-    expect(actionCaption({ status: "published", registration_url: null })).toBe(
-      "spectators",
-    );
+    expect(
+      actionCaption({ status: "published", registration_url: null }),
+    ).toBeNull();
     expect(
       actionCaption({ status: "completed", registration_url: null }),
     ).toBeNull();
@@ -185,6 +187,33 @@ describe("sharing and directions", () => {
     expect(shareTitle(jam, "en")).toMatch(
       /^Paris Cypher · Sat,? 8 Jun · Paris$/,
     );
+    // A draft without a venue stops at the date.
+    expect(shareTitle({ ...jam, city: null }, "en")).toMatch(
+      /^Paris Cypher · Sat,? 8 Jun$/,
+    );
+  });
+
+  it("names the place as far as the draft knows it", () => {
+    expect(placeLine({ city: "Zürich", country: "CH" }, "en")).toBe(
+      "Zürich, Switzerland",
+    );
+    expect(placeLine({ city: "Zürich", country: "CH" }, "fr")).toBe(
+      "Zürich, Suisse",
+    );
+    expect(placeLine({ city: null, country: "CH" }, "en")).toBe("Switzerland");
+    expect(placeLine({ city: null, country: null }, "en")).toBeNull();
+  });
+
+  it("shows the jam's own hours once it opens at a known time", () => {
+    expect(
+      openingHours({ opens_at: "14:00:00", closes_at: "21:30:00" }, "en"),
+    ).toEqual({ from: "14:00", to: "21:30" });
+    expect(
+      openingHours({ opens_at: "14:00:00", closes_at: null }, "de"),
+    ).toEqual({ from: "14:00", to: null });
+    expect(
+      openingHours({ opens_at: null, closes_at: "21:00:00" }, "en"),
+    ).toBeNull();
   });
 
   it("opens the platform's maps app", () => {

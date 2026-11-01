@@ -20,7 +20,7 @@ fn jam() -> Value {
 async fn published_jam(app: &Router, pool: &PgPool) -> (String, String) {
     let owner = sign_up(app, "owner@example.com").await;
     let id = id_of(&send(app, post("/api/events", jam(), Some(&owner))).await);
-    publish(app, pool, &id, &owner).await;
+    publish(pool, &id).await;
     (id, owner)
 }
 

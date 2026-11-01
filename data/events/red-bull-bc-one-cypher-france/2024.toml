@@ -1,0 +1,31 @@
+name = "Red Bull BC One Cypher France 2024"
+starts_on = 2024-04-14
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+venue = "Le Centquatre"
+lat = 48.89
+lng = 2.3707
+sources = [
+  "https://www.sortiraparis.com/en/what-to-do-in-paris/sport-wellness/articles/301007-red-bull-bc-one-the-best-of-french-breaking-at-the-centquatre-with-battles-and-workshops",
+  "https://www.redbull.com/fr-fr/red-bull-bc-one-cypher-france-2025-vainqueurs",
+]
+
+# The winner of the Killian vs Shlag final is unconfirmed, so both stay finalists.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "killian", reached = "top2", video = "https://youtu.be/1aXbyoiqS1E" },
+  { entrant = "shlag", reached = "top2", video = "https://youtu.be/1aXbyoiqS1E" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "syssy", reached = "winner", video = "https://youtu.be/5Oz1Uj46Krw" },
+  { entrant = "kimie", reached = "top2", video = "https://youtu.be/5Oz1Uj46Krw" },
+]

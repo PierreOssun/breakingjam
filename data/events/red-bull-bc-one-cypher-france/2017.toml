@@ -1,0 +1,22 @@
+name = "Red Bull BC One Cypher France 2017"
+starts_on = 2017-07-09
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8534
+lng = 2.3488
+sources = [
+  "https://web.archive.org/web/20170807193220/http://bcone.redbull.com/en_INT/event/red-bull-bc-one-france-cypher-2017",
+  "https://viacomit.net/tag/red-bull-bc-one/",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "pac-pac", reached = "winner", video = "https://youtu.be/cXIaYboNLcM" },
+  { entrant = "damani", reached = "top2", video = "https://youtu.be/cXIaYboNLcM" },
+  { entrant = "bruce-wayne", reached = "top4", video = "https://youtu.be/J_ZIW6MarM8" },
+  { entrant = "chakal", reached = "top4", video = "https://youtu.be/OwY8hOIrmSw" },
+]

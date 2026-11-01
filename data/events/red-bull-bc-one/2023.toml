@@ -7,7 +7,7 @@ lat = 48.8472
 lng = 2.2464
 venue = "Roland-Garros"
 sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://thesource.com/?p=695134"]
-judges = ["flea-rock", "movie-one", "dr-hill", "babyson", "kill"]
+judges = ["flea-rock", "movie-one", "hill", "babyson", "kill"]
 mcs = ["amjad", "myverse"]
 djs = ["dj-one-up"]
 

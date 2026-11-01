@@ -25,7 +25,7 @@ use crate::{
     db::{self, events::MapPoint},
     domain::{
         battle::{Battle, Category, starts_during},
-        event::{Event, EventFields, EventStatus, Transition, can_write},
+        event::{Event, EventFields, EventStatus, Missing, Transition, can_write},
         organizer::OrganizerRef,
     },
     error::{AppError, ErrorEnvelope, InvalidCursor, InvalidFields, JamNotVisible, Unauthorized},
@@ -321,7 +321,7 @@ async fn create(
     Ok((StatusCode::CREATED, Json(event)))
 }
 
-/// Replace a jam's fields; slug and status never change here.
+/// Replace a jam's fields; slug and status never change here, and past draft the place stays.
 #[utoipa::path(
     put,
     path = "/events/{id}",
@@ -335,7 +335,7 @@ async fn create(
         Unauthorized,
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
         JamNotVisible,
-        InvalidFields,
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields, or a jam past draft losing its city, country or pin (`place`)", body = ErrorEnvelope),
     )
 )]
 async fn update(
@@ -344,8 +344,13 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<EventFields>,
 ) -> Result<Json<Event>, AppError> {
-    writable(&state, &current, id).await?;
+    let event = writable(&state, &current, id).await?;
     check_days(&state, id, &fields).await?;
+    // Past draft, the map, the lists and the stats count on the place staying (M24). Only what
+    // it has can be lost: a jam published without a pin before the checklist keeps saving.
+    if event.status != EventStatus::Draft && event.loses_place(&fields) {
+        AppError::check(vec![Missing::Place.as_field()])?;
+    }
     Ok(Json(db::events::update(&state.pool, id, &fields).await?))
 }
 
@@ -414,6 +419,7 @@ async fn delete(
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+, or `publish` by an organiser", body = ErrorEnvelope),
         JamNotVisible,
         (status = CONFLICT, description = "The current status does not allow it", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "`submit` or `publish` before the venue is on the map and a battle exists; `fields` names `place` and `battles`", body = ErrorEnvelope),
     )
 )]
 async fn transition(
@@ -427,6 +433,17 @@ async fn transition(
         .status
         .apply(transition)
         .map_err(|err| AppError::Conflict(err.to_string()))?;
+    if transition.announces() {
+        // The publish checklist (M24): a venue on the map and at least one battle.
+        let battles = db::battles::list(&state.pool, id).await?.len();
+        AppError::check(
+            event
+                .missing(battles)
+                .into_iter()
+                .map(Missing::as_field)
+                .collect(),
+        )?;
+    }
     db::events::set_status(&state.pool, id, event.status, next)
         .await?
         .map(Json)

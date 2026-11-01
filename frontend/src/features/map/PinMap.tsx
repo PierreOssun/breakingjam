@@ -73,7 +73,7 @@ export default function PinMap({ value, onChange }: PinMapProps) {
           >
             <span
               role="img"
-              aria-label={t("org.location.pin")}
+              aria-label={t("org.venue.pin")}
               className="block size-7 cursor-grab rounded-full border-2 border-marker-ring bg-primary shadow-selected"
             />
           </Marker>

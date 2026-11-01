@@ -12,10 +12,17 @@ import {
   formatOffset,
   parseOffset,
 } from "../../../src/features/jams/entryFields";
+import type { TFunction } from "i18next";
 import {
+  brokenSpot,
+  checklist,
   emptyJam,
   jamBody,
+  jamProblems,
   jamValues,
+  sameJam,
+  startBody,
+  withheld,
 } from "../../../src/features/jams/jamFields";
 
 describe("jam fields", () => {
@@ -24,16 +31,19 @@ describe("jam fields", () => {
       ...emptyJam(),
       name: "  Paris Cypher ",
       starts_on: "2030-06-01",
-      ends_on: "2030-06-01",
       city: " Paris ",
       country: "FR",
       venue_name: "  ",
+      opens_at: "14:00",
       registration_url: "https://example.com/register",
       contact_email: " hello@pariscypher.com ",
     });
     expect(body).toMatchObject({
       name: "Paris Cypher",
+      ends_on: "2030-06-01",
       city: "Paris",
+      opens_at: "14:00",
+      closes_at: null,
       venue_name: null,
       address: null,
       description: null,
@@ -44,34 +54,130 @@ describe("jam fields", () => {
       lng: null,
     });
   });
+
+  it("starts a jam from a name and a day, without a place", () => {
+    expect(startBody("Winter Cypher Jam", "2030-12-12")).toMatchObject({
+      name: "Winter Cypher Jam",
+      starts_on: "2030-12-12",
+      ends_on: "2030-12-12",
+      city: null,
+      country: null,
+      lat: null,
+    });
+  });
+
+  it("reads a one-day jam as a blank last day, and times as HH:MM", () => {
+    const stored = {
+      ...emptyJam(),
+      starts_on: "2030-06-08",
+      ends_on: "2030-06-08",
+      opens_at: "14:00:00",
+      closes_at: null,
+      city: null,
+      country: null,
+    } as never;
+    expect(jamValues(stored)).toMatchObject({
+      ends_on: "",
+      opens_at: "14:00",
+      closes_at: "",
+      city: "",
+      country: "",
+    });
+    expect(
+      jamValues({ ...(stored as object), ends_on: "2030-06-09" } as never)
+        .ends_on,
+    ).toBe("2030-06-09");
+  });
+
+  it("lists what a draft still needs to go public", () => {
+    const missing = (...args: Parameters<typeof checklist>) =>
+      checklist(...args)
+        .filter((item) => !item.done)
+        .map((item) => item.key);
+    const bare = { city: null, country: null, lat: null, lng: null };
+    expect(missing(bare, 0)).toEqual(["place", "battle"]);
+    expect(missing({ ...bare, city: "Zürich", country: "CH" }, 1)).toEqual([
+      "place",
+    ]);
+    const placed = { city: "Zürich", country: "CH", lat: 47.38, lng: 8.54 };
+    expect(missing(placed, 1)).toEqual([]);
+    expect(checklist(placed, 0).find((i) => !i.done)?.block).toBe("battles");
+  });
+});
+
+describe("what the API would refuse", () => {
+  const t = ((key: string) => key) as unknown as TFunction;
+  const fine = { ...emptyJam(), name: "Jam", starts_on: "2030-06-01" };
+  const problems = (changes: object, kept?: typeof fine) =>
+    jamProblems({ ...fine, ...changes }, t, kept);
+
+  it("finds nothing wrong with a bare draft", () => {
+    expect(problems({})).toEqual({});
+  });
+
+  it("wants a name and a first day, in the right order", () => {
+    expect(problems({ name: "  " })).toEqual({ name: "validation.required" });
+    expect(problems({ starts_on: "" })).toEqual({
+      starts_on: "validation.required",
+    });
+    expect(problems({ ends_on: "2030-05-31" })).toEqual({
+      ends_on: "validation.endsBeforeStarts",
+    });
+    expect(problems({ ends_on: "2030-06-01" })).toEqual({});
+  });
+
+  it("reads links and emails as the API does, blanks allowed", () => {
+    expect(problems({ website_url: "www.myjam.com" })).toEqual({
+      website_url: "validation.url",
+    });
+    expect(problems({ instagram_url: "https://exa mple.com" })).toEqual({
+      instagram_url: "validation.url",
+    });
+    expect(problems({ registration_url: " https://example.com " })).toEqual({});
+    expect(problems({ contact_email: "hello at" })).toEqual({
+      contact_email: "validation.email",
+    });
+    expect(problems({ contact_email: " hello@jam.com " })).toEqual({});
+  });
+
+  it("counts what is sent, trimmed", () => {
+    expect(problems({ description: "x".repeat(201) })).toEqual({
+      description: "validation.tooLong",
+    });
+    expect(problems({ description: `${"x".repeat(200)}  ` })).toEqual({});
+  });
+
+  it("keeps the city and country of a jam past draft", () => {
+    const stored = { ...fine, city: "Paris", country: "FR" };
+    expect(problems({ city: "  ", country: "" }, stored)).toEqual({
+      city: "validation.required",
+      country: "validation.required",
+    });
+    expect(problems({ city: "Lyon", country: "FR" }, stored)).toEqual({});
+    // A draft, or a place it never had, has nothing to keep.
+    expect(problems({ city: "" })).toEqual({});
+    expect(problems({ city: "" }, fine)).toEqual({});
+  });
+
+  it("holds back only the fields with a problem", () => {
+    const stored = { ...fine, website_url: "https://old.example" };
+    const typed = { ...stored, website_url: "nope", description: "New." };
+    const next = withheld(typed, stored, { website_url: "validation.url" });
+    expect(next).toEqual({ ...typed, website_url: "https://old.example" });
+    expect(sameJam(next, stored)).toBe(false);
+    expect(sameJam({ ...stored, name: " Jam " }, stored)).toBe(true);
+  });
+
+  it("leads to the first field at fault, not to what concerns the whole jam", () => {
+    expect(brokenSpot({})).toBeNull();
+    expect(brokenSpot({ root: "Something went wrong." })).toBeNull();
+    expect(brokenSpot({ name: "x" })).toBe("title");
+    expect(brokenSpot({ contact_email: "x", city: "x" })).toBe("venue");
+    expect(brokenSpot({ ends_on: "x", root: undefined })).toBe("dates");
+  });
 });
 
 const DAY = "2030-06-01";
-
-describe("one-day jams", () => {
-  it("send their single date as both days", () => {
-    const body = jamBody({
-      ...emptyJam(),
-      one_day: true,
-      starts_on: "2030-06-08",
-      ends_on: "2030-06-12",
-    });
-    expect([body.starts_on, body.ends_on]).toEqual([
-      "2030-06-08",
-      "2030-06-08",
-    ]);
-  });
-
-  it("open ticked when the stored days are the same", () => {
-    const jam = { ...emptyJam(), starts_on: "2030-06-08" } as never;
-    expect(
-      jamValues({ ...(jam as object), ends_on: "2030-06-08" } as never).one_day,
-    ).toBe(true);
-    expect(
-      jamValues({ ...(jam as object), ends_on: "2030-06-09" } as never).one_day,
-    ).toBe(false);
-  });
-});
 
 describe("battle fields", () => {
   it("sends a start only with a time, on the chosen day", () => {

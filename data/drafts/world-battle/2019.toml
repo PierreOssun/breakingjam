@@ -1,0 +1,11 @@
+name = "The World Battle 2019"
+# check: only porto.pt's summary gives the dates (29 April to 5 May); venue unknown
+starts_on = 2019-04-29
+ends_on = 2019-05-05
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+lat = 41.1485
+lng = -8.6110
+sources = ["https://porto.pt/en/news/the-world-battle-is-coming-to-porto"]
+judges = []

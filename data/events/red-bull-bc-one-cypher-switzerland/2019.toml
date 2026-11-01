@@ -1,0 +1,29 @@
+name = "Red Bull BC One Cypher Switzerland 2019"
+starts_on = 2019-09-29  # the day of the official livestream, the last day of the Biel camp
+timezone = "Europe/Zurich"
+city = "Biel/Bienne"
+country = "CH"
+lat = 47.1402
+lng = 7.2439
+sources = [
+  "https://www.youtube.com/watch?v=hGyrUKBXo1s",
+  "https://www.redbull.com/ch-de/red-bull-bc-one-switzerland-hall-of-fame",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "moa", reached = "winner", video = "https://youtu.be/MFHb8yqGEoA" },
+  { entrant = "shaymin", reached = "top2", video = "https://youtu.be/MFHb8yqGEoA" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "vlo", reached = "winner", video = "https://youtu.be/hAMrlKSsjoA" },
+  { entrant = "jazzy-jes", reached = "top2", video = "https://youtu.be/hAMrlKSsjoA" },
+]

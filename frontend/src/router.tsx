@@ -76,7 +76,7 @@ export const routes: RouteObject[] = [
           {
             path: "/org/jams/new",
             lazy: async () => ({
-              Component: (await import("./routes/OrgJamNewPage")).OrgJamNewPage,
+              Component: (await import("./routes/OrgJamsPage")).OrgJamNewPage,
             }),
           },
           {

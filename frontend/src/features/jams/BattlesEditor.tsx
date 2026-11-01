@@ -4,6 +4,7 @@ import {
   PencilSimple,
   Plus,
   Trash,
+  Trophy,
 } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -12,16 +13,17 @@ import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
 import { IconButton } from "../../components/IconButton";
-import { InlineEmpty } from "../../components/InlineEmpty";
 import { useToast } from "../../components/useToast";
 import { daysOf } from "../../lib/dates";
 import { BattleDialog } from "./BattleDialog";
+import { BlockCard, EmptyBlock } from "./EditorBlock";
 import { prizeLine, presetOf } from "./battleFields";
 import { useBattles } from "./queries";
 
 type Battle = Schemas["Battle"];
 
-/** A jam's battles in display order: add, edit, reorder, delete. */
+/** The editor's Battles block (M24): "+ Add" while there are none, else the battles in display
+ * order with add, edit, reorder and delete. */
 export function BattlesEditor({
   jam,
 }: {
@@ -71,14 +73,55 @@ export function BattlesEditor({
     reorder.mutate(ids);
   };
 
-  return (
-    <section aria-labelledby="battles-title" className="flex flex-col gap-4">
-      <h2 id="battles-title" className="font-display text-display-md">
-        {t("jam.battles")}
-      </h2>
-      {battles.data && list.length === 0 && (
-        <InlineEmpty>{t("org.battles.none")}</InlineEmpty>
+  const dialogs = (
+    <>
+      {editing !== null && (
+        <BattleDialog
+          jamId={jamId}
+          days={daysOf(jam.starts_on, jam.ends_on)}
+          battle={editing === "new" ? undefined : editing}
+          onClose={() => setEditing(null)}
+        />
       )}
+      {deleting && (
+        <Dialog
+          onClose={() => setDeleting(null)}
+          title={t("org.battles.deleteTitle")}
+          action={{
+            label: t("org.battles.deleteConfirm"),
+            loading: remove.isPending,
+            onClick: () => remove.mutate(deleting),
+          }}
+        >
+          <p className="text-body text-muted">
+            {t("org.battles.deleteBody", { name: deleting.name })}
+          </p>
+        </Dialog>
+      )}
+    </>
+  );
+  if (!battles.data) return null;
+  if (list.length === 0) {
+    return (
+      <>
+        <EmptyBlock
+          id="battles"
+          icon={<Trophy size={20} weight="bold" />}
+          title={t("jam.battles")}
+          required
+          hint={t("org.blocks.battlesHint")}
+          onAdd={() => setEditing("new")}
+        />
+        {dialogs}
+      </>
+    );
+  }
+  return (
+    <BlockCard
+      id="battles"
+      icon={<Trophy size={20} weight="bold" />}
+      title={t("jam.battles")}
+    >
       <ol className="flex flex-col gap-4">
         {list.map((battle, index) => (
           <li
@@ -132,31 +175,8 @@ export function BattlesEditor({
         <Plus size={20} weight="bold" aria-hidden />
         {t("org.battles.add")}
       </Button>
-
-      {editing !== null && (
-        <BattleDialog
-          jamId={jamId}
-          days={daysOf(jam.starts_on, jam.ends_on)}
-          battle={editing === "new" ? undefined : editing}
-          onClose={() => setEditing(null)}
-        />
-      )}
-      {deleting && (
-        <Dialog
-          onClose={() => setDeleting(null)}
-          title={t("org.battles.deleteTitle")}
-          action={{
-            label: t("org.battles.deleteConfirm"),
-            loading: remove.isPending,
-            onClick: () => remove.mutate(deleting),
-          }}
-        >
-          <p className="text-body text-muted">
-            {t("org.battles.deleteBody", { name: deleting.name })}
-          </p>
-        </Dialog>
-      )}
-    </section>
+      {dialogs}
+    </BlockCard>
   );
 }
 

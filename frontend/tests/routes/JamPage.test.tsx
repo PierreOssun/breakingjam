@@ -403,6 +403,51 @@ describe("JamPage", () => {
     expect(screen.queryByText(/spots left|Full/)).not.toBeInTheDocument();
   });
 
+  it("shows the jam's own hours once announced, else the first battle's start", async () => {
+    mockJam({ opens_at: "14:00:00", closes_at: "21:30:00" });
+    renderApp(`/jams/${JAM.slug}`);
+    expect(
+      (await screen.findAllByText(/Sun,? 2 Jun(e 2030)? · 14:00–21:30$/))
+        .length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("says from when it opens, when only that is known", async () => {
+    mockJam({ opens_at: "14:00:00" });
+    renderApp(`/jams/${JAM.slug}`);
+    expect(
+      (await screen.findAllByText(/Sun,? 2 Jun(e 2030)? · from 14:00$/)).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("shows an organiser their draft before it has a venue", async () => {
+    mockJam(
+      {
+        status: "draft",
+        venue_name: null,
+        address: null,
+        city: null,
+        country: null,
+        lat: null,
+        lng: null,
+        can_edit: true,
+      },
+      { "GET /api/auth/me": { status: 200, body: LIL_G } },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+
+    expect(
+      await screen.findByRole("heading", { name: "Paris Cypher Sessions" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Draft")).toBeInTheDocument();
+    expect(screen.queryByText(/Paris, France/)).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Venue" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Edit jam" })).toHaveAttribute(
+      "href",
+      `/org/jams/${JAM.id}/edit`,
+    );
+  });
+
   it("plays an entry's video from its offset in the YouTube player", async () => {
     mockJam();
     renderApp(`/jams/${JAM.slug}`);

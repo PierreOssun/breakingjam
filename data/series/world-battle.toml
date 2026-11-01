@@ -1,0 +1,14 @@
+name = "The World Battle"
+city = "Porto"
+country = "PT"
+timezone = "Europe/Lisbon"
+
+[youtube]
+channels = ["UCQu4ixtMVb9TFJhZO1A2GpQ"]   # The World Battle
+title = "World Battle"
+battles = [
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["bboy", "b-boy", "1vs1", "1v1"] },
+  { key = "bgirl", name = "1v1 Bgirl", gender = "bgirl", words = ["bgirl", "b-girl"] },
+  { key = "crew", name = "Crew battle", sides = "crews", words = ["crew"] },
+  { key = "kids", name = "Kids", age = "kids", words = ["kids", "kidz"] },
+]

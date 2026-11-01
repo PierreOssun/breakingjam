@@ -1,0 +1,31 @@
+name = "Red Bull BC One Cypher Switzerland 2024"
+starts_on = 2024-04-20
+timezone = "Europe/Zurich"
+city = "Zürich"
+country = "CH"
+venue = "Halle 622"
+lat = 47.4134
+lng = 8.5429
+sources = [
+  "https://www.halle622.ch/622/de/event/detail/2024/red-bull-bc-one-cypher-switzerland.html",
+  "https://www.youtube.com/watch?v=dOPkPA3n1Gw",
+  "https://www.20min.ch/fr/story/red-bull-bc-one-deux-suisses-tenteront-de-se-qualifier-pour-la-finale-mondiale-103223484",
+]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "lotus", reached = "winner" },
+  { entrant = "neo", reached = "top16" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "becca", reached = "winner" },
+  { entrant = "warlene", reached = "top4" },
+]

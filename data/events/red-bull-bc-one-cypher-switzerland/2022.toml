@@ -1,0 +1,35 @@
+name = "Red Bull BC One Cypher Switzerland 2022"
+starts_on = 2022-06-12
+timezone = "Europe/Zurich"
+city = "Baden"
+country = "CH"
+venue = "Trafo Baden"
+lat = 47.4784
+lng = 8.3053
+sources = [
+  "https://www.youtube.com/watch?v=OOX6QXVGUQA",
+  "https://www.nau.ch/ort/baden/red-bull-bc-one-cypher-breakdance-spektakel-im-vollen-trafo-baden-66199553",
+  "https://www.20min.ch/story/wer-holt-sich-heute-die-schweizer-breakdance-krone-865373772269",
+  "https://socialize-magazine.ch/red-bull-bc-one-cypher-spectacle-de-breaking-a-guichets-fermes-au-trafo-de-baden/",
+]
+judges = ["junior", "san-andrea", "keys"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "baby-og", reached = "winner" },
+  { entrant = "deijva", reached = "top2" },
+  { entrant = "moa", reached = "top4", video = "https://youtu.be/VyQrtajgyrU" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "jazzy-jes", reached = "winner" },
+  { entrant = "becca", reached = "top2" },
+  { entrant = "jin", reached = "top4", video = "https://youtu.be/SZ31yORejeI" },
+]

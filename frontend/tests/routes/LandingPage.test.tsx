@@ -116,7 +116,7 @@ describe("LandingPage", () => {
       page.getByRole("heading", { name: "Next up near you" }),
     ).toBeInTheDocument();
     expect(
-      page.getByRole("heading", { name: "The scene so far" }),
+      page.getByRole("heading", { name: "BreakingJam so far" }),
     ).toBeInTheDocument();
     // One "Loading…" for the cards, one for the counts.
     expect(page.getAllByText("Loading…")).toHaveLength(2);
@@ -151,37 +151,63 @@ describe("LandingPage", () => {
     ).toBeNull();
   });
 
-  it("sums up the scene: counts, then the busiest countries", async () => {
+  const scene = async (stats: object) => {
     mockApi({
       "GET /api/auth/me": LOGGED_OUT,
-      "GET /api/stats": {
-        status: 200,
-        body: {
-          countries: 12,
-          battles: 1234,
-          dancers: 56,
-          battles_by_country: Array.from({ length: 11 }, (_, i) => ({
-            country: i === 0 ? "BE" : `A${String.fromCharCode(65 + i)}`,
-            battles: 28 - i,
-          })),
-        },
-      },
+      "GET /api/stats": { status: 200, body: stats },
     });
     renderApp("/");
-    const scene = (
-      await screen.findByRole("heading", { name: "The scene so far" })
+    return (
+      await screen.findByRole("heading", { name: "BreakingJam so far" })
     ).closest("section")!;
+  };
+
+  it("sums up the past and links what's coming up to the map", async () => {
+    const section = await scene({
+      battles_past: 1234,
+      dancers: 742,
+      battles_upcoming: 38,
+      countries_upcoming: 9,
+    });
 
     // The section shows at once, its counts once they arrive.
-    expect(await within(scene).findByText("1,234")).toBeInTheDocument();
-    expect(within(scene).getByText("battles")).toBeInTheDocument();
-    expect(within(scene).getByText("56")).toBeInTheDocument();
-    const chips = within(
-      within(scene).getByRole("list", { name: "Battles by country" }),
-    ).getAllByRole("listitem");
-    // The ten busiest countries, then how many more.
-    expect(chips).toHaveLength(11);
-    expect(chips[0]).toHaveTextContent("Belgium28");
-    expect(chips.at(-1)).toHaveTextContent("+1 more");
+    expect(await within(section).findByText("1,234")).toBeInTheDocument();
+    expect(within(section).getByText("Past")).toBeInTheDocument();
+    expect(within(section).getByText("742")).toBeInTheDocument();
+    expect(within(section).getByText("dancers")).toBeInTheDocument();
+    const upcoming = within(section).getByRole("link", { name: /Coming up/ });
+    expect(upcoming).toHaveAttribute("href", "/map");
+    expect(upcoming).toHaveTextContent("38battles");
+    expect(upcoming).toHaveTextContent("in9countries");
+  });
+
+  it("uses the singular for one", async () => {
+    const section = await scene({
+      battles_past: 1,
+      dancers: 1,
+      battles_upcoming: 1,
+      countries_upcoming: 1,
+    });
+
+    const upcoming = await within(section).findByRole("link", {
+      name: /Coming up/,
+    });
+    expect(upcoming).toHaveTextContent("1battle");
+    expect(upcoming).toHaveTextContent("in1country");
+    expect(upcoming).not.toHaveTextContent("battles");
+    expect(within(section).getByText("dancer")).toBeInTheDocument();
+  });
+
+  it("hides what's coming up with no upcoming battle", async () => {
+    const section = await scene({
+      battles_past: 263,
+      dancers: 742,
+      battles_upcoming: 0,
+      countries_upcoming: 0,
+    });
+
+    expect(await within(section).findByText("263")).toBeInTheDocument();
+    expect(within(section).queryByText("Coming up")).toBeNull();
+    expect(within(section).queryByRole("link")).toBeNull();
   });
 });
