@@ -13,10 +13,11 @@ use uuid::Uuid;
 use super::{
     json::ValidJson,
     page::{self, Page},
+    transaction,
 };
 use crate::{
     auth::session::{CurrentUser, MaybeUser},
-    db,
+    db::{self, dancers::MergeLock},
     domain::{
         crew::CrewRef,
         dancer::{self, Dancer, DancerFields, DancerSource, DancerSummary, Participation},
@@ -209,22 +210,27 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<DancerFields>,
 ) -> Result<Json<DancerResponse>, AppError> {
-    // Locked, so the logged change is against the version the update replaces.
-    let mut tx = state.pool.begin().await?;
-    let old = db::dancers::find_for_update(&mut tx, id)
-        .await?
-        .filter(|d| d.merged_into_id.is_none())
-        .ok_or(AppError::NotFound)?;
-    if !old.can_edit(&current.user) {
-        return Err(AppError::Forbidden);
-    }
-    let new = db::dancers::update(&mut tx, id, &fields).await?;
-    // §4: every change to an unverified dancer is kept in `dancer_edits`.
-    if old.verified_at.is_none() {
-        let changes = dancer::changes(&old, &new);
-        db::dancers::log_edits(&mut tx, id, current.user.id, &changes).await?;
-    }
-    tx.commit().await?;
+    let (pool, user, fields) = (&state.pool, &current.user, &fields);
+    let new = transaction::retrying(move || async move {
+        let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
+        // Locked, so the logged change is against the version the update replaces.
+        let old = db::dancers::find_for_update(&mut tx, id)
+            .await?
+            .filter(|d| d.merged_into_id.is_none())
+            .ok_or(AppError::NotFound)?;
+        if !old.can_edit(user) {
+            return Err(AppError::Forbidden);
+        }
+        let new = db::dancers::update(&mut tx, id, fields).await?;
+        // §4: every change to an unverified dancer is kept in `dancer_edits`.
+        if old.verified_at.is_none() {
+            let changes = dancer::changes(&old, &new);
+            db::dancers::log_edits(&mut tx, id, user.id, &changes).await?;
+        }
+        tx.commit().await?;
+        Ok(new)
+    })
+    .await?;
     respond(&state, new, Some(&current)).await.map(Json)
 }
 

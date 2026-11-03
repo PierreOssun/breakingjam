@@ -29,14 +29,14 @@ pub async fn search(
 }
 
 /// A crew that is not soft-deleted.
-pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Crew>> {
+pub async fn find(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<Option<Crew>> {
     sqlx::query_as!(
         Crew,
         "select id, name, country, city, instagram_handle, created_at, updated_at
          from crews where id = $1 and deleted_at is null",
         id,
     )
-    .fetch_optional(pool)
+    .fetch_optional(db)
     .await
 }
 

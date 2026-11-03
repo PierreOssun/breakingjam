@@ -16,6 +16,7 @@ pub(crate) mod page;
 mod places;
 mod reviews;
 mod stats;
+mod transaction;
 
 use utoipa_axum::router::OpenApiRouter;
 

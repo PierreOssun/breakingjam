@@ -115,8 +115,9 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
 pub async fn of_user(pool: &PgPool, user_id: Uuid) -> sqlx::Result<Option<DancerRef>> {
     sqlx::query_as!(
         DancerRef,
-        "select id, dancer_name, country, country2, instagram_handle, avatar_url, avatar_parts
-         from dancers where user_id = $1 and deleted_at is null and merged_into_id is null",
+        r#"select id, dancer_name, country, country2, instagram_handle, avatar_url, avatar_parts,
+                  false as "deleted!"
+           from dancers where user_id = $1 and deleted_at is null and merged_into_id is null"#,
         user_id,
     )
     .fetch_optional(pool)
@@ -445,15 +446,40 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
         .collect())
 }
 
-/// How many of `ids` are live dancers (not deleted, not merged).
-pub async fn count_live(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<i64> {
-    sqlx::query_scalar!(
+/// Whether every one of `ids` may be referenced: live, or deleted but already in `kept`.
+pub async fn usable(conn: &mut PgConnection, ids: &[Uuid], kept: &[Uuid]) -> sqlx::Result<bool> {
+    let count = sqlx::query_scalar!(
         r#"select count(*) as "count!" from dancers
-           where id = any($1) and deleted_at is null and merged_into_id is null"#,
+           where id = any($1) and merged_into_id is null and (deleted_at is null or id = any($2))"#,
         ids,
+        kept,
     )
-    .fetch_one(pool)
-    .await
+    .fetch_one(conn)
+    .await?;
+    Ok(count == ids.len() as i64)
+}
+
+/// The advisory lock merges hold; any number, as long as nothing else uses it.
+const MERGE_LOCK: i64 = 0x6d65_7267_6573;
+
+/// How a transaction stands toward merges, which run alone (ARCHITECTURE.md "Concurrency").
+#[derive(Debug, Clone, Copy)]
+pub enum MergeLock {
+    /// A merge: waits for the writes below to finish and holds new ones off.
+    Exclusive,
+    /// A write to dancers or what points at them: runs beside others, never beside a merge.
+    Shared,
+}
+
+/// Takes the merge lock for the rest of the transaction.
+pub async fn lock_merges(conn: &mut PgConnection, mode: MergeLock) -> sqlx::Result<()> {
+    match mode {
+        MergeLock::Exclusive => sqlx::query!("select pg_advisory_xact_lock($1)", MERGE_LOCK),
+        MergeLock::Shared => sqlx::query!("select pg_advisory_xact_lock_shared($1)", MERGE_LOCK),
+    }
+    .execute(conn)
+    .await?;
+    Ok(())
 }
 
 /// Gives the dancers nobody has drawn yet the look a bgirl or bboy battle suggests; a mixed

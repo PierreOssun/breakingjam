@@ -5,16 +5,18 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
+use sqlx::PgConnection;
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use super::{
     events::{readable, writable},
     json::ValidJson,
+    transaction,
 };
 use crate::{
     auth::session::{CurrentUser, MaybeUser},
-    db,
+    db::{self, dancers::MergeLock},
     domain::{
         battle::{
             Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, MAX_BATTLES,
@@ -208,7 +210,9 @@ async fn list_entries(
         .await?
         .ok_or(AppError::NotFound)?;
     readable(&state, &current, &battle.event_id.to_string()).await?;
-    Ok(Json(db::battles::entries(&state.pool, battle_id).await?))
+    Ok(Json(
+        db::battles::entries(&mut *state.pool.acquire().await?, battle_id).await?,
+    ))
 }
 
 /// Register an entry; results may be set at once for past jams.
@@ -235,12 +239,21 @@ async fn create_entry(
     Path(battle_id): Path<Uuid>,
     ValidJson(mut fields): ValidJson<EntryFields>,
 ) -> Result<(StatusCode, Json<Entry>), AppError> {
-    let (battle, _) = writable_battle(&state, &current, battle_id).await?;
-    check_entry(&state, &battle, &mut fields, None).await?;
-    let mut tx = state.pool.begin().await?;
-    let id = db::battles::insert_entry(&mut tx, battle_id, battle.gender, &fields).await?;
-    tx.commit().await?;
-    let entry = db::battles::find_entry(&state.pool, id)
+    writable_battle(&state, &current, battle_id).await?;
+    fields.normalize();
+    let (pool, fields) = (&state.pool, &fields);
+    let id = transaction::retrying(move || async move {
+        let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
+        let battle = lock_battle(&mut tx, battle_id).await?;
+        AppError::check(fields.errors_for(&battle))?;
+        check_members(&mut tx, &fields.dancer_ids, &[]).await?;
+        check_entry(&mut tx, &battle, fields, None).await?;
+        let id = db::battles::insert_entry(&mut tx, battle_id, battle.gender, fields).await?;
+        tx.commit().await?;
+        Ok(id)
+    })
+    .await?;
+    let entry = db::battles::find_entry(&mut *state.pool.acquire().await?, id)
         .await?
         .ok_or(AppError::NotFound)?;
     Ok((StatusCode::CREATED, Json(entry)))
@@ -270,15 +283,28 @@ async fn update_entry(
     Path(id): Path<Uuid>,
     ValidJson(mut fields): ValidJson<EntryFields>,
 ) -> Result<Json<Entry>, AppError> {
-    let entry = db::battles::find_entry(&state.pool, id)
+    let entry = db::battles::find_entry(&mut *state.pool.acquire().await?, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    let (battle, _) = writable_battle(&state, &current, entry.battle_id).await?;
-    check_entry(&state, &battle, &mut fields, Some(id)).await?;
-    let mut tx = state.pool.begin().await?;
-    db::battles::update_entry(&mut tx, id, battle.gender, &fields).await?;
-    tx.commit().await?;
-    let entry = db::battles::find_entry(&state.pool, id)
+    writable_battle(&state, &current, entry.battle_id).await?;
+    fields.normalize();
+    let (pool, fields, battle_id) = (&state.pool, &fields, entry.battle_id);
+    transaction::retrying(move || async move {
+        let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
+        let battle = lock_battle(&mut tx, battle_id).await?;
+        // Read again under the battle's lock: another save may have changed it since.
+        let entry = db::battles::find_entry(&mut tx, id)
+            .await?
+            .ok_or(AppError::NotFound)?;
+        let members: Vec<Uuid> = entry.members.iter().map(|m| m.id).collect();
+        AppError::check(fields.errors_for(&battle))?;
+        check_members(&mut tx, &fields.dancer_ids, &members).await?;
+        check_entry(&mut tx, &battle, fields, Some(&entry)).await?;
+        db::battles::update_entry(&mut tx, id, battle.gender, fields).await?;
+        Ok(tx.commit().await?)
+    })
+    .await?;
+    let entry = db::battles::find_entry(&mut *state.pool.acquire().await?, id)
         .await?
         .ok_or(AppError::NotFound)?;
     Ok(Json(entry))
@@ -304,7 +330,7 @@ async fn remove_entry(
     current: CurrentUser,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, AppError> {
-    let entry = db::battles::find_entry(&state.pool, id)
+    let entry = db::battles::find_entry(&mut *state.pool.acquire().await?, id)
         .await?
         .ok_or(AppError::NotFound)?;
     writable_battle(&state, &current, entry.battle_id).await?;
@@ -361,12 +387,19 @@ async fn replace_staff(
     let mut dancer_ids: Vec<Uuid> = staff.iter().map(|s| s.dancer_id).collect();
     dancer_ids.sort();
     dancer_ids.dedup();
-    if db::dancers::count_live(&state.pool, &dancer_ids).await? != dancer_ids.len() as i64 {
-        return Err(AppError::invalid("staff", "unknown dancer"));
-    }
-    let mut tx = state.pool.begin().await?;
-    db::events::replace_staff(&mut tx, event_id, &staff).await?;
-    tx.commit().await?;
+    let (pool, staff, dancer_ids) = (&state.pool, &staff, &dancer_ids);
+    transaction::retrying(move || async move {
+        let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
+        // One save of the jam's staff at a time, so the list it replaces is the one it reads here.
+        db::events::lock(&mut tx, event_id).await?;
+        let kept = db::events::staff_ids(&mut tx, event_id).await?;
+        if !db::dancers::usable(&mut tx, dancer_ids, &kept).await? {
+            return Err(AppError::invalid("staff", "unknown dancer"));
+        }
+        db::events::replace_staff(&mut tx, event_id, staff).await?;
+        Ok(tx.commit().await?)
+    })
+    .await?;
     Ok(Json(db::events::staff(&state.pool, event_id).await?))
 }
 
@@ -407,39 +440,56 @@ async fn check_room(state: &AppState, event_id: Uuid) -> Result<(), AppError> {
     }
 }
 
-/// Normalises the entry, then checks the §4 rules: domain, referenced rows, one entry per
-/// dancer per battle and `max_entries`; a withdrawn entry only needs the first two.
-async fn check_entry(
-    state: &AppState,
-    battle: &Battle,
-    fields: &mut EntryFields,
-    except_entry: Option<Uuid>,
+/// The battle, locked and read again: entries count against its current limit one save at a time.
+async fn lock_battle(conn: &mut PgConnection, id: Uuid) -> Result<Battle, AppError> {
+    db::battles::lock(&mut *conn, id).await?;
+    db::battles::find(conn, id).await?.ok_or(AppError::NotFound)
+}
+
+/// Checks the entry's dancers; a deleted one may only stay, as one of the entry's `members`.
+async fn check_members(
+    conn: &mut PgConnection,
+    dancer_ids: &[Uuid],
+    members: &[Uuid],
 ) -> Result<(), AppError> {
-    fields.normalize();
-    AppError::check(fields.errors_for(battle))?;
-    if db::dancers::count_live(&state.pool, &fields.dancer_ids).await?
-        != fields.dancer_ids.len() as i64
-    {
-        return Err(AppError::invalid("dancer_ids", "unknown dancer"));
+    if db::dancers::usable(conn, dancer_ids, members).await? {
+        Ok(())
+    } else {
+        Err(AppError::invalid("dancer_ids", "unknown dancer"))
     }
+}
+
+/// Checks the §4 rules left once the battle is locked: the crew, one entry per
+/// dancer per battle and `max_entries`; a withdrawn entry only needs the crew. `existing` is the
+/// entry being saved again: it may keep its deleted crew, and holds its place unless withdrawn.
+async fn check_entry(
+    conn: &mut PgConnection,
+    battle: &Battle,
+    fields: &EntryFields,
+    existing: Option<&Entry>,
+) -> Result<(), AppError> {
+    let kept_crew = existing.and_then(|e| e.crew.as_ref()).map(|crew| crew.id);
     if let Some(crew_id) = fields.crew_id
-        && db::crews::find(&state.pool, crew_id).await?.is_none()
+        && Some(crew_id) != kept_crew
+        && db::crews::find(&mut *conn, crew_id).await?.is_none()
     {
         return Err(AppError::invalid("crew_id", "unknown crew"));
     }
     if fields.status == EntryStatus::Withdrawn {
         return Ok(());
     }
-    if db::battles::already_entered(&state.pool, battle.id, &fields.dancer_ids, except_entry)
-        .await?
+    let except_entry = existing.map(|e| e.id);
+    if db::battles::already_entered(&mut *conn, battle.id, &fields.dancer_ids, except_entry).await?
     {
         return Err(AppError::Conflict(
             "a dancer is already entered in this battle".into(),
         ));
     }
-    if let Some(max) = battle.max_entries
-        && db::battles::active_entry_count(&state.pool, battle.id, except_entry).await?
-            >= i64::from(max)
+    // Lowering the limit must not lock out the entries already in: only a new place is counted.
+    let takes_a_place = existing.is_none_or(|e| e.status == EntryStatus::Withdrawn);
+    if takes_a_place
+        && let Some(max) = battle.max_entries
+        && db::battles::active_entry_count(conn, battle.id, except_entry).await? >= i64::from(max)
     {
         return Err(AppError::Conflict("battle is full".into()));
     }

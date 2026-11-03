@@ -12,22 +12,32 @@ type DancerChipProps = {
   badge?: ReactNode;
 };
 
-/** A link chip to a dancer page, with their avatar (DESIGN.md §4.12). */
+/** A link chip to a dancer page, with their avatar; a deleted dancer has no page, so no link (DESIGN.md §4.12). */
 export function DancerChip({ dancer, remove, badge }: DancerChipProps) {
+  const shape = `inline-flex h-full items-center gap-2 rounded-full pl-1 ${remove ? "pr-2" : badge ? "pr-1" : "pr-3.5"}`;
+  const content = (
+    <>
+      {/* The name says who it is; the avatar is decoration here. */}
+      <span aria-hidden className="inline-flex">
+        <DancerAvatar dancer={dancer} size="chip" />
+      </span>
+      {dancer.dancer_name}
+      {badge && " "}
+      {badge}
+    </>
+  );
   return (
     <span className="relative inline-flex h-9 items-center rounded-full border border-border-strong text-body-sm font-bold text-text">
-      <Link
-        to={`/dancers/${dancer.id}`}
-        className={`inline-flex h-full items-center gap-2 rounded-full pl-1 transition-colors duration-fast hover:bg-surface-raised ${remove ? "pr-2" : badge ? "pr-1 after:absolute after:-inset-1 after:content-['']" : "pr-3.5 after:absolute after:-inset-1 after:content-['']"}`}
-      >
-        {/* The name says who it is; the avatar is decoration here. */}
-        <span aria-hidden className="inline-flex">
-          <DancerAvatar dancer={dancer} size="chip" />
-        </span>
-        {dancer.dancer_name}
-        {badge && " "}
-        {badge}
-      </Link>
+      {dancer.deleted ? (
+        <span className={shape}>{content}</span>
+      ) : (
+        <Link
+          to={`/dancers/${dancer.id}`}
+          className={`${shape} transition-colors duration-fast hover:bg-surface-raised ${remove ? "" : "after:absolute after:-inset-1 after:content-['']"}`}
+        >
+          {content}
+        </Link>
+      )}
       {remove && (
         <button
           type="button"

@@ -6,11 +6,13 @@ Read `ARCHITECTURE.md` first; it is the source of truth for scope, schema and ro
 - Stupid simple. The simplest code that passes the tests and reads top to bottom. If a reviewer needs a diagram, it is too complex.
 - Less is more. Fewer lines, fewer types, fewer files, fewer crates. Deleting code is a valid change.
 - Idiomatic Rust only. `Option`/`Result` with `?`, iterators over loops where clearer, enums over bool flags, newtypes over primitives with meaning, `impl Trait` over boxing, borrowing over cloning. No OOP emulation, no getters/setters, no `Rc<RefCell>` in server code.
+- Human friendly. Write code and comments in a human friendly manner: a person should understand them on a first read.
 - Fix smells on sight. Duplicated code, long parameter lists, deep nesting, boolean parameters, stringly-typed values, dead code, `unwrap` outside tests, `clone` to silence the borrow checker, `#[allow]` without a reason. When you touch a file and see one, fix it in the same change and say so.
 
 ## Design patterns
 - Default is no pattern: a module of plain types and functions.
 - Use a named pattern only when it removes real complexity. Allowed and expected here: newtype, an enum state machine for event status (`EventStatus::apply`; the status comes from the database at runtime, so typestate cannot check it), extractor (axum), repository-free data access (sqlx queries in `db/`, no trait layer), builder only via `derive` crates.
+- High-performance Rust: make the code lock-free or shard the locks; for shared state, use the actor/message-passing pattern with backpressure.
 - If a file deliberately uses a pattern, say so in the first line: `//! Pattern: extractor — the session cookie becomes a handler argument.` Otherwise no header.
 - Any new `trait` or generic parameter needs a one-line justification in the PR description. One implementation = no trait.
 

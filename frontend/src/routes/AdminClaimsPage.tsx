@@ -22,9 +22,9 @@ type Review = {
   code: string;
   created_at: string;
   user: Schemas["ClaimUser"];
-  /** The page being verified, and where it lives. */
+  /** The page being verified, and where it lives; null once a dancer page is deleted. */
   name: string;
-  to: string;
+  to: string | null;
   handle: string | null | undefined;
 };
 type ReviewPage = { items: Review[]; next_cursor?: string | null };
@@ -51,7 +51,7 @@ export function AdminClaimsPage() {
       items: data.items.map((c) => ({
         ...c,
         name: c.dancer.dancer_name,
-        to: `/dancers/${c.dancer.id}`,
+        to: c.dancer.deleted ? null : `/dancers/${c.dancer.id}`,
         handle: c.dancer.instagram_handle,
       })),
     };
@@ -182,9 +182,13 @@ function ClaimRow({ review, decide }: { review: Review; decide: DecideFn }) {
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 lg:flex-row lg:items-center">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <Link to={review.to} className="text-body font-extrabold underline">
-            {review.name}
-          </Link>
+          {review.to ? (
+            <Link to={review.to} className="text-body font-extrabold underline">
+              {review.name}
+            </Link>
+          ) : (
+            <span className="text-body font-extrabold">{review.name}</span>
+          )}
           {review.handle ? (
             <ExternalLink
               href={`https://instagram.com/${review.handle}`}

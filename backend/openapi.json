@@ -5129,7 +5129,8 @@
         "required": [
           "id",
           "dancer_name",
-          "country"
+          "country",
+          "deleted"
         ],
         "properties": {
           "id": {
@@ -5172,6 +5173,10 @@
               "null"
             ],
             "description": "The pixel avatar's chosen parts; null = seeded from the id."
+          },
+          "deleted": {
+            "type": "boolean",
+            "description": "The page is gone: the name stays on past results, with nothing to link to."
           }
         }
       },

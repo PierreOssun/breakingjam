@@ -1265,6 +1265,8 @@ export interface components {
             avatar_url?: string | null;
             /** @description The pixel avatar's chosen parts; null = seeded from the id. */
             avatar_parts?: string | null;
+            /** @description The page is gone: the name stays on past results, with nothing to link to. */
+            deleted: boolean;
         };
         /** @description A dancer page (§6): profile, current crews, and whether the caller may edit it. */
         DancerResponse: components["schemas"]["Dancer"] & {

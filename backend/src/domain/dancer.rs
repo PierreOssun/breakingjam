@@ -198,6 +198,8 @@ pub struct DancerRef {
     pub avatar_url: Option<String>,
     /// The pixel avatar's chosen parts; null = seeded from the id.
     pub avatar_parts: Option<String>,
+    /// The page is gone: the name stays on past results, with nothing to link to.
+    pub deleted: bool,
 }
 
 /// One appearance at a public jam: the jam, the battle when competing, the result when known.

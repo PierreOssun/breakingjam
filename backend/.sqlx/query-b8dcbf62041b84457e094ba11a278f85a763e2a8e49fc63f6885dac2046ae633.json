@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select m.entry_id, d.id, d.dancer_name, d.country, d.country2, d.instagram_handle,\n                d.avatar_url, d.avatar_parts\n         from entry_members m join dancers d on d.id = m.dancer_id\n         where m.entry_id = any($1)\n         order by lower(d.dancer_name), d.id",
+  "query": "select m.entry_id, d.id, d.dancer_name, d.country, d.country2, d.instagram_handle,\n                  d.avatar_url, d.avatar_parts, d.deleted_at is not null as \"deleted!\"\n           from entry_members m join dancers d on d.id = m.dancer_id\n           where m.entry_id = any($1)\n           order by lower(d.dancer_name), d.id",
   "describe": {
     "columns": [
       {
@@ -90,6 +90,12 @@
             "name": "avatar_parts"
           }
         }
+      },
+      {
+        "ordinal": 8,
+        "name": "deleted!",
+        "type_info": "Bool",
+        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -105,8 +111,9 @@
       true,
       true,
       true,
-      true
+      true,
+      null
     ]
   },
-  "hash": "70957ca3675a7e502b19af2a532bc2d6d547ff3215da8abf237cd1aeffaa8a7c"
+  "hash": "b8dcbf62041b84457e094ba11a278f85a763e2a8e49fc63f6885dac2046ae633"
 }

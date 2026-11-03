@@ -330,8 +330,8 @@ describe("entry fields", () => {
 
   it("names an entry by its team, else its members", () => {
     const members = [
-      { id: "a", dancer_name: "Lil G", country: "FR" },
-      { id: "b", dancer_name: "Ventus", country: "FR" },
+      { id: "a", dancer_name: "Lil G", country: "FR", deleted: false },
+      { id: "b", dancer_name: "Ventus", country: "FR", deleted: false },
     ];
     expect(entryLabel({ team_name: null, members })).toBe("Lil G & Ventus");
     expect(entryLabel({ team_name: "Floor Lords", members })).toBe(

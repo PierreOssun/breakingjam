@@ -445,3 +445,89 @@ async fn staff_is_replaced_as_a_whole(pool: PgPool) {
         StatusCode::FORBIDDEN
     );
 }
+
+#[sqlx::test]
+async fn an_entry_keeps_its_deleted_crew_but_no_entry_takes_one_on(pool: PgPool) {
+    let jam = jam(pool).await;
+    let duo = json!({ "format": "team", "team_size": 2, "gender": "bboy", "age": "adult", "age_min": 18 });
+    let battle = id_of(&jam.battle(duo).await);
+    let (a, b) = (jam.dancer("A").await, jam.dancer("B").await);
+    let (c, d) = (jam.dancer("C").await, jam.dancer("D").await);
+    let crew = json!({ "name": "Floor Lords", "country": "FR" });
+    let crew = id_of(&send(&jam.app, post("/api/crews", crew, Some(&jam.owner))).await);
+    let body = json!({ "dancer_ids": [a, b], "status": "confirmed", "crew_id": crew });
+    let entry = id_of(&jam.entry(&battle, body.clone()).await);
+    let gone = send(
+        &jam.app,
+        delete(&format!("/api/crews/{crew}"), Some(&jam.owner)),
+    )
+    .await;
+    assert_eq!(gone.status, StatusCode::NO_CONTENT);
+
+    // Someone else's delete must not block recording this entry's result.
+    let saved = send(
+        &jam.app,
+        put(&format!("/api/entries/{entry}"), body, Some(&jam.owner)),
+    )
+    .await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.json);
+    assert_eq!(saved.json["crew"]["id"], crew);
+
+    let body = json!({ "dancer_ids": [c, d], "status": "confirmed", "crew_id": crew });
+    let other = jam.entry(&battle, body).await;
+    assert_eq!(other.status, StatusCode::UNPROCESSABLE_ENTITY);
+    let body = json!({ "dancer_ids": [c, d], "status": "confirmed" });
+    let other = id_of(&jam.entry(&battle, body).await);
+    let body = json!({ "dancer_ids": [c, d], "status": "confirmed", "crew_id": crew });
+    let switched = send(
+        &jam.app,
+        put(&format!("/api/entries/{other}"), body, Some(&jam.owner)),
+    )
+    .await;
+    assert_eq!(switched.status, StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+#[sqlx::test]
+async fn a_battle_over_its_limit_still_saves_its_entries_but_takes_no_more(pool: PgPool) {
+    let jam = jam(pool).await;
+    let mut fields = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult",
+                             "age_min": 18, "max_entries": 3 });
+    let battle = id_of(&jam.battle(fields.clone()).await);
+    let mut entries = Vec::new();
+    let mut dancers = Vec::new();
+    for name in ["A", "B", "C"] {
+        let dancer = jam.dancer(name).await;
+        let body = json!({ "dancer_ids": [dancer], "status": "confirmed" });
+        entries.push(id_of(&jam.entry(&battle, body).await));
+        dancers.push(dancer);
+    }
+    fields["max_entries"] = json!(2);
+    let lowered = send(
+        &jam.app,
+        put(&format!("/api/battles/{battle}"), fields, Some(&jam.owner)),
+    )
+    .await;
+    assert_eq!(lowered.status, StatusCode::OK, "{}", lowered.json);
+    let save = |entry: &str, dancer: &str, status: &str| {
+        let body = json!({ "dancer_ids": [dancer], "status": status, "reached": "top4" });
+        put(&format!("/api/entries/{entry}"), body, Some(&jam.owner))
+    };
+
+    // An entry already in the battle keeps its place.
+    let saved = send(&jam.app, save(&entries[0], &dancers[0], "confirmed")).await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.json);
+    let withdrawn = send(&jam.app, save(&entries[1], &dancers[1], "withdrawn")).await;
+    assert_eq!(withdrawn.status, StatusCode::OK, "{}", withdrawn.json);
+
+    // Two active entries fill the new limit: coming back or joining takes a place there isn't.
+    let back = send(&jam.app, save(&entries[1], &dancers[1], "confirmed")).await;
+    assert_eq!(back.status, StatusCode::CONFLICT);
+    let newcomer = jam.dancer("D").await;
+    let joined = jam
+        .entry(
+            &battle,
+            json!({ "dancer_ids": [newcomer], "status": "confirmed" }),
+        )
+        .await;
+    assert_eq!(joined.status, StatusCode::CONFLICT);
+}

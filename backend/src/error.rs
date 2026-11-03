@@ -103,6 +103,18 @@ impl From<(&str, &str)> for FieldError {
 }
 
 impl AppError {
+    /// Whether Postgres aborted the transaction to break a deadlock or a serialisation conflict,
+    /// so running it again can succeed.
+    pub fn is_transient(&self) -> bool {
+        let Self::Internal(err) = self else {
+            return false;
+        };
+        err.downcast_ref::<sqlx::Error>()
+            .and_then(|err| err.as_database_error())
+            .and_then(|db| db.code())
+            .is_some_and(|code| code == "40P01" || code == "40001")
+    }
+
     /// A 422 on one field.
     pub fn invalid(field: &str, message: &str) -> Self {
         Self::Validation(vec![(field, message).into()])

@@ -107,7 +107,8 @@ Single backend crate for now. Split into a Cargo workspace only when compile tim
 - Primary keys: `uuid` generated as **UUIDv7** by the application (`uuid` crate, `v7` feature). Postgres column type `uuid`.
 - Table names: plural, snake_case. Column names: snake_case.
 - Every table: `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()` (maintained by the `set_updated_at` trigger, never set in code).
-- Soft delete: `deleted_at timestamptz null` on `events`, `dancers`, `crews` only. All public queries filter `deleted_at is null`.
+- Soft delete: `deleted_at timestamptz null` on `events`, `dancers`, `crews` only. All public queries filter `deleted_at is null`, except a jam's entries and staff: a deleted dancer stays on past results by name, `deleted: true` and unlinked. They can stay on an entry or staff list that is saved again, but join no new one.
+- Concurrency (`api/transaction.rs`): merges run alone. A merge takes the merge lock (a transaction-level advisory lock) exclusively; every other transaction that writes dancers or rows pointing at them (entry and staff saves, claim reviews, dancer edits) takes it shared, through `transaction::begin`. Beyond that, a save locks the parent of what it replaces first (the battle for an entry, the jam for its staff), then reads and checks the rows it keeps, so each save judges the list as it is and `max_entries` can't be overrun; a claim approval locks the dancer before its claims. A transaction Postgres aborts for a deadlock or a serialisation conflict runs once more (`transaction::retrying`).
 - Enums: Postgres `enum` types, mirrored as Rust enums with `#[sqlx(type_name = "...", rename_all = "snake_case")]`.
 - Timestamps in UTC. Event dates are calendar dates (`date`) with a separate `timezone` text column (IANA name).
 - Coordinates: `lat double precision`, `lng double precision`. No PostGIS for now.

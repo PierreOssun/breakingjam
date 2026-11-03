@@ -1,10 +1,34 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, dancer_name, country, country2, instagram_handle, avatar_url, avatar_parts\n         from dancers where user_id = $1 and deleted_at is null and merged_into_id is null",
+  "query": "select s.role as \"role: StaffRole\", d.id, d.dancer_name, d.country, d.country2,\n                  d.instagram_handle, d.avatar_url, d.avatar_parts,\n                  d.deleted_at is not null as \"deleted!\"\n           from event_staff s join dancers d on d.id = s.dancer_id\n           where s.event_id = $1\n           order by s.role, lower(d.dancer_name), d.id",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
+        "name": "role: StaffRole",
+        "type_info": {
+          "Custom": {
+            "name": "staff_role",
+            "kind": {
+              "Enum": [
+                "judge",
+                "dj",
+                "mc",
+                "organizer",
+                "other"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "event_staff",
+            "name": "role"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
         "name": "id",
         "type_info": "Uuid",
         "origin": {
@@ -15,7 +39,7 @@
         }
       },
       {
-        "ordinal": 1,
+        "ordinal": 2,
         "name": "dancer_name",
         "type_info": "Text",
         "origin": {
@@ -26,7 +50,7 @@
         }
       },
       {
-        "ordinal": 2,
+        "ordinal": 3,
         "name": "country",
         "type_info": "Bpchar",
         "origin": {
@@ -37,7 +61,7 @@
         }
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "country2",
         "type_info": "Bpchar",
         "origin": {
@@ -48,7 +72,7 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "instagram_handle",
         "type_info": "Text",
         "origin": {
@@ -59,7 +83,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "avatar_url",
         "type_info": "Text",
         "origin": {
@@ -70,7 +94,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "avatar_parts",
         "type_info": "Text",
         "origin": {
@@ -79,6 +103,12 @@
             "name": "avatar_parts"
           }
         }
+      },
+      {
+        "ordinal": 8,
+        "name": "deleted!",
+        "type_info": "Bool",
+        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -90,11 +120,13 @@
       false,
       false,
       false,
+      false,
       true,
       true,
       true,
-      true
+      true,
+      null
     ]
   },
-  "hash": "38c16c56b0e886f2fcf462180693390a36adbfa435eac2df8f96a502c39dbf97"
+  "hash": "4715ab36a6c702733c39e7fa230db2e97fdc296d0713628c73290ad7fc893360"
 }

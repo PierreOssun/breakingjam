@@ -5,16 +5,21 @@ use axum::{
     extract::{Path, Query, State},
 };
 use serde::{Deserialize, Serialize};
+use sqlx::PgConnection;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
-use super::page::{self, Page};
+use super::{
+    page::{self, Page},
+    transaction,
+};
 use crate::{
     auth::session::CurrentUser,
-    db,
+    db::{self, dancers::MergeLock},
     domain::{
         claim::{Claim, ClaimForReview, ClaimStatus},
+        dancer::Dancer,
         user::Role,
     },
     error::{AppError, ErrorEnvelope, InvalidCursor, NotAdmin, Unauthorized},
@@ -203,32 +208,63 @@ async fn decide(
     decision: ClaimStatus,
 ) -> Result<Json<Claim>, AppError> {
     current.require(Role::Admin)?;
-    let mut tx = state.pool.begin().await?;
-    let claim = db::claims::find_for_update(&mut tx, id)
+    let (pool, reviewer) = (&state.pool, current.user.id);
+    let claim = transaction::retrying(move || async move {
+        let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
+        // Approving writes the dancer's other claims, so two approvals on one dancer would lock
+        // each other's claim: an approval takes the dancer first, and they queue there.
+        let dancer = match decision {
+            ClaimStatus::Approved => lock_claimed_dancer(&mut tx, id).await?,
+            _ => None,
+        };
+        let claim = db::claims::find_for_update(&mut tx, id)
+            .await?
+            .ok_or(AppError::NotFound)?;
+        if claim.status != ClaimStatus::Pending {
+            return Err(AppError::Conflict("this claim was already reviewed".into()));
+        }
+        if decision == ClaimStatus::Approved {
+            grant(&mut tx, &claim, dancer, reviewer).await?;
+        }
+        let claim = db::claims::decide(&mut tx, id, decision, reviewer).await?;
+        tx.commit().await?;
+        Ok(claim)
+    })
+    .await?;
+    Ok(Json(claim))
+}
+
+/// The dancer the claim is on, locked; no merge runs meanwhile, so the claim stays on it.
+async fn lock_claimed_dancer(
+    conn: &mut PgConnection,
+    id: Uuid,
+) -> Result<Option<Dancer>, AppError> {
+    let dancer = db::claims::dancer_of(&mut *conn, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    if claim.status != ClaimStatus::Pending {
-        return Err(AppError::Conflict("this claim was already reviewed".into()));
+    Ok(db::dancers::find_for_update(conn, dancer).await?)
+}
+
+/// Hands the locked `dancer` to the claim's account, unless it is already owned.
+async fn grant(
+    conn: &mut PgConnection,
+    claim: &Claim,
+    dancer: Option<Dancer>,
+    reviewer: Uuid,
+) -> Result<(), AppError> {
+    let dancer = dancer
+        .filter(|d| d.merged_into_id.is_none())
+        .ok_or(AppError::NotFound)?;
+    if dancer.verified_at.is_some() {
+        return Err(AppError::Conflict("this dancer is already verified".into()));
     }
-    if decision == ClaimStatus::Approved {
-        let dancer = db::dancers::find_for_update(&mut tx, claim.dancer_id)
-            .await?
-            .filter(|d| d.merged_into_id.is_none())
-            .ok_or(AppError::NotFound)?;
-        if dancer.verified_at.is_some() {
-            return Err(AppError::Conflict("this dancer is already verified".into()));
-        }
-        // `dancers.user_id` is unique; the database decides so two approvals cannot both pass.
-        db::claims::grant_ownership(&mut tx, &claim, current.user.id)
-            .await
-            .map_err(|err| match err {
-                sqlx::Error::Database(db) if db.constraint() == Some("dancers_user_id_key") => {
-                    AppError::Conflict("this user already owns a dancer page".into())
-                }
-                other => other.into(),
-            })?;
-    }
-    let claim = db::claims::decide(&mut tx, id, decision, current.user.id).await?;
-    tx.commit().await?;
-    Ok(Json(claim))
+    // `dancers.user_id` is unique; the database decides so two approvals cannot both pass.
+    db::claims::grant_ownership(conn, claim, reviewer)
+        .await
+        .map_err(|err| match err {
+            sqlx::Error::Database(db) if db.constraint() == Some("dancers_user_id_key") => {
+                AppError::Conflict("this user already owns a dancer page".into())
+            }
+            other => other.into(),
+        })
 }

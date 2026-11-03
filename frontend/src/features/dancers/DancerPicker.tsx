@@ -13,6 +13,8 @@ import { toHandle } from "../../lib/instagram";
 import { searchDancers } from "./search";
 
 type DancerRef = Schemas["DancerRef"];
+// Search and creation only ever give a live dancer.
+type LiveDancer = Omit<DancerRef, "deleted">;
 
 type DancerPickerProps = {
   label: string;
@@ -30,7 +32,8 @@ export function DancerPicker({
   max,
 }: DancerPickerProps) {
   const { t } = useTranslation();
-  const add = (dancer: DancerRef) => onChange([...selected, dancer]);
+  const add = (dancer: LiveDancer) =>
+    onChange([...selected, { ...dancer, deleted: false }]);
   return (
     <div className="flex flex-col gap-3">
       {selected.length > 0 && (
@@ -108,7 +111,7 @@ function NewDancer({
   onCancel,
 }: {
   name: string;
-  onCreated: (dancer: DancerRef) => void;
+  onCreated: (dancer: LiveDancer) => void;
   onCancel: () => void;
 }) {
   const { t } = useTranslation();

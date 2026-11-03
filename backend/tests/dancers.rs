@@ -349,3 +349,61 @@ async fn events_split_upcoming_and_past_with_roles(pool: PgPool) {
     assert!(only_past.json["upcoming"].as_array().unwrap().is_empty());
     assert_eq!(only_past.json["past"].as_array().unwrap().len(), 2);
 }
+
+#[sqlx::test]
+async fn a_deleted_dancer_stays_on_past_results_and_saves_but_joins_nothing_new(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    let admin = sign_up(&app, "admin@example.com").await;
+    set_role(&pool, "admin@example.com", "seed_admin").await;
+    let jam = json!({ "name": "Paris Cypher", "starts_on": "2020-06-01", "ends_on": "2020-06-01",
+                      "timezone": "Europe/Paris", "city": "Paris", "country": "FR" });
+    let jam = id_of(&send(&app, post("/api/events", jam, Some(&owner))).await);
+    let battle = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
+    let uri = format!("/api/events/{jam}/battles");
+    let battle = id_of(&send(&app, post(&uri, battle, Some(&owner))).await);
+    let gone = id_of(&create(&app, &owner, dancer("Gone", None)).await);
+    let kept = id_of(&create(&app, &owner, dancer("Kept", None)).await);
+    let entries = format!("/api/battles/{battle}/entries");
+    let body = json!({ "dancer_ids": [gone], "status": "confirmed" });
+    let entry = id_of(&send(&app, post(&entries, body.clone(), Some(&owner))).await);
+    let staff_uri = format!("/api/events/{jam}/staff");
+    let staff = json!([{ "dancer_id": gone, "role": "judge" }]);
+    send(&app, put(&staff_uri, staff.clone(), Some(&owner))).await;
+    let deleted = send(&app, delete(&format!("/api/dancers/{gone}"), Some(&admin))).await;
+    assert_eq!(deleted.status, StatusCode::NO_CONTENT);
+
+    // Still named, marked so the page shows no link.
+    let listed = send(&app, get(&entries, Some(&owner))).await;
+    assert_eq!(listed.json[0]["members"][0]["dancer_name"], "Gone");
+    assert_eq!(listed.json[0]["members"][0]["deleted"], true);
+    let listed = send(&app, get(&staff_uri, Some(&owner))).await;
+    assert_eq!(listed.json[0]["dancer"]["deleted"], true);
+
+    // Saving what is already there works: the organiser can't be blocked by someone else's delete.
+    let body = json!({ "dancer_ids": [gone], "status": "confirmed", "reached": "winner" });
+    let saved = send(
+        &app,
+        put(&format!("/api/entries/{entry}"), body, Some(&owner)),
+    )
+    .await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.json);
+    let saved = send(&app, put(&staff_uri, staff, Some(&owner))).await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.json);
+
+    // Nobody deleted joins anything new.
+    let other = send(&app, post(&uri, json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18, "name": "Other" }), Some(&owner))).await;
+    let other = format!("/api/battles/{}/entries", id_of(&other));
+    let body = json!({ "dancer_ids": [gone], "status": "confirmed" });
+    let joined = send(&app, post(&other, body, Some(&owner))).await;
+    assert_eq!(joined.status, StatusCode::UNPROCESSABLE_ENTITY);
+    let body = json!({ "dancer_ids": [kept], "status": "confirmed" });
+    let second = id_of(&send(&app, post(&other, body, Some(&owner))).await);
+    let body = json!({ "dancer_ids": [gone], "status": "confirmed" });
+    let swapped = send(
+        &app,
+        put(&format!("/api/entries/{second}"), body, Some(&owner)),
+    )
+    .await;
+    assert_eq!(swapped.status, StatusCode::UNPROCESSABLE_ENTITY);
+}

@@ -52,7 +52,7 @@ pub async fn of_events(
 }
 
 /// One battle.
-pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Battle>> {
+pub async fn find(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<Option<Battle>> {
     sqlx::query_as!(
         Battle,
         r#"select id, event_id, name, format as "format: BattleFormat", team_size,
@@ -62,8 +62,16 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Battle>> {
            from battles where id = $1"#,
         id,
     )
-    .fetch_optional(pool)
+    .fetch_optional(db)
     .await
+}
+
+/// Locks a battle for the rest of the transaction, so its entries are saved one at a time.
+pub async fn lock(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<()> {
+    sqlx::query!("select id from battles where id = $1 for no key update", id)
+        .fetch_optional(conn)
+        .await?;
+    Ok(())
 }
 
 /// Adds a battle at the end of the jam's list.
@@ -167,17 +175,17 @@ pub async fn reorder(pool: &PgPool, event_id: Uuid, ids: &[Uuid]) -> sqlx::Resul
 }
 
 /// Entries of a battle, oldest first, with members and crew.
-pub async fn entries(pool: &PgPool, battle_id: Uuid) -> sqlx::Result<Vec<Entry>> {
-    fetch_entries(pool, Some(battle_id), None).await
+pub async fn entries(conn: &mut PgConnection, battle_id: Uuid) -> sqlx::Result<Vec<Entry>> {
+    fetch_entries(conn, Some(battle_id), None).await
 }
 
 /// One entry, with members and crew.
-pub async fn find_entry(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Entry>> {
-    Ok(fetch_entries(pool, None, Some(id)).await?.pop())
+pub async fn find_entry(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<Option<Entry>> {
+    Ok(fetch_entries(conn, None, Some(id)).await?.pop())
 }
 
 async fn fetch_entries(
-    pool: &PgPool,
+    conn: &mut PgConnection,
     battle_id: Option<Uuid>,
     entry_id: Option<Uuid>,
 ) -> sqlx::Result<Vec<Entry>> {
@@ -192,10 +200,10 @@ async fn fetch_entries(
         battle_id,
         entry_id,
     )
-    .fetch_all(pool)
+    .fetch_all(&mut *conn)
     .await?;
     let ids: Vec<Uuid> = rows.iter().map(|r| r.id).collect();
-    let mut members = members(pool, &ids).await?;
+    let mut members = members(conn, &ids).await?;
     Ok(rows
         .into_iter()
         .map(|r| Entry {
@@ -218,16 +226,19 @@ async fn fetch_entries(
         .collect())
 }
 
-async fn members(pool: &PgPool, entry_ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, Vec<DancerRef>>> {
+async fn members(
+    conn: &mut PgConnection,
+    entry_ids: &[Uuid],
+) -> sqlx::Result<HashMap<Uuid, Vec<DancerRef>>> {
     let rows = sqlx::query!(
-        "select m.entry_id, d.id, d.dancer_name, d.country, d.country2, d.instagram_handle,
-                d.avatar_url, d.avatar_parts
-         from entry_members m join dancers d on d.id = m.dancer_id
-         where m.entry_id = any($1)
-         order by lower(d.dancer_name), d.id",
+        r#"select m.entry_id, d.id, d.dancer_name, d.country, d.country2, d.instagram_handle,
+                  d.avatar_url, d.avatar_parts, d.deleted_at is not null as "deleted!"
+           from entry_members m join dancers d on d.id = m.dancer_id
+           where m.entry_id = any($1)
+           order by lower(d.dancer_name), d.id"#,
         entry_ids,
     )
-    .fetch_all(pool)
+    .fetch_all(conn)
     .await?;
     let mut by_entry = HashMap::<Uuid, Vec<DancerRef>>::new();
     for r in rows {
@@ -239,6 +250,7 @@ async fn members(pool: &PgPool, entry_ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid
             instagram_handle: r.instagram_handle,
             avatar_url: r.avatar_url,
             avatar_parts: r.avatar_parts,
+            deleted: r.deleted,
         });
     }
     Ok(by_entry)
@@ -246,7 +258,7 @@ async fn members(pool: &PgPool, entry_ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid
 
 /// Entries other than `except_entry` that still count toward `max_entries` (not withdrawn).
 pub async fn active_entry_count(
-    pool: &PgPool,
+    db: impl PgExecutor<'_>,
     battle_id: Uuid,
     except_entry: Option<Uuid>,
 ) -> sqlx::Result<i64> {
@@ -256,13 +268,13 @@ pub async fn active_entry_count(
         battle_id,
         except_entry,
     )
-    .fetch_one(pool)
+    .fetch_one(db)
     .await
 }
 
 /// Whether any of `dancer_ids` already competes in another active entry of the battle.
 pub async fn already_entered(
-    pool: &PgPool,
+    db: impl PgExecutor<'_>,
     battle_id: Uuid,
     dancer_ids: &[Uuid],
     except_entry: Option<Uuid>,
@@ -276,7 +288,7 @@ pub async fn already_entered(
         dancer_ids,
         except_entry,
     )
-    .fetch_one(pool)
+    .fetch_one(db)
     .await
 }
 

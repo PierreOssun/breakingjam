@@ -322,11 +322,30 @@ fn uploaded(url: Option<String>, card_url: Option<String>) -> Option<UploadedFly
     })
 }
 
+/// Locks a jam for the rest of the transaction, so its staff is saved one list at a time.
+pub async fn lock(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<()> {
+    sqlx::query!("select id from events where id = $1 for no key update", id)
+        .fetch_optional(conn)
+        .await?;
+    Ok(())
+}
+
+/// The dancers on a jam's staff, in any role.
+pub async fn staff_ids(conn: &mut PgConnection, event_id: Uuid) -> sqlx::Result<Vec<Uuid>> {
+    sqlx::query_scalar!(
+        "select distinct dancer_id from event_staff where event_id = $1",
+        event_id
+    )
+    .fetch_all(conn)
+    .await
+}
+
 /// A jam's staff, by role then name.
 pub async fn staff(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<StaffMember>> {
     let rows = sqlx::query!(
         r#"select s.role as "role: StaffRole", d.id, d.dancer_name, d.country, d.country2,
-                  d.instagram_handle, d.avatar_url, d.avatar_parts
+                  d.instagram_handle, d.avatar_url, d.avatar_parts,
+                  d.deleted_at is not null as "deleted!"
            from event_staff s join dancers d on d.id = s.dancer_id
            where s.event_id = $1
            order by s.role, lower(d.dancer_name), d.id"#,
@@ -346,6 +365,7 @@ pub async fn staff(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<StaffMembe
                 instagram_handle: r.instagram_handle,
                 avatar_url: r.avatar_url,
                 avatar_parts: r.avatar_parts,
+                deleted: r.deleted,
             },
         })
         .collect())

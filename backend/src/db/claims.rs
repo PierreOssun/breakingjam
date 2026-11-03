@@ -71,7 +71,7 @@ pub async fn list(
         r#"select c.id, c.dancer_id, c.user_id, c.code, c.status as "status: ClaimStatus",
                   c.reviewed_at, c.created_at,
                   d.dancer_name, d.country, d.country2, d.instagram_handle,
-                  d.avatar_url, d.avatar_parts,
+                  d.avatar_url, d.avatar_parts, d.deleted_at is not null as "deleted!",
                   u.email::text as "email!", u.display_name
            from dancer_claims c
            join dancers d on d.id = c.dancer_id
@@ -96,6 +96,7 @@ pub async fn list(
                 instagram_handle: r.instagram_handle,
                 avatar_url: r.avatar_url,
                 avatar_parts: r.avatar_parts,
+                deleted: r.deleted,
             },
             user: ClaimUser {
                 id: r.user_id,
@@ -113,6 +114,13 @@ pub async fn list(
             },
         })
         .collect())
+}
+
+/// The dancer a claim is on; a merge may move it until the claim is locked.
+pub async fn dancer_of(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<Option<Uuid>> {
+    sqlx::query_scalar!("select dancer_id from dancer_claims where id = $1", id)
+        .fetch_optional(conn)
+        .await
 }
 
 /// Locks a claim for review.

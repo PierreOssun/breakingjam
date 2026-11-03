@@ -349,6 +349,7 @@ One component that changes shape by viewport.
 - **Dancer chip:** the same chip linking to the dancer page, with the 28px avatar (`size-7 rounded-[8px]`, §4.16) at `pl-1 gap-2`. Used for every competitor and lineup member on a jam page. For the jam's organiser it ends with a 28px "Remove …" icon button.
   - A battle's entries and each lineup group are one **wrapping row** of chips (`flex flex-wrap gap-2`), never a chip per full-width row. A team shows its name, then its members' chips.
   - A podium place (1st–3rd, §4.13) sits inside the chip after the name, as the result badge at `h-6 px-2`.
+  - A deleted dancer keeps their place on the jam page: the same chip without the link or the hover, since the page is gone.
 - **Add chip** (organiser only): the same shape with `border-dashed`, a `Plus` 16 and a label ("Add a dancer", "Add a judge"…).
 
 ### 4.13 Result badge
