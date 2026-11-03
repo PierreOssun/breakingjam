@@ -20,10 +20,11 @@
     "contact": "Contact"
   },
   "account": {
-    "viewPage": "View my dancer page",
-    "unclaimedTitle": "Are you a dancer?",
-    "unclaimedBody": "Find your page and claim it.",
-    "findPage": "Find my dancer page",
+    "viewPage": "View my page",
+    "verifyPage": "Not verified yet · Verify it",
+    "unclaimedTitle": "Are you on BreakingJam?",
+    "unclaimedBody": "Find your page, or make it.",
+    "findPage": "Find my page",
     "drafts_one": "{{count}} draft",
     "drafts_other": "{{count}} drafts",
     "toReview": "{{count}} to review",
@@ -31,6 +32,18 @@
     "light": "Light",
     "dark": "Dark",
     "auto": "Auto"
+  },
+  "welcome": {
+    "title": "Are you on BreakingJam?",
+    "intro": "Dancers, DJs, MCs and judges each have a page with their jams. Find yours and tap “This is me” on it to verify it.",
+    "search": "Your name in the scene",
+    "searchHint": "Your name, an alias or your Instagram handle.",
+    "found": "Pages that match",
+    "nobody": "No page matches “{{q}}” yet.",
+    "notHere": "Not here yet?",
+    "notHereBody": "Make your page now: it shows your jams as they come, and you can verify it.",
+    "create": "Create my page",
+    "skip": "Skip, I’m just here for the jams"
   },
   "testSite": {
     "notice": "Test site — demo data, not real jams",
@@ -233,6 +246,14 @@
       "mc": "MC",
       "organizer": "Host",
       "other": "Staff"
+    },
+    "titles": {
+      "bboy": "Bboy",
+      "bgirl": "Bgirl",
+      "breaker": "Breaker",
+      "dj": "DJ",
+      "mc": "MC",
+      "judge": "Judge"
     }
   },
   "result": {
@@ -306,13 +327,14 @@
     "searchFirst": "Search first: they may already have a page.",
     "newDancer": "Create a new dancer",
     "newCrew": "Create a new crew",
-    "dancerName": "Dancer name",
+    "dancerName": "Stage name",
     "crewName": "Crew name",
     "instagram": "Instagram",
     "create": "Create",
     "remove": "Remove {{name}}",
     "nameAndCountry": "A name and a country are needed.",
-    "handleTaken": "This Instagram handle already has a page. Search for it instead."
+    "handleTaken": "This Instagram handle already has a page. Search for it instead.",
+    "ownPageTaken": "This account already has a page."
   },
   "org": {
     "newIntro": "It stays a draft, visible only to you, until you publish it.",
@@ -678,7 +700,10 @@
         "lips": "Lip tint",
         "hoops": "Hoop earrings"
       }
-    }
+    },
+    "titlesMine": "I’m a…",
+    "titles": "What they do",
+    "titlesHint": "Only the dancer, once verified, and the BreakingJam team set these."
   },
   "admin": {
     "claims": {

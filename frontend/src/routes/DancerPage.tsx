@@ -77,6 +77,7 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
             verified={Boolean(dancer.verified_at)}
             flags={[dancer.country, dancer.country2]}
             aliases={dancer.aliases}
+            titles={dancer.titles.map((title) => t(`dancer.titles.${title}`))}
             instagram={dancer.instagram_handle}
             avatar={<DancerAvatar dancer={dancer} />}
           />

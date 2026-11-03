@@ -296,8 +296,25 @@ export interface paths {
         /** Search dancers by name, alias or handle; notable dancers first. */
         get: operations["search_dancers"];
         put?: never;
-        /** Create a dancer; `source` follows the creator's role. */
+        /** Create a page for someone else, as jam flows do; `source` follows the creator's role. */
         post: operations["create_dancer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dancers/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create the account's own page (M25), unverified until a claim on it is approved; one per account. */
+        post: operations["create_own_dancer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1194,6 +1211,8 @@ export interface components {
             avatar_url?: string | null;
             /** @description The generated avatar's parts, e.g. `h2-s1-c0-o3-e0-b1`; null means seeded from the id. */
             avatar_parts?: string | null;
+            /** @description What the dancer does, in a fixed order; empty until its owner or the team says. */
+            titles: components["schemas"]["DancerTitle"][];
             /**
              * Format: uuid
              * @description Set when an admin merged this row into another; it is then only a redirect.
@@ -1237,6 +1256,11 @@ export interface components {
             instagram_handle?: string | null;
             /** @description The generated avatar's parts (DESIGN.md §4.16); blank or absent means seeded from the id. */
             avatar_parts?: string | null;
+            /**
+             * @description What the dancer does; absent keeps what is stored. Only its verified owner or
+             *     `seed_admin`+ may send it.
+             */
+            titles?: components["schemas"]["DancerTitle"][] | null;
         };
         /** @description Body of `GET /dancers/{id}`: the page, or where a merged dancer now lives (§4 "Merge"). */
         DancerPage: {
@@ -1274,6 +1298,8 @@ export interface components {
             crews: components["schemas"]["CrewRef"][];
             /** @description Whether the caller may `PUT` this dancer. */
             can_edit: boolean;
+            /** @description Whether the caller may send its `titles`: its verified owner, or `seed_admin`+. */
+            can_set_titles: boolean;
         };
         /**
          * @description Where a dancer row came from (§4 "Dancer identity").
@@ -1308,6 +1334,11 @@ export interface components {
             /** @description Current crews. */
             crews: components["schemas"]["CrewRef"][];
         };
+        /**
+         * @description What a dancer page says its dancer does ("I'm a…", M25); never guessed, only set.
+         * @enum {string}
+         */
+        DancerTitle: "bboy" | "bgirl" | "breaker" | "dj" | "mc" | "judge";
         /** @description A registration in a battle, with its members and result. */
         Entry: {
             /**
@@ -1795,6 +1826,14 @@ export interface components {
             /** @description Only the organiser edits their own page. */
             can_edit: boolean;
         };
+        /**
+         * @description The account's own page (`GET /auth/me`): linked by an approved claim, or made by the account
+         *     and waiting for one.
+         */
+        OwnPage: components["schemas"]["DancerRef"] & {
+            /** @description Whether an approved claim links it to the account; false while it waits for one. */
+            verified: boolean;
+        };
         /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
         Page_ClaimForReview: {
             /** @description At most `limit` rows. */
@@ -2193,7 +2232,7 @@ export interface components {
             display_name: string;
             /** @description Account role, snake_case. */
             role: components["schemas"]["Role"];
-            dancer?: components["schemas"]["DancerRef"] | null;
+            dancer?: components["schemas"]["OwnPage"] | null;
         };
     };
     responses: never;
@@ -2393,7 +2432,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Logged in: to `FRONTEND_ORIGIN` + `next`, except a new account coming from the jam form, which goes home. Failed: to `/login?error=google` */
+            /** @description Logged in: to `FRONTEND_ORIGIN` + `next`; a new account first to the welcome step, `/welcome?next=…`, and never on to the jam form. Failed: to `/login?error=google` */
             303: {
                 headers: {
                     location?: string;
@@ -3026,7 +3065,75 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description Below `organizer`, or titles below `seed_admin` */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description Instagram handle already taken */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_own_dancer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DancerFields"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DancerResponse"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Titles below `seed_admin`: they come with verification */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The account already has a page, or the Instagram handle is taken */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -3110,7 +3217,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Not the creator (unverified), the owner (verified) nor `seed_admin`+ */
+            /** @description Not the creator (unverified), the owner (verified) nor `seed_admin`+; or titles from anyone but the verified owner and `seed_admin`+ */
             403: {
                 headers: {
                     [name: string]: unknown;

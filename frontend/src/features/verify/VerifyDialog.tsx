@@ -51,9 +51,14 @@ export function VerifyDialog({
         <span className="text-caption text-muted">{t("verify.yourCode")}</span>
         <span className="font-mono text-code-xl select-all">{claim?.code}</span>
       </div>
-      {/* Primary first on phones; from lg a right-aligned row ending with it (§4.9). */}
-      <div className="flex flex-col gap-3 lg:flex-row-reverse">
-        <Button data-autofocus onClick={() => void copy()}>
+      {/* One column on phones; from lg, Instagram beside Copy code and Done under it: three
+          buttons in a row are wider than the dialog (§4.9). */}
+      <div className="grid gap-3 lg:grid-cols-2">
+        <Button
+          data-autofocus
+          className="lg:col-start-2 lg:row-start-1"
+          onClick={() => void copy()}
+        >
           <Copy size={20} weight="bold" aria-hidden />
           {t("verify.copy")}
         </Button>
@@ -61,12 +66,12 @@ export function VerifyDialog({
           href={DM}
           target="_blank"
           rel="noopener noreferrer"
-          className={buttonClasses("secondary", "md")}
+          className={`${buttonClasses("secondary", "md")} lg:col-start-1 lg:row-start-1`}
         >
           {t("verify.openInstagram")}
           <ArrowSquareOut size={20} weight="bold" aria-hidden />
         </a>
-        <Button variant="ghost" onClick={onClose}>
+        <Button className="lg:col-start-2" onClick={onClose}>
           {t("verify.done")}
         </Button>
       </div>

@@ -22,7 +22,7 @@ use crate::{
     },
     db,
     domain::{
-        dancer::DancerRef,
+        dancer::OwnPage,
         user::{Role, User},
     },
     error::{AppError, ErrorEnvelope, InvalidFields, Unauthorized},
@@ -77,15 +77,16 @@ pub struct UserResponse {
     pub display_name: String,
     /// Account role, snake_case.
     pub role: Role,
-    /// The dancer page an approved claim linked to the account, so verified; null until then.
-    pub dancer: Option<DancerRef>,
+    /// The account's own page: the one an approved claim linked to it, else the one it made for
+    /// itself, still unverified; null when it has neither (M25).
+    pub dancer: Option<OwnPage>,
 }
 
 impl UserResponse {
     /// The account with its dancer page.
     pub async fn load(pool: &PgPool, user: User) -> sqlx::Result<Self> {
         Ok(Self {
-            dancer: db::dancers::of_user(pool, user.id).await?,
+            dancer: db::dancers::own_page(pool, user.id).await?,
             id: user.id,
             email: user.email,
             display_name: user.display_name,
@@ -254,7 +255,7 @@ async fn google_start(
     operation_id = "google_callback",
     params(GoogleCallbackQuery),
     responses(
-        (status = SEE_OTHER, description = "Logged in: to `FRONTEND_ORIGIN` + `next`, except a new account coming from the jam form, which goes home. Failed: to `/login?error=google`", headers(("location" = String))),
+        (status = SEE_OTHER, description = "Logged in: to `FRONTEND_ORIGIN` + `next`; a new account first to the welcome step, `/welcome?next=…`, and never on to the jam form. Failed: to `/login?error=google`", headers(("location" = String))),
     )
 )]
 async fn google_callback(
@@ -285,7 +286,7 @@ async fn finish_google(
     let profile = google::exchange(&state.config, &state.http, code, pending.verifier).await?;
     let next = safe_next(Some(&pending.next));
     let (user, next) = match google::find_or_create_user(&state.pool, &profile).await? {
-        Account::Existing(user) => (user, next),
+        Account::Existing(user) => (user, next.to_owned()),
         Account::New(user) => (user, after_sign_up(next)),
     };
     let session_cookie = session::start(state, user.id).await?;
@@ -298,10 +299,13 @@ async fn finish_google(
     Ok((cookies, Redirect::to(&target)).into_response())
 }
 
-/// Where a new account goes after `next`: anywhere but the jam form, as it may only dance or
-/// watch (mirrored in the frontend's `afterSignUp`).
-pub(crate) fn after_sign_up(next: &str) -> &str {
-    if next == "/org/jams/new" { "/" } else { next }
+/// Where a new account goes: the welcome step ("Are you on BreakingJam?", M25), then `next`,
+/// anywhere but the jam form, as it may only dance or watch (mirrored in the frontend's
+/// `afterSignUp`).
+pub(crate) fn after_sign_up(next: &str) -> String {
+    let next = if next == "/org/jams/new" { "/" } else { next };
+    let next: String = url::form_urlencoded::byte_serialize(next.as_bytes()).collect();
+    format!("/welcome?next={next}")
 }
 
 /// Only same-site paths: `/x` yes, `//evil.com` and `https://evil.com` no.

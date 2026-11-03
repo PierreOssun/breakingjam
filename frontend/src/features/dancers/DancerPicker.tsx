@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
@@ -10,6 +11,7 @@ import { SearchPicker } from "../../components/SearchPicker";
 import { TextField } from "../../components/TextField";
 import { VerifiedTick } from "../../components/VerifiedTick";
 import { toHandle } from "../../lib/instagram";
+import { ME_KEY } from "../auth/useMe";
 import { searchDancers } from "./search";
 
 type DancerRef = Schemas["DancerRef"];
@@ -104,17 +106,26 @@ function DancerLine({ dancer }: { dancer: Schemas["DancerSummary"] }) {
   );
 }
 
+/** Where a new page goes: one for someone else, or the account's own (M25). */
+type NewDancerRoute = "/api/dancers" | "/api/dancers/mine";
+
 /** Name, country and handle: enough for a dancer page the dancer can claim later. */
-function NewDancer({
+export function NewDancer({
   name: initialName,
+  route = "/api/dancers",
+  label,
   onCreated,
   onCancel,
 }: {
   name: string;
+  route?: NewDancerRoute;
+  /** Names the form for screen readers; "New dancer" by default. */
+  label?: string;
   onCreated: (dancer: LiveDancer) => void;
   onCancel: () => void;
 }) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [name, setName] = useState(initialName);
   const [country, setCountry] = useState("");
   const [handle, setHandle] = useState("");
@@ -132,20 +143,29 @@ function NewDancer({
       country,
       instagram_handle: toHandle(handle) || null,
     };
-    const { data, error, response } = await api.POST("/api/dancers", { body });
+    const { data, error, response } = await api.POST(route, { body });
     setSaving(false);
     if (data) return onCreated(data);
-    setError(
-      response.status === 409
-        ? t("picker.handleTaken")
-        : (error?.error.fields?.[0]?.message ?? t("errors.generic")),
-    );
+    if (response.status !== 409) {
+      setError(error?.error.fields?.[0]?.message ?? t("errors.generic"));
+    } else if (route === "/api/dancers/mine") {
+      // The account may have made its page meanwhile, in another tab: reading it again moves
+      // the welcome step on; without a handle, that is the only conflict there is.
+      void queryClient.invalidateQueries({ queryKey: ME_KEY });
+      setError(
+        body.instagram_handle
+          ? t("picker.handleTaken")
+          : t("picker.ownPageTaken"),
+      );
+    } else {
+      setError(t("picker.handleTaken"));
+    }
   }
 
   return (
     <div
       role="group"
-      aria-label={t("picker.newDancer")}
+      aria-label={label ?? t("picker.newDancer")}
       className="flex flex-col gap-4 rounded-lg border border-dashed border-border-strong p-4"
     >
       <TextField

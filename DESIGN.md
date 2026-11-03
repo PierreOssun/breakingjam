@@ -203,7 +203,7 @@ Base: `inline-flex items-center justify-center gap-2 rounded-full border-2 font-
 - **Focus:** a 3px `focus` outline, offset 2px, on every variant.
 - **Disabled:** 40% opacity, `cursor-not-allowed`, no hover change. Use a real `disabled` attribute, or `aria-disabled` when it needs a tooltip.
 - **Loading:** keep the label and the width (`min-w` set to the width at rest). Swap the leading icon for Phosphor `CircleNotch` with `animate-spin`, change the label to the progressive form ("Saving…"), set `aria-busy="true"`, block clicks, and keep the colour unchanged.
-- Use at most one primary button per view region. Icons go before the label (`Plus`, `MagnifyingGlass`), and an arrow goes after it only for "go to" actions (`View jam →`).
+- Use at most one primary button per view region (one exception: the verify modal's **Done**, §6). Icons go before the label (`Plus`, `MagnifyingGlass`), and an arrow goes after it only for "go to" actions (`View jam →`).
 
 ### 4.2 Text input, select, date
 
@@ -422,8 +422,9 @@ One component that changes shape by viewport.
 - Contents, top to bottom:
   1. avatar
   2. name `font-display text-display-lg` + tick + flag chips (`flex flex-wrap items-center gap-2`; chips wrap under long names)
-  3. aliases `text-body-sm font-semibold text-muted` ("aka …", joined with " · ")
-  4. Instagram handle: Phosphor `InstagramLogo` 20 + `@handle` in `text-body font-extrabold text-text`, 44px min height. It opens `https://instagram.com/<handle>`, which the OS hands to the app.
+  3. titles, when the dancer has said (M25): `label uppercase text-primary-text`, joined with " · " ("BGIRL · DJ"); nothing when none are set, never a guess
+  4. aliases `text-body-sm font-semibold text-muted` ("aka …", joined with " · ")
+  5. Instagram handle: Phosphor `InstagramLogo` 20 + `@handle` in `text-body font-extrabold text-text`, 44px min height. It opens `https://instagram.com/<handle>`, which the OS hands to the app.
 - It has to look complete when cropped on its own (screenshots). Nothing inside it depends on the page around it.
 - The **OG image** for `/d/<slug>` renders this same card at 1200×630.
 
@@ -431,7 +432,7 @@ One component that changes shape by viewport.
 
 - `inline-flex items-center gap-2.5 h-11 pl-4 pr-1.5 rounded-full border-[1.5px] border-dashed border-accent-text text-accent-text bg-accent/10 text-body-sm font-extrabold`.
 - Contents: `Clock` icon, "Verification pending", then the code inside a nested pill (`h-8 px-3 rounded-full bg-bg text-text font-mono font-bold tracking-[0.08em]`).
-- It's a `<button>` that copies the code and confirms with the "Code copied" toast.
+- It's a `<button>` that opens the verify modal again, with the same code (a modal closed by Esc or a tap outside comes back from here).
 - Below it: `text-caption text-muted` "We check by hand, usually within a day."
 
 ### 4.19 Code display
@@ -649,7 +650,7 @@ What the avatar button opens, logged in (§4.6). One `role="menu"` named "Accoun
 - **Dropdown (≥ xl):** anchored to the avatar button's right edge, 8px below it; `w-80 p-2 rounded-[20px] bg-surface-raised border border-border-strong shadow-lg`.
 - **Top sheet (< xl):** hangs from the header's bottom edge, full width, `rounded-b-[28px] bg-surface-raised shadow-lg p-4`, scrolling when taller than the screen, over a `bg-scrim` on the page below. The page doesn't scroll while it is open.
 - **Items, in order** (the sheet adds what the bar holds on desktop):
-  1. **Profile block** → the dancer page (`/dancers/<id>`): 52px avatar, the name in `display-sm` with the verified tick (only an approved claim links a page to an account), "View my dancer page" in `primary-text`, a `CaretRight`. `p-3 rounded-[14px]`, hover and focus `bg-surface`.
+  1. **Profile block** → the account's page (`/dancers/<id>`): 52px avatar, the name in `display-sm` with the verified tick when an approved claim linked it, then in `primary-text` "View my page", or "Not verified yet · Verify it" for a page the account made that waits for its claim (M25; the page has "This is me"), a `CaretRight`. `p-3 rounded-[14px]`, hover and focus `bg-surface`.
   2. *Sheet only:* **Jam map** (`MapPin`), **Find a jam** (`MagnifyingGlass`), **Find someone** (`User`), then a separator when My jams follows.
   3. **My jams** (`Ticket`) → `/org/jams`, with "N drafts" when there are drafts. Only for accounts that have registered a jam (the first one makes the account an organiser), the team and admins: a dancer sees their page, the theme and Log out.
   4. **Admin** (`ShieldCheck`) → `/admin`, **admins only**, with "N to review" (jams in review plus pending dancer and organiser claims).
@@ -658,7 +659,7 @@ What the avatar button opens, logged in (§4.6). One `role="menu"` named "Accoun
   7. *Sheet only:* a full-width primary lg **Register a jam**.
 - **Items:** `h-11 px-3 rounded-xl gap-3`, a 20px icon, `font-bold`; hover and focus `bg-surface`. Separators: `h-px bg-border` inset 12px.
 - **Badges:** at the item's right end, `h-6 px-2 rounded-full text-caption font-extrabold`. Drafts: muted (`border border-border bg-surface text-muted`); to review: `bg-primary text-on-primary`. Hidden at 0. Each opening fetches the counts again.
-- **No dancer page linked:** in place of the profile block, a dashed card, `border-2 border-dashed border-border-strong rounded-[20px] p-4`: a `User` square, "Are you a dancer?" (`font-extrabold`) over "Find your page and claim it." (muted), then a full-width secondary sm **Find my dancer page** with `MagnifyingGlass`, to Find someone searching the account's name (`/dancers?q=…`), where "This is me" takes over.
+- **No page of its own:** in place of the profile block, a dashed card, `border-2 border-dashed border-border-strong rounded-[20px] p-4`: a `User` square, "Are you on BreakingJam?" (`font-extrabold`) over "Find your page, or make it." (muted), then a full-width secondary sm **Find my page** with `MagnifyingGlass`, to the welcome step (§4.36) and back to the page it was opened on.
 - **Theme:** the choice is kept on the device (`bj.theme`) and set as `data-theme` on `<html>` before the app renders; **Auto** removes it, so the OS setting applies (§2). The maps follow it.
 - **Keyboard and screen readers:** the trigger has `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`. Opening focuses the first item; Up and Down move through every item, the three theme options included (Home, End too); Enter or Space picks; Esc, a click outside, the scrim or the trigger close it, and closing gives focus back to the trigger; Tab leaves. A `radiogroup` can't sit inside a `menu`, so the theme options are `menuitemradio`s with `aria-checked` in a `group` named "Theme". Every target is at least 44px.
 
@@ -683,6 +684,20 @@ The jam page in edit mode is made of blocks, one per part of the page (Venue, Ba
   - **More options:** a `rounded-md border` row, "More options" in `body font-bold` over a `body-sm muted` line: the name that will be saved, in quotes, when there is one, then the battle's summary (as on its card). A `CaretDown` turns when open. It folds out Size, Open to, Age, Bracket and Name.
   - **The action:** **Add battle** for a new battle, so one tap adds a 1v1 Open; **Save** when editing.
 - **Flyer pill:** over the flyer's top-right, `rounded-full bg-text text-bg p-1 pl-3 caption`: "Generated" (or "Uploaded"), a `bg-bg text-text h-9` **Upload flyer** button, and a remove icon once there is an upload.
+
+---
+
+### 4.36 Welcome step *(M25)*
+
+`/welcome?next=…`, right after sign-up (email or Google), and from the account menu while the account has no page.
+
+- Reading column (`max-w-prose`, `py-10 lg:py-20`, `gap-6`): the `<h1>` "Are you on BreakingJam?" in `display-lg` (`display-xl` from lg), then in `body-lg muted`: "Dancers, DJs, MCs and judges each have a page with their jams. Find yours and tap “This is me” on it to verify it."
+- **Search:** a search field labelled "Your name in the scene", pre-filled with the account's name, hint "Your name, an alias or your Instagram handle."; it searches as you type (250 ms). The matches are person rows (§4.25) leading to each page, paged with **Show more**; none: "No page matches “…” yet." (§4.22).
+- **Not here yet?** A dashed card (`rounded-lg border border-dashed border-border-strong p-4`): the title in `font-extrabold`, "Make your page now: it shows your jams as they come, and you can verify it." (muted), then a secondary **Create my page**, disabled until a search has run (search before create). It opens the picker's short form (stage name, country, Instagram) in place; creating opens the new page.
+- **Skip, I’m just here for the jams:** a ghost button, centred, to `next`.
+- An account that has its page goes straight to `next`.
+
+---
 
 ## 5. Layout rules
 
@@ -811,11 +826,11 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Desktop 1024+:** `grid grid-cols-[340px_1fr] gap-12`. The left column is `sticky top-6` and holds the card, chips, action and a 2×2 stats grid. The right column holds the lists, with `display-md` section titles.
 - **Verify modal** (4.9 + 4.19):
   - Title "Verify it’s you", two lines of explanation, then the code.
-  - Buttons: **Copy code** (primary), **Open Instagram** (secondary, opens the @breakingjam DM thread), **Done** (ghost).
+  - Buttons: **Copy code** (primary), **Open Instagram** (secondary, opens the @breakingjam DM thread), **Done** (primary too: an exception to §4.1's one primary per region, chosen by the author so the way out reads as clearly as the code). Phones: one full-width column in that order. From lg: a two-column grid, Open Instagram beside Copy code and Done under Copy code; three in a row are wider than the 480px dialog.
   - When someone else has already requested it: an inline notice above the code, and the request is still allowed.
   - Submitting moves the page to the pending state.
 - **Edit sheet** (4.9 + 4.20):
-  - Fields: dancer name, aliases (chip input), country, second country (optional), city, Instagram, bio (160).
+  - Fields: stage name, aliases (chip input), then for the verified owner and the BreakingJam team only, "I’m a…" ("What they do" for the team): choice chips (§4.35 battle sheet), several at once, Bboy · Bgirl · Breaker · DJ · MC · Judge, with the hint "Only the dancer, once verified, and the BreakingJam team set these."; then country, second country (optional), city, Instagram, bio (160).
   - On unverified dancers: the notice "Edits by the community are logged." at the top.
   - Avatar upload (photo or "Use pixel avatar") only for the verified owner.
   - Desktop shows it as a 560px dialog with the two country selects side by side.

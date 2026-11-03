@@ -58,7 +58,8 @@ export function VerifyButton({
   return (
     <>
       {pending ? (
-        <PendingPill code={pending.code} />
+        // A modal closed by Esc or a tap outside comes back from here.
+        <PendingPill code={pending.code} onOpen={() => setVerifying(true)} />
       ) : (
         enabled &&
         claim.isSuccess && (

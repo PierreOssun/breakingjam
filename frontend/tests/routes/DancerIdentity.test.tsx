@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   formatParts,
@@ -33,7 +33,9 @@ const DANCER = {
   created_at: at,
   updated_at: at,
   crews: [],
+  titles: [],
   can_edit: false,
+  can_set_titles: false,
 };
 const NO_EVENTS = { status: 200, body: { upcoming: [], past: [] } };
 // No claim yet: the API answers 404.
@@ -122,10 +124,42 @@ describe("dancer identity", () => {
 
     await userEvent.click(within(dialog).getByRole("button", { name: "Done" }));
     expect(screen.queryByRole("dialog")).toBeNull();
-    expect(
-      screen.getByRole("button", { name: /Verification pending.*BJ-7K2M/ }),
-    ).toBeInTheDocument();
+    const pending = screen.getByRole("button", {
+      name: /Verification pending.*BJ-7K2M/,
+    });
     expect(screen.queryByRole("button", { name: "This is me" })).toBeNull();
+
+    // Closed by mistake, the modal comes back from the pill, code and all.
+    await userEvent.click(pending);
+    const again = screen.getByRole("dialog", { name: "Verify it’s you" });
+    expect(within(again).getByText("BJ-7K2M")).toBeInTheDocument();
+    // A tap outside lands on the <dialog> itself, around its content.
+    fireEvent.click(again);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    await userEvent.click(
+      screen.getByRole("button", { name: /Verification pending/ }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "Verify it’s you" }),
+    ).toBeInTheDocument();
+  });
+
+  it("opens a claim still waiting, after a reload, from its pill", async () => {
+    page(
+      user,
+      {},
+      { [`GET /api/dancers/${ID}/claim`]: { status: 200, body: CLAIM } },
+    );
+    renderApp(`/dancers/${ID}`);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /Verification pending/ }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Verify it’s you" });
+    expect(within(dialog).getByText("BJ-7K2M")).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("button", { name: "Copy code" }),
+    ).toBeInTheDocument();
   });
 
   it("says why a page can't be claimed", async () => {
@@ -220,6 +254,55 @@ describe("dancer identity", () => {
       bio: null,
     });
     expect(body.avatar_parts).toMatch(/^h8-s3-c\d-o\d-e\d-b\d-d1$/);
+    // This editor may not say what the dancer does: the sheet sends no titles to keep.
+    expect(body).not.toHaveProperty("titles");
+    expect(within(dialog).queryByRole("group", { name: /I’m a/ })).toBeNull();
+  });
+
+  it("lets the verified dancer say what they do, shown on their page", async () => {
+    const mine = {
+      status: 200,
+      body: {
+        ...LIL_G,
+        dancer: { ...DANCER, deleted: false, verified: true },
+      },
+    };
+    const fetch = page(
+      mine,
+      {
+        can_edit: true,
+        can_set_titles: true,
+        verified_at: at,
+        titles: ["bgirl", "dj"],
+      },
+      {
+        [`PUT /api/dancers/${ID}`]: {
+          status: 200,
+          body: { ...DANCER, verified_at: at, titles: ["bgirl", "breaker"] },
+        },
+      },
+    );
+    renderApp(`/dancers/${ID}`);
+
+    expect(await screen.findByText("Bgirl · DJ")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Edit profile" }));
+    const dialog = screen.getByRole("dialog", { name: "Edit profile" });
+    const titles = within(dialog).getByRole("group", { name: "I’m a…" });
+    expect(titles).toHaveAccessibleDescription(
+      "Only the dancer, once verified, and the BreakingJam team set these.",
+    );
+    const chip = (name: string) => within(titles).getByRole("button", { name });
+    expect(chip("Bgirl")).toHaveAttribute("aria-pressed", "true");
+    expect(chip("Breaker")).toHaveAttribute("aria-pressed", "false");
+    // Several at once; picked again, a title goes.
+    await userEvent.click(chip("Breaker"));
+    await userEvent.click(chip("DJ"));
+    await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    expect(await screen.findByText("Profile saved.")).toBeInTheDocument();
+    expect(await bodyOf(fetch, `PUT /api/dancers/${ID}`)).toMatchObject({
+      titles: ["bgirl", "breaker"],
+    });
   });
 
   it("stores the avatar only once the picker is touched, even when it ends on the seed", async () => {

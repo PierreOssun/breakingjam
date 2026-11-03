@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set aliases = $2, instagram_handle = coalesce(instagram_handle, $3),\n                titles = case when cardinality(titles) = 0 and verified_at is null then $4\n                              else titles end\n         where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "TextArray",
+        "Text",
+        {
+          "Custom": {
+            "name": "dancer_title[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "dancer_title",
+                  "kind": {
+                    "Enum": [
+                      "bboy",
+                      "bgirl",
+                      "breaker",
+                      "dj",
+                      "mc",
+                      "judge"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d3c285ee6c25756876001a6c5d05609f3b0b59d53a6a3fe36792f0ba723a5a13"
+}

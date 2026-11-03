@@ -74,6 +74,12 @@ export const routes: RouteObject[] = [
         element: <RequireAuth />,
         children: [
           {
+            path: "/welcome",
+            lazy: async () => ({
+              Component: (await import("./routes/WelcomePage")).WelcomePage,
+            }),
+          },
+          {
             path: "/org/jams",
             lazy: async () => ({
               Component: (await import("./routes/OrgJamsPage")).OrgJamsPage,

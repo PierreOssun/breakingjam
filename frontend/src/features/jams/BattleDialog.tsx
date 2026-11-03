@@ -1,9 +1,10 @@
-import { CaretDown, WarningCircle } from "@phosphor-icons/react";
+import { CaretDown } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useId, useMemo, useState } from "react";
 import { type UseFormReturn, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
+import { ChipRow } from "../../components/ChipRow";
 import { Dialog } from "../../components/Dialog";
 import { FormError } from "../../components/FormError";
 import { OptionalLabel } from "../../components/OptionalLabel";
@@ -183,51 +184,6 @@ export function BattleDialog({
         <FormError message={errors.root?.message} />
       </form>
     </Dialog>
-  );
-}
-
-type Chip = { key: string; label: string; on: boolean; onPick: () => void };
-
-/** A labelled row of chips; the lit one is what the fields read as. */
-function ChipRow({
-  label,
-  error,
-  chips,
-}: {
-  label: string;
-  error?: string;
-  chips: Chip[];
-}) {
-  const id = useId();
-  return (
-    <div role="group" aria-labelledby={id} className="flex flex-col gap-2">
-      <span id={id} className="text-label text-text uppercase">
-        {label}
-      </span>
-      <div className="flex flex-wrap gap-2">
-        {chips.map((chip) => (
-          <button
-            key={chip.key}
-            type="button"
-            aria-pressed={chip.on}
-            onClick={chip.onPick}
-            className={`h-11 cursor-pointer rounded-full border px-4 text-body-sm font-semibold whitespace-nowrap transition-colors duration-fast ${
-              chip.on
-                ? "border-primary bg-primary text-on-primary"
-                : "border-border-strong bg-surface text-text hover:bg-surface-raised"
-            }`}
-          >
-            {chip.label}
-          </button>
-        ))}
-      </div>
-      {error && (
-        <p className="flex items-center gap-1 text-caption font-bold text-danger">
-          <WarningCircle size={14} weight="bold" aria-hidden />
-          {error}
-        </p>
-      )}
-    </div>
   );
 }
 

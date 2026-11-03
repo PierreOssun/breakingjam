@@ -11,6 +11,8 @@ type IdentityCardProps = {
   /** Country codes; at most two chips show (§4.10). */
   flags: (string | null | undefined)[];
   aliases?: string[];
+  /** What the dancer says they do ("I'm a…", M25), already in words. */
+  titles?: string[];
   instagram?: string | null;
   avatar: ReactNode;
   /** The name's heading: the page title on the dancer's own page, a sub-head elsewhere. */
@@ -22,7 +24,14 @@ type IdentityCardProps = {
  * cropped from a screenshot.
  */
 export function IdentityCard(props: IdentityCardProps) {
-  const { name, verified, aliases = [], instagram, avatar } = props;
+  const {
+    name,
+    verified,
+    aliases = [],
+    titles = [],
+    instagram,
+    avatar,
+  } = props;
   const Heading = props.heading ?? "h1";
   const { t } = useTranslation();
   const flags = props.flags.filter((c): c is string => Boolean(c)).slice(0, 2);
@@ -41,6 +50,11 @@ export function IdentityCard(props: IdentityCardProps) {
           <FlagChip key={code} code={code} />
         ))}
       </div>
+      {titles.length > 0 && (
+        <p className="relative text-label text-primary-text uppercase">
+          {titles.join(" · ")}
+        </p>
+      )}
       {aliases.length > 0 && (
         <p className="relative text-body-sm font-semibold text-muted">
           {t("dancer.aka", { names: aliases.join(" · ") })}

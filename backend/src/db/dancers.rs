@@ -9,8 +9,8 @@ use crate::domain::{
     battle::{BattleAge, BattleFormat, BattleGender, BracketStage, EntryStatus, StaffRole},
     crew::CrewRef,
     dancer::{
-        BattleRef, Dancer, DancerFields, DancerRef, DancerSource, DancerSummary, EventRef,
-        FieldChange, Participation, default_look,
+        BattleRef, Dancer, DancerFields, DancerRef, DancerSource, DancerSummary, DancerTitle,
+        EventRef, FieldChange, OwnPage, Participation, default_look,
     },
     event::EventStatus,
 };
@@ -102,7 +102,7 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
         Dancer,
         r#"select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                   instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                  avatar_parts,
+                  avatar_parts, titles as "titles: Vec<DancerTitle>",
                   created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null"#,
         id,
@@ -111,17 +111,46 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
     .await
 }
 
-/// The live dancer page an approved claim linked to the account `user_id`, if any.
-pub async fn of_user(pool: &PgPool, user_id: Uuid) -> sqlx::Result<Option<DancerRef>> {
-    sqlx::query_as!(
-        DancerRef,
-        r#"select id, dancer_name, country, country2, instagram_handle, avatar_url, avatar_parts,
-                  false as "deleted!"
-           from dancers where user_id = $1 and deleted_at is null and merged_into_id is null"#,
+/// The account's own live page: the one an approved claim linked to it, else the one it made
+/// for itself (or what that was merged into), as long as nobody else owns that.
+pub async fn own_page(pool: &PgPool, user_id: Uuid) -> sqlx::Result<Option<OwnPage>> {
+    // Two branches, so each finds its rows through an index: the claimed page by `user_id`,
+    // the page made for oneself by `created_by`.
+    let row = sqlx::query!(
+        r#"select id as "id!", dancer_name as "dancer_name!", country as "country!",
+                  country2, instagram_handle, avatar_url, avatar_parts, verified as "verified!"
+           from (select p.id, p.dancer_name, p.country, p.country2, p.instagram_handle,
+                        p.avatar_url, p.avatar_parts, true as verified
+                 from dancers p
+                 where p.user_id = $1 and p.deleted_at is null and p.merged_into_id is null
+                 union all
+                 select p.id, p.dancer_name, p.country, p.country2, p.instagram_handle,
+                        p.avatar_url, p.avatar_parts, false
+                 from dancers mine
+                 join dancers p on p.id = coalesce(mine.merged_into_id, mine.id)
+                 where mine.created_by = $1 and mine.source = 'self' and mine.deleted_at is null
+                   and p.user_id is null and p.deleted_at is null and p.merged_into_id is null
+                ) own
+           -- A page the account owns wins over one still waiting for its claim.
+           order by verified desc
+           limit 1"#,
         user_id,
     )
     .fetch_optional(pool)
-    .await
+    .await?;
+    Ok(row.map(|r| OwnPage {
+        dancer: DancerRef {
+            id: r.id,
+            dancer_name: r.dancer_name,
+            country: r.country,
+            country2: r.country2,
+            instagram_handle: r.instagram_handle,
+            avatar_url: r.avatar_url,
+            avatar_parts: r.avatar_parts,
+            deleted: false,
+        },
+        verified: r.verified,
+    }))
 }
 
 /// Inserts a dancer; text is trimmed, blanks become null, the handle is stored lower case without `@`.
@@ -135,13 +164,14 @@ pub async fn insert(
         Dancer,
         r#"insert into dancers
              (id, dancer_name, aliases, real_name, country, country2, city, bio,
-              instagram_handle, source, notable, created_by, avatar_parts)
+              instagram_handle, source, notable, created_by, avatar_parts, titles)
            values ($1, btrim($2), array(select btrim(a) from unnest($3::text[]) a),
                    nullif(btrim($4), ''), $5, $6, nullif(btrim($7), ''), nullif(btrim($8), ''),
-                   nullif(lower(ltrim(btrim($9), '@')), ''), $10, $11, $12, nullif(btrim($13), ''))
+                   nullif(lower(ltrim(btrim($9), '@')), ''), $10, $11, $12, nullif(btrim($13), ''),
+                   array(select distinct t from unnest($14::dancer_title[]) t order by t))
            returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                      instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                  avatar_parts,
+                     avatar_parts, titles as "titles: Vec<DancerTitle>",
                      created_by, merged_into_id, created_at, updated_at"#,
         Uuid::now_v7(),
         fields.dancer_name,
@@ -157,6 +187,7 @@ pub async fn insert(
         source == DancerSource::Seed,
         created_by,
         fields.avatar_parts,
+        fields.titles.as_deref().unwrap_or_default() as &[DancerTitle],
     )
     .fetch_one(pool)
     .await
@@ -175,11 +206,14 @@ pub async fn update(
              real_name = nullif(btrim($4), ''), country = $5, country2 = $6,
              city = nullif(btrim($7), ''), bio = nullif(btrim($8), ''),
              instagram_handle = nullif(lower(ltrim(btrim($9), '@')), ''),
-             avatar_parts = nullif(btrim($10), '')
+             avatar_parts = nullif(btrim($10), ''),
+             -- Absent titles keep the stored ones; the enum's order, without repeats.
+             titles = case when $11::dancer_title[] is null then titles
+                           else array(select distinct t from unnest($11) t order by t) end
            where id = $1 and deleted_at is null
            returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                      instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                  avatar_parts,
+                     avatar_parts, titles as "titles: Vec<DancerTitle>",
                      created_by, merged_into_id, created_at, updated_at"#,
         id,
         fields.dancer_name,
@@ -191,6 +225,7 @@ pub async fn update(
         fields.bio,
         fields.instagram_handle,
         fields.avatar_parts,
+        fields.titles.as_deref() as Option<&[DancerTitle]>,
     )
     .fetch_one(conn)
     .await
@@ -207,7 +242,7 @@ pub async fn find_for_update(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<
         Dancer,
         r#"select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
                   instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                  avatar_parts,
+                  avatar_parts, titles as "titles: Vec<DancerTitle>",
                   created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null
            for update"#,
@@ -341,7 +376,7 @@ async fn move_claims(
     Ok(())
 }
 
-/// The loser (and anything already redirected to it) points at the survivor, which takes the aliases and a missing handle.
+/// The loser (and anything already redirected to it) points at the survivor, which takes the aliases, a missing handle and, while unclaimed, missing titles.
 async fn redirect(
     conn: &mut PgConnection,
     loser: &Dancer,
@@ -356,13 +391,17 @@ async fn redirect(
     )
     .execute(&mut *conn)
     .await?;
-    // The loser no longer holds the handle (the unique index skips merged rows), so it can move.
+    // The loser no longer holds the handle (the unique index skips merged rows), so it can move;
+    // its titles too, when the survivor says none and has no owner to say so.
     sqlx::query!(
-        "update dancers set aliases = $2, instagram_handle = coalesce(instagram_handle, $3)
+        "update dancers set aliases = $2, instagram_handle = coalesce(instagram_handle, $3),
+                titles = case when cardinality(titles) = 0 and verified_at is null then $4
+                              else titles end
          where id = $1",
         into,
         aliases,
         loser.instagram_handle,
+        &loser.titles as &[DancerTitle],
     )
     .execute(&mut *conn)
     .await?;

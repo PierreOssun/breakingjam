@@ -20,9 +20,10 @@
     "contact": "Contact"
   },
   "account": {
-    "viewPage": "Voir ma page de danseur·se",
-    "unclaimedTitle": "Tu danses ?",
-    "unclaimedBody": "Trouve ta page et revendique-la.",
+    "viewPage": "Voir ma page",
+    "verifyPage": "Pas encore vérifiée · La vérifier",
+    "unclaimedTitle": "Tu es sur BreakingJam ?",
+    "unclaimedBody": "Trouve ta page, ou crée-la.",
     "findPage": "Trouver ma page",
     "drafts_one": "{{count}} brouillon",
     "drafts_other": "{{count}} brouillons",
@@ -31,6 +32,18 @@
     "light": "Clair",
     "dark": "Sombre",
     "auto": "Auto"
+  },
+  "welcome": {
+    "title": "Tu es sur BreakingJam ?",
+    "intro": "Danseur·ses, DJs, MCs et juges ont chacun·e une page avec leurs jams. Trouve la tienne et touche « C’est moi » pour la vérifier.",
+    "search": "Ton nom dans la scène",
+    "searchHint": "Ton nom, un alias ou ton compte Instagram.",
+    "found": "Pages correspondantes",
+    "nobody": "Aucune page ne correspond encore à « {{q}} ».",
+    "notHere": "Pas encore là ?",
+    "notHereBody": "Crée ta page maintenant : elle montre tes jams au fil du temps, et tu peux la vérifier.",
+    "create": "Créer ma page",
+    "skip": "Passer, je viens juste pour les jams"
   },
   "testSite": {
     "notice": "Site de test — données de démo, pas de vrais jams",
@@ -233,6 +246,14 @@
       "mc": "MC",
       "organizer": "Hôte",
       "other": "Staff"
+    },
+    "titles": {
+      "bboy": "Bboy",
+      "bgirl": "Bgirl",
+      "breaker": "Breaker",
+      "dj": "DJ",
+      "mc": "MC",
+      "judge": "Juge"
     }
   },
   "result": {
@@ -306,13 +327,14 @@
     "searchFirst": "Cherchez d’abord : la personne a peut-être déjà une page.",
     "newDancer": "Créer un·e nouveau·elle danseur·se",
     "newCrew": "Créer un nouveau crew",
-    "dancerName": "Nom de danse",
+    "dancerName": "Nom de scène",
     "crewName": "Nom du crew",
     "instagram": "Instagram",
     "create": "Créer",
     "remove": "Retirer {{name}}",
     "nameAndCountry": "Un nom et un pays sont nécessaires.",
-    "handleTaken": "Ce compte Instagram a déjà une page. Cherchez-la plutôt."
+    "handleTaken": "Ce compte Instagram a déjà une page. Cherchez-la plutôt.",
+    "ownPageTaken": "Ce compte a déjà une page."
   },
   "org": {
     "newIntro": "Elle reste en brouillon, visible par vous seul·e, jusqu’à sa publication.",
@@ -678,7 +700,10 @@
         "lips": "Teinte sur les lèvres",
         "hoops": "Créoles"
       }
-    }
+    },
+    "titlesMine": "Je suis…",
+    "titles": "Rôles",
+    "titlesHint": "Seule la personne, une fois vérifiée, et l’équipe BreakingJam les choisissent."
   },
   "admin": {
     "claims": {

@@ -14,9 +14,10 @@ import {
 } from "@phosphor-icons/react";
 import { useEffect, useId, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import type { Schemas } from "../api/client";
 import { useAdminStats } from "../features/admin/queries";
+import { withNext } from "../features/auth/safeNext";
 import { useLogout } from "../features/auth/useLogout";
 import { DancerAvatar } from "../features/dancers/DancerAvatar";
 import { useMyDraftCount } from "../features/jams/queries";
@@ -146,7 +147,7 @@ export function AccountMenu({
             {me.dancer ? (
               <Profile dancer={me.dancer} roving={item("profile")} />
             ) : (
-              <Unclaimed name={me.display_name} roving={item("profile")} />
+              <Unclaimed roving={item("profile")} />
             )}
           </li>
           {sheet && (
@@ -251,11 +252,11 @@ function Profile({
           <span className="truncate font-display text-display-sm">
             {dancer.dancer_name}
           </span>
-          {/* Only an approved claim links a page to an account. */}
-          <VerifiedTick />
+          {dancer.verified && <VerifiedTick />}
         </span>
+        {/* A page the account made waits for its claim: the page has "This is me". */}
         <span className="text-body-sm text-primary-text">
-          {t("account.viewPage")}
+          {dancer.verified ? t("account.viewPage") : t("account.verifyPage")}
         </span>
       </span>
       <CaretRight
@@ -268,10 +269,11 @@ function Profile({
   );
 }
 
-/** In place of the dancer page, until one is claimed: the search for it, by the account's name. */
-function Unclaimed({ name, roving }: { name: string; roving: Roving }) {
+/** In place of the account's page, until it has one: the welcome step, to find it or make it. */
+function Unclaimed({ roving }: { roving: Roving }) {
   const { t } = useTranslation();
   const id = useId();
+  const location = useLocation();
   return (
     <div className="flex flex-col gap-3 rounded-[20px] border-2 border-dashed border-border-strong p-4">
       <div className="flex items-center gap-3">
@@ -288,7 +290,7 @@ function Unclaimed({ name, roving }: { name: string; roving: Roving }) {
         </span>
       </div>
       <Link
-        to={`/dancers?q=${encodeURIComponent(name)}`}
+        to={withNext("/welcome", location.pathname + location.search)}
         role="menuitem"
         aria-describedby={`${id}-title ${id}-body`}
         {...roving}

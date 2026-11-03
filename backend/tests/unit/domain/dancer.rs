@@ -25,6 +25,7 @@ fn dancer(verified: bool, user_id: Option<Uuid>, created_by: Option<Uuid>) -> Da
         verified_at: verified.then(Utc::now),
         avatar_url: None,
         avatar_parts: None,
+        titles: Vec::new(),
         created_by,
         merged_into_id: None,
         created_at: Utc::now(),
@@ -143,9 +144,10 @@ fn bgirls_get_long_hair_and_lashes_bboys_short_hair_mixed_nothing() {
 
 #[test]
 fn source_follows_creator_role() {
+    // An account's own page is `SelfCreated` through its own route, never by role.
     assert_eq!(
         DancerSource::for_creator(Role::User),
-        DancerSource::SelfCreated
+        DancerSource::Organizer
     );
     assert_eq!(
         DancerSource::for_creator(Role::Organizer),

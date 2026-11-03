@@ -1,6 +1,10 @@
 mod test_app;
 
 use axum::{Router, http::StatusCode};
+use breakingjam::{
+    db,
+    domain::dancer::{DancerFields, DancerSource},
+};
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use test_app::{TestResponse, app, delete, get, id_of, post, put, send, set_role, sign_up};
@@ -23,6 +27,13 @@ async fn create(app: &Router, cookie: &str, body: Value) -> TestResponse {
     send(app, post("/api/dancers", body, Some(cookie))).await
 }
 
+/// A new account that has registered a jam, so it may make pages for others.
+async fn organizer(app: &Router, pool: &PgPool, email: &str) -> String {
+    let cookie = sign_up(app, email).await;
+    set_role(pool, email, "organizer").await;
+    cookie
+}
+
 fn names(response: &TestResponse) -> Vec<String> {
     response.json["items"]
         .as_array()
@@ -36,7 +47,18 @@ fn names(response: &TestResponse) -> Vec<String> {
 async fn create_normalises_and_sets_source_from_role(pool: PgPool) {
     let app = app(pool.clone());
     let user = sign_up(&app, "user@example.com").await;
-    let created = create(&app, &user, dancer("Lil G", Some(" @Lil_G "))).await;
+    // A plain account makes only its own page; pages for others come with jams.
+    let for_someone = create(&app, &user, dancer("Lil G", None)).await;
+    assert_eq!(for_someone.status, StatusCode::FORBIDDEN);
+    let created = send(
+        &app,
+        post(
+            "/api/dancers/mine",
+            dancer("Lil G", Some(" @Lil_G ")),
+            Some(&user),
+        ),
+    )
+    .await;
     assert_eq!(created.status, StatusCode::CREATED);
     assert_eq!(created.json["instagram_handle"], "lil_g");
     assert_eq!(created.json["real_name"], Value::Null);
@@ -49,8 +71,7 @@ async fn create_normalises_and_sets_source_from_role(pool: PgPool) {
         );
     }
 
-    let organizer = sign_up(&app, "org@example.com").await;
-    set_role(&pool, "org@example.com", "organizer").await;
+    let organizer = organizer(&app, &pool, "org@example.com").await;
     let by_organizer = create(&app, &organizer, dancer("Ventus", None)).await;
     assert_eq!(by_organizer.json["source"], "organizer");
 
@@ -62,8 +83,8 @@ async fn create_normalises_and_sets_source_from_role(pool: PgPool) {
 
 #[sqlx::test]
 async fn handle_is_unique_but_names_are_not(pool: PgPool) {
-    let app = app(pool);
-    let cookie = sign_up(&app, "user@example.com").await;
+    let app = app(pool.clone());
+    let cookie = organizer(&app, &pool, "org@example.com").await;
     create(&app, &cookie, dancer("Lil G", Some("lilg"))).await;
 
     let same_handle = create(&app, &cookie, dancer("Other", Some("@LILG"))).await;
@@ -117,7 +138,7 @@ async fn create_validates_fields(pool: PgPool) {
 async fn search_matches_name_alias_and_handle_notable_first(pool: PgPool) {
     let app = app(pool.clone());
     let seeder = sign_up(&app, "seed@example.com").await;
-    let user = sign_up(&app, "user@example.com").await;
+    let user = organizer(&app, &pool, "org@example.com").await;
 
     create(&app, &user, dancer("Kid Rockett", None)).await;
     set_role(&pool, "seed@example.com", "seed_admin").await;
@@ -170,8 +191,8 @@ async fn search_matches_name_alias_and_handle_notable_first(pool: PgPool) {
 
 #[sqlx::test]
 async fn profile_shows_can_edit_per_caller(pool: PgPool) {
-    let app = app(pool);
-    let creator = sign_up(&app, "creator@example.com").await;
+    let app = app(pool.clone());
+    let creator = organizer(&app, &pool, "creator@example.com").await;
     let stranger = sign_up(&app, "stranger@example.com").await;
     let id = id_of(&create(&app, &creator, dancer("Lil G", None)).await);
     let uri = format!("/api/dancers/{id}");
@@ -195,7 +216,7 @@ async fn profile_shows_can_edit_per_caller(pool: PgPool) {
 #[sqlx::test]
 async fn update_rights_follow_verification(pool: PgPool) {
     let app = app(pool.clone());
-    let creator = sign_up(&app, "creator@example.com").await;
+    let creator = organizer(&app, &pool, "creator@example.com").await;
     let owner = sign_up(&app, "owner@example.com").await;
     let id = id_of(&create(&app, &creator, dancer("Lil G", None)).await);
     let uri = format!("/api/dancers/{id}");
@@ -230,8 +251,7 @@ async fn update_rights_follow_verification(pool: PgPool) {
 #[sqlx::test]
 async fn delete_is_seed_admin_only_and_soft(pool: PgPool) {
     let app = app(pool.clone());
-    let organizer = sign_up(&app, "org@example.com").await;
-    set_role(&pool, "org@example.com", "organizer").await;
+    let organizer = organizer(&app, &pool, "org@example.com").await;
     let id = id_of(&create(&app, &organizer, dancer("Lil G", None)).await);
     let uri = format!("/api/dancers/{id}");
 
@@ -308,7 +328,7 @@ async fn enter(pool: &PgPool, battle: Uuid, dancer: Uuid, reached: &str) {
 #[sqlx::test]
 async fn events_split_upcoming_and_past_with_roles(pool: PgPool) {
     let app = app(pool.clone());
-    let cookie = sign_up(&app, "user@example.com").await;
+    let cookie = organizer(&app, &pool, "org@example.com").await;
     let id: Uuid = id_of(&create(&app, &cookie, dancer("Lil G", None)).await)
         .parse()
         .unwrap();
@@ -406,4 +426,197 @@ async fn a_deleted_dancer_stays_on_past_results_and_saves_but_joins_nothing_new(
     )
     .await;
     assert_eq!(swapped.status, StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+/// What an approved claim (M7b) does: the account owns the page, now verified.
+async fn verify(pool: &PgPool, dancer: &str, email: &str) {
+    sqlx::query!(
+        "update dancers set verified_at = now(),
+           user_id = (select id from app_users where email = $2::text::citext)
+         where id = $1::text::uuid",
+        dancer,
+        email
+    )
+    .execute(pool)
+    .await
+    .unwrap();
+}
+
+#[sqlx::test]
+async fn an_account_makes_one_page_of_its_own_and_me_shows_it(pool: PgPool) {
+    let app = app(pool.clone());
+    let user = sign_up(&app, "nova@example.com").await;
+    let me = |cookie: String| {
+        let app = app.clone();
+        async move { send(&app, get("/api/auth/me", Some(&cookie))).await.json }
+    };
+    assert_eq!(me(user.clone()).await["dancer"], Value::Null);
+
+    let mine = |body: Value, cookie: &str| post("/api/dancers/mine", body, Some(cookie));
+    let created = send(&app, mine(dancer("Nova", None), &user)).await;
+    assert_eq!(created.status, StatusCode::CREATED);
+    assert_eq!(created.json["source"], "self");
+    assert_eq!(created.json["can_edit"], true);
+    // What the dancer does comes with verification.
+    assert_eq!(created.json["can_set_titles"], false);
+    let id = id_of(&created);
+    let page = me(user.clone()).await["dancer"].clone();
+    assert_eq!(
+        (&page["id"], &page["dancer_name"], &page["verified"]),
+        (&json!(id), &json!("Nova"), &json!(false))
+    );
+
+    let again = send(&app, mine(dancer("Nova 2", None), &user)).await;
+    assert_eq!(again.status, StatusCode::CONFLICT);
+    assert_eq!(
+        again.json["error"]["message"],
+        "this account already has a page"
+    );
+    // Two tabs at once get past that check together; the index still holds.
+    let fields: DancerFields = serde_json::from_value(dancer("Nova 3", None)).unwrap();
+    let user_id = sqlx::query_scalar!("select id from app_users where email = 'nova@example.com'")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    let raced = db::dancers::insert(&pool, &fields, DancerSource::SelfCreated, user_id).await;
+    assert!(raced.is_err_and(|e| {
+        e.as_database_error()
+            .is_some_and(|d| d.is_unique_violation())
+    }));
+    let mut titled = dancer("Atlas", None);
+    titled["titles"] = json!(["bboy"]);
+    let other = sign_up(&app, "atlas@example.com").await;
+    assert_eq!(
+        send(&app, mine(titled, &other)).await.status,
+        StatusCode::FORBIDDEN
+    );
+    // An organiser's own page is theirs too, not one made for a jam.
+    let organizer = organizer(&app, &pool, "org@example.com").await;
+    let theirs = send(&app, mine(dancer("Ventus", None), &organizer)).await;
+    assert_eq!(theirs.json["source"], "self");
+
+    // Its maker edits it like any unverified page: every change kept in `dancer_edits`.
+    let uri = format!("/api/dancers/{id}");
+    let edited = send(&app, put(&uri, dancer("Nova B", None), Some(&user))).await;
+    assert_eq!(edited.status, StatusCode::OK);
+    let logged = sqlx::query_scalar!(
+        r#"select count(*) as "count!" from dancer_edits
+           where dancer_id = $1::text::uuid and field = 'dancer_name'"#,
+        id
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(logged, 1);
+
+    // Merged into the page an organiser made for the same dancer, it follows the merge.
+    let survivor = id_of(&create(&app, &organizer, dancer("Nova", Some("nova"))).await);
+    let admin = sign_up(&app, "admin@example.com").await;
+    set_role(&pool, "admin@example.com", "admin").await;
+    let uri = format!("/api/admin/dancers/{id}/merge");
+    let merged = send(&app, post(&uri, json!({ "into": survivor }), Some(&admin))).await;
+    assert_eq!(merged.status, StatusCode::OK);
+    assert_eq!(me(user.clone()).await["dancer"]["id"], json!(survivor));
+    // The merged page still counts: no fresh duplicate.
+    let after_merge = send(&app, mine(dancer("Nova", None), &user)).await;
+    assert_eq!(after_merge.status, StatusCode::CONFLICT);
+
+    // Verified, it says so; a page someone else owns is never "mine".
+    verify(&pool, &survivor, "nova@example.com").await;
+    assert_eq!(me(user.clone()).await["dancer"]["verified"], true);
+    sqlx::query!(
+        "update dancers set user_id = (select id from app_users where email = 'atlas@example.com')
+         where id = $1::text::uuid",
+        survivor
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+    assert_eq!(me(user.clone()).await["dancer"], Value::Null);
+    // With no page left, the account may make one again: never stuck between the two rules.
+    let fresh = send(&app, mine(dancer("Nova", None), &user)).await;
+    assert_eq!(fresh.status, StatusCode::CREATED);
+    assert_eq!(me(user.clone()).await["dancer"]["id"], json!(id_of(&fresh)));
+
+    // The same when someone else's claim on the page it made is approved.
+    let fresh = id_of(&fresh);
+    sign_up(&app, "rival@example.com").await;
+    verify(&pool, &fresh, "rival@example.com").await;
+    assert_eq!(me(user.clone()).await["dancer"], Value::Null);
+    let again = send(&app, mine(dancer("Nova", None), &user)).await;
+    assert_eq!(again.status, StatusCode::CREATED);
+}
+
+#[sqlx::test]
+async fn titles_are_set_by_the_verified_owner_or_the_team_only(pool: PgPool) {
+    let app = app(pool.clone());
+    let organizer = organizer(&app, &pool, "org@example.com").await;
+    let owner = sign_up(&app, "owner@example.com").await;
+    let seeder = sign_up(&app, "seed@example.com").await;
+    set_role(&pool, "seed@example.com", "seed_admin").await;
+    let with_titles = |name: &str, titles: Value| {
+        let mut body = dancer(name, None);
+        body["titles"] = titles;
+        body
+    };
+
+    // An organiser makes the page, but doesn't say what its dancer does.
+    let refused = create(&app, &organizer, with_titles("Lil G", json!(["bboy"]))).await;
+    assert_eq!(refused.status, StatusCode::FORBIDDEN);
+    let id = id_of(&create(&app, &organizer, dancer("Lil G", None)).await);
+    let uri = format!("/api/dancers/{id}");
+    let page = send(&app, get(&uri, Some(&organizer))).await.json;
+    assert_eq!(
+        (&page["titles"], &page["can_set_titles"]),
+        (&json!([]), &json!(false))
+    );
+    let by_creator = send(
+        &app,
+        put(&uri, with_titles("Lil G", json!(["dj"])), Some(&organizer)),
+    )
+    .await;
+    assert_eq!(by_creator.status, StatusCode::FORBIDDEN);
+
+    // Its verified owner does: in the fixed order, without repeats.
+    verify(&pool, &id, "owner@example.com").await;
+    assert_eq!(
+        send(&app, get(&uri, Some(&owner))).await.json["can_set_titles"],
+        true
+    );
+    let titles = json!(["dj", "bgirl", "dj"]);
+    let set = send(&app, put(&uri, with_titles("Lil G", titles), Some(&owner))).await;
+    assert_eq!(set.status, StatusCode::OK);
+    assert_eq!(set.json["titles"], json!(["bgirl", "dj"]));
+    // A save without titles keeps them.
+    let kept = send(&app, put(&uri, dancer("Lil G.", None), Some(&owner))).await;
+    assert_eq!(kept.json["titles"], json!(["bgirl", "dj"]));
+
+    // The BreakingJam team may, on any page; a merge gives them to a survivor that has none.
+    let seeded = create(
+        &app,
+        &seeder,
+        with_titles("Hong 10", json!(["breaker", "judge"])),
+    )
+    .await;
+    assert_eq!(seeded.json["titles"], json!(["breaker", "judge"]));
+    let survivor = id_of(&create(&app, &organizer, dancer("Hong10", None)).await);
+    let admin = sign_up(&app, "admin@example.com").await;
+    set_role(&pool, "admin@example.com", "admin").await;
+    let merge = format!("/api/admin/dancers/{}/merge", id_of(&seeded));
+    send(
+        &app,
+        post(&merge, json!({ "into": survivor }), Some(&admin)),
+    )
+    .await;
+    let merged = send(&app, get(&format!("/api/dancers/{survivor}"), None)).await;
+    assert_eq!(merged.json["titles"], json!(["breaker", "judge"]));
+
+    // A survivor with an owner keeps the titles its owner chose, none included.
+    let titled = create(&app, &seeder, with_titles("B-Boy X", json!(["mc"]))).await;
+    let owned = id_of(&create(&app, &organizer, dancer("Bboy X", None)).await);
+    verify(&pool, &owned, "seed@example.com").await;
+    let merge = format!("/api/admin/dancers/{}/merge", id_of(&titled));
+    send(&app, post(&merge, json!({ "into": owned }), Some(&admin))).await;
+    let kept = send(&app, get(&format!("/api/dancers/{owned}"), None)).await;
+    assert_eq!(kept.json["titles"], json!([]));
 }

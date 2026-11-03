@@ -32,12 +32,42 @@ pub enum DancerSource {
 }
 
 impl DancerSource {
-    /// The origin implied by who creates the row.
+    /// The origin of a page made for someone else, by who makes it; an account's own page is
+    /// `SelfCreated`, made only through `POST /dancers/mine`.
     pub fn for_creator(role: Role) -> Self {
         match role {
-            Role::User => Self::SelfCreated,
-            Role::Organizer => Self::Organizer,
+            Role::User | Role::Organizer => Self::Organizer,
             Role::SeedAdmin | Role::Admin => Self::Seed,
+        }
+    }
+}
+
+/// What a dancer page says its dancer does ("I'm a…", M25); never guessed, only set.
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
+#[sqlx(type_name = "dancer_title", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum DancerTitle {
+    Bboy,
+    Bgirl,
+    /// The word that picks no side.
+    Breaker,
+    Dj,
+    Mc,
+    Judge,
+}
+
+impl DancerTitle {
+    /// The stored word, e.g. `dj`.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Bboy => "bboy",
+            Self::Bgirl => "bgirl",
+            Self::Breaker => "breaker",
+            Self::Dj => "dj",
+            Self::Mc => "mc",
+            Self::Judge => "judge",
         }
     }
 }
@@ -74,6 +104,8 @@ pub struct Dancer {
     pub avatar_url: Option<String>,
     /// The generated avatar's parts, e.g. `h2-s1-c0-o3-e0-b1`; null means seeded from the id.
     pub avatar_parts: Option<String>,
+    /// What the dancer does, in a fixed order; empty until its owner or the team says.
+    pub titles: Vec<DancerTitle>,
     #[serde(skip)]
     pub created_by: Option<Uuid>,
     /// Set when an admin merged this row into another; it is then only a redirect.
@@ -94,6 +126,12 @@ impl Dancer {
             Some(_) => self.user_id == Some(user.id),
             None => self.created_by == Some(user.id),
         }
+    }
+
+    /// Who may say what the dancer does: its verified owner, or `seed_admin`+.
+    pub fn can_set_titles(&self, user: &User) -> bool {
+        user.role >= Role::SeedAdmin
+            || (self.verified_at.is_some() && self.user_id == Some(user.id))
     }
 }
 
@@ -129,7 +167,7 @@ pub type FieldChange = (&'static str, Option<String>, Option<String>);
 
 /// The profile fields that differ between two versions of a dancer.
 pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
-    const FIELDS: [&str; 9] = [
+    const FIELDS: [&str; 10] = [
         "dancer_name",
         "aliases",
         "real_name",
@@ -139,8 +177,10 @@ pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
         "bio",
         "instagram_handle",
         "avatar_parts",
+        "titles",
     ];
-    let values = |d: &Dancer| -> [Option<String>; 9] {
+    let titles = |d: &Dancer| d.titles.iter().map(|t| t.as_str()).collect::<Vec<_>>();
+    let values = |d: &Dancer| -> [Option<String>; 10] {
         [
             Some(d.dancer_name.clone()),
             (!d.aliases.is_empty()).then(|| d.aliases.join(", ")),
@@ -151,6 +191,7 @@ pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
             d.bio.clone(),
             d.instagram_handle.clone(),
             d.avatar_parts.clone(),
+            (!d.titles.is_empty()).then(|| titles(d).join(", ")),
         ]
     };
     FIELDS
@@ -200,6 +241,17 @@ pub struct DancerRef {
     pub avatar_parts: Option<String>,
     /// The page is gone: the name stays on past results, with nothing to link to.
     pub deleted: bool,
+}
+
+/// The account's own page (`GET /auth/me`): linked by an approved claim, or made by the account
+/// and waiting for one.
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
+pub struct OwnPage {
+    /// The page.
+    #[serde(flatten)]
+    pub dancer: DancerRef,
+    /// Whether an approved claim links it to the account; false while it waits for one.
+    pub verified: bool,
 }
 
 /// One appearance at a public jam: the jam, the battle when competing, the result when known.
@@ -324,6 +376,10 @@ pub struct DancerFields {
     /// The generated avatar's parts (DESIGN.md §4.16); blank or absent means seeded from the id.
     #[validate(custom(function = "avatar_parts_shape"))]
     pub avatar_parts: Option<String>,
+    /// What the dancer does; absent keeps what is stored. Only its verified owner or
+    /// `seed_admin`+ may send it.
+    #[serde(default)]
+    pub titles: Option<Vec<DancerTitle>>,
 }
 
 /// Each part's letter and highest option: hair, skin, hair colour, hoodie, extra, backdrop, then

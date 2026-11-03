@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { api, type Schemas } from "../../api/client";
 import { ChipInput } from "../../components/ChipInput";
+import { ChipRow } from "../../components/ChipRow";
 import { CountrySelect } from "../../components/CountrySelect";
 import { Dialog } from "../../components/Dialog";
 import { FormError } from "../../components/FormError";
@@ -18,7 +19,7 @@ import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
 import { applyFieldErrors } from "../../lib/apiErrors";
 import { toHandle } from "../../lib/instagram";
-import { ME_KEY } from "../auth/useMe";
+import { ME_KEY, useMe } from "../auth/useMe";
 import {
   type AvatarParts,
   DETAILS,
@@ -30,6 +31,16 @@ import {
 import { DancerAvatar } from "./DancerAvatar";
 
 type Dancer = Schemas["DancerResponse"];
+type Title = Schemas["DancerTitle"];
+/** "I'm a…" (M25), in the order the API keeps them. */
+const TITLES: readonly Title[] = [
+  "bboy",
+  "bgirl",
+  "breaker",
+  "dj",
+  "mc",
+  "judge",
+];
 type Values = {
   dancer_name: string;
   aliases: string[];
@@ -39,6 +50,7 @@ type Values = {
   instagram_handle: string;
   bio: string;
   parts: AvatarParts;
+  titles: Title[];
 };
 const FIELDS = [
   "dancer_name",
@@ -60,6 +72,7 @@ function valuesOf(dancer: Dancer): Values {
     instagram_handle: dancer.instagram_handle ?? "",
     bio: dancer.bio ?? "",
     parts: partsOf(dancer),
+    titles: dancer.titles,
   };
 }
 
@@ -81,6 +94,7 @@ export function DancerEditDialog({
   const queryClient = useQueryClient();
   const formId = useId();
   const schema = useSchema();
+  const mine = useMe().data?.dancer?.id === dancer.id;
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     mode: "onTouched",
@@ -111,6 +125,8 @@ export function DancerEditDialog({
             dancer.avatar_parts || drawn.current
               ? formatParts(values.parts)
               : null,
+          // Sent only by who may set them; the API keeps them otherwise.
+          ...(dancer.can_set_titles && { titles: values.titles }),
         },
       }),
     onSuccess: ({ data, error, response }) => {
@@ -165,6 +181,34 @@ export function DancerEditDialog({
             />
           )}
         />
+        {dancer.can_set_titles && (
+          <Controller
+            control={control}
+            name="titles"
+            render={({ field }) => (
+              <ChipRow
+                label={
+                  mine ? t("dancerEdit.titlesMine") : t("dancerEdit.titles")
+                }
+                hint={t("dancerEdit.titlesHint")}
+                chips={TITLES.map((title) => {
+                  const on = field.value.includes(title);
+                  return {
+                    key: title,
+                    label: t(`dancer.titles.${title}`),
+                    on,
+                    onPick: () =>
+                      field.onChange(
+                        on
+                          ? field.value.filter((other) => other !== title)
+                          : [...field.value, title],
+                      ),
+                  };
+                })}
+              />
+            )}
+          />
+        )}
         <div className="grid gap-6 lg:grid-cols-2">
           <CountrySelect
             label={t("dancerEdit.country")}
@@ -309,6 +353,7 @@ function useSchema() {
           .regex(/^[A-Za-z0-9._]{0,30}$/, t("validation.handle")),
         bio: z.string().max(160, t("validation.tooLong", { max: 160 })),
         parts: z.custom<AvatarParts>(),
+        titles: z.custom<Title[]>(),
       }),
     [t],
   );

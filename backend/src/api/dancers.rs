@@ -31,6 +31,7 @@ use crate::{
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(list, create))
+        .routes(routes!(create_mine))
         .routes(routes!(show, update, delete))
         .routes(routes!(events))
 }
@@ -59,6 +60,8 @@ pub struct DancerResponse {
     pub crews: Vec<CrewRef>,
     /// Whether the caller may `PUT` this dancer.
     pub can_edit: bool,
+    /// Whether the caller may send its `titles`: its verified owner, or `seed_admin`+.
+    pub can_set_titles: bool,
 }
 
 /// Body of `GET /dancers/{id}`: the page, or where a merged dancer now lives (§4 "Merge").
@@ -160,7 +163,7 @@ async fn show(
     Ok(Json(DancerPage::Dancer(Box::new(response))))
 }
 
-/// Create a dancer; `source` follows the creator's role.
+/// Create a page for someone else, as jam flows do; `source` follows the creator's role.
 #[utoipa::path(
     post,
     path = "/dancers",
@@ -171,6 +174,7 @@ async fn show(
     responses(
         (status = CREATED, body = DancerResponse),
         Unauthorized,
+        (status = FORBIDDEN, description = "Below `organizer`, or titles below `seed_admin`", body = ErrorEnvelope),
         (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
         InvalidFields,
     )
@@ -180,10 +184,62 @@ async fn create(
     current: CurrentUser,
     ValidJson(fields): ValidJson<DancerFields>,
 ) -> Result<(StatusCode, Json<DancerResponse>), AppError> {
+    // An account makes its own page through `create_mine`; other pages come with jams.
+    current.require(Role::Organizer)?;
+    check_new_titles(&fields, &current)?;
     let source = DancerSource::for_creator(current.user.role);
     let dancer = db::dancers::insert(&state.pool, &fields, source, current.user.id).await?;
     let response = respond(&state, dancer, Some(&current)).await?;
     Ok((StatusCode::CREATED, Json(response)))
+}
+
+/// Create the account's own page (M25), unverified until a claim on it is approved; one per account.
+#[utoipa::path(
+    post,
+    path = "/dancers/mine",
+    tag = "dancers",
+    operation_id = "create_own_dancer",
+    request_body = DancerFields,
+    security(("session" = [])),
+    responses(
+        (status = CREATED, body = DancerResponse),
+        Unauthorized,
+        (status = FORBIDDEN, description = "Titles below `seed_admin`: they come with verification", body = ErrorEnvelope),
+        (status = CONFLICT, description = "The account already has a page, or the Instagram handle is taken", body = ErrorEnvelope),
+        InvalidFields,
+    )
+)]
+async fn create_mine(
+    State(state): State<AppState>,
+    current: CurrentUser,
+    ValidJson(fields): ValidJson<DancerFields>,
+) -> Result<(StatusCode, Json<DancerResponse>), AppError> {
+    check_new_titles(&fields, &current)?;
+    // The unique index holds the rule against a race; this says it in words.
+    if db::dancers::own_page(&state.pool, current.user.id)
+        .await?
+        .is_some()
+    {
+        return Err(AppError::Conflict("this account already has a page".into()));
+    }
+    let dancer = db::dancers::insert(
+        &state.pool,
+        &fields,
+        DancerSource::SelfCreated,
+        current.user.id,
+    )
+    .await?;
+    let response = respond(&state, dancer, Some(&current)).await?;
+    Ok((StatusCode::CREATED, Json(response)))
+}
+
+/// A new page is unverified, so only `seed_admin`+ may say what its dancer does.
+fn check_new_titles(fields: &DancerFields, current: &CurrentUser) -> Result<(), AppError> {
+    let titled = fields.titles.as_ref().is_some_and(|t| !t.is_empty());
+    if titled && current.user.role < Role::SeedAdmin {
+        return Err(AppError::Forbidden);
+    }
+    Ok(())
 }
 
 /// Replace a dancer's profile; edits to unverified dancers are logged.
@@ -198,7 +254,7 @@ async fn create(
     responses(
         (status = OK, body = DancerResponse),
         Unauthorized,
-        (status = FORBIDDEN, description = "Not the creator (unverified), the owner (verified) nor `seed_admin`+", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the creator (unverified), the owner (verified) nor `seed_admin`+; or titles from anyone but the verified owner and `seed_admin`+", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such dancer, or merged away", body = ErrorEnvelope),
         (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
         InvalidFields,
@@ -218,7 +274,8 @@ async fn update(
             .await?
             .filter(|d| d.merged_into_id.is_none())
             .ok_or(AppError::NotFound)?;
-        if !old.can_edit(user) {
+        // Titles are the dancer's own word: a creator may fix the page, not say what they do.
+        if !old.can_edit(user) || (fields.titles.is_some() && !old.can_set_titles(user)) {
             return Err(AppError::Forbidden);
         }
         let new = db::dancers::update(&mut tx, id, fields).await?;
@@ -310,9 +367,11 @@ async fn respond(
         .remove(&dancer.id)
         .unwrap_or_default();
     let can_edit = current.is_some_and(|c| dancer.can_edit(&c.user));
+    let can_set_titles = current.is_some_and(|c| dancer.can_set_titles(&c.user));
     Ok(DancerResponse {
         dancer,
         crews,
         can_edit,
+        can_set_titles,
     })
 }

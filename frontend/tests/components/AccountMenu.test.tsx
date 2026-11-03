@@ -14,6 +14,8 @@ const NOVA = {
     instagram_handle: "nova",
     avatar_url: null,
     avatar_parts: null,
+    deleted: false,
+    verified: true,
   },
 };
 const ORGANIZER = { ...LIL_G, role: "organizer" };
@@ -51,22 +53,36 @@ describe("AccountMenu", () => {
     const first = menu.getAllByRole("menuitem")[0];
     expect(first).toHaveFocus();
     expect(first).toHaveAttribute("href", `/dancers/${NOVA.dancer.id}`);
-    expect(first).toHaveAccessibleName(/^Nova Verified View my dancer page/);
+    expect(first).toHaveAccessibleName(/^Nova Verified View my page/);
     expect(menu.queryByRole("menuitem", { name: /My jams/ })).toBeNull();
     expect(menu.queryByRole("menuitem", { name: /Admin/ })).toBeNull();
   });
 
-  it("without a dancer page, first looks for one by the account's name", async () => {
-    mockApi({ "GET /api/auth/me": me(LIL_G), "GET /api/events": drafts(0) });
+  it("shows a page the account made as its own, asking to verify it", async () => {
+    const unverified = { ...NOVA, dancer: { ...NOVA.dancer, verified: false } };
+    mockApi({
+      "GET /api/auth/me": me(unverified),
+      "GET /api/events": drafts(0),
+    });
     renderApp("/nowhere");
+    const menu = await openMenu("Nova");
+
+    const first = menu.getAllByRole("menuitem")[0];
+    expect(first).toHaveAttribute("href", `/dancers/${NOVA.dancer.id}`);
+    expect(first).toHaveAccessibleName("Nova Not verified yet · Verify it");
+  });
+
+  it("without a page, leads to the welcome step, back here after", async () => {
+    mockApi({ "GET /api/auth/me": me(LIL_G), "GET /api/events": drafts(0) });
+    renderApp("/nowhere?x=1");
     const menu = await openMenu("Lil G");
 
     const find = menu.getAllByRole("menuitem")[0];
-    expect(find).toHaveAccessibleName("Find my dancer page");
+    expect(find).toHaveAccessibleName("Find my page");
     expect(find).toHaveAccessibleDescription(
-      "Are you a dancer? Find your page and claim it.",
+      "Are you on BreakingJam? Find your page, or make it.",
     );
-    expect(find).toHaveAttribute("href", "/dancers?q=Lil%20G");
+    expect(find).toHaveAttribute("href", "/welcome?next=%2Fnowhere%3Fx%3D1");
     expect(menu.queryByRole("menuitem", { name: /My jams/ })).toBeNull();
     expect(menu.queryByRole("menuitem", { name: /Admin/ })).toBeNull();
   });

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                  instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                  avatar_parts,\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null\n           for update",
+  "query": "select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,\n                  instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                  avatar_parts, titles as \"titles: Vec<DancerTitle>\",\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null\n           for update",
   "describe": {
     "columns": [
       {
@@ -170,6 +170,38 @@
       },
       {
         "ordinal": 14,
+        "name": "titles: Vec<DancerTitle>",
+        "type_info": {
+          "Custom": {
+            "name": "dancer_title[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "dancer_title",
+                  "kind": {
+                    "Enum": [
+                      "bboy",
+                      "bgirl",
+                      "breaker",
+                      "dj",
+                      "mc",
+                      "judge"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "titles"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
         "name": "created_by",
         "type_info": "Uuid",
         "origin": {
@@ -180,7 +212,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "merged_into_id",
         "type_info": "Uuid",
         "origin": {
@@ -191,7 +223,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -202,7 +234,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -233,11 +265,12 @@
       true,
       true,
       true,
+      false,
       true,
       true,
       false,
       false
     ]
   },
-  "hash": "eadc3009e22d286cd999e85049bc185e7ed44c4757486001d0b99fc7f6eb0e0c"
+  "hash": "68d683811c6e8a854fe945c56f6dd9b529c5689e9234599733a563bc45f9c09a"
 }

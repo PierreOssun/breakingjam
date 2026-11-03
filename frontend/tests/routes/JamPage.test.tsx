@@ -577,7 +577,7 @@ describe("JamPage", () => {
       await within(dialog).findByText("Nothing found for “Lil”."),
     ).toBeInTheDocument();
     await userEvent.click(create);
-    const name = within(dialog).getByLabelText("Dancer name");
+    const name = within(dialog).getByLabelText("Stage name");
     expect(name).toHaveValue("Lil");
     await userEvent.type(name, " Nova");
     await userEvent.selectOptions(

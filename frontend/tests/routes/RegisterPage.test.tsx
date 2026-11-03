@@ -26,15 +26,24 @@ describe("RegisterPage", () => {
     expect(calls(fetch)).not.toContain("POST /api/auth/register");
   });
 
-  it("sends a new account home rather than to the jam form", async () => {
+  it("welcomes a new account, then sends it home rather than to the jam form", async () => {
     mockApi({
       "GET /api/auth/me": LOGGED_OUT,
       "POST /api/auth/register": { status: 201, body: LIL_G },
+      "GET /api/dancers": {
+        status: 200,
+        body: { items: [], next_cursor: null },
+      },
     });
     const router = renderApp("/register?next=%2Forg%2Fjams%2Fnew");
 
     await fillAndSubmit();
 
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe("/welcome"),
+    );
+    expect(router.state.location.search).toBe("?next=%2F");
+    await userEvent.click(await screen.findByRole("button", { name: /^Skip/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
     expect(
       screen.queryByRole("heading", { name: "Register a jam" }),
@@ -51,8 +60,11 @@ describe("RegisterPage", () => {
     await fillAndSubmit();
 
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe("/jams/paris-cypher-3f9a1c"),
+      expect(router.state.location.search).toBe(
+        "?next=%2Fjams%2Fparis-cypher-3f9a1c",
+      ),
     );
+    expect(router.state.location.pathname).toBe("/welcome");
   });
 
   it("points a taken email at the login page", async () => {

@@ -20,7 +20,9 @@ const DANCER = {
   created_at: at,
   updated_at: at,
   crews: [{ id: "c1", name: "Floor Lords", since: null }],
+  titles: [],
   can_edit: false,
+  can_set_titles: false,
 };
 
 const jam = (n: number, startsOn: string, country = "FR") => ({

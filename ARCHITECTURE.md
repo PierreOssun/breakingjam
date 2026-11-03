@@ -8,7 +8,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 ## 1. Scope
 
 ### In scope
-- Public landing page: a title, a subtitle and one search for jams and people (`/search`), then the next jams near the visitor and the site's counts (M18). **Register a jam** (`/org/jams/new`; login required, back to it after logging in; a new account, by email or Google, lands on the home page instead, as it may not organise; from any other page it returns there) is in the header on every page. The map (`/map`) and the jam list (`/jams`) are the browse experiences.
+- Public landing page: a title, a subtitle and one search for jams and people (`/search`), then the next jams near the visitor and the site's counts (M18). **Register a jam** (`/org/jams/new`; login required, back to it after logging in; a new account, by email or Google, goes through the welcome step and then to the home page instead, as it may not organise; from any other page it returns there) is in the header on every page. The map (`/map`) and the jam list (`/jams`) are the browse experiences.
 - World map of published jams (MapLibre GL); clicking a point opens a popup → jam detail page.
 - Jam (event) CRUD for authenticated organisers. An admin approves each organiser's jam before it goes public (M14).
 - Jam editor (M24, replaces the form of M12): **Register a jam** asks for the name and the first day only, creates the draft and opens its page in edit mode (`/org/jams/{id}/edit`). Every part of the page is a block (dates, venue, battles, lineup, about, links) that saves as you type; empty blocks show "+ Add" to the organiser and nothing to visitors. A publish checklist (name, dates, city + map pin, at least one battle) gates **Publish**, which submits to review as before; the API refuses `submit` and `publish` until it is complete. Edits to a live jam go public at once, like the flyer. The organiser is the account (co-organisers and crews as organisers stay deferred). Decided Nov 2026, with the author: the venue block gets as-you-type suggestions from Photon (komoot's OpenStreetMap geocoder, which allows autocomplete; Nominatim does not), done in step 2, and the battle sheet becomes category and format chips over the existing fields (§4 Notes), done in step 3.
@@ -20,6 +20,8 @@ This document is the source of truth for the project and evolves with it. Anythi
 - Dancer page (`/dancers/{id}`): name, crew(s), country flag(s), Instagram link, generated avatar, a stats strip (jams, countries, years active, podiums, from past jams; added in M10), and the dancer's jams split into **upcoming** and **past** (with the battle, the stage reached and, once the manager exists, the full result). Reached from a dancer on a jam page, or from **Find someone** (`/dancers`): a public search by name, alias or handle over everyone (bboys, bgirls, DJs, MCs, judges), notable dancers first (`GET /api/dancers`).
 - Organiser page (`/organizers/{id}`, added in M12c): like a dancer page without battles: the organiser's name, Instagram, country, city, bio and public jams, upcoming and past. Organisers verify their Instagram handle with the same code-and-review flow as dancers. The jam page links to it from its organiser card, which is left out for jams the BreakingJam team entered (seed admins and admins list jams they don't run, such as the imported historical ones).
 - Dancer identity: Instagram handle as the (optional) uniqueness key, "Verify me" claim flow with a code-in-bio check reviewed by an admin, edits on unverified dancers by their creator or a BreakingJam admin (logged in `dancer_edits`), admin merge. See §4 "Dancer identity".
+- Welcome step (M25, `/welcome?next=…`): right after sign-up, by email or Google, "Are you on BreakingJam?" searches the account's name. Each match leads to its page, where "This is me" verifies it. **Create my page** appears once a search has run and makes the account's own page, unverified, one per account (`POST /api/dancers/mine`). **Skip** goes on to `next`. The account and the page stay separate: an account may never have a page, and the account menu's "Find my page" leads back here.
+- "I'm a…" titles (M25): a page may say what its dancer does (Bboy, Bgirl, Breaker, DJ, MC, Judge; several, none by default). Only its verified owner and `seed_admin`+ set them, so BreakingJam never guesses anyone's gender or role. The page shows them under the name. One page type for everyone: the code keeps `dancers`, the UI says "people", "my page" and "stage name", never "dancer" for a DJ.
 - Seed data: ~200 well-known dancers entered by a `seed_admin` user before launch (see roles in §5).
 - Crew CRUD and crew membership (dated).
 - Battles per jam (1v1, 2v2 … 10v10, seven-to-smoke; bboy/bgirl/mixed; kids/adult) and entries (registrations) with members and the stage reached.
@@ -118,6 +120,7 @@ Single backend crate for now. Split into a Cargo workspace only when compile tim
 ```sql
 create type user_role as enum ('user', 'organizer', 'seed_admin', 'admin');
 create type dancer_source as enum ('seed', 'organizer', 'self');
+create type dancer_title as enum ('bboy', 'bgirl', 'breaker', 'dj', 'mc', 'judge');   -- M25
 create type claim_status as enum ('pending', 'approved', 'rejected');
 create type event_status as enum ('draft', 'in_review', 'published', 'registration_closed', 'completed', 'cancelled');
 create type entry_status as enum ('pending', 'confirmed', 'withdrawn');
@@ -167,6 +170,7 @@ create table dancers (
   verified_at timestamptz,            -- set on approved claim
   avatar_url text,                    -- uploaded by a verified dancer; null = generated avatar
   avatar_parts text,                  -- the generated avatar's parts, e.g. 'h2-s1-c0-o3-e0-b1', '-d5' for details (M17); null = seeded from id (M12b)
+  titles dancer_title[] not null default '{}',   -- "I'm a…" (M25), in the enum's order; set by the verified owner or seed_admin+
   merged_into_id uuid references dancers(id),   -- non-null = this row is a redirect
   created_by uuid references app_users(id),
   deleted_at timestamptz,
@@ -179,6 +183,10 @@ create index on dancers (country);
 create unique index dancers_instagram_handle_key
   on dancers (lower(instagram_handle))
   where instagram_handle is not null and deleted_at is null and merged_into_id is null;
+create unique index dancers_one_self_page                        -- M25: one page of its own per account,
+  on dancers (created_by)                                          -- counted like `own_page` does: live,
+  where source = 'self' and deleted_at is null and merged_into_id is null   -- not merged away, not someone
+    and (user_id is null or user_id = created_by);                 -- else's (a merge is refused in the handler)
 
 create table dancer_claims (
   id uuid primary key,
@@ -376,7 +384,8 @@ Notes:
 Principles: the Instagram handle is the identity key but may be absent; verification is a state on top of existence, not a different kind of dancer; no photo is ever required.
 
 - **Uniqueness**: `instagram_handle` is unique when present (partial index above). `dancer_name` is not unique — search results always show `name · @handle · country · crew` so the right one can be picked.
-- **Three origins**, one row shape: `seed` (entered by a `seed_admin` before launch, `notable = true`), `organizer` (created during jam registration via search-before-create), `self` (a logged-in user creating their own page). `notable` affects search ranking only; it is never shown in the UI.
+- **Three origins**, one row shape: `seed` (entered by a `seed_admin` before launch, `notable = true`), `organizer` (created during jam registration via search-before-create), `self` (an account's own page, made through `POST /api/dancers/mine` whatever its role, one per account; M25). `notable` affects search ranking only; it is never shown in the UI.
+- **The account's own page** (`me.dancer`, M25): the page an approved claim linked to the account, else the `self` page it made (or the page that was merged into), unless someone else owns that. A page made for oneself is unverified like any other until "This is me" is approved, so the account may edit it (as its creator) but not set its titles.
 - **Verification ("Verify me")**:
   1. A logged-in user opens a dancer page and calls `POST /api/dancers/{id}/claim`. One pending claim per (dancer, user).
   2. The response carries a short code (`BJ-` + 4 chars, unambiguous alphabet). The UI tells them to put it in their Instagram bio or DM it to @breaking.jam (BreakingJam's account; @breakingjam was taken).
@@ -418,8 +427,8 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 - Sessions: `sessions` table, cookie `bj_session` (HttpOnly, Secure, SameSite=Lax, 30-day expiry, rolling). Session id is a UUIDv4 (random, not v7).
 - Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `RequireRole(Organizer)` helper. Roles are ordered `user < organizer < seed_admin < admin`; a check for a role passes for any higher role.
 - Roles:
-  - `user`: can claim a dancer, edit the unverified dancers they created, see everything public.
-  - `organizer`: everything above + create jams and manage their own jams (battles, entries, staff), submit them for review, create dancers/crews from within a jam. A `user` who creates their first jam is promoted to `organizer` automatically (jams start as drafts).
+  - `user`: can claim a dancer, make their own page (one), edit the unverified dancers they created, set the titles of their verified page, see everything public.
+  - `organizer`: everything above + create jams and manage their own jams (battles, entries, staff), submit them for review, create dancers/crews from within a jam (`POST /api/dancers` is `organizer`+, so no account mints pages for others; M25). A `user` who creates their first jam is promoted to `organizer` automatically (jams start as drafts).
   - `seed_admin` ("breakingjam_admin_seed"): everything above + create and edit **any** jam, dancer or crew, including seeding the initial ~200 dancers and historical jams, and publish jams without review. Cannot review jams or claims, merge dancers or manage users.
   - `admin`: everything. Reviews jams and claims, merges dancers, changes roles, sees the overview counts.
 - Google OAuth: authorization-code flow with PKCE via `oauth2` crate; on first login create `app_users` row with `google_sub`; on later logins match by `google_sub`, then by verified email.
@@ -439,7 +448,7 @@ GET    /api/docs                         (Swagger UI, dev only)
 POST   /api/auth/register                {email, password, display_name}
 POST   /api/auth/login
 POST   /api/auth/logout
-GET    /api/auth/me                      {id, email, display_name, role, dancer}: dancer = the page an approved claim linked to the account (id, name, avatar), null until then (M23); register, login and role changes return the same
+GET    /api/auth/me                      {id, email, display_name, role, dancer}: dancer = the account's own page (§4 "Dancer identity": id, name, avatar, `verified`), null when it has none (M23, M25); register, login and role changes return the same
 GET    /api/auth/google                  → redirect
 GET    /api/auth/google/callback
 
@@ -477,8 +486,9 @@ PUT    /api/events/{id}/staff            replace full list
 GET    /api/dancers                      ?q=&country=&verified=&cursor=&limit=   (q = ilike on dancer_name, aliases and instagram_handle; verified = true|false; notable first)
 GET    /api/dancers/{id}                 profile + current crews
 GET    /api/dancers/{id}/events          ?scope=upcoming|past (default both, grouped)  — jams where the dancer is an entry member or staff; each item: event (id, name, slug, starts_on, ends_on, city, country, status), battle (id, name, format, team_size, gender, age), role (competitor|judge|dj|mc…), entry status, reached, final_rank, video_url
-POST   /api/dancers
-PUT    /api/dancers/{id}                 see authorization rules; writes dancer_edits when unverified
+POST   /api/dancers                      a page for someone else, organizer+; titles seed_admin+
+POST   /api/dancers/mine                 the account's own page, unverified, source self; 409 when it has one (M25)
+PUT    /api/dancers/{id}                 see authorization rules; writes dancer_edits when unverified; titles absent = kept, sent only by the verified owner or seed_admin+ (else 403); can_set_titles on the page says who
 DELETE /api/dancers/{id}                 soft delete, seed_admin+
 POST   /api/dancers/{id}/claim           logged-in user → {code, status: pending}
 GET    /api/dancers/{id}/claim           current user's claim on this dancer, if any
@@ -535,7 +545,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Vite + React + TS strict. ESLint + Prettier with defaults.
 - Data fetching: TanStack Query only. No global state library. Auth state = `useQuery(['me'])`.
 - API client: `openapi-typescript` generates `src/api/schema.d.ts` from `backend` OpenAPI (`npm run gen:api` fetches `http://localhost:8080/api/openapi.json`). Calls go through `openapi-fetch`.
-- Routing: `/` (landing), `/map`, `/jams` (Find a jam, the list), `/jams/{slug}`, `/search` (jams and people), `/dancers` (Find someone), `/dancers/{id}`, `/contact`, `/login`, `/register`, `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review), `/admin/claims` and `/admin/dancers/{id}/merge`. No `/crews` routes yet; crews render inline.
+- Routing: `/` (landing), `/map`, `/jams` (Find a jam, the list), `/jams/{slug}`, `/search` (jams and people), `/dancers` (Find someone), `/dancers/{id}`, `/contact`, `/login`, `/register`, `/welcome` (M25, after sign-up), `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review), `/admin/claims` and `/admin/dancers/{id}/merge`. No `/crews` routes yet; crews render inline.
 - Dancer page (`/dancers/{id}`): header (avatar, dancer name, one or two country flags, city, current crews, Instagram link, verified tick when `verified_at` is set, "Verify me" button for logged-in non-owners while unverified, "Edit" for whoever is allowed), then two lists from `GET /api/dancers/{id}/events` — **Upcoming** (jams with `starts_on >= today`, link to `/jams/{slug}`) and **Past** (reverse chronological, with battle name, role, a result badge (`final_rank` as "1st/2nd/3rd", else `reached` as "Top 8"…), and a play icon when the entry has a `video_url`). Empty states for each. This page is the seed of the "where does this bboy go / what did he do" feature; the only edit affordances are those in §4 "Dancer identity".
 - Video embeds: a play icon on an entry (jam page or dancer page) opens a modal with the official YouTube iframe (`youtube-nocookie.com/embed/{id}?start={offset}&rel=0`). Only YouTube URLs are accepted, validated server-side (`youtube.com/watch`, `youtu.be`, `youtube.com/live`); the video id is parsed once on save. Nothing is ever downloaded or hosted.
 - Landing page (`/`), in order (M18, DESIGN.md §6 Landing):
@@ -546,7 +556,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
   M10 decided "no data fetching on this page"; M15 reverses that at the author's request. The map preview and the For dancers and For organisers bands are gone since M18; the organisers' pitch moves to a future `/register` landing.
 - Search (`/search?q=`): first "Near <Place>" when `GET /api/places` finds a city (M22, DESIGN.md §4.33): the 3 nearest upcoming jams within 500 km of it, by great-circle distance in the browser over the map's GeoJSON, on a static mini map, with "Open the map around <Place>" (`/map?lat=&lng=&fit=`). Then the jams the words match, matched in the browser like the map's search (name, city, country), upcoming first, up to 10 then "See all on the map" (`/map?q=`); and the people from `GET /api/dancers?q=`, paged. A section with nothing in it hides while another has results; with nothing anywhere, one empty state. A blank search shows the upcoming jams and the notable people.
 - Find a jam (`/jams`): every jam from `GET /api/events.geojson` as a list, with the map's search and filter chips, upcoming first (past ones with the "Past jams" chip), 30 at a time. The search is kept in `?q=`.
-- Header: Jam map, Find a jam, Find someone, then the language switch, Log in or the avatar button, and **Register a jam**. The full bar shows from `xl`; below, logged out, a menu sheet holds the same items, and logged in, the avatar button opens the account menu as a top sheet that also holds the nav. The account menu (M23, DESIGN.md §4.34): my dancer page (or the search for it), My jams with its drafts (`GET /api/events?mine=true&status=draft`) once the account has registered a jam (role `organizer` and up), Admin for admins with what waits for review (`GET /api/admin/stats`), the Light / Dark / Auto theme (kept in `localStorage`, `data-theme` on `<html>`), Log out.
+- Header: Jam map, Find a jam, Find someone, then the language switch, Log in or the avatar button, and **Register a jam**. The full bar shows from `xl`; below, logged out, a menu sheet holds the same items, and logged in, the avatar button opens the account menu as a top sheet that also holds the nav. The account menu (M23, DESIGN.md §4.34): my page, verified or waiting for its claim (or the welcome step to find or make it), My jams with its drafts (`GET /api/events?mine=true&status=draft`) once the account has registered a jam (role `organizer` and up), Admin for admins with what waits for review (`GET /api/admin/stats`), the Light / Dark / Auto theme (kept in `localStorage`, `data-theme` on `<html>`), Log out.
 - Visual system: follow `DESIGN.md` (tokens, components, states). Tailwind v4: its tokens live in the `@theme` of `src/styles/index.css` (the default palette, type scale, radii and shadows are removed), and `src/styles/tokens.test.ts` fails when they drift from `DESIGN.md` §2; do not hard-code colours or spacing outside it. Where `DESIGN.md` differs from this file on scope or routes (8 languages, `/en/…` prefixes, a cookie, `/d/<slug>`), this file wins: EN/FR/DE, unprefixed routes, `localStorage`.
 - Forms: `react-hook-form` + `zod`. Validation mirrors backend validators; backend remains authoritative.
 - i18n: `react-i18next`, language detected from browser, switchable in header, persisted in `localStorage`. Keys namespaced by feature (`events.form.name`). All three JSON files must have identical key sets (add a test).
@@ -652,5 +662,6 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 14. Admin area: jams reviewed before going public, overview counts, claims under the same tabs.
 15. Jam contact email and website; landing page "Featured near you" and site counts.
 24. Jam editor (M24): a) start sheet, editor page with blocks and autosave, publish checklist, nullable city/country, opening hours — done; b) venue block with Photon suggestions, map pin, city and country from the address — done; c) battle sheet with category and format chips, "Add battle" in one tap — done.
+25. Welcome step (M25): "Are you on BreakingJam?" after sign-up (find and verify, create my page, skip), `me` returns the account's own page, one own page per account, "I'm a…" titles set by the verified owner or the team. Find someone filters (by title and country) are their own later step.
 
 For Every suggested build order point, save it in milestones/ with a filename matching the build order point.
