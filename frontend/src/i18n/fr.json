@@ -204,7 +204,8 @@
     },
     "format": {
       "top": "Top {{n}}",
-      "sevenToSmoke": "7 to Smoke"
+      "sevenToSmoke": "7 to Smoke",
+      "showcase": "Showcase"
     }
   },
   "dancer": {
@@ -374,6 +375,7 @@
     },
     "battles": {
       "add": "Ajouter une battle",
+      "addAction": "Ajouter la battle",
       "edit": "Modifier la battle",
       "editOne": "Modifier {{name}}",
       "deleteOne": "Supprimer {{name}}",
@@ -386,11 +388,32 @@
       "deleteConfirm": "Supprimer la battle",
       "format": "Format",
       "formats": {
-        "team": "Battle",
         "seven_to_smoke": "Seven to smoke",
-        "na": "Autre"
+        "na": "Autre",
+        "showcase": "Showcase"
+      },
+      "category": "Catégorie",
+      "categories": {
+        "bboy": "1v1 Bboy",
+        "bgirl": "1v1 Bgirl",
+        "open": "1v1 Open",
+        "duo": "2v2",
+        "crew": "Crew",
+        "kids": "Kids",
+        "footwork": "Footwork",
+        "powermove": "Powermove"
+      },
+      "formatChips": {
+        "top8": "Top 8",
+        "top16": "Top 16",
+        "top32": "Top 32",
+        "smoke": "7 to Smoke",
+        "showcase": "Showcase"
       },
       "teamSize": "Taille",
+      "anySize": "Toute taille",
+      "crewsOf_one": "Solo",
+      "crewsOf_other": "Équipes de {{count}}",
       "gender": "Ouvert aux",
       "genders": {
         "bboy": "Bboys",
@@ -411,10 +434,13 @@
       "bracket": "Tableau",
       "bracketUnknown": "Pas encore connu",
       "bracketOf": "Top {{n}}",
-      "maxEntries": "Places",
+      "maxDancers": "Places max",
+      "maxTeams": "Équipes max",
       "spots_one": "{{count}} place",
       "spots_other": "{{count}} places",
       "name": "Nom",
+      "more": "Plus d’options",
+      "namedAs": "« {{name}} »",
       "nameHint": "Laissez vide pour un nom tiré des champs ci-dessus.",
       "prize": "Prix en argent",
       "noPrize": "Pas de prix en argent",
@@ -429,8 +455,7 @@
         "third": "3e {{amount}}"
       },
       "startDay": "Jour",
-      "startTime": "Heure de début",
-      "startTimeHint": "À laisser vide tant que le programme n’est pas fixé."
+      "startTime": "Heure de début"
     },
     "entries": {
       "add": "Ajouter une inscription",

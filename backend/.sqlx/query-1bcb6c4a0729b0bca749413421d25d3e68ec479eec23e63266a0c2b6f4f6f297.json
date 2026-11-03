@@ -46,7 +46,8 @@
               "Enum": [
                 "team",
                 "seven_to_smoke",
-                "na"
+                "na",
+                "showcase"
               ]
             }
           }
@@ -257,7 +258,8 @@
               "Enum": [
                 "team",
                 "seven_to_smoke",
-                "na"
+                "na",
+                "showcase"
               ]
             }
           }

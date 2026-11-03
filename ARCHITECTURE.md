@@ -11,7 +11,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 - Public landing page: a title, a subtitle and one search for jams and people (`/search`), then the next jams near the visitor and the site's counts (M18). **Register a jam** (`/org/jams/new`; login required, back to it after logging in; a new account, by email or Google, lands on the home page instead, as it may not organise; from any other page it returns there) is in the header on every page. The map (`/map`) and the jam list (`/jams`) are the browse experiences.
 - World map of published jams (MapLibre GL); clicking a point opens a popup → jam detail page.
 - Jam (event) CRUD for authenticated organisers. An admin approves each organiser's jam before it goes public (M14).
-- Jam editor (M24, replaces the form of M12): **Register a jam** asks for the name and the first day only, creates the draft and opens its page in edit mode (`/org/jams/{id}/edit`). Every part of the page is a block (dates, venue, battles, lineup, about, links) that saves as you type; empty blocks show "+ Add" to the organiser and nothing to visitors. A publish checklist (name, dates, city + map pin, at least one battle) gates **Publish**, which submits to review as before; the API refuses `submit` and `publish` until it is complete. Edits to a live jam go public at once, like the flyer. The organiser is the account (co-organisers and crews as organisers stay deferred). Decided Nov 2026, with the author: the venue block gets as-you-type suggestions from Photon (komoot's OpenStreetMap geocoder, which allows autocomplete; Nominatim does not), done in step 2, and the battle sheet becomes category and format chips over the existing fields, the last step.
+- Jam editor (M24, replaces the form of M12): **Register a jam** asks for the name and the first day only, creates the draft and opens its page in edit mode (`/org/jams/{id}/edit`). Every part of the page is a block (dates, venue, battles, lineup, about, links) that saves as you type; empty blocks show "+ Add" to the organiser and nothing to visitors. A publish checklist (name, dates, city + map pin, at least one battle) gates **Publish**, which submits to review as before; the API refuses `submit` and `publish` until it is complete. Edits to a live jam go public at once, like the flyer. The organiser is the account (co-organisers and crews as organisers stay deferred). Decided Nov 2026, with the author: the venue block gets as-you-type suggestions from Photon (komoot's OpenStreetMap geocoder, which allows autocomplete; Nominatim does not), done in step 2, and the battle sheet becomes category and format chips over the existing fields (§4 Notes), done in step 3.
 - Search near a place (M22): when a search names a city, `/search` shows the closest upcoming jams to it ("Near <Place>"), even where no jam is registered, from the GeoNames cities of 15,000+ people (CC BY 4.0) loaded into `places`.
 - Jam flyer upload (M19): whoever may edit a jam uploads a flyer that replaces the generated one everywhere (jam page, cards, lists, map). The browser crops it to 4:5 and encodes it; it goes live at once, without review, and admins remove unsuitable ones (decided in M19). The generated flyer stays the fallback and the share image.
 - Contact page (`/contact`): how to reach BreakingJam by email or Instagram, with topic cards as `mailto:` links that prefill a subject. No form and no backend.
@@ -274,7 +274,7 @@ create index on events (country);
 
 -- A battle is one competition inside a jam ("Outbreak 2025 — 1v1 Bboy Adult").
 -- A jam has several battles; each battle has its own entries, bracket and results.
-create type battle_format as enum ('team', 'seven_to_smoke', 'na');
+create type battle_format as enum ('team', 'seven_to_smoke', 'na', 'showcase');   -- showcase added in M24; na = not known
 create type battle_gender as enum ('bboy', 'bgirl', 'mixed');   -- mixed = open to both
 create type battle_age as enum ('kids', 'adult', 'na');
 create type bracket_stage as enum ('prelims', 'top64', 'top32', 'top16', 'top8', 'top4', 'top2', 'winner', 'na');
@@ -284,7 +284,7 @@ create table battles (
   event_id uuid not null references events(id) on delete cascade,
   name text not null,                 -- display name, e.g. "1v1 Bboy", "Crew 5v5", "Seven to Smoke Bgirl"
   format battle_format not null default 'team',
-  team_size smallint check (team_size between 1 and 10),   -- 1 = 1v1 … 10 = 10v10; null unless format = 'team'
+  team_size smallint check (team_size between 1 and 10),   -- 1 = 1v1 … 10 = 10v10; null unless format = 'team', or 'showcase' with a size
   gender battle_gender not null default 'mixed',
   age battle_age not null default 'adult',
   age_min smallint check (age_min >= 0),   -- required for adult (18, or e.g. 40 for a masters battle); kids: optional lower bound (e.g. 8)
@@ -357,12 +357,19 @@ create index on place_names (place_id); -- each import deletes the places, casca
 
 Notes:
 - `citext` requires `create extension if not exists citext;` in the first migration.
-- `entry_members` row count must equal `battles.team_size` for a `confirmed` entry when `format = 'team'`; for `seven_to_smoke` an entry is always one dancer — enforced in domain code, not DB.
+- `entry_members` row count must equal `battles.team_size` for a `confirmed` entry when `format = 'team'` (or a `showcase` with a size); for `seven_to_smoke` an entry is always one dancer — enforced in domain code, not DB.
 - One dancer may appear in only one entry per battle — enforce in code for now.
 - A jam holds at most 32 battles (`domain::battle::MAX_BATTLES`, checked when a battle is added); every flyer lists them all.
 - `reached` vs `final_rank`: `reached` is what organisers actually know the night of the jam ("he went out in top 8"); `final_rank` is set when there is a real placement (1st, 2nd, and 3rd/4th when a small final is held). The dancer page shows `final_rank` as "1st/2nd/3rd" when set, otherwise `reached` as "Top 8" / "Prelims". Rule: `reached = 'winner'` ⇔ `final_rank = 1`; `reached = 'top2'` ⇒ `final_rank = 2`.
 - `battles.name` is free text so organisers keep their own wording; the structured fields (`format`, `team_size`, `gender`, `age`) are what search, filters and dancer stats use. The UI pre-fills `name` from the structured fields ("1v1 Bboy", "2v2 Mixed Kids", "Seven to Smoke Bgirl") and lets the organiser override it.
 - Age presets in the UI: Kids (8–17, editable lower bound), Adult (18+), Masters (40+). Stored as `age` + `age_min`/`age_max`.
+- The battle sheet's chips (M24) are presets over these fields, never a column of their own (`features/jams/battleFields.ts`):
+  - Category: 1v1 Bboy, 1v1 Bgirl, 1v1 Open, 2v2, Crew (3v3 until a size is chosen), Kids (1v1 Open, 8–17), and Footwork and Powermove (1v1 Open battles named "1v1 Footwork" and "1v1 Powermove").
+  - Format: Top 8, 16 and 32 (that bracket), 7 to Smoke (always solo: the category row reads it as 1v1 and no size is sent, but the form keeps the size it found, so letting go of it gives back the crew battle or the battle of unknown size it was; 2v2 and Crew drop it), and Showcase (format `showcase`, which keeps the category's size or none, and no bracket). Showcase got a format of its own because `na` already marks imported crew battles of unknown size and can't hold a team size. A bracket chip leaves such a battle `na`; only a category chip gives it a size, and with it the `team` format.
+  - Only Footwork and Powermove touch the name; format chips never do.
+  - A chip is lit when picking it would change nothing. A naming chip reads a name that already says its word ("Winter Power Move"). The other chips take back only a name a chip gave, never a typed one.
+  - The server stores the name it made for an unnamed battle, so a stored name equal to what the fields would give loads blank in the sheet and keeps following them.
+  - What no chip says (3v3 Bgirl, Masters, Top 64, a custom name) is set under **More options**. Folded, its row still shows the name that will be saved and the battle's summary, so nothing hides; it opens by itself on a stored battle no category chip describes, and on a server refusal of one of its fields.
 
 ### Dancer identity
 
@@ -644,6 +651,6 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 13. Integration test coverage pass, README, first release tag.
 14. Admin area: jams reviewed before going public, overview counts, claims under the same tabs.
 15. Jam contact email and website; landing page "Featured near you" and site counts.
-24. Jam editor (M24): a) start sheet, editor page with blocks and autosave, publish checklist, nullable city/country, opening hours — done; b) venue block with Photon suggestions, map pin, city and country from the address — done; c) battle sheet with category and format chips, "Add battle" in one tap.
+24. Jam editor (M24): a) start sheet, editor page with blocks and autosave, publish checklist, nullable city/country, opening hours — done; b) venue block with Photon suggestions, map pin, city and country from the address — done; c) battle sheet with category and format chips, "Add battle" in one tap — done.
 
 For Every suggested build order point, save it in milestones/ with a filename matching the build order point.

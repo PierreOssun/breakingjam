@@ -204,7 +204,8 @@
     },
     "format": {
       "top": "Top {{n}}",
-      "sevenToSmoke": "7 to Smoke"
+      "sevenToSmoke": "7 to Smoke",
+      "showcase": "Showcase"
     }
   },
   "dancer": {
@@ -374,6 +375,7 @@
     },
     "battles": {
       "add": "Add a battle",
+      "addAction": "Add battle",
       "edit": "Edit battle",
       "editOne": "Edit {{name}}",
       "deleteOne": "Delete {{name}}",
@@ -386,11 +388,32 @@
       "deleteConfirm": "Delete battle",
       "format": "Format",
       "formats": {
-        "team": "Battle",
         "seven_to_smoke": "Seven to smoke",
-        "na": "Other"
+        "na": "Other",
+        "showcase": "Showcase"
+      },
+      "category": "Category",
+      "categories": {
+        "bboy": "1v1 Bboy",
+        "bgirl": "1v1 Bgirl",
+        "open": "1v1 Open",
+        "duo": "2v2",
+        "crew": "Crew",
+        "kids": "Kids",
+        "footwork": "Footwork",
+        "powermove": "Powermove"
+      },
+      "formatChips": {
+        "top8": "Top 8",
+        "top16": "Top 16",
+        "top32": "Top 32",
+        "smoke": "7 to Smoke",
+        "showcase": "Showcase"
       },
       "teamSize": "Size",
+      "anySize": "Any size",
+      "crewsOf_one": "Solo",
+      "crewsOf_other": "Crews of {{count}}",
       "gender": "Open to",
       "genders": {
         "bboy": "Bboys",
@@ -411,10 +434,13 @@
       "bracket": "Bracket",
       "bracketUnknown": "Not known yet",
       "bracketOf": "Top {{n}}",
-      "maxEntries": "Spots",
+      "maxDancers": "Max dancers",
+      "maxTeams": "Max teams",
       "spots_one": "{{count}} spot",
       "spots_other": "{{count}} spots",
       "name": "Name",
+      "more": "More options",
+      "namedAs": "“{{name}}”",
       "nameHint": "Leave it blank for a name made from the fields above.",
       "prize": "Cash prize",
       "noPrize": "No cash prize",
@@ -429,8 +455,7 @@
         "third": "3rd {{amount}}"
       },
       "startDay": "Day",
-      "startTime": "Start time",
-      "startTimeHint": "Leave empty until the running order is set."
+      "startTime": "Start time"
     },
     "entries": {
       "add": "Add an entry",

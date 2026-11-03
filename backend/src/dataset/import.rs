@@ -275,6 +275,7 @@ fn event_fields(event: &EventRecord) -> EventFields {
 fn battle_fields(battle: &BattleRecord) -> BattleFields {
     let (format, team_size) = match (battle.format, battle.is_team_battle(), battle.team_size) {
         (Some(BattleFormat::SevenToSmoke), ..) => (BattleFormat::SevenToSmoke, None),
+        (Some(BattleFormat::Showcase), _, size) => (BattleFormat::Showcase, size.map(i16::from)),
         (_, false, _) => (BattleFormat::Team, Some(1)),
         (_, true, Some(size)) => (BattleFormat::Team, Some(i16::from(size))),
         (_, true, None) => (BattleFormat::Na, None),

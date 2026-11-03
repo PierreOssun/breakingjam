@@ -1031,7 +1031,45 @@ describe("the jam editor", () => {
     });
   });
 
-  it("adds a battle named from its fields", async () => {
+  /** Opens the battle sheet from the empty Battles block. */
+  async function addBattle() {
+    const battles = await screen.findByRole("region", { name: "Battles" });
+    await userEvent.click(within(battles).getByRole("button", { name: "Add" }));
+    return screen.getByRole("dialog", { name: "Add a battle" });
+  }
+  const chip = (dialog: HTMLElement, name: string) =>
+    within(dialog).getByRole("button", { name });
+
+  it("adds a battle in one tap: 1v1 Open, named by the server", async () => {
+    const fetch = editApi({
+      [`POST /api/events/${ID}/battles`]: { status: 201, body: battle() },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+
+    const dialog = await addBattle();
+    expect(chip(dialog, "1v1 Open")).toHaveAttribute("aria-pressed", "true");
+    expect(chip(dialog, "Top 16")).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(chip(dialog, "Add battle"));
+
+    expect(await bodyOf(fetch, `POST /api/events/${ID}/battles`)).toEqual({
+      name: null,
+      format: "team",
+      team_size: 1,
+      gender: "mixed",
+      age: "adult",
+      age_min: 18,
+      age_max: null,
+      bracket_size: null,
+      max_entries: null,
+      prize_currency: null,
+      prize_first: null,
+      prize_second: null,
+      prize_third: null,
+      starts_at: null,
+    });
+  });
+
+  it("adds a battle from its chips, with its start, spots and prize", async () => {
     const fetch = editApi({
       [`GET /api/events/${ID}/battles`]: (n) => ({
         status: 200,
@@ -1040,7 +1078,8 @@ describe("the jam editor", () => {
             ? []
             : [
                 battle({
-                  name: "2v2 Mixed Kids",
+                  name: "2v2 Mixed",
+                  team_size: 2,
                   prize_currency: "EUR",
                   prize_first: 500,
                 }),
@@ -1050,49 +1089,229 @@ describe("the jam editor", () => {
     });
     renderApp(`/org/jams/${ID}/edit`);
 
-    const battles = await screen.findByRole("region", { name: "Battles" });
-    await userEvent.click(within(battles).getByRole("button", { name: "Add" }));
-    const dialog = screen.getByRole("dialog", { name: "Add a battle" });
-    await userEvent.selectOptions(within(dialog).getByLabelText("Size"), "2");
-    await userEvent.selectOptions(within(dialog).getByLabelText("Age"), "kids");
-    expect(within(dialog).getByLabelText(/^Name/)).toHaveAttribute(
-      "placeholder",
-      "2v2 Mixed Kids",
-    );
+    const dialog = await addBattle();
+    await userEvent.click(chip(dialog, "2v2"));
+    await userEvent.click(chip(dialog, "Top 16"));
+    expect(chip(dialog, "2v2")).toHaveAttribute("aria-pressed", "true");
+    expect(chip(dialog, "1v1 Open")).toHaveAttribute("aria-pressed", "false");
+    // Entries of two are teams.
+    await userEvent.type(within(dialog).getByLabelText(/^Max teams/), "16");
     // Prize amounts appear once a currency is chosen.
-    expect(within(dialog).queryByLabelText(/^1st place/)).toBeNull();
+    expect(within(dialog).queryByLabelText("1st place")).toBeNull();
     await userEvent.selectOptions(
       within(dialog).getByLabelText(/^Cash prize/),
       "EUR",
     );
-    await userEvent.type(within(dialog).getByLabelText(/^1st place/), "500");
+    await userEvent.type(within(dialog).getByLabelText("1st place"), "500");
     // The jam runs two days: the start takes a day and a time.
     await userEvent.selectOptions(
       within(dialog).getByLabelText("Day"),
       "2030-06-02",
     );
     await userEvent.type(within(dialog).getByLabelText(/^Start time/), "14:30");
-    await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+    // The fields the chips set stay folded, under what the battle card will say.
+    expect(
+      within(dialog).getByRole("button", { name: /^More options/ }),
+    ).toHaveTextContent("2v2 · Everyone · 18+ · Top 16 · 16 spots · 1st €500");
+    expect(within(dialog).queryByLabelText("Size")).toBeNull();
+    await userEvent.click(chip(dialog, "Add battle"));
 
     expect(
-      await screen.findByRole("heading", { name: "2v2 Mixed Kids" }),
+      await screen.findByRole("heading", { name: "2v2 Mixed" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/1st €500$/)).toBeInTheDocument();
     expect(await bodyOf(fetch, `POST /api/events/${ID}/battles`)).toEqual({
       name: null,
       format: "team",
       team_size: 2,
       gender: "mixed",
-      age: "kids",
-      age_min: 8,
-      age_max: 17,
-      bracket_size: null,
-      max_entries: null,
+      age: "adult",
+      age_min: 18,
+      age_max: null,
+      bracket_size: 16,
+      max_entries: 16,
       prize_currency: "EUR",
       prize_first: 500,
       prize_second: null,
       prize_third: null,
       starts_at: "2030-06-02T14:30:00",
+    });
+  });
+
+  it("sets up a showcase of a crew size, or of any size", async () => {
+    const fetch = editApi({
+      [`POST /api/events/${ID}/battles`]: { status: 201, body: battle() },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+
+    const dialog = await addBattle();
+    await userEvent.click(chip(dialog, "Crew"));
+    await userEvent.click(chip(dialog, "Showcase"));
+    expect(chip(dialog, "Crew")).toHaveAttribute("aria-pressed", "true");
+    expect(chip(dialog, "Showcase")).toHaveAttribute("aria-pressed", "true");
+    expect(within(dialog).getByLabelText(/^Max teams/)).toBeInTheDocument();
+    // Picked again, Showcase lets go, and comes back.
+    await userEvent.click(chip(dialog, "Showcase"));
+    expect(chip(dialog, "Showcase")).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(chip(dialog, "Showcase"));
+
+    const more = within(dialog).getByRole("button", { name: /^More options/ });
+    expect(more).toHaveTextContent("Showcase · Crews of 3 · Everyone · 18+");
+    await userEvent.click(more);
+    const size = within(dialog).getByLabelText("Size");
+    expect(size).toHaveValue("3");
+    await userEvent.selectOptions(size, "Any size");
+    // No category says a crew of any size; the format still does.
+    expect(chip(dialog, "Crew")).toHaveAttribute("aria-pressed", "false");
+    expect(chip(dialog, "Showcase")).toHaveAttribute("aria-pressed", "true");
+    expect(within(dialog).getByLabelText(/^Name/)).toHaveAttribute(
+      "placeholder",
+      "Showcase Mixed",
+    );
+    await userEvent.click(chip(dialog, "Add battle"));
+
+    expect(await bodyOf(fetch, `POST /api/events/${ID}/battles`)).toMatchObject(
+      {
+        name: null,
+        format: "showcase",
+        team_size: null,
+        bracket_size: null,
+      },
+    );
+  });
+
+  it("opens More options on a field the server refused under it", async () => {
+    editApi({
+      [`POST /api/events/${ID}/battles`]: {
+        status: 422,
+        body: {
+          error: {
+            code: "validation",
+            message: "validation failed",
+            fields: [{ field: "age_min", message: "must be 6 or more" }],
+          },
+        },
+      },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+
+    const dialog = await addBattle();
+    await userEvent.click(chip(dialog, "Kids"));
+    const more = within(dialog).getByRole("button", { name: /^More options/ });
+    expect(more).toHaveAttribute("aria-expanded", "false");
+    await userEvent.click(chip(dialog, "Add battle"));
+
+    expect(
+      await within(dialog).findByText("must be 6 or more"),
+    ).toBeInTheDocument();
+    expect(more).toHaveAttribute("aria-expanded", "true");
+    expect(within(dialog).getByLabelText("From age")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+  });
+
+  it("sends again once a refusal is fixed, even one on a field with no input", async () => {
+    const POST = `POST /api/events/${ID}/battles`;
+    const fetch = editApi({
+      [POST]: (n) =>
+        n === 0
+          ? {
+              status: 422,
+              body: {
+                error: {
+                  code: "validation",
+                  message: "validation failed",
+                  fields: [
+                    { field: "age_max", message: "must not be below age_min" },
+                  ],
+                },
+              },
+            }
+          : { status: 201, body: battle() },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+
+    const dialog = await addBattle();
+    await userEvent.click(chip(dialog, "Kids"));
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: /^More options/ }),
+    );
+    const from = within(dialog).getByLabelText("From age");
+    await userEvent.clear(from);
+    await userEvent.type(from, "18");
+    await userEvent.click(chip(dialog, "Add battle"));
+    // The kids' upper age has no input: its refusal shows under the lower one.
+    expect(
+      await within(dialog).findByText("must not be below age_min"),
+    ).toBeInTheDocument();
+
+    await userEvent.clear(from);
+    await userEvent.type(from, "10");
+    await userEvent.click(chip(dialog, "Add battle"));
+    await waitFor(() =>
+      expect(calls(fetch).filter((call) => call === POST)).toHaveLength(2),
+    );
+    expect(await bodyOf(fetch, POST)).toMatchObject({
+      age: "kids",
+      age_min: 10,
+      age_max: 17,
+    });
+  });
+
+  it("shows the name that will be saved, even folded under More options", async () => {
+    const stored = battle({ name: "Winter Kings", gender: "mixed" });
+    editApi({
+      [`GET /api/events/${ID}/battles`]: { status: 200, body: [stored] },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Edit Winter Kings" }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Edit battle" });
+    expect(chip(dialog, "1v1 Open")).toHaveAttribute("aria-pressed", "true");
+    const more = within(dialog).getByRole("button", { name: /^More options/ });
+    expect(more).toHaveAttribute("aria-expanded", "false");
+    expect(more).toHaveTextContent("“Winter Kings” · 1v1 · Everyone · 18+");
+    // A naming chip replaces the typed name, in plain sight.
+    await userEvent.click(chip(dialog, "Footwork"));
+    expect(more).toHaveTextContent("“1v1 Footwork” · 1v1 · Everyone · 18+");
+  });
+
+  it("opens a battle no chip describes on its fields", async () => {
+    const stored = battle({ name: "3v3 Bgirl", team_size: 3, gender: "bgirl" });
+    const fetch = editApi({
+      [`GET /api/events/${ID}/battles`]: { status: 200, body: [stored] },
+      [`PUT /api/battles/${stored.id}`]: { status: 200, body: stored },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Edit 3v3 Bgirl" }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Edit battle" });
+    expect(within(dialog).queryAllByRole("button", { pressed: true })).toEqual(
+      [],
+    );
+    expect(
+      within(dialog).getByRole("button", { name: /^More options/ }),
+    ).toHaveAttribute("aria-expanded", "true");
+    expect(within(dialog).getByLabelText("Size")).toHaveValue("3");
+    expect(within(dialog).getByLabelText("Open to")).toHaveValue("bgirl");
+    // The server made the stored name from the fields, so it loads blank and follows them.
+    const name = within(dialog).getByLabelText(/^Name/);
+    expect(name).toHaveValue("");
+    await userEvent.selectOptions(within(dialog).getByLabelText("Age"), "kids");
+    expect(name).toHaveAttribute("placeholder", "3v3 Bgirl Kids");
+    await userEvent.click(chip(dialog, "Save"));
+
+    expect(await bodyOf(fetch, `PUT /api/battles/${stored.id}`)).toMatchObject({
+      name: null,
+      team_size: 3,
+      gender: "bgirl",
+      age: "kids",
+      age_min: 8,
+      age_max: 17,
     });
   });
 

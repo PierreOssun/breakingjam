@@ -85,6 +85,14 @@ async fn battles_get_default_names_and_positions(pool: PgPool) {
     let updated = send(&jam.app, put(&uri, renamed, Some(&jam.owner))).await;
     assert_eq!(updated.json["name"], "Queen of the Floor");
     assert_eq!(updated.json["team_size"], Value::Null);
+
+    let showcase = json!({ "format": "showcase", "team_size": 5, "gender": "mixed",
+                           "age": "adult", "age_min": 18 });
+    let third = jam.battle(showcase).await;
+    assert_eq!(third.status, StatusCode::CREATED);
+    assert_eq!(third.json["name"], "Showcase Mixed");
+    assert_eq!(third.json["format"], "showcase");
+    assert_eq!(third.json["team_size"], 5);
 }
 
 #[sqlx::test]

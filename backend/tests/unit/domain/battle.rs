@@ -82,6 +82,12 @@ fn categories_come_from_the_structured_fields() {
     let smoke = battle(BattleFormat::SevenToSmoke, None);
     assert_eq!(smoke.categories(), [Category::SevenToSmoke]);
     assert!(battle(BattleFormat::Na, None).categories().is_empty());
+    // A showcase is no battle category, whatever its size.
+    assert!(
+        battle(BattleFormat::Showcase, Some(5))
+            .categories()
+            .is_empty()
+    );
 }
 
 #[test]
@@ -94,6 +100,8 @@ fn default_names_follow_the_examples() {
     let mut smoke = battle_fields(BattleFormat::SevenToSmoke, None, BattleAge::Adult);
     smoke.gender = BattleGender::Bgirl;
     assert_eq!(smoke.display_name(), "Seven to Smoke Bgirl");
+    let showcase = battle_fields(BattleFormat::Showcase, Some(5), BattleAge::Kids);
+    assert_eq!(showcase.display_name(), "Showcase Mixed Kids");
     let mut masters = battle_fields(BattleFormat::Team, Some(1), BattleAge::Adult);
     masters.age_min = Some(40);
     assert_eq!(masters.display_name(), "1v1 Mixed Masters");
@@ -120,6 +128,13 @@ fn battle_checks_mirror_the_schema() {
     assert_eq!(broken_rules(&no_size), ["team_size"]);
     let smoke_with_size = battle_fields(BattleFormat::SevenToSmoke, Some(1), BattleAge::Adult);
     assert_eq!(broken_rules(&smoke_with_size), ["team_size"]);
+    let unknown_with_size = battle_fields(BattleFormat::Na, Some(3), BattleAge::Adult);
+    assert_eq!(broken_rules(&unknown_with_size), ["team_size"]);
+    // A showcase may say how many dancers an entry holds, or not.
+    for size in [Some(5), None] {
+        let showcase = battle_fields(BattleFormat::Showcase, size, BattleAge::Adult);
+        assert!(broken_rules(&showcase).is_empty());
+    }
     let mut old_kids = battle_fields(BattleFormat::Team, Some(1), BattleAge::Kids);
     old_kids.age_max = Some(18);
     assert_eq!(broken_rules(&old_kids), ["age_max"]);
@@ -139,6 +154,22 @@ fn entry_member_counts() {
     let smoke = battle(BattleFormat::SevenToSmoke, None);
     assert!(entry(1, EntryStatus::Pending).errors_for(&smoke).is_empty());
     assert!(!entry(2, EntryStatus::Pending).errors_for(&smoke).is_empty());
+
+    // A showcase with a size counts like a team; without one, any crew goes.
+    let trios = battle(BattleFormat::Showcase, Some(3));
+    assert!(entry(2, EntryStatus::Pending).errors_for(&trios).is_empty());
+    assert!(
+        !entry(2, EntryStatus::Confirmed)
+            .errors_for(&trios)
+            .is_empty()
+    );
+    assert!(!entry(4, EntryStatus::Pending).errors_for(&trios).is_empty());
+    let open = battle(BattleFormat::Showcase, None);
+    assert!(
+        entry(8, EntryStatus::Confirmed)
+            .errors_for(&open)
+            .is_empty()
+    );
 
     let mut twice = entry(1, EntryStatus::Pending);
     twice.dancer_ids.push(twice.dancer_ids[0]);

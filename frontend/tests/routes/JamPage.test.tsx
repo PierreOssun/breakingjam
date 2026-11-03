@@ -491,6 +491,35 @@ describe("JamPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("tags a showcase, counting crews or dancers by its size", async () => {
+    mockJam(
+      {},
+      {
+        [`GET /api/events/${JAM.id}/battles`]: {
+          status: 200,
+          body: [
+            { ...battle("s1", "Crew Showcase", 5, 8), format: "showcase" },
+            { ...battle("s2", "Solo Showcase", 1, 12), format: "showcase" },
+          ],
+        },
+        "GET /api/battles/s1/entries": { status: 200, body: [] },
+        "GET /api/battles/s2/entries": { status: 200, body: [] },
+      },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+    const main = within(await screen.findByRole("main"));
+
+    const crews = (
+      await main.findByRole("heading", { name: "Crew Showcase" })
+    ).closest("li")!;
+    expect(within(crews).getByText("Showcase")).toBeInTheDocument();
+    expect(await within(crews).findByText("0 / 8 teams")).toBeInTheDocument();
+    const solo = main
+      .getByRole("heading", { name: "Solo Showcase" })
+      .closest("li")!;
+    expect(await within(solo).findByText("0 / 12 dancers")).toBeInTheDocument();
+  });
+
   it("shows prizes in the battle's currency", async () => {
     mockJam(
       {},

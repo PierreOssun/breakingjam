@@ -214,9 +214,10 @@ function entrants(battle: Schemas["Battle"], count: number, t: TFunction) {
     : t(`jam.entrants.${unit}`, { count, max: battle.max_entries });
 }
 
-/** "7 to Smoke", "Top 8", or nothing when the format says no more than the name. */
+/** "7 to Smoke", "Showcase", "Top 8", or nothing when the format says no more than the name. */
 function formatLabel(battle: Schemas["Battle"], t: TFunction): string | null {
   if (battle.format === "seven_to_smoke") return t("jam.format.sevenToSmoke");
+  if (battle.format === "showcase") return t("jam.format.showcase");
   if (battle.bracket_size != null)
     return t("jam.format.top", { n: battle.bracket_size });
   return null;

@@ -17,7 +17,7 @@ import { useToast } from "../../components/useToast";
 import { daysOf } from "../../lib/dates";
 import { BattleDialog } from "./BattleDialog";
 import { BlockCard, EmptyBlock } from "./EditorBlock";
-import { prizeLine, presetOf } from "./battleFields";
+import { battleSummary } from "./battleFields";
 import { useBattles } from "./queries";
 
 type Battle = Schemas["Battle"];
@@ -30,7 +30,7 @@ export function BattlesEditor({
   jam: Pick<Schemas["EventResponse"], "id" | "starts_on" | "ends_on">;
 }) {
   const jamId = jam.id;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const battles = useBattles(jamId);
@@ -134,7 +134,7 @@ export function BattlesEditor({
                   {battle.name}
                 </h3>
                 <p className="text-caption text-muted">
-                  <BattleSummary battle={battle} />
+                  {battleSummary(battle, t, i18n.language)}
                 </p>
               </div>
               <IconButton
@@ -178,29 +178,4 @@ export function BattlesEditor({
       {dialogs}
     </BlockCard>
   );
-}
-
-/** "1v1 · Bboys · 18+ · 16 spots · 1st CHF 1,000": the structured fields in words. */
-function BattleSummary({ battle }: { battle: Battle }) {
-  const { t, i18n } = useTranslation();
-  const preset = presetOf(battle);
-  const parts = [
-    // "1v1" already says it is a team battle.
-    battle.format === "team"
-      ? `${battle.team_size}v${battle.team_size}`
-      : t(`org.battles.formats.${battle.format}`),
-    t(`org.battles.genders.${battle.gender}`),
-    preset === "kids"
-      ? t("org.battles.kidsRange", {
-          from: battle.age_min ?? 0,
-          to: battle.age_max ?? 17,
-        })
-      : preset !== "na" &&
-        t("org.battles.adultFrom", { from: battle.age_min ?? 18 }),
-    battle.bracket_size &&
-      t("org.battles.bracketOf", { n: battle.bracket_size }),
-    battle.max_entries && t("org.battles.spots", { count: battle.max_entries }),
-    prizeLine(battle, t, i18n.language),
-  ].filter(Boolean);
-  return <>{parts.join(" · ")}</>;
 }

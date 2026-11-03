@@ -866,7 +866,7 @@ export interface components {
             format: components["schemas"]["BattleFormat"];
             /**
              * Format: int32
-             * @description 1 = 1v1 … 10 = 10v10; set only for team battles.
+             * @description 1 = 1v1 … 10 = 10v10; set for team battles, and for showcases that fix a size.
              */
             team_size?: number | null;
             /** @description Who may enter. */
@@ -944,7 +944,7 @@ export interface components {
             format: components["schemas"]["BattleFormat"];
             /**
              * Format: int32
-             * @description 1 = 1v1 … 10 = 10v10; required for team battles, absent otherwise.
+             * @description 1 = 1v1 … 10 = 10v10; required for team battles, optional for showcases, absent otherwise.
              */
             team_size?: number | null;
             /** @description Who may enter. */
@@ -998,7 +998,7 @@ export interface components {
          * @description How a battle is run.
          * @enum {string}
          */
-        BattleFormat: "team" | "seven_to_smoke" | "na";
+        BattleFormat: "team" | "seven_to_smoke" | "na" | "showcase";
         /**
          * @description Who may enter.
          * @enum {string}

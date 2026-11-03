@@ -313,3 +313,69 @@ korea = { name = "Team Korea", members = ["menno", "lee"] }
             .all(|t| t.video_url.as_deref() == Some("https://www.youtube.com/watch?v=abcdefghijk"))
     );
 }
+
+/// A showcase keeps its format, with its size or none, while a crew battle of no fixed size stays
+/// of unknown format.
+#[sqlx::test]
+async fn a_showcase_is_imported_as_one(pool: PgPool) {
+    let dir = data_dir();
+    fs::write(
+        dir.join("events/bc-one/2022.toml"),
+        r#"name = "BC One 2022"
+starts_on = 2022-10-21
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+
+[[battles]]
+key = "crew-showcase"
+name = "Crew Showcase"
+gender = "mixed"
+format = "showcase"
+results = [{ entrant = "ruggeds", reached = "winner" }]
+
+[battles.teams]
+ruggeds = { crew = "ruggeds" }
+
+[[battles]]
+key = "solo-showcase"
+name = "Solo Showcase"
+gender = "mixed"
+format = "showcase"
+team_size = 1
+results = [{ entrant = "storm", reached = "winner" }]
+"#,
+    )
+    .unwrap();
+    let (data, unreadable) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    assert!(unreadable.is_empty(), "{unreadable:?}");
+    let owner = organizer(&pool).await;
+    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
+
+    let mut tx = pool.begin().await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner, today).await.unwrap();
+    tx.commit().await.unwrap();
+
+    assert_eq!(imported.events, 2);
+    let battles = sqlx::query!(
+        r#"select name, format::text as "format!", team_size from battles
+           where name in ('Crew Showcase', 'Solo Showcase', 'Crew battle')
+           order by format::text, name"#
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    let rows: Vec<(&str, &str, Option<i16>)> = battles
+        .iter()
+        .map(|b| (b.name.as_str(), b.format.as_str(), b.team_size))
+        .collect();
+    assert_eq!(
+        rows,
+        [
+            ("Crew battle", "na", None),
+            ("Crew Showcase", "showcase", None),
+            ("Solo Showcase", "showcase", Some(1)),
+        ]
+    );
+}

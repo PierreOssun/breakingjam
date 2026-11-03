@@ -4319,7 +4319,7 @@
               "null"
             ],
             "format": "int32",
-            "description": "1 = 1v1 … 10 = 10v10; set only for team battles."
+            "description": "1 = 1v1 … 10 = 10v10; set for team battles, and for showcases that fix a size."
           },
           "gender": {
             "$ref": "#/components/schemas/BattleGender",
@@ -4452,7 +4452,7 @@
               "null"
             ],
             "format": "int32",
-            "description": "1 = 1v1 … 10 = 10v10; required for team battles, absent otherwise."
+            "description": "1 = 1v1 … 10 = 10v10; required for team battles, optional for showcases, absent otherwise."
           },
           "gender": {
             "$ref": "#/components/schemas/BattleGender",
@@ -4541,7 +4541,8 @@
         "enum": [
           "team",
           "seven_to_smoke",
-          "na"
+          "na",
+          "showcase"
         ]
       },
       "BattleGender": {

@@ -17,7 +17,10 @@ pub enum BattleFormat {
     /// 1v1 … 10v10, size in `team_size`.
     Team,
     SevenToSmoke,
+    /// Not known, e.g. an imported crew battle of no fixed size.
     Na,
+    /// Entries perform rather than battle in a bracket; any size in `team_size`, or none.
+    Showcase,
 }
 
 /// Who may enter.
@@ -102,7 +105,7 @@ pub struct Battle {
     pub name: String,
     /// How it is run.
     pub format: BattleFormat,
-    /// 1 = 1v1 … 10 = 10v10; set only for team battles.
+    /// 1 = 1v1 … 10 = 10v10; set for team battles, and for showcases that fix a size.
     pub team_size: Option<i16>,
     /// Who may enter.
     pub gender: BattleGender,
@@ -185,7 +188,7 @@ pub struct BattleFields {
     pub name: Option<String>,
     /// How the battle is run.
     pub format: BattleFormat,
-    /// 1 = 1v1 … 10 = 10v10; required for team battles, absent otherwise.
+    /// 1 = 1v1 … 10 = 10v10; required for team battles, optional for showcases, absent otherwise.
     #[validate(range(min = 1, max = 10))]
     pub team_size: Option<i16>,
     /// Who may enter.
@@ -224,7 +227,7 @@ fn team_size_matches_format(fields: &BattleFields) -> Result<(), ValidationError
     match (fields.format, fields.team_size) {
         (BattleFormat::Team, None) => Err(rule("team_size", "required for team battles")),
         (BattleFormat::SevenToSmoke | BattleFormat::Na, Some(_)) => {
-            Err(rule("team_size", "only for team battles"))
+            Err(rule("team_size", "only for team battles and showcases"))
         }
         _ => Ok(()),
     }
@@ -305,6 +308,7 @@ impl BattleFields {
         let format = match (self.format, self.team_size) {
             (BattleFormat::Team, Some(n)) => format!("{n}v{n}"),
             (BattleFormat::SevenToSmoke, _) => "Seven to Smoke".to_owned(),
+            (BattleFormat::Showcase, _) => "Showcase".to_owned(),
             _ => "Battle".to_owned(),
         };
         let gender = match self.gender {
@@ -382,10 +386,12 @@ impl EntryFields {
             (BattleFormat::SevenToSmoke, _) if members != 1 => {
                 errors.push(("dancer_ids", "seven-to-smoke entries are one dancer"))
             }
-            (BattleFormat::Team, Some(size)) if members > size as usize => {
+            (BattleFormat::Team | BattleFormat::Showcase, Some(size))
+                if members > size as usize =>
+            {
                 errors.push(("dancer_ids", "more dancers than the team size"))
             }
-            (BattleFormat::Team, Some(size))
+            (BattleFormat::Team | BattleFormat::Showcase, Some(size))
                 if self.status == EntryStatus::Confirmed && members != size as usize =>
             {
                 errors.push((

@@ -204,7 +204,8 @@
     },
     "format": {
       "top": "Top {{n}}",
-      "sevenToSmoke": "7 to Smoke"
+      "sevenToSmoke": "7 to Smoke",
+      "showcase": "Showcase"
     }
   },
   "dancer": {
@@ -374,6 +375,7 @@
     },
     "battles": {
       "add": "Battle hinzufügen",
+      "addAction": "Battle hinzufügen",
       "edit": "Battle bearbeiten",
       "editOne": "{{name}} bearbeiten",
       "deleteOne": "{{name}} löschen",
@@ -386,11 +388,32 @@
       "deleteConfirm": "Battle löschen",
       "format": "Format",
       "formats": {
-        "team": "Battle",
         "seven_to_smoke": "Seven to Smoke",
-        "na": "Andere"
+        "na": "Andere",
+        "showcase": "Showcase"
+      },
+      "category": "Kategorie",
+      "categories": {
+        "bboy": "1v1 Bboy",
+        "bgirl": "1v1 Bgirl",
+        "open": "1v1 Open",
+        "duo": "2v2",
+        "crew": "Crew",
+        "kids": "Kids",
+        "footwork": "Footwork",
+        "powermove": "Powermove"
+      },
+      "formatChips": {
+        "top8": "Top 8",
+        "top16": "Top 16",
+        "top32": "Top 32",
+        "smoke": "7 to Smoke",
+        "showcase": "Showcase"
       },
       "teamSize": "Größe",
+      "anySize": "Beliebige Größe",
+      "crewsOf_one": "Solo",
+      "crewsOf_other": "Teams zu {{count}}",
       "gender": "Offen für",
       "genders": {
         "bboy": "Bboys",
@@ -411,10 +434,13 @@
       "bracket": "Bracket",
       "bracketUnknown": "Noch unbekannt",
       "bracketOf": "Top {{n}}",
-      "maxEntries": "Plätze",
+      "maxDancers": "Max. Plätze",
+      "maxTeams": "Max. Teams",
       "spots_one": "{{count}} Platz",
       "spots_other": "{{count}} Plätze",
       "name": "Name",
+      "more": "Weitere Optionen",
+      "namedAs": "„{{name}}“",
       "nameHint": "Leer lassen für einen Namen aus den Feldern oben.",
       "prize": "Preisgeld",
       "noPrize": "Kein Preisgeld",
@@ -429,8 +455,7 @@
         "third": "3. Platz {{amount}}"
       },
       "startDay": "Tag",
-      "startTime": "Startzeit",
-      "startTimeHint": "Leer lassen, bis der Ablauf feststeht."
+      "startTime": "Startzeit"
     },
     "entries": {
       "add": "Anmeldung hinzufügen",
