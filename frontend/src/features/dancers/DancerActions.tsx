@@ -33,7 +33,8 @@ export function DancerActions({
       <VerifyButton
         kind="dancers"
         id={dancer.id}
-        enabled={!dancer.verified_at}
+        // An account with a verified page of its own can't claim another (the API says 409).
+        enabled={!dancer.verified_at && !me.dancer?.verified}
         label={t("verify.thisIsMe")}
         conflict={t("verify.conflict")}
       />

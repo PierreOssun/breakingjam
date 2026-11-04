@@ -15,13 +15,20 @@ async fn organizer(app: &Router, pool: &PgPool) -> String {
     cookie
 }
 
+/// A `seed_admin`: crew edits and memberships are the BreakingJam team's.
+async fn team(app: &Router, pool: &PgPool) -> String {
+    let cookie = sign_up(app, "team@example.com").await;
+    set_role(pool, "team@example.com", "seed_admin").await;
+    cookie
+}
+
 async fn new_dancer(app: &Router, cookie: &str) -> String {
     let body = json!({ "dancer_name": "Lil G", "country": "FR" });
     id_of(&send(app, post("/api/dancers", body, Some(cookie))).await)
 }
 
 #[sqlx::test]
-async fn writes_need_organizer(pool: PgPool) {
+async fn organisers_create_crews_and_the_team_edits_them(pool: PgPool) {
     let app = app(pool.clone());
     let user = sign_up(&app, "user@example.com").await;
     let as_user = send(&app, post("/api/crews", crew("Floor Lords"), Some(&user))).await;
@@ -38,18 +45,28 @@ async fn writes_need_organizer(pool: PgPool) {
     assert_eq!(created.json["city"], Value::Null);
     assert_eq!(created.json["members"], json!([]));
 
+    // One draft makes any account an organiser: renaming a crew is the team's.
     let uri = format!("/api/crews/{}", id_of(&created));
-    let renamed = send(&app, put(&uri, crew("Floor Lords FR"), Some(&organizer))).await;
+    for cookie in [&user, &organizer] {
+        let hijack = send(&app, put(&uri, crew("Hijack"), Some(cookie))).await;
+        assert_eq!(hijack.status, StatusCode::FORBIDDEN);
+        let gone = send(&app, delete(&uri, Some(cookie))).await;
+        assert_eq!(gone.status, StatusCode::FORBIDDEN);
+    }
+    let dancer_id = new_dancer(&app, &organizer).await;
+    let join = json!({ "dancer_id": dancer_id });
+    let joined = send(
+        &app,
+        post(&format!("{uri}/members"), join, Some(&organizer)),
+    )
+    .await;
+    assert_eq!(joined.status, StatusCode::FORBIDDEN);
+
+    let team = team(&app, &pool).await;
+    let renamed = send(&app, put(&uri, crew("Floor Lords FR"), Some(&team))).await;
     assert_eq!(renamed.json["name"], "Floor Lords FR");
     assert_eq!(
-        send(&app, put(&uri, crew("Hijack"), Some(&user)))
-            .await
-            .status,
-        StatusCode::FORBIDDEN
-    );
-
-    assert_eq!(
-        send(&app, delete(&uri, Some(&organizer))).await.status,
+        send(&app, delete(&uri, Some(&team))).await.status,
         StatusCode::NO_CONTENT
     );
     assert_eq!(
@@ -79,7 +96,7 @@ async fn search_by_name(pool: PgPool) {
 #[sqlx::test]
 async fn membership_lifecycle(pool: PgPool) {
     let app = app(pool.clone());
-    let organizer = organizer(&app, &pool).await;
+    let organizer = team(&app, &pool).await;
     let crew_id = id_of(
         &send(
             &app,
@@ -154,7 +171,7 @@ async fn membership_lifecycle(pool: PgPool) {
 #[sqlx::test]
 async fn membership_needs_existing_dancer_and_crew(pool: PgPool) {
     let app = app(pool.clone());
-    let organizer = organizer(&app, &pool).await;
+    let organizer = team(&app, &pool).await;
     let crew_id = id_of(
         &send(
             &app,

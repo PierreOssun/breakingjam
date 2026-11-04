@@ -154,7 +154,7 @@ function Summary({
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <StatusBadge status={jam.status} />
+        <StatusBadge jam={jam} />
         {jam.battles.length > 0 && (
           <p className="text-caption text-muted">{jam.battles.join(" · ")}</p>
         )}

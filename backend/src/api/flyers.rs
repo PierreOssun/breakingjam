@@ -4,7 +4,7 @@ use axum::{
     Json,
     body::Bytes,
     extract::{
-        DefaultBodyLimit, Multipart, Path, State,
+        DefaultBodyLimit, Multipart, State,
         multipart::{MultipartError, MultipartRejection},
     },
 };
@@ -12,12 +12,13 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
-use super::events::writable;
+use super::events::editable;
+use super::extract::Path;
 use crate::{
     auth::session::CurrentUser,
     db,
     domain::event::{Event, UploadedFlyer},
-    error::{AppError, InvalidFields, JamNotVisible, NotJamWriter, Unauthorized},
+    error::{AppError, InvalidFields, JamNotVisible, JamOver, NotJamWriter, Unauthorized},
     media::{self, ImageSpec, MediaStore},
     state::AppState,
 };
@@ -58,6 +59,7 @@ pub struct FlyerUpload {
         Unauthorized,
         NotJamWriter,
         JamNotVisible,
+        JamOver,
         InvalidFields,
     )
 )]
@@ -67,7 +69,7 @@ async fn upload(
     Path(id): Path<Uuid>,
     multipart: Result<Multipart, MultipartRejection>,
 ) -> Result<Json<Event>, AppError> {
-    writable(&state, &current, id).await?;
+    editable(&state, &current, id).await?;
     let multipart = multipart.map_err(|rejection| unreadable(rejection.body_text()))?;
     let upload = FlyerUpload::read(multipart).await?;
     // A new key per upload, so a URL never shows two different images.
@@ -97,6 +99,7 @@ async fn upload(
         Unauthorized,
         NotJamWriter,
         JamNotVisible,
+        JamOver,
     )
 )]
 async fn remove(
@@ -104,7 +107,7 @@ async fn remove(
     current: CurrentUser,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Event>, AppError> {
-    writable(&state, &current, id).await?;
+    editable(&state, &current, id).await?;
     let (event, old) = db::events::set_flyer(&state.pool, id, None).await?;
     discard(&state.media, old);
     Ok(Json(event))

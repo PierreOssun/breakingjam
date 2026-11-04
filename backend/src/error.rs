@@ -65,6 +65,15 @@ pub struct JamNotVisible(pub ErrorEnvelope);
 )]
 pub struct NotJamWriter(pub ErrorEnvelope);
 
+/// 409 of every route that edits a jam's details: it is public and over, so only its battles
+/// change, unless the caller is `seed_admin`+.
+#[derive(IntoResponses)]
+#[response(
+    status = 409,
+    description = "The jam is public and over: only its battles and results change"
+)]
+pub struct JamOver(pub ErrorEnvelope);
+
 /// One invalid input field.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct FieldError {

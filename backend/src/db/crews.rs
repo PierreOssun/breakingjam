@@ -123,7 +123,7 @@ pub async fn is_current_member(
 /// Adds a membership starting `since` (null = unknown); `false` when the dancer is already a
 /// current member, or a past membership already starts then.
 pub async fn add_member(
-    pool: &PgPool,
+    db: impl PgExecutor<'_>,
     crew_id: Uuid,
     dancer_id: Uuid,
     since: Option<NaiveDate>,
@@ -135,7 +135,7 @@ pub async fn add_member(
         crew_id,
         since,
     )
-    .execute(pool)
+    .execute(db)
     .await?;
     Ok(result.rows_affected() > 0)
 }

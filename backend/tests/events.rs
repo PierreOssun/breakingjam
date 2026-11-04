@@ -3,7 +3,9 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, delete, get, post, publish, put, send, set_role, sign_up};
+use test_app::{
+    Files, TestResponse, app, delete, get, post, post_files, publish, put, send, set_role, sign_up,
+};
 
 fn jam(name: &str) -> Value {
     json!({
@@ -483,8 +485,14 @@ async fn status_transitions_follow_the_machine(pool: PgPool) {
     let owner = sign_up(&app, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
 
-    let completed_too_early = act(&app, &owner, &id, "complete").await;
-    assert_eq!(completed_too_early.status, StatusCode::CONFLICT);
+    let closed_too_early = act(&app, &owner, &id, "close-registration").await;
+    assert_eq!(closed_too_early.status, StatusCode::CONFLICT);
+    let gone = act(&app, &owner, &id, "complete").await;
+    assert_eq!(
+        gone.status,
+        StatusCode::NOT_FOUND,
+        "a jam is over by its dates"
+    );
     let unreviewed = act(&app, &owner, &id, "publish").await;
     assert_eq!(
         unreviewed.status,
@@ -495,16 +503,16 @@ async fn status_transitions_follow_the_machine(pool: PgPool) {
     publish(&pool, &id).await;
     for (action, status) in [
         ("close-registration", "registration_closed"),
-        ("complete", "completed"),
+        ("cancel", "cancelled"),
     ] {
         let response = act(&app, &owner, &id, action).await;
         assert_eq!(response.status, StatusCode::OK, "{action}");
         assert_eq!(response.json["status"], status);
     }
 
-    let cancel_completed = act(&app, &owner, &id, "cancel").await;
-    assert_eq!(cancel_completed.status, StatusCode::CONFLICT);
-    assert_eq!(cancel_completed.json["error"]["code"], "conflict");
+    let cancel_twice = act(&app, &owner, &id, "cancel").await;
+    assert_eq!(cancel_twice.status, StatusCode::CONFLICT);
+    assert_eq!(cancel_twice.json["error"]["code"], "conflict");
 
     let stranger = sign_up(&app, "other@example.com").await;
     let other_id = draft_id(&app, &stranger, jam("Other")).await;
@@ -562,9 +570,6 @@ async fn list_shows_public_jams_with_filters_and_pages(pool: PgPool) {
     let all = send(&app, get("/api/events", None)).await;
     assert_eq!(names(&all), ["A", "B", "C"], "no draft, no deleted");
 
-    let french = send(&app, get("/api/events?country=FR&from=2030-02-01", None)).await;
-    assert_eq!(names(&french), ["C"]);
-
     let first = send(&app, get("/api/events?limit=2", None)).await;
     assert_eq!(names(&first), ["A", "B"]);
     let cursor = first.json["next_cursor"].as_str().unwrap();
@@ -603,7 +608,15 @@ async fn geojson_has_public_jams_with_coordinates_past_ones_included(pool: PgPoo
     make("Closed", &["publish", "close-registration"]).await;
     make("Draft", &[]).await;
     make("In review", &["submit"]).await;
-    make("Done", &["publish", "close-registration", "complete"]).await;
+    let mut done = jam("Done");
+    done["starts_on"] = json!("2020-06-01");
+    done["ends_on"] = json!("2020-06-01");
+    let id = draft_id(&app, &owner, done).await;
+    add_battle(&app, &owner, &id).await;
+    assert_eq!(
+        act(&app, &owner, &id, "publish").await.status,
+        StatusCode::OK
+    );
 
     let response = send(&app, get("/api/events.geojson", None)).await;
     assert_eq!(response.status, StatusCode::OK);
@@ -613,9 +626,14 @@ async fn geojson_has_public_jams_with_coordinates_past_ones_included(pool: PgPoo
         .iter()
         .map(|f| f["properties"]["name"].as_str().unwrap())
         .collect();
-    assert_eq!(names, ["Published", "Closed", "Done"]);
+    assert_eq!(names, ["Done", "Published", "Closed"]);
+    let phases: Vec<&str> = features
+        .iter()
+        .map(|f| f["properties"]["phase"].as_str().unwrap())
+        .collect();
+    assert_eq!(phases, ["past", "upcoming", "upcoming"]);
     assert_eq!(
-        features[0]["geometry"],
+        features[1]["geometry"],
         json!({ "type": "Point", "coordinates": [2.3522, 48.8566] })
     );
 }
@@ -707,7 +725,8 @@ async fn flyer_speaks_the_page_language_and_shows_cancellation(pool: PgPool) {
         get(&format!("/api/events/{id}/flyer.svg?lang=xx"), None),
     )
     .await;
-    assert_eq!(unknown.status, StatusCode::BAD_REQUEST);
+    assert_eq!(unknown.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(unknown.json["error"]["fields"][0]["field"], "query");
 }
 
 #[sqlx::test]
@@ -769,4 +788,218 @@ async fn geojson_carries_what_the_popup_and_filters_need(pool: PgPool) {
         properties["categories"],
         json!(["one_v_one", "crew", "bgirl", "kids"])
     );
+}
+
+#[sqlx::test]
+async fn a_public_jam_that_is_over_keeps_only_its_battles_open(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    let mut body = jam("Over");
+    body["starts_on"] = json!("2020-06-01");
+    body["ends_on"] = json!("2020-06-01");
+    let id = draft_id(&app, &owner, body.clone()).await;
+    let uri = format!("/api/events/{id}");
+
+    // A draft whose days went by can still be moved: nobody saw it.
+    body["ends_on"] = json!("2020-06-02");
+    let moved = send(&app, put(&uri, body.clone(), Some(&owner))).await;
+    assert_eq!(moved.status, StatusCode::OK);
+    assert_eq!(moved.json["phase"], "past");
+    add_battle(&app, &owner, &id).await;
+    publish(&pool, &id).await;
+
+    let page = send(&app, get(&uri, Some(&owner))).await;
+    assert_eq!(page.json["phase"], "past");
+    assert_eq!(page.json["can_edit"], false);
+    assert_eq!(page.json["can_edit_battles"], true);
+    assert_eq!(page.json["actions"], json!([]));
+
+    let over = |response: TestResponse| {
+        assert_eq!(response.status, StatusCode::CONFLICT, "{}", response.json);
+    };
+    over(send(&app, put(&uri, body.clone(), Some(&owner))).await);
+    over(send(&app, delete(&uri, Some(&owner))).await);
+    over(act(&app, &owner, &id, "cancel").await);
+    over(send(&app, put(&format!("{uri}/staff"), json!([]), Some(&owner))).await);
+    over(send(&app, delete(&format!("{uri}/flyer"), Some(&owner))).await);
+    let flyer: &Files = &[("flyer", b"jpeg"), ("card", b"jpeg")];
+    over(
+        send(
+            &app,
+            post_files(&format!("{uri}/flyer"), flyer, Some(&owner)),
+        )
+        .await,
+    );
+
+    // Its battles, entries and results are still recorded.
+    let battle = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
+    let added = send(
+        &app,
+        post(&format!("{uri}/battles"), battle.clone(), Some(&owner)),
+    )
+    .await;
+    assert_eq!(added.status, StatusCode::CREATED, "{}", added.json);
+    let battle_uri = format!("/api/battles/{}", added.json["id"].as_str().unwrap());
+    let renamed = json!({ "name": "Final 1v1", "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
+    assert_eq!(
+        send(&app, put(&battle_uri, renamed, Some(&owner)))
+            .await
+            .status,
+        StatusCode::OK
+    );
+    let dancer = json!({ "dancer_name": "Lil G", "country": "FR" });
+    let dancer = send(&app, post("/api/dancers", dancer, Some(&owner)))
+        .await
+        .json["id"]
+        .clone();
+    let entry = json!({ "dancer_ids": [dancer] });
+    let entered = send(
+        &app,
+        post(&format!("{battle_uri}/entries"), entry, Some(&owner)),
+    )
+    .await;
+    assert_eq!(entered.status, StatusCode::CREATED, "{}", entered.json);
+    let result = json!({ "dancer_ids": [dancer], "status": "confirmed", "reached": "winner",
+                         "video_url": "https://youtu.be/dQw4w9WgXcQ" });
+    let entry_uri = format!("/api/entries/{}", entered.json["id"].as_str().unwrap());
+    assert_eq!(
+        send(&app, put(&entry_uri, result, Some(&owner)))
+            .await
+            .status,
+        StatusCode::OK
+    );
+
+    // The team fixes history.
+    let team = sign_up(&app, "team@example.com").await;
+    set_role(&pool, "team@example.com", "seed_admin").await;
+    let fixed = send(&app, put(&uri, body, Some(&team))).await;
+    assert_eq!(fixed.status, StatusCode::OK);
+    let page = send(&app, get(&uri, Some(&team))).await;
+    assert_eq!(page.json["can_edit"], true);
+    assert_eq!(
+        page.json["actions"],
+        json!(["close-registration", "cancel"])
+    );
+}
+
+#[sqlx::test]
+async fn the_jam_page_says_what_its_writer_may_do(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    let id = draft_id(&app, &owner, jam("Jam")).await;
+    let uri = format!("/api/events/{id}");
+    let draft = send(&app, get(&uri, Some(&owner))).await;
+    assert_eq!(draft.json["phase"], "upcoming");
+    assert_eq!(draft.json["can_edit"], true);
+    assert_eq!(draft.json["actions"], json!(["submit", "cancel"]));
+
+    publish(&pool, &id).await;
+    let visitor = send(&app, get(&uri, None)).await;
+    assert_eq!(visitor.json["can_edit"], false);
+    assert_eq!(visitor.json["can_edit_battles"], false);
+    assert_eq!(visitor.json["actions"], json!([]));
+}
+
+#[sqlx::test]
+async fn a_timezone_postgres_does_not_know_is_refused(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    let mut body = jam("Jam");
+    body["timezone"] = json!("Europe/Atlantis");
+    let refused = create(&app, &owner, body.clone()).await;
+    assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(refused.json["error"]["fields"][0]["field"], "timezone");
+
+    let id = draft_id(&app, &owner, jam("Jam")).await;
+    let refused = send(&app, put(&format!("/api/events/{id}"), body, Some(&owner))).await;
+    assert_eq!(refused.json["error"]["fields"][0]["field"], "timezone");
+}
+
+#[sqlx::test]
+async fn the_checklist_holds_once_submitted(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    let admin = sign_up(&app, "admin@example.com").await;
+    set_role(&pool, "admin@example.com", "admin").await;
+    let id = draft_id(&app, &owner, jam("Jam")).await;
+    add_battle(&app, &owner, &id).await;
+    add_battle(&app, &owner, &id).await;
+    assert_eq!(
+        act(&app, &owner, &id, "submit").await.status,
+        StatusCode::OK
+    );
+
+    let battles = send(
+        &app,
+        get(&format!("/api/events/{id}/battles"), Some(&owner)),
+    )
+    .await;
+    let ids: Vec<&str> = battles
+        .json
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|b| b["id"].as_str().unwrap())
+        .collect();
+    let first = send(
+        &app,
+        delete(&format!("/api/battles/{}", ids[0]), Some(&owner)),
+    )
+    .await;
+    assert_eq!(first.status, StatusCode::NO_CONTENT);
+    let last = send(
+        &app,
+        delete(&format!("/api/battles/{}", ids[1]), Some(&owner)),
+    )
+    .await;
+    assert_eq!(last.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(last.json["error"]["fields"][0]["field"], "battles");
+
+    // Approval checks again: a jam that lost its battles some other way stays in review.
+    sqlx::query!("delete from battles where event_id = $1::text::uuid", id)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let uri = format!("/api/admin/events/{id}/approve");
+    let refused = send(&app, post(&uri, json!({}), Some(&admin))).await;
+    assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(refused.json["error"]["fields"][0]["field"], "battles");
+}
+
+#[sqlx::test]
+async fn an_id_that_does_not_parse_is_not_found(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    for uri in [
+        "/api/events/nope/battles",
+        "/api/dancers/nope/events",
+        "/api/organizers/nope",
+    ] {
+        let response = send(&app, get(uri, Some(&owner))).await;
+        assert_eq!(response.status, StatusCode::NOT_FOUND, "{uri}");
+        assert_eq!(response.json["error"]["code"], "not_found", "{uri}");
+    }
+}
+
+#[sqlx::test]
+async fn an_organiser_cannot_move_a_public_jam_into_the_past(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, "org@example.com").await;
+    let mut body = jam("Jam");
+    let id = draft_id(&app, &owner, body.clone()).await;
+    let uri = format!("/api/events/{id}");
+    add_battle(&app, &owner, &id).await;
+    publish(&pool, &id).await;
+
+    // One mistyped date would lock them out of putting it back.
+    body["starts_on"] = json!("2020-06-01");
+    body["ends_on"] = json!("2020-06-01");
+    let refused = send(&app, put(&uri, body.clone(), Some(&owner))).await;
+    assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(refused.json["error"]["fields"][0]["field"], "ends_on");
+
+    let team = sign_up(&app, "team@example.com").await;
+    set_role(&pool, "team@example.com", "seed_admin").await;
+    let fixed = send(&app, put(&uri, body, Some(&team))).await;
+    assert_eq!(fixed.status, StatusCode::OK, "the team records history");
 }

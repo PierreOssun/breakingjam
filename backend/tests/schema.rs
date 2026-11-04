@@ -221,3 +221,125 @@ async fn battle_checks_reject_inconsistent_formats(pool: PgPool) {
         assert!(check_violation(&result), "{why}");
     }
 }
+
+/// A jam today in Paris with one 1v1 battle; returns (event id, battle id).
+async fn jam_with_battle(pool: &PgPool) -> (Uuid, Uuid) {
+    let (event, battle) = (Uuid::now_v7(), Uuid::now_v7());
+    sqlx::query!(
+        "insert into events (id, organizer_id, name, slug, starts_on, ends_on, timezone)
+         values ($1, $2, 'Jam', $3, current_date, current_date, 'Europe/Paris')",
+        event,
+        user(pool).await,
+        format!("jam-{event}"),
+    )
+    .execute(pool)
+    .await
+    .unwrap();
+    sqlx::query!(
+        "insert into battles (id, event_id, name, format, team_size, age, age_min)
+         values ($1, $2, '1v1', 'team', 1, 'adult', 18)",
+        battle,
+        event,
+    )
+    .execute(pool)
+    .await
+    .unwrap();
+    (event, battle)
+}
+
+#[sqlx::test]
+async fn results_and_prizes_hold_together(pool: PgPool) {
+    let (event, battle) = jam_with_battle(&pool).await;
+    let entry = |reached: &'static str,
+                 rank: Option<i32>,
+                 video: Option<&'static str>,
+                 at: Option<i32>| {
+        sqlx::query!(
+            "insert into entries (id, battle_id, reached, final_rank, video_url, video_offset_seconds)
+             values ($1, $2, $3::text::bracket_stage, $4, $5, $6)",
+            Uuid::now_v7(),
+            battle,
+            reached,
+            rank,
+            video,
+            at,
+        )
+        .execute(&pool)
+    };
+    entry("winner", Some(1), None, None).await.unwrap();
+    entry(
+        "top2",
+        Some(2),
+        Some("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+        Some(90),
+    )
+    .await
+    .unwrap();
+    entry("top4", Some(3), None, None).await.unwrap();
+    let rejected = [
+        (entry("winner", None, None, None).await, "a winner is first"),
+        (
+            entry("top8", Some(1), None, None).await,
+            "first is the winner",
+        ),
+        (entry("top2", Some(3), None, None).await, "top 2 is second"),
+        (
+            entry("na", None, None, Some(90)).await,
+            "an offset needs a video",
+        ),
+    ];
+    for (result, why) in rejected {
+        assert!(check_violation(&result), "{why}");
+    }
+
+    let prize = |currency: Option<&'static str>, first: Option<i32>| {
+        sqlx::query!(
+            "update battles set prize_currency = $2, prize_first = $3 where id = $1",
+            battle,
+            currency,
+            first,
+        )
+        .execute(&pool)
+    };
+    prize(Some("EUR"), Some(500)).await.unwrap();
+    assert!(
+        check_violation(&prize(Some("EUR"), None).await),
+        "a currency needs a prize"
+    );
+    assert!(
+        check_violation(&prize(None, Some(500)).await),
+        "a prize needs a currency"
+    );
+    let sized_smoke = sqlx::query!(
+        "update battles set format = 'seven_to_smoke' where id = $1",
+        battle
+    )
+    .execute(&pool)
+    .await;
+    assert!(
+        check_violation(&sized_smoke),
+        "seven to smoke has no team size"
+    );
+    let half_pin = sqlx::query!("update events set lat = 48.86 where id = $1", event)
+        .execute(&pool)
+        .await;
+    assert!(check_violation(&half_pin), "a pin is both coordinates");
+}
+
+#[sqlx::test]
+async fn a_jams_phase_follows_its_own_calendar(pool: PgPool) {
+    let phase = |starts: i32, ends: i32, timezone: &'static str| {
+        sqlx::query_scalar!(
+            r#"select jam_phase(d + $1::int, d + $2::int, $3)::text as "phase!"
+               from (select (now() at time zone $3)::date as d) today"#,
+            starts,
+            ends,
+            timezone,
+        )
+        .fetch_one(&pool)
+    };
+    assert_eq!(phase(1, 2, "Europe/Paris").await.unwrap(), "upcoming");
+    assert_eq!(phase(0, 0, "Pacific/Kiritimati").await.unwrap(), "live");
+    assert_eq!(phase(-2, 1, "America/Los_Angeles").await.unwrap(), "live");
+    assert_eq!(phase(-3, -1, "Asia/Tokyo").await.unwrap(), "past");
+}

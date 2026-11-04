@@ -27,8 +27,7 @@ const StaticMap = lazy(() => import("../map/StaticMap"));
  */
 export function NearCard({ place, jams }: { place: Place; jams: MapJam[] }) {
   const { t } = useTranslation();
-  const today = new Date();
-  const near = nearestTo(place, jams, today);
+  const near = nearestTo(place, jams);
   const listed = near.map(({ jam }) => jam);
   return (
     <section
@@ -48,7 +47,7 @@ export function NearCard({ place, jams }: { place: Place; jams: MapJam[] }) {
           </h2>
           <FlagChip code={place.country} />
         </div>
-        {near.length > 0 && !hasJamIn(place, jams, today) && (
+        {near.length > 0 && !hasJamIn(place, jams) && (
           <p className="text-body-sm text-muted">
             {t("search.near.closest", { place: place.name })}
           </p>

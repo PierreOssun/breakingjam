@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use sqlx::{PgConnection, PgPool};
+use sqlx::{PgConnection, PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{
@@ -12,7 +12,7 @@ use crate::domain::{
         BattleRef, Dancer, DancerFields, DancerRef, DancerSource, DancerSummary, DancerTitle,
         EventRef, FieldChange, OwnPage, Participation, default_look,
     },
-    event::EventStatus,
+    event::{EventStatus, Phase},
 };
 
 /// What `search` narrows to; each `None` matches everyone.
@@ -97,17 +97,17 @@ pub async fn current_crews(
 }
 
 /// A dancer that is not soft-deleted.
-pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
+pub async fn find(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<Option<Dancer>> {
     sqlx::query_as!(
         Dancer,
-        r#"select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
+        r#"select id, user_id, dancer_name, aliases, country, country2, city, bio,
                   instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
                   avatar_parts, titles as "titles: Vec<DancerTitle>",
                   created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null"#,
         id,
     )
-    .fetch_optional(pool)
+    .fetch_optional(db)
     .await
 }
 
@@ -163,20 +163,19 @@ pub async fn insert(
     sqlx::query_as!(
         Dancer,
         r#"insert into dancers
-             (id, dancer_name, aliases, real_name, country, country2, city, bio,
+             (id, dancer_name, aliases, country, country2, city, bio,
               instagram_handle, source, notable, created_by, avatar_parts, titles)
            values ($1, btrim($2), array(select btrim(a) from unnest($3::text[]) a),
-                   nullif(btrim($4), ''), $5, $6, nullif(btrim($7), ''), nullif(btrim($8), ''),
-                   nullif(lower(ltrim(btrim($9), '@')), ''), $10, $11, $12, nullif(btrim($13), ''),
-                   array(select distinct t from unnest($14::dancer_title[]) t order by t))
-           returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
+                   $4, $5, nullif(btrim($6), ''), nullif(btrim($7), ''),
+                   nullif(lower(ltrim(btrim($8), '@')), ''), $9, $10, $11, nullif(btrim($12), ''),
+                   array(select distinct t from unnest($13::dancer_title[]) t order by t))
+           returning id, user_id, dancer_name, aliases, country, country2, city, bio,
                      instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
                      avatar_parts, titles as "titles: Vec<DancerTitle>",
                      created_by, merged_into_id, created_at, updated_at"#,
         Uuid::now_v7(),
         fields.dancer_name,
         &fields.aliases,
-        fields.real_name,
         fields.country,
         fields.country2,
         fields.city,
@@ -203,22 +202,21 @@ pub async fn update(
         Dancer,
         r#"update dancers set
              dancer_name = btrim($2), aliases = array(select btrim(a) from unnest($3::text[]) a),
-             real_name = nullif(btrim($4), ''), country = $5, country2 = $6,
-             city = nullif(btrim($7), ''), bio = nullif(btrim($8), ''),
-             instagram_handle = nullif(lower(ltrim(btrim($9), '@')), ''),
-             avatar_parts = nullif(btrim($10), ''),
+             country = $4, country2 = $5,
+             city = nullif(btrim($6), ''), bio = nullif(btrim($7), ''),
+             instagram_handle = nullif(lower(ltrim(btrim($8), '@')), ''),
+             avatar_parts = nullif(btrim($9), ''),
              -- Absent titles keep the stored ones; the enum's order, without repeats.
-             titles = case when $11::dancer_title[] is null then titles
-                           else array(select distinct t from unnest($11) t order by t) end
+             titles = case when $10::dancer_title[] is null then titles
+                           else array(select distinct t from unnest($10) t order by t) end
            where id = $1 and deleted_at is null
-           returning id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
+           returning id, user_id, dancer_name, aliases, country, country2, city, bio,
                      instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
                      avatar_parts, titles as "titles: Vec<DancerTitle>",
                      created_by, merged_into_id, created_at, updated_at"#,
         id,
         fields.dancer_name,
         &fields.aliases,
-        fields.real_name,
         fields.country,
         fields.country2,
         fields.city,
@@ -232,15 +230,15 @@ pub async fn update(
 }
 
 /// A dancer that is neither soft-deleted nor merged away: the only kind that can be written.
-pub async fn find_live(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Dancer>> {
-    Ok(find(pool, id).await?.filter(|d| d.merged_into_id.is_none()))
+pub async fn find_live(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<Option<Dancer>> {
+    Ok(find(db, id).await?.filter(|d| d.merged_into_id.is_none()))
 }
 
 /// Locks a dancer row for the rest of the transaction.
 pub async fn find_for_update(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<Option<Dancer>> {
     sqlx::query_as!(
         Dancer,
-        r#"select id, user_id, dancer_name, aliases, real_name, country, country2, city, bio,
+        r#"select id, user_id, dancer_name, aliases, country, country2, city, bio,
                   instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
                   avatar_parts, titles as "titles: Vec<DancerTitle>",
                   created_by, merged_into_id, created_at, updated_at
@@ -294,6 +292,31 @@ pub async fn merge(
     redirect(conn, loser, into, aliases).await
 }
 
+/// A battle where both dancers are in different active entries, as "Jam · Battle": merging
+/// them would put one dancer in two entries of it.
+pub async fn shared_battle(
+    conn: &mut PgConnection,
+    one: Uuid,
+    other: Uuid,
+) -> sqlx::Result<Option<String>> {
+    sqlx::query_scalar!(
+        r#"select e.name || ' · ' || b.name as "name!"
+           from entry_members m1
+           join entries n1 on n1.id = m1.entry_id
+           join entries n2 on n2.battle_id = n1.battle_id and n2.id <> n1.id
+           join entry_members m2 on m2.entry_id = n2.id
+           join battles b on b.id = n1.battle_id
+           join events e on e.id = b.event_id
+           where m1.dancer_id = $1 and m2.dancer_id = $2
+             and n1.status <> 'withdrawn' and n2.status <> 'withdrawn'
+           limit 1"#,
+        one,
+        other,
+    )
+    .fetch_optional(conn)
+    .await
+}
+
 /// Entry rows move unless the survivor is already in that entry; leftovers are dropped.
 async fn move_entry_members(conn: &mut PgConnection, from: Uuid, into: Uuid) -> sqlx::Result<()> {
     sqlx::query!(
@@ -329,14 +352,16 @@ async fn move_staff(conn: &mut PgConnection, from: Uuid, into: Uuid) -> sqlx::Re
     Ok(())
 }
 
-/// Memberships move unless the survivor has the same crew and `since`; leftovers are dropped.
+/// Memberships move unless the survivor has the same crew with the same `since`, or both are
+/// current members (one current membership per crew); leftovers are dropped.
 async fn move_memberships(conn: &mut PgConnection, from: Uuid, into: Uuid) -> sqlx::Result<()> {
     sqlx::query!(
         "update crew_memberships m set dancer_id = $2
          where dancer_id = $1
            and not exists (select 1 from crew_memberships t
                            where t.dancer_id = $2 and t.crew_id = m.crew_id
-                             and t.since is not distinct from m.since)",
+                             and (t.since is not distinct from m.since
+                                  or (t.until is null and m.until is null)))",
         from,
         into,
     )
@@ -425,7 +450,7 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
         r#"select e.id as "event_id!", e.name as "event_name!", e.slug as "slug!",
                   e.starts_on as "starts_on!", e.ends_on as "ends_on!", e.city,
                   e.country, e.status as "status!: EventStatus",
-                  e.starts_on >= current_date as "upcoming!",
+                  jam_phase(e.starts_on, e.ends_on, e.timezone) as "phase!: Phase",
                   b.id as "battle_id?", b.name as "battle_name?",
                   b.format as "format?: BattleFormat", b.team_size as "team_size?",
                   b.gender as "gender?: BattleGender", b.age as "age?: BattleAge",
@@ -439,7 +464,7 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
            where m.dancer_id = $1 and e.deleted_at is null and e.status not in ('draft', 'in_review')
            union all
            select e.id, e.name, e.slug, e.starts_on, e.ends_on, e.city, e.country, e.status,
-                  e.starts_on >= current_date,
+                  jam_phase(e.starts_on, e.ends_on, e.timezone),
                   null::uuid, null::text, null::battle_format, null::smallint,
                   null::battle_gender, null::battle_age, s.role,
                   null::entry_status, null::bracket_stage, null::int, null::text
@@ -463,6 +488,7 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
                 city: r.city,
                 country: r.country,
                 status: r.status,
+                phase: r.phase,
             },
             battle: match (r.battle_id, r.battle_name, r.format, r.gender, r.age) {
                 (Some(id), Some(name), Some(format), Some(gender), Some(age)) => Some(BattleRef {
@@ -480,7 +506,6 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
             reached: r.reached,
             final_rank: r.final_rank,
             video_url: r.video_url,
-            upcoming: r.upcoming,
         })
         .collect())
 }

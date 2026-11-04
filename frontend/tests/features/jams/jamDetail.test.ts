@@ -1,3 +1,4 @@
+import type { Schemas } from "../../../src/api/client";
 import {
   actionCaption,
   countdown,
@@ -49,10 +50,9 @@ describe("the countdown chip", () => {
     });
   });
 
-  it("is gone once the jam is over, completed or cancelled", () => {
+  it("is gone once the jam is over or cancelled", () => {
     expect(countdown(JAM, null, zurich("2030-06-10T09:00"))).toBeNull();
     const early = zurich("2030-05-30T12:00");
-    expect(countdown({ ...JAM, status: "completed" }, null, early)).toBeNull();
     expect(countdown({ ...JAM, status: "cancelled" }, null, early)).toBeNull();
   });
 
@@ -64,40 +64,40 @@ describe("the countdown chip", () => {
 
 describe("the primary action", () => {
   const url = "https://example.com/register";
+  const upcoming = (
+    status: Schemas["EventStatus"],
+    registration_url: string | null,
+  ) => ({
+    status,
+    phase: "upcoming" as const,
+    registration_url,
+  });
   it("follows the jam's state", () => {
-    expect(primaryAction({ status: "published", registration_url: url })).toBe(
-      "register",
-    );
-    expect(primaryAction({ status: "published", registration_url: null })).toBe(
+    expect(primaryAction(upcoming("published", url))).toBe("register");
+    expect(primaryAction(upcoming("published", null))).toBe("calendar");
+    expect(primaryAction(upcoming("registration_closed", url))).toBe(
       "calendar",
     );
-    expect(
-      primaryAction({ status: "registration_closed", registration_url: url }),
-    ).toBe("calendar");
-    expect(primaryAction({ status: "completed", registration_url: url })).toBe(
-      "results",
-    );
-    expect(
-      primaryAction({ status: "cancelled", registration_url: url }),
-    ).toBeNull();
+    expect(primaryAction(upcoming("cancelled", url))).toBeNull();
+  });
+
+  it("shows the results once the jam is over by its dates, whatever its status", () => {
+    for (const status of ["published", "registration_closed"] as const) {
+      expect(primaryAction({ ...upcoming(status, url), phase: "past" })).toBe(
+        "results",
+      );
+    }
+    const cancelled = { ...upcoming("cancelled", url), phase: "past" as const };
+    expect(primaryAction(cancelled)).toBeNull();
   });
 
   it("captions the action card", () => {
-    expect(actionCaption({ status: "published", registration_url: url })).toBe(
-      "open",
-    );
-    expect(
-      actionCaption({ status: "registration_closed", registration_url: url }),
-    ).toBe("closed");
-    expect(
-      actionCaption({ status: "published", registration_url: null }),
-    ).toBeNull();
-    expect(
-      actionCaption({ status: "completed", registration_url: null }),
-    ).toBeNull();
-    expect(actionCaption({ status: "cancelled", registration_url: url })).toBe(
-      "cancelled",
-    );
+    expect(actionCaption(upcoming("published", url))).toBe("open");
+    expect(actionCaption(upcoming("registration_closed", url))).toBe("closed");
+    expect(actionCaption(upcoming("published", null))).toBeNull();
+    const over = { ...upcoming("published", null), phase: "past" as const };
+    expect(actionCaption(over)).toBeNull();
+    expect(actionCaption(upcoming("cancelled", url))).toBe("cancelled");
   });
 });
 

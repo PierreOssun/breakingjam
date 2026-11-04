@@ -140,7 +140,7 @@
     "in_review": "In review",
     "published": "Published",
     "registration_closed": "Registration closed",
-    "completed": "Completed",
+    "past": "Past",
     "cancelled": "Cancelled"
   },
   "jam": {
@@ -224,6 +224,7 @@
   "dancer": {
     "aka": "aka {{names}}",
     "verified": "Verified",
+    "live": "Live now",
     "upcoming": "Upcoming",
     "past": "Past",
     "noUpcoming": "No upcoming jams.",
@@ -370,19 +371,17 @@
       "explain": {
         "published": "On the map and open for registration.",
         "registration_closed": "On the map; registration is closed.",
-        "completed": "It took place. Record the results in the battles below.",
+        "past": "It took place. Record the results in the battles below.",
         "cancelled": "Called off. Its page says so.",
         "in_review": "A BreakingJam admin is checking it. It goes on the map once approved; you can keep editing meanwhile."
       },
       "action": {
         "close-registration": "Close registration",
-        "complete": "Mark as completed",
         "cancel": "Cancel jam"
       },
       "done": {
         "publish": "Published. It’s on the map.",
         "close-registration": "Registration closed.",
-        "complete": "Marked as completed.",
         "cancel": "Jam cancelled.",
         "submit": "Submitted. A BreakingJam admin will review it soon."
       },

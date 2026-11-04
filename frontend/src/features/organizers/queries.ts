@@ -9,8 +9,7 @@ export function useOrganizer(id: string) {
       const reply = await api.GET("/api/organizers/{id}", {
         params: { path: { id } },
       });
-      if (reply.response.status === 404 || reply.response.status === 400)
-        return null;
+      if (reply.response.status === 404) return null;
       return unwrap(reply, "organizer");
     },
   });

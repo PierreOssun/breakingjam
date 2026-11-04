@@ -7,9 +7,9 @@ use utoipa::ToSchema;
 /// What the site holds and what waits for an admin; percentages are left to the reader.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct Stats {
-    /// Public jams still to come or running.
+    /// Announced jams still to come or running.
     pub jams_upcoming: i64,
-    /// Public jams that are over, completed or not.
+    /// Announced jams that are over.
     pub jams_past: i64,
     /// Jams waiting for an admin's approval.
     pub jams_in_review: i64,
@@ -42,13 +42,13 @@ pub async fn overview(pool: &PgPool) -> sqlx::Result<Stats> {
     sqlx::query_as!(
         Stats,
         r#"with jams as (
-             select status in ('published', 'registration_closed') as public, status, ends_on
+             select status in ('published', 'registration_closed') as announced, status,
+                    jam_phase(starts_on, ends_on, timezone) = 'past' as over
              from events where deleted_at is null
            )
            select
-             (select count(*) from jams where public and ends_on >= current_date) as "jams_upcoming!",
-             (select count(*) from jams
-              where status = 'completed' or (public and ends_on < current_date)) as "jams_past!",
+             (select count(*) from jams where announced and not over) as "jams_upcoming!",
+             (select count(*) from jams where announced and over) as "jams_past!",
              (select count(*) from jams where status = 'in_review') as "jams_in_review!",
              (select count(*) from jams where status = 'draft') as "jams_draft!",
              (select count(*) from jams where status = 'cancelled') as "jams_cancelled!",
@@ -71,14 +71,14 @@ pub async fn overview(pool: &PgPool) -> sqlx::Result<Stats> {
     .await
 }
 
-/// What the landing page counts; public jams are announced or completed, never cancelled.
+/// What the landing page counts: battles of announced jams, never cancelled ones.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct SiteStats {
-    /// Battles of public jams that ended before today.
+    /// Battles of jams that are over.
     pub battles_past: i64,
     /// Dancer pages, merged and deleted ones left out.
     pub dancers: i64,
-    /// Battles of public jams that end today or later.
+    /// Battles of jams upcoming or live, so both counts add up to every battle.
     pub battles_upcoming: i64,
     /// Countries those upcoming battles take place in.
     pub countries_upcoming: i64,
@@ -88,16 +88,18 @@ pub struct SiteStats {
 pub async fn site(pool: &PgPool) -> sqlx::Result<SiteStats> {
     sqlx::query_as!(
         SiteStats,
-        r#"select
-             count(*) filter (where e.ends_on < current_date) as "battles_past!",
+        r#"with jams as (
+             select id, country, jam_phase(starts_on, ends_on, timezone) = 'past' as over
+             from events
+             where deleted_at is null and status in ('published', 'registration_closed')
+           )
+           select
+             count(*) filter (where over) as "battles_past!",
              (select count(*) from dancers
               where deleted_at is null and merged_into_id is null) as "dancers!",
-             count(*) filter (where e.ends_on >= current_date) as "battles_upcoming!",
-             count(distinct e.country) filter (where e.ends_on >= current_date)
-               as "countries_upcoming!"
-           from battles b join events e on e.id = b.event_id
-           where e.deleted_at is null
-             and e.status in ('published', 'registration_closed', 'completed')"#,
+             count(*) filter (where not over) as "battles_upcoming!",
+             count(distinct e.country) filter (where not over) as "countries_upcoming!"
+           from battles b join jams e on e.id = b.event_id"#,
     )
     .fetch_one(pool)
     .await

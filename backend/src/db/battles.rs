@@ -1,36 +1,30 @@
-//! `battles`, `entries` and `entry_members` queries.
+//! `battles`, `entries`, `entry_members` and `event_staff` queries.
 
 use std::collections::HashMap;
 
+use chrono::{DateTime, Utc};
 use sqlx::{PgConnection, PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{
     battle::{
         Battle, BattleAge, BattleFields, BattleFormat, BattleGender, BracketStage, CrewName, Entry,
-        EntryFields, EntryStatus,
+        EntryFields, EntryStatus, StaffAssignment, StaffMember, StaffRole,
     },
     dancer::DancerRef,
 };
 
 /// A jam's battles in display order.
-pub async fn list(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<Battle>> {
-    sqlx::query_as!(
-        Battle,
-        r#"select id, event_id, name, format as "format: BattleFormat", team_size,
-                  gender as "gender: BattleGender", age as "age: BattleAge", age_min, age_max,
-                  bracket_size, max_entries, prize_currency, prize_first, prize_second,
-                  prize_third, position, starts_at, created_at, updated_at
-           from battles where event_id = $1 order by position, id"#,
-        event_id,
-    )
-    .fetch_all(pool)
-    .await
+pub async fn list(db: impl PgExecutor<'_>, event_id: Uuid) -> sqlx::Result<Vec<Battle>> {
+    Ok(of_events(db, &[event_id])
+        .await?
+        .remove(&event_id)
+        .unwrap_or_default())
 }
 
 /// The battles of several jams by jam, each jam's in display order.
 pub async fn of_events(
-    pool: &PgPool,
+    db: impl PgExecutor<'_>,
     event_ids: &[Uuid],
 ) -> sqlx::Result<HashMap<Uuid, Vec<Battle>>> {
     let battles = sqlx::query_as!(
@@ -42,7 +36,7 @@ pub async fn of_events(
            from battles where event_id = any($1) order by event_id, position, id"#,
         event_ids,
     )
-    .fetch_all(pool)
+    .fetch_all(db)
     .await?;
     let mut by_event = HashMap::<Uuid, Vec<Battle>>::new();
     for battle in battles {
@@ -116,7 +110,7 @@ pub async fn insert(
 
 /// Replaces a battle's fields; its position is changed only by `reorder`.
 pub async fn update(
-    pool: &PgPool,
+    db: impl PgExecutor<'_>,
     id: Uuid,
     name: &str,
     fields: &BattleFields,
@@ -148,14 +142,14 @@ pub async fn update(
         fields.prize_third,
         fields.starts_at,
     )
-    .fetch_one(pool)
+    .fetch_one(db)
     .await
 }
 
 /// Deletes a battle with its entries (cascade).
-pub async fn delete(pool: &PgPool, id: Uuid) -> sqlx::Result<()> {
+pub async fn delete(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<()> {
     sqlx::query!("delete from battles where id = $1", id)
-        .execute(pool)
+        .execute(db)
         .await?;
     Ok(())
 }
@@ -174,34 +168,69 @@ pub async fn reorder(pool: &PgPool, event_id: Uuid, ids: &[Uuid]) -> sqlx::Resul
     Ok(())
 }
 
-/// Entries of a battle, oldest first, with members and crew.
-pub async fn entries(conn: &mut PgConnection, battle_id: Uuid) -> sqlx::Result<Vec<Entry>> {
-    fetch_entries(conn, Some(battle_id), None).await
+/// The entries of several battles by battle, oldest first, with members and crew.
+pub async fn entries_of(
+    conn: &mut PgConnection,
+    battle_ids: &[Uuid],
+) -> sqlx::Result<HashMap<Uuid, Vec<Entry>>> {
+    let rows = sqlx::query_as!(
+        EntryRow,
+        // A subquery, not a join: the columns' nullability then comes from the table, not
+        // from whichever plan Postgres picks, so `sqlx prepare --check` stays stable.
+        r#"select e.id, e.battle_id, e.team_name, e.status as "status: EntryStatus",
+                  e.reached as "reached: BracketStage", e.final_rank, e.video_url,
+                  e.video_offset_seconds, e.created_at, e.updated_at, e.crew_id,
+                  (select c.name from crews c where c.id = e.crew_id) as "crew_name?"
+           from entries e
+           where e.battle_id = any($1)
+           order by e.created_at, e.id"#,
+        battle_ids,
+    )
+    .fetch_all(&mut *conn)
+    .await?;
+    let mut by_battle = HashMap::<Uuid, Vec<Entry>>::new();
+    for entry in with_members(conn, rows).await? {
+        by_battle.entry(entry.battle_id).or_default().push(entry);
+    }
+    Ok(by_battle)
 }
 
 /// One entry, with members and crew.
 pub async fn find_entry(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<Option<Entry>> {
-    Ok(fetch_entries(conn, None, Some(id)).await?.pop())
-}
-
-async fn fetch_entries(
-    conn: &mut PgConnection,
-    battle_id: Option<Uuid>,
-    entry_id: Option<Uuid>,
-) -> sqlx::Result<Vec<Entry>> {
-    let rows = sqlx::query!(
+    let rows = sqlx::query_as!(
+        EntryRow,
+        // A subquery, not a join: the columns' nullability then comes from the table, not
+        // from whichever plan Postgres picks, so `sqlx prepare --check` stays stable.
         r#"select e.id, e.battle_id, e.team_name, e.status as "status: EntryStatus",
                   e.reached as "reached: BracketStage", e.final_rank, e.video_url,
-                  e.video_offset_seconds, e.created_at, e.updated_at,
-                  c.id as "crew_id?", c.name as "crew_name?"
-           from entries e left join crews c on c.id = e.crew_id
-           where ($1::uuid is null or e.battle_id = $1) and ($2::uuid is null or e.id = $2)
-           order by e.created_at, e.id"#,
-        battle_id,
-        entry_id,
+                  e.video_offset_seconds, e.created_at, e.updated_at, e.crew_id,
+                  (select c.name from crews c where c.id = e.crew_id) as "crew_name?"
+           from entries e
+           where e.id = $1"#,
+        id,
     )
     .fetch_all(&mut *conn)
     .await?;
+    Ok(with_members(conn, rows).await?.pop())
+}
+
+/// An `entries` row with its crew's name, before its members are read.
+struct EntryRow {
+    id: Uuid,
+    battle_id: Uuid,
+    team_name: Option<String>,
+    status: EntryStatus,
+    reached: BracketStage,
+    final_rank: Option<i32>,
+    video_url: Option<String>,
+    video_offset_seconds: Option<i32>,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+    crew_id: Option<Uuid>,
+    crew_name: Option<String>,
+}
+
+async fn with_members(conn: &mut PgConnection, rows: Vec<EntryRow>) -> sqlx::Result<Vec<Entry>> {
     let ids: Vec<Uuid> = rows.iter().map(|r| r.id).collect();
     let mut members = members(conn, &ids).await?;
     Ok(rows
@@ -371,5 +400,69 @@ pub async fn delete_entry(pool: &PgPool, id: Uuid) -> sqlx::Result<()> {
     sqlx::query!("delete from entries where id = $1", id)
         .execute(pool)
         .await?;
+    Ok(())
+}
+
+/// The dancers on a jam's staff, in any role.
+pub async fn staff_ids(conn: &mut PgConnection, event_id: Uuid) -> sqlx::Result<Vec<Uuid>> {
+    sqlx::query_scalar!(
+        "select distinct dancer_id from event_staff where event_id = $1",
+        event_id
+    )
+    .fetch_all(conn)
+    .await
+}
+
+/// A jam's staff, by role then name.
+pub async fn staff(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<StaffMember>> {
+    let rows = sqlx::query!(
+        r#"select s.role as "role: StaffRole", d.id, d.dancer_name, d.country, d.country2,
+                  d.instagram_handle, d.avatar_url, d.avatar_parts,
+                  d.deleted_at is not null as "deleted!"
+           from event_staff s join dancers d on d.id = s.dancer_id
+           where s.event_id = $1
+           order by s.role, lower(d.dancer_name), d.id"#,
+        event_id,
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(rows
+        .into_iter()
+        .map(|r| StaffMember {
+            role: r.role,
+            dancer: DancerRef {
+                id: r.id,
+                dancer_name: r.dancer_name,
+                country: r.country,
+                country2: r.country2,
+                instagram_handle: r.instagram_handle,
+                avatar_url: r.avatar_url,
+                avatar_parts: r.avatar_parts,
+                deleted: r.deleted,
+            },
+        })
+        .collect())
+}
+
+/// Replaces a jam's whole staff list.
+pub async fn replace_staff(
+    conn: &mut PgConnection,
+    event_id: Uuid,
+    staff: &[StaffAssignment],
+) -> sqlx::Result<()> {
+    let (dancers, roles): (Vec<Uuid>, Vec<StaffRole>) =
+        staff.iter().map(|s| (s.dancer_id, s.role)).unzip();
+    sqlx::query!("delete from event_staff where event_id = $1", event_id)
+        .execute(&mut *conn)
+        .await?;
+    sqlx::query!(
+        "insert into event_staff (event_id, dancer_id, role)
+         select $1, d, r from unnest($2::uuid[], $3::staff_role[]) as t(d, r)",
+        event_id,
+        &dancers,
+        &roles as &[StaffRole],
+    )
+    .execute(&mut *conn)
+    .await?;
     Ok(())
 }

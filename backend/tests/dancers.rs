@@ -14,7 +14,6 @@ fn dancer(name: &str, handle: Option<&str>) -> Value {
     json!({
         "dancer_name": name,
         "aliases": [],
-        "real_name": " ",
         "country": "FR",
         "country2": null,
         "city": "Paris",
@@ -61,10 +60,10 @@ async fn create_normalises_and_sets_source_from_role(pool: PgPool) {
     .await;
     assert_eq!(created.status, StatusCode::CREATED);
     assert_eq!(created.json["instagram_handle"], "lil_g");
-    assert_eq!(created.json["real_name"], Value::Null);
     assert_eq!(created.json["source"], "self");
     assert_eq!(created.json["can_edit"], true);
-    for hidden in ["notable", "user_id", "created_by"] {
+    // `real_name` was dropped in M26: a legal name never reaches a public page.
+    for hidden in ["notable", "user_id", "created_by", "real_name"] {
         assert!(
             created.json.get(hidden).is_none(),
             "{hidden} is never exposed"
@@ -279,8 +278,9 @@ async fn jam(pool: &PgPool, name: &str, days: i32, status: &str) -> (Uuid, Uuid)
     let event = Uuid::now_v7();
     sqlx::query!(
         "insert into events (id, organizer_id, name, slug, status, starts_on, ends_on, timezone, city, country)
-         values ($1, $2, $3, $4, $5::text::event_status, current_date + $6::int, current_date + $6::int,
-                 'Europe/Paris', 'Paris', 'FR')",
+         values ($1, $2, $3, $4, $5::text::event_status,
+                 (now() at time zone 'Europe/Paris')::date + $6::int,
+                 (now() at time zone 'Europe/Paris')::date + $6::int, 'Europe/Paris', 'Paris', 'FR')",
         event,
         organizer,
         name,
@@ -307,7 +307,9 @@ async fn jam(pool: &PgPool, name: &str, days: i32, status: &str) -> (Uuid, Uuid)
 async fn enter(pool: &PgPool, battle: Uuid, dancer: Uuid, reached: &str) {
     let entry = Uuid::now_v7();
     sqlx::query!(
-        "insert into entries (id, battle_id, status, reached) values ($1, $2, 'confirmed', $3::text::bracket_stage)",
+        "insert into entries (id, battle_id, status, reached, final_rank)
+         values ($1, $2, 'confirmed', $3::text::bracket_stage,
+                 case $3 when 'winner' then 1 when 'top2' then 2 end)",
         entry,
         battle,
         reached,
@@ -326,7 +328,7 @@ async fn enter(pool: &PgPool, battle: Uuid, dancer: Uuid, reached: &str) {
 }
 
 #[sqlx::test]
-async fn events_split_upcoming_and_past_with_roles(pool: PgPool) {
+async fn events_split_live_upcoming_and_past_with_roles(pool: PgPool) {
     let app = app(pool.clone());
     let cookie = organizer(&app, &pool, "org@example.com").await;
     let id: Uuid = id_of(&create(&app, &cookie, dancer("Lil G", None)).await)
@@ -335,9 +337,11 @@ async fn events_split_upcoming_and_past_with_roles(pool: PgPool) {
 
     let (_, upcoming_battle) = jam(&pool, "Soon", 10, "published").await;
     enter(&pool, upcoming_battle, id, "na").await;
-    let (_, old_battle) = jam(&pool, "Old", -400, "completed").await;
+    let (_, today_battle) = jam(&pool, "Tonight", 0, "registration_closed").await;
+    enter(&pool, today_battle, id, "na").await;
+    let (_, old_battle) = jam(&pool, "Old", -400, "published").await;
     enter(&pool, old_battle, id, "winner").await;
-    let (recent, _) = jam(&pool, "Recent", -30, "completed").await;
+    let (recent, _) = jam(&pool, "Recent", -30, "published").await;
     sqlx::query!(
         "insert into event_staff (event_id, dancer_id, role) values ($1, $2, 'judge')",
         recent,
@@ -357,6 +361,11 @@ async fn events_split_upcoming_and_past_with_roles(pool: PgPool) {
     assert_eq!(upcoming[0]["event"]["name"], "Soon");
     assert_eq!(upcoming[0]["role"], "competitor");
     assert_eq!(upcoming[0]["battle"]["format"], "team");
+    assert_eq!(upcoming[0]["event"]["phase"], "upcoming");
+    let live = both.json["live"].as_array().unwrap();
+    assert_eq!(live.len(), 1);
+    assert_eq!(live[0]["event"]["name"], "Tonight");
+    assert_eq!(live[0]["event"]["phase"], "live");
 
     let past = both.json["past"].as_array().unwrap();
     assert_eq!(past[0]["event"]["name"], "Recent", "most recent first");
@@ -364,10 +373,7 @@ async fn events_split_upcoming_and_past_with_roles(pool: PgPool) {
     assert_eq!(past[0]["battle"], Value::Null);
     assert_eq!(past[1]["event"]["name"], "Old");
     assert_eq!(past[1]["reached"], "winner");
-
-    let only_past = send(&app, get(&format!("{uri}?scope=past"), None)).await;
-    assert!(only_past.json["upcoming"].as_array().unwrap().is_empty());
-    assert_eq!(only_past.json["past"].as_array().unwrap().len(), 2);
+    assert_eq!(past.len(), 2);
 }
 
 #[sqlx::test]
@@ -385,6 +391,7 @@ async fn a_deleted_dancer_stays_on_past_results_and_saves_but_joins_nothing_new(
     let gone = id_of(&create(&app, &owner, dancer("Gone", None)).await);
     let kept = id_of(&create(&app, &owner, dancer("Kept", None)).await);
     let entries = format!("/api/battles/{battle}/entries");
+    let battles = format!("/api/events/{jam}/battles");
     let body = json!({ "dancer_ids": [gone], "status": "confirmed" });
     let entry = id_of(&send(&app, post(&entries, body.clone(), Some(&owner))).await);
     let staff_uri = format!("/api/events/{jam}/staff");
@@ -394,9 +401,10 @@ async fn a_deleted_dancer_stays_on_past_results_and_saves_but_joins_nothing_new(
     assert_eq!(deleted.status, StatusCode::NO_CONTENT);
 
     // Still named, marked so the page shows no link.
-    let listed = send(&app, get(&entries, Some(&owner))).await;
-    assert_eq!(listed.json[0]["members"][0]["dancer_name"], "Gone");
-    assert_eq!(listed.json[0]["members"][0]["deleted"], true);
+    let listed = send(&app, get(&battles, Some(&owner))).await;
+    let members = &listed.json[0]["entries"][0]["members"];
+    assert_eq!(members[0]["dancer_name"], "Gone");
+    assert_eq!(members[0]["deleted"], true);
     let listed = send(&app, get(&staff_uri, Some(&owner))).await;
     assert_eq!(listed.json[0]["dancer"]["deleted"], true);
 

@@ -229,7 +229,7 @@ Base: `inline-flex items-center justify-center gap-2 rounded-full border-2 font-
 - **Row card** (mobile lists, map side panel): `flex gap-3 p-3`. The flyer is `w-16 h-20` (or `w-20 h-[100px]` on the landing page), `rounded-md`, with the same text stack as the grid card and a `display-xs` title.
   - Selected row: `border-primary-text bg-surface-raised`, plus `aria-current="true"`.
 - **No flyer image:** render the **generated flyer** (4.24) at the same size. There is no empty placeholder.
-- Public cards show a status badge only when it's exceptional: Registration closed or Cancelled. Never show Published.
+- Public cards show a status badge only when it's exceptional: **Live now** (the countdown chip of §4.30, while today is one of the jam's days; M26), Registration closed (before the jam) or Cancelled. Never show Published.
 
 ### 4.4 Map popup
 
@@ -257,7 +257,7 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
 | In review | `border-primary-text text-primary-text bg-primary/[.12]` | `HourglassMedium` | Organiser and admins only |
 | Published | `border-success text-success bg-success/[.12]` | filled 8px dot | Everyone |
 | Registration closed | `border-accent-text text-accent-text bg-accent/[.15]` | `Lock` | Everyone |
-| Completed | `border-border text-muted bg-surface-raised` | `Check` | Everyone |
+| Past (announced, its days over; M26) | `border-border text-muted bg-surface-raised` | `Check` | Everyone |
 | Cancelled | `border-danger text-danger bg-danger/[.12]` | `X` | Everyone (hidden from the map by default) |
 
 ### 4.6 Header with language switch
@@ -600,7 +600,7 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
 
 - Next to the status badge on the jam page: "In 9 days", "Tomorrow", "Today", "Live now".
 - `inline-flex h-6 items-center rounded-full border border-primary-text/50 bg-primary/[.12] px-2.5 text-caption font-extrabold text-primary-text uppercase`.
-- Counted in the jam's own timezone. **Live now** once its first battle has started, or from its second day when no start is announced. Hidden once the jam is over, completed or cancelled.
+- Counted in the jam's own timezone. **Live now** once its first battle has started, or from its second day when no start is announced. Hidden once the jam is over or cancelled.
 
 ### 4.31 "Who's in" card
 
@@ -620,7 +620,7 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
 | Registration open (a registration link) | **Register to battle** ↗ | Registration is open |
 | Announced without a registration link | **Add to calendar** | — |
 | Registration closed | **Add to calendar** | Registration is closed |
-| Completed | **See results** (to Battles) | — |
+| Over (its days are past; M26) | **See results** (to Battles) | — |
 | Cancelled | none, Share only | This jam is called off. |
 
 - **Add to calendar** opens the API's `.ics` (`GET /api/events/{slug}/calendar.ics`): one all-day event over the jam's days, at its venue, with the page's link.
@@ -765,7 +765,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 
 **Find a jam** (`/jams`): every jam as a list, for those who don't want the map.
 - Reading column (`max-w-prose`): `display-lg`/`display-xl` title, the search field, the filter chips (§5, wrapped as in the side panel), the result count.
-- Jam rows (§4.14), upcoming soonest first; **Past jams** shows the completed ones, most recent first. 30 at a time, then **Show more**.
+- Jam rows (§4.14), live and upcoming soonest first; **Past jams** shows the ones that are over, most recent first. 30 at a time, then **Show more**.
 - The search lives in the URL (`?q=`), like the map's.
 
 **Map with a popup open.**

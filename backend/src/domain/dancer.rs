@@ -9,7 +9,7 @@ use super::{
     battle::{BattleAge, BattleFormat, BattleGender, BracketStage, EntryStatus, StaffRole},
     country_code,
     crew::CrewRef,
-    event::EventStatus,
+    event::{EventStatus, Phase},
     not_blank,
     user::{Role, User},
 };
@@ -84,8 +84,6 @@ pub struct Dancer {
     pub dancer_name: String,
     /// Other names the dancer goes by.
     pub aliases: Vec<String>,
-    /// Legal name, when shared.
-    pub real_name: Option<String>,
     /// Primary flag, ISO 3166-1 alpha-2.
     pub country: String,
     /// Optional second flag.
@@ -167,10 +165,9 @@ pub type FieldChange = (&'static str, Option<String>, Option<String>);
 
 /// The profile fields that differ between two versions of a dancer.
 pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
-    const FIELDS: [&str; 10] = [
+    const FIELDS: [&str; 9] = [
         "dancer_name",
         "aliases",
-        "real_name",
         "country",
         "country2",
         "city",
@@ -180,11 +177,10 @@ pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
         "titles",
     ];
     let titles = |d: &Dancer| d.titles.iter().map(|t| t.as_str()).collect::<Vec<_>>();
-    let values = |d: &Dancer| -> [Option<String>; 10] {
+    let values = |d: &Dancer| -> [Option<String>; 9] {
         [
             Some(d.dancer_name.clone()),
             (!d.aliases.is_empty()).then(|| d.aliases.join(", ")),
-            d.real_name.clone(),
             Some(d.country.clone()),
             d.country2.clone(),
             d.city.clone(),
@@ -271,9 +267,6 @@ pub struct Participation {
     pub final_rank: Option<i32>,
     /// Battle video, when attached.
     pub video_url: Option<String>,
-    /// Whether the jam starts today or later; splits the dancer page's two lists.
-    #[serde(skip)]
-    pub upcoming: bool,
 }
 
 /// The jam side of a participation.
@@ -295,6 +288,8 @@ pub struct EventRef {
     pub country: Option<String>,
     /// Where it is in its lifecycle.
     pub status: EventStatus,
+    /// Upcoming, live or past.
+    pub phase: Phase,
 }
 
 /// The battle side of a participation.
@@ -355,9 +350,6 @@ pub struct DancerFields {
     #[serde(default)]
     #[validate(length(max = 10), custom(function = "aliases"))]
     pub aliases: Vec<String>,
-    /// Blank is stored as null.
-    #[validate(length(max = 100))]
-    pub real_name: Option<String>,
     /// Primary flag, ISO 3166-1 alpha-2.
     #[validate(custom(function = "country_code"))]
     pub country: String,

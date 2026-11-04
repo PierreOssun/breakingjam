@@ -2,7 +2,7 @@
 
 use axum::{
     Json,
-    extract::{Query, State},
+    extract::State,
     http::{HeaderMap, HeaderValue, StatusCode, header::SET_COOKIE},
     response::{AppendHeaders, IntoResponse, Redirect, Response},
 };
@@ -13,7 +13,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 use validator::Validate;
 
-use super::json::ValidJson;
+use super::extract::{Query, ValidJson};
 use crate::{
     auth::{
         google::{self, Account},

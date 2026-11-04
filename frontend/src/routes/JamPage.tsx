@@ -40,12 +40,7 @@ import { JamFlyer } from "../features/jams/JamFlyer";
 import { Lineup } from "../features/jams/Lineup";
 import { MoreJams } from "../features/jams/MoreJams";
 import { InitialsAvatar } from "../features/jams/OrganizerCard";
-import {
-  useBattles,
-  useEntries,
-  useJam,
-  useStaff,
-} from "../features/jams/queries";
+import { useBattles, useJam, useStaff } from "../features/jams/queries";
 import { WhosIn } from "../features/jams/WhosIn";
 import {
   formatBattleStart,
@@ -109,9 +104,8 @@ function JamDetail({ jam }: { jam: Jam }) {
   const [video, setVideo] = useState<Video | null>(null);
   const battles = useBattles(jam.id);
   const staff = useStaff(jam.id);
-  const entries = useEntries((battles.data ?? []).map((b) => b.id));
   const who = whoIsIn(
-    entries.flatMap((e) => e.data ?? []),
+    (battles.data ?? []).flatMap((b) => b.entries),
     staff.data ?? [],
   );
   const chip = countdown(jam, firstStart(battles.data ?? []), new Date());
@@ -131,7 +125,7 @@ function JamDetail({ jam }: { jam: Jam }) {
         <div className="flex max-w-prose flex-col gap-10 px-4 pt-4 md:px-6 lg:px-0 lg:pt-0">
           <header className="flex flex-col gap-3 lg:gap-4">
             <div className="flex flex-wrap items-center gap-2">
-              <StatusBadge status={jam.status} />
+              <StatusBadge jam={jam} />
               {chip && <CountdownChip value={chip} />}
             </div>
             <h1 className="font-display text-display-lg break-words lg:text-display-2xl">
@@ -159,12 +153,11 @@ function JamDetail({ jam }: { jam: Jam }) {
               <InlineEmpty>{t("jam.noBattles")}</InlineEmpty>
             ) : (
               <ul className="flex flex-col gap-4">
-                {battles.data.map((battle, index) => (
+                {battles.data.map((battle) => (
                   <BattleCard
                     key={battle.id}
                     jam={jam}
                     battle={battle}
-                    entries={entries[index]?.data}
                     onPlay={setVideo}
                   />
                 ))}

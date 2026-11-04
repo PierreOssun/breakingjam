@@ -24,6 +24,7 @@ import {
   type TextField,
   withheld,
 } from "./jamFields";
+import { storeJam } from "./queries";
 
 type Jam = Schemas["EventResponse"];
 
@@ -85,18 +86,20 @@ export function useJamAutosave(jam: Jam): JamDraft {
           return { ...Object.fromEntries(fields), root: rest ?? undefined };
         }
         stored.current = next;
-        for (const key of [jam.id, jam.slug]) {
-          queryClient.setQueryData<Jam | null>(["event", key], (old) =>
-            old ? { ...old, ...data } : old,
-          );
-        }
+        storeJam(queryClient, { id: jam.id, slug: jam.slug }, data);
+        // New days may start or end the jam: what its writer may do comes from the server.
+        if (data.phase !== jam.phase)
+          void queryClient.invalidateQueries({
+            queryKey: ["event", jam.id],
+            exact: true,
+          });
         void queryClient.invalidateQueries({ queryKey: ["events"] });
         return null;
       } catch {
         return { root: t("errors.generic") };
       }
     },
-    [jam.id, jam.slug, queryClient, t],
+    [jam.id, jam.slug, jam.phase, queryClient, t],
   );
 
   /** Saves what can be saved; true when nothing is left out. */

@@ -140,7 +140,7 @@
     "in_review": "In Prüfung",
     "published": "Veröffentlicht",
     "registration_closed": "Anmeldung geschlossen",
-    "completed": "Abgeschlossen",
+    "past": "Vorbei",
     "cancelled": "Abgesagt"
   },
   "jam": {
@@ -224,6 +224,7 @@
   "dancer": {
     "aka": "aka {{names}}",
     "verified": "Verifiziert",
+    "live": "Läuft gerade",
     "upcoming": "Demnächst",
     "past": "Vergangen",
     "noUpcoming": "Keine kommenden Jams.",
@@ -370,19 +371,17 @@
       "explain": {
         "published": "Auf der Karte und offen für Anmeldungen.",
         "registration_closed": "Auf der Karte; die Anmeldung ist geschlossen.",
-        "completed": "Sie hat stattgefunden. Trag die Ergebnisse unten in den Battles ein.",
+        "past": "Sie hat stattgefunden. Trag die Ergebnisse unten in den Battles ein.",
         "cancelled": "Abgesagt. Die Seite zeigt das an.",
         "in_review": "Ein BreakingJam-Admin prüft sie. Nach der Freigabe erscheint sie auf der Karte; du kannst sie bis dahin weiter bearbeiten."
       },
       "action": {
         "close-registration": "Anmeldung schließen",
-        "complete": "Als abgeschlossen markieren",
         "cancel": "Jam absagen"
       },
       "done": {
         "publish": "Veröffentlicht. Sie ist auf der Karte.",
         "close-registration": "Anmeldung geschlossen.",
-        "complete": "Als abgeschlossen markiert.",
         "cancel": "Jam abgesagt.",
         "submit": "Eingereicht. Ein BreakingJam-Admin prüft sie bald."
       },

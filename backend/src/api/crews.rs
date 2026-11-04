@@ -1,10 +1,6 @@
 //! `/crews`: crew CRUD and dated memberships.
 
-use axum::{
-    Json,
-    extract::{Path, Query, State},
-    http::StatusCode,
-};
+use axum::{Json, extract::State, http::StatusCode};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
@@ -13,12 +9,13 @@ use uuid::Uuid;
 use validator::Validate;
 
 use super::{
-    json::ValidJson,
+    extract::{Path, Query, ValidJson},
     page::{self, Page},
+    transaction,
 };
 use crate::{
     auth::session::CurrentUser,
-    db,
+    db::{self, dancers::MergeLock},
     domain::{
         crew::{Crew, CrewFields, Member},
         user::Role,
@@ -155,7 +152,7 @@ async fn create(
     responses(
         (status = OK, body = CrewDetail),
         Unauthorized,
-        (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Below `seed_admin`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such crew", body = ErrorEnvelope),
         InvalidFields,
     )
@@ -166,7 +163,7 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<CrewFields>,
 ) -> Result<Json<CrewDetail>, AppError> {
-    current.require(Role::Organizer)?;
+    current.require(Role::SeedAdmin)?;
     // A missing or soft-deleted crew surfaces as RowNotFound, hence 404.
     let crew = db::crews::update(&state.pool, id, &fields).await?;
     detail(&state, crew).await.map(Json)
@@ -183,7 +180,7 @@ async fn update(
     responses(
         (status = NO_CONTENT, description = "Deleted"),
         Unauthorized,
-        (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Below `seed_admin`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such crew", body = ErrorEnvelope),
     )
 )]
@@ -192,7 +189,7 @@ async fn remove(
     current: CurrentUser,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, AppError> {
-    current.require(Role::Organizer)?;
+    current.require(Role::SeedAdmin)?;
     if !db::crews::soft_delete(&state.pool, id).await? {
         return Err(AppError::NotFound);
     }
@@ -211,7 +208,7 @@ async fn remove(
     responses(
         (status = CREATED, body = CrewDetail),
         Unauthorized,
-        (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Below `seed_admin`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such crew or dancer", body = ErrorEnvelope),
         (status = CONFLICT, description = "Already a current member, or a past membership with the same `since`", body = ErrorEnvelope),
     )
@@ -222,15 +219,24 @@ async fn add_member(
     Path(id): Path<Uuid>,
     ValidJson(req): ValidJson<AddMemberRequest>,
 ) -> Result<(StatusCode, Json<CrewDetail>), AppError> {
-    current.require(Role::Organizer)?;
+    current.require(Role::SeedAdmin)?;
     let crew = db::crews::find(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    db::dancers::find_live(&state.pool, req.dancer_id)
-        .await?
-        .ok_or(AppError::NotFound)?;
-    // The schema refuses both conflicts, so racing adds can't slip past a check made first.
-    if !db::crews::add_member(&state.pool, id, req.dancer_id, req.since).await? {
+    let (pool, dancer_id, since) = (&state.pool, req.dancer_id, req.since);
+    let added = transaction::retrying(move || async move {
+        // Under the merge lock, so the dancer can't be merged away between the check and the add.
+        let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
+        db::dancers::find_live(&mut *tx, dancer_id)
+            .await?
+            .ok_or(AppError::NotFound)?;
+        // The schema refuses both conflicts, so racing adds can't slip past a check made first.
+        let added = db::crews::add_member(&mut *tx, id, dancer_id, since).await?;
+        tx.commit().await?;
+        Ok(added)
+    })
+    .await?;
+    if !added {
         let message = if db::crews::is_current_member(&state.pool, id, req.dancer_id).await? {
             "already a current member"
         } else {
@@ -252,7 +258,7 @@ async fn add_member(
     responses(
         (status = NO_CONTENT, description = "Membership ended"),
         Unauthorized,
-        (status = FORBIDDEN, description = "Below `organizer`", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Below `seed_admin`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No current membership", body = ErrorEnvelope),
     )
 )]
@@ -261,7 +267,7 @@ async fn end_member(
     current: CurrentUser,
     Path((id, dancer_id)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, AppError> {
-    current.require(Role::Organizer)?;
+    current.require(Role::SeedAdmin)?;
     if !db::crews::end_membership(&state.pool, id, dancer_id).await? {
         return Err(AppError::NotFound);
     }

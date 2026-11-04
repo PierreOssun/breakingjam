@@ -30,7 +30,6 @@ const person = (id: string, name: string) => ({
 /** The page `POST /api/dancers/mine` returns, unverified. */
 const created = {
   ...person(PAGE_ID, "Lil G"),
-  real_name: null,
   bio: null,
   source: "self",
   verified_at: null,
@@ -88,7 +87,7 @@ describe("WelcomePage", () => {
       [`GET /api/dancers/${PAGE_ID}`]: { status: 200, body: created },
       [`GET /api/dancers/${PAGE_ID}/events`]: {
         status: 200,
-        body: { upcoming: [], past: [] },
+        body: { live: [], upcoming: [], past: [] },
       },
     });
     const router = renderApp("/welcome?next=%2F");

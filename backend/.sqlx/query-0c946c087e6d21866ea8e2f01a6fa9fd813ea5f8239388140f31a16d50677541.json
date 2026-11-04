@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select jam_phase(d + $1::int, d + $2::int, $3)::text as \"phase!\"\n               from (select (now() at time zone $3)::date as d) today",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "phase!",
+        "type_info": "Text",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "0c946c087e6d21866ea8e2f01a6fa9fd813ea5f8239388140f31a16d50677541"
+}

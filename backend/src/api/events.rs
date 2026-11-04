@@ -2,7 +2,7 @@
 
 use axum::{
     Json,
-    extract::{Path, Query, State},
+    extract::State,
     http::{
         StatusCode,
         header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE},
@@ -11,12 +11,13 @@ use axum::{
 };
 use chrono::{NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::PgConnection;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use super::{
-    json::ValidJson,
+    extract::{Path, Query, ValidJson},
     page::{self, Page},
 };
 use crate::{
@@ -25,10 +26,13 @@ use crate::{
     db::{self, events::MapPoint},
     domain::{
         battle::{Battle, Category, starts_during},
-        event::{Event, EventFields, EventStatus, Missing, Transition, can_write},
+        event::{Event, EventFields, EventStatus, Missing, Phase, Transition, can_write},
         organizer::OrganizerRef,
+        user::{Role, User},
     },
-    error::{AppError, ErrorEnvelope, InvalidCursor, InvalidFields, JamNotVisible, Unauthorized},
+    error::{
+        AppError, ErrorEnvelope, InvalidCursor, InvalidFields, JamNotVisible, JamOver, Unauthorized,
+    },
     flyer::{self, FlyerOptions, FlyerText, Lang},
     state::AppState,
 };
@@ -51,12 +55,6 @@ pub fn router() -> OpenApiRouter<AppState> {
 pub struct ListQuery {
     /// Only jams in this status.
     pub status: Option<EventStatus>,
-    /// Only jams in this country (ISO 3166-1 alpha-2).
-    pub country: Option<String>,
-    /// Only jams still running on or after this date.
-    pub from: Option<NaiveDate>,
-    /// Only jams starting on or before this date.
-    pub to: Option<NaiveDate>,
     /// `true` lists the caller's own jams, drafts included (organiser list page).
     #[serde(default)]
     pub mine: bool,
@@ -148,6 +146,8 @@ pub struct MapJam {
     pub ends_on: NaiveDate,
     /// `published` or `registration_closed`.
     pub status: EventStatus,
+    /// Upcoming, live or past.
+    pub phase: Phase,
     /// City.
     pub city: String,
     /// ISO 3166-1 alpha-2.
@@ -187,9 +187,6 @@ async fn list(
     let limit = page::limit(query.limit);
     let filter = db::events::ListFilter {
         status: query.status,
-        country: query.country.as_deref(),
-        from: query.from,
-        to: query.to,
         organizer_id,
         after: query.cursor.as_deref().map(decode_cursor).transpose()?,
         // One extra row tells whether another page exists.
@@ -242,6 +239,7 @@ fn feature(p: MapPoint, battles: Vec<Battle>) -> Feature {
             starts_on: p.starts_on,
             ends_on: p.ends_on,
             status: p.status,
+            phase: p.phase,
             city: p.city,
             country: p.country,
             battles: battles.into_iter().map(|b| b.name).collect(),
@@ -251,17 +249,35 @@ fn feature(p: MapPoint, battles: Vec<Battle>) -> Feature {
     }
 }
 
-/// A jam page: the jam, and whether the caller may edit it.
+/// A jam page: the jam, and what the caller may do with it.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct EventResponse {
     /// The jam itself.
     #[serde(flatten)]
     pub event: Event,
-    /// Whether the caller may edit it, change its status or delete it.
+    /// Whether the caller may edit its details, flyer and lineup or delete it; no longer for its
+    /// organiser once it is public and over.
     pub can_edit: bool,
+    /// Whether the caller may edit its battles, entries and results; still true once it is over.
+    pub can_edit_battles: bool,
+    /// The status changes the caller may make now.
+    pub actions: Vec<Transition>,
     /// Who runs it: the jam page's organiser card (M12c); null when the BreakingJam team
     /// entered it, as the team is not its organiser.
     pub organizer: Option<OrganizerRef>,
+}
+
+impl EventResponse {
+    /// The jam as `user` sees it, with what they may do.
+    pub fn new(event: Event, user: Option<&User>, organizer: Option<OrganizerRef>) -> Self {
+        Self {
+            can_edit: user.is_some_and(|u| event.editable_by(u)),
+            can_edit_battles: user.is_some_and(|u| can_write(u, event.organizer_id)),
+            actions: user.map(|u| event.actions(u)).unwrap_or_default(),
+            event,
+            organizer,
+        }
+    }
 }
 
 /// One jam, by id or slug.
@@ -283,15 +299,9 @@ async fn show(
     Path(id_or_slug): Path<String>,
 ) -> Result<Json<EventResponse>, AppError> {
     let event = readable(&state, &current, &id_or_slug).await?;
-    let can_edit = current
-        .as_ref()
-        .is_some_and(|c| can_write(&c.user, event.organizer_id));
     let organizer = db::organizers::reference(&state.pool, event.organizer_id).await?;
-    Ok(Json(EventResponse {
-        event,
-        can_edit,
-        organizer,
-    }))
+    let user = current.as_ref().map(|c| &c.user);
+    Ok(Json(EventResponse::new(event, user, organizer)))
 }
 
 /// Register a jam as a draft; a first jam makes a `user` an `organizer`.
@@ -313,6 +323,7 @@ async fn create(
     current: CurrentUser,
     ValidJson(fields): ValidJson<EventFields>,
 ) -> Result<(StatusCode, Json<Event>), AppError> {
+    check_timezone(&state, &fields.timezone).await?;
     let mut tx = state.pool.begin().await?;
     // Registering a first jam makes a plain user an organiser (decided in M5).
     db::users::promote_to_organizer(&mut tx, current.user.id).await?;
@@ -321,7 +332,8 @@ async fn create(
     Ok((StatusCode::CREATED, Json(event)))
 }
 
-/// Replace a jam's fields; slug and status never change here, and past draft the place stays.
+/// Replace a jam's fields; slug and status never change here, past draft the place stays, and
+/// once public and over only the team may.
 #[utoipa::path(
     put,
     path = "/events/{id}",
@@ -335,7 +347,8 @@ async fn create(
         Unauthorized,
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
         JamNotVisible,
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields, or a jam past draft losing its city, country or pin (`place`)", body = ErrorEnvelope),
+        JamOver,
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields, an unknown timezone, or a jam past draft losing its city, country or pin (`place`)", body = ErrorEnvelope),
     )
 )]
 async fn update(
@@ -344,19 +357,49 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<EventFields>,
 ) -> Result<Json<Event>, AppError> {
-    let event = writable(&state, &current, id).await?;
-    check_days(&state, id, &fields).await?;
+    writable(&state, &current, id).await?;
+    check_timezone(&state, &fields.timezone).await?;
+    let mut tx = state.pool.begin().await?;
+    // Locked, so a battle saved meanwhile can't fall outside the days checked here.
+    let event = db::events::find_locked(&mut tx, id)
+        .await?
+        .ok_or(AppError::NotFound)?;
+    check_update(&mut tx, &current, &event, &fields).await?;
+    let event = db::events::update(&mut *tx, id, &fields).await?;
+    tx.commit().await?;
+    Ok(Json(event))
+}
+
+/// What a save of `fields` over the locked `event` must respect: the lock, the battles' days,
+/// the place past draft, and no public jam moved into the past by its organiser.
+async fn check_update(
+    conn: &mut PgConnection,
+    current: &CurrentUser,
+    event: &Event,
+    fields: &EventFields,
+) -> Result<(), AppError> {
+    check_editable(current, event)?;
+    check_days(&db::battles::list(&mut *conn, event.id).await?, fields)?;
     // Past draft, the map, the lists and the stats count on the place staying (M24). Only what
     // it has can be lost: a jam published without a pin before the checklist keeps saving.
-    if event.status != EventStatus::Draft && event.loses_place(&fields) {
+    if event.status != EventStatus::Draft && event.loses_place(fields) {
         AppError::check(vec![Missing::Place.as_field()])?;
     }
-    Ok(Json(db::events::update(&state.pool, id, &fields).await?))
+    // Moved into the past, a public jam would lock its organiser out of moving it back.
+    if event.status.is_public() && current.user.role < Role::SeedAdmin {
+        let phase = db::events::phase_of(conn, fields.starts_on, fields.ends_on, &fields.timezone);
+        if phase.await? == Phase::Past {
+            return Err(AppError::invalid(
+                "ends_on",
+                "a public jam can't be moved into the past",
+            ));
+        }
+    }
+    Ok(())
 }
 
 /// The jam's days keep every announced battle start; the boundary that would drop one is refused.
-async fn check_days(state: &AppState, id: Uuid, fields: &EventFields) -> Result<(), AppError> {
-    let battles = db::battles::list(&state.pool, id).await?;
+fn check_days(battles: &[Battle], fields: &EventFields) -> Result<(), AppError> {
     let outside = battles
         .iter()
         .find(|b| !starts_during(b.starts_at, fields.starts_on, fields.ends_on))
@@ -374,6 +417,18 @@ async fn check_days(state: &AppState, id: Uuid, fields: &EventFields) -> Result<
     }
 }
 
+/// 422 on a timezone Postgres doesn't know: `jam_phase` reads the jam's calendar in it.
+async fn check_timezone(state: &AppState, timezone: &str) -> Result<(), AppError> {
+    if db::events::known_timezone(&state.pool, timezone).await? {
+        Ok(())
+    } else {
+        Err(AppError::invalid(
+            "timezone",
+            "unknown timezone, e.g. Europe/Zurich",
+        ))
+    }
+}
+
 /// Soft-delete a jam.
 #[utoipa::path(
     delete,
@@ -387,6 +442,7 @@ async fn check_days(state: &AppState, id: Uuid, fields: &EventFields) -> Result<
         Unauthorized,
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
         JamNotVisible,
+        JamOver,
     )
 )]
 async fn delete(
@@ -394,15 +450,15 @@ async fn delete(
     current: CurrentUser,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, AppError> {
-    writable(&state, &current, id).await?;
+    editable(&state, &current, id).await?;
     let flyer = db::events::soft_delete(&state.pool, id).await?;
     // Nothing edits a deleted jam, so its flyer goes now or stays public for good.
     super::flyers::discard(&state.media, flyer);
     Ok(StatusCode::NO_CONTENT)
 }
 
-/// Move a jam along draft → in_review → published → registration_closed → completed, or
-/// cancel it; the BreakingJam team publishes drafts without review.
+/// Move a jam along draft → in_review → published → registration_closed, or cancel it; the
+/// BreakingJam team publishes drafts without review. `actions` on the jam says what is allowed.
 #[utoipa::path(
     post,
     path = "/events/{id}/{transition}",
@@ -410,7 +466,7 @@ async fn delete(
     operation_id = "transition_event",
     params(
         ("id" = Uuid, Path, description = "Jam id"),
-        ("transition" = inline(Transition), Path, description = "`publish` is for `seed_admin`+; cancel is allowed from any status but completed"),
+        ("transition" = inline(Transition), Path, description = "`publish` is for `seed_admin`+; cancel is allowed from any status but cancelled"),
     ),
     security(("session" = [])),
     responses(
@@ -418,7 +474,7 @@ async fn delete(
         Unauthorized,
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+, or `publish` by an organiser", body = ErrorEnvelope),
         JamNotVisible,
-        (status = CONFLICT, description = "The current status does not allow it", body = ErrorEnvelope),
+        (status = CONFLICT, description = "The current status does not allow it, or the jam is public and over", body = ErrorEnvelope),
         (status = UNPROCESSABLE_ENTITY, description = "`submit` or `publish` before the venue is on the map and a battle exists; `fields` names `place` and `battles`", body = ErrorEnvelope),
     )
 )]
@@ -427,27 +483,29 @@ async fn transition(
     current: CurrentUser,
     Path((id, transition)): Path<(Uuid, Transition)>,
 ) -> Result<Json<Event>, AppError> {
-    let event = writable(&state, &current, id).await?;
+    writable(&state, &current, id).await?;
     current.require(transition.required_role())?;
+    let mut tx = state.pool.begin().await?;
+    // Locked, so no save can take the place or the last battle between the checklist and the change.
+    let event = db::events::find_locked(&mut tx, id)
+        .await?
+        .ok_or(AppError::NotFound)?;
+    check_editable(&current, &event)?;
     let next = event
         .status
         .apply(transition)
         .map_err(|err| AppError::Conflict(err.to_string()))?;
     if transition.announces() {
         // The publish checklist (M24): a venue on the map and at least one battle.
-        let battles = db::battles::list(&state.pool, id).await?.len();
-        AppError::check(
-            event
-                .missing(battles)
-                .into_iter()
-                .map(Missing::as_field)
-                .collect(),
-        )?;
+        let battles = db::battles::list(&mut *tx, id).await?.len();
+        let missing = event.missing(battles).into_iter().map(Missing::as_field);
+        AppError::check(missing.collect())?;
     }
-    db::events::set_status(&state.pool, id, event.status, next)
+    let event = db::events::set_status(&mut *tx, id, event.status, next, None)
         .await?
-        .map(Json)
-        .ok_or_else(|| AppError::Conflict("status changed meanwhile, reload and retry".into()))
+        .ok_or_else(|| AppError::Conflict("status changed meanwhile, reload and retry".into()))?;
+    tx.commit().await?;
+    Ok(Json(event))
 }
 
 /// The generated 4:5 flyer of a jam (DESIGN.md §4.24), as SVG to inline in the page.
@@ -585,6 +643,29 @@ pub(super) async fn readable(
         .await?
         .filter(|event| event.visible_to(current.as_ref().map(|c| &c.user)))
         .ok_or(AppError::NotFound)
+}
+
+/// The jam if `current` may edit its details: `writable`, then 409 once it is public and over.
+pub(super) async fn editable(
+    state: &AppState,
+    current: &CurrentUser,
+    id: Uuid,
+) -> Result<Event, AppError> {
+    let event = writable(state, current, id).await?;
+    check_editable(current, &event)?;
+    Ok(event)
+}
+
+/// 409 once the jam is public and over, unless `current` is on the BreakingJam team: only its
+/// battles and their results change then.
+fn check_editable(current: &CurrentUser, event: &Event) -> Result<(), AppError> {
+    if event.editable_by(&current.user) {
+        Ok(())
+    } else {
+        Err(AppError::Conflict(
+            "this jam is over: only its battles and results can change".into(),
+        ))
+    }
 }
 
 /// The jam if `current` may write it: 404 when it is missing or invisible, 403 when read-only.

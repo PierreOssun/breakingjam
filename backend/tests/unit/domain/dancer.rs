@@ -15,7 +15,6 @@ fn dancer(verified: bool, user_id: Option<Uuid>, created_by: Option<Uuid>) -> Da
         user_id,
         dancer_name: "Lil G".into(),
         aliases: vec![],
-        real_name: None,
         country: "FR".into(),
         country2: None,
         city: None,

@@ -13,6 +13,7 @@ import {
   type Rect,
   tooSmall,
 } from "./flyerCrop";
+import { storeJam } from "./queries";
 
 type Jam = Schemas["EventResponse"];
 type Problem = "type" | "size" | "small" | "unreadable";
@@ -198,11 +199,7 @@ function useFlyerMutations(jam: Jam) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const saved = (event: Schemas["Event"], message: string) => {
-    for (const key of [jam.id, jam.slug]) {
-      queryClient.setQueryData<Jam | null>(["event", key], (old) =>
-        old ? { ...old, ...event } : old,
-      );
-    }
+    storeJam(queryClient, jam, event);
     void queryClient.invalidateQueries({ queryKey: ["events"] });
     toast({ kind: "success", message });
   };

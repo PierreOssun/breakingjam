@@ -7,7 +7,6 @@ const DANCER = {
   id: "01920000-0000-7000-8000-0000000000d1",
   dancer_name: "Lil G",
   aliases: ["G", "Lil Gee"],
-  real_name: null,
   country: "FR",
   country2: "MA",
   city: "Paris",
@@ -33,7 +32,8 @@ const jam = (n: number, startsOn: string, country = "FR") => ({
   ends_on: startsOn,
   city: "Paris",
   country,
-  status: "completed",
+  status: "published",
+  phase: "past",
 });
 
 const oneVOne = {
@@ -72,14 +72,25 @@ const PAST = [
 
 const UPCOMING = [
   {
-    event: { ...jam(20, "2030-06-01"), status: "published" },
+    event: { ...jam(20, "2030-06-01"), phase: "upcoming" },
     battle: oneVOne,
     role: "competitor",
     reached: "na",
   },
 ];
 
-function mockDancer(events = { upcoming: UPCOMING, past: PAST }) {
+const LIVE = [
+  {
+    event: { ...jam(30, "2026-11-04"), phase: "live" },
+    battle: oneVOne,
+    role: "competitor",
+    reached: "na",
+  },
+];
+
+const NO_EVENTS = { live: [], upcoming: [], past: [] };
+
+function mockDancer(events = { live: LIVE, upcoming: UPCOMING, past: PAST }) {
   return mockApi({
     "GET /api/auth/me": LOGGED_OUT,
     [`GET /api/dancers/${DANCER.id}`]: { status: 200, body: DANCER },
@@ -97,15 +108,17 @@ describe("DancerPage", () => {
       await main.findByRole("heading", { level: 1, name: "Lil G" }),
     ).toBeInTheDocument();
     expect(document.title).toBe("Lil G · BreakingJam");
-    expect(main.getByRole("img", { name: "Verified" })).toBeInTheDocument();
-    expect(main.getByRole("img", { name: "France" })).toBeInTheDocument();
-    expect(main.getByRole("img", { name: "Morocco" })).toBeInTheDocument();
-    expect(main.getByText("aka G · Lil Gee")).toBeInTheDocument();
-    const instagram = main.getByRole("link", { name: "@lilg" });
+    // The jams load beside the page and carry flags too: look at the card alone.
+    const card = within(main.getByRole("complementary"));
+    expect(card.getByRole("img", { name: "Verified" })).toBeInTheDocument();
+    expect(card.getByRole("img", { name: "France" })).toBeInTheDocument();
+    expect(card.getByRole("img", { name: "Morocco" })).toBeInTheDocument();
+    expect(card.getByText("aka G · Lil Gee")).toBeInTheDocument();
+    const instagram = card.getByRole("link", { name: "@lilg" });
     expect(instagram).toHaveAttribute("href", "https://instagram.com/lilg");
     expect(instagram).toHaveAttribute("target", "_blank");
-    expect(main.getByText("Floor Lords")).toBeInTheDocument();
-    expect(main.getByText("Paris", { selector: "span" })).toBeInTheDocument();
+    expect(card.getByText("Floor Lords")).toBeInTheDocument();
+    expect(card.getByText("Paris", { selector: "span" })).toBeInTheDocument();
   });
 
   it("counts past jams in the stats strip", async () => {
@@ -126,10 +139,18 @@ describe("DancerPage", () => {
     ]);
   });
 
-  it("lists upcoming then past jams, by year, ten at a time", async () => {
+  it("lists live, upcoming then past jams, by year, ten at a time", async () => {
     mockDancer();
     renderApp(`/dancers/${DANCER.id}`);
     const main = within(await screen.findByRole("main"));
+
+    const live = (
+      await main.findByRole("heading", { name: "Live now" })
+    ).closest("section")!;
+    expect(within(live).getByRole("link", { name: /Jam 30/ })).toHaveAttribute(
+      "href",
+      "/jams/jam-30",
+    );
 
     const upcoming = (
       await main.findByRole("heading", { name: "Upcoming" })
@@ -175,12 +196,15 @@ describe("DancerPage", () => {
   });
 
   it("says so when there is nothing yet, and hides the empty stats", async () => {
-    mockDancer({ upcoming: [], past: [] });
+    mockDancer(NO_EVENTS);
     renderApp(`/dancers/${DANCER.id}`);
 
     expect(await screen.findByText("No upcoming jams.")).toBeInTheDocument();
     expect(screen.getByText(/No past jams on record yet/)).toBeInTheDocument();
     expect(screen.queryByText("jams")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Live now" }),
+    ).not.toBeInTheDocument();
   });
 
   it("follows a merge to the surviving dancer", async () => {
@@ -193,7 +217,7 @@ describe("DancerPage", () => {
       [`GET /api/dancers/${DANCER.id}`]: { status: 200, body: DANCER },
       [`GET /api/dancers/${DANCER.id}/events`]: {
         status: 200,
-        body: { upcoming: [], past: [] },
+        body: NO_EVENTS,
       },
     });
     const router = renderApp("/dancers/old-id");

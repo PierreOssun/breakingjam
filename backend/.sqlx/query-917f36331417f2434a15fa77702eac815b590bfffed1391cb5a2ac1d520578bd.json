@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update battles set format = 'seven_to_smoke' where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "917f36331417f2434a15fa77702eac815b590bfffed1391cb5a2ac1d520578bd"
+}

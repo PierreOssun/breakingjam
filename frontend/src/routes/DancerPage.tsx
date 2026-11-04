@@ -19,11 +19,13 @@ import { StatsStrip } from "../features/dancers/StatsStrip";
 import { statsOf } from "../features/dancers/stats";
 import { NotFoundPage } from "./NotFoundPage";
 
-/** `/dancers/:id`: a dancer's record, upcoming and past jams (§6, DESIGN.md §6). */
+/** `/dancers/:id`: a dancer's record, live, upcoming and past jams (§6, DESIGN.md §6). */
 export function DancerPage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
   const page = useDancer(id);
+  // From the URL, so the jams load beside the page rather than after it.
+  const events = useDancerEvents(id);
 
   if (page.isPending) return <ProfileSkeleton />;
   if (page.isError)
@@ -36,15 +38,20 @@ export function DancerPage() {
   // §4 Merge: the old id answers with where the dancer lives now.
   if ("merged_into" in page.data)
     return <Navigate to={`/dancers/${page.data.merged_into}`} replace />;
-  return <DancerDetail dancer={page.data} />;
+  return <DancerDetail dancer={page.data} events={events} />;
 }
 
-function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
+function DancerDetail({
+  dancer,
+  events,
+}: {
+  dancer: Schemas["DancerResponse"];
+  events: ReturnType<typeof useDancerEvents>;
+}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [video, setVideo] = useState<Video | null>(null);
-  const events = useDancerEvents(dancer.id);
   const play = (p: Schemas["Participation"]) =>
     p.video_url &&
     setVideo({
@@ -113,6 +120,19 @@ function DancerDetail({ dancer }: { dancer: Schemas["DancerResponse"] }) {
         </aside>
 
         <div className="flex flex-col gap-10">
+          {events.data && events.data.live.length > 0 && (
+            <section className="flex flex-col gap-2">
+              <h2 className="font-display text-display-sm lg:text-display-md">
+                {t("dancer.live")}
+              </h2>
+              <JamList
+                items={events.data.live}
+                past={false}
+                empty=""
+                onPlay={play}
+              />
+            </section>
+          )}
           <section className="flex flex-col gap-2">
             <h2 className="font-display text-display-sm lg:text-display-md">
               {t("dancer.upcoming")}

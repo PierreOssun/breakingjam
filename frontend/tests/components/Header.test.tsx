@@ -41,7 +41,7 @@ describe("Header", () => {
     await userEvent.click(screen.getByRole("option", { name: "Français" }));
 
     expect(
-      await (await header()).findByRole("link", { name: "Trouver une jam" }),
+      await (await header()).findByRole("link", { name: "Trouver un jam" }),
     ).toBeInTheDocument();
     expect(document.documentElement.lang).toBe("fr");
     expect(localStorage.getItem("bj.lang")).toBe("fr");

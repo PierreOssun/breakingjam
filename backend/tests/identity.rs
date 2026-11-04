@@ -283,15 +283,23 @@ async fn merge_moves_everything_and_leaves_a_redirect(pool: PgPool) {
         .as_str()
         .unwrap()
         .to_owned();
-    send(
-        &w.app,
-        post(
-            &format!("/api/crews/{crew}/members"),
-            json!({ "dancer_id": loser }),
-            Some(&w.organizer),
-        ),
-    )
-    .await;
+    // Both current members: the merge keeps one membership, it doesn't trip on the second.
+    for dancer in [&loser, &survivor] {
+        let join = json!({ "dancer_id": dancer });
+        let uri = format!("/api/crews/{crew}/members");
+        let joined = send(&w.app, post(&uri, join, Some(&w.admin))).await;
+        assert_eq!(joined.status, StatusCode::CREATED);
+    }
+    // A crew only the loser is in: its membership must move.
+    let body = json!({ "name": "Spin Syndicate" });
+    let other = send(&w.app, post("/api/crews", body, Some(&w.organizer))).await;
+    let other = other.json["id"].as_str().unwrap().to_owned();
+    let join = json!({ "dancer_id": loser });
+    let uri = format!("/api/crews/{other}/members");
+    assert_eq!(
+        send(&w.app, post(&uri, join, Some(&w.admin))).await.status,
+        StatusCode::CREATED
+    );
 
     let uri = format!("/api/admin/dancers/{loser}/merge");
     let by_organizer = send(
@@ -317,7 +325,18 @@ async fn merge_moves_everything_and_leaves_a_redirect(pool: PgPool) {
 
     let page = send(&w.app, get(&format!("/api/dancers/{survivor}"), None)).await;
     assert_eq!(page.json["instagram_handle"], "kidrocket", "handle adopted");
-    assert_eq!(page.json["crews"][0]["name"], "Floor Lords");
+    let mut crews: Vec<&str> = page.json["crews"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|c| c["name"].as_str().unwrap())
+        .collect();
+    crews.sort();
+    assert_eq!(
+        crews,
+        ["Floor Lords", "Spin Syndicate"],
+        "one each, the loser's moved"
+    );
     let events = send(
         &w.app,
         get(&format!("/api/dancers/{survivor}/events"), None),
@@ -427,4 +446,40 @@ async fn admins_change_roles_but_not_their_own(pool: PgPool) {
     )
     .await;
     assert_eq!(by_organizer.status, StatusCode::FORBIDDEN);
+}
+
+#[sqlx::test]
+async fn merge_refuses_two_entries_of_one_battle(pool: PgPool) {
+    let w = world(pool).await;
+    let survivor = w.dancer("Kid Rocket", None).await;
+    let loser = w.dancer("Kid Rockett", None).await;
+    let (_, battle) = jam(&w).await;
+    let entries = format!("/api/battles/{battle}/entries");
+    let mut ids = Vec::new();
+    for dancer in [&loser, &survivor] {
+        let body = json!({ "dancer_ids": [dancer] });
+        let entered = send(&w.app, post(&entries, body, Some(&w.organizer))).await;
+        assert_eq!(entered.status, StatusCode::CREATED);
+        ids.push(entered.json["id"].as_str().unwrap().to_owned());
+    }
+    let uri = format!("/api/admin/dancers/{loser}/merge");
+    let refused = send(
+        &w.app,
+        post(&uri, json!({ "into": survivor }), Some(&w.admin)),
+    )
+    .await;
+    assert_eq!(refused.status, StatusCode::CONFLICT);
+    let message = refused.json["error"]["message"].as_str().unwrap();
+    assert!(message.contains("1v1 Bboy"), "names the battle: {message}");
+
+    // Once one entry is withdrawn, nothing stands in the way.
+    let withdrawn = json!({ "dancer_ids": [loser], "status": "withdrawn" });
+    let uri_entry = format!("/api/entries/{}", ids[0]);
+    send(&w.app, put(&uri_entry, withdrawn, Some(&w.organizer))).await;
+    let merged = send(
+        &w.app,
+        post(&uri, json!({ "into": survivor }), Some(&w.admin)),
+    )
+    .await;
+    assert_eq!(merged.status, StatusCode::OK);
 }

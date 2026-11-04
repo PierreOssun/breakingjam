@@ -16,8 +16,9 @@ import { ResultBadge } from "../../components/ResultBadge";
 import { MetaTag } from "../../components/Tag";
 import { useToast } from "../../components/useToast";
 import type { Video } from "../../components/VideoDialog";
-import { formatBattleStart } from "../../lib/dates";
+import { daysOf, formatBattleStart } from "../../lib/dates";
 import { AddChip, DancerChip } from "../dancers/DancerChip";
+import { BattleDialog } from "./BattleDialog";
 import { membersPerEntry, prizeLine } from "./battleFields";
 import { entryLabel } from "./entryFields";
 import { EntryDialog } from "./EntryDialog";
@@ -40,8 +41,7 @@ const STAGE_ORDER: Record<Schemas["BracketStage"], number> = {
 
 type BattleCardProps = {
   jam: Schemas["EventResponse"];
-  battle: Schemas["Battle"];
-  entries: Entry[] | undefined;
+  battle: Schemas["BattleDetail"];
   onPlay: (video: Video) => void;
 };
 
@@ -50,12 +50,14 @@ type BattleCardProps = {
  * who entered, best result first. Visitors see the entries as one wrapping row of chips; the
  * jam's organiser gets a row per entry, withdrawn ones included, to add, edit and delete them.
  */
-export function BattleCard({ jam, battle, entries, onPlay }: BattleCardProps) {
+export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<Entry | "new" | null>(null);
-  const remove = useDeleteEntry(battle.id);
-  const active = (entries ?? []).filter((e) => e.status !== "withdrawn");
-  const shown = [...(jam.can_edit ? (entries ?? []) : active)].sort(
+  const remove = useDeleteEntry(battle.event_id);
+  // Its organiser manages the results, even once the jam is over.
+  const canEdit = jam.can_edit_battles;
+  const active = battle.entries.filter((e) => e.status !== "withdrawn");
+  const shown = [...(canEdit ? battle.entries : active)].sort(
     (a, b) =>
       (a.final_rank ?? STAGE_ORDER[a.reached]) -
       (b.final_rank ?? STAGE_ORDER[b.reached]),
@@ -70,10 +72,10 @@ export function BattleCard({ jam, battle, entries, onPlay }: BattleCardProps) {
   return (
     <li className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-5">
       <BattleHeader jam={jam} battle={battle} entered={active.length} />
-      {entries && shown.length === 0 && (
+      {shown.length === 0 && (
         <p className="text-body-sm text-muted">{t("jam.noEntries")}</p>
       )}
-      {shown.length > 0 && !jam.can_edit && (
+      {shown.length > 0 && !canEdit && (
         // Solo battles: one wrapping row of chips; team battles: a block per team.
         <ul
           className={
@@ -87,7 +89,7 @@ export function BattleCard({ jam, battle, entries, onPlay }: BattleCardProps) {
           ))}
         </ul>
       )}
-      {shown.length > 0 && jam.can_edit && (
+      {shown.length > 0 && canEdit && (
         <ul className="divide-y divide-border">
           {shown.map((entry) => (
             <li key={entry.id} className="flex items-center gap-2 py-2.5">
@@ -125,7 +127,7 @@ export function BattleCard({ jam, battle, entries, onPlay }: BattleCardProps) {
           ))}
         </ul>
       )}
-      {jam.can_edit && (
+      {canEdit && (
         <>
           <div>
             <AddChip
@@ -201,8 +203,43 @@ function BattleHeader({
           </p>
         )}
       </div>
-      {format && <MetaTag>{format}</MetaTag>}
+      <div className="flex shrink-0 items-center gap-1">
+        {format && <MetaTag>{format}</MetaTag>}
+        <EditBattle jam={jam} battle={battle} />
+      </div>
     </div>
+  );
+}
+
+/** Once a public jam is over its editor is closed, but its organiser still fixes its battles
+ * here (M26); before that, battles are edited in the editor. */
+function EditBattle({
+  jam,
+  battle,
+}: {
+  jam: Schemas["EventResponse"];
+  battle: Schemas["Battle"];
+}) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  if (jam.can_edit || !jam.can_edit_battles) return null;
+  return (
+    <>
+      <IconButton
+        label={t("org.battles.editOne", { name: battle.name })}
+        onClick={() => setOpen(true)}
+      >
+        <PencilSimple size={20} weight="bold" aria-hidden />
+      </IconButton>
+      {open && (
+        <BattleDialog
+          jamId={jam.id}
+          days={daysOf(jam.starts_on, jam.ends_on)}
+          battle={battle}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -301,7 +338,7 @@ function EntryWho({ entry, status }: { entry: Entry; status: boolean }) {
   );
 }
 
-function useDeleteEntry(battleId: string) {
+function useDeleteEntry(jamId: string) {
   const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -314,7 +351,7 @@ function useDeleteEntry(battleId: string) {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["battle", battleId, "entries"],
+        queryKey: ["event", jamId, "battles"],
       });
       toast({ kind: "success", message: t("org.entries.deleted") });
     },

@@ -1,5 +1,9 @@
-import { useInfiniteQuery, useQueries, useQuery } from "@tanstack/react-query";
-import { api, unwrap } from "../../api/client";
+import {
+  type QueryClient,
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query";
+import { api, type Schemas, unwrap } from "../../api/client";
 
 // Reads behind the jam page; a missing or hidden jam is `null`, not an error.
 
@@ -16,6 +20,22 @@ export function useJam(idOrSlug: string) {
   });
 }
 
+/** Writes the jam a save returned into the page's cache, under its id and its slug, keeping
+ * what only the page carries (`can_edit`, `actions`, the organiser). */
+export function storeJam(
+  queryClient: QueryClient,
+  jam: { id: string; slug: string },
+  event: Schemas["Event"],
+) {
+  for (const key of [jam.id, jam.slug]) {
+    queryClient.setQueryData<Schemas["EventResponse"] | null>(
+      ["event", key],
+      (old) => (old ? { ...old, ...event } : old),
+    );
+  }
+}
+
+/** The jam's battles in display order, each with its entries. */
 export function useBattles(eventId: string) {
   return useQuery({
     queryKey: ["event", eventId, "battles"],
@@ -26,21 +46,6 @@ export function useBattles(eventId: string) {
         }),
         "battles",
       ),
-  });
-}
-
-export function useEntries(battleIds: string[]) {
-  return useQueries({
-    queries: battleIds.map((id) => ({
-      queryKey: ["battle", id, "entries"],
-      queryFn: async () =>
-        unwrap(
-          await api.GET("/api/battles/{id}/entries", {
-            params: { path: { id } },
-          }),
-          "entries",
-        ),
-    })),
   });
 }
 

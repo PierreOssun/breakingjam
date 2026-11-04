@@ -24,7 +24,8 @@ This document is the source of truth for the project and evolves with it. Anythi
 - "I'm a…" titles (M25): a page may say what its dancer does (Bboy, Bgirl, Breaker, DJ, MC, Judge; several, none by default). Only its verified owner and `seed_admin`+ set them, so BreakingJam never guesses anyone's gender or role. The page shows them under the name. One page type for everyone: the code keeps `dancers`, the UI says "people", "my page" and "stage name", never "dancer" for a DJ.
 - Seed data: ~200 well-known dancers entered by a `seed_admin` user before launch (see roles in §5).
 - Crew CRUD and crew membership (dated).
-- Battles per jam (1v1, 2v2 … 10v10, seven-to-smoke; bboy/bgirl/mixed; kids/adult) and entries (registrations) with members and the stage reached.
+- Battles per jam (1v1, 2v2 … 10v10, seven-to-smoke; bboy/bgirl/mixed; kids/adult) and entries (the organiser's record of the lineup and results; `pending` means the team isn't complete yet) with members and the stage reached.
+- Jam phases (M26): a jam is **upcoming**, **live** (today is one of its days) or **past**, by its own calendar in its timezone, never by a status someone has to set. Live jams are a group of their own on the dancer and organiser pages and wear a "Live now" chip on cards. Once a public jam is past, its organiser can still record its battles, entries, results and videos, but no longer edit its details, flyer or lineup, change its status or delete it; the BreakingJam team (`seed_admin`+) still can, to fix history.
 - Event staff (judges, DJ, MC).
 - Auth: email + password, and Google OAuth. Session cookies.
 - UI in English, French, German (UI strings only — user content is stored as written).
@@ -108,9 +109,10 @@ Single backend crate for now. Split into a Cargo workspace only when compile tim
 ### Conventions
 - Primary keys: `uuid` generated as **UUIDv7** by the application (`uuid` crate, `v7` feature). Postgres column type `uuid`.
 - Table names: plural, snake_case. Column names: snake_case.
-- Every table: `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()` (maintained by the `set_updated_at` trigger, never set in code).
+- Entity tables (users, dancers, crews, events, battles, entries, places): `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()` (maintained by the `set_updated_at` trigger, never set in code). Claims, sessions and `dancer_edits` have `created_at` only; join tables have neither.
+- Migrations: `backend/migrations/` is the source of truth; the SQL below is a summary kept in step with it. An applied migration is never edited: add one.
 - Soft delete: `deleted_at timestamptz null` on `events`, `dancers`, `crews` only. All public queries filter `deleted_at is null`, except a jam's entries and staff: a deleted dancer stays on past results by name, `deleted: true` and unlinked. They can stay on an entry or staff list that is saved again, but join no new one.
-- Concurrency (`api/transaction.rs`): merges run alone. A merge takes the merge lock (a transaction-level advisory lock) exclusively; every other transaction that writes dancers or rows pointing at them (entry and staff saves, claim reviews, dancer edits) takes it shared, through `transaction::begin`. Beyond that, a save locks the parent of what it replaces first (the battle for an entry, the jam for its staff), then reads and checks the rows it keeps, so each save judges the list as it is and `max_entries` can't be overrun; a claim approval locks the dancer before its claims. A transaction Postgres aborts for a deadlock or a serialisation conflict runs once more (`transaction::retrying`).
+- Concurrency (`api/transaction.rs`): merges run alone. A merge takes the merge lock (a transaction-level advisory lock) exclusively; every other transaction that writes dancers or rows pointing at them (entry and staff saves, claim openings and reviews, crew member adds, dancer edits) takes it shared, through `transaction::begin`. Beyond that, a save locks the parent of what it replaces first (the battle for an entry; the jam for its staff, its battles, its own fields and its status changes, so a battle's start and the jam's days can't drift apart and the publish checklist holds when the status changes), then reads and checks the rows it keeps, so each save judges the list as it is and `max_entries` can't be overrun; a claim approval locks the dancer before its claims. A transaction Postgres aborts for a deadlock or a serialisation conflict runs once more (`transaction::retrying`).
 - Enums: Postgres `enum` types, mirrored as Rust enums with `#[sqlx(type_name = "...", rename_all = "snake_case")]`.
 - Timestamps in UTC. Event dates are calendar dates (`date`) with a separate `timezone` text column (IANA name).
 - Coordinates: `lat double precision`, `lng double precision`. No PostGIS for now.
@@ -122,7 +124,15 @@ create type user_role as enum ('user', 'organizer', 'seed_admin', 'admin');
 create type dancer_source as enum ('seed', 'organizer', 'self');
 create type dancer_title as enum ('bboy', 'bgirl', 'breaker', 'dj', 'mc', 'judge');   -- M25
 create type claim_status as enum ('pending', 'approved', 'rejected');
-create type event_status as enum ('draft', 'in_review', 'published', 'registration_closed', 'completed', 'cancelled');
+create type event_status as enum ('draft', 'in_review', 'published', 'registration_closed', 'cancelled');   -- `completed` dropped in M26
+create type jam_phase as enum ('upcoming', 'live', 'past');   -- M26, returned by the function below
+
+-- Where a jam is in time, by its own calendar; every query asks this, so the rule lives once (M26).
+-- The API refuses a timezone Postgres doesn't know (`pg_timezone_names`), so this never fails.
+create function jam_phase(starts_on date, ends_on date, timezone text) returns jam_phase stable
+  as $$ select case when ends_on < (now() at time zone timezone)::date then 'past'
+                    when starts_on > (now() at time zone timezone)::date then 'upcoming'
+                    else 'live' end $$;
 create type entry_status as enum ('pending', 'confirmed', 'withdrawn');
 create type staff_role as enum ('judge', 'dj', 'mc', 'organizer', 'other');
 
@@ -143,8 +153,8 @@ create table app_users (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-create unique index app_users_instagram_handle_key
-  on app_users (lower(instagram_handle)) where instagram_handle is not null;
+create unique index app_users_instagram_handle_key        -- verification reserves a handle,
+  on app_users (lower(instagram_handle)) where verified_at is not null;   -- typing it doesn't (M26)
 
 create table sessions (
   id uuid primary key,
@@ -159,7 +169,6 @@ create table dancers (
   user_id uuid unique references app_users(id) on delete set null,  -- set only by an approved claim
   dancer_name text not null,          -- "Lil G" — NOT unique
   aliases text[] not null default '{}',   -- "Hongten", "홍텐"
-  real_name text,
   country char(2) not null,           -- ISO 3166-1 alpha-2, primary flag
   country2 char(2),                   -- optional second flag (dual nationality / based in)
   city text,
@@ -177,7 +186,7 @@ create table dancers (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-create index on dancers (lower(dancer_name));   -- search-before-create
+create index on dancers (lower(dancer_name));   -- no query uses it yet; decided with the Find someone filters
 create index on dancers using gin (aliases);
 create index on dancers (country);
 create unique index dancers_instagram_handle_key
@@ -187,6 +196,7 @@ create unique index dancers_one_self_page                        -- M25: one pag
   on dancers (created_by)                                          -- counted like `own_page` does: live,
   where source = 'self' and deleted_at is null and merged_into_id is null   -- not merged away, not someone
     and (user_id is null or user_id = created_by);                 -- else's (a merge is refused in the handler)
+create index dancers_self_pages on dancers (created_by) where source = 'self';   -- `own_page` on every /auth/me
 
 create table dancer_claims (
   id uuid primary key,
@@ -245,6 +255,7 @@ create table crew_memberships (
   until date,                          -- null = current member
   unique nulls not distinct (dancer_id, crew_id, since)   -- not a PK: PK columns are forced NOT NULL
 );
+create unique index crew_memberships_one_current on crew_memberships (dancer_id, crew_id) where until is null;
 
 create table events (
   id uuid primary key,
@@ -275,10 +286,12 @@ create table events (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   check (ends_on >= starts_on),
+  constraint events_pin_together check ((lat is null) = (lng is null)),
   constraint events_flyer_together check ((flyer_url is null) = (flyer_card_url is null))
 );
 create index on events (status, starts_on);
 create index on events (country);
+create index on events (organizer_id);
 
 -- A battle is one competition inside a jam ("Outbreak 2025 — 1v1 Bboy Adult").
 -- A jam has several battles; each battle has its own entries, bracket and results.
@@ -309,7 +322,10 @@ create table battles (
   updated_at timestamptz not null default now(),
   check (format <> 'team' or team_size is not null),
   check (age <> 'kids' or (age_max is not null and age_max <= 17)),
-  check (age <> 'adult' or (age_min is not null and age_min >= 18))
+  check (age <> 'adult' or (age_min is not null and age_min >= 18)),
+  constraint battles_team_size_format check (format in ('team', 'showcase') or team_size is null),
+  constraint battles_prize_currency
+    check ((prize_currency is null) = (coalesce(prize_first, prize_second, prize_third) is null))
 );
 create index on battles (event_id, position);
 
@@ -324,7 +340,10 @@ create table entries (
   video_url text,                     -- YouTube URL of this entry's best/final battle; embed only, never hosted
   video_offset_seconds int check (video_offset_seconds >= 0),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint entries_winner_is_first check ((reached = 'winner') = (final_rank is not distinct from 1)),
+  constraint entries_top2_is_second check (reached <> 'top2' or final_rank = 2),
+  constraint entries_offset_needs_video check (video_offset_seconds is null or video_url is not null)
 );
 create index on entries (battle_id);
 
@@ -333,6 +352,7 @@ create table entry_members (
   dancer_id uuid not null references dancers(id),
   primary key (entry_id, dancer_id)
 );
+create index on entry_members (dancer_id);
 
 create table event_staff (
   event_id uuid not null references events(id) on delete cascade,
@@ -340,6 +360,7 @@ create table event_staff (
   role staff_role not null,
   primary key (event_id, dancer_id, role)
 );
+create index on event_staff (dancer_id);
 
 -- M22: GeoNames cities of 15,000+ people, loaded by `cargo run --bin data -- places` (data/places/).
 create table places (
@@ -365,6 +386,7 @@ create index on place_names (place_id); -- each import deletes the places, casca
 
 Notes:
 - `citext` requires `create extension if not exists citext;` in the first migration.
+- The team-size, winner/rank, video-offset, prize-currency and pin rules are both validated in `domain::` (a 422 naming the field) and held by the checks above (M26), so the curated-data import and any later writer can't break them; the import also runs `EntryFields::errors_for`.
 - `entry_members` row count must equal `battles.team_size` for a `confirmed` entry when `format = 'team'` (or a `showcase` with a size); for `seven_to_smoke` an entry is always one dancer — enforced in domain code, not DB.
 - One dancer may appear in only one entry per battle — enforce in code for now.
 - A jam holds at most 32 battles (`domain::battle::MAX_BATTLES`, checked when a battle is added); every flyer lists them all.
@@ -398,15 +420,17 @@ Principles: the Instagram handle is the identity key but may be absent; verifica
 ### Organiser identity (M12c)
 - The organiser page is the account's public side: `display_name` (shown on their jams), and the `instagram_handle`, `country`, `city`, `bio` columns of `app_users`. Never the email or role. Only accounts that registered a jam (`organizer`+) have one; only its owner edits it.
 - **Verification** is of the handle, not the account: the organiser opens a claim on their current handle (`BJ-` code, same review queue screen as dancers), and approval sets `verified_at` only if the handle is still the claimed one. Changing the handle clears `verified_at` and rejects the pending claim on the old one.
+- **Verification reserves the handle, typing it doesn't** (M26): two unverified accounts may type the same handle, so nobody squats one; approving a claim on a handle another verified account holds is a 409.
 
 ### Event status transitions
 ```
-draft → in_review → published → registration_closed → completed      (organisers)
+draft → in_review → published → registration_closed                  (organisers)
 draft → published                                                    (seed_admin+: no review)
 in_review → draft                                                    (admin rejects, with a note)
-any (except completed) → cancelled
+any (except cancelled) → cancelled
 ```
-Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free `PATCH status`. `submit` and `publish` run the publish checklist (M24): a city, a country and a map pin, and at least one battle; else 422 with the fields `place` and `battles` (`domain::event::Event::missing`). Once past draft, `PUT /events/{id}` refuses to drop a city, country or pin the jam has, so the map, the organiser and dancer pages and the stats can count on them (a jam published without a pin before M24 keeps saving); a jam cancelled while still a draft is the one public jam that may lack them, which is why `EventRef.city` and `country` are nullable. Approval and rejection are the admins' (`POST /admin/events/{id}/approve | reject`), decided in M14: every organiser's jam is reviewed, while the BreakingJam team publishes its own directly. A jam in review is private like a draft, and its organiser can keep editing it. Jams published before M14 stay public.
+Whether a jam is over is its dates' business, not its status' (M26 dropped `completed`): `phase` (`jam_phase`) says upcoming, live or past, and the jam page shows its results once it is past. A public jam (published, registration closed, cancelled) that is past is locked for its organiser: `PUT`, `DELETE`, the status changes, the flyer and the lineup answer 409, while its battles and entries stay open (the editor then sends them to the jam page, where each battle card has Edit and its entries their controls); drafts and jams in review never lock, and `seed_admin`+ never do. An organiser can't move a public jam into the past either (422 `ends_on`), as the lock would keep them from moving it back. `GET /events/{id}` says what the caller may do: `can_edit` (details), `can_edit_battles` and `actions` (the transitions allowed now, from `Event::actions`), so the frontend keeps no copy of this graph.
+Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free `PATCH status`. `submit` and `publish` run the publish checklist (M24): a city, a country and a map pin, and at least one battle; else 422 with the fields `place` and `battles` (`domain::event::Event::missing`). Once past draft, `PUT /events/{id}` refuses to drop a city, country or pin the jam has, so the map, the organiser and dancer pages and the stats can count on them (a jam published without a pin before M24 keeps saving); a jam cancelled while still a draft is the one public jam that may lack them, which is why `EventRef.city` and `country` are nullable. Approval and rejection are the admins' (`POST /admin/events/{id}/approve | reject`), decided in M14: every organiser's jam is reviewed, while the BreakingJam team publishes its own directly. A jam in review is private like a draft, and its organiser can keep editing it; approval runs the checklist again, and deleting the last battle of a jam past draft is refused (422 `battles`, M26). Jams published before M14 stay public.
 
 ## 5. Backend
 
@@ -416,8 +440,9 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 - `From<sqlx::Error>` maps `RowNotFound` → `NotFound`, unique violations → `Conflict`, rest → `Internal`.
 
 ### Handlers
-- One module per resource in `api/`, exposing `pub fn router() -> Router<AppState>`.
-- DTOs (`CreateEventRequest`, `EventResponse`…) live next to handlers, derive `Serialize/Deserialize`, `utoipa::ToSchema`, and `validator::Validate`.
+- One module per resource in `api/`, exposing `pub fn router() -> OpenApiRouter<AppState>`.
+- Request bodies are `<Resource>Fields` in `domain/` (shared by POST and PUT, `Deserialize` + `validator::Validate`) or `<Action>Request` next to the handler; responses are the domain type or a `<Resource>Response`/`<Resource>Detail` next to the handler; all derive `utoipa::ToSchema`.
+- Extractors (`api/extract.rs`): `Path`, `Query` and `ValidJson` replace axum's, so a path that doesn't parse is a 404 and a bad query or body a 422 in the error envelope, never a plain-text 400 (M26).
 - Handlers are thin: validate → call `db::`/`domain::` → map to response. No SQL in handlers.
 - Pagination: `?limit=` (default 50, max 200) and `?cursor=` (opaque, based on `(starts_on, id)` for events). Responses `{ "items": [...], "next_cursor": "..." | null }`.
 - IDs in paths are `uuid`. Public event pages also resolve by `slug`.
@@ -428,15 +453,15 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 - Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `RequireRole(Organizer)` helper. Roles are ordered `user < organizer < seed_admin < admin`; a check for a role passes for any higher role.
 - Roles:
   - `user`: can claim a dancer, make their own page (one), edit the unverified dancers they created, set the titles of their verified page, see everything public.
-  - `organizer`: everything above + create jams and manage their own jams (battles, entries, staff), submit them for review, create dancers/crews from within a jam (`POST /api/dancers` is `organizer`+, so no account mints pages for others; M25). A `user` who creates their first jam is promoted to `organizer` automatically (jams start as drafts).
-  - `seed_admin` ("breakingjam_admin_seed"): everything above + create and edit **any** jam, dancer or crew, including seeding the initial ~200 dancers and historical jams, and publish jams without review. Cannot review jams or claims, merge dancers or manage users.
+  - `organizer`: everything above + create jams and manage their own jams (battles, entries, staff), submit them for review, create dancers/crews from within a jam (`POST /api/dancers` is `organizer`+; M25). A `user` who creates their first jam is promoted to `organizer` automatically (jams start as drafts), so one draft is enough to make pages for others: `organizer`+ keeps plain visitors out, not determined accounts. Once one of their public jams is past, only its battles stay theirs to edit (M26).
+  - `seed_admin` ("breakingjam_admin_seed"): everything above + create and edit **any** jam, dancer or crew, including seeding the initial ~200 dancers and historical jams, editing jams that are over, and publish jams without review. Cannot review jams or claims, merge dancers or manage users.
   - `admin`: everything. Reviews jams and claims, merges dancers, changes roles, sees the overview counts.
 - Google OAuth: authorization-code flow with PKCE via `oauth2` crate; on first login create `app_users` row with `google_sub`; on later logins match by `google_sub`, then by verified email.
 - Authorization rules:
   - Event write: `organizer_id == user.id`, or `seed_admin`+.
   - Dancer write (unverified): its creator (`created_by`), or `seed_admin`+; logged in `dancer_edits`. Dancer write (verified): `dancer.user_id == user.id`, or `seed_admin`+.
   - Dancer create: `organizer`+ (from a jam), or `user` for their own page (`source = self`).
-  - Crew write: `organizer`+ (membership self-service later).
+  - Crew create: `organizer`+ (from the entry sheet). Crew edit, delete and memberships: `seed_admin`+ (M26: a first draft makes any account an organiser, so `organizer`+ meant anyone; membership self-service later).
   - Jam review, claims review, merge, role changes, overview counts: `admin` only.
 
 ### Routes
@@ -456,36 +481,35 @@ GET    /api/stats                        public counts for the landing page: pas
 GET    /api/geo                          {country}: the visitor's ISO 3166-1 alpha-2 country from the `cf-ipcountry` header (set by the Worker), null when unknown
 GET    /api/places                       ?q=   {place: {name, country, lat, lng, population} | null}: the city a search names, case and accents aside; an exact name or alternate name first (own names before alternates), then a prefix; when several match, one with a public jam within about 25 km, then the most populated; no lookup under 3 letters, no prefix under 4 nor of a name more than twice as long; under 50,000 people only the place's own name finds it; codes like "ZRH" are no names (M22)
 
-GET    /api/events                       ?status=published&country=&from=&to=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required)
-GET    /api/events.geojson               published, registration_closed and completed events with coordinates, as FeatureCollection (id, name, slug, starts_on, ends_on, status, city, country, battles: names in display order, categories: what the map's chips match, flyer_card_url)
-GET    /api/events/{id_or_slug}           + can_edit, organizer {id, display_name, instagram_handle, verified, jams: their public jams} (M12, M12c, M21)
+GET    /api/events                       ?status=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required; M26 dropped the unused country, from and to)
+GET    /api/events.geojson               published and registration_closed events with coordinates, as FeatureCollection (id, name, slug, starts_on, ends_on, status, phase, city, country, battles: names in display order, categories: what the map's chips match, flyer_card_url)
+GET    /api/events/{id_or_slug}           + phase, can_edit, can_edit_battles, actions, organizer {id, display_name, instagram_handle, verified, jams: how many public jams} (M12, M12c, M21, M26)
 GET    /api/events/{id_or_slug}/flyer.svg  ?compact=&lang=en|fr|de   generated 4:5 flyer to inline (DESIGN.md §4.24)
 GET    /api/events/{id_or_slug}/og.png     ?lang=   1200×630 Open Graph image
 GET    /api/events/{id_or_slug}/calendar.ics      "Add to calendar": one all-day event over the jam's days, its venue and page link (M21)
 POST   /api/events                       logged in (promotes `user` → `organizer`); a name, the days and a timezone are enough for a draft (M24)
-PUT    /api/events/{id}                  owner/admin; past draft the city, country and pin must stay, else 422 `place` (M24)
-DELETE /api/events/{id}                  soft delete, owner/admin
-POST   /api/events/{id}/submit | publish | close-registration | complete | cancel   (publish: seed_admin+, skips review; submit and publish need the checklist, else 422)
+PUT    /api/events/{id}                  owner/seed_admin+; past draft the city, country and pin must stay, else 422 `place` (M24); a timezone Postgres doesn't know is 422; 409 once public and past, 422 `ends_on` when the organiser would move a public jam into the past (M26)
+DELETE /api/events/{id}                  soft delete, owner/seed_admin+; 409 once public and past
+POST   /api/events/{id}/submit | publish | close-registration | cancel   (publish: seed_admin+, skips review; submit and publish need the checklist, else 422; 409 once public and past)
 POST   /api/events/{id}/flyer            multipart: flyer (1080×1350 JPEG ≤ 2 MB), card (540×675 JPEG ≤ 400 KB)   owner/seed_admin+, live at once (M19)
 DELETE /api/events/{id}/flyer            back to the generated flyer; how admins take one down
 
-GET    /api/events/{id}/battles          ordered by position
+GET    /api/events/{id}/battles          ordered by position, each with its entries (members, crew, results), so the jam page loads in three calls (M26)
 POST   /api/events/{id}/battles          {name?, format, team_size?, gender, age, age_min?, age_max?, bracket_size?, max_entries?, prize_currency?, prize_first?, prize_second?, prize_third?, starts_at?}
 PUT    /api/battles/{id}
-DELETE /api/battles/{id}
-PUT    /api/events/{id}/battles/order    [battle_id, ...]
+DELETE /api/battles/{id}                 422 `battles` for the last battle of a jam past draft
+PUT    /api/events/{id}/battles/order    [battle_id, ...] → the battles with their entries, as GET
 
-GET    /api/battles/{id}/entries
 POST   /api/battles/{id}/entries         {team_name?, crew_id?, dancer_ids: [...]}
 PUT    /api/entries/{id}                 status, reached, final_rank, video_url, video_offset_seconds, members
 DELETE /api/entries/{id}
 
 GET    /api/events/{id}/staff
-PUT    /api/events/{id}/staff            replace full list
+PUT    /api/events/{id}/staff            replace full list; 409 once public and past
 
-GET    /api/dancers                      ?q=&country=&verified=&cursor=&limit=   (q = ilike on dancer_name, aliases and instagram_handle; verified = true|false; notable first)
+GET    /api/dancers                      ?q=&country=&cursor=&limit=   (q = ilike on dancer_name, aliases and instagram_handle; notable first)
 GET    /api/dancers/{id}                 profile + current crews
-GET    /api/dancers/{id}/events          ?scope=upcoming|past (default both, grouped)  — jams where the dancer is an entry member or staff; each item: event (id, name, slug, starts_on, ends_on, city, country, status), battle (id, name, format, team_size, gender, age), role (competitor|judge|dj|mc…), entry status, reached, final_rank, video_url
+GET    /api/dancers/{id}/events          {live, upcoming, past} — jams where the dancer is an entry member or staff; each item: event (id, name, slug, starts_on, ends_on, city, country, status, phase), battle (id, name, format, team_size, gender, age), role (competitor|judge|dj|mc…), entry status, reached, final_rank, video_url
 POST   /api/dancers                      a page for someone else, organizer+; titles seed_admin+
 POST   /api/dancers/mine                 the account's own page, unverified, source self; 409 when it has one (M25)
 PUT    /api/dancers/{id}                 see authorization rules; writes dancer_edits when unverified; titles absent = kept, sent only by the verified owner or seed_admin+ (else 403); can_set_titles on the page says who
@@ -497,7 +521,7 @@ POST   /api/dancers/{id}/avatar          multipart image, owner only   (deferred
 
 GET    /api/admin/stats                  overview counts: jams by status, dancers and organisers (verified, with Instagram), accounts (new in 30 days), pending claims   admin
 GET    /api/admin/events                 jams in review, soonest first, with their organiser   admin
-POST   /api/admin/events/{id}/approve    in_review → published   admin
+POST   /api/admin/events/{id}/approve    in_review → published, if the checklist still holds (else 422)   admin
 POST   /api/admin/events/{id}/reject     {note} in_review → draft   admin
 GET    /api/admin/claims                 ?status=pending   admin
 POST   /api/admin/claims/{id}/approve    admin
@@ -507,7 +531,7 @@ PUT    /api/admin/users/{id}/role        admin
 
 GET    /api/organizers/{id}              organiser page + can_edit; 404 below `organizer` (M12c)
 PUT    /api/organizers/{id}              own page only
-GET    /api/organizers/{id}/events       public jams, {upcoming, past}
+GET    /api/organizers/{id}/events       public jams, {live, upcoming, past}
 POST   /api/organizers/{id}/claim        own page, needs a handle → {code, status: pending}
 GET    /api/organizers/{id}/claim        own latest claim
 GET    /api/admin/organizer-claims       ?status=pending   admin
@@ -515,11 +539,11 @@ POST   /api/admin/organizer-claims/{id}/approve | reject   admin
 
 GET    /api/crews                        ?q=&cursor=&limit=
 GET    /api/crews/{id}                   includes current members
-POST   /api/crews
-PUT    /api/crews/{id}
-DELETE /api/crews/{id}
-POST   /api/crews/{id}/members           {dancer_id, since?}
-DELETE /api/crews/{id}/members/{dancer_id}   sets until = today
+POST   /api/crews                        organizer+
+PUT    /api/crews/{id}                   seed_admin+ (M26)
+DELETE /api/crews/{id}                   seed_admin+
+POST   /api/crews/{id}/members           {dancer_id, since?}   seed_admin+
+DELETE /api/crews/{id}/members/{dancer_id}   sets until = today   seed_admin+
 ```
 
 ### Config (env)
@@ -546,12 +570,12 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Data fetching: TanStack Query only. No global state library. Auth state = `useQuery(['me'])`.
 - API client: `openapi-typescript` generates `src/api/schema.d.ts` from `backend` OpenAPI (`npm run gen:api` fetches `http://localhost:8080/api/openapi.json`). Calls go through `openapi-fetch`.
 - Routing: `/` (landing), `/map`, `/jams` (Find a jam, the list), `/jams/{slug}`, `/search` (jams and people), `/dancers` (Find someone), `/dancers/{id}`, `/contact`, `/login`, `/register`, `/welcome` (M25, after sign-up), `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review), `/admin/claims` and `/admin/dancers/{id}/merge`. No `/crews` routes yet; crews render inline.
-- Dancer page (`/dancers/{id}`): header (avatar, dancer name, one or two country flags, city, current crews, Instagram link, verified tick when `verified_at` is set, "Verify me" button for logged-in non-owners while unverified, "Edit" for whoever is allowed), then two lists from `GET /api/dancers/{id}/events` — **Upcoming** (jams with `starts_on >= today`, link to `/jams/{slug}`) and **Past** (reverse chronological, with battle name, role, a result badge (`final_rank` as "1st/2nd/3rd", else `reached` as "Top 8"…), and a play icon when the entry has a `video_url`). Empty states for each. This page is the seed of the "where does this bboy go / what did he do" feature; the only edit affordances are those in §4 "Dancer identity".
+- Dancer page (`/dancers/{id}`): header (avatar, dancer name, one or two country flags, city, current crews, Instagram link, verified tick when `verified_at` is set, "Verify me" button for logged-in non-owners while unverified, "Edit" for whoever is allowed), then the lists of `GET /api/dancers/{id}/events` (fetched from the URL id, beside the page) — **Live now** (only when a jam runs today, M26), **Upcoming** (jams starting after today in their own timezone, link to `/jams/{slug}`) and **Past** (reverse chronological, with battle name, role, a result badge (`final_rank` as "1st/2nd/3rd", else `reached` as "Top 8"…), and a play icon when the entry has a `video_url`). Empty states for each. This page is the seed of the "where does this bboy go / what did he do" feature; the only edit affordances are those in §4 "Dancer identity".
 - Video embeds: a play icon on an entry (jam page or dancer page) opens a modal with the official YouTube iframe (`youtube-nocookie.com/embed/{id}?start={offset}&rel=0`). Only YouTube URLs are accepted, validated server-side (`youtube.com/watch`, `youtu.be`, `youtube.com/live`); the video id is parsed once on save. Nothing is ever downloaded or hosted.
 - Landing page (`/`), in order (M18, DESIGN.md §6 Landing):
   - The hero: the title "Find your next jam" (the page's only `<h1>`), the subtitle, and the search, whose round J logo button hands the words to `/search?q=`.
   - **Next up near you**: up to six upcoming jams as grid cards. By the visitor's position when they already allowed it (or tap "change" to share it): the nearest, soonest first. Else by their country (`GET /api/geo`): that country's jams first, soonest first, then the nearest others measured from the centre of its box (§6 Map); with an unknown country, the soonest anywhere. Hidden when nothing is upcoming.
-  - **BreakingJam so far**: from `GET /api/stats`, Past (battles, dancers) and Coming up (battles, countries), the latter linking to the map and hidden with no upcoming battle. Public jams count, cancelled ones don't; a jam is upcoming through the day it ends.
+  - **BreakingJam so far**: from `GET /api/stats`, Past (battles, dancers) and Coming up (battles, countries), the latter linking to the map and hidden with no upcoming battle. Public jams count, cancelled ones don't; Coming up counts live and upcoming battles together, so both counts add up to every battle (M26).
   - Then the footer: the round logo, Contact and Instagram, on one row (wrapping below about 400px); the header holds the other links and the language (DESIGN.md §6).
   M10 decided "no data fetching on this page"; M15 reverses that at the author's request. The map preview and the For dancers and For organisers bands are gone since M18; the organisers' pitch moves to a future `/register` landing.
 - Search (`/search?q=`): first "Near <Place>" when `GET /api/places` finds a city (M22, DESIGN.md §4.33): the 3 nearest upcoming jams within 500 km of it, by great-circle distance in the browser over the map's GeoJSON, on a static mini map, with "Open the map around <Place>" (`/map?lat=&lng=&fit=`). Then the jams the words match, matched in the browser like the map's search (name, city, country), upcoming first, up to 10 then "See all on the map" (`/map?q=`); and the people from `GET /api/dancers?q=`, paged. A section with nothing in it hides while another has results; with nothing anywhere, one empty state. A blank search shows the upcoming jams and the notable people.
@@ -572,7 +596,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
   - A link may ask for the first view: `?fit=west,south,east,north` frames that box, else `?lat=&lng=` centres there (M22, from "Open the map around <Place>").
   - Otherwise the first view: the visitor's country from `GET /api/geo`, framed by a bounding box from Natural Earth (main landmass and nearby islands, `features/map/countryBounds.ts`). A country without upcoming jams is widened to its three nearest jams; an unknown country frames every jam. In development, `DEV_COUNTRY` in `frontend/.env` stands in for Cloudflare.
   - Click a point → popup with name, dates, city → link to `/jams/{slug}`.
-  - Filters and search (decided in M11), all client-side over the one GeoJSON download: **When** (this weekend, next 30 days, past jams; one at a time) and **battle categories** (1v1, 2v2, crews, 7 to smoke, bgirl, kids; any one matches), combined with AND. Search matches every word against name, city, country code and country name (accents ignored); Enter fits the map to the matches and opens the jam when there is one. Without a time filter the map shows upcoming jams; **Past jams** shows the completed ones, most recent first, and a search looks through both, so "red bull" finds every BC One. No Cancelled filter yet.
+  - Filters and search (decided in M11), all client-side over the one GeoJSON download: **When** (this weekend, next 30 days, past jams; one at a time) and **battle categories** (1v1, 2v2, crews, 7 to smoke, bgirl, kids; any one matches), combined with AND. Search matches every word against name, city, country code and country name (accents ignored); Enter fits the map to the matches and opens the jam when there is one. Without a time filter the map shows live and upcoming jams; **Past jams** shows the ones whose `phase` is past, most recent first, and a search looks through both, so "red bull" finds every BC One. No Cancelled filter yet.
   - Container: `height: 100dvh` minus header, `touch-action: none`.
 - Dancer picker (used in entry and staff editing): debounced search on `dancer_name` showing existing matches; "create new dancer" is only enabled after a search has run (search-before-create). The crew picker works the same way.
 - Jam location (M24 step 2, replacing the Nominatim search of M12): the Venue block's **Find the place** field asks Photon (`photon.komoot.io`, OpenStreetMap data, attributed under the block) from the browser as you type, after 3 letters and a 300 ms pause, for 5 places in the UI language, biased to the pin when there is one; `features/jams/geocode.ts` reads each result into a venue name (named places only, never towns or streets), an address line, the city and the country code. Picking one fills those fields and drops the pin, replacing what an earlier pick filled in but never what was typed by hand; the pin is then dragged or the map tapped to the exact door. A pin dropped before any search asks Photon's `/reverse` once for the city and country, a new drop calling off the last. City and country show as a flag chip "Filled from the address" with Edit while they are what the search found, and as fields otherwise. A jam needs its city, country and pin to be submitted or published.
@@ -611,7 +635,7 @@ cd frontend && npm i && npm run gen:api && npm run dev   # vite proxies /api →
 cd deploy && npx wrangler dev -c wrangler.media.jsonc   # uploads: a local R2 bucket on :8788
 ```
 `just dev` starts all three. `just places` loads the GeoNames cities into the local database (`just reset-db` does too).
-Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("BreakingJam Team") and an `organizer` ("Cypher Collective", with two jams waiting for review), then **imports the real past jams of `data/`** (Red Bull BC One, Battle of the Year, Outbreak Europe, Unbreakable…, owned by the `seed_admin`): every jam that passes `data check`, with its dancers, crews, staff and results, completed or published by date; the rest is left out (`RUST_LOG=seed=debug` lists what and why). On top come invented upcoming jams with registrations, drafts and in-review jams, invented dancers (one pair of deliberate near-duplicates for merge testing, DJs and MCs) and 5 crews; a dancer of `data/` they name (Menno, Hong 10…) is the imported row. It refuses any database host other than localhost, except the one `SEED_ALLOW_HOST` names exactly (UAT's). The real ~200 notable dancers are entered by hand through the UI by a `seed_admin`, not by this script.
+Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("BreakingJam Team") and an `organizer` ("Cypher Collective", with two jams waiting for review), then **imports the real past jams of `data/`** (Red Bull BC One, Battle of the Year, Outbreak Europe, Unbreakable…, owned by the `seed_admin`): every jam that passes `data check`, with its dancers, crews, staff and results, published (their dates say they are over; an entry breaking a result rule the schema holds is left out, as is a jam whose timezone Postgres doesn't know; teams known by name only keep their results); the rest is left out (`RUST_LOG=seed=debug` lists what and why). On top come invented upcoming jams with registrations, drafts and in-review jams, invented dancers (one pair of deliberate near-duplicates for merge testing, DJs and MCs) and 5 crews; a dancer of `data/` they name (Menno, Hong 10…) is the imported row. It refuses any database host other than localhost, except the one `SEED_ALLOW_HOST` names exactly (UAT's). The real ~200 notable dancers are entered by hand through the UI by a `seed_admin`, not by this script.
 
 **Places** (`data/places/`, guide in its README): GeoNames `cities15000` (CC BY 4.0) trimmed to id, name, ASCII name, alternate names, country, coordinates and population, committed so imports never download. `cargo run --bin data -- places` replaces the `places` and `place_names` rows in one transaction; UAT and production run it with the **Import places** workflow.
 
@@ -663,5 +687,6 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 15. Jam contact email and website; landing page "Featured near you" and site counts.
 24. Jam editor (M24): a) start sheet, editor page with blocks and autosave, publish checklist, nullable city/country, opening hours — done; b) venue block with Photon suggestions, map pin, city and country from the address — done; c) battle sheet with category and format chips, "Add battle" in one tap — done.
 25. Welcome step (M25): "Are you on BreakingJam?" after sign-up (find and verify, create my page, skip), `me` returns the account's own page, one own page per account, "I'm a…" titles set by the verified owner or the team. Find someone filters (by title and country) are their own later step.
+26. Pre-production hardening (M26): no `completed` status, jams upcoming, live or past by their own calendar (`jam_phase`), a public jam that is over locked but for its battles, the schema's checks and indexes, crew writes for the team, entries inside battles, server-side status actions, the merge fixes, docs brought up to date.
 
 For Every suggested build order point, save it in milestones/ with a filename matching the build order point.

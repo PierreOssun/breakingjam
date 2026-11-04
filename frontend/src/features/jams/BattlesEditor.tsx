@@ -27,7 +27,10 @@ type Battle = Schemas["Battle"];
 export function BattlesEditor({
   jam,
 }: {
-  jam: Pick<Schemas["EventResponse"], "id" | "starts_on" | "ends_on">;
+  jam: Pick<
+    Schemas["EventResponse"],
+    "id" | "status" | "starts_on" | "ends_on"
+  >;
 }) {
   const jamId = jam.id;
   const { t, i18n } = useTranslation();
@@ -66,6 +69,8 @@ export function BattlesEditor({
   });
 
   const list = battles.data ?? [];
+  // A submitted jam keeps a battle: the API refuses to delete its last one.
+  const keepsLast = jam.status !== "draft" && list.length === 1;
   const move = (index: number, by: -1 | 1) => {
     const ids = list.map((b) => b.id);
     const [moved] = ids.splice(index, 1);
@@ -157,12 +162,14 @@ export function BattlesEditor({
               >
                 <PencilSimple size={20} weight="bold" aria-hidden />
               </IconButton>
-              <IconButton
-                label={t("org.battles.deleteOne", { name: battle.name })}
-                onClick={() => setDeleting(battle)}
-              >
-                <Trash size={20} weight="bold" aria-hidden />
-              </IconButton>
+              {!keepsLast && (
+                <IconButton
+                  label={t("org.battles.deleteOne", { name: battle.name })}
+                  onClick={() => setDeleting(battle)}
+                >
+                  <Trash size={20} weight="bold" aria-hidden />
+                </IconButton>
+              )}
             </div>
           </li>
         ))}

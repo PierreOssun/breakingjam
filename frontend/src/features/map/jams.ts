@@ -72,16 +72,16 @@ function overlaps(
   return jam.starts_on <= to && jam.ends_on >= from;
 }
 
-/** Whether a jam is over, judged from the viewer's `today`. */
-export function isPast(jam: Pick<MapJam, "ends_on">, today: Date): boolean {
-  return jam.ends_on < isoDate(today);
+/** Whether a jam is over, by its own calendar (the API's `phase`). */
+export function isPast(jam: Pick<MapJam, "phase">): boolean {
+  return jam.phase === "past";
 }
 
-/** Upcoming jams soonest first, then past ones most recent first (DESIGN.md §4.14). */
-export function byDate(today: Date) {
+/** Live and upcoming jams soonest first, then past ones most recent first (DESIGN.md §4.14). */
+export function byDate() {
   return (a: MapJam, b: MapJam) => {
-    const past = isPast(a, today);
-    if (past !== isPast(b, today)) return past ? 1 : -1;
+    const past = isPast(a);
+    if (past !== isPast(b)) return past ? 1 : -1;
     return past
       ? b.starts_on.localeCompare(a.starts_on)
       : a.starts_on.localeCompare(b.starts_on);
@@ -89,7 +89,7 @@ export function byDate(today: Date) {
 }
 
 function matchesWhen(jam: MapJam, when: When, today: Date): boolean {
-  if (when === "past") return isPast(jam, today);
+  if (when === "past") return isPast(jam);
   return overlaps(jam, rangeOf(when, today));
 }
 
@@ -135,11 +135,11 @@ export function narrow(
   return jams
     .filter(
       (jam) =>
-        !(upcomingOnly && isPast(jam, today)) &&
+        !(upcomingOnly && isPast(jam)) &&
         matchesFilters(jam, filters, today) &&
         matchesSearch(jam, search, language),
     )
-    .sort(byDate(today));
+    .sort(byDate());
 }
 
 /** Every word of the query appears in the name, city, country code or country name. */
@@ -216,14 +216,9 @@ const FEATURED = 6;
  * "Next up near you" from the visitor's IP: upcoming jams in their country, soonest first,
  * then the nearest others from its centre; the soonest anywhere when the country is unknown.
  */
-export function featuredJams(
-  jams: MapJam[],
-  country: string | null,
-  today: Date,
-): MapJam[] {
-  const date = isoDate(today);
+export function featuredJams(jams: MapJam[], country: string | null): MapJam[] {
   const upcoming = jams
-    .filter((jam) => jam.ends_on >= date)
+    .filter((jam) => !isPast(jam))
     .sort((a, b) => a.starts_on.localeCompare(b.starts_on));
   const local = upcoming.filter((jam) => jam.country === country);
   const others = upcoming.filter((jam) => jam.country !== country);
@@ -239,10 +234,9 @@ export function featuredJams(
 export function nearestJams(
   jams: MapJam[],
   point: { lng: number; lat: number },
-  today: Date,
 ): MapJam[] {
   return jams
-    .filter((jam) => !isPast(jam, today))
+    .filter((jam) => !isPast(jam))
     .sort((a, b) => distanceKm(point, a) - distanceKm(point, b))
     .slice(0, FEATURED)
     .sort((a, b) => a.starts_on.localeCompare(b.starts_on));
@@ -253,16 +247,15 @@ export function nearestJams(
 export function otherJams(
   jams: MapJam[],
   jam: { id: string; lng?: number | null; lat?: number | null },
-  today: Date,
 ): MapJam[] {
   const { lng, lat } = jam;
-  const others = jams.filter((j) => j.id !== jam.id && !isPast(j, today));
+  const others = jams.filter((j) => j.id !== jam.id && !isPast(j));
   if (lng != null && lat != null) {
     others.sort(
       (a, b) => distanceKm({ lng, lat }, a) - distanceKm({ lng, lat }, b),
     );
   } else {
-    others.sort(byDate(today));
+    others.sort(byDate());
   }
   return others.slice(0, 4);
 }

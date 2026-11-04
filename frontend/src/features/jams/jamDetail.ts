@@ -41,14 +41,14 @@ const daysBetween = (from: string, to: string) =>
 
 /**
  * The countdown chip, in the jam's timezone: live once its first battle has started (or from its
- * second day when no start is announced); none once it's over, completed or cancelled.
+ * second day when no start is announced); none once it's over or cancelled.
  */
 export function countdown(
   jam: Pick<Jam, "status" | "starts_on" | "ends_on" | "timezone">,
   firstStart: string | null,
   now: Date,
 ): Countdown | null {
-  if (jam.status === "completed" || jam.status === "cancelled") return null;
+  if (jam.status === "cancelled") return null;
   const { day, time } = wallClock(now, jam.timezone);
   if (day > jam.ends_on) return null;
   if (day < jam.starts_on) {
@@ -71,24 +71,19 @@ export function firstStart(battles: Schemas["Battle"][]): string | null {
 export type PrimaryAction = "register" | "calendar" | "results";
 
 export function primaryAction(
-  jam: Pick<Jam, "status" | "registration_url">,
+  jam: Pick<Jam, "status" | "phase" | "registration_url">,
 ): PrimaryAction | null {
-  switch (jam.status) {
-    case "cancelled":
-      return null;
-    case "completed":
-      return "results";
-    case "registration_closed":
-      return "calendar";
-    default:
-      // Published (and drafts, as their organiser previews them): register where they can.
-      return jam.registration_url ? "register" : "calendar";
-  }
+  if (jam.status === "cancelled") return null;
+  // Over by its own calendar, whatever status it was left in.
+  if (jam.phase === "past") return "results";
+  if (jam.status === "registration_closed") return "calendar";
+  // Published (and drafts, as their organiser previews them): register where they can.
+  return jam.registration_url ? "register" : "calendar";
 }
 
 /** The action card's caption, as an i18n key under `jam.caption`; none without one to give. */
 export function actionCaption(
-  jam: Pick<Jam, "status" | "registration_url">,
+  jam: Pick<Jam, "status" | "phase" | "registration_url">,
 ): "open" | "closed" | "cancelled" | null {
   switch (primaryAction(jam)) {
     case "register":

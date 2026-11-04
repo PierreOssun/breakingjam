@@ -9,9 +9,7 @@ export function useDancer(id: string) {
       const reply = await api.GET("/api/dancers/{id}", {
         params: { path: { id } },
       });
-      // 400: not a uuid at all; either way there is no such dancer.
-      if (reply.response.status === 404 || reply.response.status === 400)
-        return null;
+      if (reply.response.status === 404) return null;
       return unwrap(reply, "dancer");
     },
   });

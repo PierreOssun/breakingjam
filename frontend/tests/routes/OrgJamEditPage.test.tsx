@@ -61,6 +61,7 @@ const jam = (extra: object = {}) => ({
   slug: "paris-cypher-00e001",
   description: null,
   status: "draft",
+  phase: "upcoming",
   starts_on: "2030-06-01",
   ends_on: "2030-06-02",
   timezone: "Europe/Paris",
@@ -78,10 +79,21 @@ const jam = (extra: object = {}) => ({
   ...extra,
 });
 
+/** The status changes the API offers an organiser, by status. */
+const ACTIONS: Record<string, string[]> = {
+  draft: ["submit", "cancel"],
+  in_review: ["cancel"],
+  published: ["close-registration", "cancel"],
+  registration_closed: ["cancel"],
+  cancelled: [],
+};
+
 /** The same jam as `GET` returns it to its organiser. */
 const page = (extra: object = {}) => ({
   ...jam(extra),
   can_edit: true,
+  can_edit_battles: true,
+  actions: ACTIONS[jam(extra).status],
   organizer: {
     id: LIL_G.id,
     display_name: "Lil G",
@@ -104,6 +116,7 @@ const battle = (extra: object = {}) => ({
   position: 0,
   created_at: at,
   updated_at: at,
+  entries: [],
   ...extra,
 });
 
@@ -219,7 +232,12 @@ describe("the jam editor", () => {
       "GET /api/auth/me": ME,
       [`GET /api/events/${ID}`]: {
         status: 200,
-        body: { ...page({ status: "published" }), can_edit: false },
+        body: {
+          ...page({ status: "published" }),
+          can_edit: false,
+          can_edit_battles: false,
+          actions: [],
+        },
       },
     });
     renderApp(`/org/jams/${ID}/edit`);
@@ -227,6 +245,27 @@ describe("the jam editor", () => {
     expect(
       await screen.findByRole("heading", { name: "Page not found" }),
     ).toBeInTheDocument();
+  });
+
+  it("sends its organiser to the jam page once it is over, to record results there", async () => {
+    const past = {
+      ...page({ status: "published", phase: "past", lat: 48.86, lng: 2.35 }),
+      can_edit: false,
+      actions: [],
+    };
+    const fetch = editApi({
+      [`GET /api/events/${ID}`]: { status: 200, body: past },
+      [`GET /api/events/${past.slug}`]: { status: 200, body: past },
+    });
+    const router = renderApp(`/org/jams/${ID}/edit`);
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(`/jams/${past.slug}`),
+    );
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Paris Cypher" }),
+    ).toBeInTheDocument();
+    expect(calls(fetch)).not.toContain(PUT);
   });
 
   it("shows why an admin sent the jam back", async () => {
@@ -925,6 +964,15 @@ describe("the jam editor", () => {
   it("publishes once the checklist is complete, and saves the name in place", async () => {
     const fetch = editApi({
       ...complete(),
+      // Refetched after the move, for what may come next.
+      [`GET /api/events/${ID}`]: (n) => ({
+        status: 200,
+        body: page({
+          lat: 48.86,
+          lng: 2.35,
+          status: n === 0 ? "draft" : "in_review",
+        }),
+      }),
       [`POST /api/events/${ID}/submit`]: {
         status: 200,
         body: jam({ status: "in_review" }),
@@ -974,6 +1022,14 @@ describe("the jam editor", () => {
         status: 200,
         body: { ...LIL_G, role: "seed_admin" },
       },
+      // The API offers the team `publish` on top of what an organiser may do.
+      [`GET /api/events/${ID}`]: {
+        status: 200,
+        body: {
+          ...page({ lat: 48.86, lng: 2.35 }),
+          actions: ["submit", "publish", "cancel"],
+        },
+      },
       [`POST /api/events/${ID}/publish`]: {
         status: 200,
         body: jam({ status: "published" }),
@@ -1016,6 +1072,17 @@ describe("the jam editor", () => {
       screen.queryByRole("region", { name: "Ready to publish?" }),
     ).toBeNull();
     expect(screen.queryByRole("button", { name: /Publish/ })).toBeNull();
+    // It runs its course by its dates: there is no step to mark it done.
+    expect(
+      within(status).queryByRole("button", { name: /complete/i }),
+    ).toBeNull();
+    // A submitted jam keeps a battle: no Delete on its last one.
+    expect(
+      await screen.findByRole("button", { name: "Edit 1v1 Bboy" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Delete 1v1 Bboy" }),
+    ).toBeNull();
 
     // Edits to a live jam go public as soon as they save.
     await userEvent.click(

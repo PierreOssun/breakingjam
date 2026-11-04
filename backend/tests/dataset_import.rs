@@ -4,7 +4,6 @@ use breakingjam::{
     dataset::{import::insert_all, load},
     domain::{battle::BattleGender, dancer::default_look},
 };
-use chrono::NaiveDate;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -101,10 +100,9 @@ async fn imports_the_jams_that_pass_check(pool: PgPool) {
     fs::remove_dir_all(&dir).unwrap();
     assert!(unreadable.is_empty(), "{unreadable:?}");
     let owner = organizer(&pool).await;
-    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
 
     let mut tx = pool.begin().await.unwrap();
-    let imported = insert_all(&mut tx, &data, owner, today).await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner).await.unwrap();
     tx.commit().await.unwrap();
 
     assert_eq!(imported.events, 1);
@@ -119,7 +117,7 @@ async fn imports_the_jams_that_pass_check(pool: PgPool) {
     assert_eq!(events.len(), 1);
     assert_eq!(
         (events[0].name.as_str(), events[0].status.as_str()),
-        ("BC One 2023", "completed")
+        ("BC One 2023", "published")
     );
     assert_eq!(
         (events[0].lat, events[0].lng),
@@ -193,10 +191,9 @@ async fn a_jam_whose_dancer_dances_for_a_crew_with_a_broken_rule_is_left_out(poo
     fs::remove_dir_all(&dir).unwrap();
     assert!(unreadable.is_empty(), "{unreadable:?}");
     let owner = organizer(&pool).await;
-    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
 
     let mut tx = pool.begin().await.unwrap();
-    let imported = insert_all(&mut tx, &data, owner, today).await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner).await.unwrap();
     tx.commit().await.unwrap();
 
     assert_eq!(imported.events, 0);
@@ -225,10 +222,9 @@ async fn a_dancers_look_wins_over_their_battles(pool: PgPool) {
     fs::remove_dir_all(&dir).unwrap();
     assert!(unreadable.is_empty(), "{unreadable:?}");
     let owner = organizer(&pool).await;
-    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
 
     let mut tx = pool.begin().await.unwrap();
-    insert_all(&mut tx, &data, owner, today).await.unwrap();
+    insert_all(&mut tx, &data, owner).await.unwrap();
     tx.commit().await.unwrap();
 
     let looks = sqlx::query!(
@@ -279,10 +275,9 @@ korea = { name = "Team Korea", members = ["menno", "lee"] }
     fs::remove_dir_all(&dir).unwrap();
     assert!(unreadable.is_empty(), "{unreadable:?}");
     let owner = organizer(&pool).await;
-    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
 
     let mut tx = pool.begin().await.unwrap();
-    let imported = insert_all(&mut tx, &data, owner, today).await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner).await.unwrap();
     tx.commit().await.unwrap();
 
     assert_eq!(imported.events, 2);
@@ -351,10 +346,9 @@ results = [{ entrant = "storm", reached = "winner" }]
     fs::remove_dir_all(&dir).unwrap();
     assert!(unreadable.is_empty(), "{unreadable:?}");
     let owner = organizer(&pool).await;
-    let today = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
 
     let mut tx = pool.begin().await.unwrap();
-    let imported = insert_all(&mut tx, &data, owner, today).await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner).await.unwrap();
     tx.commit().await.unwrap();
 
     assert_eq!(imported.events, 2);
@@ -378,4 +372,61 @@ results = [{ entrant = "storm", reached = "winner" }]
             ("Solo Showcase", "showcase", Some(1)),
         ]
     );
+}
+
+/// A 2v2 whose winners are known by their team name only: the result is kept, as the import
+/// checks only the result rules the schema holds, not the member count (M26, after review).
+#[sqlx::test]
+async fn a_team_known_by_name_only_keeps_its_result(pool: PgPool) {
+    let dir = data_dir();
+    fs::write(
+        dir.join("events/bc-one/2006.toml"),
+        r#"name = "BC One 2006"
+starts_on = 2006-09-09
+timezone = "Europe/Amsterdam"
+city = "Rotterdam"
+country = "NL"
+
+[[battles]]
+key = "duo"
+name = "2v2"
+gender = "bboy"
+team_size = 2
+results = [
+  { entrant = "flow", reached = "winner" },
+  { entrant = "dutch", reached = "top2" },
+]
+
+[battles.teams]
+flow = { name = "Flow Mo" }
+dutch = { name = "Dutch Duo", members = ["menno", "lee"] }
+"#,
+    )
+    .unwrap();
+    let (data, unreadable) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    assert!(unreadable.is_empty(), "{unreadable:?}");
+    let owner = organizer(&pool).await;
+
+    let mut tx = pool.begin().await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner).await.unwrap();
+    tx.commit().await.unwrap();
+
+    assert!(
+        !imported.skipped.iter().any(|s| s.contains("2006")),
+        "{:?}",
+        imported.skipped
+    );
+    let results = sqlx::query!(
+        r#"select en.team_name as "team!", en.final_rank from entries en
+           join battles b on b.id = en.battle_id where b.name = '2v2' order by en.final_rank"#
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    let rows: Vec<(&str, Option<i32>)> = results
+        .iter()
+        .map(|r| (r.team.as_str(), r.final_rank))
+        .collect();
+    assert_eq!(rows, [("Flow Mo", Some(1)), ("Dutch Duo", Some(2))]);
 }

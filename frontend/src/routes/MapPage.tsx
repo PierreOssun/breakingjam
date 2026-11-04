@@ -116,8 +116,7 @@ export function MapPage() {
     }
     if (!all || country.isPending) return;
     framed.current = true;
-    const today = new Date();
-    const upcoming = all.filter((jam) => !isPast(jam, today));
+    const upcoming = all.filter((jam) => !isPast(jam));
     const box =
       (asked ? boundsOf(matching) : null) ??
       firstView(upcoming, country.data ?? null);

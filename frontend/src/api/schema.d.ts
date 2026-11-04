@@ -167,7 +167,10 @@ export interface paths {
         };
         /** One jam, by id or slug. */
         get: operations["get_event"];
-        /** Replace a jam's fields; slug and status never change here, and past draft the place stays. */
+        /**
+         * Replace a jam's fields; slug and status never change here, past draft the place stays, and
+         *     once public and over only the team may.
+         */
         put: operations["update_event"];
         post?: never;
         /** Soft-delete a jam. */
@@ -187,8 +190,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Move a jam along draft → in_review → published → registration_closed → completed, or
-         *     cancel it; the BreakingJam team publishes drafts without review.
+         * Move a jam along draft → in_review → published → registration_closed, or cancel it; the
+         *     BreakingJam team publishes drafts without review. `actions` on the jam says what is allowed.
          */
         post: operations["transition_event"];
         delete?: never;
@@ -347,7 +350,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The public jams a dancer competed in or worked at, split into upcoming and past. */
+        /** The public jams a dancer competed in or worked at, split into live, upcoming and past. */
         get: operations["dancer_events"];
         put?: never;
         post?: never;
@@ -435,7 +438,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** A jam's battles in display order. */
+        /** A jam's battles in display order, each with its entries. */
         get: operations["list_battles"];
         put?: never;
         /** Add a battle at the end; a blank name is generated. */
@@ -474,7 +477,7 @@ export interface paths {
         /** Replace a battle's fields (not its position). */
         put: operations["update_battle"];
         post?: never;
-        /** Delete a battle and its entries. */
+        /** Delete a battle and its entries; a jam past draft keeps at least one. */
         delete: operations["delete_battle"];
         options?: never;
         head?: never;
@@ -488,8 +491,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** A battle's entries with members and results. */
-        get: operations["list_entries"];
+        get?: never;
         put?: never;
         /** Register an entry; results may be set at once for past jams. */
         post: operations["create_entry"];
@@ -663,7 +665,7 @@ export interface paths {
             cookie?: never;
         };
         /** Jams waiting for an admin's approval, the soonest first. */
-        get: operations["list_jams_in_review"];
+        get: operations["list_events_in_review"];
         put?: never;
         post?: never;
         delete?: never;
@@ -681,8 +683,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Approve a jam in review: it goes public. */
-        post: operations["approve_jam"];
+        /** Approve a jam in review: it goes public, if it still passes the publish checklist. */
+        post: operations["approve_event"];
         delete?: never;
         options?: never;
         head?: never;
@@ -699,7 +701,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Send a jam in review back to draft, with a note for its organiser. */
-        post: operations["reject_jam"];
+        post: operations["reject_event"];
         delete?: never;
         options?: never;
         head?: never;
@@ -748,7 +750,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The organiser's public jams, split into upcoming and past. */
+        /** The organiser's public jams, split into live, upcoming and past. */
         get: operations["organizer_events"];
         put?: never;
         post?: never;
@@ -953,6 +955,11 @@ export interface components {
          * @enum {string}
          */
         BattleAge: "kids" | "adult" | "na";
+        /** @description A battle on the jam page, with its entries. */
+        BattleDetail: components["schemas"]["Battle"] & {
+            /** @description Its entries with members and results, oldest first. */
+            entries: components["schemas"]["Entry"][];
+        };
         /** @description Everything set when creating or editing a battle. */
         BattleFields: {
             /** @description Free text; blank means "generate from the structured fields". */
@@ -1188,8 +1195,6 @@ export interface components {
             dancer_name: string;
             /** @description Other names the dancer goes by. */
             aliases: string[];
-            /** @description Legal name, when shared. */
-            real_name?: string | null;
             /** @description Primary flag, ISO 3166-1 alpha-2. */
             country: string;
             /** @description Optional second flag. */
@@ -1229,9 +1234,11 @@ export interface components {
              */
             updated_at: string;
         };
-        /** @description Body of `GET /dancers/{id}/events`: upcoming by date, past most recent first. */
+        /** @description Body of `GET /dancers/{id}/events`: live and upcoming soonest first, past most recent first. */
         DancerEvents: {
-            /** @description Jams starting today or later, soonest first. */
+            /** @description Jams running today, soonest first. */
+            live: components["schemas"]["Participation"][];
+            /** @description Jams starting after today, soonest first. */
             upcoming: components["schemas"]["Participation"][];
             /** @description Earlier jams, most recent first. */
             past: components["schemas"]["Participation"][];
@@ -1242,8 +1249,6 @@ export interface components {
             dancer_name: string;
             /** @description Other names the dancer goes by, at most 10. */
             aliases?: string[];
-            /** @description Blank is stored as null. */
-            real_name?: string | null;
             /** @description Primary flag, ISO 3166-1 alpha-2. */
             country: string;
             /** @description Optional second flag. */
@@ -1447,6 +1452,8 @@ export interface components {
             description?: string | null;
             /** @description Where it is in its lifecycle. */
             status: components["schemas"]["EventStatus"];
+            /** @description Where it is in time, by its own calendar. */
+            phase: components["schemas"]["Phase"];
             /**
              * Format: date
              * @description First day, in the jam's timezone.
@@ -1582,18 +1589,27 @@ export interface components {
             country?: string | null;
             /** @description Where it is in its lifecycle. */
             status: components["schemas"]["EventStatus"];
+            /** @description Upcoming, live or past. */
+            phase: components["schemas"]["Phase"];
         };
-        /** @description A jam page: the jam, and whether the caller may edit it. */
+        /** @description A jam page: the jam, and what the caller may do with it. */
         EventResponse: components["schemas"]["Event"] & {
-            /** @description Whether the caller may edit it, change its status or delete it. */
+            /**
+             * @description Whether the caller may edit its details, flyer and lineup or delete it; no longer for its
+             *     organiser once it is public and over.
+             */
             can_edit: boolean;
+            /** @description Whether the caller may edit its battles, entries and results; still true once it is over. */
+            can_edit_battles: boolean;
+            /** @description The status changes the caller may make now. */
+            actions: components["schemas"]["Transition"][];
             organizer?: components["schemas"]["OrganizerRef"] | null;
         };
         /**
          * @description Lifecycle of a jam (§4 "Event status transitions").
          * @enum {string}
          */
-        EventStatus: "draft" | "in_review" | "published" | "registration_closed" | "completed" | "cancelled";
+        EventStatus: "draft" | "in_review" | "published" | "registration_closed" | "cancelled";
         /** @description One jam on the map. */
         Feature: {
             /** @description Always `Feature`. */
@@ -1672,6 +1688,8 @@ export interface components {
             ends_on: string;
             /** @description `published` or `registration_closed`. */
             status: components["schemas"]["EventStatus"];
+            /** @description Upcoming, live or past. */
+            phase: components["schemas"]["Phase"];
             /** @description City. */
             city: string;
             /** @description ISO 3166-1 alpha-2. */
@@ -1782,9 +1800,11 @@ export interface components {
             /** @description Who is asking. */
             user: components["schemas"]["ClaimUser"];
         };
-        /** @description Body of `GET /organizers/{id}/events`: upcoming soonest first, past most recent first. */
+        /** @description Body of `GET /organizers/{id}/events`: live and upcoming soonest first, past most recent first. */
         OrganizerEvents: {
-            /** @description Public jams starting today or later. */
+            /** @description Public jams running today. */
+            live: components["schemas"]["EventRef"][];
+            /** @description Public jams starting after today. */
             upcoming: components["schemas"]["EventRef"][];
             /** @description Earlier public jams, cancelled ones included. */
             past: components["schemas"]["EventRef"][];
@@ -1932,6 +1952,8 @@ export interface components {
                 description?: string | null;
                 /** @description Where it is in its lifecycle. */
                 status: components["schemas"]["EventStatus"];
+                /** @description Where it is in time, by its own calendar. */
+                phase: components["schemas"]["Phase"];
                 /**
                  * Format: date
                  * @description First day, in the jam's timezone.
@@ -1998,8 +2020,15 @@ export interface components {
         Page_EventResponse: {
             /** @description At most `limit` rows. */
             items: (components["schemas"]["Event"] & {
-                /** @description Whether the caller may edit it, change its status or delete it. */
+                /**
+                 * @description Whether the caller may edit its details, flyer and lineup or delete it; no longer for its
+                 *     organiser once it is public and over.
+                 */
                 can_edit: boolean;
+                /** @description Whether the caller may edit its battles, entries and results; still true once it is over. */
+                can_edit_battles: boolean;
+                /** @description The status changes the caller may make now. */
+                actions: components["schemas"]["Transition"][];
                 organizer?: components["schemas"]["OrganizerRef"] | null;
             })[];
             /** @description Pass as `?cursor=` for the next page; null on the last one. */
@@ -2037,6 +2066,11 @@ export interface components {
          * @enum {string}
          */
         ParticipationRole: "competitor" | "judge" | "dj" | "mc" | "organizer" | "other";
+        /**
+         * @description Where a jam is in time, by its own calendar: the `jam_phase` SQL function.
+         * @enum {string}
+         */
+        Phase: "upcoming" | "live" | "past";
         /** @description A city that "Near <Place>" centres on. */
         Place: {
             /** @description As GeoNames writes it, e.g. "Zürich". */
@@ -2099,11 +2133,11 @@ export interface components {
             /** @description The new role. */
             role: components["schemas"]["Role"];
         };
-        /** @description What the landing page counts; public jams are announced or completed, never cancelled. */
+        /** @description What the landing page counts: battles of announced jams, never cancelled ones. */
         SiteStats: {
             /**
              * Format: int64
-             * @description Battles of public jams that ended before today.
+             * @description Battles of jams that are over.
              */
             battles_past: number;
             /**
@@ -2113,7 +2147,7 @@ export interface components {
             dancers: number;
             /**
              * Format: int64
-             * @description Battles of public jams that end today or later.
+             * @description Battles of jams upcoming or live, so both counts add up to every battle.
              */
             battles_upcoming: number;
             /**
@@ -2150,12 +2184,12 @@ export interface components {
         Stats: {
             /**
              * Format: int64
-             * @description Public jams still to come or running.
+             * @description Announced jams still to come or running.
              */
             jams_upcoming: number;
             /**
              * Format: int64
-             * @description Public jams that are over, completed or not.
+             * @description Announced jams that are over.
              */
             jams_past: number;
             /**
@@ -2219,6 +2253,11 @@ export interface components {
              */
             organizer_claims_pending: number;
         };
+        /**
+         * @description An explicit status change: the last segment of `POST /events/{id}/{transition}`.
+         * @enum {string}
+         */
+        Transition: "submit" | "publish" | "close-registration" | "cancel";
         /** @description The logged-in account, as returned by register, login and me. */
         UserResponse: {
             /**
@@ -2447,12 +2486,6 @@ export interface operations {
             query?: {
                 /** @description Only jams in this status. */
                 status?: components["schemas"]["EventStatus"];
-                /** @description Only jams in this country (ISO 3166-1 alpha-2). */
-                country?: string;
-                /** @description Only jams still running on or after this date. */
-                from?: string;
-                /** @description Only jams starting on or before this date. */
-                to?: string;
                 /** @description `true` lists the caller's own jams, drafts included (organiser list page). */
                 mine?: boolean;
                 /** @description `next_cursor` of the previous page. */
@@ -2636,7 +2669,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Invalid fields, or a jam past draft losing its city, country or pin (`place`) */
+            /** @description The jam is public and over: only its battles and results change */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields, an unknown timezone, or a jam past draft losing its city, country or pin (`place`) */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -2693,6 +2735,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description The jam is public and over: only its battles and results change */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
     transition_event: {
@@ -2702,8 +2753,8 @@ export interface operations {
             path: {
                 /** @description Jam id */
                 id: string;
-                /** @description `publish` is for `seed_admin`+; cancel is allowed from any status but completed */
-                transition: "submit" | "publish" | "close-registration" | "complete" | "cancel";
+                /** @description `publish` is for `seed_admin`+; cancel is allowed from any status but cancelled */
+                transition: "submit" | "publish" | "close-registration" | "cancel";
             };
             cookie?: never;
         };
@@ -2744,7 +2795,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description The current status does not allow it */
+            /** @description The current status does not allow it, or the jam is public and over */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -2919,6 +2970,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description The jam is public and over: only its battles and results change */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description Invalid fields */
             422: {
                 headers: {
@@ -2970,6 +3030,15 @@ export interface operations {
             };
             /** @description No such jam, or a draft you can't see */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The jam is public and over: only its battles and results change */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3305,10 +3374,7 @@ export interface operations {
     };
     dancer_events: {
         parameters: {
-            query?: {
-                /** @description Only one of the two lists; both when absent. */
-                scope?: "upcoming" | "past";
-            };
+            query?: never;
             header?: never;
             path: {
                 /** @description Dancer id */
@@ -3486,7 +3552,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Below `organizer` */
+            /** @description Below `seed_admin` */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3543,7 +3609,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Below `organizer` */
+            /** @description Below `seed_admin` */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3596,7 +3662,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Below `organizer` */
+            /** @description Below `seed_admin` */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3655,7 +3721,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Below `organizer` */
+            /** @description Below `seed_admin` */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3692,7 +3758,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Battle"][];
+                    "application/json": components["schemas"]["BattleDetail"][];
                 };
             };
             /** @description No such jam, or a draft you can't see */
@@ -3789,7 +3855,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Battle"][];
+                    "application/json": components["schemas"]["BattleDetail"][];
                 };
             };
             /** @description No valid session */
@@ -3938,30 +4004,8 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-        };
-    };
-    list_entries: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Battle id */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Entry"][];
-                };
-            };
-            /** @description No such battle, or its jam is a draft you can't see */
-            404: {
+            /** @description The last battle of a jam past draft (`battles`) */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4236,6 +4280,15 @@ export interface operations {
             };
             /** @description No such jam, or a draft you can't see */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The jam is public and over: only its battles and results change */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4600,7 +4653,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Already merged, or `{id}` is verified */
+            /** @description Already merged, `{id}` is verified, or both are in different active entries of one battle */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -4682,7 +4735,7 @@ export interface operations {
             };
         };
     };
-    list_jams_in_review: {
+    list_events_in_review: {
         parameters: {
             query?: {
                 /** @description `next_cursor` of the previous page. */
@@ -4733,7 +4786,7 @@ export interface operations {
             };
         };
     };
-    approve_jam: {
+    approve_event: {
         parameters: {
             query?: never;
             header?: never;
@@ -4789,9 +4842,18 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description The venue left the map or the battles are gone; `fields` names `place` and `battles` */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
-    reject_jam: {
+    reject_event: {
         parameters: {
             query?: never;
             header?: never;
@@ -5230,7 +5292,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Already reviewed, or the handle changed since */
+            /** @description Already reviewed, the handle changed since, or another verified account holds it */
             409: {
                 headers: {
                     [name: string]: unknown;

@@ -49,7 +49,7 @@ export function OrgJamsPage({ starting = false }: { starting?: boolean }) {
           <JamRow
             jam={jam}
             to={`/org/jams/${jam.id}/edit`}
-            trailing={<StatusBadge status={jam.status} />}
+            trailing={<StatusBadge jam={jam} />}
           />
         )}
       </MoreList>

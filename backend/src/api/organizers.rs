@@ -1,9 +1,6 @@
 //! `/organizers`: the organiser page, its edits, and Instagram verification (M12c).
 
-use axum::{
-    Json,
-    extract::{Path, Query, State},
-};
+use axum::{Json, extract::State};
 use serde::Serialize;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -11,7 +8,7 @@ use uuid::Uuid;
 
 use super::{
     claims::QueueQuery,
-    json::ValidJson,
+    extract::{Path, Query, ValidJson},
     page::{self, Page},
 };
 use crate::{
@@ -20,6 +17,7 @@ use crate::{
     domain::{
         claim::ClaimStatus,
         dancer::EventRef,
+        event::by_phase,
         organizer::{Organizer, OrganizerClaim, OrganizerClaimForReview, OrganizerFields},
         user::Role,
     },
@@ -48,10 +46,12 @@ pub struct OrganizerResponse {
     pub can_edit: bool,
 }
 
-/// Body of `GET /organizers/{id}/events`: upcoming soonest first, past most recent first.
+/// Body of `GET /organizers/{id}/events`: live and upcoming soonest first, past most recent first.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct OrganizerEvents {
-    /// Public jams starting today or later.
+    /// Public jams running today.
+    pub live: Vec<EventRef>,
+    /// Public jams starting after today.
     pub upcoming: Vec<EventRef>,
     /// Earlier public jams, cancelled ones included.
     pub past: Vec<EventRef>,
@@ -119,7 +119,7 @@ async fn update(
     }))
 }
 
-/// The organiser's public jams, split into upcoming and past.
+/// The organiser's public jams, split into live, upcoming and past.
 #[utoipa::path(
     get,
     path = "/organizers/{id}/events",
@@ -138,14 +138,12 @@ async fn events(
     db::organizers::find(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    let (upcoming, past): (Vec<_>, Vec<_>) = db::organizers::events(&state.pool, id)
-        .await?
-        .into_iter()
-        .partition(|(_, upcoming)| *upcoming);
+    let rows = db::organizers::events(&state.pool, id).await?;
+    let [live, upcoming, past] = by_phase(rows, |e| e.phase);
     Ok(Json(OrganizerEvents {
-        upcoming: upcoming.into_iter().map(|(event, _)| event).collect(),
-        // Rows come oldest first; the past list reads most recent first.
-        past: past.into_iter().rev().map(|(event, _)| event).collect(),
+        live,
+        upcoming,
+        past,
     }))
 }
 
@@ -255,7 +253,7 @@ async fn queue(
         Unauthorized,
         NotAdmin,
         (status = NOT_FOUND, description = "No such claim", body = ErrorEnvelope),
-        (status = CONFLICT, description = "Already reviewed, or the handle changed since", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Already reviewed, the handle changed since, or another verified account holds it", body = ErrorEnvelope),
     )
 )]
 async fn approve(
@@ -304,10 +302,21 @@ async fn decide(
     if claim.status != ClaimStatus::Pending {
         return Err(AppError::Conflict("this claim was already reviewed".into()));
     }
-    if decision == ClaimStatus::Approved && !db::organizers::verify(&mut tx, &claim).await? {
-        return Err(AppError::Conflict(
-            "the Instagram handle changed since this request".into(),
-        ));
+    if decision == ClaimStatus::Approved {
+        // Verification reserves the handle: another verified account may already hold it.
+        let verified = db::organizers::verify(&mut tx, &claim)
+            .await
+            .map_err(|err| match AppError::from(err) {
+                AppError::Conflict(_) => AppError::Conflict(
+                    "another verified account holds this Instagram handle".into(),
+                ),
+                other => other,
+            })?;
+        if !verified {
+            return Err(AppError::Conflict(
+                "the Instagram handle changed since this request".into(),
+            ));
+        }
     }
     let claim = db::organizers::decide_claim(&mut tx, id, decision, current.user.id).await?;
     tx.commit().await?;

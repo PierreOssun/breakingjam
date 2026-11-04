@@ -1,10 +1,10 @@
 {
   "nav": {
     "home": "Accueil BreakingJam",
-    "findJam": "Trouver une jam",
+    "findJam": "Trouver un jam",
     "findSomeone": "Trouver quelqu'un",
     "myJams": "Mes jams",
-    "registerJam": "Inscrire une jam",
+    "registerJam": "Inscrire un jam",
     "logIn": "Se connecter",
     "logOut": "Se déconnecter",
     "openMenu": "Ouvrir le menu",
@@ -94,15 +94,15 @@
     "map": "Carte des jams",
     "people": "Trouver quelqu'un",
     "orgJams": "Vos jams",
-    "orgJamNew": "Inscrire une jam",
-    "orgJamEdit": "Modifier la jam",
-    "jams": "Trouver une jam",
+    "orgJamNew": "Inscrire un jam",
+    "orgJamEdit": "Modifier le jam",
+    "jams": "Trouver un jam",
     "search": "Recherche",
     "contact": "Contact"
   },
   "notFound": {
     "title": "Page introuvable",
-    "body": "Ce lien ne mène nulle part. La carte a toutes les jams.",
+    "body": "Ce lien ne mène nulle part. La carte a tous les jams.",
     "action": "Retour à l’accueil"
   },
   "errors": {
@@ -129,7 +129,7 @@
       "countries_one": "pays",
       "countries_other": "pays"
     },
-    "heading": "Trouvez votre prochaine jam",
+    "heading": "Trouvez votre prochain jam",
     "search": "Chercher des jams et des personnes",
     "searchPlaceholder": "Jam, ville, battle, bgirl, bboy, DJ…",
     "searchSubmit": "Rechercher",
@@ -138,10 +138,10 @@
   "status": {
     "draft": "Brouillon",
     "in_review": "En vérification",
-    "published": "Publiée",
+    "published": "Publié",
     "registration_closed": "Inscriptions closes",
-    "completed": "Terminée",
-    "cancelled": "Annulée"
+    "past": "Passé",
+    "cancelled": "Annulé"
   },
   "jam": {
     "backToMap": "Carte",
@@ -166,7 +166,7 @@
     },
     "organiser": "Organisation",
     "contact": "Contacter",
-    "edit": "Modifier la jam",
+    "edit": "Modifier le jam",
     "website": "Site web",
     "email": "E-mail",
     "battleStart": "Début {{when}}",
@@ -193,17 +193,17 @@
     },
     "calendar": "Ajouter au calendrier",
     "results": "Voir les résultats",
-    "shareJam": "Partager cette jam",
+    "shareJam": "Partager ce jam",
     "caption": {
       "open": "Inscriptions ouvertes",
       "closed": "Inscriptions closes",
-      "cancelled": "Cette jam est annulée."
+      "cancelled": "Ce jam est annulé."
     },
     "when": "Quand",
     "where": "Où",
     "info": "Infos",
     "directions": "Itinéraire",
-    "moreJams": "Les prochaines jams",
+    "moreJams": "Les prochains jams",
     "seeMap": "Voir la carte",
     "organiserJams_one": "{{count}} jam sur BreakingJam",
     "organiserJams_other": "{{count}} jams sur BreakingJam",
@@ -224,10 +224,11 @@
   "dancer": {
     "aka": "alias {{names}}",
     "verified": "Vérifié",
+    "live": "En direct",
     "upcoming": "À venir",
-    "past": "Passées",
-    "noUpcoming": "Aucune jam à venir.",
-    "noPast": "Aucune jam passée pour l’instant — les orgas ajoutent les résultats après la jam.",
+    "past": "Passés",
+    "noUpcoming": "Aucun jam à venir.",
+    "noPast": "Aucun jam passé pour l’instant — les orgas ajoutent les résultats après le jam.",
     "showMore": "Voir plus ({{count}})",
     "back": "Retour",
     "stats": {
@@ -277,7 +278,7 @@
     "battles": "Battles",
     "weekend": "Ce week-end",
     "month": "30 prochains jours",
-    "past": "Jams passées",
+    "past": "Jams passés",
     "categories": {
       "one_v_one": "1v1",
       "two_v_two": "2v2",
@@ -293,7 +294,7 @@
     "inArea_one": "{{count}} jam dans cette zone",
     "inArea_other": "{{count}} jams dans cette zone",
     "emptyTitle": "Pas encore de jam ici",
-    "emptyBody": "Dézoomez ou effacez vos filtres. Vous en organisez une ? Mettez-la sur la carte.",
+    "emptyBody": "Dézoomez ou effacez vos filtres. Vous en organisez un ? Mettez-le sur la carte.",
     "list": "Liste",
     "backToMap": "Carte",
     "locate": "Afficher ma position",
@@ -302,10 +303,10 @@
     "zoomIn": "Zoom avant",
     "zoomOut": "Zoom arrière",
     "close": "Fermer",
-    "viewJam": "Voir la jam",
+    "viewJam": "Voir le jam",
     "cluster_one": "{{count}} jam ici, zoomer",
     "cluster_other": "{{count}} jams ici, zoomer",
-    "loadError": "Les jams n’ont pas pu être chargées. Rechargez la page pour réessayer."
+    "loadError": "Les jams n’ont pas pu être chargés. Rechargez la page pour réessayer."
   },
   "dialog": {
     "close": "Fermer",
@@ -337,18 +338,18 @@
     "ownPageTaken": "Ce compte a déjà une page."
   },
   "org": {
-    "newIntro": "Elle reste en brouillon, visible par vous seul·e, jusqu’à sa publication.",
+    "newIntro": "Il reste en brouillon, visible par vous seul·e, jusqu’à sa publication.",
     "showMore": "Voir plus",
     "empty": {
       "title": "Pas encore de jam",
-      "body": "Enregistrez votre première jam. Elle reste en brouillon jusqu’à sa publication."
+      "body": "Enregistrez votre premier jam. Il reste en brouillon jusqu’à sa publication."
     },
     "fields": {
-      "name": "Nom de la jam",
+      "name": "Nom du jam",
       "startsOn": "Premier jour",
       "endsOn": "Dernier jour",
       "timezone": "Fuseau horaire",
-      "timezoneHint": "Celui du lieu de la jam.",
+      "timezoneHint": "Celui du lieu du jam.",
       "venue": "Lieu",
       "address": "Adresse",
       "city": "Ville",
@@ -360,54 +361,52 @@
       "instagramUrl": "Page Instagram",
       "websiteUrl": "Site web",
       "contactEmail": "E-mail de contact",
-      "contactEmailHint": "Public : affiché sur la page de la jam pour que les danseur·ses puissent vous écrire.",
-      "endsOnHint": "Laissez vide pour une jam d’une journée.",
+      "contactEmailHint": "Public : affiché sur la page du jam pour que les danseur·ses puissent vous écrire.",
+      "endsOnHint": "Laissez vide pour un jam d’une journée.",
       "opensAt": "Ouverture",
       "closesAt": "Fin"
     },
     "status": {
       "title": "Statut",
       "explain": {
-        "published": "Sur la carte et ouverte aux inscriptions.",
+        "published": "Sur la carte et ouvert aux inscriptions.",
         "registration_closed": "Sur la carte ; les inscriptions sont closes.",
-        "completed": "Elle a eu lieu. Notez les résultats dans les battles ci-dessous.",
-        "cancelled": "Annulée. Sa page l’indique.",
-        "in_review": "Un·e admin BreakingJam la vérifie. Elle apparaît sur la carte une fois approuvée ; vous pouvez continuer à la modifier en attendant."
+        "past": "Il a eu lieu. Notez les résultats dans les battles ci-dessous.",
+        "cancelled": "Annulé. Sa page l’indique.",
+        "in_review": "Un·e admin BreakingJam le vérifie. Il apparaît sur la carte une fois approuvé ; vous pouvez continuer à le modifier en attendant."
       },
       "action": {
         "close-registration": "Clore les inscriptions",
-        "complete": "Marquer comme terminée",
-        "cancel": "Annuler la jam"
+        "cancel": "Annuler le jam"
       },
       "done": {
-        "publish": "Publiée. Elle est sur la carte.",
+        "publish": "Publié. Il est sur la carte.",
         "close-registration": "Inscriptions closes.",
-        "complete": "Marquée comme terminée.",
-        "cancel": "Jam annulée.",
-        "submit": "Envoyée. Un·e admin BreakingJam la vérifiera bientôt."
+        "cancel": "Jam annulé.",
+        "submit": "Envoyé. Un·e admin BreakingJam le vérifiera bientôt."
       },
-      "cancelTitle": "Annuler cette jam ?",
-      "cancelBody": "« {{name}} » apparaîtra comme annulée. Impossible de revenir en arrière.",
-      "delete": "Supprimer la jam",
-      "deleteTitle": "Supprimer cette jam ?",
+      "cancelTitle": "Annuler ce jam ?",
+      "cancelBody": "« {{name}} » apparaîtra comme annulé. Impossible de revenir en arrière.",
+      "delete": "Supprimer le jam",
+      "deleteTitle": "Supprimer ce jam ?",
       "deleteBody": "« {{name}} » disparaît de la carte et des pages des danseur·ses.",
-      "deleted": "Jam supprimée.",
-      "keep": "La garder",
+      "deleted": "Jam supprimé.",
+      "keep": "Le garder",
       "sentBack": "Renvoyé par BreakingJam : {{note}}"
     },
     "battles": {
-      "add": "Ajouter une battle",
-      "addAction": "Ajouter la battle",
-      "edit": "Modifier la battle",
+      "add": "Ajouter un battle",
+      "addAction": "Ajouter le battle",
+      "edit": "Modifier le battle",
       "editOne": "Modifier {{name}}",
       "deleteOne": "Supprimer {{name}}",
       "moveUp": "Monter {{name}}",
       "moveDown": "Descendre {{name}}",
-      "saved": "Battle enregistrée.",
-      "deleted": "Battle supprimée.",
-      "deleteTitle": "Supprimer cette battle ?",
+      "saved": "Battle enregistré.",
+      "deleted": "Battle supprimé.",
+      "deleteTitle": "Supprimer ce battle ?",
       "deleteBody": "« {{name}} » et toutes ses inscriptions seront supprimées.",
-      "deleteConfirm": "Supprimer la battle",
+      "deleteConfirm": "Supprimer le battle",
       "format": "Format",
       "formats": {
         "seven_to_smoke": "Seven to smoke",
@@ -513,10 +512,10 @@
       },
       "finalRank": "Place exacte",
       "finalRankHint": "Par ex. 3 s’il y a eu une petite finale.",
-      "video": "Vidéo de la battle",
-      "videoHint": "Un lien YouTube ; la vidéo se lit sur les pages de la jam et des danseur·ses.",
+      "video": "Vidéo du battle",
+      "videoHint": "Un lien YouTube ; la vidéo se lit sur les pages du jam et des danseur·ses.",
       "videoStart": "Commence à",
-      "videoStartHint": "Pour un live : où commence cette battle, par ex. 1:02:03.",
+      "videoStartHint": "Pour un live : où commence ce battle, par ex. 1:02:03.",
       "addDancer": "Ajouter un·e danseur·se",
       "addTeam": "Ajouter une équipe"
     },
@@ -559,8 +558,8 @@
       "uploaded": "Importé"
     },
     "start": {
-      "intro": "Deux choses pour commencer. Vous remplissez le reste sur la page de la jam.",
-      "create": "Créer la page de la jam"
+      "intro": "Deux choses pour commencer. Vous remplissez le reste sur la page du jam.",
+      "create": "Créer la page du jam"
     },
     "editor": {
       "editing": "Édition",
@@ -608,7 +607,7 @@
       },
       "add": "Ajouter",
       "private": "D’ici là, vous seul·e voyez cette page.",
-      "review": "Un admin BreakingJam la vérifie avant qu’elle n’apparaisse sur la carte.",
+      "review": "Un admin BreakingJam le vérifie avant qu’il n’apparaisse sur la carte.",
       "team": "En tant qu’équipe BreakingJam, vous publiez directement.",
       "missing_one": "Encore une chose avant que votre jam n’apparaisse sur la carte.",
       "missing_other": "Encore {{count}} choses avant que votre jam n’apparaisse sur la carte.",
@@ -624,7 +623,7 @@
       "tapHint": "Touchez la carte pour poser l’épingle",
       "fromAddress": "Rempli d’après l’adresse",
       "attribution": "Recherche de lieux par Photon · © contributeurs OpenStreetMap",
-      "pin": "Lieu de la jam"
+      "pin": "Lieu du jam"
     }
   },
   "verify": {
@@ -735,7 +734,7 @@
     "overview": {
       "tab": "Vue d’ensemble",
       "jams": "Jams à venir",
-      "jamsDetail": "{{past}} passées · {{draft}} brouillons · {{cancelled}} annulées",
+      "jamsDetail": "{{past}} passés · {{draft}} brouillons · {{cancelled}} annulés",
       "dancers": "Danseur·ses",
       "dancersDetail": "{{verified}} vérifié·es · {{instagram}} avec Instagram",
       "organizers": "Organisateur·ices",
@@ -754,16 +753,16 @@
     "jams": {
       "tab": "Jams",
       "title": "Jams à vérifier",
-      "intro": "Vérifiez que chaque jam est réelle (son Instagram, ses dates, son lieu) avant qu’elle apparaisse sur la carte. Pour en renvoyer une, il faut une note : son organisateur·ice la voit dans l’éditeur de la jam.",
-      "none": "Aucune jam en attente.",
+      "intro": "Vérifiez que chaque jam est réel (son Instagram, ses dates, son lieu) avant qu’il apparaisse sur la carte. Pour en renvoyer un, il faut une note : son organisateur·ice la voit dans l’éditeur du jam.",
+      "none": "Aucun jam en attente.",
       "by": "Par",
       "approve": "Approuver",
       "sendBack": "Renvoyer",
       "approved": "{{name}} est sur la carte.",
-      "sentBack": "{{name}} a été renvoyée à son organisateur·ice.",
+      "sentBack": "{{name}} a été renvoyé à son organisateur·ice.",
       "sendBackTitle": "Renvoyer {{name}} ?",
       "note": "Que doit changer l’organisateur·ice ?",
-      "noteHint": "Visible dans l’éditeur de la jam."
+      "noteHint": "Visible dans l’éditeur du jam."
     }
   },
   "organizer": {
@@ -774,10 +773,10 @@
     "nameHint": "Affiché sur vos jams : le vôtre, ou celui de votre crew ou association.",
     "handleTaken": "Ce compte Instagram est déjà sur une autre page d’organisation.",
     "newHandle": "Un nouveau compte doit être revérifié : la coche disparaît jusqu’à notre vérification.",
-    "whyHandle": "Ajoutez votre Instagram, puis vérifiez-le : les danseur·ses verront que la jam est bien la vôtre.",
+    "whyHandle": "Ajoutez votre Instagram, puis vérifiez-le : les danseur·ses verront que le jam est bien le vôtre.",
     "verify": "Vérifier Instagram",
     "noUpcoming": "Pas de jam à venir.",
-    "noPast": "Pas encore de jam passée."
+    "noPast": "Pas encore de jam passé."
   },
   "people": {
     "search": "Nom, alias ou @compte",
@@ -793,7 +792,7 @@
     "near": {
       "title": "Près de {{place}}",
       "closest": "Pas encore de jam à {{place}}. Voici les plus proches.",
-      "none": "Aucune jam à venir à moins de {{km}} km de {{place}}.",
+      "none": "Aucun jam à venir à moins de {{km}} km de {{place}}.",
       "openMap": "Ouvrir la carte autour de {{place}}"
     },
     "nothing": "Rien ne correspond à « {{q}} »."
@@ -801,7 +800,7 @@
   "jams": {
     "count_one": "{{count}} jam",
     "count_other": "{{count}} jams",
-    "empty": "Aucune jam ne correspond à votre recherche et à vos filtres.",
+    "empty": "Aucun jam ne correspond à votre recherche et à vos filtres.",
     "showMore": "Voir plus"
   },
   "contact": {
@@ -828,7 +827,7 @@
       },
       "fix": {
         "title": "Une info erronée",
-        "body": "Une mauvaise date, un battle manquant, un résultat à corriger ? Envoyez le lien de la jam ou de la page danseur·se.",
+        "body": "Une mauvaise date, un battle manquant, un résultat à corriger ? Envoyez le lien du jam ou de la page danseur·se.",
         "subject": "Correction :"
       },
       "hello": {

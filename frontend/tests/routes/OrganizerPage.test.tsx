@@ -21,7 +21,7 @@ const ORGANIZER = {
   verified_at: at,
   can_edit: false,
 };
-const jam = (n: number, startsOn: string, status: string) => ({
+const jam = (n: number, startsOn: string, status: string, phase: string) => ({
   id: `jam-${n}`,
   name: `Jam ${n}`,
   slug: `jam-${n}`,
@@ -30,14 +30,16 @@ const jam = (n: number, startsOn: string, status: string) => ({
   city: "Paris",
   country: "FR",
   status,
+  phase,
 });
 const EVENTS = {
   status: 200,
   body: {
-    upcoming: [jam(1, "2030-06-01", "published")],
+    live: [],
+    upcoming: [jam(1, "2030-06-01", "published", "upcoming")],
     past: [
-      jam(2, "2025-06-01", "completed"),
-      jam(3, "2024-06-01", "cancelled"),
+      jam(2, "2025-06-01", "published", "past"),
+      jam(3, "2024-06-01", "cancelled", "past"),
     ],
   },
 };
@@ -75,13 +77,15 @@ describe("OrganizerPage", () => {
         name: "Floor Lords e.V.",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "Verified" })).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "France" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "@floor.lords" })).toHaveAttribute(
+    // The jams load beside the page and carry flags too: look at the card alone.
+    const card = within(screen.getByRole("complementary"));
+    expect(card.getByRole("img", { name: "Verified" })).toBeInTheDocument();
+    expect(card.getByRole("img", { name: "France" })).toBeInTheDocument();
+    expect(card.getByRole("link", { name: "@floor.lords" })).toHaveAttribute(
       "href",
       "https://instagram.com/floor.lords",
     );
-    expect(screen.getByText("Jams in Paris since 2012.")).toBeInTheDocument();
+    expect(card.getByText("Jams in Paris since 2012.")).toBeInTheDocument();
 
     const past = screen
       .getByRole("heading", { name: "Past" })
@@ -91,6 +95,7 @@ describe("OrganizerPage", () => {
       "/jams/jam-2",
       "/jams/jam-3",
     ]);
+    expect(within(rows[0]!).getByText("Past")).toBeInTheDocument();
     expect(within(rows[1]!).getByText("Cancelled")).toBeInTheDocument();
     // Visitors get no actions.
     expect(screen.queryByRole("button", { name: "Edit page" })).toBeNull();

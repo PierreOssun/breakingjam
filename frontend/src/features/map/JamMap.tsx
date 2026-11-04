@@ -327,7 +327,7 @@ function JamMarker({
   // §7: a past jam is a smaller grey dot, so the upcoming ones stand out.
   const dot = selected
     ? "size-7 border-marker-ring bg-primary shadow-selected"
-    : isPast(jam, new Date())
+    : isPast(jam)
       ? "size-3.5 border-bg bg-border-strong"
       : "size-5 border-marker-ring bg-primary shadow-sm";
   return (

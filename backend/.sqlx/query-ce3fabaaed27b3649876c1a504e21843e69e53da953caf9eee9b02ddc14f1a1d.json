@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into entries (id, battle_id, reached, final_rank, video_url, video_offset_seconds)\n             values ($1, $2, $3::text::bracket_stage, $4, $5, $6)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Int4",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ce3fabaaed27b3649876c1a504e21843e69e53da953caf9eee9b02ddc14f1a1d"
+}

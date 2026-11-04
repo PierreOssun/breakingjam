@@ -1,17 +1,15 @@
 //! Battles, entries and staff of a jam. Readable like the jam; writable by the jam's writers.
 
-use axum::{
-    Json,
-    extract::{Path, State},
-    http::StatusCode,
-};
+use axum::{Json, extract::State, http::StatusCode};
+use serde::Serialize;
 use sqlx::PgConnection;
+use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use super::{
-    events::{readable, writable},
-    json::ValidJson,
+    events::{editable, readable, writable},
+    extract::{Path, ValidJson},
     transaction,
 };
 use crate::{
@@ -22,9 +20,11 @@ use crate::{
             Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, MAX_BATTLES,
             StaffList, StaffMember, starts_during,
         },
-        event::Event,
+        event::{Event, EventStatus},
     },
-    error::{AppError, ErrorEnvelope, InvalidFields, JamNotVisible, NotJamWriter, Unauthorized},
+    error::{
+        AppError, ErrorEnvelope, InvalidFields, JamNotVisible, JamOver, NotJamWriter, Unauthorized,
+    },
     state::AppState,
 };
 
@@ -34,12 +34,22 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list, create))
         .routes(routes!(reorder))
         .routes(routes!(update, remove))
-        .routes(routes!(list_entries, create_entry))
+        .routes(routes!(create_entry))
         .routes(routes!(update_entry, remove_entry))
         .routes(routes!(list_staff, replace_staff))
 }
 
-/// A jam's battles in display order.
+/// A battle on the jam page, with its entries.
+#[derive(Debug, Serialize, ToSchema)]
+pub struct BattleDetail {
+    /// The battle itself.
+    #[serde(flatten)]
+    pub battle: Battle,
+    /// Its entries with members and results, oldest first.
+    pub entries: Vec<Entry>,
+}
+
+/// A jam's battles in display order, each with its entries.
 #[utoipa::path(
     get,
     path = "/events/{id}/battles",
@@ -48,7 +58,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     params(("id" = Uuid, Path, description = "Jam id")),
     security((), ("session" = [])),
     responses(
-        (status = OK, body = Vec<Battle>),
+        (status = OK, body = Vec<BattleDetail>),
         JamNotVisible,
     )
 )]
@@ -56,9 +66,24 @@ async fn list(
     State(state): State<AppState>,
     current: MaybeUser,
     Path(event_id): Path<Uuid>,
-) -> Result<Json<Vec<Battle>>, AppError> {
+) -> Result<Json<Vec<BattleDetail>>, AppError> {
     readable(&state, &current, &event_id.to_string()).await?;
-    Ok(Json(db::battles::list(&state.pool, event_id).await?))
+    Ok(Json(details(&state, event_id).await?))
+}
+
+/// A jam's battles in display order, each with its entries.
+async fn details(state: &AppState, event_id: Uuid) -> Result<Vec<BattleDetail>, AppError> {
+    let mut conn = state.pool.acquire().await?;
+    let battles = db::battles::list(&mut *conn, event_id).await?;
+    let ids: Vec<Uuid> = battles.iter().map(|b| b.id).collect();
+    let mut entries = db::battles::entries_of(&mut conn, &ids).await?;
+    Ok(battles
+        .into_iter()
+        .map(|battle| BattleDetail {
+            entries: entries.remove(&battle.id).unwrap_or_default(),
+            battle,
+        })
+        .collect())
 }
 
 /// Add a battle at the end; a blank name is generated.
@@ -84,11 +109,19 @@ async fn create(
     Path(event_id): Path<Uuid>,
     ValidJson(fields): ValidJson<BattleFields>,
 ) -> Result<(StatusCode, Json<Battle>), AppError> {
-    let event = writable(&state, &current, event_id).await?;
+    writable(&state, &current, event_id).await?;
+    let mut tx = state.pool.begin().await?;
+    // Locked, so the days, the cap and the next position hold until the battle is in.
+    let event = lock_jam(&mut tx, event_id).await?;
     check_start(&fields, &event)?;
-    check_room(&state, event_id).await?;
-    let battle =
-        db::battles::insert(&state.pool, event_id, &fields.display_name(), &fields).await?;
+    if db::battles::list(&mut *tx, event_id).await?.len() >= MAX_BATTLES {
+        return Err(AppError::invalid(
+            "battles",
+            &format!("a jam has at most {MAX_BATTLES} battles"),
+        ));
+    }
+    let battle = db::battles::insert(&mut *tx, event_id, &fields.display_name(), &fields).await?;
+    tx.commit().await?;
     Ok((StatusCode::CREATED, Json(battle)))
 }
 
@@ -115,13 +148,17 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<BattleFields>,
 ) -> Result<Json<Battle>, AppError> {
-    let (_, event) = writable_battle(&state, &current, id).await?;
+    let (battle, _) = writable_battle(&state, &current, id).await?;
+    let mut tx = state.pool.begin().await?;
+    // Locked, so the jam's days can't move from under the start checked here.
+    let event = lock_jam(&mut tx, battle.event_id).await?;
     check_start(&fields, &event)?;
-    let battle = db::battles::update(&state.pool, id, &fields.display_name(), &fields).await?;
+    let battle = db::battles::update(&mut *tx, id, &fields.display_name(), &fields).await?;
+    tx.commit().await?;
     Ok(Json(battle))
 }
 
-/// Delete a battle and its entries.
+/// Delete a battle and its entries; a jam past draft keeps at least one.
 #[utoipa::path(
     delete,
     path = "/battles/{id}",
@@ -134,6 +171,7 @@ async fn update(
         Unauthorized,
         NotJamWriter,
         (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "The last battle of a jam past draft (`battles`)", body = ErrorEnvelope),
     )
 )]
 async fn remove(
@@ -141,8 +179,19 @@ async fn remove(
     current: CurrentUser,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, AppError> {
-    writable_battle(&state, &current, id).await?;
-    db::battles::delete(&state.pool, id).await?;
+    let (battle, _) = writable_battle(&state, &current, id).await?;
+    let mut tx = state.pool.begin().await?;
+    let event = lock_jam(&mut tx, battle.event_id).await?;
+    // The publish checklist holds past draft: a submitted jam keeps a battle (M24).
+    let last = db::battles::list(&mut *tx, event.id).await?.len() <= 1;
+    if last && event.status != EventStatus::Draft {
+        return Err(AppError::invalid(
+            "battles",
+            "a submitted jam keeps at least one battle",
+        ));
+    }
+    db::battles::delete(&mut *tx, id).await?;
+    tx.commit().await?;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -156,7 +205,7 @@ async fn remove(
     request_body = BattleOrder,
     security(("session" = [])),
     responses(
-        (status = OK, body = Vec<Battle>),
+        (status = OK, body = Vec<BattleDetail>),
         Unauthorized,
         NotJamWriter,
         JamNotVisible,
@@ -168,7 +217,7 @@ async fn reorder(
     current: CurrentUser,
     Path(event_id): Path<Uuid>,
     ValidJson(BattleOrder(ids)): ValidJson<BattleOrder>,
-) -> Result<Json<Vec<Battle>>, AppError> {
+) -> Result<Json<Vec<BattleDetail>>, AppError> {
     writable(&state, &current, event_id).await?;
     let mut current_ids: Vec<Uuid> = db::battles::list(&state.pool, event_id)
         .await?
@@ -185,34 +234,8 @@ async fn reorder(
         ));
     }
     db::battles::reorder(&state.pool, event_id, &ids).await?;
-    Ok(Json(db::battles::list(&state.pool, event_id).await?))
-}
-
-/// A battle's entries with members and results.
-#[utoipa::path(
-    get,
-    path = "/battles/{id}/entries",
-    tag = "battles",
-    operation_id = "list_entries",
-    params(("id" = Uuid, Path, description = "Battle id")),
-    security((), ("session" = [])),
-    responses(
-        (status = OK, body = Vec<Entry>),
-        (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
-    )
-)]
-async fn list_entries(
-    State(state): State<AppState>,
-    current: MaybeUser,
-    Path(battle_id): Path<Uuid>,
-) -> Result<Json<Vec<Entry>>, AppError> {
-    let battle = db::battles::find(&state.pool, battle_id)
-        .await?
-        .ok_or(AppError::NotFound)?;
-    readable(&state, &current, &battle.event_id.to_string()).await?;
-    Ok(Json(
-        db::battles::entries(&mut *state.pool.acquire().await?, battle_id).await?,
-    ))
+    // The same shape as `GET /events/{id}/battles`: the page caches both under one key.
+    Ok(Json(details(&state, event_id).await?))
 }
 
 /// Register an entry; results may be set at once for past jams.
@@ -357,7 +380,7 @@ async fn list_staff(
     Path(event_id): Path<Uuid>,
 ) -> Result<Json<Vec<StaffMember>>, AppError> {
     readable(&state, &current, &event_id.to_string()).await?;
-    Ok(Json(db::events::staff(&state.pool, event_id).await?))
+    Ok(Json(db::battles::staff(&state.pool, event_id).await?))
 }
 
 /// Replace a jam's whole staff list.
@@ -374,6 +397,7 @@ async fn list_staff(
         Unauthorized,
         NotJamWriter,
         JamNotVisible,
+        JamOver,
         InvalidFields,
     )
 )]
@@ -383,7 +407,7 @@ async fn replace_staff(
     Path(event_id): Path<Uuid>,
     ValidJson(StaffList(staff)): ValidJson<StaffList>,
 ) -> Result<Json<Vec<StaffMember>>, AppError> {
-    writable(&state, &current, event_id).await?;
+    editable(&state, &current, event_id).await?;
     let mut dancer_ids: Vec<Uuid> = staff.iter().map(|s| s.dancer_id).collect();
     dancer_ids.sort();
     dancer_ids.dedup();
@@ -391,16 +415,16 @@ async fn replace_staff(
     transaction::retrying(move || async move {
         let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
         // One save of the jam's staff at a time, so the list it replaces is the one it reads here.
-        db::events::lock(&mut tx, event_id).await?;
-        let kept = db::events::staff_ids(&mut tx, event_id).await?;
+        lock_jam(&mut tx, event_id).await?;
+        let kept = db::battles::staff_ids(&mut tx, event_id).await?;
         if !db::dancers::usable(&mut tx, dancer_ids, &kept).await? {
             return Err(AppError::invalid("staff", "unknown dancer"));
         }
-        db::events::replace_staff(&mut tx, event_id, staff).await?;
+        db::battles::replace_staff(&mut tx, event_id, staff).await?;
         Ok(tx.commit().await?)
     })
     .await?;
-    Ok(Json(db::events::staff(&state.pool, event_id).await?))
+    Ok(Json(db::battles::staff(&state.pool, event_id).await?))
 }
 
 /// The battle if `current` may write its jam.
@@ -428,16 +452,11 @@ fn check_start(fields: &BattleFields, event: &Event) -> Result<(), AppError> {
     }
 }
 
-/// 422 once the jam already holds `MAX_BATTLES`.
-async fn check_room(state: &AppState, event_id: Uuid) -> Result<(), AppError> {
-    if db::battles::list(&state.pool, event_id).await?.len() < MAX_BATTLES {
-        Ok(())
-    } else {
-        Err(AppError::invalid(
-            "battles",
-            &format!("a jam has at most {MAX_BATTLES} battles"),
-        ))
-    }
+/// The jam, locked and read again: what a save checks against it holds until it commits.
+async fn lock_jam(conn: &mut PgConnection, id: Uuid) -> Result<Event, AppError> {
+    db::events::find_locked(conn, id)
+        .await?
+        .ok_or(AppError::NotFound)
 }
 
 /// The battle, locked and read again: entries count against its current limit one save at a time.

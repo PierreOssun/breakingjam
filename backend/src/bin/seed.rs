@@ -443,8 +443,7 @@ async fn import_data(conn: &mut PgConnection, owner: Uuid) -> anyhow::Result<imp
     for error in &unreadable {
         tracing::debug!(%error, "data file left out");
     }
-    let today = chrono::Utc::now().date_naive();
-    let imported = import::insert_all(conn, &data, owner, today).await?;
+    let imported = import::insert_all(conn, &data, owner).await?;
     for why in &imported.skipped {
         tracing::debug!(why, "left out");
     }

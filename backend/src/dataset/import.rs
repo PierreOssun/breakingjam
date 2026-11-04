@@ -2,7 +2,6 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use chrono::NaiveDate;
 use sqlx::PgConnection;
 use thiserror::Error;
 use uuid::Uuid;
@@ -44,28 +43,26 @@ pub enum ImportError {
     Unknown(String),
 }
 
-/// Who owns the imported jams, the date that decides past from upcoming, and the ids written so far.
+/// Who owns the imported jams, and the ids written so far.
 struct Context<'a> {
     data: &'a Dataset,
     organizer: Uuid,
-    today: NaiveDate,
     dancers: BTreeMap<String, Uuid>,
     crews: BTreeMap<String, Uuid>,
 }
 
-/// Writes every jam that passes `check`, owned by `organizer`: completed when it ended before `today`.
+/// Writes every jam that passes `check`, published and owned by `organizer`; its dates say
+/// whether it is over.
 pub async fn insert_all(
     conn: &mut PgConnection,
     data: &Dataset,
     organizer: Uuid,
-    today: NaiveDate,
 ) -> Result<Imported, ImportError> {
     let (events, skipped) = importable(data, &check(data).errors);
     let (dancer_keys, crew_keys) = needed(data, &events);
     let mut cx = Context {
         data,
         organizer,
-        today,
         dancers: BTreeMap::new(),
         crews: BTreeMap::new(),
     };
@@ -207,15 +204,17 @@ async fn insert_event(
             "refused by the jam rules: {errors}"
         )));
     }
+    // `jam_phase` reads the jam's calendar in its timezone, as the API makes sure on every save.
+    if !db::events::known_timezone(&mut *conn, &fields.timezone).await? {
+        return Ok(Written::Refused(format!(
+            "timezone {:?} unknown to Postgres",
+            fields.timezone
+        )));
+    }
     let id = db::events::insert(&mut *conn, Uuid::now_v7(), cx.organizer, &fields)
         .await?
         .id;
-    let status = if fields.ends_on < cx.today {
-        EventStatus::Completed
-    } else {
-        EventStatus::Published
-    };
-    db::dataset::set_status(conn, id, status).await?;
+    db::dataset::set_status(conn, id, EventStatus::Published).await?;
     for (role, keys) in [
         (StaffRole::Judge, &event.judges),
         (StaffRole::Mc, &event.mcs),
@@ -238,9 +237,18 @@ async fn insert_event(
         let battle_id = db::battles::insert(&mut *conn, id, &battle.name, &fields)
             .await?
             .id;
-        // `check` passed, so the bracket holds.
+        // `check` passed, so the bracket holds. Teams may be known by name only, so only the
+        // result rules the schema enforces apply; one refused there would abort the import.
         for standing in battle.standings().unwrap_or_default() {
             let entry = entry(battle, &standing, cx)?;
+            let errors = entry.result_errors();
+            if !errors.is_empty() {
+                skipped.push(format!(
+                    "an entry of battle {} refused by the result rules: {errors:?}",
+                    battle.key
+                ));
+                continue;
+            }
             db::battles::insert_entry(conn, battle_id, fields.gender, &entry).await?;
         }
     }

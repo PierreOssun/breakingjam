@@ -1,17 +1,18 @@
 //! Admin-only tools besides claims and jam reviews: the overview, merging duplicate dancers and
 //! changing roles.
 
-use axum::{
-    Json,
-    extract::{Path, State},
-};
+use axum::{Json, extract::State};
 use serde::Deserialize;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 use validator::Validate;
 
-use super::{auth::UserResponse, json::ValidJson, transaction};
+use super::{
+    auth::UserResponse,
+    extract::{Path, ValidJson},
+    transaction,
+};
 use crate::{
     auth::session::CurrentUser,
     db::dancers::MergeLock,
@@ -89,7 +90,7 @@ async fn stats(
         Unauthorized,
         NotAdmin,
         (status = NOT_FOUND, description = "No such dancer", body = ErrorEnvelope),
-        (status = CONFLICT, description = "Already merged, or `{id}` is verified", body = ErrorEnvelope),
+        (status = CONFLICT, description = "Already merged, `{id}` is verified, or both are in different active entries of one battle", body = ErrorEnvelope),
         (status = UNPROCESSABLE_ENTITY, description = "`into` is `{id}` or unknown", body = ErrorEnvelope),
     )
 )]
@@ -125,6 +126,11 @@ async fn merge(
             return Err(AppError::Conflict(
                 "cannot merge away a verified dancer; merge the other one into it".into(),
             ));
+        }
+        if let Some(battle) = db::dancers::shared_battle(&mut tx, id, into).await? {
+            return Err(AppError::Conflict(format!(
+                "both dancers compete in {battle}; withdraw or remove one entry first"
+            )));
         }
         let aliases = merged_aliases(&survivor, &loser);
         db::dancers::merge(&mut tx, &loser, &survivor, &aliases).await?;

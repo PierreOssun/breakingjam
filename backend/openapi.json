@@ -299,35 +299,6 @@
             }
           },
           {
-            "name": "country",
-            "in": "query",
-            "description": "Only jams in this country (ISO 3166-1 alpha-2).",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "from",
-            "in": "query",
-            "description": "Only jams still running on or after this date.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          },
-          {
-            "name": "to",
-            "in": "query",
-            "description": "Only jams starting on or before this date.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          },
-          {
             "name": "mine",
             "in": "query",
             "description": "`true` lists the caller's own jams, drafts included (organiser list page).",
@@ -518,7 +489,7 @@
         "tags": [
           "events"
         ],
-        "summary": "Replace a jam's fields; slug and status never change here, and past draft the place stays.",
+        "summary": "Replace a jam's fields; slug and status never change here, past draft the place stays, and\nonce public and over only the team may.",
         "operationId": "update_event",
         "parameters": [
           {
@@ -582,8 +553,18 @@
               }
             }
           },
+          "409": {
+            "description": "The jam is public and over: only its battles and results change",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
           "422": {
-            "description": "Invalid fields, or a jam past draft losing its city, country or pin (`place`)",
+            "description": "Invalid fields, an unknown timezone, or a jam past draft losing its city, country or pin (`place`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -650,6 +631,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "The jam is public and over: only its battles and results change",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -664,7 +655,7 @@
         "tags": [
           "events"
         ],
-        "summary": "Move a jam along draft → in_review → published → registration_closed → completed, or\ncancel it; the BreakingJam team publishes drafts without review.",
+        "summary": "Move a jam along draft → in_review → published → registration_closed, or cancel it; the\nBreakingJam team publishes drafts without review. `actions` on the jam says what is allowed.",
         "operationId": "transition_event",
         "parameters": [
           {
@@ -680,7 +671,7 @@
           {
             "name": "transition",
             "in": "path",
-            "description": "`publish` is for `seed_admin`+; cancel is allowed from any status but completed",
+            "description": "`publish` is for `seed_admin`+; cancel is allowed from any status but cancelled",
             "required": true,
             "schema": {
               "type": "string",
@@ -689,7 +680,6 @@
                 "submit",
                 "publish",
                 "close-registration",
-                "complete",
                 "cancel"
               ]
             }
@@ -736,7 +726,7 @@
             }
           },
           "409": {
-            "description": "The current status does not allow it",
+            "description": "The current status does not allow it, or the jam is public and over",
             "content": {
               "application/json": {
                 "schema": {
@@ -1015,6 +1005,16 @@
               }
             }
           },
+          "409": {
+            "description": "The jam is public and over: only its battles and results change",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Invalid fields",
             "content": {
@@ -1082,6 +1082,16 @@
           },
           "404": {
             "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The jam is public and over: only its battles and results change",
             "content": {
               "application/json": {
                 "schema": {
@@ -1542,7 +1552,7 @@
         "tags": [
           "dancers"
         ],
-        "summary": "The public jams a dancer competed in or worked at, split into upcoming and past.",
+        "summary": "The public jams a dancer competed in or worked at, split into live, upcoming and past.",
         "operationId": "dancer_events",
         "parameters": [
           {
@@ -1553,20 +1563,6 @@
             "schema": {
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "name": "scope",
-            "in": "query",
-            "description": "Only one of the two lists; both when absent.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "description": "Which list `GET /dancers/{id}/events` fills.",
-              "enum": [
-                "upcoming",
-                "past"
-              ]
             }
           }
         ],
@@ -1806,7 +1802,7 @@
             }
           },
           "403": {
-            "description": "Below `organizer`",
+            "description": "Below `seed_admin`",
             "content": {
               "application/json": {
                 "schema": {
@@ -1875,7 +1871,7 @@
             }
           },
           "403": {
-            "description": "Below `organizer`",
+            "description": "Below `seed_admin`",
             "content": {
               "application/json": {
                 "schema": {
@@ -1952,7 +1948,7 @@
             }
           },
           "403": {
-            "description": "Below `organizer`",
+            "description": "Below `seed_admin`",
             "content": {
               "application/json": {
                 "schema": {
@@ -2033,7 +2029,7 @@
             }
           },
           "403": {
-            "description": "Below `organizer`",
+            "description": "Below `seed_admin`",
             "content": {
               "application/json": {
                 "schema": {
@@ -2065,7 +2061,7 @@
         "tags": [
           "battles"
         ],
-        "summary": "A jam's battles in display order.",
+        "summary": "A jam's battles in display order, each with its entries.",
         "operationId": "list_battles",
         "parameters": [
           {
@@ -2086,7 +2082,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Battle"
+                    "$ref": "#/components/schemas/BattleDetail"
                   }
                 }
               }
@@ -2232,7 +2228,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Battle"
+                    "$ref": "#/components/schemas/BattleDetail"
                   }
                 }
               }
@@ -2376,7 +2372,7 @@
         "tags": [
           "battles"
         ],
-        "summary": "Delete a battle and its entries.",
+        "summary": "Delete a battle and its entries; a jam past draft keeps at least one.",
         "operationId": "delete_battle",
         "parameters": [
           {
@@ -2423,49 +2419,9 @@
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/api/battles/{id}/entries": {
-      "get": {
-        "tags": [
-          "battles"
-        ],
-        "summary": "A battle's entries with members and results.",
-        "operationId": "list_entries",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Battle id",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Entry"
-                  }
-                }
-              }
-            }
           },
-          "404": {
-            "description": "No such battle, or its jam is a draft you can't see",
+          "422": {
+            "description": "The last battle of a jam past draft (`battles`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2476,12 +2432,13 @@
           }
         },
         "security": [
-          {},
           {
             "session": []
           }
         ]
-      },
+      }
+    },
+    "/api/battles/{id}/entries": {
       "post": {
         "tags": [
           "battles"
@@ -2847,6 +2804,16 @@
           },
           "404": {
             "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The jam is public and over: only its battles and results change",
             "content": {
               "application/json": {
                 "schema": {
@@ -3349,7 +3316,7 @@
             }
           },
           "409": {
-            "description": "Already merged, or `{id}` is verified",
+            "description": "Already merged, `{id}` is verified, or both are in different active entries of one battle",
             "content": {
               "application/json": {
                 "schema": {
@@ -3469,7 +3436,7 @@
           "admin"
         ],
         "summary": "Jams waiting for an admin's approval, the soonest first.",
-        "operationId": "list_jams_in_review",
+        "operationId": "list_events_in_review",
         "parameters": [
           {
             "name": "cursor",
@@ -3544,8 +3511,8 @@
         "tags": [
           "admin"
         ],
-        "summary": "Approve a jam in review: it goes public.",
-        "operationId": "approve_jam",
+        "summary": "Approve a jam in review: it goes public, if it still passes the publish checklist.",
+        "operationId": "approve_event",
         "parameters": [
           {
             "name": "id",
@@ -3607,6 +3574,16 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "The venue left the map or the battles are gone; `fields` names `place` and `battles`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3622,7 +3599,7 @@
           "admin"
         ],
         "summary": "Send a jam in review back to draft, with a note for its organiser.",
-        "operationId": "reject_jam",
+        "operationId": "reject_event",
         "parameters": [
           {
             "name": "id",
@@ -3881,7 +3858,7 @@
         "tags": [
           "organizers"
         ],
-        "summary": "The organiser's public jams, split into upcoming and past.",
+        "summary": "The organiser's public jams, split into live, upcoming and past.",
         "operationId": "organizer_events",
         "parameters": [
           {
@@ -4215,7 +4192,7 @@
             }
           },
           "409": {
-            "description": "Already reviewed, or the handle changed since",
+            "description": "Already reviewed, the handle changed since, or another verified account holds it",
             "content": {
               "application/json": {
                 "schema": {
@@ -4510,6 +4487,30 @@
           "adult",
           "na"
         ]
+      },
+      "BattleDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Battle",
+            "description": "The battle itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "entries"
+            ],
+            "properties": {
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Entry"
+                },
+                "description": "Its entries with members and results, oldest first."
+              }
+            }
+          }
+        ],
+        "description": "A battle on the jam page, with its entries."
       },
       "BattleFields": {
         "type": "object",
@@ -5011,13 +5012,6 @@
             },
             "description": "Other names the dancer goes by."
           },
-          "real_name": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Legal name, when shared."
-          },
           "country": {
             "type": "string",
             "description": "Primary flag, ISO 3166-1 alpha-2."
@@ -5105,18 +5099,26 @@
       },
       "DancerEvents": {
         "type": "object",
-        "description": "Body of `GET /dancers/{id}/events`: upcoming by date, past most recent first.",
+        "description": "Body of `GET /dancers/{id}/events`: live and upcoming soonest first, past most recent first.",
         "required": [
+          "live",
           "upcoming",
           "past"
         ],
         "properties": {
+          "live": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Participation"
+            },
+            "description": "Jams running today, soonest first."
+          },
           "upcoming": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Participation"
             },
-            "description": "Jams starting today or later, soonest first."
+            "description": "Jams starting after today, soonest first."
           },
           "past": {
             "type": "array",
@@ -5145,13 +5147,6 @@
               "type": "string"
             },
             "description": "Other names the dancer goes by, at most 10."
-          },
-          "real_name": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Blank is stored as null."
           },
           "country": {
             "type": "string",
@@ -5628,6 +5623,7 @@
           "name",
           "slug",
           "status",
+          "phase",
           "starts_on",
           "ends_on",
           "timezone",
@@ -5663,6 +5659,10 @@
           "status": {
             "$ref": "#/components/schemas/EventStatus",
             "description": "Where it is in its lifecycle."
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase",
+            "description": "Where it is in time, by its own calendar."
           },
           "starts_on": {
             "type": "string",
@@ -5929,7 +5929,8 @@
           "slug",
           "starts_on",
           "ends_on",
-          "status"
+          "status",
+          "phase"
         ],
         "properties": {
           "id": {
@@ -5972,6 +5973,10 @@
           "status": {
             "$ref": "#/components/schemas/EventStatus",
             "description": "Where it is in its lifecycle."
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase",
+            "description": "Upcoming, live or past."
           }
         }
       },
@@ -5984,12 +5989,25 @@
           {
             "type": "object",
             "required": [
-              "can_edit"
+              "can_edit",
+              "can_edit_battles",
+              "actions"
             ],
             "properties": {
               "can_edit": {
                 "type": "boolean",
-                "description": "Whether the caller may edit it, change its status or delete it."
+                "description": "Whether the caller may edit its details, flyer and lineup or delete it; no longer for its\norganiser once it is public and over."
+              },
+              "can_edit_battles": {
+                "type": "boolean",
+                "description": "Whether the caller may edit its battles, entries and results; still true once it is over."
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Transition"
+                },
+                "description": "The status changes the caller may make now."
               },
               "organizer": {
                 "oneOf": [
@@ -6005,7 +6023,7 @@
             }
           }
         ],
-        "description": "A jam page: the jam, and whether the caller may edit it."
+        "description": "A jam page: the jam, and what the caller may do with it."
       },
       "EventStatus": {
         "type": "string",
@@ -6015,7 +6033,6 @@
           "in_review",
           "published",
           "registration_closed",
-          "completed",
           "cancelled"
         ]
       },
@@ -6160,6 +6177,7 @@
           "starts_on",
           "ends_on",
           "status",
+          "phase",
           "city",
           "country",
           "battles",
@@ -6192,6 +6210,10 @@
           "status": {
             "$ref": "#/components/schemas/EventStatus",
             "description": "`published` or `registration_closed`."
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase",
+            "description": "Upcoming, live or past."
           },
           "city": {
             "type": "string",
@@ -6447,18 +6469,26 @@
       },
       "OrganizerEvents": {
         "type": "object",
-        "description": "Body of `GET /organizers/{id}/events`: upcoming soonest first, past most recent first.",
+        "description": "Body of `GET /organizers/{id}/events`: live and upcoming soonest first, past most recent first.",
         "required": [
+          "live",
           "upcoming",
           "past"
         ],
         "properties": {
+          "live": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventRef"
+            },
+            "description": "Public jams running today."
+          },
           "upcoming": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EventRef"
             },
-            "description": "Public jams starting today or later."
+            "description": "Public jams starting after today."
           },
           "past": {
             "type": "array",
@@ -6825,6 +6855,7 @@
                 "name",
                 "slug",
                 "status",
+                "phase",
                 "starts_on",
                 "ends_on",
                 "timezone",
@@ -6860,6 +6891,10 @@
                 "status": {
                   "$ref": "#/components/schemas/EventStatus",
                   "description": "Where it is in its lifecycle."
+                },
+                "phase": {
+                  "$ref": "#/components/schemas/Phase",
+                  "description": "Where it is in time, by its own calendar."
                 },
                 "starts_on": {
                   "type": "string",
@@ -7023,12 +7058,25 @@
                 {
                   "type": "object",
                   "required": [
-                    "can_edit"
+                    "can_edit",
+                    "can_edit_battles",
+                    "actions"
                   ],
                   "properties": {
                     "can_edit": {
                       "type": "boolean",
-                      "description": "Whether the caller may edit it, change its status or delete it."
+                      "description": "Whether the caller may edit its details, flyer and lineup or delete it; no longer for its\norganiser once it is public and over."
+                    },
+                    "can_edit_battles": {
+                      "type": "boolean",
+                      "description": "Whether the caller may edit its battles, entries and results; still true once it is over."
+                    },
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transition"
+                      },
+                      "description": "The status changes the caller may make now."
                     },
                     "organizer": {
                       "oneOf": [
@@ -7044,7 +7092,7 @@
                   }
                 }
               ],
-              "description": "A jam page: the jam, and whether the caller may edit it."
+              "description": "A jam page: the jam, and what the caller may do with it."
             },
             "description": "At most `limit` rows."
           },
@@ -7174,6 +7222,15 @@
           "mc",
           "organizer",
           "other"
+        ]
+      },
+      "Phase": {
+        "type": "string",
+        "description": "Where a jam is in time, by its own calendar: the `jam_phase` SQL function.",
+        "enum": [
+          "upcoming",
+          "live",
+          "past"
         ]
       },
       "Place": {
@@ -7319,7 +7376,7 @@
       },
       "SiteStats": {
         "type": "object",
-        "description": "What the landing page counts; public jams are announced or completed, never cancelled.",
+        "description": "What the landing page counts: battles of announced jams, never cancelled ones.",
         "required": [
           "battles_past",
           "dancers",
@@ -7330,7 +7387,7 @@
           "battles_past": {
             "type": "integer",
             "format": "int64",
-            "description": "Battles of public jams that ended before today."
+            "description": "Battles of jams that are over."
           },
           "dancers": {
             "type": "integer",
@@ -7340,7 +7397,7 @@
           "battles_upcoming": {
             "type": "integer",
             "format": "int64",
-            "description": "Battles of public jams that end today or later."
+            "description": "Battles of jams upcoming or live, so both counts add up to every battle."
           },
           "countries_upcoming": {
             "type": "integer",
@@ -7427,12 +7484,12 @@
           "jams_upcoming": {
             "type": "integer",
             "format": "int64",
-            "description": "Public jams still to come or running."
+            "description": "Announced jams still to come or running."
           },
           "jams_past": {
             "type": "integer",
             "format": "int64",
-            "description": "Public jams that are over, completed or not."
+            "description": "Announced jams that are over."
           },
           "jams_in_review": {
             "type": "integer",
@@ -7495,6 +7552,16 @@
             "description": "Organiser claims waiting for review."
           }
         }
+      },
+      "Transition": {
+        "type": "string",
+        "description": "An explicit status change: the last segment of `POST /events/{id}/{transition}`.",
+        "enum": [
+          "submit",
+          "publish",
+          "close-registration",
+          "cancel"
+        ]
       },
       "UserResponse": {
         "type": "object",

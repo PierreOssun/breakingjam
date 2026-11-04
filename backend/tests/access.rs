@@ -298,7 +298,7 @@ async fn writes_on_someone_elses_things_are_forbidden(pool: PgPool) {
             json!({}),
             &w.other_organizer,
         ),
-        // Crews are written by organisers and up.
+        // Crews are created by organisers; edits and memberships are the team's (M26).
         (
             "post",
             "/api/crews".into(),
@@ -309,25 +309,25 @@ async fn writes_on_someone_elses_things_are_forbidden(pool: PgPool) {
             "put",
             format!("/api/crews/{crew}"),
             json!({ "name": "Crew" }),
-            &w.plain_user,
+            &w.other_organizer,
         ),
         (
             "delete",
             format!("/api/crews/{crew}"),
             json!({}),
-            &w.plain_user,
+            &w.other_organizer,
         ),
         (
             "post",
             format!("/api/crews/{crew}/members"),
             json!({ "dancer_id": dancer }),
-            &w.plain_user,
+            &w.other_organizer,
         ),
         (
             "delete",
             format!("/api/crews/{crew}/members/{dancer}"),
             json!({}),
-            &w.plain_user,
+            &w.other_organizer,
         ),
         // Dancers: deleting is seed_admin+; an unverified dancer is edited by its creator only.
         (

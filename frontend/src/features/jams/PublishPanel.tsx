@@ -11,8 +11,8 @@ import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
 import { useToast } from "../../components/useToast";
-import { useMe } from "../auth/useMe";
 import type { ChecklistItem } from "./jamFields";
+import { storeJam } from "./queries";
 
 type Jam = Schemas["EventResponse"];
 type Jump = (block: NonNullable<ChecklistItem["block"]>) => void;
@@ -22,9 +22,8 @@ function usePublish(jam: Jam) {
   const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const role = useMe().data?.role;
-  const transition =
-    role === "seed_admin" || role === "admin" ? "publish" : "submit";
+  // The API offers `publish` to the BreakingJam team only; everyone else goes through review.
+  const transition = jam.actions.includes("publish") ? "publish" : "submit";
   const move = useMutation({
     mutationFn: async () =>
       unwrap(
@@ -34,11 +33,12 @@ function usePublish(jam: Jam) {
         "transition",
       ),
     onSuccess: (event) => {
-      for (const key of [jam.id, jam.slug]) {
-        queryClient.setQueryData<Jam | null>(["event", key], (old) =>
-          old ? { ...old, ...event } : old,
-        );
-      }
+      storeJam(queryClient, jam, event);
+      // What may come next changed with the status.
+      void queryClient.invalidateQueries({
+        queryKey: ["event", jam.id],
+        exact: true,
+      });
       void queryClient.invalidateQueries({ queryKey: ["events"] });
       toast({ kind: "success", message: t(`org.status.done.${transition}`) });
     },

@@ -21,12 +21,14 @@ import { NotFoundPage } from "./NotFoundPage";
 
 /**
  * `/organizers/:id` (M12c): like a dancer page without battles, the organiser's card and
- * their jams, upcoming then past.
+ * their jams, live now, upcoming then past.
  */
 export function OrganizerPage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
   const organizer = useOrganizer(id);
+  // From the URL, so the jams load beside the page rather than after it.
+  const events = useOrganizerEvents(id);
   if (organizer.isPending) return <ProfileSkeleton />;
   if (organizer.isError)
     return (
@@ -35,16 +37,17 @@ export function OrganizerPage() {
       </p>
     );
   if (!organizer.data) return <NotFoundPage />;
-  return <OrganizerDetail organizer={organizer.data} />;
+  return <OrganizerDetail organizer={organizer.data} events={events} />;
 }
 
 function OrganizerDetail({
   organizer,
+  events,
 }: {
   organizer: Schemas["OrganizerResponse"];
+  events: ReturnType<typeof useOrganizerEvents>;
 }) {
   const { t } = useTranslation();
-  const events = useOrganizerEvents(organizer.id);
   return (
     <div className="mx-auto max-w-content px-4 md:px-6 lg:px-8">
       <title>{`${organizer.display_name} · BreakingJam`}</title>
@@ -83,6 +86,13 @@ function OrganizerDetail({
             <p className="text-danger">{t("errors.generic")}</p>
           ) : (
             <>
+              {events.data && events.data.live.length > 0 && (
+                <JamSection
+                  title={t("dancer.live")}
+                  jams={events.data.live}
+                  empty=""
+                />
+              )}
               <JamSection
                 title={t("dancer.upcoming")}
                 jams={events.data?.upcoming}
@@ -124,7 +134,7 @@ function JamSection({
             <JamRow
               jam={jam}
               to={`/jams/${jam.slug}`}
-              trailing={<StatusBadge status={jam.status} />}
+              trailing={<StatusBadge jam={jam} />}
             />
           </li>
         ))}

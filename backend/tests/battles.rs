@@ -4,7 +4,9 @@ use axum::{Router, http::StatusCode};
 use breakingjam::domain::battle::MAX_BATTLES;
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, delete, get, id_of, post, publish, put, send, sign_up};
+use test_app::{
+    TestResponse, app, delete, get, id_of, post, publish, put, send, set_role, sign_up,
+};
 
 struct Jam {
     app: Router,
@@ -371,12 +373,12 @@ async fn results_and_video_are_normalised(pool: PgPool) {
         send(&jam.app, delete(&uri, Some(&jam.owner))).await.status,
         StatusCode::NO_CONTENT
     );
-    let entries = send(
+    let battles = send(
         &jam.app,
-        get(&format!("/api/battles/{battle}/entries"), None),
+        get(&format!("/api/events/{}/battles", jam.event_id), None),
     )
     .await;
-    assert_eq!(entries.json, json!([]));
+    assert_eq!(battles.json[0]["entries"], json!([]));
 }
 
 #[sqlx::test]
@@ -391,8 +393,14 @@ async fn deleting_a_battle_removes_its_entries(pool: PgPool) {
         send(&jam.app, delete(&uri, Some(&jam.owner))).await.status,
         StatusCode::NO_CONTENT
     );
-    let entries = send(&jam.app, get(&format!("{uri}/entries"), Some(&jam.owner))).await;
-    assert_eq!(entries.status, StatusCode::NOT_FOUND);
+    let entries = sqlx::query_scalar!(
+        r#"select count(*) as "count!" from entries where battle_id = $1"#,
+        battle.parse::<uuid::Uuid>().unwrap()
+    )
+    .fetch_one(&jam.pool)
+    .await
+    .unwrap();
+    assert_eq!(entries, 0);
 }
 
 #[sqlx::test]
@@ -465,11 +473,10 @@ async fn an_entry_keeps_its_deleted_crew_but_no_entry_takes_one_on(pool: PgPool)
     let crew = id_of(&send(&jam.app, post("/api/crews", crew, Some(&jam.owner))).await);
     let body = json!({ "dancer_ids": [a, b], "status": "confirmed", "crew_id": crew });
     let entry = id_of(&jam.entry(&battle, body.clone()).await);
-    let gone = send(
-        &jam.app,
-        delete(&format!("/api/crews/{crew}"), Some(&jam.owner)),
-    )
-    .await;
+    // Only the team deletes crews.
+    let team = sign_up(&jam.app, "team@example.com").await;
+    set_role(&jam.pool, "team@example.com", "seed_admin").await;
+    let gone = send(&jam.app, delete(&format!("/api/crews/{crew}"), Some(&team))).await;
     assert_eq!(gone.status, StatusCode::NO_CONTENT);
 
     // Someone else's delete must not block recording this entry's result.

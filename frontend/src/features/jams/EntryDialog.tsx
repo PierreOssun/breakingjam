@@ -71,7 +71,7 @@ export function EntryDialog({ battle, entry, onClose }: EntryDialogProps) {
         return;
       }
       void queryClient.invalidateQueries({
-        queryKey: ["battle", battle.id, "entries"],
+        queryKey: ["event", battle.event_id, "battles"],
       });
       toast({ kind: "success", message: t("org.entries.saved") });
       onClose();

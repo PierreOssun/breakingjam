@@ -25,6 +25,7 @@ function jam(overrides: Partial<MapJam> = {}): MapJam {
     starts_on: "2026-10-17",
     ends_on: "2026-10-17",
     status: "published",
+    phase: "upcoming",
     city: "Zürich",
     country: "CH",
     battles: ["1v1 Bboy"],
@@ -98,22 +99,22 @@ describe("map jams", () => {
     expect(matchesFilters(jam(), NO_FILTERS, thursday)).toBe(true);
   });
 
-  it("keeps the jams over before today for 'past jams'", () => {
+  it("keeps the jams over by their own calendar for 'past jams'", () => {
     const past = { ...NO_FILTERS, when: "past" as const };
-    expect(matchesFilters(jam(), past, sunday)).toBe(true);
-    expect(matchesFilters(jam(), past, saturday)).toBe(false);
+    expect(matchesFilters(jam({ phase: "past" }), past, sunday)).toBe(true);
+    expect(matchesFilters(jam({ phase: "live" }), past, saturday)).toBe(false);
   });
 
   it("orders upcoming jams soonest first, then past ones most recent first", () => {
-    const named = (name: string, day: string) =>
-      jam({ name, starts_on: day, ends_on: day });
+    const named = (name: string, day: string, phase: MapJam["phase"]) =>
+      jam({ name, starts_on: day, ends_on: day, phase });
     const jams = [
-      named("old", "2026-10-01"),
-      named("later", "2026-11-01"),
-      named("recent", "2026-10-17"),
-      named("soon", "2026-10-20"),
+      named("old", "2026-10-01", "past"),
+      named("later", "2026-11-01", "upcoming"),
+      named("recent", "2026-10-17", "past"),
+      named("soon", "2026-10-20", "upcoming"),
     ];
-    expect(jams.sort(byDate(sunday)).map((j) => j.name)).toEqual([
+    expect(jams.sort(byDate()).map((j) => j.name)).toEqual([
       "soon",
       "later",
       "recent",
@@ -122,11 +123,11 @@ describe("map jams", () => {
   });
 
   it("narrows to upcoming jams, unless 'past jams' or a search looks further", () => {
-    const named = (name: string, day: string) =>
-      jam({ id: name, name, starts_on: day, ends_on: day });
+    const named = (name: string, day: string, phase: MapJam["phase"]) =>
+      jam({ id: name, name, starts_on: day, ends_on: day, phase });
     const jams = [
-      named("Old Zurich", "2026-10-01"),
-      named("New Zurich", "2026-10-20"),
+      named("Old Zurich", "2026-10-01", "past"),
+      named("New Zurich", "2026-10-20", "upcoming"),
     ];
     const names = (filters = NO_FILTERS, search = "") =>
       narrow(jams, filters, search, "en", sunday).map((j) => j.name);
@@ -183,10 +184,20 @@ describe("map jams", () => {
       lng: number,
       lat: number,
       starts_on = "2030-06-01",
+      phase: MapJam["phase"] = "upcoming",
     ) =>
-      jam({ id: name, name, country, lng, lat, starts_on, ends_on: starts_on });
+      jam({
+        id: name,
+        name,
+        country,
+        lng,
+        lat,
+        starts_on,
+        ends_on: starts_on,
+        phase,
+      });
     const jams = [
-      at("Over", "CH", 8.54, 47.37, "2026-10-01"),
+      at("Over", "CH", 8.54, 47.37, "2026-10-01", "past"),
       at("Zurich", "CH", 8.54, 47.37),
       at("Seoul", "KR", 126.98, 37.57),
       at("Paris", "FR", 2.35, 48.86),
@@ -194,7 +205,7 @@ describe("map jams", () => {
       at("Berlin", "DE", 13.4, 52.52),
     ];
     const names = (country: string | null) =>
-      featuredJams(jams, country, thursday).map((j) => j.name);
+      featuredJams(jams, country).map((j) => j.name);
 
     // Past jams never show; the country's own come first, in date order.
     expect(names("CH")).toEqual([
@@ -221,7 +232,7 @@ describe("map jams", () => {
       "Geneva",
     ]);
     const many = Array.from({ length: 8 }, (_, i) => at(`J${i}`, "FR", 2, 48));
-    expect(featuredJams(many, "FR", thursday)).toHaveLength(6);
+    expect(featuredJams(many, "FR")).toHaveLength(6);
   });
 
   it("writes cluster counts the DESIGN.md way", () => {
@@ -266,20 +277,18 @@ describe("more jams coming up", () => {
     lat: 47.4,
     starts_on: "2026-09-01",
     ends_on: "2026-09-01",
+    phase: "past",
   });
 
   it("lists other upcoming jams, the nearest first", () => {
     const all = [paris, zurich, past, basel];
-    expect(otherJams(all, zurich, thursday).map((j) => j.id)).toEqual([
-      "basel",
-      "paris",
-    ]);
+    expect(otherJams(all, zurich).map((j) => j.id)).toEqual(["basel", "paris"]);
   });
 
   it("falls back to the soonest without a pin", () => {
     const all = [paris, zurich, past, basel];
     const unpinned = { id: "here", lng: null, lat: null };
-    expect(otherJams(all, unpinned, thursday).map((j) => j.id)).toEqual([
+    expect(otherJams(all, unpinned).map((j) => j.id)).toEqual([
       "paris",
       "basel",
     ]);
@@ -287,7 +296,7 @@ describe("more jams coming up", () => {
 
   it("shows at most four", () => {
     const many = Array.from({ length: 6 }, (_, i) => jam({ id: `j${i}` }));
-    expect(otherJams(many, zurich, thursday)).toHaveLength(4);
+    expect(otherJams(many, zurich)).toHaveLength(4);
   });
 });
 

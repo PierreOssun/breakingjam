@@ -13,7 +13,6 @@ const MULHOUSE = {
   lat: 47.75,
   population: 111430,
 };
-const today = new Date(2030, 0, 1);
 
 const jam = (
   id: string,
@@ -30,6 +29,7 @@ const jam = (
     starts_on: "2030-06-01",
     ends_on: "2030-06-01",
     status: "published",
+    phase: "upcoming",
     battles: [],
     categories: [],
     lng,
@@ -43,33 +43,35 @@ describe("near a place", () => {
   const lyon = jam("Lyon", 4.83, 45.76);
   const paris = jam("Paris", 2.35, 48.86);
   const berlin = jam("Berlin", 13.4, 52.52);
-  const past = jam("Past", 7.34, 47.76, { ends_on: "2029-06-01" });
+  const past = jam("Past", 7.34, 47.76, {
+    ends_on: "2029-06-01",
+    phase: "past",
+  });
 
   it("lists the 3 nearest upcoming jams within 500 km, nearest first", () => {
-    const near = nearestTo(
-      MULHOUSE,
-      [paris, berlin, past, zurich, lyon, basel],
-      today,
-    );
+    const near = nearestTo(MULHOUSE, [
+      paris,
+      berlin,
+      past,
+      zurich,
+      lyon,
+      basel,
+    ]);
     expect(near.map(({ jam }) => jam.id)).toEqual(["Basel", "Zurich", "Lyon"]);
-    expect(nearestTo(MULHOUSE, [berlin], today)).toEqual([]);
+    expect(nearestTo(MULHOUSE, [berlin])).toEqual([]);
   });
 
   it("knows when a jam is in the place, by its city or its distance", () => {
-    expect(hasJamIn(MULHOUSE, [zurich], today)).toBe(false);
-    expect(hasJamIn(MULHOUSE, [jam("x", 7.4, 47.8)], today)).toBe(true);
-    expect(
-      hasJamIn(MULHOUSE, [jam("x", 0, 0, { city: "Mülhouse" })], today),
-    ).toBe(true);
+    expect(hasJamIn(MULHOUSE, [zurich])).toBe(false);
+    expect(hasJamIn(MULHOUSE, [jam("x", 7.4, 47.8)])).toBe(true);
+    expect(hasJamIn(MULHOUSE, [jam("x", 0, 0, { city: "Mülhouse" })])).toBe(
+      true,
+    );
     // A city of the same name elsewhere is not this one.
     expect(
-      hasJamIn(
-        MULHOUSE,
-        [jam("x", 0, 0, { city: "Mulhouse", country: "US" })],
-        today,
-      ),
+      hasJamIn(MULHOUSE, [jam("x", 0, 0, { city: "Mulhouse", country: "US" })]),
     ).toBe(false);
-    expect(hasJamIn(MULHOUSE, [past], today)).toBe(false);
+    expect(hasJamIn(MULHOUSE, [past])).toBe(false);
   });
 
   it("frames the map link on the place and its jams", () => {

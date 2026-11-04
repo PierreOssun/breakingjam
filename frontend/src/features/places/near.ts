@@ -21,9 +21,9 @@ const LISTED = 3;
 const IN_PLACE_KM = 15;
 
 /** The nearest upcoming jams within 500 km, nearest first, with their distance. */
-export function nearestTo(place: Place, jams: MapJam[], today: Date) {
+export function nearestTo(place: Place, jams: MapJam[]) {
   return jams
-    .filter((jam) => !isPast(jam, today))
+    .filter((jam) => !isPast(jam))
     .map((jam) => ({ jam, km: distanceKm(place, jam) }))
     .filter(({ km }) => km <= NEAR_KM)
     .sort((a, b) => a.km - b.km)
@@ -32,11 +32,11 @@ export function nearestTo(place: Place, jams: MapJam[], today: Date) {
 
 /** Whether an upcoming jam is in the place itself: its city has the place's name, or it is
  * within 15 km. */
-export function hasJamIn(place: Place, jams: MapJam[], today: Date): boolean {
+export function hasJamIn(place: Place, jams: MapJam[]): boolean {
   const name = fold(place.name);
   return jams.some(
     (jam) =>
-      !isPast(jam, today) &&
+      !isPast(jam) &&
       ((jam.country === place.country && fold(jam.city) === name) ||
         distanceKm(place, jam) <= IN_PLACE_KM),
   );

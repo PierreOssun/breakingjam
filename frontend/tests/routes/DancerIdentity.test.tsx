@@ -19,7 +19,6 @@ const DANCER = {
   id: ID,
   dancer_name: "Ventus",
   aliases: [],
-  real_name: "Victor V.",
   country: "FR",
   country2: null,
   city: "Paris",
@@ -37,7 +36,10 @@ const DANCER = {
   can_edit: false,
   can_set_titles: false,
 };
-const NO_EVENTS = { status: 200, body: { upcoming: [], past: [] } };
+const NO_EVENTS = {
+  status: 200,
+  body: { live: [], upcoming: [], past: [] },
+};
 // No claim yet: the API answers 404.
 const NO_CLAIM = {
   status: 404,
@@ -189,6 +191,35 @@ describe("dancer identity", () => {
     );
   });
 
+  it("offers no claim to an account that already has a verified page", async () => {
+    const owner = {
+      status: 200,
+      body: {
+        ...LIL_G,
+        dancer: {
+          ...DANCER,
+          id: "01920000-0000-7000-8000-0000000000d2",
+          deleted: false,
+          verified: true,
+        },
+      },
+    };
+    const fetch = page(
+      owner,
+      {},
+      { [`GET /api/dancers/${ID}/claim`]: NO_CLAIM },
+    );
+    renderApp(`/dancers/${ID}`);
+
+    expect(
+      await screen.findByRole("heading", { name: "Ventus" }),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("No upcoming jams.")).toBeInTheDocument();
+    // Never asked: the API would refuse the claim (409).
+    expect(calls(fetch)).not.toContain(`GET /api/dancers/${ID}/claim`);
+    expect(screen.queryByRole("button", { name: "This is me" })).toBeNull();
+  });
+
   it("lets whoever may edit change the profile and the avatar", async () => {
     const fetch = page(
       user,
@@ -246,13 +277,13 @@ describe("dancer identity", () => {
     expect(body).toMatchObject({
       dancer_name: "Ventus",
       aliases: ["Vent", "V"],
-      real_name: "Victor V.",
       country: "FR",
       country2: null,
       city: "Lyon",
       instagram_handle: "ventus_bj",
       bio: null,
     });
+    expect(body).not.toHaveProperty("real_name");
     expect(body.avatar_parts).toMatch(/^h8-s3-c\d-o\d-e\d-b\d-d1$/);
     // This editor may not say what the dancer does: the sheet sends no titles to keep.
     expect(body).not.toHaveProperty("titles");

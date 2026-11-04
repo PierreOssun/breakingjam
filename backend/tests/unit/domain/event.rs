@@ -21,7 +21,6 @@ fn transitions_follow_the_table() {
         Published.apply(CloseRegistration).unwrap(),
         RegistrationClosed
     );
-    assert_eq!(RegistrationClosed.apply(Complete).unwrap(), Completed);
     for from in [Draft, InReview, Published, RegistrationClosed] {
         assert_eq!(from.apply(Cancel).unwrap(), Cancelled);
     }
@@ -32,7 +31,7 @@ fn only_jams_in_review_are_reviewed() {
     let reject = Review::Reject("Add the venue".into());
     assert_eq!(InReview.review(&Review::Approve), Some(Published));
     assert_eq!(InReview.review(&reject), Some(Draft));
-    for from in [Draft, Published, RegistrationClosed, Completed, Cancelled] {
+    for from in [Draft, Published, RegistrationClosed, Cancelled] {
         assert_eq!(from.review(&Review::Approve), None, "{from:?}");
         assert_eq!(from.review(&reject), None, "{from:?}");
     }
@@ -41,7 +40,7 @@ fn only_jams_in_review_are_reviewed() {
 #[test]
 fn publishing_without_review_is_the_teams() {
     assert_eq!(Publish.required_role(), Role::SeedAdmin);
-    for transition in [Submit, CloseRegistration, Complete, Cancel] {
+    for transition in [Submit, CloseRegistration, Cancel] {
         assert_eq!(transition.required_role(), Role::User, "{transition:?}");
     }
 }
@@ -50,7 +49,7 @@ fn publishing_without_review_is_the_teams() {
 fn drafts_and_jams_in_review_are_private() {
     assert!(!Draft.is_public());
     assert!(!InReview.is_public());
-    for status in [Published, RegistrationClosed, Completed, Cancelled] {
+    for status in [Published, RegistrationClosed, Cancelled] {
         assert!(status.is_public(), "{status:?}");
     }
 }
@@ -59,16 +58,13 @@ fn drafts_and_jams_in_review_are_private() {
 fn transitions_reject_everything_else() {
     let invalid = [
         (Draft, CloseRegistration),
-        (Draft, Complete),
         (InReview, Submit),
         (InReview, Publish),
         (InReview, CloseRegistration),
         (Published, Submit),
         (Published, Publish),
-        (Published, Complete),
         (RegistrationClosed, Publish),
-        (Completed, Cancel),
-        (Completed, Publish),
+        (RegistrationClosed, CloseRegistration),
         (Cancelled, Cancel),
         (Cancelled, Publish),
     ];
@@ -138,7 +134,7 @@ fn only_a_place_it_has_can_be_lost() {
 #[test]
 fn submitting_and_publishing_announce_a_jam() {
     assert!(Submit.announces() && Publish.announces());
-    for transition in [CloseRegistration, Complete, Cancel] {
+    for transition in [CloseRegistration, Cancel] {
         assert!(!transition.announces(), "{transition:?}");
     }
 }
@@ -153,18 +149,76 @@ fn slug_keeps_words_and_id_suffix() {
     assert_eq!(slug("서울 잼", id), "서울-잼-3f9a1c");
 }
 
-#[test]
-fn writers_are_owner_or_seed_admin() {
-    let user = |role| User {
+fn user(role: Role) -> User {
+    User {
         id: Uuid::now_v7(),
         email: String::new(),
         display_name: String::new(),
         role,
-    };
+    }
+}
+
+#[test]
+fn writers_are_owner_or_seed_admin() {
     let organizer = user(Role::Organizer);
     assert!(can_write(&organizer, organizer.id));
     assert!(!can_write(&organizer, Uuid::now_v7()));
     assert!(can_write(&user(Role::SeedAdmin), Uuid::now_v7()));
+}
+
+#[test]
+fn a_public_jam_that_is_over_is_locked_for_its_organiser_only() {
+    let organizer = user(Role::Organizer);
+    let team = user(Role::SeedAdmin);
+    let mut jam = bare_draft();
+    jam.organizer_id = organizer.id;
+    jam.phase = Phase::Past;
+    assert!(!jam.is_over(), "a stale draft can still be moved");
+    assert!(jam.editable_by(&organizer));
+
+    jam.status = Published;
+    assert!(jam.is_over());
+    assert!(!jam.editable_by(&organizer));
+    assert!(jam.actions(&organizer).is_empty(), "not even cancel");
+    assert!(jam.editable_by(&team), "the team fixes history");
+
+    jam.phase = Phase::Live;
+    assert!(!jam.is_over());
+    assert!(jam.editable_by(&organizer));
+}
+
+#[test]
+fn actions_are_what_the_status_and_role_allow() {
+    let organizer = user(Role::Organizer);
+    let mut jam = bare_draft();
+    jam.organizer_id = organizer.id;
+    assert_eq!(jam.actions(&organizer), [Submit, Cancel]);
+    assert_eq!(
+        jam.actions(&user(Role::SeedAdmin)),
+        [Submit, Publish, Cancel]
+    );
+    assert!(jam.actions(&user(Role::Organizer)).is_empty(), "not theirs");
+    jam.status = Published;
+    assert_eq!(jam.actions(&organizer), [CloseRegistration, Cancel]);
+    jam.status = Cancelled;
+    assert!(jam.actions(&organizer).is_empty());
+}
+
+#[test]
+fn rows_split_by_phase_with_the_past_most_recent_first() {
+    use Phase::*;
+    let rows = vec![
+        (1, Past),
+        (2, Past),
+        (3, Live),
+        (4, Upcoming),
+        (5, Upcoming),
+    ];
+    let [live, upcoming, past] = by_phase(rows, |r| r.1);
+    let ids = |rows: Vec<(i32, Phase)>| rows.into_iter().map(|r| r.0).collect::<Vec<_>>();
+    assert_eq!(ids(live), [3]);
+    assert_eq!(ids(upcoming), [4, 5]);
+    assert_eq!(ids(past), [2, 1]);
 }
 
 #[test]

@@ -32,7 +32,7 @@ pub async fn best_match(pool: &PgPool, key: &str) -> sqlx::Result<Option<Place>>
            order by n.name = $1 desc, n.own desc,
                     exists (select 1 from events e
                             where e.deleted_at is null
-                              and e.status in ('published', 'registration_closed', 'completed')
+                              and e.status in ('published', 'registration_closed')
                               and abs(e.lat - p.lat) < $5 and abs(e.lng - p.lng) < $5) desc,
                     p.population desc
            limit 1"#,

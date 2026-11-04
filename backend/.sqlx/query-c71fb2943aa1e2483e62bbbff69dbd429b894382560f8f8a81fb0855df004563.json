@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select jam_phase($1, $2, $3) as \"phase!: Phase\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "phase!: Phase",
+        "type_info": {
+          "Custom": {
+            "name": "jam_phase",
+            "kind": {
+              "Enum": [
+                "upcoming",
+                "live",
+                "past"
+              ]
+            }
+          }
+        },
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Date",
+        "Date",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "c71fb2943aa1e2483e62bbbff69dbd429b894382560f8f8a81fb0855df004563"
+}

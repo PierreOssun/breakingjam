@@ -8,23 +8,13 @@ import { InlineNotice } from "../../components/InlineNotice";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/useToast";
 import { DeleteJamButton } from "./DeleteJamButton";
+import { storeJam } from "./queries";
 
 type Jam = Schemas["EventResponse"];
-type Transition = "close-registration" | "complete" | "cancel";
+type Transition = "close-registration" | "cancel";
 
-// §4 "Event status transitions": the one step forward from each public status. A draft goes
-// through the publish checklist instead (PublishPanel).
-const NEXT: Partial<Record<Schemas["EventStatus"], Transition>> = {
-  published: "close-registration",
-  registration_closed: "complete",
-};
-const CANCELLABLE: Schemas["EventStatus"][] = [
-  "in_review",
-  "published",
-  "registration_closed",
-];
-
-/** Where a submitted jam is in its lifecycle, the step forward, cancelling and deleting. */
+/** Where a submitted jam is in its lifecycle, and what the API lets the caller do with it now
+ * (`actions`): close registration, cancel, delete. A draft has the checklist (PublishPanel). */
 export function StatusActions({ jam }: { jam: Jam }) {
   const { t } = useTranslation();
   const toast = useToast();
@@ -40,9 +30,12 @@ export function StatusActions({ jam }: { jam: Jam }) {
         "transition",
       ),
     onSuccess: (event, transition) => {
-      queryClient.setQueryData<Jam | null>(["event", jam.id], (old) =>
-        old ? { ...old, ...event } : old,
-      );
+      storeJam(queryClient, jam, event);
+      // What may come next changed with the status.
+      void queryClient.invalidateQueries({
+        queryKey: ["event", jam.id],
+        exact: true,
+      });
       void queryClient.invalidateQueries({ queryKey: ["events"] });
       toast({ kind: "success", message: t(`org.status.done.${transition}`) });
       setConfirming(false);
@@ -52,7 +45,7 @@ export function StatusActions({ jam }: { jam: Jam }) {
 
   // A draft has the publish checklist instead.
   if (jam.status === "draft") return null;
-  const next = NEXT[jam.status];
+  const can = (transition: Transition) => jam.actions.includes(transition);
   return (
     <section
       aria-labelledby="status-title"
@@ -62,10 +55,12 @@ export function StatusActions({ jam }: { jam: Jam }) {
         <h2 id="status-title" className="text-title">
           {t("org.status.title")}
         </h2>
-        <StatusBadge status={jam.status} />
+        <StatusBadge jam={jam} />
       </div>
       <p className="text-body-sm text-muted">
-        {t(`org.status.explain.${jam.status}`)}
+        {t(
+          `org.status.explain.${jam.phase === "past" && jam.status !== "cancelled" ? "past" : jam.status}`,
+        )}
       </p>
       {jam.review_note && (
         <InlineNotice actionable>
@@ -73,15 +68,15 @@ export function StatusActions({ jam }: { jam: Jam }) {
         </InlineNotice>
       )}
       <div className="flex flex-wrap gap-3">
-        {next && (
+        {can("close-registration") && (
           <Button
-            loading={move.isPending && move.variables === next}
-            onClick={() => move.mutate(next)}
+            loading={move.isPending && move.variables === "close-registration"}
+            onClick={() => move.mutate("close-registration")}
           >
-            {t(`org.status.action.${next}`)}
+            {t("org.status.action.close-registration")}
           </Button>
         )}
-        {CANCELLABLE.includes(jam.status) && (
+        {can("cancel") && (
           <Button variant="ghost" onClick={() => setConfirming(true)}>
             {t("org.status.action.cancel")}
           </Button>

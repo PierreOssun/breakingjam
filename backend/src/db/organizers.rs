@@ -8,7 +8,7 @@ use uuid::Uuid;
 use crate::domain::{
     claim::{ClaimStatus, ClaimUser, new_code},
     dancer::EventRef,
-    event::EventStatus,
+    event::{EventStatus, Phase},
     organizer::{
         Organizer, OrganizerClaim, OrganizerClaimForReview, OrganizerFields, OrganizerRef,
     },
@@ -30,20 +30,10 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Organizer>> {
 /// The organiser of a jam, for its page; none when the BreakingJam team entered it, since the
 /// team lists jams it doesn't run.
 pub async fn reference(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<OrganizerRef>> {
-    sqlx::query_as!(
-        OrganizerRef,
-        r#"select id, display_name, instagram_handle, verified_at is not null as "verified!",
-                  (select count(*) from events e
-                   where e.organizer_id = app_users.id and e.deleted_at is null
-                     and e.status not in ('draft', 'in_review')) as "jams!"
-           from app_users where id = $1 and role not in ('seed_admin', 'admin')"#,
-        id,
-    )
-    .fetch_optional(pool)
-    .await
+    Ok(references(pool, &[id]).await?.remove(&id))
 }
 
-/// The organiser cards of `ids`, keyed by account id; team accounts have none, as in `reference`.
+/// The organiser cards of `ids`, keyed by account id; team accounts have none.
 pub async fn references(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, OrganizerRef>> {
     let refs = sqlx::query_as!(
         OrganizerRef,
@@ -99,34 +89,20 @@ pub async fn update(
     Ok(organizer)
 }
 
-/// The organiser's public jams (drafts and jams in review left out), oldest first, each flagged upcoming or not.
-pub async fn events(pool: &PgPool, organizer_id: Uuid) -> sqlx::Result<Vec<(EventRef, bool)>> {
-    let rows = sqlx::query!(
+/// The organiser's public jams (drafts and jams in review left out), oldest first.
+pub async fn events(pool: &PgPool, organizer_id: Uuid) -> sqlx::Result<Vec<EventRef>> {
+    sqlx::query_as!(
+        EventRef,
         r#"select id, name, slug, starts_on, ends_on, city, country,
-                  status as "status: EventStatus", starts_on >= current_date as "upcoming!"
+                  status as "status: EventStatus",
+                  jam_phase(starts_on, ends_on, timezone) as "phase!: Phase"
            from events
            where organizer_id = $1 and deleted_at is null and status not in ('draft', 'in_review')
            order by starts_on, id"#,
         organizer_id,
     )
     .fetch_all(pool)
-    .await?;
-    Ok(rows
-        .into_iter()
-        .map(|r| {
-            let event = EventRef {
-                id: r.id,
-                name: r.name,
-                slug: r.slug,
-                starts_on: r.starts_on,
-                ends_on: r.ends_on,
-                city: r.city,
-                country: r.country,
-                status: r.status,
-            };
-            (event, r.upcoming)
-        })
-        .collect())
+    .await
 }
 
 /// Opens a pending claim on `handle`, or returns the one already pending.

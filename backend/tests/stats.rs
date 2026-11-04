@@ -81,8 +81,9 @@ async fn site_stats_split_battles_at_today_and_leave_out_private_jams(pool: PgPo
         }
         sqlx::query!(
             "update events
-             set status = $1::text::event_status, starts_on = current_date + $2::int,
-                 ends_on = current_date + $2::int
+             set status = $1::text::event_status,
+                 starts_on = (now() at time zone 'Europe/Paris')::date + $2::int,
+                 ends_on = (now() at time zone 'Europe/Paris')::date + $2::int
              where id = $3::text::uuid",
             status,
             days,
@@ -93,7 +94,7 @@ async fn site_stats_split_battles_at_today_and_leave_out_private_jams(pool: PgPo
         .unwrap();
     };
     jam("Yesterday", "FR", 2, -1, "published").await;
-    jam("Long ago", "BE", 1, -400, "completed").await;
+    jam("Long ago", "BE", 1, -400, "published").await;
     jam("Today", "FR", 1, 0, "published").await;
     jam("Tomorrow", "CH", 2, 1, "registration_closed").await;
     jam("Same country", "CH", 1, 2, "published").await;

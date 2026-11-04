@@ -170,10 +170,17 @@ describe("MapPage", () => {
   });
 
   it("shows past jams on demand, most recent first, and finds them by search", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date(2030, 5, 17, 12)); // Monday 17 June 2030
+    // The server tells which jams are over; here all but Berlin Breaks.
+    const ended = GEOJSON.body.features.map((jam) =>
+      jam.properties.name === "Berlin Breaks"
+        ? jam
+        : { ...jam, properties: { ...jam.properties, phase: "past" as const } },
+    );
     desktop();
-    api();
+    mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "GET /api/events.geojson": geojson(...ended),
+    });
     renderApp("/map");
 
     expect(await rows()).toEqual(["Berlin Breaks"]);

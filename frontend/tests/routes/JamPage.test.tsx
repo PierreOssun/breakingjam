@@ -22,6 +22,7 @@ const JAM = {
   slug: "paris-cypher-sessions-00e001",
   description: "Open floor.\nBring your crew.",
   status: "published",
+  phase: "upcoming",
   starts_on: "2030-06-01",
   ends_on: "2030-06-02",
   timezone: "Europe/Paris",
@@ -38,6 +39,8 @@ const JAM = {
   created_at: at,
   updated_at: at,
   can_edit: false,
+  can_edit_battles: false,
+  actions: [],
   organizer: {
     id: "01920000-0000-7000-8000-0000000000a1",
     display_name: "Floor Lords e.V.",
@@ -52,6 +55,7 @@ const battle = (
   name: string,
   teamSize: number,
   maxEntries: number | null,
+  entries: object[] = [],
 ) => ({
   id,
   event_id: JAM.id,
@@ -65,6 +69,7 @@ const battle = (
   position: 0,
   created_at: at,
   updated_at: at,
+  entries,
 });
 
 const dancer = (id: string, name: string) => ({
@@ -94,37 +99,32 @@ function mockJam(
     [`GET /api/events/${JAM.slug}`]: { status: 200, body: jam },
     [`GET /api/events/${JAM.id}/battles`]: {
       status: 200,
-      body: [battle("b1", "1v1 Bboy", 1, 16), battle("b2", "2v2 Mixed", 2, 1)],
-    },
-    "GET /api/battles/b1/entries": {
-      status: 200,
       body: [
-        entry("e2", "b1", {
-          reached: "top8",
-          members: [dancer("d2", "Ventus")],
-        }),
-        entry("e1", "b1", {
-          reached: "winner",
-          final_rank: 1,
-          video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          video_offset_seconds: 90,
-          members: [dancer("d1", "Lil G")],
-        }),
-        entry("e3", "b1", {
-          status: "withdrawn",
-          members: [dancer("d3", "Ghost")],
-        }),
-      ],
-    },
-    "GET /api/battles/b2/entries": {
-      status: 200,
-      body: [
-        entry("e4", "b2", {
-          status: "pending",
-          team_name: "Floor Lords",
-          crew: { id: "c1", name: "Floor Lords" },
-          members: [dancer("d4", "Atlas"), dancer("d5", "Drift")],
-        }),
+        battle("b1", "1v1 Bboy", 1, 16, [
+          entry("e2", "b1", {
+            reached: "top8",
+            members: [dancer("d2", "Ventus")],
+          }),
+          entry("e1", "b1", {
+            reached: "winner",
+            final_rank: 1,
+            video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            video_offset_seconds: 90,
+            members: [dancer("d1", "Lil G")],
+          }),
+          entry("e3", "b1", {
+            status: "withdrawn",
+            members: [dancer("d3", "Ghost")],
+          }),
+        ]),
+        battle("b2", "2v2 Mixed", 2, 1, [
+          entry("e4", "b2", {
+            status: "pending",
+            team_name: "Floor Lords",
+            crew: { id: "c1", name: "Floor Lords" },
+            members: [dancer("d4", "Atlas"), dancer("d5", "Drift")],
+          }),
+        ]),
       ],
     },
     [`GET /api/events/${JAM.id}/staff`]: {
@@ -143,20 +143,28 @@ function mockJam(
   });
 }
 
-/** A jam as write routes return it: without `can_edit` and `organizer`, which only GET adds. */
+/** What only GET adds to a jam: what the caller may do, and its organiser. */
+const PAGE_ONLY = ["can_edit", "can_edit_battles", "actions", "organizer"];
+
+/** A jam as write routes return it: without what only GET adds. */
 const asWritten = (jam: object) =>
   Object.fromEntries(
-    Object.entries(jam).filter(
-      ([key]) => !["can_edit", "organizer"].includes(key),
-    ),
+    Object.entries(jam).filter(([key]) => !PAGE_ONLY.includes(key)),
   );
+
+/** What the organiser of the published, upcoming jam may do with it. */
+const ORGANISER = {
+  can_edit: true,
+  can_edit_battles: true,
+  actions: ["close-registration", "cancel"],
+};
 
 /** The jam as its organiser sees it. */
 const asOrganiser = (replies: Parameters<typeof mockApi>[0] = {}) =>
-  mockJam(
-    { can_edit: true },
-    { "GET /api/auth/me": { status: 200, body: LIL_G }, ...replies },
-  );
+  mockJam(ORGANISER, {
+    "GET /api/auth/me": { status: 200, body: LIL_G },
+    ...replies,
+  });
 
 describe("JamPage", () => {
   it("shows the jam, its facts and the generated flyer", async () => {
@@ -264,7 +272,7 @@ describe("JamPage", () => {
     // Admins and the BreakingJam team get them too: `can_edit` covers every writer.
     mockJam(
       {
-        can_edit: true,
+        ...ORGANISER,
         flyer_url: "https://media.breakingjam.com/flyers/e001/f.jpg",
         flyer_card_url: "https://media.breakingjam.com/flyers/e001/f-card.jpg",
       },
@@ -356,7 +364,8 @@ describe("JamPage", () => {
   });
 
   it("points to the results once the jam took place", async () => {
-    mockJam({ status: "completed" });
+    // Over by its own calendar, whatever status it was left in.
+    mockJam({ status: "published", phase: "past" });
     renderApp(`/jams/${JAM.slug}`);
     const results = await screen.findAllByRole("link", { name: "See results" });
     for (const link of results)
@@ -389,11 +398,11 @@ describe("JamPage", () => {
     ).toBeNull();
   });
 
-  it("drops registration and spots once the jam is completed", async () => {
-    mockJam({ status: "completed" });
+  it("drops registration and spots once the jam is past", async () => {
+    mockJam({ status: "registration_closed", phase: "past" });
     renderApp(`/jams/${JAM.slug}`);
 
-    expect(await screen.findByText("Completed")).toBeInTheDocument();
+    expect(await screen.findByText("Past")).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", { name: "1v1 Bboy" }),
     ).toBeInTheDocument();
@@ -431,6 +440,8 @@ describe("JamPage", () => {
         lat: null,
         lng: null,
         can_edit: true,
+        can_edit_battles: true,
+        actions: ["submit", "cancel"],
       },
       { "GET /api/auth/me": { status: 200, body: LIL_G } },
     );
@@ -502,8 +513,6 @@ describe("JamPage", () => {
             { ...battle("s2", "Solo Showcase", 1, 12), format: "showcase" },
           ],
         },
-        "GET /api/battles/s1/entries": { status: 200, body: [] },
-        "GET /api/battles/s2/entries": { status: 200, body: [] },
       },
     );
     renderApp(`/jams/${JAM.slug}`);
@@ -642,9 +651,10 @@ describe("JamPage", () => {
     });
     renderApp(`/jams/${JAM.slug}`);
 
-    await userEvent.click(
-      await screen.findByRole("button", { name: "Delete Ventus" }),
-    );
+    const remove = await screen.findByRole("button", { name: "Delete Ventus" });
+    // Before the jam is over, battles themselves are edited in the editor.
+    expect(screen.queryByRole("button", { name: "Edit 1v1 Bboy" })).toBeNull();
+    await userEvent.click(remove);
     expect(await screen.findByText("Entry deleted.")).toBeInTheDocument();
     expect(
       fetch.mock.calls.some(
@@ -654,6 +664,33 @@ describe("JamPage", () => {
           request.url.endsWith("/api/entries/e2"),
       ),
     ).toBe(true);
+  });
+
+  it("keeps the battles open to its organiser once the jam is past, and nothing else", async () => {
+    mockJam(
+      { phase: "past", can_edit: false, can_edit_battles: true, actions: [] },
+      { "GET /api/auth/me": { status: 200, body: LIL_G } },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+
+    const solo = (
+      await screen.findByRole("heading", { name: "1v1 Bboy" })
+    ).closest("li")!;
+    expect(
+      within(solo).getByRole("button", { name: "Add a dancer" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Delete Ventus" }),
+    ).toBeInTheDocument();
+    // The battle itself still opens its sheet here, since the editor is closed.
+    await userEvent.click(
+      within(solo).getByRole("button", { name: "Edit 1v1 Bboy" }),
+    );
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+    // The details, the flyer and the lineup are settled.
+    expect(screen.queryByRole("link", { name: "Edit jam" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Upload a flyer" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Add a judge" })).toBeNull();
   });
 
   it("lets its organiser add a judge from a search and remove the DJ", async () => {

@@ -1,9 +1,6 @@
 //! Jam reviews: the admins' queue of jams waiting to go public, and their decisions.
 
-use axum::{
-    Json,
-    extract::{Path, Query, State},
-};
+use axum::{Json, extract::State};
 use serde::Deserialize;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -12,14 +9,14 @@ use validator::Validate;
 
 use super::{
     events::EventResponse,
-    json::ValidJson,
+    extract::{Path, Query, ValidJson},
     page::{self, Page},
 };
 use crate::{
     auth::session::CurrentUser,
     db,
     domain::{
-        event::{Event, Review, can_write},
+        event::{Event, Missing, Review},
         not_blank,
         user::Role,
     },
@@ -58,7 +55,7 @@ pub struct RejectRequest {
     get,
     path = "/admin/events",
     tag = "admin",
-    operation_id = "list_jams_in_review",
+    operation_id = "list_events_in_review",
     params(ReviewQuery),
     security(("session" = [])),
     responses(
@@ -81,21 +78,20 @@ async fn queue(
     let organizers = db::organizers::references(&state.pool, &ids).await?;
     let rows = jams
         .into_iter()
-        .map(|event| EventResponse {
-            can_edit: can_write(&current.user, event.organizer_id),
-            organizer: organizers.get(&event.organizer_id).cloned(),
-            event,
+        .map(|event| {
+            let organizer = organizers.get(&event.organizer_id).cloned();
+            EventResponse::new(event, Some(&current.user), organizer)
         })
         .collect();
     Ok(Json(Page::from_offset(rows, limit, offset)))
 }
 
-/// Approve a jam in review: it goes public.
+/// Approve a jam in review: it goes public, if it still passes the publish checklist.
 #[utoipa::path(
     post,
     path = "/admin/events/{id}/approve",
     tag = "admin",
-    operation_id = "approve_jam",
+    operation_id = "approve_event",
     params(("id" = Uuid, Path, description = "Jam id")),
     security(("session" = [])),
     responses(
@@ -104,6 +100,7 @@ async fn queue(
         NotAdmin,
         (status = NOT_FOUND, description = "No such jam", body = ErrorEnvelope),
         (status = CONFLICT, description = "Not in review", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "The venue left the map or the battles are gone; `fields` names `place` and `battles`", body = ErrorEnvelope),
     )
 )]
 async fn approve(
@@ -119,7 +116,7 @@ async fn approve(
     post,
     path = "/admin/events/{id}/reject",
     tag = "admin",
-    operation_id = "reject_jam",
+    operation_id = "reject_event",
     params(("id" = Uuid, Path, description = "Jam id")),
     request_body = RejectRequest,
     security(("session" = [])),
@@ -161,9 +158,15 @@ async fn decide(
     let next = event.status.review(&review).ok_or_else(not_in_review)?;
     let note = match &review {
         Review::Reject(note) => Some(note.as_str()),
-        Review::Approve => None,
+        Review::Approve => {
+            // Its organiser kept editing while it waited: it goes public only if still complete.
+            let battles = db::battles::list(&state.pool, id).await?.len();
+            let missing = event.missing(battles).into_iter().map(Missing::as_field);
+            AppError::check(missing.collect())?;
+            None
+        }
     };
-    db::events::review(&state.pool, id, next, note)
+    db::events::set_status(&state.pool, id, event.status, next, note)
         .await?
         .map(Json)
         .ok_or_else(not_in_review)

@@ -8,7 +8,7 @@ import {
 } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
+import { Navigate, useParams } from "react-router";
 import type { Schemas } from "../api/client";
 import { InlineNotice } from "../components/InlineNotice";
 import { Loading, Skeleton } from "../components/Skeleton";
@@ -57,6 +57,9 @@ export function OrgJamEditPage() {
         {t("errors.generic")}
       </p>
     );
+  // Over and public: its organiser records results on the jam page, where battles stay open.
+  if (jam.data && !jam.data.can_edit && jam.data.can_edit_battles)
+    return <Navigate to={`/jams/${jam.data.slug}`} replace />;
   // Someone else's jam reads as missing here, as drafts do on the API.
   if (!jam.data?.can_edit) return <NotFoundPage />;
   // Keyed: the editor holds its own copy, which must never go out under another jam's id.

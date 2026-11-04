@@ -33,7 +33,7 @@ export function GridCard({ jam }: { jam: MapJam }) {
           <Flag code={jam.country} size="bare" />
           {jam.city}
         </p>
-        <CardStatus status={jam.status} />
+        <CardStatus jam={jam} />
       </div>
     </article>
   );

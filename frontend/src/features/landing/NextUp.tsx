@@ -60,10 +60,9 @@ export function NextUp() {
       </Shell>
     );
   const visitor = country.data ?? null;
-  const today = new Date();
   const next = position
-    ? nearestJams(jams.data, position, today)
-    : featuredJams(jams.data, visitor, today);
+    ? nearestJams(jams.data, position)
+    : featuredJams(jams.data, visitor);
   if (next.length === 0) return null;
   const around = position
     ? t("landing.next.aroundYou")

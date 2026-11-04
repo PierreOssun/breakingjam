@@ -1,15 +1,13 @@
 //! "Verify me": users claim a dancer page; admins review the queue (§4 "Dancer identity").
 
-use axum::{
-    Json,
-    extract::{Path, Query, State},
-};
+use axum::{Json, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgConnection;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
+use super::extract::{Path, Query};
 use super::{
     page::{self, Page},
     transaction,
@@ -77,17 +75,25 @@ async fn open(
     current: CurrentUser,
     Path(dancer_id): Path<Uuid>,
 ) -> Result<Json<MyClaim>, AppError> {
-    let dancer = db::dancers::find_live(&state.pool, dancer_id)
-        .await?
-        .ok_or(AppError::NotFound)?;
-    if dancer.verified_at.is_some() {
-        return Err(AppError::Conflict("this dancer is already verified".into()));
-    }
     // `dancers.user_id` is unique: one account owns at most one page.
     if db::users::owns_dancer(&state.pool, current.user.id).await? {
         return Err(AppError::Conflict("you already own a dancer page".into()));
     }
-    let claim = db::claims::open(&state.pool, dancer_id, current.user.id).await?;
+    let (pool, user_id) = (&state.pool, current.user.id);
+    let claim = transaction::retrying(move || async move {
+        // Under the merge lock, so the dancer can't be merged away between the check and the claim.
+        let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
+        let dancer = db::dancers::find_live(&mut *tx, dancer_id)
+            .await?
+            .ok_or(AppError::NotFound)?;
+        if dancer.verified_at.is_some() {
+            return Err(AppError::Conflict("this dancer is already verified".into()));
+        }
+        let claim = db::claims::open(&mut tx, dancer_id, user_id).await?;
+        tx.commit().await?;
+        Ok(claim)
+    })
+    .await?;
     with_others(&state, claim).await
 }
 

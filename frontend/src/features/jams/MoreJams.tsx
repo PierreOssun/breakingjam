@@ -11,7 +11,7 @@ import { useMapJams } from "../map/queries";
 export function MoreJams({ jam }: { jam: Schemas["EventResponse"] }) {
   const { t } = useTranslation();
   const jams = useMapJams();
-  const next = otherJams(jams.data ?? [], jam, new Date());
+  const next = otherJams(jams.data ?? [], jam);
   if (next.length === 0) return null;
   return (
     <section

@@ -401,6 +401,14 @@ impl EntryFields {
             }
             _ => {}
         }
+        errors.extend(self.result_errors());
+        errors
+    }
+
+    /// The rules of the result and its video alone, which the schema also holds; run after
+    /// `normalize`. The curated-data import checks only these: its teams may be known by name.
+    pub fn result_errors(&self) -> Vec<(&'static str, &'static str)> {
+        let mut errors = Vec::new();
         if (self.reached == BracketStage::Winner) != (self.final_rank == Some(1)) {
             errors.push(("final_rank", "winner and final_rank 1 go together"));
         }

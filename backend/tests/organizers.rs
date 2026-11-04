@@ -92,8 +92,9 @@ async fn only_the_organiser_edits_their_page(pool: PgPool) {
     assert_eq!(forbidden.status, StatusCode::FORBIDDEN);
     let taken = send(&app, get("/api/auth/me", Some(&other))).await;
     let other_id = taken.json["id"].as_str().unwrap();
+    // Typing a handle reserves nothing; verifying it does (see the next test).
     let duplicate = edit(&app, other_id, profile(Some("FLOOR.LORDS")), &other).await;
-    assert_eq!(duplicate.status, StatusCode::CONFLICT);
+    assert_eq!(duplicate.status, StatusCode::OK);
     let invalid = edit(
         &app,
         &id,
@@ -149,6 +150,35 @@ async fn instagram_verification_goes_through_review(pool: PgPool) {
     assert_eq!(changed.json["verified_at"], Value::Null);
     let keeps = edit(&app, &id, profile(Some("floorlords_official")), &cookie).await;
     assert_eq!(keeps.json["verified_at"], Value::Null);
+}
+
+#[sqlx::test]
+async fn a_handle_is_reserved_by_verification_not_by_typing(pool: PgPool) {
+    let app = app(pool.clone());
+    let admin = sign_up(&app, "admin@example.com").await;
+    set_role(&pool, "admin@example.com", "admin").await;
+    let (squatter, squatter_id, _) = organizer(&app, "squat@example.com", "2030-06-01").await;
+    let (owner, owner_id, _) = organizer(&app, "org@example.com", "2030-06-01").await;
+    let approve = async |claim: &TestResponse| {
+        let id = claim.json["id"].as_str().unwrap();
+        let uri = format!("/api/admin/organizer-claims/{id}/approve");
+        send(&app, post(&uri, json!({}), Some(&admin))).await
+    };
+
+    // The squatter typed it first, yet the real owner can still take it and verify it.
+    edit(&app, &squatter_id, profile(Some("floor.lords")), &squatter).await;
+    let mine = edit(&app, &owner_id, profile(Some("floor.lords")), &owner).await;
+    assert_eq!(mine.status, StatusCode::OK);
+    let squat_claim = claim(&app, &squatter_id, &squatter).await;
+    let owner_claim = claim(&app, &owner_id, &owner).await;
+    assert_eq!(approve(&owner_claim).await.status, StatusCode::OK);
+
+    let refused = approve(&squat_claim).await;
+    assert_eq!(refused.status, StatusCode::CONFLICT);
+    assert_eq!(
+        refused.json["error"]["message"],
+        "another verified account holds this Instagram handle"
+    );
 }
 
 #[sqlx::test]

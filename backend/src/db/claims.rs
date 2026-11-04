@@ -1,6 +1,6 @@
 //! `dancer_claims` queries.
 
-use sqlx::{PgConnection, PgPool};
+use sqlx::{PgConnection, PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{
@@ -9,7 +9,7 @@ use crate::domain::{
 };
 
 /// Opens a pending claim, or returns the one this user already has on the dancer.
-pub async fn open(pool: &PgPool, dancer_id: Uuid, user_id: Uuid) -> sqlx::Result<Claim> {
+pub async fn open(conn: &mut PgConnection, dancer_id: Uuid, user_id: Uuid) -> sqlx::Result<Claim> {
     let created = sqlx::query_as!(
         Claim,
         r#"insert into dancer_claims (id, dancer_id, user_id, code)
@@ -22,18 +22,22 @@ pub async fn open(pool: &PgPool, dancer_id: Uuid, user_id: Uuid) -> sqlx::Result
         user_id,
         new_code(),
     )
-    .fetch_optional(pool)
+    .fetch_optional(&mut *conn)
     .await?;
     match created {
         Some(claim) => Ok(claim),
-        None => latest(pool, dancer_id, user_id)
+        None => latest(conn, dancer_id, user_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound),
     }
 }
 
 /// The user's most recent claim on the dancer.
-pub async fn latest(pool: &PgPool, dancer_id: Uuid, user_id: Uuid) -> sqlx::Result<Option<Claim>> {
+pub async fn latest(
+    db: impl PgExecutor<'_>,
+    dancer_id: Uuid,
+    user_id: Uuid,
+) -> sqlx::Result<Option<Claim>> {
     sqlx::query_as!(
         Claim,
         r#"select id, dancer_id, user_id, code, status as "status: ClaimStatus",
@@ -43,7 +47,7 @@ pub async fn latest(pool: &PgPool, dancer_id: Uuid, user_id: Uuid) -> sqlx::Resu
         dancer_id,
         user_id,
     )
-    .fetch_optional(pool)
+    .fetch_optional(db)
     .await
 }
 

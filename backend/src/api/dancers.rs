@@ -1,17 +1,13 @@
 //! `/dancers`: search-before-create, profiles and the jams a dancer took part in.
 
-use axum::{
-    Json,
-    extract::{Path, Query, State},
-    http::StatusCode,
-};
+use axum::{Json, extract::State, http::StatusCode};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use super::{
-    json::ValidJson,
+    extract::{Path, Query, ValidJson},
     page::{self, Page},
     transaction,
 };
@@ -21,6 +17,7 @@ use crate::{
     domain::{
         crew::CrewRef,
         dancer::{self, Dancer, DancerFields, DancerSource, DancerSummary, Participation},
+        event::by_phase,
         user::Role,
     },
     error::{AppError, ErrorEnvelope, InvalidCursor, InvalidFields, Unauthorized},
@@ -77,27 +74,12 @@ pub enum DancerPage {
     Dancer(Box<DancerResponse>),
 }
 
-/// Query of `GET /dancers/{id}/events`.
-#[derive(Debug, Deserialize, IntoParams)]
-#[into_params(parameter_in = Query)]
-pub struct EventsQuery {
-    /// Only one of the two lists; both when absent.
-    #[param(inline)]
-    pub scope: Option<Scope>,
-}
-
-/// Which list `GET /dancers/{id}/events` fills.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, ToSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum Scope {
-    Upcoming,
-    Past,
-}
-
-/// Body of `GET /dancers/{id}/events`: upcoming by date, past most recent first.
+/// Body of `GET /dancers/{id}/events`: live and upcoming soonest first, past most recent first.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct DancerEvents {
-    /// Jams starting today or later, soonest first.
+    /// Jams running today, soonest first.
+    pub live: Vec<Participation>,
+    /// Jams starting after today, soonest first.
     pub upcoming: Vec<Participation>,
     /// Earlier jams, most recent first.
     pub past: Vec<Participation>,
@@ -318,13 +300,13 @@ async fn delete(
     Ok(StatusCode::NO_CONTENT)
 }
 
-/// The public jams a dancer competed in or worked at, split into upcoming and past.
+/// The public jams a dancer competed in or worked at, split into live, upcoming and past.
 #[utoipa::path(
     get,
     path = "/dancers/{id}/events",
     tag = "dancers",
     operation_id = "dancer_events",
-    params(("id" = Uuid, Path, description = "Dancer id"), EventsQuery),
+    params(("id" = Uuid, Path, description = "Dancer id")),
     responses(
         (status = OK, body = DancerEvents),
         (status = NOT_FOUND, description = "No such dancer", body = ErrorEnvelope),
@@ -333,27 +315,16 @@ async fn delete(
 async fn events(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    Query(query): Query<EventsQuery>,
 ) -> Result<Json<DancerEvents>, AppError> {
     db::dancers::find_live(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    let (upcoming, mut past): (Vec<_>, Vec<_>) = db::dancers::participations(&state.pool, id)
-        .await?
-        .into_iter()
-        .partition(|p| p.upcoming);
-    // Rows come oldest first; the past list reads most recent first.
-    past.reverse();
-    let wanted = |scope, rows: Vec<Participation>| {
-        if query.scope.is_none_or(|s| s == scope) {
-            rows
-        } else {
-            Vec::new()
-        }
-    };
+    let rows = db::dancers::participations(&state.pool, id).await?;
+    let [live, upcoming, past] = by_phase(rows, |p| p.event.phase);
     Ok(Json(DancerEvents {
-        upcoming: wanted(Scope::Upcoming, upcoming),
-        past: wanted(Scope::Past, past),
+        live,
+        upcoming,
+        past,
     }))
 }
 

@@ -15,7 +15,7 @@ mod media;
 use chrono::{NaiveDate, Utc};
 use uuid::Uuid;
 
-use crate::domain::event::{Event, EventStatus};
+use crate::domain::event::{Event, EventStatus, Phase};
 
 /// A draft as the start sheet creates it: a name, a day and a timezone, nothing else.
 pub(crate) fn bare_draft() -> Event {
@@ -28,6 +28,7 @@ pub(crate) fn bare_draft() -> Event {
         slug: "winter-cypher-jam-000000".into(),
         description: None,
         status: EventStatus::Draft,
+        phase: Phase::Upcoming,
         starts_on: day,
         ends_on: day,
         timezone: "Europe/Zurich".into(),

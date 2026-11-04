@@ -1,13 +1,11 @@
 //! `/places`: the city a search names, for "Near <Place>" on the search page.
 
-use axum::{
-    Json,
-    extract::{Query, State},
-};
+use axum::{Json, extract::State};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use super::extract::Query;
 use crate::{
     db,
     domain::place::{Place, search_key},

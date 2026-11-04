@@ -28,8 +28,6 @@ pub enum EventStatus {
     Published,
     /// Announced, registration closed.
     RegistrationClosed,
-    /// Took place.
-    Completed,
     /// Called off.
     Cancelled,
 }
@@ -41,14 +39,13 @@ impl fmt::Display for EventStatus {
             Self::InReview => "in_review",
             Self::Published => "published",
             Self::RegistrationClosed => "registration_closed",
-            Self::Completed => "completed",
             Self::Cancelled => "cancelled",
         })
     }
 }
 
 /// An explicit status change: the last segment of `POST /events/{id}/{transition}`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, utoipa::ToSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "kebab-case")]
 pub enum Transition {
     /// `draft` → `in_review`: an organiser asks for the jam to go public.
@@ -57,9 +54,7 @@ pub enum Transition {
     Publish,
     /// `published` → `registration_closed`.
     CloseRegistration,
-    /// `registration_closed` → `completed`.
-    Complete,
-    /// Any status but `completed` and `cancelled` → `cancelled`.
+    /// Any status but `cancelled` → `cancelled`.
     Cancel,
 }
 
@@ -69,7 +64,6 @@ impl fmt::Display for Transition {
             Self::Submit => "submit",
             Self::Publish => "publish",
             Self::CloseRegistration => "close-registration",
-            Self::Complete => "complete",
             Self::Cancel => "cancel",
         })
     }
@@ -131,15 +125,14 @@ impl Missing {
 
 impl EventStatus {
     /// The status after `transition`, following draft → in_review → published →
-    /// registration_closed → completed (the team publishes drafts directly), with cancel
-    /// allowed from any state except completed and cancelled.
+    /// registration_closed (the team publishes drafts directly), with cancel allowed from any
+    /// state but cancelled. Whether the jam is over is its dates' business, not its status'.
     pub fn apply(self, transition: Transition) -> Result<Self, InvalidTransition> {
         use EventStatus::*;
         match (self, transition) {
             (Draft, Transition::Submit) => Ok(InReview),
             (Draft, Transition::Publish) => Ok(Published),
             (Published, Transition::CloseRegistration) => Ok(RegistrationClosed),
-            (RegistrationClosed, Transition::Complete) => Ok(Completed),
             (Draft | InReview | Published | RegistrationClosed, Transition::Cancel) => {
                 Ok(Cancelled)
             }
@@ -157,8 +150,41 @@ impl EventStatus {
 
     /// Drafts and jams in review are private to their writers.
     pub fn is_public(self) -> bool {
-        !matches!(self, Self::Draft | Self::InReview)
+        match self {
+            Self::Draft | Self::InReview => false,
+            Self::Published | Self::RegistrationClosed | Self::Cancelled => true,
+        }
     }
+}
+
+/// Where a jam is in time, by its own calendar: the `jam_phase` SQL function.
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
+#[sqlx(type_name = "jam_phase", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum Phase {
+    /// It starts after today.
+    Upcoming,
+    /// Today is one of its days.
+    Live,
+    /// It ended before today.
+    Past,
+}
+
+/// Rows that come oldest first, split by phase: live and upcoming soonest first, past most
+/// recent first, as the dancer and organiser pages list them.
+pub fn by_phase<T>(rows: Vec<T>, phase: impl Fn(&T) -> Phase) -> [Vec<T>; 3] {
+    let [mut live, mut upcoming, mut past] = [Vec::new(), Vec::new(), Vec::new()];
+    for row in rows {
+        match phase(&row) {
+            Phase::Live => live.push(row),
+            Phase::Upcoming => upcoming.push(row),
+            Phase::Past => past.push(row),
+        }
+    }
+    past.reverse();
+    [live, upcoming, past]
 }
 
 /// A stored jam.
@@ -176,6 +202,8 @@ pub struct Event {
     pub description: Option<String>,
     /// Where it is in its lifecycle.
     pub status: EventStatus,
+    /// Where it is in time, by its own calendar.
+    pub phase: Phase,
     /// First day, in the jam's timezone.
     pub starts_on: NaiveDate,
     /// Last day, never before `starts_on`.
@@ -227,7 +255,7 @@ pub struct UploadedFlyer {
     pub card_url: String,
 }
 
-/// Whether `user` may edit, delete or change the status of a jam owned by `organizer_id`.
+/// Whether `user` writes the jam owned by `organizer_id`: its organiser or the BreakingJam team.
 pub fn can_write(user: &User, organizer_id: Uuid) -> bool {
     user.id == organizer_id || user.role >= Role::SeedAdmin
 }
@@ -236,6 +264,29 @@ impl Event {
     /// Drafts and jams in review are private to their writers; every other status is public.
     pub fn visible_to(&self, user: Option<&User>) -> bool {
         self.status.is_public() || user.is_some_and(|u| can_write(u, self.organizer_id))
+    }
+
+    /// Public and over: its organiser may still record its battles' results, nothing else.
+    pub fn is_over(&self) -> bool {
+        self.status.is_public() && self.phase == Phase::Past
+    }
+
+    /// Whether `user` may edit its details, flyer and lineup, change its status or delete it;
+    /// the team still may once it is over, to fix history.
+    pub fn editable_by(&self, user: &User) -> bool {
+        can_write(user, self.organizer_id) && (!self.is_over() || user.role >= Role::SeedAdmin)
+    }
+
+    /// The status changes `user` may make now.
+    pub fn actions(&self, user: &User) -> Vec<Transition> {
+        use Transition::*;
+        if !self.editable_by(user) {
+            return Vec::new();
+        }
+        [Submit, Publish, CloseRegistration, Cancel]
+            .into_iter()
+            .filter(|t| user.role >= t.required_role() && self.status.apply(*t).is_ok())
+            .collect()
     }
 
     /// Whether `fields` would take away the city, country or pin it has; blank counts as none.

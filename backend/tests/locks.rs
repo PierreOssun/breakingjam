@@ -359,7 +359,7 @@ async fn a_staff_save_waits_for_another_save_of_the_same_jam(pool: PgPool) {
     let event: Uuid = race.event.parse().unwrap();
     let (judge, other) = (race.dancer("Judge").await, race.dancer("Other").await);
     let mut first = race.pool.begin().await.unwrap();
-    db::events::lock(&mut first, event).await.unwrap();
+    db::events::find_locked(&mut first, event).await.unwrap();
 
     let (app, admin, uri) = (
         race.app.clone(),
@@ -520,4 +520,79 @@ async fn an_approval_between_two_merges_of_its_dancer_goes_in_turn(pool: PgPool)
     let (approved, second) = (approve.await.unwrap(), second.await.unwrap());
     assert_eq!(approved.status, StatusCode::OK, "{}", approved.json);
     assert_eq!(second.status, StatusCode::CONFLICT, "{}", second.json);
+}
+
+/// A battle added while the jam's days change: it waits for the jam, then checks its start
+/// against the days as they now are (M26).
+#[sqlx::test]
+async fn a_battle_waits_for_a_change_of_the_jams_days(pool: PgPool) {
+    let race = race(pool).await;
+    let event: Uuid = race.event.parse().unwrap();
+    let mut move_days = race.pool.begin().await.unwrap();
+    db::events::find_locked(&mut move_days, event)
+        .await
+        .unwrap();
+
+    let (app, admin, uri) = (
+        race.app.clone(),
+        race.admin.clone(),
+        format!("/api/events/{event}/battles"),
+    );
+    let add = tokio::spawn(async move {
+        let battle = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult",
+                             "age_min": 18, "starts_at": "2030-06-01T14:00:00" });
+        send(&app, post(&uri, battle, Some(&admin))).await
+    });
+    tokio::time::sleep(Duration::from_millis(300)).await;
+    assert!(!add.is_finished(), "the battle didn't wait for the jam");
+    sqlx::query!(
+        "update events set starts_on = '2030-07-01', ends_on = '2030-07-01' where id = $1",
+        event
+    )
+    .execute(&mut *move_days)
+    .await
+    .unwrap();
+    move_days.commit().await.unwrap();
+
+    let added = add.await.unwrap();
+    assert_eq!(
+        added.status,
+        StatusCode::UNPROCESSABLE_ENTITY,
+        "{}",
+        added.json
+    );
+    assert_eq!(added.json["error"]["fields"][0]["field"], "starts_at");
+}
+
+/// A claim opened on a dancer being merged away waits for the merge, then finds it gone.
+#[sqlx::test]
+async fn a_claim_waits_for_a_merge_of_its_dancer(pool: PgPool) {
+    let race = race(pool).await;
+    let loser: Uuid = race.dancer("Loser").await.parse().unwrap();
+    let survivor: Uuid = race.dancer("Survivor").await.parse().unwrap();
+    let claimant = sign_up(&race.app, "claimant@example.com").await;
+    let mut merge = race.pool.begin().await.unwrap();
+    db::dancers::lock_merges(&mut merge, MergeLock::Exclusive)
+        .await
+        .unwrap();
+    let locked_loser = db::dancers::find_for_update(&mut merge, loser)
+        .await
+        .unwrap()
+        .unwrap();
+    let locked_survivor = db::dancers::find_for_update(&mut merge, survivor)
+        .await
+        .unwrap()
+        .unwrap();
+
+    let (app, uri) = (race.app.clone(), format!("/api/dancers/{loser}/claim"));
+    let claim =
+        tokio::spawn(async move { send(&app, post(&uri, json!({}), Some(&claimant))).await });
+    tokio::time::sleep(Duration::from_millis(300)).await;
+    assert!(!claim.is_finished(), "the claim didn't wait for the merge");
+    db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, &[])
+        .await
+        .unwrap();
+    merge.commit().await.unwrap();
+
+    assert_eq!(claim.await.unwrap().status, StatusCode::NOT_FOUND);
 }

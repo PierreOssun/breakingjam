@@ -114,8 +114,6 @@ export function DancerEditDialog({
         body: {
           dancer_name: values.dancer_name.trim(),
           aliases: values.aliases,
-          // Not in the sheet; kept as it is.
-          real_name: dancer.real_name ?? null,
           country: values.country,
           country2: values.country2 || null,
           city: values.city.trim() || null,
