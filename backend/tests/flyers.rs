@@ -18,7 +18,7 @@ fn jam() -> Value {
 
 /// A published jam on the map, and its owner's session.
 async fn published_jam(app: &Router, pool: &PgPool) -> (String, String) {
-    let owner = sign_up(app, "owner@example.com").await;
+    let owner = sign_up(app, pool, "owner@example.com").await;
     let id = id_of(&send(app, post("/api/events", jam(), Some(&owner))).await);
     publish(pool, &id).await;
     (id, owner)
@@ -102,7 +102,7 @@ async fn admins_can_take_a_flyer_down(pool: PgPool) {
     let (app, objects) = app_with_media(pool.clone()).await;
     let (id, owner) = published_jam(&app, &pool).await;
     upload(&app, &id, &owner).await;
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
 
     let removed = send(

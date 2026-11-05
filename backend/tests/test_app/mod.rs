@@ -25,22 +25,33 @@ use tower::ServiceExt;
 /// Where the test app says uploaded images are served from.
 pub const MEDIA_URL: &str = "https://media.example.com";
 
+/// Where nothing listens: tests that upload or read emails use `app_with_media` or `app_with_mail`.
+const NOWHERE: &str = "http://127.0.0.1:9";
+
 pub fn app(pool: PgPool) -> Router {
-    // Nothing listens there: tests that upload use `app_with_media`.
-    app_storing_at(pool, "http://127.0.0.1:9")
+    app_using(pool, NOWHERE, NOWHERE)
 }
 
-fn app_storing_at(pool: PgPool, media_store_url: &str) -> Router {
+fn app_using(pool: PgPool, media_store_url: &str, mail_url: &str) -> Router {
     let config = Config::from_lookup(|name| match name {
         "APP_PORT" => None,
         "FRONTEND_ORIGIN" => Some("http://localhost:5173".into()),
         "GOOGLE_REDIRECT_URL" => Some("http://localhost:8080/api/auth/google/callback".into()),
         "MEDIA_STORE_URL" => Some(media_store_url.into()),
         "MEDIA_PUBLIC_URL" => Some(MEDIA_URL.into()),
+        "MAIL_URL" => Some(mail_url.into()),
         _ => Some(format!("test-{name}")),
     })
     .unwrap();
     breakingjam::app(AppState::new(pool, config).unwrap()).unwrap()
+}
+
+/// Serves `router` on a free local port; returns its base URL.
+async fn serve(router: Router) -> String {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let url = format!("http://{}", listener.local_addr().unwrap());
+    tokio::spawn(async move { axum::serve(listener, router).await.unwrap() });
+    url
 }
 
 /// What the stand-in store holds: each key's request headers and body.
@@ -61,10 +72,36 @@ pub async fn app_with_media(pool: PgPool) -> (Router, Objects) {
             deleted.lock().unwrap().remove(&key);
         }),
     );
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
-    let url = format!("http://{}", listener.local_addr().unwrap());
-    tokio::spawn(async move { axum::serve(listener, store).await.unwrap() });
-    (app_storing_at(pool, &url), objects)
+    (app_using(pool, &serve(store).await, NOWHERE), objects)
+}
+
+/// What the stand-in mail service received: each email's JSON, oldest first.
+pub type Mails = Arc<Mutex<Vec<Value>>>;
+
+/// The app, with a stand-in for the Worker's mail handler on a local port.
+pub async fn app_with_mail(pool: PgPool) -> (Router, Mails) {
+    let mails = Mails::default();
+    let received = mails.clone();
+    let service = Router::new().route(
+        "/",
+        routing::post(|axum::Json(mail): axum::Json<Value>| async move {
+            received.lock().unwrap().push(mail);
+        }),
+    );
+    let url = serve(service).await;
+    (app_using(pool, NOWHERE, &url), mails)
+}
+
+/// The first email `wanted`, waiting up to two seconds: the API sends in the background.
+pub async fn mail_with(mails: &Mails, wanted: impl Fn(&Value) -> bool) -> Value {
+    for _ in 0..200 {
+        let found = mails.lock().unwrap().iter().find(|m| wanted(m)).cloned();
+        if let Some(mail) = found {
+            return mail;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+    }
+    panic!("no such email in {:?}", mails.lock().unwrap());
 }
 
 pub struct TestResponse {
@@ -128,14 +165,34 @@ pub fn delete(uri: &str, cookie: Option<&str>) -> Request<Body> {
     request("DELETE", uri, cookie).body(Body::empty()).unwrap()
 }
 
-/// Registers `email` and returns its session cookie, ready for a `Cookie` header.
-pub async fn sign_up(app: &Router, email: &str) -> String {
-    let body =
-        serde_json::json!({ "email": email, "password": "correct horse", "display_name": "Test" });
-    send(app, post("/api/auth/register", body, None))
+/// The password `sign_up` gives every account.
+pub const PASSWORD: &str = "correct horse";
+
+/// Registers `email`, confirms it with the mailed code and returns its session cookie, ready
+/// for a `Cookie` header.
+pub async fn sign_up(app: &Router, pool: &PgPool, email: &str) -> String {
+    let body = serde_json::json!({ "email": email, "password": PASSWORD, "display_name": "Test" });
+    let registered = send(app, post("/api/auth/register", body, None)).await;
+    assert_eq!(registered.status, StatusCode::ACCEPTED);
+    let code = live_code(pool, email, "verify_email").await.unwrap();
+    let body = serde_json::json!({ "email": email, "code": code });
+    send(app, post("/api/auth/email/verify", body, None))
         .await
         .cookie("bj_session")
         .unwrap()
+}
+
+/// The live code of `email` for `purpose` (`verify_email`, `reset_password`), as stored.
+pub async fn live_code(pool: &PgPool, email: &str, purpose: &str) -> Option<String> {
+    sqlx::query_scalar!(
+        "select c.code from email_codes c join app_users u on u.id = c.user_id
+         where u.email = $1::text::citext and c.purpose = $2::text::email_code_purpose",
+        email,
+        purpose,
+    )
+    .fetch_optional(pool)
+    .await
+    .unwrap()
 }
 
 /// Makes a jam public in the DB, whatever it lacks; the checklist `submit` runs is tested in

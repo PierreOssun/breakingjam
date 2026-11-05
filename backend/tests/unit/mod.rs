@@ -10,6 +10,7 @@ mod db;
 mod domain;
 mod error;
 mod flyer;
+mod mail;
 mod media;
 
 use chrono::{NaiveDate, Utc};

@@ -18,7 +18,7 @@ struct Jam {
 /// A logged-in organiser with one draft jam.
 async fn jam(pool: PgPool) -> Jam {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let body = json!({
         "name": "Paris Cypher", "starts_on": "2030-06-01", "ends_on": "2030-06-01",
         "timezone": "Europe/Paris", "city": "Paris", "country": "FR"
@@ -191,7 +191,7 @@ async fn prizes_are_per_place_in_one_currency(pool: PgPool) {
 
 #[sqlx::test]
 async fn battles_follow_jam_visibility_and_rights(pool: PgPool) {
-    let jam = jam(pool).await;
+    let jam = jam(pool.clone()).await;
     jam.battle(one_v_one()).await;
     let uri = format!("/api/events/{}/battles", jam.event_id);
 
@@ -203,7 +203,7 @@ async fn battles_follow_jam_visibility_and_rights(pool: PgPool) {
     let public = send(&jam.app, get(&uri, None)).await;
     assert_eq!(public.json.as_array().unwrap().len(), 1);
 
-    let stranger = sign_up(&jam.app, "other@example.com").await;
+    let stranger = sign_up(&jam.app, &pool, "other@example.com").await;
     let response = send(&jam.app, post(&uri, one_v_one(), Some(&stranger))).await;
     assert_eq!(response.status, StatusCode::FORBIDDEN);
 }
@@ -405,7 +405,7 @@ async fn deleting_a_battle_removes_its_entries(pool: PgPool) {
 
 #[sqlx::test]
 async fn staff_is_replaced_as_a_whole(pool: PgPool) {
-    let jam = jam(pool).await;
+    let jam = jam(pool.clone()).await;
     let judge = jam.dancer("Judge Judy").await;
     let dj = jam.dancer("DJ Spin").await;
     let uri = format!("/api/events/{}/staff", jam.event_id);
@@ -452,7 +452,7 @@ async fn staff_is_replaced_as_a_whole(pool: PgPool) {
     let cleared = send(&jam.app, put(&uri, json!([]), Some(&jam.owner))).await;
     assert_eq!(cleared.json, json!([]));
 
-    let stranger = sign_up(&jam.app, "other@example.com").await;
+    let stranger = sign_up(&jam.app, &pool, "other@example.com").await;
     jam.publish().await;
     assert_eq!(
         send(&jam.app, put(&uri, json!([]), Some(&stranger)))
@@ -464,7 +464,7 @@ async fn staff_is_replaced_as_a_whole(pool: PgPool) {
 
 #[sqlx::test]
 async fn an_entry_keeps_its_deleted_crew_but_no_entry_takes_one_on(pool: PgPool) {
-    let jam = jam(pool).await;
+    let jam = jam(pool.clone()).await;
     let duo = json!({ "format": "team", "team_size": 2, "gender": "bboy", "age": "adult", "age_min": 18 });
     let battle = id_of(&jam.battle(duo).await);
     let (a, b) = (jam.dancer("A").await, jam.dancer("B").await);
@@ -474,7 +474,7 @@ async fn an_entry_keeps_its_deleted_crew_but_no_entry_takes_one_on(pool: PgPool)
     let body = json!({ "dancer_ids": [a, b], "status": "confirmed", "crew_id": crew });
     let entry = id_of(&jam.entry(&battle, body.clone()).await);
     // Only the team deletes crews.
-    let team = sign_up(&jam.app, "team@example.com").await;
+    let team = sign_up(&jam.app, &pool, "team@example.com").await;
     set_role(&jam.pool, "team@example.com", "seed_admin").await;
     let gone = send(&jam.app, delete(&format!("/api/crews/{crew}"), Some(&team))).await;
     assert_eq!(gone.status, StatusCode::NO_CONTENT);

@@ -5,6 +5,7 @@ use std::{collections::HashMap, path::Path};
 use anyhow::Context;
 use breakingjam::{
     auth::password,
+    config::Secret,
     dataset::{self, import, key_for},
     db,
     domain::{
@@ -299,6 +300,11 @@ async fn main() -> anyhow::Result<()> {
 
     let url = std::env::var("DATABASE_URL").context("DATABASE_URL must be set")?;
     let password = std::env::var("SEED_PASSWORD").context("SEED_PASSWORD must be set")?;
+    let pepper = std::env::var("PASSWORD_PEPPER").context("PASSWORD_PEPPER must be set")?;
+    let accounts = Accounts {
+        password: &password,
+        pepper: &Secret(pepper),
+    };
     let options: PgConnectOptions = url.parse()?;
     // Demo jams and invented results about real dancers must never reach production. A remote
     // database (UAT) is seeded only when SEED_ALLOW_HOST names its host exactly.
@@ -317,14 +323,18 @@ async fn main() -> anyhow::Result<()> {
     .fetch_one(&pool)
     .await?;
     if seeded {
-        tracing::info!("already seeded, nothing to do");
+        // Their *.local emails get no reset code, so a new pepper or password is applied here.
+        for user in [&ADMIN, &SEED_ADMIN, &ORGANIZER] {
+            accounts.reset_password(&pool, user).await?;
+        }
+        tracing::info!("already seeded: only the seed accounts' passwords were set again");
         return Ok(());
     }
 
     let mut tx = pool.begin().await?;
-    insert_user(&mut tx, &ADMIN, &password).await?;
-    let seed_admin = insert_user(&mut tx, &SEED_ADMIN, &password).await?;
-    let organizer = insert_user(&mut tx, &ORGANIZER, &password).await?;
+    accounts.insert(&mut tx, &ADMIN).await?;
+    let seed_admin = accounts.insert(&mut tx, &SEED_ADMIN).await?;
+    let organizer = accounts.insert(&mut tx, &ORGANIZER).await?;
     let imported = import_data(&mut tx, seed_admin).await?;
     let crews = insert_crews(&mut tx).await?;
     let ids = Ids {
@@ -455,22 +465,44 @@ async fn import_data(conn: &mut PgConnection, owner: Uuid) -> anyhow::Result<imp
     Ok(imported)
 }
 
-async fn insert_user(conn: &mut PgConnection, user: &User, password: &str) -> anyhow::Result<Uuid> {
-    let id = Uuid::now_v7();
-    // Hash per user: a shared hash would reveal that the accounts share a password.
-    let password_hash = password::hash(password.to_owned()).await?;
-    sqlx::query!(
-        "insert into app_users (id, email, password_hash, display_name, role, email_verified_at)
-         values ($1, $2, $3, $4, $5, now())",
-        id,
-        user.email,
-        password_hash,
-        user.display_name,
-        user.role as _,
-    )
-    .execute(conn)
-    .await?;
-    Ok(id)
+/// How the seed accounts log in: one password, hashed with the site's pepper.
+struct Accounts<'a> {
+    password: &'a str,
+    pepper: &'a Secret,
+}
+
+impl Accounts<'_> {
+    /// A hash per account: a shared one would reveal that the accounts share a password.
+    async fn hash(&self) -> anyhow::Result<String> {
+        Ok(password::hash(self.password.to_owned(), self.pepper).await?)
+    }
+
+    async fn insert(&self, conn: &mut PgConnection, user: &User) -> anyhow::Result<Uuid> {
+        let id = Uuid::now_v7();
+        sqlx::query!(
+            "insert into app_users (id, email, password_hash, display_name, role, email_verified_at)
+             values ($1, $2, $3, $4, $5, now())",
+            id,
+            user.email,
+            self.hash().await?,
+            user.display_name,
+            user.role as _,
+        )
+        .execute(conn)
+        .await?;
+        Ok(id)
+    }
+
+    async fn reset_password(&self, pool: &PgPool, user: &User) -> anyhow::Result<()> {
+        sqlx::query!(
+            "update app_users set password_hash = $2 where email = $1",
+            user.email,
+            self.hash().await?,
+        )
+        .execute(pool)
+        .await?;
+        Ok(())
+    }
 }
 
 async fn insert_crews(conn: &mut PgConnection) -> sqlx::Result<Vec<Uuid>> {

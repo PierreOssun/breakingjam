@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, email::text as \"email!\", display_name, role as \"role: Role\", password_hash\n           from app_users where email = $1::text::citext",
+  "query": "select id, email::text as \"email!\", display_name, role as \"role: Role\", password_hash,\n                  email_verified_at is not null as \"email_verified!\"\n           from app_users where email = $1::text::citext",
   "describe": {
     "columns": [
       {
@@ -64,6 +64,12 @@
             "name": "password_hash"
           }
         }
+      },
+      {
+        "ordinal": 5,
+        "name": "email_verified!",
+        "type_info": "Bool",
+        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -76,8 +82,9 @@
       null,
       false,
       false,
-      true
+      true,
+      null
     ]
   },
-  "hash": "abf8288b70cc089eb7f4dc7f333aa3459cd85ab20421a88dc656cdf43a361f9c"
+  "hash": "63a272c9de2c021b9097df67fcb1887d60b3a1855456a7759bb5a09d6ae3d977"
 }

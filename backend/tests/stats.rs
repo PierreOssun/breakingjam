@@ -8,9 +8,9 @@ use test_app::{app, get, id_of, post, send, set_role, sign_up};
 #[sqlx::test]
 async fn admin_stats_count_jams_dancers_accounts_and_queues(pool: PgPool) {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
-    let organizer = sign_up(&app, "org@example.com").await;
+    let organizer = sign_up(&app, &pool, "org@example.com").await;
 
     let jam = |name: &str, day: &str| {
         json!({ "name": name, "starts_on": day, "ends_on": day,
@@ -68,7 +68,7 @@ async fn admin_stats_count_jams_dancers_accounts_and_queues(pool: PgPool) {
 #[sqlx::test]
 async fn site_stats_split_battles_at_today_and_leave_out_private_jams(pool: PgPool) {
     let app = app(pool.clone());
-    let organizer = sign_up(&app, "org@example.com").await;
+    let organizer = sign_up(&app, &pool, "org@example.com").await;
     let one_v_one = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
     // Each jam ends `days` from today, whatever day the test runs.
     let jam = async |name: &str, country: &str, battles: usize, days: i32, status: &str| {

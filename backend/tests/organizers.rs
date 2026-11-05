@@ -7,8 +7,13 @@ use sqlx::PgPool;
 use test_app::{TestResponse, app, get, post, publish, put, send, set_role, sign_up};
 
 /// Signs up and registers a jam (which makes an organiser); returns (cookie, account id, jam id).
-async fn organizer(app: &Router, email: &str, starts_on: &str) -> (String, String, String) {
-    let cookie = sign_up(app, email).await;
+async fn organizer(
+    app: &Router,
+    pool: &PgPool,
+    email: &str,
+    starts_on: &str,
+) -> (String, String, String) {
+    let cookie = sign_up(app, pool, email).await;
     let jam = json!({ "name": "Jam", "starts_on": starts_on, "ends_on": starts_on,
                       "timezone": "Europe/Paris", "city": "Paris", "country": "FR" });
     let created = send(app, post("/api/events", jam, Some(&cookie))).await;
@@ -39,7 +44,7 @@ async fn claim(app: &Router, id: &str, cookie: &str) -> TestResponse {
 #[sqlx::test]
 async fn organisers_have_a_public_page_with_their_jams(pool: PgPool) {
     let app = app(pool.clone());
-    let (_, id, jam) = organizer(&app, "org@example.com", "2030-06-01").await;
+    let (_, id, jam) = organizer(&app, &pool, "org@example.com", "2030-06-01").await;
     let page = send(&app, get(&format!("/api/organizers/{id}"), None)).await;
     assert_eq!(page.status, StatusCode::OK);
     assert_eq!(page.json["display_name"], "Test");
@@ -66,7 +71,7 @@ async fn organisers_have_a_public_page_with_their_jams(pool: PgPool) {
     assert_eq!(jam_page.json["organizer"]["jams"], 1);
 
     // Accounts that never registered a jam have no page.
-    let user = sign_up(&app, "user@example.com").await;
+    let user = sign_up(&app, &pool, "user@example.com").await;
     let me = send(&app, get("/api/auth/me", Some(&user))).await;
     let user_id = me.json["id"].as_str().unwrap();
     let none = send(&app, get(&format!("/api/organizers/{user_id}"), None)).await;
@@ -75,8 +80,8 @@ async fn organisers_have_a_public_page_with_their_jams(pool: PgPool) {
 
 #[sqlx::test]
 async fn only_the_organiser_edits_their_page(pool: PgPool) {
-    let app = app(pool);
-    let (cookie, id, _) = organizer(&app, "org@example.com", "2030-06-01").await;
+    let app = app(pool.clone());
+    let (cookie, id, _) = organizer(&app, &pool, "org@example.com", "2030-06-01").await;
 
     let edited = edit(&app, &id, profile(Some("@Floor.Lords")), &cookie).await;
     assert_eq!(edited.status, StatusCode::OK);
@@ -87,7 +92,7 @@ async fn only_the_organiser_edits_their_page(pool: PgPool) {
     let me = send(&app, get("/api/auth/me", Some(&cookie))).await;
     assert_eq!(me.json["display_name"], "Floor Lords e.V.");
 
-    let (other, _, _) = organizer(&app, "other@example.com", "2030-06-01").await;
+    let (other, _, _) = organizer(&app, &pool, "other@example.com", "2030-06-01").await;
     let forbidden = edit(&app, &id, profile(None), &other).await;
     assert_eq!(forbidden.status, StatusCode::FORBIDDEN);
     let taken = send(&app, get("/api/auth/me", Some(&other))).await;
@@ -108,9 +113,9 @@ async fn only_the_organiser_edits_their_page(pool: PgPool) {
 #[sqlx::test]
 async fn instagram_verification_goes_through_review(pool: PgPool) {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
-    let (cookie, id, jam) = organizer(&app, "org@example.com", "2030-06-01").await;
+    let (cookie, id, jam) = organizer(&app, &pool, "org@example.com", "2030-06-01").await;
 
     let no_handle = claim(&app, &id, &cookie).await;
     assert_eq!(no_handle.status, StatusCode::UNPROCESSABLE_ENTITY);
@@ -155,10 +160,11 @@ async fn instagram_verification_goes_through_review(pool: PgPool) {
 #[sqlx::test]
 async fn a_handle_is_reserved_by_verification_not_by_typing(pool: PgPool) {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
-    let (squatter, squatter_id, _) = organizer(&app, "squat@example.com", "2030-06-01").await;
-    let (owner, owner_id, _) = organizer(&app, "org@example.com", "2030-06-01").await;
+    let (squatter, squatter_id, _) =
+        organizer(&app, &pool, "squat@example.com", "2030-06-01").await;
+    let (owner, owner_id, _) = organizer(&app, &pool, "org@example.com", "2030-06-01").await;
     let approve = async |claim: &TestResponse| {
         let id = claim.json["id"].as_str().unwrap();
         let uri = format!("/api/admin/organizer-claims/{id}/approve");
@@ -184,9 +190,9 @@ async fn a_handle_is_reserved_by_verification_not_by_typing(pool: PgPool) {
 #[sqlx::test]
 async fn a_handle_changed_during_review_cannot_be_approved(pool: PgPool) {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
-    let (cookie, id, _) = organizer(&app, "org@example.com", "2030-06-01").await;
+    let (cookie, id, _) = organizer(&app, &pool, "org@example.com", "2030-06-01").await;
     edit(&app, &id, profile(Some("floor.lords")), &cookie).await;
     let opened = claim(&app, &id, &cookie).await;
     let claim_id = opened.json["id"].as_str().unwrap();
@@ -208,9 +214,9 @@ async fn a_handle_changed_during_review_cannot_be_approved(pool: PgPool) {
 #[sqlx::test]
 async fn a_rejected_claim_can_be_made_again(pool: PgPool) {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
-    let (cookie, id, _) = organizer(&app, "org@example.com", "2030-06-01").await;
+    let (cookie, id, _) = organizer(&app, &pool, "org@example.com", "2030-06-01").await;
     edit(&app, &id, profile(Some("floor.lords")), &cookie).await;
     let first = claim(&app, &id, &cookie).await;
     let first_id = first.json["id"].as_str().unwrap();

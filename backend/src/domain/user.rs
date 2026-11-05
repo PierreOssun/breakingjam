@@ -42,3 +42,19 @@ pub struct User {
     /// Privilege level.
     pub role: Role,
 }
+
+/// What a mailed code proves (M27).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, sqlx::Type)]
+#[sqlx(type_name = "email_code_purpose", rename_all = "snake_case")]
+pub enum CodePurpose {
+    /// The account owns its email; ends the sign-up.
+    VerifyEmail,
+    /// The account's owner may choose a new password.
+    ResetPassword,
+}
+
+/// A fresh 6-digit code, `000000` to `999999`.
+pub fn random_code() -> String {
+    // A v4 uuid is 122 bits from the OS's secure generator, so the remainder is as good as uniform.
+    format!("{:06}", Uuid::new_v4().as_u128() % 1_000_000)
+}

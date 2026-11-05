@@ -14,6 +14,8 @@ fn full_env() -> HashMap<&'static str, String> {
         "GOOGLE_REDIRECT_URL",
         "MEDIA_STORE_URL",
         "MEDIA_PUBLIC_URL",
+        "MAIL_URL",
+        "PASSWORD_PEPPER",
     ]
     .into_iter()
     .map(|name| (name, format!("{name}-value")))
@@ -56,4 +58,10 @@ fn rejects_invalid_port() {
     let mut env = full_env();
     env.insert("APP_PORT", "eighty".into());
     assert!(matches!(load(&env), Err(ConfigError::Invalid("APP_PORT"))));
+}
+
+#[test]
+fn the_pepper_never_shows_in_debug() {
+    let config = load(&full_env()).unwrap();
+    assert!(!format!("{config:?}").contains("PASSWORD_PEPPER-value"));
 }

@@ -80,19 +80,21 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
    npx wrangler secret put DATABASE_URL          # breakingjam_app's direct connection string
    npx wrangler secret put GOOGLE_CLIENT_ID
    npx wrangler secret put GOOGLE_CLIENT_SECRET
+   npx wrangler secret put PASSWORD_PEPPER       # openssl rand -base64 32, one per target
    ```
-   The other settings are plain `vars` in `wrangler.jsonc` (`APP_BASE_URL`, `GOOGLE_REDIRECT_URL`, `RUST_LOG`, `API_INSTANCES`).
+   The other settings are plain `vars` in `wrangler.jsonc` (`APP_BASE_URL`, `GOOGLE_REDIRECT_URL`, `RUST_LOG`, `API_INSTANCES`, `MEDIA_PUBLIC_URL`).
+   - `PASSWORD_PEPPER` is mixed into every password hash (M27). Keep a copy in a password manager: losing or changing it makes every password fail, and people then need "Forgot password". UAT's goes in the GitHub `uat` environment too (step 7), for the seed.
 7. **GitHub:** repository Settings → Environments → `prod` and `uat`.
    - Deployment branches: only `prod` for `prod`, only `uat` for `uat`.
    - Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` (the **owner** string, for migrations), `NEON_API_KEY`.
-   - `uat` only: secret `SEED_PASSWORD`, the seeded accounts' password (`openssl rand -hex 16`), and variable `SEED_ALLOW_HOST`, UAT's database host (`ep-….neon.tech`, no `-pooler`). The seed refuses any other host.
+   - `uat` only: secrets `SEED_PASSWORD`, the seeded accounts' password (`openssl rand -hex 16`), and `PASSWORD_PEPPER`, the same value as the UAT Worker's, and variable `SEED_ALLOW_HOST`, UAT's database host (`ep-….neon.tech`, no `-pooler`). The seed refuses any other host.
    - Variables: `NEON_PROJECT_ID`, `VITE_PROTOMAPS_KEY`, and `VITE_TILES_URL` only with self-hosted tiles.
    - `prod` only: required reviewers, so each production deploy waits for an approval.
    - Settings → Rules: a ruleset on `uat` and `prod` blocking force pushes and deletion.
 8. **UAT only, optional: Cloudflare Access** (Zero Trust → Access → Applications, free up to 50 users). It keeps UAT private; without it UAT is public, but `TEST_SITE` keeps it out of search engines and labels it.
    - A self-hosted application for `uat.breakingjam.com`, policy *Allow* with your testers' emails (login with a one-time PIN).
    - A second application for `uat.breakingjam.com/api/health`, policy *Bypass* for *Everyone*, so the deploy's check gets through. The more specific path wins.
-9. **UAT only: demo data.** After the first UAT deploy: Actions → **Seed UAT** → Run workflow, on the `uat` branch (`.github/workflows/seed-uat.yml`). It does nothing once the database is seeded.
+9. **UAT only: demo data.** After the first UAT deploy: Actions → **Seed UAT** → Run workflow, on the `uat` branch (`.github/workflows/seed-uat.yml`). Once the database is seeded it only sets the seed accounts' passwords again, which is how a new `SEED_PASSWORD` or `PASSWORD_PEPPER` reaches them.
    - UAT is seeded only from GitHub, so its owner string never sits on a laptop. Production has no seed.
 10. **Production only: backups.** See [Backups](#backups).
 11. **Media bucket**, before the first deploy that has it (the deploy fails on a missing bucket). From `deploy/`, with UAT's names for UAT:
@@ -102,6 +104,9 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
     ```
     UAT uses `breakingjam-media-uat` on `media-uat.breakingjam.com`: one level under the zone, as the free certificate doesn't cover `media.uat.…`. Never use the bucket's `r2.dev` address; it is rate-limited and meant for development. If the deploy says the API token lacks R2 access, give it *Workers R2 Storage: Edit*.
 12. **Places**, after the first deploy with the `places` tables (M22), and again whenever `data/places/` changes: Actions → **Import places** → Run workflow, from `uat` or `prod`. It loads the GeoNames cities that "Near <Place>" on `/search` needs, replacing them in one transaction, as the owner role (the target's `DATABASE_URL` secret).
+13. **Email Service** (M27), before the first deploy that has the `send_email` binding: Cloudflare dashboard → Compute → Email Service → Email Sending → onboard `breakingjam.com`. The DNS is on Cloudflare, so it adds the SPF, DKIM and DMARC records itself. Both targets send as `noreply@breakingjam.com` (`FROM` in `src/mail.ts`).
+    - It needs the Workers Paid plan, which the containers already need. Until the domain is onboarded, mail only reaches the account's verified addresses; new accounts start with a small daily quota that grows with good sending.
+    - Optional: a WAF rate-limiting rule on `POST /api/auth/*` per IP, in front of the API's own limits (5 tries per code, one code a minute, 10 a day).
 
 ## Releasing
 

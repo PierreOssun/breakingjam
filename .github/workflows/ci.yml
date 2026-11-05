@@ -48,10 +48,11 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --all-targets --all-features -- -D warnings
       - run: cargo test
-      # Second run must be a no-op. Runs before `prepare --check`, which touches sources and would force a rebuild.
+      # Second run must only set the seed accounts' passwords again. Runs before `prepare --check`, which touches sources and would force a rebuild.
       - run: cargo run --bin seed && cargo run --bin seed
         env:
           SEED_PASSWORD: ci-only
+          PASSWORD_PEPPER: ci-only
       - run: cargo sqlx prepare --check -- --all-targets
       # The curated jams in data/ (data/README.md).
       - run: cargo run --bin data -- check

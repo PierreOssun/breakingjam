@@ -112,7 +112,7 @@ async fn every_route_that_needs_a_session_refuses_anonymous_calls(pool: PgPool) 
 async fn every_route_on_a_missing_resource_answers_404(pool: PgPool) {
     let app = app(pool.clone());
     // An admin passes every role check, so only the missing resource can refuse.
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
     let mut wrong = Vec::new();
     let mut checked = 0;
@@ -137,7 +137,7 @@ async fn every_route_on_a_missing_resource_answers_404(pool: PgPool) {
 #[sqlx::test]
 async fn every_paged_list_rejects_a_garbled_cursor(pool: PgPool) {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
     let mut checked = 0;
     for (method, path, op) in operations() {
@@ -179,7 +179,7 @@ struct World {
 
 async fn world(pool: PgPool) -> World {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "owner@example.com").await;
+    let owner = sign_up(&app, &pool, "owner@example.com").await;
     let owner_id = id_of(&send(&app, get("/api/auth/me", Some(&owner))).await);
     let jam = id_of(&send(&app, post("/api/events", jam(), Some(&owner))).await);
     publish(&pool, &jam).await;
@@ -192,10 +192,10 @@ async fn world(pool: PgPool) -> World {
     let entry = id_of(&send(&app, post(&entry_uri, entry_body, Some(&owner))).await);
     let crew_body = json!({ "name": "Floor Lords" });
     let crew = id_of(&send(&app, post("/api/crews", crew_body, Some(&owner))).await);
-    let other_organizer = sign_up(&app, "other@example.com").await;
+    let other_organizer = sign_up(&app, &pool, "other@example.com").await;
     set_role(&pool, "other@example.com", "organizer").await;
     let other_id = id_of(&send(&app, get("/api/auth/me", Some(&other_organizer))).await);
-    let plain_user = sign_up(&app, "user@example.com").await;
+    let plain_user = sign_up(&app, &pool, "user@example.com").await;
     World {
         app,
         owner,

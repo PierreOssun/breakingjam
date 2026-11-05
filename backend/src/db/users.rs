@@ -29,27 +29,69 @@ pub async fn insert_with_password(
     .await
 }
 
-/// The account for `email` (case-insensitive) and its password hash, if any.
-pub async fn find_with_password(
-    pool: &PgPool,
-    email: &str,
-) -> sqlx::Result<Option<(User, Option<String>)>> {
+/// An account with what logging in checks.
+#[derive(Debug)]
+pub struct Credentials {
+    /// The account.
+    pub user: User,
+    /// Its Argon2 hash; `None` for a Google-only account.
+    pub password_hash: Option<String>,
+    /// Whether its owner proved the email (a code, or Google).
+    pub email_verified: bool,
+}
+
+/// The account for `email` (case-insensitive) with its credentials.
+pub async fn find_credentials(pool: &PgPool, email: &str) -> sqlx::Result<Option<Credentials>> {
     let row = sqlx::query!(
-        r#"select id, email::text as "email!", display_name, role as "role: Role", password_hash
+        r#"select id, email::text as "email!", display_name, role as "role: Role", password_hash,
+                  email_verified_at is not null as "email_verified!"
            from app_users where email = $1::text::citext"#,
         email,
     )
     .fetch_optional(pool)
     .await?;
-    Ok(row.map(|r| {
-        let user = User {
+    Ok(row.map(|r| Credentials {
+        user: User {
             id: r.id,
             email: r.email,
             display_name: r.display_name,
             role: r.role,
-        };
-        (user, r.password_hash)
+        },
+        password_hash: r.password_hash,
+        email_verified: r.email_verified,
     }))
+}
+
+/// Marks the account's email as proved by a mailed code.
+pub async fn mark_email_verified(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<()> {
+    // A Google account linked while nobody had proved the address may be someone else's, so
+    // the code's reader takes the account alone: `link_google` the other way round.
+    sqlx::query!(
+        "update app_users
+         set google_sub = case when email_verified_at is null then null else google_sub end,
+             email_verified_at = coalesce(email_verified_at, now())
+         where id = $1",
+        id
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
+/// Replaces the account's password.
+pub async fn set_password(
+    conn: &mut PgConnection,
+    id: Uuid,
+    password_hash: &str,
+) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update app_users set password_hash = $2 where id = $1",
+        id,
+        password_hash,
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
 }
 
 /// The account linked to a Google subject id.

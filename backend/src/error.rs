@@ -24,6 +24,9 @@ pub enum AppError {
     /// 403: logged in but not allowed.
     #[error("forbidden")]
     Forbidden,
+    /// 403: the right password, but the email is not confirmed yet; a code was mailed (M27).
+    #[error("email not verified")]
+    EmailUnverified,
     /// 409: a uniqueness rule or a status transition was violated.
     #[error("{0}")]
     Conflict(String),
@@ -93,7 +96,8 @@ pub struct ErrorEnvelope {
 /// What went wrong; `fields` only for validation errors.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ErrorBody {
-    /// `not_found`, `validation`, `unauthorized`, `forbidden`, `conflict` or `internal`.
+    /// `not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`
+    /// or `internal`.
     pub code: &'static str,
     /// Human-readable; generic for `internal`.
     pub message: String,
@@ -145,6 +149,7 @@ impl AppError {
             Self::Validation(_) => (StatusCode::UNPROCESSABLE_ENTITY, "validation"),
             Self::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized"),
             Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
+            Self::EmailUnverified => (StatusCode::FORBIDDEN, "email_unverified"),
             Self::Conflict(_) => (StatusCode::CONFLICT, "conflict"),
             Self::Internal(_) => (StatusCode::INTERNAL_SERVER_ERROR, "internal"),
         }

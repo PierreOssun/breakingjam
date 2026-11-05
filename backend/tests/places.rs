@@ -78,7 +78,7 @@ async fn exact_names_come_first_then_the_most_populated(pool: PgPool) {
 #[sqlx::test]
 async fn a_town_with_a_public_jam_beats_a_bigger_namesake(pool: PgPool) {
     let app = with_places(&pool).await;
-    let organizer = sign_up(&app, "org@example.com").await;
+    let organizer = sign_up(&app, &pool, "org@example.com").await;
     let body = json!({ "name": "Battle of Sun", "starts_on": "2030-09-19", "ends_on": "2030-09-19",
                        "timezone": "Europe/Paris", "city": "Saint-Louis", "country": "FR",
                        "lat": 47.5861, "lng": 7.5626 });

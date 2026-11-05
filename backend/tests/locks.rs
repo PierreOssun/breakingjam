@@ -27,7 +27,7 @@ struct Race {
 /// An admin's session and a jam with one 1v1 battle to race on.
 async fn race(pool: PgPool) -> Race {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
     let body = json!({
         "name": "Paris Cypher", "starts_on": "2030-06-01", "ends_on": "2030-06-01",
@@ -54,7 +54,7 @@ impl Race {
 
     /// A pending claim on `dancer`, by a new account.
     async fn claim(&self, dancer: &str, email: &str) -> Uuid {
-        let cookie = sign_up(&self.app, email).await;
+        let cookie = sign_up(&self.app, &self.pool, email).await;
         let uri = format!("/api/dancers/{dancer}/claim");
         let claim = send(&self.app, post(&uri, json!({}), Some(&cookie))).await;
         claim.json["id"].as_str().unwrap().parse().unwrap()
@@ -567,10 +567,10 @@ async fn a_battle_waits_for_a_change_of_the_jams_days(pool: PgPool) {
 /// A claim opened on a dancer being merged away waits for the merge, then finds it gone.
 #[sqlx::test]
 async fn a_claim_waits_for_a_merge_of_its_dancer(pool: PgPool) {
-    let race = race(pool).await;
+    let race = race(pool.clone()).await;
     let loser: Uuid = race.dancer("Loser").await.parse().unwrap();
     let survivor: Uuid = race.dancer("Survivor").await.parse().unwrap();
-    let claimant = sign_up(&race.app, "claimant@example.com").await;
+    let claimant = sign_up(&race.app, &pool, "claimant@example.com").await;
     let mut merge = race.pool.begin().await.unwrap();
     db::dancers::lock_merges(&mut merge, MergeLock::Exclusive)
         .await

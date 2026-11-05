@@ -38,6 +38,8 @@
   },
   // Uploaded flyers. The bucket and its domain are created once by hand (deploy/README.md).
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "breakingjam-media" }],
+  // The sign-up and password codes (M27); the domain is onboarded once by hand (deploy/README.md).
+  "send_email": [{ "name": "EMAIL" }],
   "exports": {
     "Api": { "type": "durable-object", "storage": "sqlite" }
   },
@@ -78,6 +80,7 @@
       "r2_buckets": [
         { "binding": "MEDIA", "bucket_name": "breakingjam-media-uat" }
       ],
+      "send_email": [{ "name": "EMAIL" }],
       "vars": {
         "APP_BASE_URL": "https://uat.breakingjam.com",
         "GOOGLE_REDIRECT_URL": "https://uat.breakingjam.com/api/auth/google/callback",

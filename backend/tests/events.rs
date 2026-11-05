@@ -62,8 +62,8 @@ async fn make_seed_admin(pool: &PgPool, email: &str) {
 
 #[sqlx::test]
 async fn create_makes_a_draft_and_promotes_the_user(pool: PgPool) {
-    let app = app(pool);
-    let cookie = sign_up(&app, "org@example.com").await;
+    let app = app(pool.clone());
+    let cookie = sign_up(&app, &pool, "org@example.com").await;
 
     let created = create(&app, &cookie, jam("Paris Cypher Sessions")).await;
     assert_eq!(created.status, StatusCode::CREATED);
@@ -89,8 +89,8 @@ async fn create_makes_a_draft_and_promotes_the_user(pool: PgPool) {
 
 #[sqlx::test]
 async fn a_draft_starts_from_a_name_and_a_day_and_fills_in_later(pool: PgPool) {
-    let app = app(pool);
-    let cookie = sign_up(&app, "org@example.com").await;
+    let app = app(pool.clone());
+    let cookie = sign_up(&app, &pool, "org@example.com").await;
     let start = json!({ "name": "Winter Cypher Jam", "starts_on": "2030-12-12",
                         "ends_on": "2030-12-12", "timezone": "Europe/Zurich" });
     let created = create(&app, &cookie, start).await;
@@ -136,7 +136,7 @@ async fn a_draft_starts_from_a_name_and_a_day_and_fills_in_later(pool: PgPool) {
 #[sqlx::test]
 async fn a_jam_past_draft_keeps_its_place(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
     publish(&pool, &id).await;
     let uri = format!("/api/events/{id}");
@@ -178,7 +178,7 @@ async fn a_jam_past_draft_keeps_its_place(pool: PgPool) {
 #[sqlx::test]
 async fn a_public_jam_that_never_had_a_place_keeps_saving(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
 
     // Published before the checklist, without a pin.
     let mut pinless = jam("Old Jam");
@@ -204,8 +204,8 @@ async fn a_public_jam_that_never_had_a_place_keeps_saving(pool: PgPool) {
 
 #[sqlx::test]
 async fn a_venue_less_draft_still_has_its_calendar_and_share_image(pool: PgPool) {
-    let app = app(pool);
-    let owner = sign_up(&app, "org@example.com").await;
+    let app = app(pool.clone());
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let start = json!({ "name": "Winter Cypher Jam", "starts_on": "2030-12-12",
                         "ends_on": "2030-12-12", "timezone": "Europe/Zurich", "venue_name": "Dynamo" });
     let id = draft_id(&app, &owner, start).await;
@@ -228,8 +228,8 @@ async fn a_venue_less_draft_still_has_its_calendar_and_share_image(pool: PgPool)
 
 #[sqlx::test]
 async fn opening_hours_are_clock_times(pool: PgPool) {
-    let app = app(pool);
-    let cookie = sign_up(&app, "org@example.com").await;
+    let app = app(pool.clone());
+    let cookie = sign_up(&app, &pool, "org@example.com").await;
     let mut body = jam("Jam");
     body["opens_at"] = json!("25:00");
     let response = create(&app, &cookie, body.clone()).await;
@@ -251,7 +251,7 @@ async fn opening_hours_are_clock_times(pool: PgPool) {
 #[sqlx::test]
 async fn going_public_needs_the_place_and_a_battle(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let mut unplaced = jam("Jam");
     unplaced["city"] = Value::Null;
     let id = draft_id(&app, &owner, unplaced).await;
@@ -281,7 +281,7 @@ async fn going_public_needs_the_place_and_a_battle(pool: PgPool) {
     assert_eq!(submitted.json["status"], "in_review");
 
     // The team's direct publish runs the same checklist.
-    let team = sign_up(&app, "team@example.com").await;
+    let team = sign_up(&app, &pool, "team@example.com").await;
     make_seed_admin(&pool, "team@example.com").await;
     let mut pinless = jam("Team Jam");
     pinless["lat"] = Value::Null;
@@ -301,8 +301,8 @@ async fn create_requires_login(pool: PgPool) {
 
 #[sqlx::test]
 async fn create_validates_fields_then_cross_field_rules(pool: PgPool) {
-    let app = app(pool);
-    let cookie = sign_up(&app, "org@example.com").await;
+    let app = app(pool.clone());
+    let cookie = sign_up(&app, &pool, "org@example.com").await;
 
     let mut bad = jam(" ");
     bad["country"] = json!("fr");
@@ -343,7 +343,7 @@ async fn create_validates_fields_then_cross_field_rules(pool: PgPool) {
 #[sqlx::test]
 async fn drafts_are_visible_to_writers_only(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let created = create(&app, &owner, jam("Secret Jam")).await;
     let id = created.json["id"].as_str().unwrap();
     let slug = created.json["slug"].as_str().unwrap();
@@ -355,11 +355,11 @@ async fn drafts_are_visible_to_writers_only(pool: PgPool) {
 
     let anonymous = send(&app, get(&format!("/api/events/{id}"), None)).await;
     assert_eq!(anonymous.status, StatusCode::NOT_FOUND);
-    let stranger = sign_up(&app, "other@example.com").await;
+    let stranger = sign_up(&app, &pool, "other@example.com").await;
     let other = send(&app, get(&format!("/api/events/{id}"), Some(&stranger))).await;
     assert_eq!(other.status, StatusCode::NOT_FOUND);
 
-    let admin = sign_up(&app, "seed@example.com").await;
+    let admin = sign_up(&app, &pool, "seed@example.com").await;
     make_seed_admin(&pool, "seed@example.com").await;
     let seen = send(&app, get(&format!("/api/events/{id}"), Some(&admin))).await;
     assert_eq!(seen.status, StatusCode::OK);
@@ -376,7 +376,7 @@ async fn drafts_are_visible_to_writers_only(pool: PgPool) {
 #[sqlx::test]
 async fn update_is_for_owner_and_seed_admin_and_keeps_the_slug(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let created = create(&app, &owner, jam("Old Name")).await;
     let id = created.json["id"].as_str().unwrap();
     publish(&pool, id).await;
@@ -391,7 +391,7 @@ async fn update_is_for_owner_and_seed_admin_and_keeps_the_slug(pool: PgPool) {
         "PUT never changes status"
     );
 
-    let stranger = sign_up(&app, "other@example.com").await;
+    let stranger = sign_up(&app, &pool, "other@example.com").await;
     let forbidden = send(&app, put(&uri, jam("Hijack"), Some(&stranger))).await;
     assert_eq!(forbidden.status, StatusCode::FORBIDDEN);
 
@@ -403,7 +403,7 @@ async fn update_is_for_owner_and_seed_admin_and_keeps_the_slug(pool: PgPool) {
 #[sqlx::test]
 async fn calendar_file_is_one_all_day_event_over_the_jams_days(pool: PgPool) {
     let app = app(pool.clone());
-    let cookie = sign_up(&app, "org@example.com").await;
+    let cookie = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &cookie, jam("Paris; Cypher, Sessions")).await;
     let uri = format!("/api/events/{id}/calendar.ics");
     // A draft is as hidden here as on its page.
@@ -436,7 +436,7 @@ async fn calendar_file_is_one_all_day_event_over_the_jams_days(pool: PgPool) {
 #[sqlx::test]
 async fn jams_the_team_entered_name_no_organiser(pool: PgPool) {
     let app = app(pool.clone());
-    let team = sign_up(&app, "team@example.com").await;
+    let team = sign_up(&app, &pool, "team@example.com").await;
     make_seed_admin(&pool, "team@example.com").await;
     let id = draft_id(&app, &team, jam("Imported")).await;
     add_battle(&app, &team, &id).await;
@@ -450,12 +450,12 @@ async fn jams_the_team_entered_name_no_organiser(pool: PgPool) {
 #[sqlx::test]
 async fn delete_is_soft_and_owner_only(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
     publish(&pool, &id).await;
     let uri = format!("/api/events/{id}");
 
-    let stranger = sign_up(&app, "other@example.com").await;
+    let stranger = sign_up(&app, &pool, "other@example.com").await;
     assert_eq!(
         send(&app, delete(&uri, Some(&stranger))).await.status,
         StatusCode::FORBIDDEN
@@ -482,7 +482,7 @@ async fn delete_is_soft_and_owner_only(pool: PgPool) {
 #[sqlx::test]
 async fn status_transitions_follow_the_machine(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
 
     let closed_too_early = act(&app, &owner, &id, "close-registration").await;
@@ -514,7 +514,7 @@ async fn status_transitions_follow_the_machine(pool: PgPool) {
     assert_eq!(cancel_twice.status, StatusCode::CONFLICT);
     assert_eq!(cancel_twice.json["error"]["code"], "conflict");
 
-    let stranger = sign_up(&app, "other@example.com").await;
+    let stranger = sign_up(&app, &pool, "other@example.com").await;
     let other_id = draft_id(&app, &stranger, jam("Other")).await;
     assert_eq!(
         act(&app, &owner, &other_id, "publish").await.status,
@@ -535,7 +535,7 @@ async fn status_transitions_follow_the_machine(pool: PgPool) {
 #[sqlx::test]
 async fn list_shows_public_jams_with_filters_and_pages(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let mut ids = Vec::new();
     for (name, starts_on, country) in [
         ("A", "2030-01-10", "FR"),
@@ -593,7 +593,7 @@ async fn list_shows_public_jams_with_filters_and_pages(pool: PgPool) {
 #[sqlx::test]
 async fn geojson_has_public_jams_with_coordinates_past_ones_included(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     // The BreakingJam team publishes without review.
     set_role(&pool, "org@example.com", "seed_admin").await;
     let make = async |name: &str, actions: &[&str]| {
@@ -645,7 +645,7 @@ fn text(response: &TestResponse) -> String {
 #[sqlx::test]
 async fn flyer_is_an_inlinable_svg_of_the_jam(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
     let battle = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
     send(
@@ -690,8 +690,8 @@ async fn flyer_is_an_inlinable_svg_of_the_jam(pool: PgPool) {
 
 #[sqlx::test]
 async fn flyer_speaks_the_page_language_and_shows_cancellation(pool: PgPool) {
-    let app = app(pool);
-    let owner = sign_up(&app, "org@example.com").await;
+    let app = app(pool.clone());
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
     act(&app, &owner, &id, "cancel").await;
 
@@ -732,7 +732,7 @@ async fn flyer_speaks_the_page_language_and_shows_cancellation(pool: PgPool) {
 #[sqlx::test]
 async fn og_image_is_a_1200_by_630_png(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
     publish(&pool, &id).await;
     let slug = send(&app, get(&format!("/api/events/{id}"), None))
@@ -759,7 +759,7 @@ async fn og_image_is_a_1200_by_630_png(pool: PgPool) {
 #[sqlx::test]
 async fn geojson_carries_what_the_popup_and_filters_need(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Paris Cypher Sessions")).await;
     let battles = [
         json!({ "format": "team", "team_size": 1, "gender": "bgirl", "age": "adult", "age_min": 18 }),
@@ -793,7 +793,7 @@ async fn geojson_carries_what_the_popup_and_filters_need(pool: PgPool) {
 #[sqlx::test]
 async fn a_public_jam_that_is_over_keeps_only_its_battles_open(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let mut body = jam("Over");
     body["starts_on"] = json!("2020-06-01");
     body["ends_on"] = json!("2020-06-01");
@@ -870,7 +870,7 @@ async fn a_public_jam_that_is_over_keeps_only_its_battles_open(pool: PgPool) {
     );
 
     // The team fixes history.
-    let team = sign_up(&app, "team@example.com").await;
+    let team = sign_up(&app, &pool, "team@example.com").await;
     set_role(&pool, "team@example.com", "seed_admin").await;
     let fixed = send(&app, put(&uri, body, Some(&team))).await;
     assert_eq!(fixed.status, StatusCode::OK);
@@ -885,7 +885,7 @@ async fn a_public_jam_that_is_over_keeps_only_its_battles_open(pool: PgPool) {
 #[sqlx::test]
 async fn the_jam_page_says_what_its_writer_may_do(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
     let uri = format!("/api/events/{id}");
     let draft = send(&app, get(&uri, Some(&owner))).await;
@@ -903,7 +903,7 @@ async fn the_jam_page_says_what_its_writer_may_do(pool: PgPool) {
 #[sqlx::test]
 async fn a_timezone_postgres_does_not_know_is_refused(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let mut body = jam("Jam");
     body["timezone"] = json!("Europe/Atlantis");
     let refused = create(&app, &owner, body.clone()).await;
@@ -918,8 +918,8 @@ async fn a_timezone_postgres_does_not_know_is_refused(pool: PgPool) {
 #[sqlx::test]
 async fn the_checklist_holds_once_submitted(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
-    let admin = sign_up(&app, "admin@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
     add_battle(&app, &owner, &id).await;
@@ -969,7 +969,7 @@ async fn the_checklist_holds_once_submitted(pool: PgPool) {
 #[sqlx::test]
 async fn an_id_that_does_not_parse_is_not_found(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     for uri in [
         "/api/events/nope/battles",
         "/api/dancers/nope/events",
@@ -984,7 +984,7 @@ async fn an_id_that_does_not_parse_is_not_found(pool: PgPool) {
 #[sqlx::test]
 async fn an_organiser_cannot_move_a_public_jam_into_the_past(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
     let mut body = jam("Jam");
     let id = draft_id(&app, &owner, body.clone()).await;
     let uri = format!("/api/events/{id}");
@@ -998,7 +998,7 @@ async fn an_organiser_cannot_move_a_public_jam_into_the_past(pool: PgPool) {
     assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY);
     assert_eq!(refused.json["error"]["fields"][0]["field"], "ends_on");
 
-    let team = sign_up(&app, "team@example.com").await;
+    let team = sign_up(&app, &pool, "team@example.com").await;
     set_role(&pool, "team@example.com", "seed_admin").await;
     let fixed = send(&app, put(&uri, body, Some(&team))).await;
     assert_eq!(fixed.status, StatusCode::OK, "the team records history");

@@ -5,6 +5,7 @@ pub mod claims;
 pub mod crews;
 pub mod dancers;
 pub mod dataset;
+pub mod email_codes;
 pub mod events;
 pub mod organizers;
 pub mod places;

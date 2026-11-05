@@ -28,7 +28,7 @@ async fn create(app: &Router, cookie: &str, body: Value) -> TestResponse {
 
 /// A new account that has registered a jam, so it may make pages for others.
 async fn organizer(app: &Router, pool: &PgPool, email: &str) -> String {
-    let cookie = sign_up(app, email).await;
+    let cookie = sign_up(app, pool, email).await;
     set_role(pool, email, "organizer").await;
     cookie
 }
@@ -45,7 +45,7 @@ fn names(response: &TestResponse) -> Vec<String> {
 #[sqlx::test]
 async fn create_normalises_and_sets_source_from_role(pool: PgPool) {
     let app = app(pool.clone());
-    let user = sign_up(&app, "user@example.com").await;
+    let user = sign_up(&app, &pool, "user@example.com").await;
     // A plain account makes only its own page; pages for others come with jams.
     let for_someone = create(&app, &user, dancer("Lil G", None)).await;
     assert_eq!(for_someone.status, StatusCode::FORBIDDEN);
@@ -74,7 +74,7 @@ async fn create_normalises_and_sets_source_from_role(pool: PgPool) {
     let by_organizer = create(&app, &organizer, dancer("Ventus", None)).await;
     assert_eq!(by_organizer.json["source"], "organizer");
 
-    let seeder = sign_up(&app, "seed@example.com").await;
+    let seeder = sign_up(&app, &pool, "seed@example.com").await;
     set_role(&pool, "seed@example.com", "seed_admin").await;
     let by_seeder = create(&app, &seeder, dancer("Atlas", None)).await;
     assert_eq!(by_seeder.json["source"], "seed");
@@ -110,8 +110,8 @@ async fn handle_is_unique_but_names_are_not(pool: PgPool) {
 
 #[sqlx::test]
 async fn create_validates_fields(pool: PgPool) {
-    let app = app(pool);
-    let cookie = sign_up(&app, "user@example.com").await;
+    let app = app(pool.clone());
+    let cookie = sign_up(&app, &pool, "user@example.com").await;
     let mut bad = dancer(" ", Some("lil g"));
     bad["country"] = json!("France");
     bad["aliases"] = json!(["ok", " "]);
@@ -136,7 +136,7 @@ async fn create_validates_fields(pool: PgPool) {
 #[sqlx::test]
 async fn search_matches_name_alias_and_handle_notable_first(pool: PgPool) {
     let app = app(pool.clone());
-    let seeder = sign_up(&app, "seed@example.com").await;
+    let seeder = sign_up(&app, &pool, "seed@example.com").await;
     let user = organizer(&app, &pool, "org@example.com").await;
 
     create(&app, &user, dancer("Kid Rockett", None)).await;
@@ -192,7 +192,7 @@ async fn search_matches_name_alias_and_handle_notable_first(pool: PgPool) {
 async fn profile_shows_can_edit_per_caller(pool: PgPool) {
     let app = app(pool.clone());
     let creator = organizer(&app, &pool, "creator@example.com").await;
-    let stranger = sign_up(&app, "stranger@example.com").await;
+    let stranger = sign_up(&app, &pool, "stranger@example.com").await;
     let id = id_of(&create(&app, &creator, dancer("Lil G", None)).await);
     let uri = format!("/api/dancers/{id}");
 
@@ -216,7 +216,7 @@ async fn profile_shows_can_edit_per_caller(pool: PgPool) {
 async fn update_rights_follow_verification(pool: PgPool) {
     let app = app(pool.clone());
     let creator = organizer(&app, &pool, "creator@example.com").await;
-    let owner = sign_up(&app, "owner@example.com").await;
+    let owner = sign_up(&app, &pool, "owner@example.com").await;
     let id = id_of(&create(&app, &creator, dancer("Lil G", None)).await);
     let uri = format!("/api/dancers/{id}");
 
@@ -379,8 +379,8 @@ async fn events_split_live_upcoming_and_past_with_roles(pool: PgPool) {
 #[sqlx::test]
 async fn a_deleted_dancer_stays_on_past_results_and_saves_but_joins_nothing_new(pool: PgPool) {
     let app = app(pool.clone());
-    let owner = sign_up(&app, "org@example.com").await;
-    let admin = sign_up(&app, "admin@example.com").await;
+    let owner = sign_up(&app, &pool, "org@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "seed_admin").await;
     let jam = json!({ "name": "Paris Cypher", "starts_on": "2020-06-01", "ends_on": "2020-06-01",
                       "timezone": "Europe/Paris", "city": "Paris", "country": "FR" });
@@ -453,7 +453,7 @@ async fn verify(pool: &PgPool, dancer: &str, email: &str) {
 #[sqlx::test]
 async fn an_account_makes_one_page_of_its_own_and_me_shows_it(pool: PgPool) {
     let app = app(pool.clone());
-    let user = sign_up(&app, "nova@example.com").await;
+    let user = sign_up(&app, &pool, "nova@example.com").await;
     let me = |cookie: String| {
         let app = app.clone();
         async move { send(&app, get("/api/auth/me", Some(&cookie))).await.json }
@@ -493,7 +493,7 @@ async fn an_account_makes_one_page_of_its_own_and_me_shows_it(pool: PgPool) {
     }));
     let mut titled = dancer("Atlas", None);
     titled["titles"] = json!(["bboy"]);
-    let other = sign_up(&app, "atlas@example.com").await;
+    let other = sign_up(&app, &pool, "atlas@example.com").await;
     assert_eq!(
         send(&app, mine(titled, &other)).await.status,
         StatusCode::FORBIDDEN
@@ -519,7 +519,7 @@ async fn an_account_makes_one_page_of_its_own_and_me_shows_it(pool: PgPool) {
 
     // Merged into the page an organiser made for the same dancer, it follows the merge.
     let survivor = id_of(&create(&app, &organizer, dancer("Nova", Some("nova"))).await);
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
     let uri = format!("/api/admin/dancers/{id}/merge");
     let merged = send(&app, post(&uri, json!({ "into": survivor }), Some(&admin))).await;
@@ -548,7 +548,7 @@ async fn an_account_makes_one_page_of_its_own_and_me_shows_it(pool: PgPool) {
 
     // The same when someone else's claim on the page it made is approved.
     let fresh = id_of(&fresh);
-    sign_up(&app, "rival@example.com").await;
+    sign_up(&app, &pool, "rival@example.com").await;
     verify(&pool, &fresh, "rival@example.com").await;
     assert_eq!(me(user.clone()).await["dancer"], Value::Null);
     let again = send(&app, mine(dancer("Nova", None), &user)).await;
@@ -559,8 +559,8 @@ async fn an_account_makes_one_page_of_its_own_and_me_shows_it(pool: PgPool) {
 async fn titles_are_set_by_the_verified_owner_or_the_team_only(pool: PgPool) {
     let app = app(pool.clone());
     let organizer = organizer(&app, &pool, "org@example.com").await;
-    let owner = sign_up(&app, "owner@example.com").await;
-    let seeder = sign_up(&app, "seed@example.com").await;
+    let owner = sign_up(&app, &pool, "owner@example.com").await;
+    let seeder = sign_up(&app, &pool, "seed@example.com").await;
     set_role(&pool, "seed@example.com", "seed_admin").await;
     let with_titles = |name: &str, titles: Value| {
         let mut body = dancer(name, None);
@@ -608,7 +608,7 @@ async fn titles_are_set_by_the_verified_owner_or_the_team_only(pool: PgPool) {
     .await;
     assert_eq!(seeded.json["titles"], json!(["breaker", "judge"]));
     let survivor = id_of(&create(&app, &organizer, dancer("Hong10", None)).await);
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
     let merge = format!("/api/admin/dancers/{}/merge", id_of(&seeded));
     send(

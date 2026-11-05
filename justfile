@@ -1,9 +1,10 @@
 # Every recipe uses the compose Postgres, whatever the shell exports: a Neon URL left in the
 # environment must never reach `reset-db` or `seed`.
 export DATABASE_URL := "postgres://breakingjam:breakingjam@localhost:5432/breakingjam"
-# Uploaded flyers go to, and are served from, the `just media` bucket.
+# Uploaded flyers go to, and are served from, the `just media` bucket, which also prints the code emails.
 export MEDIA_STORE_URL := "http://localhost:8788"
 export MEDIA_PUBLIC_URL := "http://localhost:8788"
+export MAIL_URL := "http://localhost:8788/mail"
 
 # `just` lists these recipes.
 default:
@@ -21,7 +22,7 @@ backend: db
 frontend:
     cd frontend && npm run dev
 
-# The local media bucket on :8788, where uploaded flyers go in development.
+# The local media bucket on :8788, where uploaded flyers go in development; it prints the code emails too.
 media:
     cd deploy && npx wrangler dev -c wrangler.media.jsonc
 
@@ -46,7 +47,7 @@ dev target="": db
         exit 1 ;;
     esac
 
-# Create the admin accounts and demo data (no-op when already seeded).
+# Create the admin accounts and demo data; once seeded, it only sets the admin accounts' passwords again.
 seed: db
     cd backend && cargo run --bin seed
 

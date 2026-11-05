@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "delete from email_codes where user_id = $1 and purpose = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "email_code_purpose",
+            "kind": {
+              "Enum": [
+                "verify_email",
+                "reset_password"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d27bf2773e7ff7a7f8cc344ddcf02bc8c05be9abe4be9dc1a70ac5fe5cd4d144"
+}

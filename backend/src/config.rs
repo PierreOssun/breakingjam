@@ -1,5 +1,7 @@
 //! Process configuration read from the environment.
 
+use std::fmt;
+
 use thiserror::Error;
 
 const DEFAULT_PORT: u16 = 8080;
@@ -25,6 +27,20 @@ pub struct Config {
     pub media_store_url: String,
     /// Public base URL of uploaded images, e.g. `https://media.breakingjam.com`.
     pub media_public_url: String,
+    /// Where the API posts outgoing emails: the Worker's Email Service handler in production.
+    pub mail_url: String,
+    /// Site secret mixed into every password hash; changing it invalidates every password.
+    pub password_pepper: Secret,
+}
+
+/// A value kept out of logs: `Debug` prints `***`.
+#[derive(Clone)]
+pub struct Secret(pub String);
+
+impl fmt::Debug for Secret {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("***")
+    }
 }
 
 /// Why the configuration could not be built.
@@ -77,6 +93,8 @@ impl Config {
             google_redirect_url: required("GOOGLE_REDIRECT_URL"),
             media_store_url: required("MEDIA_STORE_URL"),
             media_public_url: required("MEDIA_PUBLIC_URL"),
+            mail_url: required("MAIL_URL"),
+            password_pepper: Secret(required("PASSWORD_PEPPER")),
         };
 
         if missing.is_empty() {

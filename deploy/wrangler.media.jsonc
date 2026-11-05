@@ -1,5 +1,5 @@
 // `just media` (src/mediaDev.ts): a local R2 bucket for uploads in development, kept in
-// .wrangler/state between runs. Never deployed.
+// .wrangler/state between runs, and the console as the mail service. Never deployed.
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "breakingjam-media-dev",

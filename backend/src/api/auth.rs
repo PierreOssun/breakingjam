@@ -1,4 +1,4 @@
-//! `/auth`: register, login, logout, me, Google sign-in.
+//! `/auth`: register, login, logout, me, Google sign-in; the codes are in `codes`.
 
 use axum::{
     Json,
@@ -13,7 +13,10 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 use validator::Validate;
 
-use super::extract::{Query, ValidJson};
+use super::{
+    codes::send_code,
+    extract::{Query, ValidJson},
+};
 use crate::{
     auth::{
         google::{self, Account},
@@ -23,9 +26,10 @@ use crate::{
     db,
     domain::{
         dancer::OwnPage,
-        user::{Role, User},
+        user::{CodePurpose, Role, User},
     },
     error::{AppError, ErrorEnvelope, InvalidFields, Unauthorized},
+    mail::Language,
     state::AppState,
 };
 
@@ -55,6 +59,9 @@ pub struct RegisterRequest {
         custom(function = "crate::domain::not_blank")
     )]
     pub display_name: String,
+    /// Language of the code email; English when absent.
+    #[serde(default)]
+    pub language: Language,
 }
 
 /// Body of `POST /auth/login`.
@@ -64,6 +71,16 @@ pub struct LoginRequest {
     pub email: String,
     /// Plain password.
     pub password: String,
+    /// Language of the code email, sent when the email is not confirmed yet; English when absent.
+    #[serde(default)]
+    pub language: Language,
+}
+
+/// Answer of `POST /auth/register`: where the code went.
+#[derive(Debug, Serialize, ToSchema)]
+pub struct CodeSent {
+    /// The account's email, as stored.
+    pub email: String,
 }
 
 /// The logged-in account, as returned by register, login and me.
@@ -113,9 +130,10 @@ pub struct GoogleCallbackQuery {
     pub state: Option<String>,
 }
 
-type WithCookie<T> = ([(axum::http::HeaderName, HeaderValue); 1], T);
+pub(super) type WithCookie<T> = ([(axum::http::HeaderName, HeaderValue); 1], T);
 
-/// Create a password account and log in.
+/// Create a password account and mail it a code; the session starts once the code is
+/// confirmed (`POST /auth/email/verify`, M27).
 #[utoipa::path(
     post,
     path = "/auth/register",
@@ -123,7 +141,7 @@ type WithCookie<T> = ([(axum::http::HeaderName, HeaderValue); 1], T);
     operation_id = "register",
     request_body = RegisterRequest,
     responses(
-        (status = CREATED, body = UserResponse, headers(("set-cookie" = String, description = "`bj_session`, HttpOnly, 30 days"))),
+        (status = ACCEPTED, body = CodeSent),
         (status = CONFLICT, description = "Email already registered", body = ErrorEnvelope),
         InvalidFields,
     )
@@ -131,21 +149,20 @@ type WithCookie<T> = ([(axum::http::HeaderName, HeaderValue); 1], T);
 async fn register(
     State(state): State<AppState>,
     ValidJson(req): ValidJson<RegisterRequest>,
-) -> Result<(StatusCode, WithCookie<Json<UserResponse>>), AppError> {
+) -> Result<(StatusCode, Json<CodeSent>), AppError> {
     let email = req.email.trim();
     // Replaying a taken email must not cost a hash; the unique index still settles races.
-    if db::users::find_with_password(&state.pool, email)
+    if db::users::find_credentials(&state.pool, email)
         .await?
         .is_some()
     {
         return Err(AppError::Conflict("email already registered".into()));
     }
-    let hash = password::hash(req.password).await?;
+    let hash = password::hash(req.password, &state.config.password_pepper).await?;
     let user =
         db::users::insert_with_password(&state.pool, email, req.display_name.trim(), &hash).await?;
-    let cookie = session::start(&state, user.id).await?;
-    let user = UserResponse::load(&state.pool, user).await?;
-    Ok((StatusCode::CREATED, ([(SET_COOKIE, cookie)], Json(user))))
+    send_code(&state, &user, CodePurpose::VerifyEmail, req.language).await?;
+    Ok((StatusCode::ACCEPTED, Json(CodeSent { email: user.email })))
 }
 
 /// Log in with email and password.
@@ -158,6 +175,7 @@ async fn register(
     responses(
         (status = OK, body = UserResponse, headers(("set-cookie" = String, description = "`bj_session`, HttpOnly, 30 days"))),
         (status = UNAUTHORIZED, description = "Unknown email, wrong password or Google-only account", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "`email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute", body = ErrorEnvelope),
     )
 )]
 async fn login(
@@ -166,17 +184,35 @@ async fn login(
 ) -> Result<WithCookie<Json<UserResponse>>, AppError> {
     // Unknown email, Google-only account and wrong password all look the same to the client,
     // in timing too: every attempt verifies against some hash.
-    let found = db::users::find_with_password(&state.pool, req.email.trim()).await?;
+    let found = db::users::find_credentials(&state.pool, req.email.trim()).await?;
     let hash = found
         .as_ref()
-        .and_then(|(_, hash)| hash.clone())
+        .and_then(|account| account.password_hash.clone())
         .unwrap_or_else(|| password::NO_PASSWORD.to_owned());
-    let ok = password::verify(req.password, hash).await?;
+    let ok = password::verify(req.password, hash, &state.config.password_pepper).await?;
     // A Google-only account has no hash of its own: matching the stand-in must not log in.
-    let (user, _) = found
-        .filter(|(_, own)| ok && own.is_some())
+    let account = found
+        .filter(|account| ok && account.password_hash.is_some())
         .ok_or(AppError::Unauthorized)?;
-    let cookie = session::start(&state, user.id).await?;
+    if !account.email_verified {
+        send_code(
+            &state,
+            &account.user,
+            CodePurpose::VerifyEmail,
+            req.language,
+        )
+        .await?;
+        return Err(AppError::EmailUnverified);
+    }
+    log_in(&state, account.user).await
+}
+
+/// Starts a session for `user`: the cookie and the account, as login answers.
+pub(super) async fn log_in(
+    state: &AppState,
+    user: User,
+) -> Result<WithCookie<Json<UserResponse>>, AppError> {
+    let cookie = session::start(state, user.id).await?;
     let user = UserResponse::load(&state.pool, user).await?;
     Ok(([(SET_COOKIE, cookie)], Json(user)))
 }

@@ -1,7 +1,8 @@
 // The production edge (ARCHITECTURE §9): one Worker serves the built frontend as static
 // assets, forwards /api/* to the Rust API running as a Cloudflare Container, gives jam
-// pages their Open Graph tags and stores the images the API uploads.
+// pages their Open Graph tags, stores the images the API uploads and sends its emails.
 import { Container, ContainerProxy } from "@cloudflare/containers";
+import { FROM, MAIL_HOST, sendMail } from "./mail";
 import { MEDIA_STORE_HOST, storeMedia } from "./media";
 import { type JamSummary, openGraphTags } from "./openGraph";
 
@@ -11,6 +12,8 @@ export interface Env {
   ASSETS: Fetcher;
   /** Uploaded images (flyers), served by the bucket's own domain. */
   MEDIA: R2Bucket;
+  /** Cloudflare Email Service: the sign-up and password codes (M27). */
+  EMAIL: SendEmail;
   /** `https://breakingjam.com`: the one public origin. */
   APP_BASE_URL: string;
   GOOGLE_REDIRECT_URL: string;
@@ -22,6 +25,8 @@ export interface Env {
   DATABASE_URL: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
+  /** Mixed into every password hash; changing it invalidates every password. */
+  PASSWORD_PEPPER: string;
   /** "true" on UAT only: kept out of search engines, with a banner saying its jams are demo data. */
   TEST_SITE?: string;
 }
@@ -48,15 +53,19 @@ export class Api extends Container<Env> {
       LOG_FORMAT: "json",
       MEDIA_STORE_URL: `http://${MEDIA_STORE_HOST}`,
       MEDIA_PUBLIC_URL: env.MEDIA_PUBLIC_URL,
+      MAIL_URL: `http://${MAIL_HOST}`,
+      PASSWORD_PEPPER: env.PASSWORD_PEPPER,
     };
   }
 }
 
 // Assigned, not a `static` field: the library's setter registers the handler, and a class
-// field would bypass it. The API's media writes land here instead of on the network.
+// field would bypass it. The API's media writes and emails land here instead of on the network.
 Api.outboundByHost = {
   [MEDIA_STORE_HOST]: (request: Request, env: Env) =>
     storeMedia(request, env.MEDIA),
+  [MAIL_HOST]: (request: Request, env: Env) =>
+    sendMail(request, (mail) => env.EMAIL.send({ ...mail, from: FROM })),
 };
 
 // The entrypoint the container's outbound requests go through, for the handler above.

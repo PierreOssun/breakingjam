@@ -9,6 +9,7 @@ pub mod db;
 pub mod domain;
 pub mod error;
 pub mod flyer;
+pub mod mail;
 pub mod media;
 pub mod openapi;
 pub mod state;

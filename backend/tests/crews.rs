@@ -10,14 +10,14 @@ fn crew(name: &str) -> Value {
 }
 
 async fn organizer(app: &Router, pool: &PgPool) -> String {
-    let cookie = sign_up(app, "org@example.com").await;
+    let cookie = sign_up(app, pool, "org@example.com").await;
     set_role(pool, "org@example.com", "organizer").await;
     cookie
 }
 
 /// A `seed_admin`: crew edits and memberships are the BreakingJam team's.
 async fn team(app: &Router, pool: &PgPool) -> String {
-    let cookie = sign_up(app, "team@example.com").await;
+    let cookie = sign_up(app, pool, "team@example.com").await;
     set_role(pool, "team@example.com", "seed_admin").await;
     cookie
 }
@@ -30,7 +30,7 @@ async fn new_dancer(app: &Router, cookie: &str) -> String {
 #[sqlx::test]
 async fn organisers_create_crews_and_the_team_edits_them(pool: PgPool) {
     let app = app(pool.clone());
-    let user = sign_up(&app, "user@example.com").await;
+    let user = sign_up(&app, &pool, "user@example.com").await;
     let as_user = send(&app, post("/api/crews", crew("Floor Lords"), Some(&user))).await;
     assert_eq!(as_user.status, StatusCode::FORBIDDEN);
 

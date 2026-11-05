@@ -13,9 +13,9 @@ struct World {
 
 async fn world(pool: PgPool) -> World {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
-    let organizer = sign_up(&app, "org@example.com").await;
+    let organizer = sign_up(&app, &pool, "org@example.com").await;
     World {
         app,
         admin,
@@ -48,7 +48,7 @@ impl World {
 #[sqlx::test]
 async fn jams_the_team_entered_name_no_organiser(pool: PgPool) {
     let w = world(pool.clone()).await;
-    let team = sign_up(&w.app, "team@example.com").await;
+    let team = sign_up(&w.app, &pool, "team@example.com").await;
     set_role(&pool, "team@example.com", "seed_admin").await;
     let jam = w.draft(&team, "BC One 2023").await;
     w.call(&format!("/api/events/{jam}/submit"), json!({}), Some(&team))
@@ -168,7 +168,7 @@ async fn a_jam_sent_back_needs_its_venue_to_return(pool: PgPool) {
 #[sqlx::test]
 async fn the_team_publishes_without_review(pool: PgPool) {
     let w = world(pool.clone()).await;
-    let team = sign_up(&w.app, "team@example.com").await;
+    let team = sign_up(&w.app, &pool, "team@example.com").await;
     set_role(&pool, "team@example.com", "seed_admin").await;
     let jam = w.draft(&team, "Team Jam").await;
 

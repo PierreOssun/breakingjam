@@ -27,7 +27,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 - Battles per jam (1v1, 2v2 … 10v10, seven-to-smoke; bboy/bgirl/mixed; kids/adult) and entries (the organiser's record of the lineup and results; `pending` means the team isn't complete yet) with members and the stage reached.
 - Jam phases (M26): a jam is **upcoming**, **live** (today is one of its days) or **past**, by its own calendar in its timezone, never by a status someone has to set. Live jams are a group of their own on the dancer and organiser pages and wear a "Live now" chip on cards. Once a public jam is past, its organiser can still record its battles, entries, results and videos, but no longer edit its details, flyer or lineup, change its status or delete it; the BreakingJam team (`seed_admin`+) still can, to fix history.
 - Event staff (judges, DJ, MC).
-- Auth: email + password, and Google OAuth. Session cookies.
+- Auth: email + password, and Google OAuth. Session cookies. A password account logs in only once its email is confirmed with a 6-digit code mailed to it, and "Forgot password" mails the same kind of code (M27).
 - UI in English, French, German (UI strings only — user content is stored as written).
 
 ### Deferred (do not build, keep the schema open for it)
@@ -163,6 +163,19 @@ create table sessions (
   created_at timestamptz not null default now()
 );
 create index on sessions(user_id);
+
+create type email_code_purpose as enum ('verify_email', 'reset_password');
+create table email_codes (            -- M27: one live code per account and purpose
+  user_id uuid not null references app_users(id) on delete cascade,
+  purpose email_code_purpose not null,
+  code text not null check (code ~ '^[0-9]{6}$'),   -- plain: a million values, 15 minutes
+  attempts smallint not null default 0 check (attempts between 0 and 5),
+  sent_at timestamptz not null default now(),       -- a new code waits a minute after it
+  sends smallint not null default 1 check (sends between 1 and 10),   -- codes since day_started_at
+  day_started_at timestamptz not null default now(),                  -- 10 a day at most
+  expires_at timestamptz not null,
+  primary key (user_id, purpose)
+);
 
 create table dancers (
   id uuid primary key,
@@ -448,7 +461,8 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 - IDs in paths are `uuid`. Public event pages also resolve by `slug`.
 
 ### Auth
-- Password hashing: `argon2` (Argon2id, default params).
+- Password hashing: `argon2` (Argon2id, default params) keyed with the site's pepper, `PASSWORD_PEPPER` (a Worker secret, never in the database; M27). The browser sends the plain password over HTTPS.
+- Email codes (M27): 6 digits from the OS's secure generator, 15 minutes, 5 tries (each try counted in the same statement that compares, so parallel guesses can't skip the count), one new code a minute per account and purpose, and at most 10 a day (so 50 guesses a day, and no email flood). The email goes out in a background task, in the language the frontend sends (en, fr, de). Register does not log in: `POST /auth/email/verify` does. A reset also confirms the email, as the code proves who reads it. A code that confirms an email also unlinks a Google account linked before anyone proved the address (the reverse of `link_google`). Google sign-in needs no code.
 - Sessions: `sessions` table, cookie `bj_session` (HttpOnly, Secure, SameSite=Lax, 30-day expiry, rolling). Session id is a UUIDv4 (random, not v7).
 - Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `RequireRole(Organizer)` helper. Roles are ordered `user < organizer < seed_admin < admin`; a check for a role passes for any higher role.
 - Roles:
@@ -470,10 +484,14 @@ GET    /api/health
 GET    /api/openapi.json
 GET    /api/docs                         (Swagger UI, dev only)
 
-POST   /api/auth/register                {email, password, display_name}
-POST   /api/auth/login
+POST   /api/auth/register                {email, password, display_name, language}: 202 {email}, no session; mails a `verify_email` code (M27)
+POST   /api/auth/login                   {email, password, language}: 403 `email_unverified` (and a new code) while the email is not confirmed
+POST   /api/auth/email/verify            {email, code}: confirms the email, ends any other session and logs in; 422 on `code` when wrong, expired or spent
+POST   /api/auth/email/resend            {email, language}: always 204; mails a code to an unconfirmed account, once a minute and 10 times a day
+POST   /api/auth/password/forgot         {email, language}: always 204; mails a `reset_password` code to any account
+POST   /api/auth/password/reset          {email, code, password}: sets the password, confirms the email, ends every session, logs in
 POST   /api/auth/logout
-GET    /api/auth/me                      {id, email, display_name, role, dancer}: dancer = the account's own page (§4 "Dancer identity": id, name, avatar, `verified`), null when it has none (M23, M25); register, login and role changes return the same
+GET    /api/auth/me                      {id, email, display_name, role, dancer}: dancer = the account's own page (§4 "Dancer identity": id, name, avatar, `verified`), null when it has none (M23, M25); login, `email/verify`, `password/reset` and role changes return the same
 GET    /api/auth/google                  → redirect
 GET    /api/auth/google/callback
 
@@ -653,6 +671,7 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 - **Releases**: commits move `main` → `uat` → `prod` by fast-forward pushes. A push to `uat` or `prod` starts `.github/workflows/deploy.yml` in the GitHub environment of the same name (`prod` needs a reviewer): the full CI, the frontend build, a Neon snapshot branch, the migrations, `wrangler deploy` (Worker, assets, image), then a `/api/health` check. `wrangler rollback` returns to the previous Worker version.
 - **Backups**: the pre-deploy Neon branch (kept 7 days), Neon point-in-time restore, and a nightly `pg_dump` of production to R2 (`.github/workflows/backup.yml`, kept 30 days, read-only role `breakingjam_backup`).
 - **Media** (M19): uploaded flyers live in an R2 bucket per target (`breakingjam-media`, `-uat`), served on its own domain (`media.breakingjam.com`, `media-uat.breakingjam.com`, both in the CSP's `img-src`). The API PUTs and DELETEs over plain HTTP to `media.internal`, a host the Worker intercepts (`Api.outboundByHost` with the exported `ContainerProxy`, `@cloudflare/containers` ≥ 0.2) and serves with its R2 binding: no R2 keys and no S3 signing in the API. Keys are new per upload (`flyers/{event}/{uuid}.jpg` and `-card.jpg`), cached a year as `immutable`. Replacing or removing a flyer, or deleting its jam, deletes the old objects in the background (so a dropped request can't skip it); the flyer replaced is read under the row's lock, so concurrent uploads never strand one.
+- **Mail** (M27): the API POSTs `{to, subject, text}` to `mail.internal`, which the Worker intercepts like `media.internal` and sends with Cloudflare Email Service (`send_email` binding `EMAIL`, from `noreply@breakingjam.com` on both targets). No mail keys in the API. The service is in beta, needs Workers Paid, and sends to any address once `breakingjam.com` is onboarded (deploy/README.md). In development, `just media` prints the emails.
 - **Tiles**: the hosted Protomaps API for now; later a `.pmtiles` extract on R2 via the pmtiles protocol (`VITE_TILES_URL`, plus its host in the CSP).
 - Secrets via `wrangler secret put` (API) and GitHub environment secrets (deploy), never committed.
 
@@ -688,5 +707,6 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 24. Jam editor (M24): a) start sheet, editor page with blocks and autosave, publish checklist, nullable city/country, opening hours — done; b) venue block with Photon suggestions, map pin, city and country from the address — done; c) battle sheet with category and format chips, "Add battle" in one tap — done.
 25. Welcome step (M25): "Are you on BreakingJam?" after sign-up (find and verify, create my page, skip), `me` returns the account's own page, one own page per account, "I'm a…" titles set by the verified owner or the team. Find someone filters (by title and country) are their own later step.
 26. Pre-production hardening (M26): no `completed` status, jams upcoming, live or past by their own calendar (`jam_phase`), a public jam that is over locked but for its battles, the schema's checks and indexes, crew writes for the team, entries inside battles, server-side status actions, the merge fixes, docs brought up to date.
+27. Email verification (M27): register mails a 6-digit code and logs in only once it is confirmed, "Forgot password" with the same codes, Cloudflare Email Service behind `mail.internal`, the password pepper. a) schema, API, Worker; b) frontend.
 
 For Every suggested build order point, save it in milestones/ with a filename matching the build order point.

@@ -44,7 +44,7 @@
         "tags": [
           "auth"
         ],
-        "summary": "Create a password account and log in.",
+        "summary": "Create a password account and mail it a code; the session starts once the code is\nconfirmed (`POST /auth/email/verify`, M27).",
         "operationId": "register",
         "requestBody": {
           "content": {
@@ -57,19 +57,11 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "headers": {
-              "set-cookie": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "`bj_session`, HttpOnly, 30 days"
-              }
-            },
+          "202": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponse"
+                  "$ref": "#/components/schemas/CodeSent"
                 }
               }
             }
@@ -134,6 +126,16 @@
           },
           "401": {
             "description": "Unknown email, wrong password or Google-only account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute",
             "content": {
               "application/json": {
                 "schema": {
@@ -274,6 +276,170 @@
               "location": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/email/verify": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Confirm the email with the code mailed at sign-up or login, and log in.",
+        "operationId": "verify_email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "set-cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "`bj_session`, HttpOnly, 30 days"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Wrong, expired or used-up code (field `code`), or an unknown email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/email/resend": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Mail a new sign-up code to an account whose email is not confirmed yet.",
+        "operationId": "resend_code",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Always, so the answer says nothing about the account; nothing is sent to a confirmed or unknown email, or within a minute of the last code"
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/password/forgot": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Mail a code to choose a new password.",
+        "operationId": "forgot_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Always, so the answer says nothing about the account; nothing is sent to an unknown email, or within a minute of the last code"
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/password/reset": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Choose a new password with the code mailed by `forgot`, and log in; every other session ends.",
+        "operationId": "reset_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "set-cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "`bj_session`, HttpOnly, 30 days"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Wrong, expired or used-up code (field `code`), an unknown email, or a bad password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
                 }
               }
             }
@@ -4826,6 +4992,19 @@
           }
         }
       },
+      "CodeSent": {
+        "type": "object",
+        "description": "Answer of `POST /auth/register`: where the code went.",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The account's email, as stored."
+          }
+        }
+      },
       "Crew": {
         "type": "object",
         "description": "A stored crew.",
@@ -5586,7 +5765,7 @@
         "properties": {
           "code": {
             "type": "string",
-            "description": "`not_found`, `validation`, `unauthorized`, `forbidden`, `conflict` or `internal`."
+            "description": "`not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`\nor `internal`."
           },
           "message": {
             "type": "string",
@@ -6149,6 +6328,15 @@
           }
         }
       },
+      "Language": {
+        "type": "string",
+        "description": "Language of the emails the site sends; the frontend passes its own.",
+        "enum": [
+          "en",
+          "fr",
+          "de"
+        ]
+      },
       "LoginRequest": {
         "type": "object",
         "description": "Body of `POST /auth/login`.",
@@ -6164,6 +6352,10 @@
           "password": {
             "type": "string",
             "description": "Plain password."
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language",
+            "description": "Language of the code email, sent when the email is not confirmed yet; English when absent."
           }
         }
       },
@@ -7335,6 +7527,10 @@
           "display_name": {
             "type": "string",
             "description": "Public name, at most 80 characters."
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language",
+            "description": "Language of the code email; English when absent."
           }
         }
       },
@@ -7348,6 +7544,29 @@
           "note": {
             "type": "string",
             "description": "What the organiser should change, shown on their jam editor."
+          }
+        }
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "description": "Body of `POST /auth/password/reset`.",
+        "required": [
+          "email",
+          "code",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Login email, case-insensitive."
+          },
+          "code": {
+            "type": "string",
+            "description": "The 6 digits mailed to it."
+          },
+          "password": {
+            "type": "string",
+            "description": "New plain password, 8 to 128 characters."
           }
         }
       },
@@ -7371,6 +7590,23 @@
           "role": {
             "$ref": "#/components/schemas/Role",
             "description": "The new role."
+          }
+        }
+      },
+      "SendCodeRequest": {
+        "type": "object",
+        "description": "Body of `POST /auth/email/resend` and `POST /auth/password/forgot`.",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Login email, case-insensitive."
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language",
+            "description": "Language of the email; English when absent."
           }
         }
       },
@@ -7600,6 +7836,24 @@
                 "type": "null"
               }
             ]
+          }
+        }
+      },
+      "VerifyEmailRequest": {
+        "type": "object",
+        "description": "Body of `POST /auth/email/verify`.",
+        "required": [
+          "email",
+          "code"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Login email, case-insensitive."
+          },
+          "code": {
+            "type": "string",
+            "description": "The 6 digits mailed to it."
           }
         }
       }

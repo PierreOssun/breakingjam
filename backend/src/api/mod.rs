@@ -4,6 +4,7 @@ mod admin;
 pub(crate) mod auth;
 mod battles;
 mod claims;
+mod codes;
 mod crews;
 mod dancers;
 mod events;
@@ -27,6 +28,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .merge(health::router())
         .merge(auth::router())
+        .merge(codes::router())
         .merge(events::router())
         .merge(flyers::router())
         .merge(geo::router())

@@ -16,9 +16,9 @@ struct World {
 
 async fn world(pool: PgPool) -> World {
     let app = app(pool.clone());
-    let admin = sign_up(&app, "admin@example.com").await;
+    let admin = sign_up(&app, &pool, "admin@example.com").await;
     set_role(&pool, "admin@example.com", "admin").await;
-    let organizer = sign_up(&app, "org@example.com").await;
+    let organizer = sign_up(&app, &pool, "org@example.com").await;
     set_role(&pool, "org@example.com", "organizer").await;
     World {
         app,
@@ -54,8 +54,8 @@ impl World {
 async fn claim_then_approve_hands_the_page_over(pool: PgPool) {
     let w = world(pool).await;
     let dancer = w.dancer("Lil G", Some("lilg")).await;
-    let lilg = sign_up(&w.app, "lilg@example.com").await;
-    let rival = sign_up(&w.app, "rival@example.com").await;
+    let lilg = sign_up(&w.app, &w.pool, "lilg@example.com").await;
+    let rival = sign_up(&w.app, &w.pool, "rival@example.com").await;
 
     let claim = w.claim(&dancer, &lilg).await;
     assert_eq!(claim.status, StatusCode::OK);
@@ -142,7 +142,7 @@ async fn claim_then_approve_hands_the_page_over(pool: PgPool) {
 async fn rejected_claims_can_be_retried(pool: PgPool) {
     let w = world(pool).await;
     let dancer = w.dancer("Lil G", None).await;
-    let lilg = sign_up(&w.app, "lilg@example.com").await;
+    let lilg = sign_up(&w.app, &w.pool, "lilg@example.com").await;
     let first = w.claim(&dancer, &lilg).await.json;
 
     assert_eq!(w.review(&first, "reject").await.json["status"], "rejected");
@@ -203,7 +203,7 @@ async fn edits_to_unverified_dancers_are_logged(pool: PgPool) {
         .execute(&w.pool)
         .await
         .unwrap();
-    let seed = sign_up(&w.app, "seed@example.com").await;
+    let seed = sign_up(&w.app, &w.pool, "seed@example.com").await;
     set_role(&w.pool, "seed@example.com", "seed_admin").await;
     let body = json!({ "dancer_name": "Lil G", "country": "BE" });
     send(&w.app, put(&uri, body, Some(&seed))).await;
@@ -402,7 +402,7 @@ async fn verified_dancers_cannot_be_merged_away(pool: PgPool) {
 #[sqlx::test]
 async fn admins_change_roles_but_not_their_own(pool: PgPool) {
     let w = world(pool).await;
-    sign_up(&w.app, "user@example.com").await;
+    sign_up(&w.app, &w.pool, "user@example.com").await;
     let user_id = sqlx::query_scalar!("select id from app_users where email = 'user@example.com'")
         .fetch_one(&w.pool)
         .await
