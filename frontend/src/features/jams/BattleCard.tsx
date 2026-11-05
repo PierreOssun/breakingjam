@@ -1,7 +1,6 @@
 import {
   Clock,
   PencilSimple,
-  Play,
   Trash,
   Trophy,
   UsersThree,
@@ -16,6 +15,7 @@ import { ResultBadge } from "../../components/ResultBadge";
 import { MetaTag } from "../../components/Tag";
 import { useToast } from "../../components/useToast";
 import type { Video } from "../../components/VideoDialog";
+import { VideoPill } from "../../components/VideoPill";
 import { daysOf, formatBattleStart } from "../../lib/dates";
 import { AddChip, DancerChip } from "../dancers/DancerChip";
 import { BattleDialog } from "./BattleDialog";
@@ -95,12 +95,10 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
             <li key={entry.id} className="flex items-center gap-2 py-2.5">
               <EntryWho entry={entry} status={entry.status !== "confirmed"} />
               {entry.video_url && (
-                <IconButton
-                  label={t("jam.watch", { name: entryLabel(entry) })}
+                <VideoPill
+                  name={entryLabel(entry)}
                   onClick={() => play(entry)}
-                >
-                  <Play size={20} weight="fill" aria-hidden />
-                </IconButton>
+                />
               )}
               <ResultBadge
                 finalRank={entry.final_rank}
@@ -261,7 +259,7 @@ function formatLabel(battle: Schemas["Battle"], t: TFunction): string | null {
 }
 
 /** An entry for visitors: a dancer's chip with their podium badge inside, or a team's name and
- * badge over its members' chips; the video button when there is one. */
+ * badge over its members' chips; the video pill when there is one (§4.37). */
 function EntryChips({
   entry,
   onPlay,
@@ -269,7 +267,6 @@ function EntryChips({
   entry: Entry;
   onPlay: (entry: Entry) => void;
 }) {
-  const { t } = useTranslation();
   const podium = resultOf(entry.final_rank, entry.reached)?.kind === "podium";
   const badge = podium && (
     <ResultBadge
@@ -279,17 +276,12 @@ function EntryChips({
     />
   );
   const video = entry.video_url && (
-    <IconButton
-      label={t("jam.watch", { name: entryLabel(entry) })}
-      onClick={() => onPlay(entry)}
-    >
-      <Play size={20} weight="fill" aria-hidden />
-    </IconButton>
+    <VideoPill name={entryLabel(entry)} onClick={() => onPlay(entry)} />
   );
   const [solo] = entry.members;
   if (solo && entry.members.length === 1 && !entry.team_name) {
     return (
-      <li className="flex items-center gap-1">
+      <li className="flex items-center gap-2">
         <DancerChip dancer={solo} badge={badge} />
         {video}
       </li>
@@ -299,8 +291,8 @@ function EntryChips({
     <li className="flex flex-col gap-1.5">
       <div className="flex min-h-7 items-center gap-2">
         <span className="text-body-sm font-extrabold">{entryLabel(entry)}</span>
-        {badge}
         {video}
+        {badge}
       </div>
       <div className="flex flex-wrap gap-2">
         {entry.members.map((member) => (

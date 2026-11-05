@@ -19,6 +19,8 @@ type JamOptions = {
   coordinates?: [number, number];
   battles?: string[];
   categories?: string[];
+  /** Whether a battle has a video; the API says so only for live and past jams. */
+  hasVideos?: boolean;
 };
 
 /** Where a jam of `day`…`until` stands on `TODAY`, as the API's `phase` says. */
@@ -42,6 +44,7 @@ export function jamFeature(
     coordinates = [8.54, 47.38],
     battles = [],
     categories = [],
+    hasVideos = false,
   }: JamOptions = {},
 ) {
   return {
@@ -59,6 +62,7 @@ export function jamFeature(
       country,
       battles,
       categories,
+      has_videos: hasVideos,
     },
   };
 }

@@ -46,7 +46,7 @@ Until M27, `POST /auth/register` logged in straight away and nothing checked `ap
    - `/verify-email` (one numeric `one-time-code` field, Resend with a 60 s countdown);
    - `/forgot-password` (email, then code and new password on the same page);
    - register and login lead there, plus "Forgot password?" under the login password;
-   - the router, i18n in en/fr/de, DESIGN.md §4.37 "Code entry";
+   - the router, i18n in en/fr/de, DESIGN.md §4.38 "Code entry";
    - the regenerated `schema.d.ts`, and tests.
 
 ## Before deploying

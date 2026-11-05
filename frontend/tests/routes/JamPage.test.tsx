@@ -459,6 +459,30 @@ describe("JamPage", () => {
     );
   });
 
+  it("shows the video pill only beside the entries that have a video", async () => {
+    mockJam();
+    renderApp(`/jams/${JAM.slug}`);
+
+    const pill = await screen.findByRole("button", { name: "Watch Lil G" });
+    expect(pill).toHaveTextContent("Video");
+    expect(screen.getAllByRole("button", { name: /^Watch / })).toEqual([pill]);
+  });
+
+  it("scrolls to the battles once they load when a preview links there", async () => {
+    // jsdom does no layout, so it has no scrollIntoView.
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    onTestFinished(() => {
+      delete (Element.prototype as Partial<Element>).scrollIntoView;
+    });
+    mockJam();
+    renderApp(`/jams/${JAM.slug}#battles`);
+
+    await screen.findByRole("button", { name: "Watch Lil G" });
+    const targets = scroll.mock.contexts as Element[];
+    expect(targets.map((section) => section.id)).toContain("battles");
+  });
+
   it("plays an entry's video from its offset in the YouTube player", async () => {
     mockJam();
     renderApp(`/jams/${JAM.slug}`);

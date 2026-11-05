@@ -4,8 +4,9 @@ import { Flag } from "../../components/Flag";
 import { Loading, Skeleton } from "../../components/Skeleton";
 import { CardStatus } from "../../components/StatusBadge";
 import { formatDateRange, formatShortDateRange } from "../../lib/dates";
+import { VideosChip } from "../../components/VideosChip";
 import { JamFlyer } from "../jams/JamFlyer";
-import type { MapJam } from "./jams";
+import { jamPath, type MapJam } from "./jams";
 
 type RowCardProps = {
   jam: MapJam;
@@ -39,12 +40,10 @@ export function RowCard({ jam, selected = false, onSelect }: RowCardProps) {
       data-row={jam.id}
       className={`${cardShell} flex gap-3 p-3 ${selected ? "border-primary-text bg-surface-raised" : "border-border bg-surface"}`}
     >
-      <JamFlyer
-        jam={jam}
-        compact
-        lazy
-        className="w-16 shrink-0 self-start rounded-md"
-      />
+      <div className="relative w-16 shrink-0 self-start">
+        <JamFlyer jam={jam} compact lazy className="rounded-md" />
+        {jam.has_videos && <VideosChip on="thumbnail" />}
+      </div>
       <div className="flex min-w-0 flex-col items-start gap-1">
         <p className="text-label text-primary-text uppercase">
           {formatShortDateRange(jam.starts_on, jam.ends_on, i18n.language)}
@@ -60,7 +59,7 @@ export function RowCard({ jam, selected = false, onSelect }: RowCardProps) {
               {name}
             </button>
           ) : (
-            <Link to={`/jams/${jam.slug}`} className={stretched}>
+            <Link to={jamPath(jam)} className={stretched}>
               {name}
             </Link>
           )}

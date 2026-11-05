@@ -76,6 +76,8 @@ const UPCOMING = [
     battle: oneVOne,
     role: "competitor",
     reached: "na",
+    // Never shown: only past battles carry the video pill.
+    video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   },
 ];
 
@@ -177,6 +179,15 @@ describe("DancerPage", () => {
     expect(
       within(past).queryByRole("button", { name: /Show more/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows the video pill only on past battles that have a video", async () => {
+    mockDancer();
+    renderApp(`/dancers/${DANCER.id}`);
+
+    const pill = await screen.findByRole("button", { name: "Watch Jam 1" });
+    expect(pill).toHaveTextContent("Video");
+    expect(screen.getAllByRole("button", { name: /^Watch / })).toEqual([pill]);
   });
 
   it("plays a past battle's video", async () => {

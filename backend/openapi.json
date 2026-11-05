@@ -6373,7 +6373,8 @@
           "city",
           "country",
           "battles",
-          "categories"
+          "categories",
+          "has_videos"
         ],
         "properties": {
           "id": {
@@ -6435,6 +6436,10 @@
               "null"
             ],
             "description": "The uploaded flyer at 540×675; null means the generated one."
+          },
+          "has_videos": {
+            "type": "boolean",
+            "description": "Whether a battle of this live or past jam has a video: previews show \"Videos available\"\nand link to its battles (M28)."
           }
         }
       },

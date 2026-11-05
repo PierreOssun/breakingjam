@@ -9,9 +9,9 @@ import {
   PencilSimple,
   Trophy,
 } from "@phosphor-icons/react";
-import { lazy, Suspense, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router";
+import { Link, useLocation, useParams } from "react-router";
 import type { Schemas } from "../api/client";
 import { buttonClasses } from "../components/buttonClasses";
 import { ExternalLink } from "../components/ExternalLink";
@@ -109,6 +109,13 @@ function JamDetail({ jam }: { jam: Jam }) {
     staff.data ?? [],
   );
   const chip = countdown(jam, firstStart(battles.data ?? []), new Date());
+  const { hash } = useLocation();
+  // A preview with videos links to #battles; the browser looked for it before the battles loaded.
+  useEffect(() => {
+    if (hash && !battles.isPending) {
+      document.getElementById(hash.slice(1))?.scrollIntoView();
+    }
+  }, [hash, battles.isPending]);
 
   return (
     <article className="lg:pb-20">

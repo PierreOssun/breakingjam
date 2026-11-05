@@ -157,6 +157,9 @@
     "noBattles": "Aucun battle annoncé pour l’instant.",
     "noEntries": "Personne n’est encore inscrit.",
     "watch": "Regarder {{name}}",
+    "video": "Vidéo",
+    "videos": "Vidéos",
+    "videosAvailable": "Vidéos disponibles",
     "roles": {
       "judge": "Juges",
       "dj": "DJ",

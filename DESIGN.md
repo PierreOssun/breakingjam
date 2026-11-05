@@ -229,6 +229,18 @@ Base: `inline-flex items-center justify-center gap-2 rounded-full border-2 font-
 - **Row card** (mobile lists, map side panel): `flex gap-3 p-3`. The flyer is `w-16 h-20` (or `w-20 h-[100px]` on the landing page), `rounded-md`, with the same text stack as the grid card and a `display-xs` title.
   - Selected row: `border-primary-text bg-surface-raised`, plus `aria-current="true"`.
 - **No flyer image:** render the **generated flyer** (4.24) at the same size. There is no empty placeholder.
+- **Videos available** *(M28)*: when a battle of a live or past jam has a video (`has_videos` from the API; upcoming jams never have it), the preview says so, and the whole preview opens the jam at its battles (`/jams/{slug}#battles`). The chip is never a link of its own.
+  - On a grid card's flyer: `absolute bottom-3 left-3 h-7 px-2.5 rounded-full bg-[#0B0D14]/72 backdrop-blur text-white text-[12px] font-extrabold`, a filled `Play` 12px, then "Videos available" ("Vidéos disponibles").
+  - On a row card's or the map popup's thumbnail (64–72px wide, too narrow for the words): the same glass as a 24px circle at `bottom-1.5 left-1.5` with the `Play` icon alone, named "Videos available" for screen readers.
+  - In a jam list row (§4.14, `/jams` and search): a `h-7 px-2.5 rounded-full border border-border bg-surface text-[12px] font-extrabold` chip in the trailing slot, `Play` 12px in `text-primary-text`, then "Videos".
+  ```
+  [ flyer                    ]
+  [                          ]
+  [ ▶ Videos available       ]   ← bottom-left of the flyer
+    SAT 25 OCT
+    DPC Jam 2025
+    🇨🇭 Zurich
+  ```
 - Public cards show a status badge only when it's exceptional: **Live now** (the countdown chip of §4.30, while today is one of the jam's days; M26), Registration closed (before the jam) or Cancelled. Never show Published.
 
 ### 4.4 Map popup
@@ -363,10 +375,10 @@ One component that changes shape by viewport.
 
 ### 4.14 Jam list row + year label
 
-- **Row** (`<a>`, the whole row is tappable): `flex items-center gap-3.5 py-3 min-h-[76px] border-b border-border`, left to right:
+- **Row** (`<a>`, the whole row is tappable): `flex items-center gap-3.5 -mx-3 px-3 py-3 min-h-[76px] border-b border-border`, hover `bg-surface`; the 12px inset gives the hover fill room around the date block and the trailing item while the text stays in line with the page. Left to right:
   1. **Date block:** `w-[52px] h-14 rounded-md border border-border bg-surface flex flex-col items-center justify-center`. The day is in Unbounded 800 18/22; the short month is in `text-[11px] font-extrabold uppercase tracking-[0.06em] text-primary-text`.
   2. **Body** (`flex-1 min-w-0 flex flex-col gap-1`): the jam name in `text-body font-extrabold truncate`; flag and city in `text-[13px] leading-[18px] text-muted`; then the meta tag and an optional role tag.
-  3. **Trailing:** the result badge (past rows only).
+  3. **Trailing:** on past rows, the **▶ Video** pill (§4.37) when the battle has a video, then the result badge; below `sm` the pill goes under the badge. Upcoming and live rows have neither.
 - **Order:** upcoming rows are soonest first; past rows are most recent first.
 - **Year label:** `sticky top-0 z-[2] bg-bg flex items-center gap-3 pt-3 pb-2`, with the year in `font-display text-display-xs` followed by a 1px `bg-border` line that fills the rest of the width.
   - On the page, use `top-14` on mobile and `lg:top-16` so it sits under the header.
@@ -697,6 +709,15 @@ The jam page in edit mode is made of blocks, one per part of the page (Venue, Ba
 - **Skip, I’m just here for the jams:** a ghost button, centred, to `next`.
 - An account that has its page goes straight to `next`.
 
+### 4.37 Video pill *(M28)*
+
+The one way to play a battle video: on a dancer page's past rows (§4.14) and in a jam's Battles section (§6), nowhere else (no play icon on upcoming rows, headers or cards).
+
+- `h-8 px-3 rounded-full border border-border bg-surface text-[13px] font-bold`, hover `border-border-strong`: a filled `Play` 14px in `text-primary-text`, then "Video". The hit area grows to 44px (`after:-inset-y-1.5`).
+- Named "Watch <what>" (the jam, or the dancer or team). It opens the YouTube player in a modal, from the entry's start time (§6 Video embeds); the visitor stays on the page.
+- Order: the pill, then the result. No video, no pill.
+- *Planned, with match videos:* several videos become "Videos · 3", opening a menu (desktop) or a bottom sheet (phones) that lists each video's title and source. Today an entry has at most one video, so nothing shows more than one.
+
 ---
 
 ## 5. Layout rules
@@ -782,8 +803,8 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
   6. **"Who's in"** (§4.31).
   7. **Battles** (`#battles`): one card per battle, `bg-surface border rounded-lg p-5`.
      - Header: the name in `display-sm`; "Starts 14:00" (`Clock`) and "8 / 16 dancers" (`UsersThree`, teams for team battles) in muted; the prize line with `Trophy`; the format as a meta tag on the right ("Top 8", "7 to Smoke").
-     - Entries: dancer chips in a wrapping row (§4.12), best result first; the podium gets its badge inside the chip; a play icon button when an entry has a video.
-     - For the jam's organiser: a row per entry instead, withdrawn ones included, with edit, delete and video buttons, and an add chip under each battle.
+     - Entries: dancer chips in a wrapping row (§4.12), best result first; the podium gets its badge inside the chip; the **▶ Video** pill (§4.37) after the chip when an entry has a video (for a team: name, pill, then badge).
+     - For the jam's organiser: a row per entry instead, withdrawn ones included, with the video pill, the result badge, edit and delete, and an add chip under each battle.
   8. **Lineup** (`#lineup`): judges, DJ, MC, hosts, staff, each a `label` and a wrapping row of chips; stacked on phones, side by side from lg. The organiser removes and adds people here.
   9. **About:** the organiser's pitch, up to 200 characters.
   10. **Info** (phones only): website (the host as label, ↗), email (`mailto:`) and Instagram; desktop has them in the facts grid.

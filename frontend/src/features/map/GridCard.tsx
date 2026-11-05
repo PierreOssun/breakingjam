@@ -4,8 +4,9 @@ import { Flag } from "../../components/Flag";
 import { Skeleton } from "../../components/Skeleton";
 import { CardStatus } from "../../components/StatusBadge";
 import { formatDateRange, formatShortDateRange } from "../../lib/dates";
+import { VideosChip } from "../../components/VideosChip";
 import { JamFlyer } from "../jams/JamFlyer";
-import type { MapJam } from "./jams";
+import { jamPath, type MapJam } from "./jams";
 import { cardShell, stretched } from "./RowCard";
 
 /** A jam as a grid card: the 4:5 flyer, then date, title and city (DESIGN.md §4.3). */
@@ -15,13 +16,16 @@ export function GridCard({ jam }: { jam: MapJam }) {
     <article
       className={`${cardShell} flex h-full flex-col overflow-hidden border-border bg-surface`}
     >
-      <JamFlyer jam={jam} lazy />
+      <div className="relative">
+        <JamFlyer jam={jam} lazy />
+        {jam.has_videos && <VideosChip on="flyer" />}
+      </div>
       <div className="flex flex-col items-start gap-2 p-4">
         <p className="text-label text-primary-text uppercase">
           {formatShortDateRange(jam.starts_on, jam.ends_on, i18n.language)}
         </p>
         <h3 className="line-clamp-2 font-display text-display-sm break-words">
-          <Link to={`/jams/${jam.slug}`} className={stretched}>
+          <Link to={jamPath(jam)} className={stretched}>
             {jam.name}
             <span className="sr-only">
               , {formatDateRange(jam.starts_on, jam.ends_on, i18n.language)},{" "}

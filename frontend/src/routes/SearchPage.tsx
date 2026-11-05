@@ -6,11 +6,12 @@ import { buttonClasses } from "../components/buttonClasses";
 import { HeroSearch } from "../components/HeroSearch";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { JamRow } from "../components/JamRow";
+import { VideosChip } from "../components/VideosChip";
 import { MoreList } from "../components/MoreList";
 import { RowsSkeleton } from "../components/Skeleton";
 import { PersonRow } from "../features/dancers/PersonRow";
 import { useDancerSearch } from "../features/dancers/search";
-import { narrow, NO_FILTERS } from "../features/map/jams";
+import { jamPath, narrow, NO_FILTERS } from "../features/map/jams";
 import { useMapJams } from "../features/map/queries";
 import { NearCard } from "../features/places/NearCard";
 import { usePlace } from "../features/places/queries";
@@ -71,7 +72,11 @@ export function SearchPage() {
           <ul aria-label={t("search.jams")}>
             {matching.slice(0, JAMS).map((jam) => (
               <li key={jam.id}>
-                <JamRow jam={jam} to={`/jams/${jam.slug}`} />
+                <JamRow
+                  jam={jam}
+                  to={jamPath(jam)}
+                  trailing={jam.has_videos && <VideosChip on="row" />}
+                />
               </li>
             ))}
           </ul>

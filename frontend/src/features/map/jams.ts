@@ -72,6 +72,11 @@ function overlaps(
   return jam.starts_on <= to && jam.ends_on >= from;
 }
 
+/** Where a preview leads: straight to the jam's battles when they have videos (DESIGN.md §4.3). */
+export function jamPath(jam: Pick<MapJam, "slug" | "has_videos">): string {
+  return `/jams/${jam.slug}${jam.has_videos ? "#battles" : ""}`;
+}
+
 /** Whether a jam is over, by its own calendar (the API's `phase`). */
 export function isPast(jam: Pick<MapJam, "phase">): boolean {
   return jam.phase === "past";

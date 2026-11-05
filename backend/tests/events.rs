@@ -790,6 +790,69 @@ async fn geojson_carries_what_the_popup_and_filters_need(pool: PgPool) {
     );
 }
 
+/// An entry in the jam's first battle, as an organiser records it after the jam.
+async fn add_entry(pool: &PgPool, jam: &str, video_url: Option<&str>, status: &str) {
+    sqlx::query!(
+        "insert into entries (id, battle_id, status, video_url)
+         select gen_random_uuid(), id, $3::text::entry_status, $2
+         from battles where event_id = $1::text::uuid order by position limit 1",
+        jam,
+        video_url,
+        status,
+    )
+    .execute(pool)
+    .await
+    .unwrap();
+}
+
+#[sqlx::test]
+async fn geojson_says_which_live_or_past_jams_have_videos(pool: PgPool) {
+    let app = app(pool.clone());
+    let owner = sign_up(&app, &pool, "org@example.com").await;
+    let video = Some("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    let new_jam = async |name: &str, day: &str| {
+        let mut body = jam(name);
+        body["starts_on"] = json!(day);
+        body["ends_on"] = json!(day);
+        let id = draft_id(&app, &owner, body).await;
+        add_battle(&app, &owner, &id).await;
+        publish(&pool, &id).await;
+        id
+    };
+    let filmed = new_jam("Filmed", "2020-06-01").await;
+    add_entry(&pool, &filmed, None, "confirmed").await;
+    add_entry(&pool, &filmed, video, "confirmed").await;
+    let unfilmed = new_jam("Unfilmed", "2020-06-02").await;
+    add_entry(&pool, &unfilmed, None, "confirmed").await;
+    let withdrawn = new_jam("Withdrawn", "2020-06-03").await;
+    add_entry(&pool, &withdrawn, video, "withdrawn").await;
+    let upcoming = new_jam("Upcoming", "2030-06-01").await;
+    add_entry(&pool, &upcoming, video, "confirmed").await;
+
+    let response = send(&app, get("/api/events.geojson", None)).await;
+    let has_videos: Vec<(&str, bool)> = response.json["features"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|f| {
+            let jam = &f["properties"];
+            (
+                jam["name"].as_str().unwrap(),
+                jam["has_videos"].as_bool().unwrap(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        has_videos,
+        [
+            ("Filmed", true),
+            ("Unfilmed", false),
+            ("Withdrawn", false),
+            ("Upcoming", false)
+        ]
+    );
+}
+
 #[sqlx::test]
 async fn a_public_jam_that_is_over_keeps_only_its_battles_open(pool: PgPool) {
     let app = app(pool.clone());

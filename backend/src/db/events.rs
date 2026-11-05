@@ -44,6 +44,8 @@ pub struct MapPoint {
     pub lng: f64,
     /// The uploaded flyer at card size; null means the generated one.
     pub flyer_card_url: Option<String>,
+    /// Whether a battle of this live or past jam has a video (M28).
+    pub has_videos: bool,
 }
 
 /// Inserts a draft jam; optional text fields are trimmed and `""` becomes null.
@@ -183,7 +185,13 @@ pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
         MapPoint,
         r#"select id, name, slug, starts_on, ends_on, status as "status: EventStatus",
                   jam_phase(starts_on, ends_on, timezone) as "phase!: Phase", city as "city!", country as "country!", lat as "lat!", lng as "lng!",
-                  flyer_card_url
+                  flyer_card_url,
+                  -- An upcoming jam never shows it, whatever was entered early (M28).
+                  jam_phase(starts_on, ends_on, timezone) <> 'upcoming' and exists (
+                    select 1 from battles b join entries e on e.battle_id = b.id
+                    where b.event_id = events.id and e.video_url is not null
+                      and e.status <> 'withdrawn'
+                  ) as "has_videos!"
            from events
            where deleted_at is null and status in ('published', 'registration_closed')
              and city is not null and country is not null and lat is not null and lng is not null

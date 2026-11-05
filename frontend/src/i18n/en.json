@@ -157,6 +157,9 @@
     "noBattles": "No battles announced yet.",
     "noEntries": "No one has entered yet.",
     "watch": "Watch {{name}}",
+    "video": "Video",
+    "videos": "Videos",
+    "videosAvailable": "Videos available",
     "roles": {
       "judge": "Judges",
       "dj": "DJ",

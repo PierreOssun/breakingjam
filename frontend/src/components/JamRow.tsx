@@ -24,7 +24,9 @@ export function JamRow({
   return (
     <Link
       to={to}
-      className="flex min-h-[76px] items-center gap-3.5 border-b border-border py-3 transition-colors duration-fast hover:bg-surface"
+      // Padded and pulled out by the same 12px: the hover fill gets room around the date block
+      // and the trailing chip, while the text stays in line with the page.
+      className="-mx-3 flex min-h-[76px] items-center gap-3.5 border-b border-border px-3 py-3 transition-colors duration-fast hover:bg-surface"
     >
       <DateBlock date={jam.starts_on} />
       <span className="flex min-w-0 flex-1 flex-col gap-1">

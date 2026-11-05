@@ -3,10 +3,16 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../components/Button";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { JamRow } from "../components/JamRow";
+import { VideosChip } from "../components/VideosChip";
 import { RowsSkeleton } from "../components/Skeleton";
 import { TextField } from "../components/TextField";
 import { FilterChips } from "../features/map/FilterChips";
-import { type Filters, narrow, NO_FILTERS } from "../features/map/jams";
+import {
+  type Filters,
+  jamPath,
+  narrow,
+  NO_FILTERS,
+} from "../features/map/jams";
 import { useMapJams } from "../features/map/queries";
 import { useSearchText } from "../lib/useSearchText";
 
@@ -68,7 +74,11 @@ export function JamsPage() {
       <ul aria-label={t("pages.jams")}>
         {matching.slice(0, shown).map((jam) => (
           <li key={jam.id}>
-            <JamRow jam={jam} to={`/jams/${jam.slug}`} />
+            <JamRow
+              jam={jam}
+              to={jamPath(jam)}
+              trailing={jam.has_videos && <VideosChip on="row" />}
+            />
           </li>
         ))}
       </ul>

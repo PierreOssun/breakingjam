@@ -30,6 +30,7 @@ function jam(overrides: Partial<MapJam> = {}): MapJam {
     country: "CH",
     battles: ["1v1 Bboy"],
     categories: ["one_v_one"],
+    has_videos: false,
     lng: 8.54,
     lat: 47.37,
     ...overrides,

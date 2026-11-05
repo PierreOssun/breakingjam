@@ -9,8 +9,9 @@ import { ShareButton } from "../../components/ShareButton";
 import { StatusBadge } from "../../components/StatusBadge";
 import { formatShortDateRange, localeOf } from "../../lib/dates";
 import { shareTitle } from "../jams/jamDetail";
+import { VideosChip } from "../../components/VideosChip";
 import { JamFlyer } from "../jams/JamFlyer";
-import type { MapJam } from "./jams";
+import { jamPath, type MapJam } from "./jams";
 
 type JamCardProps = {
   jam: MapJam;
@@ -30,7 +31,7 @@ export function JamPopup({ jam, onClose }: JamCardProps) {
       <CloseButton onClose={onClose} />
       <Summary jam={jam} titleId={titleId} distance={null} />
       <Link
-        to={`/jams/${jam.slug}`}
+        to={jamPath(jam)}
         className={`${buttonClasses("primary", "sm")} w-full`}
       >
         {t("map.viewJam")}
@@ -71,7 +72,7 @@ export function JamSheet({
       <Summary jam={jam} titleId={titleId} distance={distance} />
       <div className="flex items-center gap-3">
         <Link
-          to={`/jams/${jam.slug}`}
+          to={jamPath(jam)}
           className={`${buttonClasses("primary", "md")} flex-1`}
         >
           {t("map.viewJam")}
@@ -125,11 +126,10 @@ function Summary({
   return (
     <>
       <div className="flex gap-3 pr-8">
-        <JamFlyer
-          jam={jam}
-          compact
-          className="w-[72px] shrink-0 self-start rounded-md"
-        />
+        <div className="relative w-[72px] shrink-0 self-start">
+          <JamFlyer jam={jam} compact className="rounded-md" />
+          {jam.has_videos && <VideosChip on="thumbnail" />}
+        </div>
         <div className="flex min-w-0 flex-col gap-1">
           <p className="text-label text-primary-text uppercase">
             {formatShortDateRange(jam.starts_on, jam.ends_on, i18n.language)}

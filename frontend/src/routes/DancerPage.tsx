@@ -125,12 +125,7 @@ function DancerDetail({
               <h2 className="font-display text-display-sm lg:text-display-md">
                 {t("dancer.live")}
               </h2>
-              <JamList
-                items={events.data.live}
-                past={false}
-                empty=""
-                onPlay={play}
-              />
+              <JamList items={events.data.live} past={false} empty="" />
             </section>
           )}
           <section className="flex flex-col gap-2">
@@ -146,7 +141,6 @@ function DancerDetail({
                 items={events.data.upcoming}
                 past={false}
                 empty={t("dancer.noUpcoming")}
-                onPlay={play}
               />
             )}
           </section>

@@ -30,7 +30,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a password account and log in. */
+        /**
+         * Create a password account and mail it a code; the session starts once the code is
+         *     confirmed (`POST /auth/email/verify`, M27).
+         */
         post: operations["register"];
         delete?: never;
         options?: never;
@@ -117,6 +120,74 @@ export interface paths {
         get: operations["google_callback"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/email/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm the email with the code mailed at sign-up or login, and log in. */
+        post: operations["verify_email"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/email/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mail a new sign-up code to an account whose email is not confirmed yet. */
+        post: operations["resend_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/password/forgot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mail a code to choose a new password. */
+        post: operations["forgot_password"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/password/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Choose a new password with the code mailed by `forgot`, and log in; every other session ends. */
+        post: operations["reset_password"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1117,6 +1188,11 @@ export interface components {
             /** @description Public name. */
             display_name: string;
         };
+        /** @description Answer of `POST /auth/register`: where the code went. */
+        CodeSent: {
+            /** @description The account's email, as stored. */
+            email: string;
+        };
         /** @description A stored crew. */
         Crew: {
             /**
@@ -1420,7 +1496,10 @@ export interface components {
         EntryStatus: "pending" | "confirmed" | "withdrawn";
         /** @description What went wrong; `fields` only for validation errors. */
         ErrorBody: {
-            /** @description `not_found`, `validation`, `unauthorized`, `forbidden`, `conflict` or `internal`. */
+            /**
+             * @description `not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`
+             *     or `internal`.
+             */
             code: string;
             /** @description Human-readable; generic for `internal`. */
             message: string;
@@ -1658,12 +1737,19 @@ export interface components {
             /** @description Crate version of the running binary. */
             version: string;
         };
+        /**
+         * @description Language of the emails the site sends; the frontend passes its own.
+         * @enum {string}
+         */
+        Language: "en" | "fr" | "de";
         /** @description Body of `POST /auth/login`. */
         LoginRequest: {
             /** @description Login email, case-insensitive. */
             email: string;
             /** @description Plain password. */
             password: string;
+            /** @description Language of the code email, sent when the email is not confirmed yet; English when absent. */
+            language?: components["schemas"]["Language"];
         };
         /** @description What the map popup needs (§6 Map). */
         MapJam: {
@@ -1700,6 +1786,11 @@ export interface components {
             categories: components["schemas"]["Category"][];
             /** @description The uploaded flyer at 540×675; null means the generated one. */
             flyer_card_url?: string | null;
+            /**
+             * @description Whether a battle of this live or past jam has a video: previews show "Videos available"
+             *     and link to its battles (M28).
+             */
+            has_videos: boolean;
         };
         /** @description A current member as shown on a crew. */
         Member: {
@@ -2117,11 +2208,22 @@ export interface components {
             password: string;
             /** @description Public name, at most 80 characters. */
             display_name: string;
+            /** @description Language of the code email; English when absent. */
+            language?: components["schemas"]["Language"];
         };
         /** @description Body of `POST /admin/events/{id}/reject`. */
         RejectRequest: {
             /** @description What the organiser should change, shown on their jam editor. */
             note: string;
+        };
+        /** @description Body of `POST /auth/password/reset`. */
+        ResetPasswordRequest: {
+            /** @description Login email, case-insensitive. */
+            email: string;
+            /** @description The 6 digits mailed to it. */
+            code: string;
+            /** @description New plain password, 8 to 128 characters. */
+            password: string;
         };
         /**
          * @description Account role; declaration order is privilege order, so `>=` means "at least".
@@ -2132,6 +2234,13 @@ export interface components {
         RoleRequest: {
             /** @description The new role. */
             role: components["schemas"]["Role"];
+        };
+        /** @description Body of `POST /auth/email/resend` and `POST /auth/password/forgot`. */
+        SendCodeRequest: {
+            /** @description Login email, case-insensitive. */
+            email: string;
+            /** @description Language of the email; English when absent. */
+            language?: components["schemas"]["Language"];
         };
         /** @description What the landing page counts: battles of announced jams, never cancelled ones. */
         SiteStats: {
@@ -2273,6 +2382,13 @@ export interface components {
             role: components["schemas"]["Role"];
             dancer?: components["schemas"]["OwnPage"] | null;
         };
+        /** @description Body of `POST /auth/email/verify`. */
+        VerifyEmailRequest: {
+            /** @description Login email, case-insensitive. */
+            email: string;
+            /** @description The 6 digits mailed to it. */
+            code: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -2323,14 +2439,12 @@ export interface operations {
             };
         };
         responses: {
-            201: {
+            202: {
                 headers: {
-                    /** @description `bj_session`, HttpOnly, 30 days */
-                    "set-cookie"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserResponse"];
+                    "application/json": components["schemas"]["CodeSent"];
                 };
             };
             /** @description Email already registered */
@@ -2378,6 +2492,15 @@ export interface operations {
             };
             /** @description Unknown email, wrong password or Google-only account */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2478,6 +2601,136 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    verify_email: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    /** @description `bj_session`, HttpOnly, 30 days */
+                    "set-cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponse"];
+                };
+            };
+            /** @description Wrong, expired or used-up code (field `code`), or an unknown email */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    resend_code: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description Always, so the answer says nothing about the account; nothing is sent to a confirmed or unknown email, or within a minute of the last code */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid fields */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    forgot_password: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description Always, so the answer says nothing about the account; nothing is sent to an unknown email, or within a minute of the last code */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid fields */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    reset_password: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    /** @description `bj_session`, HttpOnly, 30 days */
+                    "set-cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponse"];
+                };
+            };
+            /** @description Wrong, expired or used-up code (field `code`), an unknown email, or a bad password */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
             };
         };
     };

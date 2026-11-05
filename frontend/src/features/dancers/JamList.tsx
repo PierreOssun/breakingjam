@@ -1,4 +1,3 @@
-import { Play } from "@phosphor-icons/react";
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -9,6 +8,7 @@ import { Flag } from "../../components/Flag";
 import { InlineEmpty } from "../../components/InlineEmpty";
 import { ResultBadge } from "../../components/ResultBadge";
 import { MetaTag, RoleTag } from "../../components/Tag";
+import { VideoPill } from "../../components/VideoPill";
 import { formatDateRange, yearOf } from "../../lib/dates";
 
 type Participation = Schemas["Participation"];
@@ -21,7 +21,8 @@ type JamListProps = {
   /** Past rows carry the result badge. */
   past: boolean;
   empty: string;
-  onPlay: (participation: Participation) => void;
+  /** Past rows only: plays a battle's video (§4.14). */
+  onPlay?: (participation: Participation) => void;
 };
 
 /** Jam rows grouped under sticky year labels, 10 at first, then 20 more at a time (§4.14). */
@@ -45,7 +46,7 @@ export function JamList({ items, past, empty, onPlay }: JamListProps) {
         key={`${participation.event.id}-${participation.battle?.id ?? participation.role}`}
         participation={participation}
         past={past}
-        onPlay={() => onPlay(participation)}
+        onPlay={onPlay && (() => onPlay(participation))}
       />,
     );
   }
@@ -76,7 +77,7 @@ function YearLabel({ year }: { year: number }) {
   );
 }
 
-/** One jam a dancer was in (§4.14); the play button shows when there is a video and `onPlay`. */
+/** One jam a dancer was in (§4.14); the video pill shows when there is a video and `onPlay`. */
 export function JamRow({
   participation: p,
   past,
@@ -116,18 +117,15 @@ export function JamRow({
           </div>
         )}
       </div>
-      {p.video_url && onPlay && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative z-[1]"
-          aria-label={t("jam.watch", { name: p.event.name })}
-          onClick={onPlay}
-        >
-          <Play size={20} weight="fill" aria-hidden />
-        </Button>
+      {past && (
+        // The pill, then the result; on phones the pill goes under it.
+        <div className="flex flex-col-reverse items-end gap-1.5 sm:flex-row sm:items-center sm:gap-2">
+          {p.video_url && onPlay && (
+            <VideoPill name={p.event.name} onClick={onPlay} />
+          )}
+          <ResultBadge finalRank={p.final_rank} reached={p.reached} />
+        </div>
       )}
-      {past && <ResultBadge finalRank={p.final_rank} reached={p.reached} />}
     </li>
   );
 }

@@ -43,6 +43,27 @@ describe("JamsPage", () => {
     );
   });
 
+  it("marks only the jams with videos, and links them to their battles", async () => {
+    mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "GET /api/events.geojson": geojson(
+        jamFeature(1, "DPC Jam", { day: "2020-10-25", hasVideos: true }),
+        jamFeature(2, "Quiet Jam", { day: "2020-10-18" }),
+      ),
+    });
+    renderApp("/jams");
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Past jams" }),
+    );
+
+    const filmed = (await list()).getByRole("link", { name: /DPC Jam/ });
+    expect(filmed).toHaveAttribute("href", "/jams/dpc-jam-1#battles");
+    expect(within(filmed).getByText("Videos available")).toBeInTheDocument();
+    const quiet = (await list()).getByRole("link", { name: /Quiet Jam/ });
+    expect(quiet).toHaveAttribute("href", "/jams/quiet-jam-2");
+    expect(within(quiet).queryByText("Videos available")).toBeNull();
+  });
+
   it("searches through every jam and keeps the words in the URL", async () => {
     mockApi({
       "GET /api/auth/me": LOGGED_OUT,

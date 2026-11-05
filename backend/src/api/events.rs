@@ -158,6 +158,9 @@ pub struct MapJam {
     pub categories: Vec<Category>,
     /// The uploaded flyer at 540×675; null means the generated one.
     pub flyer_card_url: Option<String>,
+    /// Whether a battle of this live or past jam has a video: previews show "Videos available"
+    /// and link to its battles (M28).
+    pub has_videos: bool,
 }
 
 /// List public jams, or your own with `mine=true`.
@@ -245,6 +248,7 @@ fn feature(p: MapPoint, battles: Vec<Battle>) -> Feature {
             battles: battles.into_iter().map(|b| b.name).collect(),
             categories,
             flyer_card_url: p.flyer_card_url,
+            has_videos: p.has_videos,
         },
     }
 }
