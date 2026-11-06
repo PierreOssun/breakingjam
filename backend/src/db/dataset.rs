@@ -11,6 +11,7 @@ use crate::{
 /// A dancer from `dancers.toml`, entered as a seed admin's: notable (§4 "Dancer identity").
 pub async fn insert_dancer(
     conn: &mut PgConnection,
+    key: &str,
     dancer: &DancerRecord,
     created_by: Uuid,
 ) -> sqlx::Result<Uuid> {
@@ -18,9 +19,10 @@ pub async fn insert_dancer(
     // Set before any entry, so the battles' suggestion (which fills only empty looks) defers to it.
     let avatar_parts = dancer.look.and_then(|look| default_look(id, look));
     sqlx::query!(
-        "insert into dancers (id, dancer_name, aliases, country, country2, avatar_parts, source, notable, created_by)
-         values ($1, $2, $3, $4, $5, $6, 'seed', true, $7)",
+        "insert into dancers (id, data_key, dancer_name, aliases, country, country2, avatar_parts, source, notable, created_by)
+         values ($1, $2, $3, $4, $5, $6, $7, 'seed', true, $8)",
         id,
+        key,
         dancer.name,
         &dancer.aliases,
         dancer.country,

@@ -58,8 +58,9 @@ pub async fn insert_all(
     data: &Dataset,
     organizer: Uuid,
 ) -> Result<Imported, ImportError> {
-    let (events, skipped) = importable(data, &check(data).errors);
-    let (dancer_keys, crew_keys) = needed(data, &events);
+    let errors = check(data).errors;
+    let (events, skipped) = importable(data, &errors);
+    let (dancer_keys, crew_keys) = needed(data, &events, &errors);
     let mut cx = Context {
         data,
         organizer,
@@ -74,7 +75,7 @@ pub async fn insert_all(
     }
     for key in dancer_keys {
         let dancer = &data.dancers[key];
-        let id = db::dataset::insert_dancer(conn, dancer, organizer).await?;
+        let id = db::dataset::insert_dancer(conn, key, dancer, organizer).await?;
         for crew in dancer.crews.iter().filter_map(|crew| cx.crews.get(crew)) {
             db::dataset::add_membership(conn, id, *crew).await?;
         }
@@ -102,17 +103,10 @@ pub async fn insert_all(
 
 /// The jams with no broken rule, naming no dancer or crew with one; the others, with why.
 fn importable<'a>(data: &'a Dataset, problems: &[Problem]) -> (Vec<&'a str>, Vec<String>) {
-    let broken = |kind: Kind| -> BTreeSet<&str> {
-        problems
-            .iter()
-            .filter(|p| p.kind == kind)
-            .map(|p| p.key.as_str())
-            .collect()
-    };
     let (bad_events, bad_dancers, bad_crews) = (
-        broken(Kind::Event),
-        broken(Kind::Dancer),
-        broken(Kind::Crew),
+        broken(problems, Kind::Event),
+        broken(problems, Kind::Dancer),
+        broken(problems, Kind::Crew),
     );
     let (mut events, mut skipped) = (Vec::new(), Vec::new());
     for (key, event) in &data.events {
@@ -128,18 +122,44 @@ fn importable<'a>(data: &'a Dataset, problems: &[Problem]) -> (Vec<&'a str>, Vec
     (events, skipped)
 }
 
-/// The dancers and crews the jams name.
-fn needed<'a>(data: &'a Dataset, events: &[&str]) -> (BTreeSet<&'a str>, BTreeSet<&'a str>) {
-    let mut dancers = BTreeSet::new();
-    let mut crews = BTreeSet::new();
-    for (_, event) in data
-        .events
+/// The keys of the `kind` that break a rule of `data check`.
+fn broken(problems: &[Problem], kind: Kind) -> BTreeSet<&str> {
+    problems
         .iter()
-        .filter(|(key, _)| events.contains(&key.as_str()))
-    {
-        dancers.extend(dancers_of(event));
-        crews.extend(crews_of(data, event));
-    }
+        .filter(|p| p.kind == kind)
+        .map(|p| p.key.as_str())
+        .collect()
+}
+
+/// Every dancer of `dancers.toml`, in a jam or not, and the crews the jams' teams and those
+/// dancers name; none that breaks a rule.
+fn needed<'a>(
+    data: &'a Dataset,
+    events: &[&str],
+    problems: &[Problem],
+) -> (BTreeSet<&'a str>, BTreeSet<&'a str>) {
+    let (bad_dancers, bad_crews) = (broken(problems, Kind::Dancer), broken(problems, Kind::Crew));
+    let dancers: BTreeSet<&str> = data
+        .dancers
+        .keys()
+        .map(String::as_str)
+        .filter(|key| !bad_dancers.contains(key))
+        .collect();
+    let teams = events
+        .iter()
+        .flat_map(|key| &data.events[*key].battles)
+        .flat_map(|battle| {
+            battle
+                .teams
+                .values()
+                .filter_map(|team| team.crew.as_deref())
+        });
+    let members = dancers
+        .iter()
+        .flat_map(|key| &data.dancers[*key].crews)
+        .map(String::as_str)
+        .filter(|crew| data.crews.contains_key(*crew) && !bad_crews.contains(crew));
+    let crews = teams.chain(members).collect();
     (dancers, crews)
 }
 

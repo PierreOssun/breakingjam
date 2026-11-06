@@ -15,6 +15,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 - Search near a place (M22): when a search names a city, `/search` shows the closest upcoming jams to it ("Near <Place>"), even where no jam is registered, from the GeoNames cities of 15,000+ people (CC BY 4.0) loaded into `places`.
 - Jam flyer upload (M19): whoever may edit a jam uploads a flyer that replaces the generated one everywhere (jam page, cards, lists, map). The browser crops it to 4:5 and encodes it; it goes live at once, without review, and admins remove unsuitable ones (decided in M19). The generated flyer stays the fallback and the share image.
 - Contact page (`/contact`): how to reach BreakingJam by email or Instagram, with topic cards as `mailto:` links that prefill a subject. No form and no backend.
+- Team page (`/team`): the people who run BreakingJam (role, Instagram, their dancer page when they have one) and a last card asking for organisers, to the contact page. A static config in `frontend/src/content/team.ts`, not a table; it names each person's dancer by its `data/dancers.toml` key, found with `GET /api/dancers/by-key/{key}`. Linked from the footer and the Contact page.
 - Admin area (`/admin`, M14): counts of jams, dancers, organisers and accounts with verification rates, the jams waiting for review, and the Instagram claims. One tab per tool, so new tools join as tabs.
 - Dancer CRUD via the API, used inside the jam flows (search-before-create when adding entry members or staff).
 - Dancer page (`/dancers/{id}`): name, crew(s), country flag(s), Instagram link, generated avatar, a stats strip (jams, countries, years active, podiums, from past jams; added in M10), and the dancer's jams split into **upcoming** and **past** (with the battle, the stage reached and, once the manager exists, the full result). Reached from a dancer on a jam page, or from **Find someone** (`/dancers`): a public search by name, alias or handle over everyone (bboys, bgirls, DJs, MCs, judges), notable dancers first (`GET /api/dancers`).
@@ -190,6 +191,7 @@ create table dancers (
   source dancer_source not null default 'organizer',
   notable boolean not null default false,   -- seeded well-known dancers: search ranking only, NO visible badge
   verified_at timestamptz,            -- set on approved claim
+  data_key text unique,               -- its key in data/dancers.toml when the curated import wrote it
   avatar_url text,                    -- uploaded by a verified dancer; null = generated avatar
   avatar_parts text,                  -- the generated avatar's parts, e.g. 'h2-s1-c0-o3-e0-b1', '-d5' for details (M17); null = seeded from id (M12b)
   titles dancer_title[] not null default '{}',   -- "I'm a…" (M25), in the enum's order; set by the verified owner or seed_admin+
@@ -527,6 +529,7 @@ PUT    /api/events/{id}/staff            replace full list; 409 once public and 
 
 GET    /api/dancers                      ?q=&country=&cursor=&limit=   (q = ilike on dancer_name, aliases and instagram_handle; notable first)
 GET    /api/dancers/{id}                 profile + current crews
+GET    /api/dancers/by-key/{key}         the same, for the dancer the curated import wrote for `key` (data/dancers.toml): the same in every environment, unlike ids; the Team page links its people this way
 GET    /api/dancers/{id}/events          {live, upcoming, past} — jams where the dancer is an entry member or staff; each item: event (id, name, slug, starts_on, ends_on, city, country, status, phase), battle (id, name, format, team_size, gender, age), role (competitor|judge|dj|mc…), entry status, reached, final_rank, video_url
 POST   /api/dancers                      a page for someone else, organizer+; titles seed_admin+
 POST   /api/dancers/mine                 the account's own page, unverified, source self; 409 when it has one (M25)
@@ -657,7 +660,7 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 
 **Places** (`data/places/`, guide in its README): GeoNames `cities15000` (CC BY 4.0) trimmed to id, name, ASCII name, alternate names, country, coordinates and population, committed so imports never download. `cargo run --bin data -- places` replaces the `places` and `place_names` rows in one transaction; UAT and production run it with the **Import places** workflow.
 
-**Curated data** (`data/`, guide in `data/README.md`): real jams and their results (Red Bull BC One World Finals first) as reviewed TOML files, the source of truth for those jams; the app shows them read-only and fixes are made in the files. `cargo run --bin data -- check` validates them in CI (brackets consistent, every dancer and crew known, codes and links well-formed); `draft-wikipedia` and `draft-youtube` (from a channel's battle videos, through the YouTube Data API) draft new editions for a human to review. Battles are 1v1 or team battles (2v2, crews) whose sides are a crew, a named team and/or members; dancers belong to zero or more crews, as in `crew_memberships`. Each dancer, jam and battle has a stable key; the import (next step) keeps database rows in step with the files.
+**Curated data** (`data/`, guide in `data/README.md`): real jams and their results (Red Bull BC One World Finals first) as reviewed TOML files, the source of truth for those jams; the app shows them read-only and fixes are made in the files. `cargo run --bin data -- check` validates them in CI (brackets consistent, every dancer and crew known, codes and links well-formed); `draft-wikipedia` and `draft-youtube` (from a channel's battle videos, through the YouTube Data API) draft new editions for a human to review. Battles are 1v1 or team battles (2v2, crews) whose sides are a crew, a named team and/or members; dancers belong to zero or more crews, as in `crew_memberships`. Each dancer, jam and battle has a stable key; the import (next step) keeps database rows in step with the files. It writes every dancer of `dancers.toml`, in a jam or not, storing each one's key in `dancers.data_key`.
 
 ## 9. Deployment (built in M13; guide in `deploy/README.md`)
 

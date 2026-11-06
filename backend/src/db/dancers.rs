@@ -96,6 +96,13 @@ pub async fn current_crews(
     Ok(by_dancer)
 }
 
+/// The id of the dancer the curated-data import wrote for `key` (`data/dancers.toml`).
+pub async fn id_by_key(db: impl PgExecutor<'_>, key: &str) -> sqlx::Result<Option<Uuid>> {
+    sqlx::query_scalar!("select id from dancers where data_key = $1", key)
+        .fetch_optional(db)
+        .await
+}
+
 /// A dancer that is not soft-deleted.
 pub async fn find(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<Option<Dancer>> {
     sqlx::query_as!(

@@ -30,6 +30,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list, create))
         .routes(routes!(create_mine))
         .routes(routes!(show, update, delete))
+        .routes(routes!(show_by_key))
         .routes(routes!(events))
 }
 
@@ -135,13 +136,47 @@ async fn show(
     current: MaybeUser,
     Path(id): Path<Uuid>,
 ) -> Result<Json<DancerPage>, AppError> {
+    page(&state, id, current.as_ref()).await
+}
+
+/// The page of a dancer from the curated data, by its key in `data/dancers.toml`: the same in
+/// every environment, unlike its id (the Team page links its people this way).
+#[utoipa::path(
+    get,
+    path = "/dancers/by-key/{key}",
+    tag = "dancers",
+    operation_id = "get_dancer_by_key",
+    params(("key" = String, Path, description = "Key in `data/dancers.toml`, e.g. `iki`")),
+    security((), ("session" = [])),
+    responses(
+        (status = OK, body = DancerPage),
+        (status = NOT_FOUND, description = "No dancer imported with this key", body = ErrorEnvelope),
+    )
+)]
+async fn show_by_key(
+    State(state): State<AppState>,
+    current: MaybeUser,
+    Path(key): Path<String>,
+) -> Result<Json<DancerPage>, AppError> {
+    let id = db::dancers::id_by_key(&state.pool, &key)
+        .await?
+        .ok_or(AppError::NotFound)?;
+    page(&state, id, current.as_ref()).await
+}
+
+/// A dancer page, or where it was merged into.
+async fn page(
+    state: &AppState,
+    id: Uuid,
+    current: Option<&CurrentUser>,
+) -> Result<Json<DancerPage>, AppError> {
     let dancer = db::dancers::find(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
     if let Some(merged_into) = dancer.merged_into_id {
         return Ok(Json(DancerPage::Merged { merged_into }));
     }
-    let response = respond(&state, dancer, current.as_ref()).await?;
+    let response = respond(state, dancer, current).await?;
     Ok(Json(DancerPage::Dancer(Box::new(response))))
 }
 

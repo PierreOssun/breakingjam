@@ -17,7 +17,8 @@
     "account": "Konto",
     "accountMenu": "Kontomenü",
     "accountMenuOf": "Kontomenü, {{name}}",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "team": "Team"
   },
   "account": {
     "viewPage": "Meine Seite ansehen",
@@ -98,7 +99,8 @@
     "orgJamEdit": "Jam bearbeiten",
     "jams": "Jam finden",
     "search": "Suche",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "team": "Team"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -839,6 +841,20 @@
         "subject": "Hallo:"
       }
     },
-    "caption": "Wir lesen jede Nachricht."
+    "caption": "Wir lesen jede Nachricht.",
+    "team": "Wer steckt hinter BreakingJam?"
+  },
+  "team": {
+    "title": "Die Crew",
+    "intro": "Zwei Leute hinter jedem Jam auf der Karte.",
+    "roles": {
+      "developer": "Entwicklung & Kommunikation",
+      "marketing": "Marketing & Kommunikation"
+    },
+    "join": {
+      "organisers": "Veranstalter:innen",
+      "cta": "Schreib uns"
+    },
+    "page": "Seite"
   }
 }

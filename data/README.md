@@ -34,6 +34,7 @@ hiro-10 = { name = "Hiro 10", country = "JP", aliases = ["Hiro10"] }
 - **Crews:** `crews = ["formless-corp"]` lists a dancer's crews; a dancer may have none, one or several.
 - **Unknown country:** `country = "ZZ"` (the ISO code for an unknown region). The site shows a globe instead of a flag.
 - **Look:** `look = "bboy"` or `look = "bgirl"` picks the generated avatar. Without it, the dancer's first bboy or bgirl battle picks it; mixed battles leave it random.
+- **Every line is a page:** the import writes every dancer, in a jam or not, and stores its key (`dancers.data_key`), so `GET /api/dancers/by-key/{key}` finds them in any environment (the Team page links its people this way). A dancer in no jam still gets a `data check` warning, as it is often a leftover spelling.
 
 **`crews.toml`**, the same way:
 

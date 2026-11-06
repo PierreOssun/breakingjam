@@ -15,6 +15,22 @@ export function useDancer(id: string) {
   });
 }
 
+/** A curated dancer's page by its key in `data/dancers.toml`, the same in every environment;
+ * null when no dancer has the key here, or without a key. */
+export function useDancerByKey(key: string | null) {
+  return useQuery({
+    queryKey: ["dancer", "key", key],
+    queryFn: async () => {
+      const reply = await api.GET("/api/dancers/by-key/{key}", {
+        params: { path: { key: key ?? "" } },
+      });
+      if (reply.response.status === 404) return null;
+      return unwrap(reply, "dancer");
+    },
+    enabled: key !== null,
+  });
+}
+
 /** The dancer's jams, upcoming and past. */
 export function useDancerEvents(id: string) {
   return useQuery({

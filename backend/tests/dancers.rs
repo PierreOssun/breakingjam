@@ -213,6 +213,29 @@ async fn profile_shows_can_edit_per_caller(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn a_curated_dancer_is_found_by_its_data_key(pool: PgPool) {
+    let app = app(pool.clone());
+    let organizer = organizer(&app, &pool, "org@example.com").await;
+    let id = id_of(&create(&app, &organizer, dancer("Iki", None)).await);
+    // What the curated-data import writes for `iki` in data/dancers.toml.
+    sqlx::query!(
+        "update dancers set data_key = 'iki' where id = $1::text::uuid",
+        id
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    let found = send(&app, get("/api/dancers/by-key/iki", None)).await;
+    assert_eq!(found.status, StatusCode::OK);
+    assert_eq!(found.json["id"], id.as_str());
+    assert_eq!(found.json["dancer_name"], "Iki");
+
+    let missing = send(&app, get("/api/dancers/by-key/simba", None)).await;
+    assert_eq!(missing.status, StatusCode::NOT_FOUND);
+}
+
+#[sqlx::test]
 async fn update_rights_follow_verification(pool: PgPool) {
     let app = app(pool.clone());
     let creator = organizer(&app, &pool, "creator@example.com").await;

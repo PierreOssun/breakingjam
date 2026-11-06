@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select data_key as \"key!\" from dancers where data_key in ('menno', 'simba', 'broken') order by data_key",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key!",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "data_key"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "a2f9a01225c1707392cc653bb677981b963437163c2110f5a83d5fcdd5288394"
+}

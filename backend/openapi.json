@@ -1713,6 +1713,53 @@
         ]
       }
     },
+    "/api/dancers/by-key/{key}": {
+      "get": {
+        "tags": [
+          "dancers"
+        ],
+        "summary": "The page of a dancer from the curated data, by its key in `data/dancers.toml`: the same in\nevery environment, unlike its id (the Team page links its people this way).",
+        "operationId": "get_dancer_by_key",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "Key in `data/dancers.toml`, e.g. `iki`",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DancerPage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No dancer imported with this key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/dancers/{id}/events": {
       "get": {
         "tags": [

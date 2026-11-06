@@ -770,7 +770,7 @@ The one way to play a battle video: on a dancer page's past rows (§4.14) and in
    - Each count is a `display-xl` number (`stat` on phones) + a `body-lg` muted caption (`body-sm` on phones), separated by a muted "·". Numbers use the locale's thousands separator; captions agree with the number.
    - Public jams only, never cancelled ones. A battle is past once its jam ended before today, upcoming from the day it ends; countries are those of the upcoming battles.
 5. **Footer** (every content page, the same at every width).
-   - The round Bounce logo at 56px next to the wordmark, then at the far end **Contact** and **Instagram** (`InstagramLogo` 16 + "Instagram"), `body-sm font-bold`, 44px targets, underlined on hover. Instagram opens in a new tab.
+   - The round Bounce logo at 56px next to the wordmark, then at the far end **Contact**, **Team** and **Instagram** (`InstagramLogo` 16 + "Instagram"), `body-sm font-bold`, 44px targets, underlined on hover. Instagram opens in a new tab.
    - Nothing else: the header holds the other links and the language switch.
    - One row (`justify-between`); below about 400px it wraps, the links under the logo. Nothing hangs past the page's side padding.
 
@@ -827,7 +827,18 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Title** "Get in touch", `display-lg` (`display-xl` from lg), over the intro in muted `body`, which is also the page's meta description.
 - **Two contact cards** (`bg-surface border rounded-lg p-5 gap-3`), side by side from `sm`, stacked below: Email with the address in bold, selectable and always visible since `mailto:` doesn't work for everyone, a secondary sm **Copy** (toast "Email copied") and a primary sm **Write an email**; Instagram with the handle in bold and a primary sm **Send a DM**, opening `ig.me/m/<handle>` in a new tab.
 - **"What you can write about":** a `label`, then a 2×2 grid of small cards (one column below `sm`), each wholly a `mailto:` link with a prefilled subject, translated with the page: An idea (`Lightbulb`, "Idea:"), A bug (`Bug`, "Bug:"), Wrong info (`PencilSimple`, "Fix:"), Work together (`Handshake`, "Hello:").
-- **Caption** at the end: "We read every message."
+- **Caption** at the end: "We read every message.", then a `primary-text` bold link **Who's behind BreakingJam?** to `/team`.
+
+**Team page** (`/team`, "Team — idea A" on the canvas; linked from the footer and the Contact page): who runs BreakingJam. The people are a static config (`frontend/src/content/team.ts`: name, role, Instagram handle, and their dancer's key in `data/dancers.toml`); the words are in i18n.
+- `max-w-content` with the page's side padding, `pt-8 pb-16` on phones, `py-20` from lg.
+- **Title** "The crew", `display-lg` (`display-xl` from lg), over the intro in muted `body`, "Two people behind every jam on the map.", which is also the meta description. Tab title "Team · BreakingJam".
+- **One card per person**, in the identity card's style (§4.17): `relative overflow-hidden rounded-[28px] border border-border bg-surface p-5 flex flex-col gap-3`, with a `.rings` (300px) bleeding off the top-right. *An exception to §9's one set of rings per screen, agreed for this page: the rings mark the people's cards.*
+  1. Avatar 96px, `rounded-[28px]`: their dancer page's avatar, found by its key (`GET /api/dancers/by-key/{key}`); where that page doesn't exist (production has no curated data yet), the generated pixel bust (§4.16) seeded by their key.
+  2. Name in Unbounded 800, 30/36.
+  3. Role chip, `h-7 px-3 rounded-full text-[12px] font-extrabold uppercase` with a 14px icon: Developer & comms in `text-primary-text bg-primary/12` with `Code`; Marketing & comms in `text-accent-text bg-accent/12` with `Megaphone`.
+  4. Link pills, `h-10 px-4 rounded-full border border-border-strong body-sm font-bold`, hover `bg-surface-raised`: "@handle" with `InstagramLogo` (new tab), then **Page** with the "J" mark (`/favicon.svg`, 18px; §10), to their dancer page, only when it was found.
+- **The last card**, `rounded-[28px] border border-dashed border-border-strong p-5`, no rings: an **Organisers** chip (`h-8 rounded-full border border-border body-sm font-bold`) and a primary sm **Get in touch** to `/contact`, side by side.
+- Cards stack with `gap-5` on phones, in two columns with `gap-6` from lg (the join card takes the next cell). Light and dark both come from the tokens.
 
 **Dancer page** (`/d/<slug>`). It's a record, not a social profile: no feed, followers, ratings, rankings or win/loss.
 - **Mobile 375:**

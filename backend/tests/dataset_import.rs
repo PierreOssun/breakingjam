@@ -244,6 +244,44 @@ async fn a_dancers_look_wins_over_their_battles(pool: PgPool) {
     );
 }
 
+#[sqlx::test]
+async fn every_dancer_comes_with_its_key_in_a_jam_or_not(pool: PgPool) {
+    let dir = data_dir();
+    let dancers = fs::read_to_string(dir.join("dancers.toml")).unwrap();
+    fs::write(
+        dir.join("dancers.toml"),
+        format!(
+            "{dancers}simba = {{ name = \"Simba\", country = \"FR\", crews = [\"ruggeds\"] }}\nbroken = {{ name = \"Broken\", country = \"France\" }}\n"
+        ),
+    )
+    .unwrap();
+    let (data, unreadable) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    assert!(unreadable.is_empty(), "{unreadable:?}");
+    let owner = organizer(&pool).await;
+
+    let mut tx = pool.begin().await.unwrap();
+    insert_all(&mut tx, &data, owner).await.unwrap();
+    tx.commit().await.unwrap();
+
+    let keys = sqlx::query_scalar!(
+        r#"select data_key as "key!" from dancers where data_key in ('menno', 'simba', 'broken') order by data_key"#
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    // Simba is in no jam; Broken breaks a rule of `data check`, so stays out.
+    assert_eq!(keys, ["menno", "simba"]);
+    let crew = sqlx::query_scalar!(
+        r#"select c.name from crew_memberships m join crews c on c.id = m.crew_id
+           join dancers d on d.id = m.dancer_id where d.data_key = 'simba'"#
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(crew, "The Ruggeds");
+}
+
 /// A country battle nobody won: both teams stay without a stage and keep the battle's video.
 #[sqlx::test]
 async fn a_battle_nobody_won_leaves_its_teams_unplaced(pool: PgPool) {

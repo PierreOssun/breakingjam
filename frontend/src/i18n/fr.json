@@ -17,7 +17,8 @@
     "account": "Compte",
     "accountMenu": "Menu du compte",
     "accountMenuOf": "Menu du compte, {{name}}",
-    "contact": "Contact"
+    "contact": "Contact",
+    "team": "Équipe"
   },
   "account": {
     "viewPage": "Voir ma page",
@@ -98,7 +99,8 @@
     "orgJamEdit": "Modifier le jam",
     "jams": "Trouver un jam",
     "search": "Recherche",
-    "contact": "Contact"
+    "contact": "Contact",
+    "team": "Équipe"
   },
   "notFound": {
     "title": "Page introuvable",
@@ -839,6 +841,20 @@
         "subject": "Bonjour :"
       }
     },
-    "caption": "Nous lisons chaque message."
+    "caption": "Nous lisons chaque message.",
+    "team": "Qui est derrière BreakingJam ?"
+  },
+  "team": {
+    "title": "Le crew",
+    "intro": "Deux personnes derrière chaque jam sur la carte.",
+    "roles": {
+      "developer": "Développeur & com",
+      "marketing": "Marketing & com"
+    },
+    "join": {
+      "organisers": "Organisateur·ices",
+      "cta": "Nous contacter"
+    },
+    "page": "Page"
   }
 }

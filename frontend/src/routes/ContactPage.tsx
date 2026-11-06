@@ -8,13 +8,15 @@ import {
   Lightbulb,
   PencilSimple,
 } from "@phosphor-icons/react";
-import { type ReactNode, useEffect } from "react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { Button } from "../components/Button";
 import { buttonClasses } from "../components/buttonClasses";
 import { useToast } from "../components/useToast";
 import { copyText } from "../lib/clipboard";
 import { BREAKINGJAM_INSTAGRAM } from "../lib/instagram";
+import { useMetaDescription } from "../lib/useMetaDescription";
 
 const EMAIL = "breakingjamtv@gmail.com";
 
@@ -30,21 +32,6 @@ const mailto = (subject?: string) =>
   subject
     ? `mailto:${EMAIL}?subject=${encodeURIComponent(`${subject} `)}`
     : `mailto:${EMAIL}`;
-
-/** Gives the page its own description while it is open, in `index.html`'s tag, not a second one. */
-function useMetaDescription(content: string) {
-  useEffect(() => {
-    const tag = document.querySelector<HTMLMetaElement>(
-      'meta[name="description"]',
-    );
-    if (!tag) return;
-    const site = tag.content;
-    tag.content = content;
-    return () => {
-      tag.content = site;
-    };
-  }, [content]);
-}
 
 /** `/contact`: how to reach us, by email or Instagram; no form and no backend. */
 export function ContactPage() {
@@ -94,6 +81,12 @@ export function ContactPage() {
         </ul>
       </section>
       <p className="text-caption text-muted">{t("contact.caption")}</p>
+      <Link
+        to="/team"
+        className="inline-flex min-h-11 items-center self-start text-body font-bold text-primary-text underline-offset-2 hover:underline"
+      >
+        {t("contact.team")}
+      </Link>
     </div>
   );
 }

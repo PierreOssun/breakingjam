@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set data_key = 'iki' where id = $1::text::uuid",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "56820393740e6a43bb74079d34600d54f3c16e13874864b80aa656bc2fd81fd4"
+}

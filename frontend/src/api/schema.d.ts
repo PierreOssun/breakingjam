@@ -414,6 +414,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dancers/by-key/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The page of a dancer from the curated data, by its key in `data/dancers.toml`: the same in
+         *     every environment, unlike its id (the Team page links its people this way).
+         */
+        get: operations["get_dancer_by_key"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/dancers/{id}/events": {
         parameters: {
             query?: never;
@@ -3615,6 +3635,37 @@ export interface operations {
                 };
             };
             /** @description No such dancer */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_dancer_by_key: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Key in `data/dancers.toml`, e.g. `iki` */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DancerPage"];
+                };
+            };
+            /** @description No dancer imported with this key */
             404: {
                 headers: {
                     [name: string]: unknown;
