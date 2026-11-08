@@ -362,14 +362,7 @@ impl EntryFields {
                 _ => None,
             };
         }
-        self.video_url = self
-            .video_url
-            .take()
-            .map(|url| url.trim().to_owned())
-            .filter(|url| !url.is_empty())
-            .map(|url| {
-                youtube_id(&url).map_or(url, |id| format!("https://www.youtube.com/watch?v={id}"))
-            });
+        self.video_url = self.video_url.take().and_then(|url| canonical_video(&url));
     }
 
     /// Rules §4 leaves to domain code, checked against the battle; run after `normalize`.
@@ -456,6 +449,268 @@ pub struct Entry {
     pub updated_at: DateTime<Utc>,
 }
 
+/// A bracket round, named by how many entries it starts with; `Top4` is the semi-finals and
+/// `Third` the small final (M29).
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    sqlx::Type,
+    utoipa::ToSchema,
+)]
+#[sqlx(type_name = "match_round", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum MatchRound {
+    Top64,
+    Top32,
+    Top16,
+    Top8,
+    Top4,
+    Third,
+    Final,
+}
+
+/// One battle of a bracket between two entries of the same battle; the winner first (M29).
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
+pub struct Match {
+    /// Primary key, UUIDv7.
+    pub id: Uuid,
+    /// Its round.
+    pub round: MatchRound,
+    /// Its place in the round, from 0: battles 0 and 1 feed battle 0 of the next round.
+    pub position: i16,
+    /// The entry that won.
+    pub winner_id: Uuid,
+    /// The entry that lost.
+    pub loser_id: Uuid,
+    /// Canonical YouTube watch link of the match.
+    pub video_url: Option<String>,
+    /// Where the match starts inside the video.
+    pub video_offset_seconds: Option<i32>,
+}
+
+impl MatchRound {
+    /// Matches a round holds: half its entries, one for the final and the small final.
+    pub fn capacity(self) -> usize {
+        match self {
+            Self::Top64 => 32,
+            Self::Top32 => 16,
+            Self::Top16 => 8,
+            Self::Top8 => 4,
+            Self::Top4 => 2,
+            Self::Third | Self::Final => 1,
+        }
+    }
+
+    /// How far into the bracket the round is; the final and the small final are both last.
+    fn depth(self) -> u8 {
+        match self {
+            Self::Top64 => 0,
+            Self::Top32 => 1,
+            Self::Top16 => 2,
+            Self::Top8 => 3,
+            Self::Top4 => 4,
+            Self::Third | Self::Final => 5,
+        }
+    }
+
+    /// The placing of the round's loser.
+    fn losers_stage(self) -> BracketStage {
+        match self {
+            Self::Top64 => BracketStage::Top64,
+            Self::Top32 => BracketStage::Top32,
+            Self::Top16 => BracketStage::Top16,
+            Self::Top8 => BracketStage::Top8,
+            Self::Top4 | Self::Third => BracketStage::Top4,
+            Self::Final => BracketStage::Top2,
+        }
+    }
+}
+
+/// A match as its organiser enters it in the battle sheet's Results step (M29).
+#[derive(Debug, Clone, Deserialize, utoipa::ToSchema)]
+pub struct MatchInput {
+    /// Its round.
+    pub round: MatchRound,
+    /// Its place in the round, from 0, kept when battles before it are not entered yet.
+    pub position: i16,
+    /// The entry that won.
+    pub winner_id: Uuid,
+    /// The entry that lost.
+    pub loser_id: Uuid,
+    /// A YouTube link to the match; blank or absent for none.
+    pub video_url: Option<String>,
+    /// Where the match starts inside the video, kept from the curated data; dropped without one.
+    pub video_offset_seconds: Option<i32>,
+}
+
+/// Body of `PUT /battles/{id}/matches`: every match of the battle.
+#[derive(Debug, Clone, Deserialize, utoipa::ToSchema)]
+#[serde(transparent)]
+pub struct MatchList(pub Vec<MatchInput>);
+
+impl Validate for MatchList {
+    fn validate(&self) -> Result<(), ValidationErrors> {
+        Ok(())
+    }
+}
+
+impl MatchList {
+    /// The matches to store, with canonical videos.
+    pub fn fields(&self) -> Vec<MatchFields> {
+        self.0
+            .iter()
+            .map(|m| {
+                let video_url = m.video_url.as_deref().and_then(canonical_video);
+                MatchFields {
+                    round: m.round,
+                    position: m.position,
+                    winner_id: m.winner_id,
+                    loser_id: m.loser_id,
+                    video_offset_seconds: video_url
+                        .as_ref()
+                        .and(m.video_offset_seconds)
+                        .filter(|at| *at >= 0),
+                    video_url,
+                }
+            })
+            .collect()
+    }
+}
+
+/// Why `matches` can't be the bracket of a battle with these `entries`, if they can't: both sides
+/// are its entries, none withdrawn; an entry plays once a round, and each battle has its own
+/// place in its round; an entry knocked out plays no later round, but a semi-final loser the
+/// small final.
+pub fn bracket_problem(matches: &[MatchFields], entries: &[Entry]) -> Option<&'static str> {
+    use std::collections::{BTreeSet, HashMap, HashSet};
+    let playing: HashSet<Uuid> = entries
+        .iter()
+        .filter(|e| e.status != EntryStatus::Withdrawn)
+        .map(|e| e.id)
+        .collect();
+    let mut seen = HashSet::new();
+    let mut places = BTreeSet::new();
+    let mut knocked_out = HashMap::<Uuid, MatchRound>::new();
+    for m in matches {
+        if !playing.contains(&m.winner_id) || !playing.contains(&m.loser_id) {
+            return Some("a side is not an entry of this battle");
+        }
+        if m.winner_id == m.loser_id {
+            return Some("an entry can't battle itself");
+        }
+        if m.video_url
+            .as_deref()
+            .is_some_and(|url| youtube_id(url).is_none())
+        {
+            return Some("a video must be a YouTube link");
+        }
+        let in_round = usize::try_from(m.position).is_ok_and(|at| at < m.round.capacity());
+        if !in_round || !places.insert((m.round, m.position)) {
+            return Some("a battle's place in its round is taken or out of range");
+        }
+        // The final and the small final share their depth: one entry plays only one of them.
+        for side in [m.winner_id, m.loser_id] {
+            if !seen.insert((side, m.round.depth())) {
+                return Some("an entry battles twice in one round");
+            }
+        }
+        // The earliest loss, whatever order the matches come in.
+        knocked_out
+            .entry(m.loser_id)
+            .and_modify(|out| {
+                if m.round.depth() < out.depth() {
+                    *out = m.round;
+                }
+            })
+            .or_insert(m.round);
+    }
+    let out_too_early = matches.iter().any(|m| {
+        [m.winner_id, m.loser_id].iter().any(|side| {
+            knocked_out.get(side).is_some_and(|out| {
+                let semi_loser_in_small_final =
+                    *out == MatchRound::Top4 && m.round == MatchRound::Third;
+                out.depth() < m.round.depth() && !semi_loser_in_small_final
+            })
+        })
+    });
+    out_too_early.then_some("an entry knocked out battles again")
+}
+
+/// Where an entry finished, as its matches say.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Placing {
+    /// The entry.
+    pub entry_id: Uuid,
+    /// Furthest stage reached.
+    pub reached: BracketStage,
+    /// Exact placement, for the final's and the small final's sides.
+    pub final_rank: Option<i32>,
+    /// The video of its last match, when that match has one.
+    pub video_url: Option<String>,
+    /// Where that match starts inside the video.
+    pub video_offset_seconds: Option<i32>,
+}
+
+/// The placings `matches` decide: every loser's, and the winners' of the final and the small
+/// final; an entry that only won so far keeps the one it has.
+pub fn placings(matches: &[MatchFields]) -> Vec<Placing> {
+    let mut last = std::collections::BTreeMap::<Uuid, &MatchFields>::new();
+    for m in matches {
+        for side in [m.winner_id, m.loser_id] {
+            let later = last
+                .get(&side)
+                .is_none_or(|seen| seen.round.depth() < m.round.depth());
+            if later {
+                last.insert(side, m);
+            }
+        }
+    }
+    last.into_iter()
+        .filter_map(|(entry_id, m)| {
+            let won = m.winner_id == entry_id;
+            let (reached, final_rank) = match (m.round, won) {
+                (MatchRound::Final, true) => (BracketStage::Winner, Some(1)),
+                (MatchRound::Final, false) => (BracketStage::Top2, Some(2)),
+                (MatchRound::Third, true) => (BracketStage::Top4, Some(3)),
+                (MatchRound::Third, false) => (BracketStage::Top4, Some(4)),
+                (round, false) => (round.losers_stage(), None),
+                (_, true) => return None,
+            };
+            Some(Placing {
+                entry_id,
+                reached,
+                final_rank,
+                video_url: m.video_url.clone(),
+                video_offset_seconds: m.video_offset_seconds,
+            })
+        })
+        .collect()
+}
+
+/// A match to store; `position` orders it within its round.
+#[derive(Debug, Clone)]
+pub struct MatchFields {
+    /// Its round.
+    pub round: MatchRound,
+    /// Order within the round, from 0.
+    pub position: i16,
+    /// The entry that won.
+    pub winner_id: Uuid,
+    /// The entry that lost.
+    pub loser_id: Uuid,
+    /// Canonical video link, if any.
+    pub video_url: Option<String>,
+    /// Where the match starts inside the video.
+    pub video_offset_seconds: Option<i32>,
+}
+
 /// A crew as named on an entry.
 #[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct CrewName {
@@ -513,6 +768,18 @@ impl Validate for BattleOrder {
     fn validate(&self) -> Result<(), ValidationErrors> {
         Ok(())
     }
+}
+
+/// A video link as stored: trimmed, and a YouTube one as its `watch?v=` link; `None` when blank.
+pub fn canonical_video(link: &str) -> Option<String> {
+    let link = link.trim();
+    if link.is_empty() {
+        return None;
+    }
+    Some(youtube_id(link).map_or_else(
+        || link.to_owned(),
+        |id| format!("https://www.youtube.com/watch?v={id}"),
+    ))
 }
 
 /// The 11-character video id of a YouTube watch, live or youtu.be link (§6 Video embeds).

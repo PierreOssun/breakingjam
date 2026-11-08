@@ -224,6 +224,22 @@
       "top": "Top {{n}}",
       "sevenToSmoke": "7 to Smoke",
       "showcase": "Showcase"
+    },
+    "winner": "Gewinner",
+    "rounds": {
+      "final": "Finale",
+      "third": "Platz 3",
+      "top4": "Halbfinale",
+      "top8": "Top 8",
+      "top16": "Top 16",
+      "top32": "Top 32",
+      "top64": "Top 64",
+      "prelims": "Vorrunde",
+      "entered": "Angemeldet",
+      "battles_one": "{{count}} Battle",
+      "battles_other": "{{count}} Battles",
+      "showBattles_one": "Battle zeigen",
+      "showBattles_other": "Alle {{count}} Battles zeigen"
     }
   },
   "dancer": {
@@ -481,7 +497,12 @@
         "third": "3. Platz {{amount}}"
       },
       "startDay": "Tag",
-      "startTime": "Startzeit"
+      "startTime": "Startzeit",
+      "steps": {
+        "label": "Schritt im Battle-Blatt",
+        "details": "Details",
+        "results": "Ergebnisse"
+      }
     },
     "entries": {
       "add": "Anmeldung hinzufügen",
@@ -629,6 +650,19 @@
       "fromAddress": "Aus der Adresse übernommen",
       "attribution": "Ortssuche von Photon · © OpenStreetMap-Mitwirkende",
       "pin": "Ort der Jam"
+    },
+    "results": {
+      "round": "Runde",
+      "hint": "Wähle, wer gegen wen gebattlet hat, und tippe dann auf die Krone der Gewinner:in: Sie rückt von selbst in die nächste Runde. Jede Änderung speichert sich von selbst.",
+      "battle": "Battle {{n}}",
+      "side": "Seite {{n}}",
+      "won": "{{name}} hat gewonnen",
+      "pick": "Teilnehmer:in wählen",
+      "video": "Video-Link",
+      "invalid": "Diese Ergebnisse ergeben kein Bracket: Alle battlen einmal pro Runde und nach dem Ausscheiden nicht mehr.",
+      "needsBracket": "Wähle unter Details ein Bracket (Top 8, Top 16 …), um die Battles Runde für Runde einzutragen.",
+      "needsEntries": "Füge diesem Battle zuerst mindestens zwei Teilnehmer:innen hinzu.",
+      "videoInvalid": "Füge einen YouTube-Link ein: Dieser wird nicht gespeichert."
     }
   },
   "verify": {

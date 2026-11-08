@@ -261,3 +261,168 @@ fn a_battle_starts_on_one_of_its_jams_days() {
         );
     }
 }
+
+/// Entries of a battle as the API reads them: just ids and status matter to the bracket rules.
+fn entries(n: usize) -> Vec<Entry> {
+    (0..n)
+        .map(|_| Entry {
+            id: Uuid::now_v7(),
+            battle_id: Uuid::nil(),
+            team_name: None,
+            crew: None,
+            status: EntryStatus::Confirmed,
+            reached: BracketStage::Na,
+            final_rank: None,
+            video_url: None,
+            video_offset_seconds: None,
+            members: Vec::new(),
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+        })
+        .collect()
+}
+
+fn played(round: MatchRound, winner: &Entry, loser: &Entry) -> MatchFields {
+    MatchFields {
+        round,
+        position: 0,
+        winner_id: winner.id,
+        loser_id: loser.id,
+        video_url: None,
+        video_offset_seconds: None,
+    }
+}
+
+/// `m` at another place in its round.
+fn at(position: i16, m: MatchFields) -> MatchFields {
+    MatchFields { position, ..m }
+}
+
+/// A Top 4 with its small final: a beats b and c beats d, a wins the final, d takes third.
+fn top4(e: &[Entry]) -> Vec<MatchFields> {
+    vec![
+        played(MatchRound::Top4, &e[0], &e[1]),
+        at(1, played(MatchRound::Top4, &e[2], &e[3])),
+        played(MatchRound::Third, &e[3], &e[1]),
+        played(MatchRound::Final, &e[0], &e[2]),
+    ]
+}
+
+#[test]
+fn a_full_bracket_holds() {
+    let e = entries(4);
+    assert_eq!(bracket_problem(&top4(&e), &e), None);
+}
+
+#[test]
+fn bracket_rules_refuse_what_no_battle_could_be() {
+    let e = entries(6);
+    let stranger = &entries(1)[0];
+    let mut withdrawn = e.clone();
+    withdrawn[1].status = EntryStatus::Withdrawn;
+    let cases: [(Vec<MatchFields>, &[Entry]); 8] = [
+        (vec![played(MatchRound::Final, &e[0], stranger)], &e),
+        (top4(&withdrawn), &withdrawn),
+        (vec![played(MatchRound::Final, &e[0], &e[0])], &e),
+        (
+            vec![
+                played(MatchRound::Top8, &e[0], &e[1]),
+                at(1, played(MatchRound::Top8, &e[0], &e[2])),
+            ],
+            &e,
+        ),
+        // Two battles in one place.
+        (
+            vec![
+                played(MatchRound::Top8, &e[0], &e[1]),
+                played(MatchRound::Top8, &e[2], &e[3]),
+            ],
+            &e,
+        ),
+        // A place the round doesn't have: a final is one battle, and none is before the first.
+        (vec![at(1, played(MatchRound::Final, &e[0], &e[1]))], &e),
+        (vec![at(-1, played(MatchRound::Top8, &e[0], &e[1]))], &e),
+        // b lost the quarter-final, then battles in the semis: listed in either order.
+        (
+            vec![
+                played(MatchRound::Top4, &e[1], &e[2]),
+                played(MatchRound::Top8, &e[0], &e[1]),
+            ],
+            &e,
+        ),
+    ];
+    for (matches, entries) in cases {
+        assert!(
+            bracket_problem(&matches, entries).is_some(),
+            "{matches:?} should be refused"
+        );
+    }
+    let mut vimeo = top4(&e);
+    vimeo[0].video_url = Some("https://vimeo.com/1".into());
+    assert_eq!(
+        bracket_problem(&vimeo, &e),
+        Some("a video must be a YouTube link")
+    );
+}
+
+#[test]
+fn matches_decide_placings_and_last_videos() {
+    let e = entries(4);
+    let mut matches = top4(&e);
+    matches[3].video_url = Some("https://www.youtube.com/watch?v=dQw4w9WgXcQ".into());
+    matches[3].video_offset_seconds = Some(1234);
+    let placings = placings(&matches);
+    let of = |entry: &Entry| {
+        placings
+            .iter()
+            .find(|p| p.entry_id == entry.id)
+            .map(|p| (p.reached, p.final_rank, p.video_url.is_some()))
+    };
+    assert_eq!(of(&e[0]), Some((BracketStage::Winner, Some(1), true)));
+    assert_eq!(of(&e[2]), Some((BracketStage::Top2, Some(2), true)));
+    assert_eq!(of(&e[3]), Some((BracketStage::Top4, Some(3), false)));
+    assert_eq!(of(&e[1]), Some((BracketStage::Top4, Some(4), false)));
+    // The start goes with the video, or the entry's would play from 0:00.
+    let winner = placings.iter().find(|p| p.entry_id == e[0].id).unwrap();
+    assert_eq!(winner.video_offset_seconds, Some(1234));
+}
+
+#[test]
+fn an_entry_that_only_won_so_far_keeps_its_placing() {
+    let e = entries(4);
+    let matches = [played(MatchRound::Top8, &e[0], &e[1])];
+    let placings = placings(&matches);
+    assert_eq!(placings.len(), 1);
+    assert_eq!(placings[0].entry_id, e[1].id);
+    assert_eq!(placings[0].reached, BracketStage::Top8);
+}
+
+#[test]
+fn a_match_keeps_its_start_only_with_a_video() {
+    let e = entries(2);
+    let input = |video: Option<&str>| MatchInput {
+        round: MatchRound::Final,
+        position: 0,
+        winner_id: e[0].id,
+        loser_id: e[1].id,
+        video_url: video.map(str::to_owned),
+        video_offset_seconds: Some(90),
+    };
+    let list = MatchList(vec![
+        input(Some(" https://youtu.be/dQw4w9WgXcQ ")),
+        input(None),
+    ]);
+    let fields = list.fields();
+    assert_eq!(
+        fields[0].video_url.as_deref(),
+        Some("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    );
+    assert_eq!(fields[0].video_offset_seconds, Some(90));
+    assert_eq!(
+        (
+            fields[1].video_url.as_deref(),
+            fields[1].video_offset_seconds
+        ),
+        (None, None)
+    );
+}

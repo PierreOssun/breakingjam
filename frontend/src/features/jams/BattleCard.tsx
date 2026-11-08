@@ -19,10 +19,12 @@ import { VideoPill } from "../../components/VideoPill";
 import { daysOf, formatBattleStart } from "../../lib/dates";
 import { AddChip, DancerChip } from "../dancers/DancerChip";
 import { BattleDialog } from "./BattleDialog";
+import { BattleResults } from "./BattleResults";
 import { membersPerEntry, prizeLine } from "./battleFields";
 import { entryLabel } from "./entryFields";
+import { EntryChips } from "./EntryChips";
 import { EntryDialog } from "./EntryDialog";
-import { resultOf } from "./result";
+import { resultsOf } from "./rounds";
 
 type Entry = Schemas["Entry"];
 
@@ -47,8 +49,9 @@ type BattleCardProps = {
 
 /**
  * A battle on the jam page (DESIGN.md §6): its start, how full it is, prizes and format, then
- * who entered, best result first. Visitors see the entries as one wrapping row of chips; the
- * jam's organiser gets a row per entry, withdrawn ones included, to add, edit and delete them.
+ * who entered, best result first. Visitors see the results by round once there are any (M29),
+ * else the entries as one wrapping row of chips; the jam's organiser gets a row per entry,
+ * withdrawn ones included, to add, edit and delete them.
  */
 export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
   const { t } = useTranslation();
@@ -62,6 +65,7 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
       (a.final_rank ?? STAGE_ORDER[a.reached]) -
       (b.final_rank ?? STAGE_ORDER[b.reached]),
   );
+  const results = canEdit ? null : resultsOf(battle);
   const play = (entry: Entry) =>
     onPlay({
       url: entry.video_url ?? "",
@@ -75,7 +79,10 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
       {shown.length === 0 && (
         <p className="text-body-sm text-muted">{t("jam.noEntries")}</p>
       )}
-      {shown.length > 0 && !canEdit && (
+      {results && (
+        <BattleResults battle={battle} results={results} onPlay={onPlay} />
+      )}
+      {shown.length > 0 && !canEdit && !results && (
         // Solo battles: one wrapping row of chips; team battles: a block per team.
         <ul
           className={
@@ -157,7 +164,7 @@ function BattleHeader({
   entered,
 }: {
   jam: Schemas["EventResponse"];
-  battle: Schemas["Battle"];
+  battle: Schemas["BattleDetail"];
   entered: number;
 }) {
   const { t, i18n } = useTranslation();
@@ -216,7 +223,7 @@ function EditBattle({
   battle,
 }: {
   jam: Schemas["EventResponse"];
-  battle: Schemas["Battle"];
+  battle: Schemas["BattleDetail"];
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -234,6 +241,8 @@ function EditBattle({
           jamId={jam.id}
           days={daysOf(jam.starts_on, jam.ends_on)}
           battle={battle}
+          // Over, the jam is about its results.
+          step="results"
           onClose={() => setOpen(false)}
         />
       )}
@@ -256,51 +265,6 @@ function formatLabel(battle: Schemas["Battle"], t: TFunction): string | null {
   if (battle.bracket_size != null)
     return t("jam.format.top", { n: battle.bracket_size });
   return null;
-}
-
-/** An entry for visitors: a dancer's chip with their podium badge inside, or a team's name and
- * badge over its members' chips; the video pill when there is one (§4.37). */
-function EntryChips({
-  entry,
-  onPlay,
-}: {
-  entry: Entry;
-  onPlay: (entry: Entry) => void;
-}) {
-  const podium = resultOf(entry.final_rank, entry.reached)?.kind === "podium";
-  const badge = podium && (
-    <ResultBadge
-      finalRank={entry.final_rank}
-      reached={entry.reached}
-      size="sm"
-    />
-  );
-  const video = entry.video_url && (
-    <VideoPill name={entryLabel(entry)} onClick={() => onPlay(entry)} />
-  );
-  const [solo] = entry.members;
-  if (solo && entry.members.length === 1 && !entry.team_name) {
-    return (
-      <li className="flex items-center gap-2">
-        <DancerChip dancer={solo} badge={badge} />
-        {video}
-      </li>
-    );
-  }
-  return (
-    <li className="flex flex-col gap-1.5">
-      <div className="flex min-h-7 items-center gap-2">
-        <span className="text-body-sm font-extrabold">{entryLabel(entry)}</span>
-        {video}
-        {badge}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {entry.members.map((member) => (
-          <DancerChip key={member.id} dancer={member} />
-        ))}
-      </div>
-    </li>
-  );
 }
 
 /** Team name, then crew and (for the organiser) registration state, then each member as a chip. */

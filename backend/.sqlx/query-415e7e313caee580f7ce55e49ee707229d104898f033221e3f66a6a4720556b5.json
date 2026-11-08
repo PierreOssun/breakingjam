@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select m.round::text as \"round!\", m.position,\n                  (select d.dancer_name from entry_members em join dancers d on d.id = em.dancer_id\n                   where em.entry_id = m.winner_id) as \"winner!\",\n                  (select d.dancer_name from entry_members em join dancers d on d.id = em.dancer_id\n                   where em.entry_id = m.loser_id) as \"loser!\",\n                  m.video_url\n           from battle_matches m order by m.round, m.position",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "round!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "position",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "position"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "winner!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "loser!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 4,
+        "name": "video_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "video_url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      false,
+      null,
+      null,
+      true
+    ]
+  },
+  "hash": "415e7e313caee580f7ce55e49ee707229d104898f033221e3f66a6a4720556b5"
+}

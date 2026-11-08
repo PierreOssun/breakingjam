@@ -224,6 +224,22 @@
       "top": "Top {{n}}",
       "sevenToSmoke": "7 to Smoke",
       "showcase": "Showcase"
+    },
+    "winner": "Winner",
+    "rounds": {
+      "final": "Final",
+      "third": "3rd place",
+      "top4": "Semi-finals",
+      "top8": "Top 8",
+      "top16": "Top 16",
+      "top32": "Top 32",
+      "top64": "Top 64",
+      "prelims": "Prelims",
+      "entered": "Entered",
+      "battles_one": "{{count}} battle",
+      "battles_other": "{{count}} battles",
+      "showBattles_one": "Show the battle",
+      "showBattles_other": "Show the {{count}} battles"
     }
   },
   "dancer": {
@@ -481,7 +497,12 @@
         "third": "3rd {{amount}}"
       },
       "startDay": "Day",
-      "startTime": "Start time"
+      "startTime": "Start time",
+      "steps": {
+        "label": "Battle sheet step",
+        "details": "Details",
+        "results": "Results"
+      }
     },
     "entries": {
       "add": "Add an entry",
@@ -629,6 +650,19 @@
       "fromAddress": "Filled from the address",
       "attribution": "Place search by Photon · © OpenStreetMap contributors",
       "pin": "Jam location"
+    },
+    "results": {
+      "round": "Round",
+      "hint": "Pick who battled whom, then tap the crown of the winner: they move on to the next round by themselves. Every change saves itself.",
+      "battle": "Battle {{n}}",
+      "side": "side {{n}}",
+      "won": "{{name}} won",
+      "pick": "Pick an entrant",
+      "video": "Video link",
+      "invalid": "These results don't make a bracket: each entrant battles once a round, and not again once knocked out.",
+      "needsBracket": "Pick a bracket (Top 8, Top 16…) under Details to enter the battles round by round.",
+      "needsEntries": "Add at least two entrants to this battle first.",
+      "videoInvalid": "Paste a YouTube link: this one isn’t saved."
     }
   },
   "verify": {

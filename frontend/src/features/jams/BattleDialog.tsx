@@ -13,6 +13,8 @@ import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
 import { applyFieldErrors } from "../../lib/apiErrors";
 import { formatShortDateRange } from "../../lib/dates";
+import { ResultsStep } from "./ResultsStep";
+import { useResults } from "./useResults";
 import {
   type AgePreset,
   battleBody,
@@ -62,20 +64,28 @@ const BRACKETS = [2, 4, 8, 16, 32, 64];
 type Form = UseFormReturn<BattleFormValues>;
 type Part = { form: Form; values: BattleFormValues };
 
+type Step = "details" | "results";
+
 type BattleDialogProps = {
   jamId: string;
   /** The jam's days, `YYYY-MM-DD`; a battle starts on one of them. */
   days: string[];
-  /** The battle to edit; a new one when absent. */
-  battle?: Schemas["Battle"];
+  /** The battle to edit, with its entries and matches; a new one when absent. */
+  battle?: Schemas["BattleDetail"];
+  /** Where an existing battle's sheet opens: its results, once the jam is over. */
+  step?: Step;
   onClose: () => void;
 };
 
-/** The battle sheet (M24): category and format chips over the fields, start, spots and prize. */
+/**
+ * The battle sheet (M24): category and format chips over the fields, start, spots and prize;
+ * for an existing battle, a Results step too (M29).
+ */
 export function BattleDialog({
   jamId,
   days,
   battle,
+  step: initialStep = "details",
   onClose,
 }: BattleDialogProps) {
   const { t } = useTranslation();
@@ -92,6 +102,8 @@ export function BattleDialog({
   const [more, setMore] = useState(
     () => battle !== undefined && categoryOf(values) === undefined,
   );
+  const [step, setStep] = useState<Step>(battle ? initialStep : "details");
+  const results = useResults(jamId, battle);
 
   const save = useMutation({
     mutationFn: async (body: Schemas["BattleFields"]) =>
@@ -135,55 +147,91 @@ export function BattleDialog({
       size="form"
       title={battle ? t("org.battles.edit") : t("org.battles.add")}
       confirmClose={isDirty ? t("form.discard") : undefined}
-      action={{
-        label: battle ? t("form.save") : t("org.battles.addAction"),
-        form: formId,
-        loading: save.isPending,
-      }}
+      // Results save as they change: that step has no footer.
+      action={
+        step === "results"
+          ? undefined
+          : {
+              label: battle ? t("form.save") : t("org.battles.addAction"),
+              form: formId,
+              loading: save.isPending,
+            }
+      }
     >
-      <form
-        id={formId}
-        noValidate
-        className="flex flex-col gap-6"
-        onSubmit={(e) => {
-          // The server's last refusals go stale on a new try; some, like `age_max`, sit on no
-          // input, so the form would never clear them and never submit again.
-          clearErrors();
-          void handleSubmit((v) => save.mutate(battleBody(v)))(e);
-        }}
-      >
-        <ChipRow
-          label={t("org.battles.category")}
-          chips={CATEGORIES.map((chip) => ({
-            key: chip,
-            label: t(`org.battles.categories.${chip}`),
-            on: chip === category,
-            onPick: () => pick(withCategory(values, chip)),
-          }))}
-        />
-        <ChipRow
-          label={t("org.battles.format")}
-          error={errors.format?.message}
-          chips={FORMATS.map((chip) => ({
-            key: chip,
-            label: t(`org.battles.formatChips.${chip}`),
-            on: chip === format,
-            // Picked again, the chip lets go: a battle whose bracket isn't known yet.
-            onPick: () =>
-              pick(withFormat(values, chip === format ? undefined : chip)),
-          }))}
-        />
-        <StartAndSpots form={form} values={values} days={days} />
-        <Prize form={form} values={values} keep={battle?.prize_currency} />
-        <MoreOptions
-          form={form}
-          values={values}
-          open={more || MORE.some((key) => errors[key])}
-          onToggle={setMore}
-        />
-        <FormError message={errors.root?.message} />
-      </form>
+      {battle && <Steps step={step} onPick={setStep} />}
+      {battle && step === "results" ? (
+        <ResultsStep battle={battle} results={results} />
+      ) : (
+        <form
+          id={formId}
+          noValidate
+          className="flex flex-col gap-6"
+          onSubmit={(e) => {
+            // The server's last refusals go stale on a new try; some, like `age_max`, sit on no
+            // input, so the form would never clear them and never submit again.
+            clearErrors();
+            void handleSubmit((v) => save.mutate(battleBody(v)))(e);
+          }}
+        >
+          <ChipRow
+            label={t("org.battles.category")}
+            chips={CATEGORIES.map((chip) => ({
+              key: chip,
+              label: t(`org.battles.categories.${chip}`),
+              on: chip === category,
+              onPick: () => pick(withCategory(values, chip)),
+            }))}
+          />
+          <ChipRow
+            label={t("org.battles.format")}
+            error={errors.format?.message}
+            chips={FORMATS.map((chip) => ({
+              key: chip,
+              label: t(`org.battles.formatChips.${chip}`),
+              on: chip === format,
+              // Picked again, the chip lets go: a battle whose bracket isn't known yet.
+              onPick: () =>
+                pick(withFormat(values, chip === format ? undefined : chip)),
+            }))}
+          />
+          <StartAndSpots form={form} values={values} days={days} />
+          <Prize form={form} values={values} keep={battle?.prize_currency} />
+          <MoreOptions
+            form={form}
+            values={values}
+            open={more || MORE.some((key) => errors[key])}
+            onToggle={setMore}
+          />
+          <FormError message={errors.root?.message} />
+        </form>
+      )}
     </Dialog>
+  );
+}
+
+/** Details or Results: a two-way switch over the sheet's body. */
+function Steps({ step, onPick }: { step: Step; onPick: (step: Step) => void }) {
+  const { t } = useTranslation();
+  return (
+    <div
+      role="group"
+      aria-label={t("org.battles.steps.label")}
+      className="grid grid-cols-2 gap-1 rounded-full border border-border p-1"
+    >
+      {(["details", "results"] as const).map((key) => (
+        <button
+          key={key}
+          type="button"
+          aria-pressed={step === key}
+          onClick={() => onPick(key)}
+          className={`h-10 cursor-pointer rounded-full text-body-sm font-bold transition-colors duration-fast ${
+            step === key ? "bg-text text-bg" : "text-muted hover:text-text"
+          }`}
+        >
+          {t(`org.battles.steps.${key}`)}
+        </button>
+      ))}
+    </div>
   );
 }
 

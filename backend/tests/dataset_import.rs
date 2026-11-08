@@ -207,6 +207,59 @@ async fn a_jam_whose_dancer_dances_for_a_crew_with_a_broken_rule_is_left_out(poo
 }
 
 #[sqlx::test]
+async fn matches_are_stored_round_by_round_winner_first(pool: PgPool) {
+    let dir = data_dir();
+    let (data, unreadable) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    assert!(unreadable.is_empty(), "{unreadable:?}");
+    let owner = organizer(&pool).await;
+
+    let mut tx = pool.begin().await.unwrap();
+    insert_all(&mut tx, &data, owner).await.unwrap();
+    tx.commit().await.unwrap();
+
+    // One dancer per entry in a 1v1, so the subqueries name each side.
+    let matches = sqlx::query!(
+        r#"select m.round::text as "round!", m.position,
+                  (select d.dancer_name from entry_members em join dancers d on d.id = em.dancer_id
+                   where em.entry_id = m.winner_id) as "winner!",
+                  (select d.dancer_name from entry_members em join dancers d on d.id = em.dancer_id
+                   where em.entry_id = m.loser_id) as "loser!",
+                  m.video_url
+           from battle_matches m order by m.round, m.position"#
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    let matches: Vec<_> = matches
+        .iter()
+        .map(|m| {
+            (
+                m.round.as_str(),
+                m.position,
+                m.winner.as_str(),
+                m.loser.as_str(),
+                m.video_url.as_deref(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        matches,
+        [
+            ("top4", 0, "Menno", "Lee", None),
+            ("top4", 1, "Ami", "Kastet", None),
+            (
+                "final",
+                0,
+                "Ami",
+                "Menno",
+                Some("https://www.youtube.com/watch?v=abcdefghijk")
+            ),
+        ]
+    );
+}
+
+#[sqlx::test]
 async fn a_dancers_look_wins_over_their_battles(pool: PgPool) {
     let dir = data_dir();
     let dancers = fs::read_to_string(dir.join("dancers.toml")).unwrap();

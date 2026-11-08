@@ -2904,6 +2904,96 @@
         ]
       }
     },
+    "/api/battles/{id}/matches": {
+      "put": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Replace a battle's matches, as its organiser enters the bracket in the battle sheet (M29);\nthe placings of the entries they decide follow.",
+        "operationId": "replace_matches",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Battle id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchList"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Match"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such battle, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Not a bracket of this battle's entries (field `matches`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/events/{id}/staff": {
       "get": {
         "tags": [
@@ -4710,7 +4800,8 @@
           {
             "type": "object",
             "required": [
-              "entries"
+              "entries",
+              "matches"
             ],
             "properties": {
               "entries": {
@@ -4719,6 +4810,13 @@
                   "$ref": "#/components/schemas/Entry"
                 },
                 "description": "Its entries with members and results, oldest first."
+              },
+              "matches": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Match"
+                },
+                "description": "Who met whom, round by round from the first; empty when only placings are known (M29)."
               }
             }
           }
@@ -6489,6 +6587,124 @@
             "description": "Whether a battle of this live or past jam has a video: previews show \"Videos available\"\nand link to its battles (M28)."
           }
         }
+      },
+      "Match": {
+        "type": "object",
+        "description": "One battle of a bracket between two entries of the same battle; the winner first (M29).",
+        "required": [
+          "id",
+          "round",
+          "position",
+          "winner_id",
+          "loser_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "round": {
+            "$ref": "#/components/schemas/MatchRound",
+            "description": "Its round."
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Its place in the round, from 0: battles 0 and 1 feed battle 0 of the next round."
+          },
+          "winner_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The entry that won."
+          },
+          "loser_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The entry that lost."
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Canonical YouTube watch link of the match."
+          },
+          "video_offset_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Where the match starts inside the video."
+          }
+        }
+      },
+      "MatchInput": {
+        "type": "object",
+        "description": "A match as its organiser enters it in the battle sheet's Results step (M29).",
+        "required": [
+          "round",
+          "position",
+          "winner_id",
+          "loser_id"
+        ],
+        "properties": {
+          "round": {
+            "$ref": "#/components/schemas/MatchRound",
+            "description": "Its round."
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Its place in the round, from 0, kept when battles before it are not entered yet."
+          },
+          "winner_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The entry that won."
+          },
+          "loser_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The entry that lost."
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "A YouTube link to the match; blank or absent for none."
+          },
+          "video_offset_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Where the match starts inside the video, kept from the curated data; dropped without one."
+          }
+        }
+      },
+      "MatchList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MatchInput"
+        },
+        "description": "Body of `PUT /battles/{id}/matches`: every match of the battle."
+      },
+      "MatchRound": {
+        "type": "string",
+        "description": "A bracket round, named by how many entries it starts with; `Top4` is the semi-finals and\n`Third` the small final (M29).",
+        "enum": [
+          "top64",
+          "top32",
+          "top16",
+          "top8",
+          "top4",
+          "third",
+          "final"
+        ]
       },
       "Member": {
         "type": "object",

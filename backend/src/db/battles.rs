@@ -1,4 +1,4 @@
-//! `battles`, `entries`, `entry_members` and `event_staff` queries.
+//! `battles`, `entries`, `entry_members`, `battle_matches` and `event_staff` queries.
 
 use std::collections::HashMap;
 
@@ -9,7 +9,8 @@ use uuid::Uuid;
 use crate::domain::{
     battle::{
         Battle, BattleAge, BattleFields, BattleFormat, BattleGender, BracketStage, CrewName, Entry,
-        EntryFields, EntryStatus, StaffAssignment, StaffMember, StaffRole,
+        EntryFields, EntryStatus, Match, MatchFields, MatchRound, Placing, StaffAssignment,
+        StaffMember, StaffRole,
     },
     dancer::DancerRef,
 };
@@ -193,6 +194,95 @@ pub async fn entries_of(
         by_battle.entry(entry.battle_id).or_default().push(entry);
     }
     Ok(by_battle)
+}
+
+/// The matches of several battles by battle, round by round from the first, in order.
+pub async fn matches_of(
+    conn: &mut PgConnection,
+    battle_ids: &[Uuid],
+) -> sqlx::Result<HashMap<Uuid, Vec<Match>>> {
+    let rows = sqlx::query!(
+        r#"select id, battle_id, round as "round: MatchRound", position, winner_id, loser_id,
+                  video_url, video_offset_seconds
+           from battle_matches
+           where battle_id = any($1)
+           order by round, position"#,
+        battle_ids,
+    )
+    .fetch_all(conn)
+    .await?;
+    let mut by_battle = HashMap::<Uuid, Vec<Match>>::new();
+    for row in rows {
+        by_battle.entry(row.battle_id).or_default().push(Match {
+            id: row.id,
+            round: row.round,
+            position: row.position,
+            winner_id: row.winner_id,
+            loser_id: row.loser_id,
+            video_url: row.video_url,
+            video_offset_seconds: row.video_offset_seconds,
+        });
+    }
+    Ok(by_battle)
+}
+
+/// Stores one match of a battle.
+pub async fn insert_match(
+    conn: &mut PgConnection,
+    battle_id: Uuid,
+    fields: &MatchFields,
+) -> sqlx::Result<()> {
+    sqlx::query!(
+        "insert into battle_matches
+           (id, battle_id, round, position, winner_id, loser_id, video_url, video_offset_seconds)
+         values ($1, $2, $3, $4, $5, $6, $7, $8)",
+        Uuid::now_v7(),
+        battle_id,
+        fields.round as MatchRound,
+        fields.position,
+        fields.winner_id,
+        fields.loser_id,
+        fields.video_url,
+        fields.video_offset_seconds,
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
+/// Replaces every match of a battle.
+pub async fn replace_matches(
+    conn: &mut PgConnection,
+    battle_id: Uuid,
+    matches: &[MatchFields],
+) -> sqlx::Result<()> {
+    sqlx::query!("delete from battle_matches where battle_id = $1", battle_id)
+        .execute(&mut *conn)
+        .await?;
+    for fields in matches {
+        insert_match(conn, battle_id, fields).await?;
+    }
+    Ok(())
+}
+
+/// Sets an entry's placing as its matches decide; its video and start only when its last match
+/// has a video, so one entered before the matches stays.
+pub async fn set_placing(conn: &mut PgConnection, placing: &Placing) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update entries
+         set reached = $2, final_rank = $3,
+             video_url = coalesce($4, video_url),
+             video_offset_seconds = case when $4::text is null then video_offset_seconds else $5 end
+         where id = $1",
+        placing.entry_id,
+        placing.reached as BracketStage,
+        placing.final_rank,
+        placing.video_url,
+        placing.video_offset_seconds,
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
 }
 
 /// One entry, with members and crew.

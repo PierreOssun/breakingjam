@@ -14,7 +14,7 @@ use std::{
 };
 
 use crate::domain::{
-    battle::{BattleAge, BattleFormat, BattleGender, BracketStage},
+    battle::{BattleAge, BattleFormat, BattleGender, BracketStage, MatchRound},
     fold,
 };
 use chrono::NaiveDate;
@@ -215,6 +215,20 @@ pub enum Round {
     Top4,
     Final,
     Third,
+}
+
+impl From<Round> for MatchRound {
+    fn from(round: Round) -> Self {
+        match round {
+            Round::Top64 => Self::Top64,
+            Round::Top32 => Self::Top32,
+            Round::Top16 => Self::Top16,
+            Round::Top8 => Self::Top8,
+            Round::Top4 => Self::Top4,
+            Round::Third => Self::Third,
+            Round::Final => Self::Final,
+        }
+    }
 }
 
 /// The rounds of a full bracket, in the order winners advance: semi-final winners play the final, not the small final.

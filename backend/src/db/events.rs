@@ -187,11 +187,14 @@ pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
                   jam_phase(starts_on, ends_on, timezone) as "phase!: Phase", city as "city!", country as "country!", lat as "lat!", lng as "lng!",
                   flyer_card_url,
                   -- An upcoming jam never shows it, whatever was entered early (M28).
-                  jam_phase(starts_on, ends_on, timezone) <> 'upcoming' and exists (
+                  jam_phase(starts_on, ends_on, timezone) <> 'upcoming' and (exists (
                     select 1 from battles b join entries e on e.battle_id = b.id
                     where b.event_id = events.id and e.video_url is not null
                       and e.status <> 'withdrawn'
-                  ) as "has_videos!"
+                  ) or exists (
+                    select 1 from battles b join battle_matches m on m.battle_id = b.id
+                    where b.event_id = events.id and m.video_url is not null
+                  )) as "has_videos!"
            from events
            where deleted_at is null and status in ('published', 'registration_closed')
              and city is not null and country is not null and lat is not null and lng is not null

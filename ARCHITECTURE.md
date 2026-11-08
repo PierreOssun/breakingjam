@@ -32,7 +32,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 - UI in English, French, German (UI strings only — user content is stored as written).
 
 ### Deferred (do not build, keep the schema open for it)
-- Live battle management: `rounds` and `matches` tables under `battles` (match = entry A vs entry B at a `bracket_stage`, with judge decisions and a `video_url`), prelims scoring, seeding, live view. For now the organiser only records `entries.reached` / `final_rank` by hand; the manager will compute them.
+- Live battle management: prelims scoring, seeding, judge decisions, live view. Matches exist since M29 (`battle_matches`: round, winner, loser, video), written by the curated import and entered by organisers in the battle sheet's Results step, from which the placings follow.
 - Dancer merge tool (soft dedupe only for now).
 - Payments / organiser billing.
 - Instagram or Apple login.
@@ -362,6 +362,21 @@ create table entries (
 );
 create index on entries (battle_id);
 
+create type match_round as enum ('top64', 'top32', 'top16', 'top8', 'top4', 'third', 'final');
+create table battle_matches (           -- M29: who met whom; top4 is the semi-finals, third the small final
+  id uuid primary key,
+  battle_id uuid not null references battles(id) on delete cascade,
+  round match_round not null,
+  position smallint not null check (position >= 0),     -- order within its round
+  winner_id uuid not null references entries(id) on delete cascade,
+  loser_id uuid not null references entries(id) on delete cascade,
+  video_url text,
+  video_offset_seconds int check (video_offset_seconds >= 0),   -- only with a video
+  created_at timestamptz not null default now(),
+  check (winner_id <> loser_id),
+  unique (battle_id, round, position)
+);
+
 create table entry_members (
   entry_id uuid not null references entries(id) on delete cascade,
   dancer_id uuid not null references dancers(id),
@@ -514,7 +529,8 @@ POST   /api/events/{id}/submit | publish | close-registration | cancel   (publis
 POST   /api/events/{id}/flyer            multipart: flyer (1080×1350 JPEG ≤ 2 MB), card (540×675 JPEG ≤ 400 KB)   owner/seed_admin+, live at once (M19)
 DELETE /api/events/{id}/flyer            back to the generated flyer; how admins take one down
 
-GET    /api/events/{id}/battles          ordered by position, each with its entries (members, crew, results), so the jam page loads in three calls (M26)
+PUT    /api/battles/{id}/matches         [{round, position, winner_id, loser_id, video_url?, video_offset_seconds?}]: replaces the battle's matches (M29), jam writer as for entries; 422 on `matches` unless both sides are the battle's non-withdrawn entries, each plays once a round, each battle has its own place in its round (0 to the round's battles − 1; battles 2k and 2k+1 feed battle k) and a knocked-out entry plays no later round (but a semi-final loser the small final); the placings they decide follow (each loser's stage, 1st/2nd/3rd/4th from the finals) with the video and start of each entry's last match
+GET    /api/events/{id}/battles          ordered by position, each with its entries (members, crew, results) and its matches (round, winner, loser, video; M29), so the jam page loads in three calls (M26)
 POST   /api/events/{id}/battles          {name?, format, team_size?, gender, age, age_min?, age_max?, bracket_size?, max_entries?, prize_currency?, prize_first?, prize_second?, prize_third?, starts_at?}
 PUT    /api/battles/{id}
 DELETE /api/battles/{id}                 422 `battles` for the last battle of a jam past draft
@@ -660,7 +676,7 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 
 **Places** (`data/places/`, guide in its README): GeoNames `cities15000` (CC BY 4.0) trimmed to id, name, ASCII name, alternate names, country, coordinates and population, committed so imports never download. `cargo run --bin data -- places` replaces the `places` and `place_names` rows in one transaction; UAT and production run it with the **Import places** workflow.
 
-**Curated data** (`data/`, guide in `data/README.md`): real jams and their results (Red Bull BC One World Finals first) as reviewed TOML files, the source of truth for those jams; the app shows them read-only and fixes are made in the files. `cargo run --bin data -- check` validates them in CI (brackets consistent, every dancer and crew known, codes and links well-formed); `draft-wikipedia` and `draft-youtube` (from a channel's battle videos, through the YouTube Data API) draft new editions for a human to review. Battles are 1v1 or team battles (2v2, crews) whose sides are a crew, a named team and/or members; dancers belong to zero or more crews, as in `crew_memberships`. Each dancer, jam and battle has a stable key; the import (next step) keeps database rows in step with the files. It writes every dancer of `dancers.toml`, in a jam or not, storing each one's key in `dancers.data_key`.
+**Curated data** (`data/`, guide in `data/README.md`): real jams and their results (Red Bull BC One World Finals first) as reviewed TOML files, the source of truth for those jams; the app shows them read-only and fixes are made in the files. `cargo run --bin data -- check` validates them in CI (brackets consistent, every dancer and crew known, codes and links well-formed); `draft-wikipedia` and `draft-youtube` (from a channel's battle videos, through the YouTube Data API) draft new editions for a human to review. Battles are 1v1 or team battles (2v2, crews) whose sides are a crew, a named team and/or members; dancers belong to zero or more crews, as in `crew_memberships`. Each dancer, jam and battle has a stable key; the import (next step) keeps database rows in step with the files. It writes every dancer of `dancers.toml`, in a jam or not, storing each one's key in `dancers.data_key`, and every match of a bracket into `battle_matches` (M29), besides the placings it derives for `entries`.
 
 ## 9. Deployment (built in M13; guide in `deploy/README.md`)
 
@@ -712,5 +728,6 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 26. Pre-production hardening (M26): no `completed` status, jams upcoming, live or past by their own calendar (`jam_phase`), a public jam that is over locked but for its battles, the schema's checks and indexes, crew writes for the team, entries inside battles, server-side status actions, the merge fixes, docs brought up to date.
 27. Email verification (M27): register mails a 6-digit code and logs in only once it is confirmed, "Forgot password" with the same codes, Cloudflare Email Service behind `mail.internal`, the password pepper. a) schema, API, Worker; b) frontend.
 28. Video links (M28): the **▶ Video** pill on battle results (dancer page past rows, the jam's Battles), "Videos available" on the previews of jams with videos, which open at `#battles`; `has_videos` on `events.geojson`. Several videos per battle wait for match videos.
+29. Battle results by round (M29): `battle_matches` (the final made from 1st vs 2nd for existing results), the import storing every curated match, the jam page by round (final card, crowned match cards, placings where pairings are unknown, rounds below Top 8 folded on phones). a) data, API, jam page — done; b) organisers enter matches (a "Results" step in the battle sheet) — done.
 
 For Every suggested build order point, save it in milestones/ with a filename matching the build order point.

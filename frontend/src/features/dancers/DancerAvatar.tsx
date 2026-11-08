@@ -5,6 +5,7 @@ import { PixelAvatar } from "./PixelAvatar";
 const SHAPES = {
   page: "size-24 rounded-[28px] lg:size-28 lg:rounded-[32px]",
   card: "size-24 rounded-[28px]",
+  mini: "size-[22px] rounded-[7px]",
   form: "size-[72px] rounded-[22px]",
   row: "size-[52px] rounded-[16px]",
   chip: "size-7 rounded-[8px]",
@@ -20,7 +21,7 @@ type DancerAvatarProps = {
     avatar_url?: string | null;
     avatar_parts?: string | null;
   };
-  /** `page`: the identity card · `card`: a team card · `form`: the edit sheet's preview · `row`: a person row · `chip`: a dancer chip · `stack`: the jam page's "Who's in" · `pill`, `button`: the account menu's triggers (DESIGN.md §4.16, §4.31, §4.34). */
+  /** `page`: the identity card · `card`: a team card · `mini`: a battle result's avatar stack · `form`: the edit sheet's preview · `row`: a person row · `chip`: a dancer chip · `stack`: the jam page's "Who's in" · `pill`, `button`: the account menu's triggers (DESIGN.md §4.16, §4.31, §4.34). */
   size?: keyof typeof SHAPES;
 };
 

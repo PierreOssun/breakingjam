@@ -55,7 +55,7 @@ export function EditorBar({
 }
 
 /** "Saved", "Saving…" or "Not saved" with what to do about it, announced as it changes. */
-function SaveIndicator({
+export function SaveIndicator({
   state,
   action,
   onFix,

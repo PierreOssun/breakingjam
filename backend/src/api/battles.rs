@@ -17,8 +17,8 @@ use crate::{
     db::{self, dancers::MergeLock},
     domain::{
         battle::{
-            Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, MAX_BATTLES,
-            StaffList, StaffMember, starts_during,
+            Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, MAX_BATTLES, Match,
+            MatchList, StaffList, StaffMember, bracket_problem, placings, starts_during,
         },
         event::{Event, EventStatus},
     },
@@ -36,6 +36,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(update, remove))
         .routes(routes!(create_entry))
         .routes(routes!(update_entry, remove_entry))
+        .routes(routes!(replace_matches))
         .routes(routes!(list_staff, replace_staff))
 }
 
@@ -47,6 +48,8 @@ pub struct BattleDetail {
     pub battle: Battle,
     /// Its entries with members and results, oldest first.
     pub entries: Vec<Entry>,
+    /// Who met whom, round by round from the first; empty when only placings are known (M29).
+    pub matches: Vec<Match>,
 }
 
 /// A jam's battles in display order, each with its entries.
@@ -77,10 +80,12 @@ async fn details(state: &AppState, event_id: Uuid) -> Result<Vec<BattleDetail>, 
     let battles = db::battles::list(&mut *conn, event_id).await?;
     let ids: Vec<Uuid> = battles.iter().map(|b| b.id).collect();
     let mut entries = db::battles::entries_of(&mut conn, &ids).await?;
+    let mut matches = db::battles::matches_of(&mut conn, &ids).await?;
     Ok(battles
         .into_iter()
         .map(|battle| BattleDetail {
             entries: entries.remove(&battle.id).unwrap_or_default(),
+            matches: matches.remove(&battle.id).unwrap_or_default(),
             battle,
         })
         .collect())
@@ -359,6 +364,52 @@ async fn remove_entry(
     writable_battle(&state, &current, entry.battle_id).await?;
     db::battles::delete_entry(&state.pool, id).await?;
     Ok(StatusCode::NO_CONTENT)
+}
+
+/// Replace a battle's matches, as its organiser enters the bracket in the battle sheet (M29);
+/// the placings of the entries they decide follow.
+#[utoipa::path(
+    put,
+    path = "/battles/{id}/matches",
+    tag = "battles",
+    operation_id = "replace_matches",
+    params(("id" = Uuid, Path, description = "Battle id")),
+    request_body = MatchList,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Vec<Match>),
+        Unauthorized,
+        NotJamWriter,
+        (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Not a bracket of this battle's entries (field `matches`)", body = ErrorEnvelope),
+    )
+)]
+async fn replace_matches(
+    State(state): State<AppState>,
+    current: CurrentUser,
+    Path(battle_id): Path<Uuid>,
+    ValidJson(list): ValidJson<MatchList>,
+) -> Result<Json<Vec<Match>>, AppError> {
+    writable_battle(&state, &current, battle_id).await?;
+    let (pool, matches) = (&state.pool, &list.fields());
+    transaction::retrying(move || async move {
+        let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
+        lock_battle(&mut tx, battle_id).await?;
+        let entries = db::battles::entries_of(&mut tx, &[battle_id]).await?;
+        let entries = entries.get(&battle_id).map_or(&[][..], Vec::as_slice);
+        if let Some(why) = bracket_problem(matches, entries) {
+            return Err(AppError::invalid("matches", why));
+        }
+        db::battles::replace_matches(&mut tx, battle_id, matches).await?;
+        for placing in placings(matches) {
+            db::battles::set_placing(&mut tx, &placing).await?;
+        }
+        Ok(tx.commit().await?)
+    })
+    .await?;
+    let mut conn = state.pool.acquire().await?;
+    let mut saved = db::battles::matches_of(&mut conn, &[battle_id]).await?;
+    Ok(Json(saved.remove(&battle_id).unwrap_or_default()))
 }
 
 /// A jam's judges, DJs, MCs and other staff.

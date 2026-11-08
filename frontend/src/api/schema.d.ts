@@ -610,6 +610,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/battles/{id}/matches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace a battle's matches, as its organiser enters the bracket in the battle sheet (M29);
+         *     the placings of the entries they decide follow.
+         */
+        put: operations["replace_matches"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/events/{id}/staff": {
         parameters: {
             query?: never;
@@ -1050,6 +1070,8 @@ export interface components {
         BattleDetail: components["schemas"]["Battle"] & {
             /** @description Its entries with members and results, oldest first. */
             entries: components["schemas"]["Entry"][];
+            /** @description Who met whom, round by round from the first; empty when only placings are known (M29). */
+            matches: components["schemas"]["Match"][];
         };
         /** @description Everything set when creating or editing a battle. */
         BattleFields: {
@@ -1812,6 +1834,73 @@ export interface components {
              */
             has_videos: boolean;
         };
+        /** @description One battle of a bracket between two entries of the same battle; the winner first (M29). */
+        Match: {
+            /**
+             * Format: uuid
+             * @description Primary key, UUIDv7.
+             */
+            id: string;
+            /** @description Its round. */
+            round: components["schemas"]["MatchRound"];
+            /**
+             * Format: int32
+             * @description Its place in the round, from 0: battles 0 and 1 feed battle 0 of the next round.
+             */
+            position: number;
+            /**
+             * Format: uuid
+             * @description The entry that won.
+             */
+            winner_id: string;
+            /**
+             * Format: uuid
+             * @description The entry that lost.
+             */
+            loser_id: string;
+            /** @description Canonical YouTube watch link of the match. */
+            video_url?: string | null;
+            /**
+             * Format: int32
+             * @description Where the match starts inside the video.
+             */
+            video_offset_seconds?: number | null;
+        };
+        /** @description A match as its organiser enters it in the battle sheet's Results step (M29). */
+        MatchInput: {
+            /** @description Its round. */
+            round: components["schemas"]["MatchRound"];
+            /**
+             * Format: int32
+             * @description Its place in the round, from 0, kept when battles before it are not entered yet.
+             */
+            position: number;
+            /**
+             * Format: uuid
+             * @description The entry that won.
+             */
+            winner_id: string;
+            /**
+             * Format: uuid
+             * @description The entry that lost.
+             */
+            loser_id: string;
+            /** @description A YouTube link to the match; blank or absent for none. */
+            video_url?: string | null;
+            /**
+             * Format: int32
+             * @description Where the match starts inside the video, kept from the curated data; dropped without one.
+             */
+            video_offset_seconds?: number | null;
+        };
+        /** @description Body of `PUT /battles/{id}/matches`: every match of the battle. */
+        MatchList: components["schemas"]["MatchInput"][];
+        /**
+         * @description A bracket round, named by how many entries it starts with; `Top4` is the semi-finals and
+         *     `Third` the small final (M29).
+         * @enum {string}
+         */
+        MatchRound: "top64" | "top32" | "top16" | "top8" | "top4" | "third" | "final";
         /** @description A current member as shown on a crew. */
         Member: {
             /**
@@ -4500,6 +4589,68 @@ export interface operations {
             };
             /** @description No such entry, or its jam is a draft you can't see */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    replace_matches: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Battle id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MatchList"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Match"][];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not the jam's organiser nor `seed_admin`+ */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such battle, or its jam is a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not a bracket of this battle's entries (field `matches`) */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

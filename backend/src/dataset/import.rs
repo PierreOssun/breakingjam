@@ -14,7 +14,10 @@ use super::{
 use crate::{
     db,
     domain::{
-        battle::{BattleAge, BattleFields, BattleFormat, EntryFields, EntryStatus, StaffRole},
+        battle::{
+            BattleAge, BattleFields, BattleFormat, EntryFields, EntryStatus, MatchFields,
+            MatchRound, StaffRole, canonical_video,
+        },
         event::{EventFields, EventStatus},
     },
 };
@@ -259,6 +262,7 @@ async fn insert_event(
             .id;
         // `check` passed, so the bracket holds. Teams may be known by name only, so only the
         // result rules the schema enforces apply; one refused there would abort the import.
+        let mut entries = BTreeMap::new();
         for standing in battle.standings().unwrap_or_default() {
             let entry = entry(battle, &standing, cx)?;
             let errors = entry.result_errors();
@@ -269,12 +273,56 @@ async fn insert_event(
                 ));
                 continue;
             }
-            db::battles::insert_entry(conn, battle_id, fields.gender, &entry).await?;
+            let entry_id =
+                db::battles::insert_entry(conn, battle_id, fields.gender, &entry).await?;
+            entries.insert(standing.entrant, entry_id);
         }
+        insert_matches(conn, battle_id, battle, &entries).await?;
     }
     Ok(Written::Event {
         skipped_battles: skipped,
     })
+}
+
+/// The bracket's matches between the entries written, numbered within each round in file
+/// order; a match missing an entry the result rules refused is left out.
+async fn insert_matches(
+    conn: &mut PgConnection,
+    battle_id: Uuid,
+    battle: &BattleRecord,
+    entries: &BTreeMap<&str, Uuid>,
+) -> sqlx::Result<()> {
+    let mut next = BTreeMap::<MatchRound, i16>::new();
+    for record in &battle.matches {
+        let loser = if record.winner == record.a {
+            &record.b
+        } else {
+            &record.a
+        };
+        let (Some(&winner_id), Some(&loser_id)) = (
+            entries.get(record.winner.as_str()),
+            entries.get(loser.as_str()),
+        ) else {
+            continue;
+        };
+        let round = MatchRound::from(record.round);
+        let position = next.entry(round).or_default();
+        let video_url = record.video.as_deref().and_then(canonical_video);
+        let fields = MatchFields {
+            round,
+            position: *position,
+            winner_id,
+            loser_id,
+            video_offset_seconds: video_url
+                .as_ref()
+                .and(record.at)
+                .and_then(|at| i32::try_from(at).ok()),
+            video_url,
+        };
+        db::battles::insert_match(conn, battle_id, &fields).await?;
+        *position += 1;
+    }
+    Ok(())
 }
 
 fn event_fields(event: &EventRecord) -> EventFields {

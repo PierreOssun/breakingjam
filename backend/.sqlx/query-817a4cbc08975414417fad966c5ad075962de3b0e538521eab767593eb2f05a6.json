@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, name, slug, starts_on, ends_on, status as \"status: EventStatus\",\n                  jam_phase(starts_on, ends_on, timezone) as \"phase!: Phase\", city as \"city!\", country as \"country!\", lat as \"lat!\", lng as \"lng!\",\n                  flyer_card_url,\n                  -- An upcoming jam never shows it, whatever was entered early (M28).\n                  jam_phase(starts_on, ends_on, timezone) <> 'upcoming' and exists (\n                    select 1 from battles b join entries e on e.battle_id = b.id\n                    where b.event_id = events.id and e.video_url is not null\n                      and e.status <> 'withdrawn'\n                  ) as \"has_videos!\"\n           from events\n           where deleted_at is null and status in ('published', 'registration_closed')\n             and city is not null and country is not null and lat is not null and lng is not null\n           order by starts_on, id",
+  "query": "select id, name, slug, starts_on, ends_on, status as \"status: EventStatus\",\n                  jam_phase(starts_on, ends_on, timezone) as \"phase!: Phase\", city as \"city!\", country as \"country!\", lat as \"lat!\", lng as \"lng!\",\n                  flyer_card_url,\n                  -- An upcoming jam never shows it, whatever was entered early (M28).\n                  jam_phase(starts_on, ends_on, timezone) <> 'upcoming' and (exists (\n                    select 1 from battles b join entries e on e.battle_id = b.id\n                    where b.event_id = events.id and e.video_url is not null\n                      and e.status <> 'withdrawn'\n                  ) or exists (\n                    select 1 from battles b join battle_matches m on m.battle_id = b.id\n                    where b.event_id = events.id and m.video_url is not null\n                  )) as \"has_videos!\"\n           from events\n           where deleted_at is null and status in ('published', 'registration_closed')\n             and city is not null and country is not null and lat is not null and lng is not null\n           order by starts_on, id",
   "describe": {
     "columns": [
       {
@@ -180,5 +180,5 @@
       null
     ]
   },
-  "hash": "31429b55713cb2d04abba138ba83f846b270e031e580c192854e1424b588e562"
+  "hash": "817a4cbc08975414417fad966c5ad075962de3b0e538521eab767593eb2f05a6"
 }

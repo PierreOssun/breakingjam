@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   LIL_G,
@@ -56,6 +56,7 @@ const battle = (
   teamSize: number,
   maxEntries: number | null,
   entries: object[] = [],
+  matches: object[] = [],
 ) => ({
   id,
   event_id: JAM.id,
@@ -70,6 +71,7 @@ const battle = (
   created_at: at,
   updated_at: at,
   entries,
+  matches,
 });
 
 const dancer = (id: string, name: string) => ({
@@ -304,7 +306,7 @@ describe("JamPage", () => {
     expect(main.queryByRole("button", { name: "Remove flyer" })).toBeNull();
   });
 
-  it("lists battles with results first, links every dancer and hides withdrawn entries", async () => {
+  it("falls back to each round's placings when pairings are unknown, links every dancer and hides withdrawn entries", async () => {
     mockJam();
     renderApp(`/jams/${JAM.slug}`);
     const main = within(await screen.findByRole("main"));
@@ -312,12 +314,32 @@ describe("JamPage", () => {
     const solo = (
       await main.findByRole("heading", { name: "1v1 Bboy" })
     ).closest("li")!;
-    // One wrapping row of chips, the winner first with the podium badge inside its chip.
-    const names = await within(solo).findAllByRole("link");
-    expect(names.map((a) => a.textContent)).toEqual(["Lil G 1st", "Ventus"]);
-    expect(names[0]).toHaveAttribute("href", "/dancers/d1");
-    // Only the podium gets a badge on the visitors' chips.
-    expect(within(solo).queryByText("Top 8")).not.toBeInTheDocument();
+    // No pairing is known: each round lists its placings as rows under a note, the final first.
+    const final = (
+      await within(solo).findByRole("heading", { name: "Final" })
+    ).closest("section")!;
+    expect(within(final).getByText("1 battle")).toBeInTheDocument();
+    // The name and the avatar both lead to the dancer; no name chips.
+    const links = within(final).getAllByRole("link", { name: "Lil G" });
+    expect(links.map((a) => a.getAttribute("href"))).toEqual([
+      "/dancers/d1",
+      "/dancers/d1",
+    ]);
+    // Its name shows on hover, over the avatar.
+    expect(links[1]).toHaveTextContent("Lil G");
+    expect(within(final).queryByText("1st")).not.toBeInTheDocument();
+    // The old per-entry video stays on the row.
+    expect(
+      within(final).getByRole("button", { name: "Watch Lil G" }),
+    ).toBeInTheDocument();
+    const top8 = within(solo)
+      .getByRole("heading", { name: "Top 8" })
+      .closest("section")!;
+    expect(within(top8).getAllByRole("link", { name: "Ventus" })).toHaveLength(
+      2,
+    );
+    expect(within(top8).getByText("1 battle")).toBeInTheDocument();
+    expect(within(top8).queryByRole("button")).toBeNull();
     expect(within(solo).getByText("2 / 16 dancers")).toBeInTheDocument();
     expect(within(solo).queryByText("Ghost")).not.toBeInTheDocument();
 
@@ -481,6 +503,162 @@ describe("JamPage", () => {
     await screen.findByRole("button", { name: "Watch Lil G" });
     const targets = scroll.mock.contexts as Element[];
     expect(targets.map((section) => section.id)).toContain("battles");
+  });
+
+  it("shows the final card, then each round's battles with the winner first and crowned", async () => {
+    const team = (id: string, name: string, extra: object) =>
+      entry(id, "b9", {
+        team_name: name,
+        members: [dancer(`d-${id}`, `${name} 1`)],
+        ...extra,
+      });
+    const VIDEO = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    mockJam(
+      {},
+      {
+        [`GET /api/events/${JAM.id}/battles`]: {
+          status: 200,
+          body: [
+            battle(
+              "b9",
+              "2v2",
+              2,
+              null,
+              [
+                team("s2", "Saison 2", { reached: "winner", final_rank: 1 }),
+                team("fm", "Fresh Mob Crew", {
+                  reached: "top2",
+                  final_rank: 2,
+                }),
+                team("gl", "Gatling & Loggy", { reached: "top4" }),
+                team("pv", "Pura Vida Mae", { reached: "top4" }),
+              ],
+              [
+                {
+                  id: "m1",
+                  round: "top4",
+                  winner_id: "s2",
+                  loser_id: "gl",
+                  video_url: VIDEO,
+                },
+                {
+                  id: "m2",
+                  round: "top4",
+                  winner_id: "fm",
+                  loser_id: "pv",
+                  video_url: null,
+                },
+                {
+                  id: "m3",
+                  round: "final",
+                  winner_id: "s2",
+                  loser_id: "fm",
+                  video_url: VIDEO,
+                },
+              ],
+            ),
+          ],
+        },
+      },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+
+    const final = await screen.findByRole("region", { name: "Final" });
+    expect(within(final).getByText("Saison 2")).toBeInTheDocument();
+    expect(within(final).getByText("1st")).toBeInTheDocument();
+    expect(within(final).getByText("Fresh Mob Crew")).toBeInTheDocument();
+    expect(within(final).getByText("2nd")).toBeInTheDocument();
+    expect(
+      within(final).getByRole("button", {
+        name: "Watch Saison 2 vs Fresh Mob Crew",
+      }),
+    ).toBeInTheDocument();
+
+    const semis = screen
+      .getByRole("heading", { name: "Semi-finals" })
+      .closest("section")!;
+    expect(within(semis).getByText("2 battles")).toBeInTheDocument();
+    const [first, second] = within(semis).getAllByRole("listitem");
+    // The winner is the first line, crowned; the loser has no crown. Each line starts with its name.
+    const lines = (card: HTMLElement) =>
+      Array.from(card.querySelectorAll("p")).map(
+        (line) => line.firstElementChild?.textContent,
+      );
+    expect(lines(first!)).toEqual(["Saison 2", "Gatling & Loggy"]);
+    expect(within(first!).getAllByRole("img", { name: "Winner" })).toHaveLength(
+      1,
+    );
+    expect(
+      first!.querySelector("p")?.querySelector('[aria-label="Winner"]'),
+    ).not.toBeNull();
+    expect(lines(second!)).toEqual(["Fresh Mob Crew", "Pura Vida Mae"]);
+    // Members as avatars only, each a link named after its dancer.
+    const avatar = within(first!).getByRole("link", { name: "Saison 2 1" });
+    expect(avatar).toHaveAttribute("href", "/dancers/d-s2");
+    expect(avatar).toHaveTextContent("Saison 2 1");
+    // The name is the avatar's hover label, not a chip of its own.
+    expect(within(first!).getAllByText("Saison 2 1")).toEqual([
+      within(avatar).getByText("Saison 2 1"),
+    ]);
+    expect(
+      within(final).getByRole("link", { name: "Fresh Mob Crew 1" }),
+    ).toBeInTheDocument();
+    // The video pill only where the battle has a video.
+    expect(
+      within(first!).getByRole("button", {
+        name: "Watch Saison 2 vs Gatling & Loggy",
+      }),
+    ).toBeInTheDocument();
+    expect(within(second!).queryByRole("button")).toBeNull();
+
+    await userEvent.click(
+      within(first!).getByRole("button", {
+        name: "Watch Saison 2 vs Gatling & Loggy",
+      }),
+    );
+    expect(
+      screen.getByRole("dialog", {
+        name: "Video: 2v2 — Semi-finals: Saison 2 vs Gatling & Loggy",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("folds the rounds below the quarter-finals behind a button on phones", async () => {
+    const solos = Array.from({ length: 16 }, (_, i) =>
+      entry(`e${i}`, "b9", {
+        reached: i === 0 ? "winner" : i === 1 ? "top2" : "top16",
+        members: [dancer(`d${i}`, `Dancer ${i}`)],
+      }),
+    );
+    const top16 = Array.from({ length: 8 }, (_, i) => ({
+      id: `m${i}`,
+      round: "top16",
+      winner_id: `e${i}`,
+      loser_id: `e${i + 8}`,
+      video_url: null,
+    }));
+    mockJam(
+      {},
+      {
+        [`GET /api/events/${JAM.id}/battles`]: {
+          status: 200,
+          body: [battle("b9", "1v1 Bboy", 1, null, solos, top16)],
+        },
+      },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+
+    const show = await screen.findByRole("button", {
+      name: "Show the 8 battles",
+    });
+    const round = show.closest("section")!;
+    // Hidden below lg, shown from lg: the CSS decides, the list stays in the page.
+    expect(round.querySelector("ul")).toHaveClass("hidden", "lg:grid");
+    await userEvent.click(show);
+    expect(round.querySelector("ul")).not.toHaveClass("hidden");
+    expect(
+      screen.queryByRole("button", { name: "Show the 8 battles" }),
+    ).toBeNull();
   });
 
   it("plays an entry's video from its offset in the YouTube player", async () => {
@@ -715,6 +893,82 @@ describe("JamPage", () => {
     expect(screen.queryByRole("link", { name: "Edit jam" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Upload a flyer" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Add a judge" })).toBeNull();
+  });
+
+  it("lets its organiser enter the battles round by round once the jam is past, saved as they go", async () => {
+    const VIDEO = "https://youtu.be/dQw4w9WgXcQ";
+    const fetch = mockJam(
+      { phase: "past", can_edit: false, can_edit_battles: true, actions: [] },
+      {
+        "GET /api/auth/me": { status: 200, body: LIL_G },
+        [`GET /api/events/${JAM.id}/battles`]: {
+          status: 200,
+          body: [
+            {
+              ...battle("b1", "1v1 Bboy", 1, 16, [
+                entry("e1", "b1", { members: [dancer("d1", "Lil G")] }),
+                // Their video, entered before matches existed, was of the battle they lost.
+                entry("e2", "b1", {
+                  members: [dancer("d2", "Ventus")],
+                  video_url: VIDEO,
+                  video_offset_seconds: 90,
+                }),
+              ]),
+              bracket_size: 2,
+            },
+          ],
+        },
+        "PUT /api/battles/b1/matches": { status: 200, body: [] },
+      },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Edit 1v1 Bboy" }),
+    );
+    const sheet = within(await screen.findByRole("dialog"));
+    // Over, the jam opens the sheet on its results.
+    expect(sheet.getByRole("button", { name: "Results" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await userEvent.selectOptions(
+      sheet.getByLabelText("Battle 1, side 1"),
+      "e1",
+    );
+    await userEvent.selectOptions(
+      sheet.getByLabelText("Battle 1, side 2"),
+      "e2",
+    );
+    await userEvent.click(sheet.getByRole("button", { name: "Lil G won" }));
+    expect(sheet.getByLabelText(/Video link/)).toHaveValue(VIDEO);
+    // No Save button: the battle goes out by itself once it has both sides and a winner.
+    expect(sheet.queryByRole("button", { name: "Save" })).toBeNull();
+    await waitFor(
+      () => expect(calls(fetch)).toContain("PUT /api/battles/b1/matches"),
+      { timeout: 3000 },
+    );
+    expect(await bodyOf(fetch, "PUT /api/battles/b1/matches")).toEqual([
+      {
+        round: "final",
+        position: 0,
+        winner_id: "e1",
+        loser_id: "e2",
+        video_url: VIDEO,
+        video_offset_seconds: 90,
+      },
+    ]);
+    expect(await sheet.findByText("Saved")).toBeInTheDocument();
+
+    // Not a YouTube link: the field says so, and it never goes out.
+    await userEvent.clear(sheet.getByLabelText(/Video link/));
+    await userEvent.type(
+      sheet.getByLabelText(/Video link/),
+      "https://vimeo.com/1",
+    );
+    expect(
+      sheet.getByText("Paste a YouTube link: this one isn’t saved."),
+    ).toBeInTheDocument();
   });
 
   it("lets its organiser add a judge from a search and remove the DJ", async () => {

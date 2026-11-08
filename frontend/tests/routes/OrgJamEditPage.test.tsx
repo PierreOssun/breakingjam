@@ -1357,9 +1357,12 @@ describe("the jam editor", () => {
       await screen.findByRole("button", { name: "Edit 3v3 Bgirl" }),
     );
     const dialog = screen.getByRole("dialog", { name: "Edit battle" });
-    expect(within(dialog).queryAllByRole("button", { pressed: true })).toEqual(
-      [],
-    );
+    // No chip lit: only the sheet's Details step is.
+    expect(
+      within(dialog)
+        .queryAllByRole("button", { pressed: true })
+        .map((button) => button.textContent),
+    ).toEqual(["Details"]);
     expect(
       within(dialog).getByRole("button", { name: /^More options/ }),
     ).toHaveAttribute("aria-expanded", "true");

@@ -224,6 +224,22 @@
       "top": "Top {{n}}",
       "sevenToSmoke": "7 to Smoke",
       "showcase": "Showcase"
+    },
+    "winner": "Vainqueur",
+    "rounds": {
+      "final": "Finale",
+      "third": "3e place",
+      "top4": "Demi-finales",
+      "top8": "Top 8",
+      "top16": "Top 16",
+      "top32": "Top 32",
+      "top64": "Top 64",
+      "prelims": "Présélections",
+      "entered": "Inscrits",
+      "battles_one": "{{count}} battle",
+      "battles_other": "{{count}} battles",
+      "showBattles_one": "Voir le battle",
+      "showBattles_other": "Voir les {{count}} battles"
     }
   },
   "dancer": {
@@ -481,7 +497,12 @@
         "third": "3e {{amount}}"
       },
       "startDay": "Jour",
-      "startTime": "Heure de début"
+      "startTime": "Heure de début",
+      "steps": {
+        "label": "Étape de la fiche du battle",
+        "details": "Détails",
+        "results": "Résultats"
+      }
     },
     "entries": {
       "add": "Ajouter une inscription",
@@ -629,6 +650,19 @@
       "fromAddress": "Rempli d’après l’adresse",
       "attribution": "Recherche de lieux par Photon · © contributeurs OpenStreetMap",
       "pin": "Lieu du jam"
+    },
+    "results": {
+      "round": "Tour",
+      "hint": "Choisissez qui a affronté qui, puis touchez la couronne du gagnant : il passe seul au tour suivant. Chaque modification s’enregistre toute seule.",
+      "battle": "Battle {{n}}",
+      "side": "côté {{n}}",
+      "won": "{{name}} a gagné",
+      "pick": "Choisir un·e inscrit·e",
+      "video": "Lien vidéo",
+      "invalid": "Ces résultats ne forment pas un tableau : chaque inscrit·e joue une fois par tour, et plus après une élimination.",
+      "needsBracket": "Choisissez un tableau (Top 8, Top 16…) dans Détails pour saisir les battles tour par tour.",
+      "needsEntries": "Ajoutez d’abord au moins deux inscrit·es à ce battle.",
+      "videoInvalid": "Collez un lien YouTube : celui-ci n’est pas enregistré."
     }
   },
   "verify": {

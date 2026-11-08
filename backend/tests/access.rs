@@ -73,7 +73,9 @@ fn valid_body(method: &str, path: &str) -> Value {
     match (method, path) {
         ("put", "/api/events/{id}") => jam(),
         ("post", "/api/events/{id}/battles") | ("put", "/api/battles/{id}") => battle(),
-        ("put", "/api/events/{id}/battles/order") | ("put", "/api/events/{id}/staff") => json!([]),
+        ("put", "/api/events/{id}/battles/order")
+        | ("put", "/api/events/{id}/staff")
+        | ("put", "/api/battles/{id}/matches") => json!([]),
         ("post", "/api/battles/{id}/entries") | ("put", "/api/entries/{id}") => {
             json!({ "dancer_ids": [id()] })
         }

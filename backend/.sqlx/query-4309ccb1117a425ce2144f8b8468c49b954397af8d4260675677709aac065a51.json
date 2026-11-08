@@ -1,0 +1,127 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, battle_id, round as \"round: MatchRound\", position, winner_id, loser_id,\n                  video_url, video_offset_seconds\n           from battle_matches\n           where battle_id = any($1)\n           order by round, position",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "battle_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "battle_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "round: MatchRound",
+        "type_info": {
+          "Custom": {
+            "name": "match_round",
+            "kind": {
+              "Enum": [
+                "top64",
+                "top32",
+                "top16",
+                "top8",
+                "top4",
+                "third",
+                "final"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "round"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "position",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "position"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "winner_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "winner_id"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "loser_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "loser_id"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "video_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "video_url"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "video_offset_seconds",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "battle_matches",
+            "name": "video_offset_seconds"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "4309ccb1117a425ce2144f8b8468c49b954397af8d4260675677709aac065a51"
+}

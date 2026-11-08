@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update entries\n         set reached = $2, final_rank = $3,\n             video_url = coalesce($4, video_url),\n             video_offset_seconds = case when $4::text is null then video_offset_seconds else $5 end\n         where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "bracket_stage",
+            "kind": {
+              "Enum": [
+                "prelims",
+                "top64",
+                "top32",
+                "top16",
+                "top8",
+                "top4",
+                "top2",
+                "winner",
+                "na"
+              ]
+            }
+          }
+        },
+        "Int4",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "385c4deb5ffb7bcc067296cceda64362b396af3dc626037714f49768e86084ab"
+}

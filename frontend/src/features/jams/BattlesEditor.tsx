@@ -20,7 +20,7 @@ import { BlockCard, EmptyBlock } from "./EditorBlock";
 import { battleSummary } from "./battleFields";
 import { useBattles } from "./queries";
 
-type Battle = Schemas["Battle"];
+type Battle = Schemas["BattleDetail"];
 
 /** The editor's Battles block (M24): "+ Add" while there are none, else the battles in display
  * order with add, edit, reorder and delete. */

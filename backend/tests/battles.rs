@@ -382,6 +382,132 @@ async fn results_and_video_are_normalised(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn battles_carry_their_matches_winner_first(pool: PgPool) {
+    let jam = jam(pool).await;
+    let battle = id_of(&jam.battle(one_v_one()).await);
+    let (lilg, ventus) = (jam.dancer("Lil G").await, jam.dancer("Ventus").await);
+    let winner = id_of(&jam.entry(&battle, json!({ "dancer_ids": [lilg] })).await);
+    let loser = id_of(&jam.entry(&battle, json!({ "dancer_ids": [ventus] })).await);
+    // What the curated import or (later) the organiser's Results step writes.
+    sqlx::query!(
+        "insert into battle_matches (id, battle_id, round, position, winner_id, loser_id, video_url)
+         values (gen_random_uuid(), $1::text::uuid, 'final', 0, $2::text::uuid, $3::text::uuid,
+                 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')",
+        battle,
+        winner,
+        loser,
+    )
+    .execute(&jam.pool)
+    .await
+    .unwrap();
+
+    let uri = format!("/api/events/{}/battles", jam.event_id);
+    let battles = send(&jam.app, get(&uri, Some(&jam.owner))).await;
+    let matches = &battles.json[0]["matches"];
+    assert_eq!(matches.as_array().unwrap().len(), 1);
+    assert_eq!(matches[0]["round"], "final");
+    assert_eq!(matches[0]["winner_id"], winner.as_str());
+    assert_eq!(matches[0]["loser_id"], loser.as_str());
+    assert_eq!(
+        matches[0]["video_url"],
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    );
+
+    // An entry deleted takes its matches with it.
+    let deleted = send(
+        &jam.app,
+        delete(&format!("/api/entries/{loser}"), Some(&jam.owner)),
+    )
+    .await;
+    assert_eq!(deleted.status, StatusCode::NO_CONTENT);
+    let battles = send(&jam.app, get(&uri, Some(&jam.owner))).await;
+    assert_eq!(battles.json[0]["matches"], json!([]));
+}
+
+#[sqlx::test]
+async fn organisers_enter_matches_and_placings_follow(pool: PgPool) {
+    let jam = jam(pool).await;
+    let battle = id_of(&jam.battle(one_v_one()).await);
+    let mut ids = Vec::new();
+    for name in ["Lil G", "Ventus", "Kami", "Roxy"] {
+        let dancer = jam.dancer(name).await;
+        ids.push(id_of(
+            &jam.entry(&battle, json!({ "dancer_ids": [dancer] })).await,
+        ));
+    }
+    let uri = format!("/api/battles/{battle}/matches");
+    let bracket = json!([
+        { "round": "top4", "position": 0, "winner_id": ids[0], "loser_id": ids[1] },
+        { "round": "top4", "position": 1, "winner_id": ids[2], "loser_id": ids[3] },
+        { "round": "final", "position": 0, "winner_id": ids[0], "loser_id": ids[2],
+          "video_url": "https://youtu.be/dQw4w9WgXcQ", "video_offset_seconds": 1234 },
+    ]);
+
+    // Public, so a stranger sees it but may not write it.
+    jam.publish().await;
+    let stranger = sign_up(&jam.app, &jam.pool, "other@example.com").await;
+    let refused = send(&jam.app, put(&uri, bracket.clone(), Some(&stranger))).await;
+    assert_eq!(refused.status, StatusCode::FORBIDDEN);
+
+    let twice = json!([
+        { "round": "top4", "position": 0, "winner_id": ids[0], "loser_id": ids[1] },
+        { "round": "top4", "position": 1, "winner_id": ids[0], "loser_id": ids[2] },
+    ]);
+    let refused = send(&jam.app, put(&uri, twice, Some(&jam.owner))).await;
+    assert_eq!(refused.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(refused.json["error"]["fields"][0]["field"], "matches");
+
+    let saved = send(&jam.app, put(&uri, bracket, Some(&jam.owner))).await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.json);
+    assert_eq!(saved.json.as_array().unwrap().len(), 3);
+    assert_eq!(
+        saved.json[2]["video_url"],
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    );
+
+    // The placings follow, and the winners' last battle is their video.
+    let battles = send(
+        &jam.app,
+        get(
+            &format!("/api/events/{}/battles", jam.event_id),
+            Some(&jam.owner),
+        ),
+    )
+    .await;
+    let placing = |id: &str| {
+        let entry = battles.json[0]["entries"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|e| e["id"] == id)
+            .unwrap()
+            .clone();
+        (
+            entry["reached"].clone(),
+            entry["final_rank"].clone(),
+            entry["video_offset_seconds"].clone(),
+        )
+    };
+    // The video's start comes along, or the entry's video would play from 0:00.
+    assert_eq!(placing(&ids[0]), (json!("winner"), json!(1), json!(1234)));
+    assert_eq!(placing(&ids[2]), (json!("top2"), json!(2), json!(1234)));
+    assert_eq!(placing(&ids[1]), (json!("top4"), json!(null), json!(null)));
+
+    // Saving again replaces the bracket as a whole.
+    let only_final =
+        json!([{ "round": "final", "position": 0, "winner_id": ids[2], "loser_id": ids[0] }]);
+    let saved = send(&jam.app, put(&uri, only_final, Some(&jam.owner))).await;
+    assert_eq!(saved.json.as_array().unwrap().len(), 1);
+    assert_eq!(saved.json[0]["winner_id"], ids[2].as_str());
+
+    // A battle entered before the one above it keeps its place.
+    let second_only =
+        json!([{ "round": "top4", "position": 1, "winner_id": ids[2], "loser_id": ids[3] }]);
+    let saved = send(&jam.app, put(&uri, second_only, Some(&jam.owner))).await;
+    assert_eq!(saved.json[0]["position"], 1);
+}
+
+#[sqlx::test]
 async fn deleting_a_battle_removes_its_entries(pool: PgPool) {
     let jam = jam(pool).await;
     let battle = id_of(&jam.battle(one_v_one()).await);
