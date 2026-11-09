@@ -17,21 +17,21 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "victor", b = "kido", winner = "victor" },
+  { round = "top16", a = "victor", b = "kido", winner = "victor", video = "https://youtu.be/EK1F0OEvfMg" },
   { round = "top16", a = "twister", b = "t-rock", winner = "twister" },
-  { round = "top16", a = "thomaz", b = "shigekix", winner = "thomaz" },
-  { round = "top16", a = "the-wolfer", b = "spin", winner = "the-wolfer" },
-  { round = "top16", a = "uzee-rock", b = "roxrite", winner = "uzee-rock" },
-  { round = "top16", a = "lussy-sky", b = "admiracles", winner = "lussy-sky" },
-  { round = "top16", a = "kuzya", b = "snake", winner = "kuzya" },
-  { round = "top16", a = "lb", b = "grin", winner = "lb" },
-  { round = "top8", a = "victor", b = "twister", winner = "victor" },
-  { round = "top8", a = "thomaz", b = "the-wolfer", winner = "thomaz" },
-  { round = "top8", a = "uzee-rock", b = "lussy-sky", winner = "uzee-rock" },
-  { round = "top8", a = "kuzya", b = "lb", winner = "kuzya" },
-  { round = "top4", a = "victor", b = "thomaz", winner = "victor" },
-  { round = "top4", a = "uzee-rock", b = "kuzya", winner = "uzee-rock" },
-  { round = "final", a = "victor", b = "uzee-rock", winner = "victor" },
+  { round = "top16", a = "thomaz", b = "shigekix", winner = "thomaz", video = "https://youtu.be/eQ3FcvRSyA4" },
+  { round = "top16", a = "the-wolfer", b = "spin", winner = "the-wolfer", video = "https://youtu.be/SlLcAgz06ig" },
+  { round = "top16", a = "uzee-rock", b = "roxrite", winner = "uzee-rock", video = "https://youtu.be/rSogie2KzPk" },
+  { round = "top16", a = "lussy-sky", b = "admiracles", winner = "lussy-sky", video = "https://youtu.be/EtvWhJZ0Z2Q" },
+  { round = "top16", a = "kuzya", b = "snake", winner = "kuzya", video = "https://youtu.be/HqPsL1YXWjU" },
+  { round = "top16", a = "lb", b = "grin", winner = "lb", video = "https://youtu.be/zD6R2eppUzM" },
+  { round = "top8", a = "victor", b = "twister", winner = "victor", video = "https://youtu.be/M46R3U3STM8" },
+  { round = "top8", a = "thomaz", b = "the-wolfer", winner = "thomaz", video = "https://youtu.be/yCOSDHaHWOU" },
+  { round = "top8", a = "uzee-rock", b = "lussy-sky", winner = "uzee-rock", video = "https://youtu.be/hE2ahvoFcic" },
+  { round = "top8", a = "kuzya", b = "lb", winner = "kuzya", video = "https://youtu.be/z9IAsjZFAd0" },
+  { round = "top4", a = "victor", b = "thomaz", winner = "victor", video = "https://youtu.be/ynht7mCnVu0" },
+  { round = "top4", a = "uzee-rock", b = "kuzya", winner = "uzee-rock", video = "https://youtu.be/3d6rsl7Lm2Q" },
+  { round = "final", a = "victor", b = "uzee-rock", winner = "victor", video = "https://youtu.be/bFB6bJPgCc8" },
 ]
 
 [[battles]]

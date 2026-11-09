@@ -1,0 +1,80 @@
+name = "Groove Session 2026"
+starts_on = 2026-09-12
+ends_on = 2026-09-13
+timezone = "Europe/Zurich"
+city = "Neuchâtel"
+country = "CH"
+venue = "Halle de la Riveraine"
+lat = 46.9918
+lng = 6.9310
+sources = ["https://and8.dance/de/e/4621", "https://www.rtn.ch/rtn/Actualite/Region/20260911-Neuchatel-vibre-au-rythme-du-breakdance-ce-week-end.html", "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA"]
+judges = []
+mcs = []
+djs = ["dj-khanfu", "jon-kwizera"]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "no-namez", b = "ccu7", winner = "ccu7", video = "https://youtu.be/5X74TDUC5ws" },
+  { round = "top8", a = "straight-outta-groove", b = "against-all-odds", winner = "against-all-odds", video = "https://youtu.be/zECIfiXiHUM" },
+  { round = "top8", a = "lotu", b = "body-carnival", winner = "body-carnival", video = "https://youtu.be/M81gL-YBgMI" },
+  { round = "top8", a = "nicea-internazionale", b = "from-downtown", winner = "from-downtown", video = "https://youtu.be/uqCOhXjnlOs" },
+  { round = "top4", a = "against-all-odds", b = "ccu7", winner = "ccu7", video = "https://youtu.be/A4IQp9GYIv8" },
+  { round = "top4", a = "body-carnival", b = "from-downtown", winner = "body-carnival", video = "https://youtu.be/gYQyGdutQuc" },
+  { round = "final", a = "ccu7", b = "body-carnival", winner = "body-carnival", video = "https://youtu.be/2GcAiCGGY9g" },
+]
+
+[battles.teams]
+against-all-odds = { crew = "against-all-odds" }
+body-carnival = { crew = "body-carnival" }
+ccu7 = { crew = "ccu7" }
+from-downtown = { crew = "from-downtown" }
+lotu = { crew = "lotu" }
+nicea-internazionale = { crew = "nicea-internazionale" }
+no-namez = { crew = "no-namez" }
+straight-outta-groove = { crew = "straight-outta-groove" }
+
+[[battles]]
+key = "2v2"
+name = "2v2 Kid & Adult"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "syssy-buch", b = "ra1on-taki", winner = "ra1on-taki", video = "https://youtu.be/_Xp7KrZpdX8" },
+  { round = "top16", a = "smile-roksy-rock", b = "madtrack-le-rock", winner = "madtrack-le-rock", video = "https://youtu.be/e1K3Cno3WyI" },
+  { round = "top16", a = "lotus-kitty", b = "wingzero-ro-1", winner = "lotus-kitty", video = "https://youtu.be/0N7fLeoTO6U" },
+  { round = "top16", a = "strike-ena", b = "lorenzo-mr-wolf", winner = "strike-ena", video = "https://youtu.be/lgol9-UrkqA" },
+  { round = "top16", a = "india-akemi", b = "sweet-litos", winner = "sweet-litos", video = "https://youtu.be/TFTCBnMxUCI" },
+  { round = "top16", a = "canarus-niu-niu", b = "ari-mustang", winner = "canarus-niu-niu", video = "https://youtu.be/MoClmUfBbLY" },
+  { round = "top16", a = "curt-rage-tnt", b = "r-one-axl", winner = "curt-rage-tnt", video = "https://youtu.be/8BstjRvgc2k" },
+  { round = "top16", a = "phil-wizard-lion", b = "haruto-third-bro", winner = "haruto-third-bro", video = "https://youtu.be/iliSohs1aN8" },
+  { round = "top8", a = "ra1on-taki", b = "madtrack-le-rock", winner = "ra1on-taki", video = "https://youtu.be/U-iSTtZd2PA" },
+  { round = "top8", a = "lotus-kitty", b = "strike-ena", winner = "lotus-kitty", video = "https://youtu.be/gm5XWT2lbSo" },
+  { round = "top8", a = "sweet-litos", b = "canarus-niu-niu", winner = "canarus-niu-niu", video = "https://youtu.be/chzCflj3IH4" },
+  { round = "top8", a = "curt-rage-tnt", b = "haruto-third-bro", winner = "haruto-third-bro", video = "https://youtu.be/hzbl3vULWNM" },
+  { round = "top4", a = "lotus-kitty", b = "ra1on-taki", winner = "lotus-kitty", video = "https://youtu.be/7GVpL9ygGj0" },
+  { round = "top4", a = "canarus-niu-niu", b = "haruto-third-bro", winner = "haruto-third-bro", video = "https://youtu.be/A7UvkikwW3s" },
+  { round = "final", a = "haruto-third-bro", b = "lotus-kitty", winner = "haruto-third-bro", video = "https://youtu.be/eLy8Gd5JY7w" },
+]
+
+[battles.teams]
+ari-mustang = { members = ["ari", "mustang"] }
+canarus-niu-niu = { members = ["canarus", "niu-niu"] }
+curt-rage-tnt = { members = ["curt-rage", "tnt"] }
+haruto-third-bro = { members = ["haruto", "third-bro"] }
+india-akemi = { members = ["india", "akemi"] }
+lorenzo-mr-wolf = { members = ["lorenzo", "mr-wolf"] }
+lotus-kitty = { members = ["lotus", "kitty"] }
+madtrack-le-rock = { members = ["madtrack", "le-rock"] }
+phil-wizard-lion = { members = ["phil-wizard", "lion"] }
+r-one-axl = { members = ["r-one", "axl"] }
+ra1on-taki = { members = ["ra1on", "taki"] }
+smile-roksy-rock = { members = ["smile", "roksy-rock"] }
+strike-ena = { members = ["strike", "ena"] }
+sweet-litos = { members = ["sweet", "litos"] }
+syssy-buch = { members = ["syssy", "buch"] }
+wingzero-ro-1 = { members = ["wingzero", "ro-1"] }

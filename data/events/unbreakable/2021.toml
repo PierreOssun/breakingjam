@@ -7,7 +7,7 @@ country = "BE"
 lat = 51.2182
 lng = 4.4216
 venue = "Koningin Astridplein"
-sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/3633"]
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/3633", "https://www.youtube.com/channel/UCkX7WffGr0Dl1GvvJj7ND6w"]
 judges = []
 
 [[battles]]
@@ -22,8 +22,23 @@ results = [
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "madmax", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "paulina", b = "kato", winner = "paulina", video = "https://youtu.be/Efx77DAKyrw" },
+  { round = "top16", a = "bo", b = "tata", winner = "bo", video = "https://youtu.be/n6ojQwWt738" },
+  { round = "top16", a = "miimo", b = "jojo", winner = "jojo", video = "https://youtu.be/m1I7FNuMsyI" },
+  { round = "top16", a = "madmax", b = "camine", winner = "madmax", video = "https://youtu.be/sE5cuNv588M" },
+  { round = "top16", a = "mery-berry", b = "cha-ja", winner = "mery-berry", video = "https://youtu.be/rdGJdmB3060" },
+  { round = "top16", a = "rule", b = "stefani", winner = "stefani", video = "https://youtu.be/PqJVoCPNMd8" },
+  { round = "top16", a = "jilou", b = "india", winner = "jilou", video = "https://youtu.be/jluGxUUYm7g" },
+  { round = "top16", a = "nicka", b = "jasmijn", winner = "nicka", video = "https://youtu.be/9-0hpjZLN7A" },
+  { round = "top8", a = "jilou", b = "stefani", winner = "stefani", video = "https://youtu.be/xS23HU_V-14" },
+  { round = "top8", a = "paulina", b = "nicka", winner = "nicka", video = "https://youtu.be/pvO0AQ2RUBU" },
+  { round = "top8", a = "jojo", b = "bo", winner = "jojo", video = "https://youtu.be/ZY9jydrsp-4" },
+  { round = "top8", a = "mery-berry", b = "madmax", winner = "madmax", video = "https://youtu.be/gl3S5fneOBc" },
+  { round = "top4", a = "stefani", b = "madmax", winner = "madmax", video = "https://youtu.be/W21UYtqt1jM" },
+  { round = "top4", a = "jojo", b = "nicka", winner = "nicka", video = "https://youtu.be/W4mn-IXTKts" },
+  { round = "final", a = "madmax", b = "nicka", winner = "madmax", video = "https://youtu.be/m1kbzXZ33Bo" },
 ]
 
 [[battles]]
@@ -31,8 +46,15 @@ key = "kids"
 name = "Kids"
 gender = "mixed"
 age = "kids"
-results = [
-  { entrant = "anthony", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "lil-gio", b = "anthony", winner = "anthony", video = "https://youtu.be/NJzl7s9Z5lc" },
+  { round = "top8", a = "mattix", b = "aiko", winner = "mattix", video = "https://youtu.be/CtgeeYO4lD8" },
+  { round = "top8", a = "danger", b = "maflex", winner = "maflex", video = "https://youtu.be/5Yl2cqUzL2M" },
+  { round = "top8", a = "djibril", b = "kg", winner = "kg", video = "https://youtu.be/a0IjBvn_oME" },
+  { round = "top4", a = "maflex", b = "kg", winner = "kg", video = "https://youtu.be/2szIcMajp3s" },
+  { round = "top4", a = "mattix", b = "anthony", winner = "anthony", video = "https://youtu.be/EbEKVl-mtqE" },
+  { round = "final", a = "kg", b = "anthony", winner = "anthony", video = "https://youtu.be/ugXsspMg8mE" },
 ]
 
 [[battles]]

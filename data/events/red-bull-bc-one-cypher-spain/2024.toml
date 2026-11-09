@@ -1,0 +1,30 @@
+name = "Red Bull BC One Cypher Spain 2024"
+starts_on = 2024-04-21
+timezone = "Europe/Madrid"
+city = "Madrid"
+country = "ES"
+venue = "Matadero Madrid"
+lat = 40.4165
+lng = -3.7026
+sources = ["https://www.timeout.es/madrid/es/noticias/los-mejores-bailarines-de-breakdance-llegan-a-madrid-gratis-041524", "https://diario.madrid.es/blog/notas-de-prensa/matadero-se-transforma-en-danzadero-durante-el-mes-de-abril-por-el-dia-internacional-de-la-danza/", "https://urbanworldseries.com/?p=6744", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "mini-joe", reached = "winner", video = "https://youtu.be/JTPd_0y4Wq8" },
+  { entrant = "lil-dani", reached = "top2", video = "https://youtu.be/JTPd_0y4Wq8" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "camino", reached = "winner", video = "https://youtu.be/ep1c5M4dEDw" },
+  { entrant = "furia", reached = "top2", video = "https://youtu.be/ep1c5M4dEDw" },
+]

@@ -284,9 +284,10 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
   3. Spacer
   4. Language switch: ghost sm with `Globe` + ISO code + `CaretDown`
   5. Account: ghost sm muted **Log in** when logged out; when logged in, the **avatar button** opening the account menu (§4.34)
-  6. Primary sm **Register a jam** with `Plus` 16
+  - **Register a jam** is not in the bar: it sits under the landing search (§6), and in the menu sheets below `xl`.
 - **Avatar button** (logged in, ≥ xl): a 44px round button, `rounded-full border border-border bg-surface`, hover `bg-surface-raised`, open `border-border-strong`, with the visible focus ring. It holds only the dancer page's avatar (36px, `rounded-[11px]`), else a `User` icon in a `bg-surface-raised` square of the same size, 4px from the button's edge. Without a visible name, its accessible name is "Account menu, <name>" and its `title` is the name: the dancer name, else the account's name or its email's local part. `aria-haspopup="menu"`, `aria-expanded`.
 - **Review dot:** for an admin with items to review, a 10px `bg-primary` dot at the button's top-right with a 2px `bg` ring, so "N to review" (§4.34) still gets noticed with the menu closed. Decorative, hidden from assistive tech: the badge in the menu says the count.
+- **Below 360px** (iPhone SE and the like) the bar tightens so the menu button stays on screen: 4px gaps, the wordmark at 15px, and the language switch shows the code alone (no `Globe`, `px-2`, 44px wide).
 - **< xl, logged out:** the home link, then the language switch (`Globe` + code), then a menu icon button. The menu opens a full-height sheet with the three nav links (`h-14 text-title`), then Log in, and a full-width primary **Register a jam**.
 - **< xl, logged in:** the menu icon button becomes the **avatar button**: the 40px avatar (`rounded-[12px]`) or the `User` square, in a 44px target, named "Account menu". It opens the account menu as a top sheet (§4.34).
 - **Language menu:**
@@ -623,7 +624,7 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
 
 ### 4.32 Action bar and action card
 
-- **Action bar** (< lg): along the bottom while the jam is on screen, `bg-bg border-t shadow-lg px-4 pt-3 pb-[max(28px,env(safe-area-inset-bottom))]`. A secondary **Share** (`flex-1`) and the primary action (`flex-[2]`). It is `sticky`, not `fixed`, so it stops before the footer instead of covering it.
+- **Action bar** (< lg): along the bottom while the jam is on screen, `bg-bg border-t shadow-lg px-4 pt-3 pb-[max(28px,env(safe-area-inset-bottom))]`. A secondary icon **Share** (`size-12`, named "Share") and the primary action (`flex-1`), which trims its label with "…" rather than run past a 320px screen: French and German labels don't fit beside a Share label. A jam with no primary action (cancelled) has no action bar: Share alone would repeat the top bar's. It is `sticky`, not `fixed`, so it stops before the footer instead of covering it.
 - **Action card** (≥ lg, under the flyer): `bg-surface border rounded-lg p-5 gap-3`: the primary action, a secondary **Share this jam**, and a caption.
 - **The primary action, by the jam's state:**
 
@@ -753,11 +754,12 @@ The one way to play a battle video: on a dancer page's past rows (§4.14) and in
 **Landing** (order is the same on every viewport):
 
 1. **Header** (§4.6).
-2. **Hero: title, subtitle and the search.** No pitch paragraph, map preview or second button. Everything is centred.
+2. **Hero: title, subtitle, the search, then Register a jam.** No pitch paragraph or map preview. Everything is centred.
    - **Title**, the page's only `<h1>`: "Find your next jam", `font-display` (Unbounded 800), 56px / 62px on desktop and 32px / 38px on mobile, with `text-wrap: balance` so mobile breaks as "Find your / next jam".
    - **Subtitle** (`<p>`, right under it): "All of breaking, in one search", Manrope 500 (not bold), `muted`, 20px / 30px on desktop and 17px / 26px on mobile.
    - The hero search (§4.26, landing size).
-   - Spacing: 12px between title and subtitle (8px on mobile), 36px between subtitle and search (24px on mobile). `pt-24 pb-28` on desktop, `pt-12 pb-16` on mobile, so the hero is no taller than with the search alone.
+   - **Register a jam** under it: primary lg (the J logo's blue) with `Plus` 20, to `/org/jams/new`; 32px below the search (24px on mobile).
+   - Spacing: 12px between title and subtitle (8px on mobile), 36px between subtitle and search (24px on mobile). `pt-24 pb-28` on desktop, `pt-12 pb-16` on mobile.
    - One `.rings` (1120px desktop, 560px mobile) is centred behind the whole block.
 3. **Next up near you.**
    - **Title row:**

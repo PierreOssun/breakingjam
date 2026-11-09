@@ -1,0 +1,29 @@
+name = "Red Bull BC One Cypher Germany 2023"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Berlin"
+city = "Germany"
+country = "DE"
+lat = 50.7272
+lng = 12.4884
+sources = ["https://and8.dance/en/e/4302", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "double-d", reached = "winner", video = "https://youtu.be/M4SH3WBvTaE" },
+  { entrant = "sucio", reached = "top2", video = "https://youtu.be/M4SH3WBvTaE" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "jilou", reached = "winner", video = "https://youtu.be/fykA8tXq5Xg" },
+  { entrant = "jojo", reached = "top2", video = "https://youtu.be/fykA8tXq5Xg" },
+]

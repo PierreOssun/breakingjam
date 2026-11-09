@@ -7,7 +7,7 @@ country = "SK"
 lat = 48.7309
 lng = 19.1375
 venue = "Europa SC"
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://and8.dance/en/e/3752", "https://bbonline.sk/podujatia/the-legits-blast-banska-bystrica-outbreak-europe-2022/"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://and8.dance/en/e/3752", "https://bbonline.sk/podujatia/the-legits-blast-banska-bystrica-outbreak-europe-2022/", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
 judges = []
 mcs = []
 djs = []
@@ -53,9 +53,39 @@ results = [
 key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
-results = [
-  { entrant = "ukraine", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kazakhstan", b = "morocco", winner = "morocco", video = "https://youtu.be/34SJufoU8f4" },
+  { round = "top16", a = "ukraine", b = "colombia", winner = "ukraine", video = "https://youtu.be/BeWwPLzNnIg" },
+  { round = "top16", a = "belgium", b = "japan", winner = "belgium", video = "https://youtu.be/D1zKImD1Q4s" },
+  { round = "top16", a = "italy", b = "great-britain", winner = "italy", video = "https://youtu.be/P-I9DwUQB3k" },
+  { round = "top16", a = "spain", b = "brazil", winner = "spain", video = "https://youtu.be/blMGpkQfi-0" },
+  { round = "top16", a = "poland", b = "venezuela", winner = "venezuela", video = "https://youtu.be/g-WrYSOeTdk" },
+  { round = "top16", a = "portugal", b = "china", winner = "portugal", video = "https://youtu.be/gjd8BXGdOW4" },
+  { round = "top16", a = "france", b = "chinese-taipei", winner = "france", video = "https://youtu.be/qw-0rY8xVSA" },
+  { round = "top8", a = "venezuela", b = "ukraine", winner = "ukraine", video = "https://youtu.be/S8Qjf4NDldk" },
+  { round = "top8", a = "spain", b = "portugal", winner = "spain", video = "https://youtu.be/-4Cay3fj_e0" },
+  { round = "top8", a = "france", b = "morocco", winner = "france", video = "https://youtu.be/7VXD-aAf4BI" },
+  { round = "top8", a = "belgium", b = "italy", winner = "italy", video = "https://youtu.be/ndKPKPl3Oxo" },
+  { round = "top4", a = "spain", b = "france", winner = "france", video = "https://youtu.be/T6CMLQPpDpg" },
+  { round = "top4", a = "italy", b = "ukraine", winner = "ukraine", video = "https://youtu.be/_G1vchec8kk" },
+  { round = "final", a = "ukraine", b = "france", winner = "ukraine", video = "https://youtu.be/qAz6h0pHf14" },
 ]
 
 [battles.teams]
+belgium = { name = "Belgium" }
+brazil = { name = "Brazil" }
+china = { name = "China" }
+chinese-taipei = { name = "Chinese Taipei" }
+colombia = { name = "Colombia" }
+france = { name = "France" }
+great-britain = { name = "Great Britain" }
+italy = { name = "Italy" }
+japan = { name = "Japan" }
+kazakhstan = { name = "Kazakhstan" }
+morocco = { name = "Morocco" }
+poland = { name = "Poland" }
+portugal = { name = "Portugal" }
+spain = { name = "Spain" }
 ukraine = { name = "Ukraine" }
+venezuela = { name = "Venezuela" }

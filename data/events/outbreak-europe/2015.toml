@@ -28,10 +28,10 @@ matches = [
   { round = "top8", a = "el-nino", b = "klesio", winner = "el-nino" },
   { round = "top8", a = "twister", b = "perna", winner = "twister" },
   { round = "top8", a = "fantum", b = "kleju", winner = "fantum" },
-  { round = "top8", a = "lb", b = "hulk", winner = "lb" },
+  { round = "top8", a = "lb", b = "hulk", winner = "lb", video = "https://youtu.be/X-bVRtGxthE" },
   { round = "top4", a = "el-nino", b = "twister", winner = "el-nino" },
   { round = "top4", a = "fantum", b = "lb", winner = "fantum" },
-  { round = "final", a = "el-nino", b = "fantum", winner = "el-nino" },
+  { round = "final", a = "el-nino", b = "fantum", winner = "el-nino", video = "https://youtu.be/peqGsu_bgU8" },
 ]
 
 [[battles]]

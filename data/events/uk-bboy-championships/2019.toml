@@ -21,9 +21,9 @@ matches = [
   { round = "top8", a = "ormus", b = "smac-19", winner = "smac-19" },
   { round = "top8", a = "the-italians", b = "ill-eagles", winner = "the-italians" },
   { round = "top8", a = "battalions", b = "the-tribe", winner = "the-tribe" },
-  { round = "top4", a = "soul-mavericks", b = "smac-19", winner = "smac-19" },
-  { round = "top4", a = "the-italians", b = "the-tribe", winner = "the-italians" },
-  { round = "final", a = "smac-19", b = "the-italians", winner = "the-italians" },
+  { round = "top4", a = "soul-mavericks", b = "smac-19", winner = "smac-19", video = "https://youtu.be/F00MFtEUOjM" },
+  { round = "top4", a = "the-italians", b = "the-tribe", winner = "the-italians", video = "https://youtu.be/gMJRuc4IuPM" },
+  { round = "final", a = "smac-19", b = "the-italians", winner = "the-italians", video = "https://youtu.be/3MYq6Ducu5w" },
 ]
 
 [battles.teams]

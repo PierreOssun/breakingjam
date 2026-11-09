@@ -1,0 +1,34 @@
+name = "Red Bull BC One Cypher Belgium 2019"
+starts_on = 2019-03-16
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "KVS"
+lat = 50.8505
+lng = 4.3488
+sources = ["https://and8.dance/e/3617", "https://www.redbull.com/be-nl/bc-one-2019", "https://and8.dance/en/a/D1YO", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "admiracles", b = "lucky", winner = "lucky", video = "https://youtu.be/Plf84hs3H_8" },
+  { round = "top4", a = "simon", b = "sambo", winner = "simon", video = "https://youtu.be/WPzllnASTpY" },
+  { round = "final", a = "simon", b = "lucky", winner = "simon", video = "https://youtu.be/VJMEY-4YaZg" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "maxime", b = "camine", winner = "camine", video = "https://youtu.be/PuHgnoURiUs" },
+  { round = "top4", a = "stormy", b = "mariabliss", winner = "mariabliss", video = "https://youtu.be/YdzFifeUh7w" },
+  { round = "final", a = "camine", b = "mariabliss", winner = "camine", video = "https://youtu.be/0ZVCSb8nIFM" },
+]

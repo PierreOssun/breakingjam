@@ -1,0 +1,11 @@
+name = "Red Bull BC One Cypher Germany"
+country = "DE"
+timezone = "Europe/Berlin"
+
+[youtube]
+channels = ["UC9oEzPGZiTE692KucAsTY1g"]   # Red Bull BC One
+title = "Cypher Germany"
+battles = [
+  { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["b-boy", "bboy"] },
+  { key = "bgirl", name = "1v1 Bgirl", gender = "bgirl", words = ["b-girl", "bgirl"] },
+]

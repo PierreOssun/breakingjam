@@ -1,0 +1,52 @@
+name = "Groove Session 2019"
+starts_on = 2019-11-23
+timezone = "Europe/Zurich"
+city = "Neuchâtel"
+country = "CH"
+lat = 46.9918
+lng = 6.9310
+sources = ["https://www.youtube.com/channel/UCLRCoLpDImkbFw8D3qXFpUQ"]
+judges = ["kaveman", "ynot", "torb-the-roach"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "2v2"
+name = "2v2 Kid & Adult"
+gender = "mixed"
+team_size = 2
+# One top 16 battle (San Andrea & Malish's) has no video, so the bracket is incomplete.
+results = [
+  { entrant = "gieras-tsukki", reached = "winner", video = "https://youtu.be/iao5exjXK6k" },
+  { entrant = "jamal-malik", reached = "top2", video = "https://youtu.be/iao5exjXK6k" },
+  { entrant = "san-andrea-malish", reached = "top4", video = "https://youtu.be/2MJNB7sUiI0" },
+  { entrant = "ami-raptor", reached = "top4", video = "https://youtu.be/WnLq3_IV98E" },
+  { entrant = "pashker-lotus", reached = "top8", video = "https://youtu.be/mX7KmvRvJe0" },
+  { entrant = "shaymin-petaira", reached = "top8", video = "https://youtu.be/h97uNVUG1IU" },
+  { entrant = "timbo-gera", reached = "top8", video = "https://youtu.be/TnzBZ7UmGPk" },
+  { entrant = "the-wolfer-smile", reached = "top8", video = "https://youtu.be/Nr-n6WYMdEk" },
+  { entrant = "below-chizh", reached = "top16", video = "https://youtu.be/2CwCUUyaclw" },
+  { entrant = "fat-erik-frost", reached = "top16", video = "https://youtu.be/WhEgoR5Xngg" },
+  { entrant = "shane-ramy", reached = "top16", video = "https://youtu.be/XHW5r7uVRIY" },
+  { entrant = "astro-maxoo", reached = "top16", video = "https://youtu.be/rt-_snsYXTo" },
+  { entrant = "david-lil-pearl", reached = "top16", video = "https://youtu.be/z_kfYIlyOH8" },
+  { entrant = "ze-ninho-gustas", reached = "top16", video = "https://youtu.be/wrwzx9hEjjU" },
+  { entrant = "fleau-alexis", reached = "top16", video = "https://youtu.be/5u9vNarbCLI" },
+]
+
+[battles.teams]
+ami-raptor = { members = ["ami", "raptor"] }
+astro-maxoo = { members = ["astro", "maxoo"] }
+below-chizh = { members = ["below", "chizh"] }
+david-lil-pearl = { members = ["david", "lil-pearl"] }
+fat-erik-frost = { members = ["fat", "erik-frost"] }
+fleau-alexis = { members = ["fleau", "alexis"] }
+gieras-tsukki = { members = ["gieras", "tsukki"] }
+jamal-malik = { members = ["jamal", "malik"] }
+pashker-lotus = { members = ["pashker", "lotus"] }
+san-andrea-malish = { members = ["san-andrea", "malish"] }
+shane-ramy = { members = ["shane", "ramy"] }
+shaymin-petaira = { members = ["shaymin", "petaira"] }
+the-wolfer-smile = { members = ["the-wolfer", "smile"] }
+timbo-gera = { members = ["timbo", "gera"] }
+ze-ninho-gustas = { members = ["ze-ninho", "gustas"] }

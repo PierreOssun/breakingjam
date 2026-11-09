@@ -1,0 +1,80 @@
+name = "Groove Session 2024"
+starts_on = 2024-09-20
+ends_on = 2024-09-22
+timezone = "Europe/Zurich"
+city = "Neuchâtel"
+country = "CH"
+venue = "Halle de la Riveraine"
+lat = 46.9918
+lng = 6.9310
+sources = ["https://and8.dance/en/e/4621", "https://www.rtn.ch/rtn/Actualite/Region/20240923-Le-breaking-attire-la-foule-a-Neuchatel.html", "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCBDSkBbTmI63mIp6UNt09vA", "https://www.youtube.com/channel/UCzpSzFXLLX0cg8ZC_B4ELiw"]
+judges = ["abstrak", "san-andrea", "robb", "laos", "allef"]
+mcs = []
+djs = ["just-a-kid", "ob-one"]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "stranger-thingz", b = "coolkidz-mob", winner = "stranger-thingz", video = "https://youtu.be/gdV3WH5kecY" },
+  { round = "top8", a = "marginalz-freshness", b = "found-nation", winner = "found-nation", video = "https://youtu.be/TlwXunNnjRA" },
+  { round = "top8", a = "young-villains", b = "urbc", winner = "young-villains", video = "https://youtu.be/S5BqL4IOIzo" },
+  { round = "top8", a = "style-invaders", b = "flowdue", winner = "style-invaders", video = "https://youtu.be/kjGkpwdLkYQ" },
+  { round = "top4", a = "found-nation", b = "stranger-thingz", winner = "found-nation", video = "https://youtu.be/fXNfTWAuqmA" },
+  { round = "top4", a = "young-villains", b = "style-invaders", winner = "young-villains", video = "https://youtu.be/TjVXRkgZQsQ" },
+  { round = "final", a = "young-villains", b = "found-nation", winner = "young-villains", video = "https://youtu.be/iyncm_9vo0s" },
+]
+
+[battles.teams]
+coolkidz-mob = { crew = "coolkidz-mob" }
+flowdue = { crew = "flowdue" }
+found-nation = { crew = "found-nation" }
+marginalz-freshness = { crew = "marginalz-freshness" }
+stranger-thingz = { crew = "stranger-thingz" }
+style-invaders = { crew = "style-invaders" }
+urbc = { crew = "urbc" }
+young-villains = { crew = "young-villains" }
+
+[[battles]]
+key = "2v2"
+name = "2v2 Kid & Adult"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "flea-rock-teddy-z", b = "lotus-phil-one", winner = "flea-rock-teddy-z", video = "https://youtu.be/bRhjhSvtSyk" },
+  { round = "top16", a = "quest1on-nono", b = "madmax-vitwill", winner = "madmax-vitwill", video = "https://youtu.be/3gyQvge-lV0" },
+  { round = "top16", a = "jordi-nana", b = "noe-ural", winner = "jordi-nana", video = "https://youtu.be/N29FTovlZzY" },
+  { round = "top16", a = "yu-ki-kimba", b = "syssy-kitty", winner = "syssy-kitty", video = "https://youtu.be/klwOpPnJxuE" },
+  { round = "top16", a = "pay-soul-tim", b = "tetsu-coco", winner = "tetsu-coco", video = "https://youtu.be/-HZLVYNHki0" },
+  { round = "top16", a = "xanerrr-la-fraise", b = "deijva-undr", winner = "deijva-undr", video = "https://youtu.be/1o0YssxU6Qw" },
+  { round = "top16", a = "allef-maloy", b = "campanita-arisha", winner = "allef-maloy", video = "https://youtu.be/rL3AY5NKp5U" },
+  { round = "top16", a = "nasty-fima", b = "slav-hunter", winner = "slav-hunter", video = "https://youtu.be/EjI7SvKsQjs" },
+  { round = "top8", a = "flea-rock-teddy-z", b = "madmax-vitwill", winner = "flea-rock-teddy-z", video = "https://youtu.be/BHa8zrL9u-w" },
+  { round = "top8", a = "jordi-nana", b = "syssy-kitty", winner = "jordi-nana", video = "https://youtu.be/oRdwLocYEgM" },
+  { round = "top8", a = "tetsu-coco", b = "deijva-undr", winner = "deijva-undr", video = "https://youtu.be/ekqIWwz-ToU" },
+  { round = "top8", a = "allef-maloy", b = "slav-hunter", winner = "allef-maloy", video = "https://youtu.be/RdwueYwE3Zk" },
+  { round = "top4", a = "flea-rock-teddy-z", b = "jordi-nana", winner = "flea-rock-teddy-z", video = "https://youtu.be/KgfSkolTDr8" },
+  { round = "top4", a = "deijva-undr", b = "allef-maloy", winner = "allef-maloy", video = "https://youtu.be/OfH4oDqCgX0" },
+  { round = "final", a = "allef-maloy", b = "flea-rock-teddy-z", winner = "flea-rock-teddy-z", video = "https://youtu.be/_BYG6CFC1u8" },
+]
+
+[battles.teams]
+allef-maloy = { members = ["allef", "maloy"] }
+campanita-arisha = { members = ["campanita", "arisha"] }
+deijva-undr = { members = ["deijva", "undr"] }
+flea-rock-teddy-z = { members = ["flea-rock", "teddy-z"] }
+jordi-nana = { members = ["jordi", "nana"] }
+lotus-phil-one = { members = ["lotus", "phil-one"] }
+madmax-vitwill = { members = ["madmax", "vitwill"] }
+nasty-fima = { members = ["nasty", "fima"] }
+noe-ural = { members = ["noe", "ural"] }
+pay-soul-tim = { members = ["pay", "soul-tim"] }
+quest1on-nono = { members = ["quest1on", "nono"] }
+slav-hunter = { members = ["slav", "hunter"] }
+syssy-kitty = { members = ["syssy", "kitty"] }
+tetsu-coco = { members = ["tetsu", "coco"] }
+xanerrr-la-fraise = { members = ["xanerrr", "la-fraise"] }
+yu-ki-kimba = { members = ["yu-ki", "kimba"] }

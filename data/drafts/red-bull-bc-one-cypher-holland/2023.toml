@@ -1,0 +1,29 @@
+name = "Red Bull BC One Cypher Holland 2023"
+starts_on = 2023-03-05
+timezone = "Europe/Amsterdam"
+city = "Holland"
+country = "NL"
+lat = 52.5125
+lng = 6.0944
+sources = ["https://and8.dance/en/e/4352", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "kid-colombia", reached = "winner", video = "https://youtu.be/p93NawU4CD0" },
+  { entrant = "cis", reached = "top2", video = "https://youtu.be/p93NawU4CD0" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "pauline", reached = "winner", video = "https://youtu.be/kVJ6Wjze8EU" },
+  { entrant = "jazzy-nl", reached = "top2", video = "https://youtu.be/kVJ6Wjze8EU" },
+]

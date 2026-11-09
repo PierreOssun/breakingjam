@@ -7,7 +7,7 @@ country = "BE"
 lat = 50.8788
 lng = 4.7069
 venue = "Ladeuzeplein"
-sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/3874"]
+sources = ["https://unbreakable.be/20-years/#hall-of-fame", "https://and8.dance/en/e/3874", "https://www.youtube.com/channel/UCkX7WffGr0Dl1GvvJj7ND6w"]
 judges = []
 
 [[battles]]
@@ -31,19 +31,40 @@ key = "kids"
 name = "Kids"
 gender = "mixed"
 age = "kids"
-results = [
-  { entrant = "rhythm-box", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "kid-fresh", b = "mighty-max", winner = "kid-fresh", video = "https://youtu.be/akvZ7P0X6w4" },
+  { round = "top8", a = "federico", b = "danger", winner = "federico", video = "https://youtu.be/vQj-KHvOIU8" },
+  { round = "top8", a = "littleman", b = "rhythm-box", winner = "rhythm-box", video = "https://youtu.be/2xDGSZoV4Mc" },
+  { round = "top8", a = "kent", b = "lotus", winner = "kent", video = "https://youtu.be/8PxSMUljyiU" },
+  { round = "top4", a = "kent", b = "kid-fresh", winner = "kent", video = "https://youtu.be/IUnVlH9jQhw" },
+  { round = "top4", a = "federico", b = "rhythm-box", winner = "rhythm-box", video = "https://youtu.be/GJcva9c0d0w" },
+  { round = "final", a = "kent", b = "rhythm-box", winner = "rhythm-box", video = "https://youtu.be/rrbLzlwvm9c" },
 ]
 
 [[battles]]
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "the-ruggeds", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "penisola-finest", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/eK2SCbBI46E" },
+  { round = "top8", a = "style-of-control", b = "hustle-kidz", winner = "hustle-kidz", video = "https://youtu.be/NUauCaznCAk" },
+  { round = "top8", a = "sudden-death", b = "team-china", winner = "team-china", video = "https://youtu.be/GBsEY4KAA0c" },
+  { round = "top8", a = "belgium-with-attitude", b = "heerlen-fking-zulu", winner = "heerlen-fking-zulu", video = "https://youtu.be/ySidOLOdflE" },
+  { round = "top4", a = "heerlen-fking-zulu", b = "hustle-kidz", winner = "hustle-kidz", video = "https://youtu.be/-krvvb_T8-E" },
+  { round = "top4", a = "the-ruggeds", b = "team-china", winner = "the-ruggeds", video = "https://youtu.be/I0n3Q15DTEc" },
+  { round = "final", a = "hustle-kidz", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/iMqKxgtaS48" },
 ]
 
 [battles.teams]
+belgium-with-attitude = { crew = "belgium-with-attitude" }
+heerlen-fking-zulu = { crew = "heerlen-fking-zulu" }
+hustle-kidz = { crew = "hustle-kidz" }
+penisola-finest = { crew = "penisola-finest" }
+style-of-control = { crew = "style-of-control" }
+sudden-death = { crew = "sudden-death" }
+team-china = { crew = "team-china" }
 the-ruggeds = { crew = "the-ruggeds" }
 
 [[battles]]
@@ -51,9 +72,23 @@ key = "kids-crew"
 name = "Kids crew battle"
 gender = "mixed"
 age = "kids"
-results = [
-  { entrant = "eastside-kingz", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "battle-droids", b = "eastside-kingz", winner = "eastside-kingz", video = "https://youtu.be/3wp59rlKyCo" },
+  { round = "top8", a = "fresh-allstars-kids", b = "flow-killerz", winner = "flow-killerz", video = "https://youtu.be/8KxNSp_3Tpc" },
+  { round = "top8", a = "invasion-kidzz", b = "psycho-youngstaz", winner = "psycho-youngstaz", video = "https://youtu.be/eV4N22hdm0s" },
+  { round = "top8", a = "new-wave", b = "lcb-gangz", winner = "new-wave", video = "https://youtu.be/Dofcdi_ncZg" },
+  { round = "top4", a = "new-wave", b = "psycho-youngstaz", winner = "new-wave", video = "https://youtu.be/QPMUrU72bsQ" },
+  { round = "top4", a = "eastside-kingz", b = "flow-killerz", winner = "eastside-kingz", video = "https://youtu.be/BBNLEunc7Yg" },
+  { round = "final", a = "new-wave", b = "eastside-kingz", winner = "eastside-kingz", video = "https://youtu.be/LHo-4M-RNgQ" },
 ]
 
 [battles.teams]
+battle-droids = { crew = "battle-droids" }
 eastside-kingz = { crew = "eastside-kingz" }
+flow-killerz = { crew = "flow-killerz" }
+fresh-allstars-kids = { crew = "fresh-allstars-kids" }
+invasion-kidzz = { crew = "invasion-kidzz" }
+lcb-gangz = { crew = "lcb-gangz" }
+new-wave = { crew = "new-wave" }
+psycho-youngstaz = { crew = "psycho-youngstaz" }

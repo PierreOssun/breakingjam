@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher Italy 2019"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Rome"
+city = "Italy"
+country = "IT"
+lat = 36.9515
+lng = 14.5279
+sources = ["https://and8.dance/e/3234", "https://sport.quotidiano.net/en/ultimaora/red-bull-bc-one-cypher-1421c722", "https://and8.dance/en/a/A7ZC", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "naz", b = "amaro", winner = "amaro", video = "https://youtu.be/mgd67wEjx-Y" },
+  { round = "top4", a = "funny666", b = "pesto", winner = "pesto", video = "https://youtu.be/3bAkqT4J4O4" },
+  { round = "final", a = "amaro", b = "pesto", winner = "pesto", video = "https://youtu.be/1xhC1ggnMlE" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "lexy", b = "tazz", winner = "tazz", video = "https://youtu.be/WcyrhSVSuNg" },
+  { round = "top4", a = "mambo", b = "alessandrina", winner = "alessandrina", video = "https://youtu.be/mbVYOvJuTd4" },
+  { round = "final", a = "tazz", b = "alessandrina", winner = "alessandrina", video = "https://youtu.be/f61iomW-uP8" },
+]

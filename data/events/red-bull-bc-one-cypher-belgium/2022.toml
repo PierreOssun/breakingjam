@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher Belgium 2022"
+starts_on = 2022-03-26
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "La Madeleine"
+lat = 50.8505
+lng = 4.3488
+sources = ["https://redbull.com/za-en/event-series/bc-one", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "mighty-jimm", reached = "winner", video = "https://youtu.be/Wi7dsDfQWYM" },
+  { entrant = "cis", reached = "top2", video = "https://youtu.be/Wi7dsDfQWYM" },
+  { entrant = "tirock", reached = "top8", video = "https://youtu.be/uSGHnNbX1C0" },
+  { entrant = "anthony", reached = "top16", video = "https://youtu.be/N2-_2xPY-l4" },
+  { entrant = "lucky", reached = "top16", video = "https://youtu.be/N2-_2xPY-l4" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "camine", reached = "winner", video = "https://youtu.be/XIkDWi10UE8" },
+  { entrant = "alyssa", reached = "top2", video = "https://youtu.be/XIkDWi10UE8" },
+]

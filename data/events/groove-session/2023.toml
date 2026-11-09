@@ -1,0 +1,80 @@
+name = "Groove Session 2023"
+starts_on = 2023-08-25
+ends_on = 2023-08-27
+timezone = "Europe/Zurich"
+city = "Neuchâtel"
+country = "CH"
+venue = "Halle de la Riveraine"
+lat = 46.9918
+lng = 6.9310
+sources = ["https://and8.dance/en/e/4277", "https://www.rtn.ch/rtn/Actualite/Region/20230827-Amateurs-et-stars-du-breakdance-se-cotoient-a-la-Groove-Session-a-Neuchatel.html", "https://www.youtube.com/channel/UCzpSzFXLLX0cg8ZC_B4ELiw", "https://www.youtube.com/channel/UCLRCoLpDImkbFw8D3qXFpUQ"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "coolkidz-mob", b = "032", winner = "coolkidz-mob", video = "https://youtu.be/15QnRfyuPWo" },
+  { round = "top8", a = "stranger-thingz", b = "squadron", winner = "stranger-thingz", video = "https://youtu.be/2aHhINJpyHY" },
+  { round = "top8", a = "dangerous-groove", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/EyJ39rbbSW0" },
+  { round = "top8", a = "krasota", b = "diskette", winner = "krasota", video = "https://youtu.be/pxYpDYprqzs" },
+  { round = "top4", a = "stranger-thingz", b = "coolkidz-mob", winner = "coolkidz-mob", video = "https://youtu.be/fh3wOlzRcIs" },
+  { round = "top4", a = "krasota", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/-c60HR0VfOY" },
+  { round = "final", a = "coolkidz-mob", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/I_HBjCgOlYw" },
+]
+
+[battles.teams]
+032 = { crew = "032" }
+coolkidz-mob = { crew = "coolkidz-mob" }
+dangerous-groove = { crew = "dangerous-groove" }
+diskette = { crew = "diskette" }
+krasota = { crew = "krasota" }
+squadron = { crew = "squadron" }
+stranger-thingz = { crew = "stranger-thingz" }
+the-ruggeds = { crew = "the-ruggeds" }
+
+[[battles]]
+key = "2v2"
+name = "2v2 Kid & Adult"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "phil-wizard-phil-one", b = "izzy-monkey-da", winner = "phil-wizard-phil-one", video = "https://youtu.be/__b1K3wbbUI" },
+  { round = "top16", a = "dany-dann-liam", b = "vantok-neo", winner = "dany-dann-liam", video = "https://youtu.be/XseFLs14Ppk" },
+  { round = "top16", a = "san-andrea-maloy", b = "timbo-gera", winner = "san-andrea-maloy", video = "https://youtu.be/-WgpIJxAtx8" },
+  { round = "top16", a = "hulk-shepa", b = "shaymin-lynx", winner = "shaymin-lynx", video = "https://youtu.be/RD2WQ2zKksQ" },
+  { round = "top16", a = "skychief-orion", b = "pashker-soul-tim", winner = "skychief-orion", video = "https://youtu.be/bNxlCJXQXmY" },
+  { round = "top16", a = "moa-myhey", b = "king-kong-found-kid", winner = "moa-myhey", video = "https://youtu.be/zkJWVe-ocM0" },
+  { round = "top16", a = "wigor-ko-taro", b = "gtv-swami", winner = "wigor-ko-taro", video = "https://youtu.be/QHZfHRtt59k" },
+  { round = "top16", a = "link-le-neil-arisha", b = "rius-phumlailai", winner = "link-le-neil-arisha", video = "https://youtu.be/fbcVXOiDtRU" },
+  { round = "top8", a = "phil-wizard-phil-one", b = "dany-dann-liam", winner = "dany-dann-liam", video = "https://youtu.be/-rzdApD6gWg" },
+  { round = "top8", a = "san-andrea-maloy", b = "shaymin-lynx", winner = "san-andrea-maloy", video = "https://youtu.be/siNB4LOeVOs" },
+  { round = "top8", a = "skychief-orion", b = "moa-myhey", winner = "skychief-orion", video = "https://youtu.be/O-vly9hkcBQ" },
+  { round = "top8", a = "link-le-neil-arisha", b = "wigor-ko-taro", winner = "link-le-neil-arisha", video = "https://youtu.be/Q37-PBZB-SM" },
+  { round = "top4", a = "dany-dann-liam", b = "san-andrea-maloy", winner = "san-andrea-maloy", video = "https://youtu.be/qaZgI3SGRXk" },
+  { round = "top4", a = "skychief-orion", b = "link-le-neil-arisha", winner = "skychief-orion", video = "https://youtu.be/A65W6uK4wTs" },
+  { round = "final", a = "skychief-orion", b = "san-andrea-maloy", winner = "san-andrea-maloy", video = "https://youtu.be/NmiNZq_NZnY" },
+]
+
+[battles.teams]
+dany-dann-liam = { members = ["dany-dann", "liam"] }
+gtv-swami = { members = ["gtv", "swami"] }
+hulk-shepa = { members = ["hulk", "shepa"] }
+izzy-monkey-da = { members = ["izzy-monkey", "da"] }
+king-kong-found-kid = { members = ["king-kong", "found-kid"] }
+link-le-neil-arisha = { members = ["link-le-neil", "arisha"] }
+moa-myhey = { members = ["moa", "myhey"] }
+pashker-soul-tim = { members = ["pashker", "soul-tim"] }
+phil-wizard-phil-one = { members = ["phil-wizard", "phil-one"] }
+rius-phumlailai = { members = ["rius", "phumlailai"] }
+san-andrea-maloy = { members = ["san-andrea", "maloy"] }
+shaymin-lynx = { members = ["shaymin", "lynx"] }
+skychief-orion = { members = ["skychief", "orion"] }
+timbo-gera = { members = ["timbo", "gera"] }
+vantok-neo = { members = ["vantok", "neo"] }
+wigor-ko-taro = { members = ["wigor", "ko-taro"] }

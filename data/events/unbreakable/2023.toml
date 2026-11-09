@@ -26,14 +26,14 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "menno", b = "phil-wizard", winner = "phil-wizard" },
-  { round = "top8", a = "shigekix", b = "kid-karam", winner = "shigekix" },
-  { round = "top8", a = "lithe-ing", b = "mighty-jimm", winner = "lithe-ing" },
-  { round = "top8", a = "victor", b = "alvin", winner = "victor" },
-  { round = "top4", a = "phil-wizard", b = "shigekix", winner = "phil-wizard" },
-  { round = "top4", a = "lithe-ing", b = "victor", winner = "victor" },
-  { round = "final", a = "victor", b = "phil-wizard", winner = "victor" },
-  { round = "third", a = "shigekix", b = "lithe-ing", winner = "shigekix" },
+  { round = "top8", a = "menno", b = "phil-wizard", winner = "phil-wizard", video = "https://youtu.be/1ido_KkjWRo" },
+  { round = "top8", a = "shigekix", b = "kid-karam", winner = "shigekix", video = "https://youtu.be/K9MyqK3iSnE" },
+  { round = "top8", a = "lithe-ing", b = "mighty-jimm", winner = "lithe-ing", video = "https://youtu.be/_-q3ySuQ0Q8" },
+  { round = "top8", a = "victor", b = "alvin", winner = "victor", video = "https://youtu.be/t8Q7tSwF9rk" },
+  { round = "top4", a = "phil-wizard", b = "shigekix", winner = "phil-wizard", video = "https://youtu.be/iV1Djm8z1vs" },
+  { round = "top4", a = "lithe-ing", b = "victor", winner = "victor", video = "https://youtu.be/YK0XLCyypaE" },
+  { round = "final", a = "victor", b = "phil-wizard", winner = "victor", video = "https://youtu.be/eAkJUSMu2Ko" },
+  { round = "third", a = "shigekix", b = "lithe-ing", winner = "shigekix", video = "https://youtu.be/DFQQU9VuPy0" },
 ]
 
 [[battles]]
@@ -42,14 +42,14 @@ name = "1v1 Bgirl"
 gender = "bgirl"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "ayumi", b = "stefani", winner = "ayumi" },
-  { round = "top8", a = "anti", b = "kate", winner = "kate" },
-  { round = "top8", a = "nicka", b = "logistx", winner = "nicka" },
-  { round = "top8", a = "671", b = "syssy", winner = "syssy" },
-  { round = "top4", a = "kate", b = "ayumi", winner = "ayumi" },
-  { round = "top4", a = "syssy", b = "nicka", winner = "nicka" },
-  { round = "final", a = "nicka", b = "ayumi", winner = "nicka" },
-  { round = "third", a = "syssy", b = "kate", winner = "syssy" },
+  { round = "top8", a = "ayumi", b = "stefani", winner = "ayumi", video = "https://youtu.be/qxfQDrlGfvw" },
+  { round = "top8", a = "anti", b = "kate", winner = "kate", video = "https://youtu.be/jcVI7DF10pk" },
+  { round = "top8", a = "nicka", b = "logistx", winner = "nicka", video = "https://youtu.be/AvV2Gopg3LM" },
+  { round = "top8", a = "671", b = "syssy", winner = "syssy", video = "https://youtu.be/dwWLCPmGdZc" },
+  { round = "top4", a = "kate", b = "ayumi", winner = "ayumi", video = "https://youtu.be/6aO9DIla7LE" },
+  { round = "top4", a = "syssy", b = "nicka", winner = "nicka", video = "https://youtu.be/hKKJqgefDJQ" },
+  { round = "final", a = "nicka", b = "ayumi", winner = "nicka", video = "https://youtu.be/5cd83fOX6XE" },
+  { round = "third", a = "syssy", b = "kate", winner = "syssy", video = "https://youtu.be/0d7OI1Cn9xg" },
 ]
 
 [[battles]]

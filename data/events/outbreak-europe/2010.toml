@@ -6,7 +6,7 @@ city = "Banská Bystrica"
 country = "SK"
 lat = 48.7354
 lng = 19.1457
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
 judges = ["roxrite", "kid-david", "keebz"]
 mcs = ["mario-bee", "lil-pablo"]
 djs = ["lean-rock", "renegade", "woo-d", "piggo"]
@@ -15,8 +15,15 @@ djs = ["lean-rock", "renegade", "woo-d", "piggo"]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "nadia", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "alessandrina", b = "queen-marry", winner = "alessandrina", video = "https://youtu.be/2Zm-VXN8k3M" },
+  { round = "top8", a = "tamala", b = "paulina", winner = "paulina", video = "https://youtu.be/VtkwmF1My3Y" },
+  { round = "top8", a = "nadia", b = "emilka", winner = "nadia", video = "https://youtu.be/jV3NU6SN0NQ" },
+  { round = "top8", a = "zofia", b = "lady-swift", winner = "zofia", video = "https://youtu.be/pV7ZePWJDl4" },
+  { round = "top4", a = "nadia", b = "paulina", winner = "nadia", video = "https://youtu.be/A0A5fZ3ynfs" },
+  { round = "top4", a = "zofia", b = "alessandrina", winner = "zofia", video = "https://youtu.be/BeizJCxlTPw" },
+  { round = "final", a = "nadia", b = "zofia", winner = "nadia", video = "https://youtu.be/AC6WpDtQqjs" },
 ]
 
 [[battles]]
@@ -24,9 +31,23 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "intact-pluto", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "marco-tomy", b = "kinder-kolobok", winner = "kinder-kolobok", video = "https://youtu.be/GbEy5i8NAOI" },
+  { round = "top8", a = "blanka-just-rock", b = "seven-baroni-sto-ballov", winner = "seven-baroni-sto-ballov", video = "https://youtu.be/akMS2NvkbY8" },
+  { round = "top8", a = "intact-pluto", b = "greku-yarko", winner = "intact-pluto", video = "https://youtu.be/kwuU3Ds_pIk" },
+  { round = "top8", a = "chuchu-kleju", b = "pago-thomaz", winner = "chuchu-kleju", video = "https://youtu.be/nqeM1vRTVYQ" },
+  { round = "top4", a = "intact-pluto", b = "kinder-kolobok", winner = "intact-pluto", video = "https://youtu.be/VuiCYtdZMqA" },
+  { round = "top4", a = "chuchu-kleju", b = "seven-baroni-sto-ballov", winner = "chuchu-kleju", video = "https://youtu.be/jkTNv-FgHTI" },
+  { round = "final", a = "intact-pluto", b = "chuchu-kleju", winner = "intact-pluto", video = "https://youtu.be/sIgAQ1ZHdyk" },
 ]
 
 [battles.teams]
+blanka-just-rock = { members = ["just-rock", "blanka"] }
+chuchu-kleju = { members = ["kleju", "chuchu"] }
+greku-yarko = { members = ["yarko", "greku"] }
 intact-pluto = { members = ["intact", "pluto"] }
+kinder-kolobok = { members = ["kolobok", "kinder"] }
+marco-tomy = { members = ["tomy", "marco"] }
+pago-thomaz = { members = ["pago", "thomaz"] }
+seven-baroni-sto-ballov = { members = ["seven-baroni", "sto-ballov"] }

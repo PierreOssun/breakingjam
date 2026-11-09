@@ -21,7 +21,7 @@ function PrimaryButton({ jam, className }: { jam: Jam; className: string }) {
           rel="noopener noreferrer"
           className={classes}
         >
-          {t("jam.register")}
+          <span className="min-w-0 truncate">{t("jam.register")}</span>
           <ArrowSquareOut size={20} weight="bold" aria-hidden />
         </a>
       );
@@ -32,14 +32,14 @@ function PrimaryButton({ jam, className }: { jam: Jam; className: string }) {
           className={classes}
         >
           <CalendarPlus size={20} weight="bold" aria-hidden />
-          {t("jam.calendar")}
+          <span className="min-w-0 truncate">{t("jam.calendar")}</span>
         </a>
       );
     case "results":
       return (
         <a href="#battles" className={classes}>
           <Trophy size={20} weight="bold" aria-hidden />
-          {t("jam.results")}
+          <span className="min-w-0 truncate">{t("jam.results")}</span>
         </a>
       );
     case null:
@@ -50,15 +50,18 @@ function PrimaryButton({ jam, className }: { jam: Jam; className: string }) {
 /** Phones: Share and the primary action, along the bottom while the jam is on screen (§4.32). */
 export function ActionBar({ jam }: { jam: Jam }) {
   const { i18n } = useTranslation();
+  // Without an action (a cancelled jam), Share alone repeats the top bar's.
+  if (!primaryAction(jam)) return null;
   return (
     // Sticky, not fixed: it rides along while the jam is on screen and stops before the footer.
     <div className="sticky bottom-0 z-30 mt-10 flex gap-3 border-t border-border bg-bg px-4 pt-3 pb-[max(28px,env(safe-area-inset-bottom))] shadow-lg lg:hidden">
+      {/* Share as an icon: French and German labels need the bar's width for the primary action. */}
       <ShareButton
         title={shareTitle(jam, i18n.language)}
-        look="secondary"
-        className="flex-1"
+        look="icon"
+        className="size-12 shrink-0"
       />
-      <PrimaryButton jam={jam} className="flex-[2]" />
+      <PrimaryButton jam={jam} className="min-w-0 flex-1" />
     </div>
   );
 }

@@ -1,0 +1,29 @@
+name = "Red Bull BC One Cypher Germany 2024"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Berlin"
+city = "Berlin"
+country = "DE"
+lat = 52.5244
+lng = 13.4105
+sources = ["https://and8.dance/en/e/4710", "https://www.redbull.com/int-en/events/red-bull-bc-one-germany-cypher", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "light", reached = "winner", video = "https://youtu.be/OrNw6rlIH_s" },
+  { entrant = "nord-diamond", reached = "top2", video = "https://youtu.be/OrNw6rlIH_s" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "jilou", reached = "winner", video = "https://youtu.be/L-SOGPUhptE" },
+  { entrant = "sona", reached = "top2", video = "https://youtu.be/L-SOGPUhptE" },
+]

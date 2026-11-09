@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select name, starts_on from events where data_key is null and deleted_at is null",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "starts_on",
+        "type_info": "Date",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "starts_on"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "72fdd50d6e8292f2f6bb8b332adc10cb15ea60b8b04806b47e8b8447fa8ebd5c"
+}

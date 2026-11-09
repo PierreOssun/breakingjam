@@ -6,7 +6,7 @@ country = "FR"
 lat = 43.5733
 lng = 3.9517
 venue = "Sud de France Arena"
-sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20180529195232/http://www.battleoftheyear.net/boty-2018/"]
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20180529195232/http://www.battleoftheyear.net/boty-2018/", "https://www.youtube.com/channel/UC5fCFsSpHz49f1QAV0wtpew"]
 judges = []
 mcs = []
 djs = []
@@ -39,12 +39,15 @@ results = [
 
 [[battles]]
 key = "bgirl"
-name = "2v2 Bgirl"
+name = "1v1 Bgirl"
 gender = "bgirl"
-team_size = 2
-results = [
-  { entrant = "ayane", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "ayane", b = "scarlet", winner = "ayane", video = "https://youtu.be/uEV9FeEtGM8" },
+  { round = "top8", a = "kastet", b = "lil-mami", winner = "kastet", video = "https://youtu.be/sPphelyyU7Y" },
+  { round = "top8", a = "carito", b = "playmo", winner = "playmo", video = "https://youtu.be/PB1pwG9RJaI" },
+  { round = "top8", a = "ramona", b = "maggoosh", winner = "ramona", video = "https://youtu.be/TbCz_tJbQDs" },
+  { round = "top4", a = "kastet", b = "ayane", winner = "ayane", video = "https://youtu.be/6I5EJ0xGt5U" },
+  { round = "top4", a = "playmo", b = "ramona", winner = "ramona", video = "https://youtu.be/2-YRlBXFsJE" },
+  { round = "final", a = "ramona", b = "ayane", winner = "ayane", video = "https://youtu.be/fyZeZvYAwMs" },
 ]
-
-[battles.teams]
-ayane = { name = "Ayane" }

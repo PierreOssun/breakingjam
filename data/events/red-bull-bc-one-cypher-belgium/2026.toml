@@ -1,0 +1,50 @@
+name = "Red Bull BC One Cypher Belgium 2026"
+starts_on = 2026-04-26
+timezone = "Europe/Brussels"
+city = "Ghent"
+country = "BE"
+venue = "Wintercircus"
+lat = 51.0500
+lng = 3.7167
+sources = ["https://www.redbull.com/be-nl/events/bc-one-cypher-belgium", "https://www.dhnet.be/sports/omnisports/sport-extreme/2026/04/30/madmax-et-tiro-dominent-le-breaking-belge-et-visent-toronto-FETLR7PGJNHMPG3TU7ZWZTYWJY/", "https://and8.dance/en/a/D1YO", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "tiro", b = "stef", winner = "tiro", video = "https://youtu.be/gAosUJJo-F0" },
+  { round = "top16", a = "xl", b = "yolan", winner = "xl", video = "https://youtu.be/qgtAdoh2u8o" },
+  { round = "top16", a = "staeb", b = "mike", winner = "staeb", video = "https://youtu.be/_26nqWHhzRg" },
+  { round = "top16", a = "cis", b = "titris", winner = "cis", video = "https://youtu.be/wZNfhhr2xLA" },
+  { round = "top16", a = "wayan", b = "adi-one", winner = "wayan", video = "https://youtu.be/pzS433vIapc" },
+  { round = "top16", a = "source", b = "junes", winner = "source", video = "https://youtu.be/PE2_492YVDc" },
+  { round = "top16", a = "petito", b = "jurre", winner = "jurre", video = "https://youtu.be/7q4CZ900dEQ" },
+  { round = "top16", a = "anthony", b = "nabs", winner = "nabs", video = "https://youtu.be/F-qBoxrp7ug" },
+  { round = "top8", a = "tiro", b = "staeb", winner = "tiro", video = "https://youtu.be/5p3rHPTj9uo" },
+  { round = "top8", a = "xl", b = "cis", winner = "xl", video = "https://youtu.be/yo6H7t2kZ9U" },
+  { round = "top8", a = "source", b = "wayan", winner = "source", video = "https://youtu.be/UgZUQQL0M-w" },
+  { round = "top8", a = "jurre", b = "nabs", winner = "jurre", video = "https://youtu.be/uRAqpi0ELu8" },
+  { round = "top4", a = "tiro", b = "xl", winner = "tiro", video = "https://youtu.be/Ain5VrB4IPE" },
+  { round = "top4", a = "source", b = "jurre", winner = "source", video = "https://youtu.be/01yzQ8FOuz4" },
+  { round = "final", a = "tiro", b = "source", winner = "tiro", video = "https://youtu.be/iiHwAlubP68" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "comix", b = "madmax", winner = "madmax", video = "https://youtu.be/VLxeP17KrCs" },
+  { round = "top8", a = "kato", b = "moon", winner = "kato", video = "https://youtu.be/ZMqgVraSRc0" },
+  { round = "top8", a = "valentina", b = "badli", winner = "badli", video = "https://youtu.be/Dz7RfKxruYw" },
+  { round = "top8", a = "camine", b = "lena", winner = "camine", video = "https://youtu.be/-YIBd05DrEo" },
+  { round = "top4", a = "madmax", b = "kato", winner = "madmax", video = "https://youtu.be/c21-Hm1QCeU" },
+  { round = "top4", a = "badli", b = "camine", winner = "camine", video = "https://youtu.be/ES06ddtmVFA" },
+  { round = "final", a = "madmax", b = "camine", winner = "madmax", video = "https://youtu.be/ljWL8IFP--k" },
+]

@@ -1,0 +1,32 @@
+name = "Red Bull BC One Cypher Italy 2022"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Rome"
+city = "Italy"
+country = "IT"
+lat = 36.9515
+lng = 14.5279
+sources = ["https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "daga", reached = "winner", video = "https://youtu.be/AtZ0lGxx18s" },
+  { entrant = "amaro", reached = "top2", video = "https://youtu.be/AtZ0lGxx18s" },
+  { entrant = "fat", reached = "top8", video = "https://youtu.be/j8TIQrsp-SU" },
+  { entrant = "snap", reached = "top8", video = "https://youtu.be/j8TIQrsp-SU" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "alessandrina", reached = "winner", video = "https://youtu.be/ixAaclU_c7Q" },
+  { entrant = "lexy", reached = "top2", video = "https://youtu.be/ixAaclU_c7Q" },
+  { entrant = "solid", reached = "top4", video = "https://youtu.be/GNKT3Ujvs7M" },
+]

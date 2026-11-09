@@ -1,0 +1,53 @@
+name = "Groove Session 2017"
+starts_on = 2017-11-18
+timezone = "Europe/Zurich"
+city = "Neuchâtel"
+country = "CH"
+lat = 46.9918
+lng = 6.9310
+sources = ["https://www.youtube.com/channel/UCLRCoLpDImkbFw8D3qXFpUQ", "https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA"]
+judges = ["bruce-wayne", "swift-rock", "tony-rock"]
+mcs = []
+djs = ["dj-nobunaga"]
+
+[[battles]]
+key = "2v2"
+name = "2v2 Kid & Adult"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "kazuki-rock-raptor", b = "max-bboy-smile", winner = "kazuki-rock-raptor", video = "https://youtu.be/A3W_Lfebg3A" },
+  { round = "top16", a = "ratin-masta-mace", b = "astro-madmax", winner = "ratin-masta-mace", video = "https://youtu.be/p0XqrzEAfRY" },
+  { round = "top16", a = "spider-spaghetti", b = "calle-lotus", winner = "calle-lotus", video = "https://youtu.be/JvV-IoFnBnY" },
+  { round = "top16", a = "stripes-lorenzo", b = "t-mo-damani", winner = "stripes-lorenzo", video = "https://youtu.be/0Bm8lSDfxkU" },
+  { round = "top16", a = "shlag-haruto", b = "fat-shinigabry", winner = "shlag-haruto", video = "https://youtu.be/bmGvSkUa1Ig" },
+  { round = "top16", a = "lussy-sky-grom", b = "stuart-weapon-x", winner = "lussy-sky-grom", video = "https://youtu.be/PyoYlQf81lo" },
+  { round = "top16", a = "the-wolfer-banana-joe", b = "feel-scheggia", winner = "the-wolfer-banana-joe", video = "https://youtu.be/t5BFx5qKYvM" },
+  { round = "top16", a = "moa-malish", b = "zoopreme-syssy", winner = "zoopreme-syssy", video = "https://youtu.be/jKyLSAP7jPI" },
+  { round = "top8", a = "kazuki-rock-raptor", b = "ratin-masta-mace", winner = "ratin-masta-mace", video = "https://youtu.be/eq0dyeS5-OE" },
+  { round = "top8", a = "calle-lotus", b = "stripes-lorenzo", winner = "stripes-lorenzo", video = "https://youtu.be/icXI-cpLxUU" },
+  { round = "top8", a = "shlag-haruto", b = "lussy-sky-grom", winner = "lussy-sky-grom", video = "https://youtu.be/2sgcVcu2xjY" },
+  { round = "top8", a = "the-wolfer-banana-joe", b = "zoopreme-syssy", winner = "zoopreme-syssy", video = "https://youtu.be/-uSvD_yM9OE" },
+  { round = "top4", a = "ratin-masta-mace", b = "stripes-lorenzo", winner = "stripes-lorenzo", video = "https://youtu.be/5g4IXB7GjeI" },
+  { round = "top4", a = "lussy-sky-grom", b = "zoopreme-syssy", winner = "lussy-sky-grom", video = "https://youtu.be/GZBInCAjSbI" },
+  { round = "final", a = "stripes-lorenzo", b = "lussy-sky-grom", winner = "stripes-lorenzo", video = "https://youtu.be/Eqy9SRjd1fQ" },
+]
+
+[battles.teams]
+astro-madmax = { members = ["astro", "madmax"] }
+calle-lotus = { members = ["calle", "lotus"] }
+fat-shinigabry = { members = ["fat", "shinigabry"] }
+feel-scheggia = { members = ["feel", "scheggia"] }
+kazuki-rock-raptor = { members = ["kazuki-rock", "raptor"] }
+lussy-sky-grom = { members = ["lussy-sky", "grom"] }
+max-bboy-smile = { members = ["max-bboy", "smile"] }
+moa-malish = { members = ["moa", "malish"] }
+ratin-masta-mace = { members = ["ratin", "masta-mace"] }
+shlag-haruto = { members = ["shlag", "haruto"] }
+spider-spaghetti = { members = ["spider", "spaghetti"] }
+stripes-lorenzo = { members = ["stripes", "lorenzo"] }
+stuart-weapon-x = { members = ["stuart", "weapon-x"] }
+t-mo-damani = { members = ["t-mo", "damani"] }
+the-wolfer-banana-joe = { members = ["the-wolfer", "banana-joe"] }
+zoopreme-syssy = { members = ["zoopreme", "syssy"] }

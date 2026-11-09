@@ -6,7 +6,7 @@ city = "Banská Bystrica"
 country = "SK"
 lat = 48.7354
 lng = 19.1457
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
 judges = ["float", "wing", "poe-one", "felix", "hatsolo", "renegade"]
 mcs = ["ivan-urban-action-figure", "lil-pablo", "max", "johnny-mecoch"]
 djs = ["lean-rock", "fleg", "ervin-arana", "renegade", "scream", "plash", "smirnoff", "felix", "bj-piggo"]
@@ -17,21 +17,21 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "kid-karam", b = "gun", winner = "kid-karam" },
-  { round = "top16", a = "ayumi", b = "beetle", winner = "ayumi" },
-  { round = "top16", a = "dany", b = "nord-diamond", winner = "dany" },
-  { round = "top16", a = "kuzya", b = "kae", winner = "kuzya" },
-  { round = "top16", a = "lb", b = "sheku", winner = "lb" },
-  { round = "top16", a = "illz", b = "lil-g", winner = "illz" },
-  { round = "top16", a = "phil-wizard", b = "gieras", winner = "phil-wizard" },
-  { round = "top16", a = "cheerito", b = "mini-joe", winner = "cheerito" },
-  { round = "top8", a = "kid-karam", b = "ayumi", winner = "kid-karam" },
-  { round = "top8", a = "kuzya", b = "dany", winner = "kuzya" },
-  { round = "top8", a = "illz", b = "lb", winner = "illz" },
-  { round = "top8", a = "cheerito", b = "phil-wizard", winner = "cheerito" },
-  { round = "top4", a = "kuzya", b = "kid-karam", winner = "kuzya" },
-  { round = "top4", a = "cheerito", b = "illz", winner = "cheerito" },
-  { round = "final", a = "cheerito", b = "kuzya", winner = "cheerito" },
+  { round = "top16", a = "kid-karam", b = "gun", winner = "kid-karam", video = "https://youtu.be/7a020pfKXAs" },
+  { round = "top16", a = "ayumi", b = "beetle", winner = "ayumi", video = "https://youtu.be/t_9AFI5sGbE" },
+  { round = "top16", a = "dany", b = "nord-diamond", winner = "dany", video = "https://youtu.be/auTXD0QAKzc" },
+  { round = "top16", a = "kuzya", b = "kae", winner = "kuzya", video = "https://youtu.be/TqO2lp4BYn8" },
+  { round = "top16", a = "lb", b = "sheku", winner = "lb", video = "https://youtu.be/RF7qokp9stw" },
+  { round = "top16", a = "illz", b = "lil-g", winner = "illz", video = "https://youtu.be/bw9JP1vGeFs" },
+  { round = "top16", a = "phil-wizard", b = "gieras", winner = "phil-wizard", video = "https://youtu.be/vyJqERuylZI" },
+  { round = "top16", a = "cheerito", b = "mini-joe", winner = "cheerito", video = "https://youtu.be/hwgLxwuHGAc" },
+  { round = "top8", a = "kid-karam", b = "ayumi", winner = "kid-karam", video = "https://youtu.be/xLp41kRbd44" },
+  { round = "top8", a = "kuzya", b = "dany", winner = "kuzya", video = "https://youtu.be/S8opfAIsOc4" },
+  { round = "top8", a = "illz", b = "lb", winner = "illz", video = "https://youtu.be/Cby4NGwkuEY" },
+  { round = "top8", a = "cheerito", b = "phil-wizard", winner = "cheerito", video = "https://youtu.be/renKI2IVxNo" },
+  { round = "top4", a = "kuzya", b = "kid-karam", winner = "kuzya", video = "https://youtu.be/xW2pm4e8jKw" },
+  { round = "top4", a = "cheerito", b = "illz", winner = "cheerito", video = "https://youtu.be/n7mbXHFAgI0" },
+  { round = "final", a = "cheerito", b = "kuzya", winner = "cheerito", video = "https://youtu.be/ak0B5Uhnhlo" },
 ]
 
 [[battles]]
@@ -47,12 +47,42 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "den-intact", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "nord-diamond-vicious", b = "astro-cafrey-cat", winner = "nord-diamond-vicious", video = "https://youtu.be/5dC5kwO1FQ4" },
+  { round = "top16", a = "four-willy-rock", b = "ayumi-narumi", winner = "ayumi-narumi", video = "https://youtu.be/-jLP-9QD4yw" },
+  { round = "top16", a = "lil-zoo-willy", b = "illz-phil-wizard", winner = "illz-phil-wizard", video = "https://youtu.be/hLPVclzbuxg" },
+  { round = "top16", a = "high-jack-kid-karma", b = "beetle-zip-rock", winner = "beetle-zip-rock", video = "https://youtu.be/vRATPbSGWXQ" },
+  { round = "top16", a = "lussy-sky-shigekix", b = "artform-mallekid", winner = "lussy-sky-shigekix", video = "https://youtu.be/kTx8ASoocKU" },
+  { round = "top16", a = "bart-rato", b = "cheerito-gun", winner = "bart-rato", video = "https://youtu.be/7BbDgeVyk6g" },
+  { round = "top16", a = "la-squadra", b = "ratin-ruddy", winner = "ratin-ruddy", video = "https://youtu.be/5gdY0Itlbug" },
+  { round = "top16", a = "den-intact", b = "mighty-brick-skeeter", winner = "den-intact", video = "https://youtu.be/3ZvKjwvkpDw" },
+  { round = "top8", a = "lussy-sky-shigekix", b = "nord-diamond-vicious", winner = "lussy-sky-shigekix", video = "https://youtu.be/Grr5YkskMdE" },
+  { round = "top8", a = "ayumi-narumi", b = "beetle-zip-rock", winner = "beetle-zip-rock", video = "https://youtu.be/cqiB9TzmfcY" },
+  { round = "top8", a = "ratin-ruddy", b = "den-intact", winner = "den-intact", video = "https://youtu.be/m2aFA5BQd2s" },
+  { round = "top8", a = "illz-phil-wizard", b = "bart-rato", winner = "illz-phil-wizard", video = "https://youtu.be/TVhhderxxNo" },
+  { round = "top4", a = "den-intact", b = "beetle-zip-rock", winner = "den-intact", video = "https://youtu.be/6EtsACbD_Tk" },
+  { round = "top4", a = "lussy-sky-shigekix", b = "illz-phil-wizard", winner = "lussy-sky-shigekix", video = "https://youtu.be/Ijk7YiGnBPU" },
+  { round = "final", a = "lussy-sky-shigekix", b = "den-intact", winner = "den-intact", video = "https://youtu.be/eWUh6W6hR8Y" },
 ]
 
 [battles.teams]
+artform-mallekid = { members = ["mallekid", "artform"] }
+astro-cafrey-cat = { members = ["astro", "cafrey-cat"] }
+ayumi-narumi = { members = ["ayumi", "narumi"] }
+bart-rato = { members = ["rato", "bart"] }
+beetle-zip-rock = { members = ["ziprock", "beetle"] }
+cheerito-gun = { members = ["cheerito", "gun"] }
 den-intact = { members = ["intact", "den"] }
+four-willy-rock = { members = ["willy-rock", "four"] }
+high-jack-kid-karma = { members = ["high-jack", "kid-karma"] }
+illz-phil-wizard = { members = ["illz", "phil-wizard"] }
+la-squadra = { name = "La Squadra" }
+lil-zoo-willy = { members = ["lil-zoo", "willy"] }
+lussy-sky-shigekix = { members = ["shigekix", "lussy-sky"] }
+mighty-brick-skeeter = { members = ["skeeter", "mighty-brick"] }
+nord-diamond-vicious = { members = ["vicious", "nord-diamond"] }
+ratin-ruddy = { members = ["ratin", "ruddy"] }
 
 [[battles]]
 key = "kids"

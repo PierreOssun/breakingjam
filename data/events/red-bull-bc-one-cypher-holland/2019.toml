@@ -1,0 +1,45 @@
+name = "Red Bull BC One Cypher Holland 2019"
+starts_on = 2019-08-10
+timezone = "Europe/Amsterdam"
+city = "Heerlen"
+country = "NL"
+lat = 50.8837
+lng = 5.9815
+sources = ["https://and8.dance/en/e/3261", "https://and8.dance/en/e/3234", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "guus", b = "arjuna", winner = "arjuna", video = "https://youtu.be/wItESGkCyjM" },
+  { round = "top16", a = "stepper", b = "nazgul", winner = "stepper", video = "https://youtu.be/BPIIY00tHIY" },
+  { round = "top16", a = "ozzi", b = "daryl", winner = "daryl", video = "https://youtu.be/Y0S6awli_Uc" },
+  { round = "top16", a = "marciano", b = "finn", winner = "marciano", video = "https://youtu.be/MxbBaY70z4g" },
+  { round = "top16", a = "dullart", b = "kenji", winner = "dullart", video = "https://youtu.be/D_VTVVV6KM4" },
+  { round = "top16", a = "liam", b = "shane", winner = "shane", video = "https://youtu.be/xLXEH5j0nKs" },
+  { round = "top16", a = "levi", b = "shinshan", winner = "levi", video = "https://youtu.be/Nzf6Ca5S1iY" },
+  { round = "top16", a = "joey", b = "timbo", winner = "timbo", video = "https://youtu.be/13VsUrvjz2k" },
+  { round = "top8", a = "levi", b = "timbo", winner = "timbo", video = "https://youtu.be/a0d6qJDVdSI" },
+  { round = "top8", a = "dullart", b = "shane", winner = "shane", video = "https://youtu.be/5Zhs6Dislqg" },
+  { round = "top8", a = "daryl", b = "marciano", winner = "daryl", video = "https://youtu.be/OyxlQM2tHCw" },
+  { round = "top8", a = "stepper", b = "arjuna", winner = "stepper", video = "https://youtu.be/2TpvywoWDoI" },
+  { round = "top4", a = "shane", b = "timbo", winner = "shane", video = "https://youtu.be/sFcOixSqJ1c" },
+  { round = "top4", a = "daryl", b = "stepper", winner = "stepper", video = "https://youtu.be/VwfkJzNTOBQ" },
+  { round = "final", a = "shane", b = "stepper", winner = "stepper", video = "https://youtu.be/R5dvFPWOV6g" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "mess", reached = "top2", video = "https://youtu.be/lIwyrzO70HM" },
+  { entrant = "pauline", reached = "top2", video = "https://youtu.be/lIwyrzO70HM" },
+  { entrant = "bo", reached = "top4", video = "https://youtu.be/fpWpPQd4Xmw" },
+  { entrant = "alicia", reached = "top4", video = "https://youtu.be/v1kParqQQ_A" },
+]

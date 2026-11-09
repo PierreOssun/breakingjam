@@ -17,11 +17,11 @@ name = "Crew battle"
 gender = "mixed"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "momentum-crew", b = "the-future-crew", winner = "momentum-crew" },
-  { round = "top8", a = "body-carnival", b = "ufo-techniques", winner = "body-carnival" },
+  { round = "top8", a = "momentum-crew", b = "the-future-crew", winner = "momentum-crew", video = "https://youtu.be/uXykqhcxi-c" },
+  { round = "top8", a = "body-carnival", b = "ufo-techniques", winner = "body-carnival", video = "https://youtu.be/K5mH85RCe3Y" },
   { round = "top8", a = "arabiq-flavour", b = "still-contact-break", winner = "arabiq-flavour" },
-  { round = "top8", a = "awa-crew", b = "mb-crew", winner = "mb-crew" },
-  { round = "top4", a = "momentum-crew", b = "body-carnival", winner = "momentum-crew" },
+  { round = "top8", a = "awa-crew", b = "mb-crew", winner = "mb-crew", video = "https://youtu.be/BQWuX2-PMoI" },
+  { round = "top4", a = "momentum-crew", b = "body-carnival", winner = "momentum-crew", video = "https://youtu.be/oTXROIkvENs" },
   { round = "top4", a = "arabiq-flavour", b = "mb-crew", winner = "arabiq-flavour" },
   { round = "final", a = "momentum-crew", b = "arabiq-flavour", winner = "momentum-crew" },
 ]
@@ -42,19 +42,19 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "soso", b = "yu-seng", winner = "soso" },
-  { round = "top16", a = "sunni", b = "yaio", winner = "sunni" },
-  { round = "top16", a = "lil-kev", b = "mokhtar", winner = "lil-kev" },
-  { round = "top16", a = "beetle", b = "salo", winner = "beetle" },
+  { round = "top16", a = "soso", b = "yu-seng", winner = "soso", video = "https://youtu.be/wEOE1ko94Vw" },
+  { round = "top16", a = "sunni", b = "yaio", winner = "sunni", video = "https://youtu.be/HTKoP45YG0s" },
+  { round = "top16", a = "lil-kev", b = "mokhtar", winner = "lil-kev", video = "https://youtu.be/C9jN9I8hSmQ" },
+  { round = "top16", a = "beetle", b = "salo", winner = "beetle", video = "https://youtu.be/SuyV9gf54O4" },
   { round = "top16", a = "flexholik", b = "gimnast", winner = "flexholik" },
-  { round = "top16", a = "pac-pac", b = "daniel", winner = "pac-pac" },
+  { round = "top16", a = "pac-pac", b = "daniel", winner = "pac-pac", video = "https://youtu.be/fMadbRMFTF4" },
   { round = "top16", a = "tip-top-t", b = "arthur", winner = "tip-top-t" },
-  { round = "top16", a = "xak", b = "bruce-almighty", winner = "xak" },
-  { round = "top8", a = "soso", b = "sunni", winner = "soso" },
+  { round = "top16", a = "xak", b = "bruce-almighty", winner = "xak", video = "https://youtu.be/LO_NSt2zx20" },
+  { round = "top8", a = "soso", b = "sunni", winner = "soso", video = "https://youtu.be/x8WKBcMmZFE" },
   { round = "top8", a = "lil-kev", b = "beetle", winner = "lil-kev" },
-  { round = "top8", a = "flexholik", b = "pac-pac", winner = "flexholik" },
+  { round = "top8", a = "flexholik", b = "pac-pac", winner = "flexholik", video = "https://youtu.be/wmoeRs6bHS0" },
   { round = "top8", a = "tip-top-t", b = "xak", winner = "tip-top-t" },
-  { round = "top4", a = "soso", b = "lil-kev", winner = "soso" },
+  { round = "top4", a = "soso", b = "lil-kev", winner = "soso", video = "https://youtu.be/1FMj8BPCx4M" },
   { round = "top4", a = "flexholik", b = "tip-top-t", winner = "flexholik" },
   { round = "final", a = "soso", b = "flexholik", winner = "soso" },
 ]

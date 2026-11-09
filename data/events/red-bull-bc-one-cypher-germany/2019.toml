@@ -1,0 +1,38 @@
+name = "Red Bull BC One Cypher Germany 2019"
+starts_on = 2019-09-20
+ends_on = 2019-09-21
+timezone = "Europe/Berlin"
+city = "Berlin"
+country = "DE"
+venue = "Festsaal Kreuzberg"
+lat = 52.5244
+lng = 13.4105
+sources = ["https://and8.dance/en/e/3259", "https://www.redbull.tv/en_MV/page/rrn:content:event-profiles:014878d2-40ad-488c-b705-2abaa2b8cbb1/bc-one-2019-germany-cypher", "https://and8.dance/en/stats/reports/3259/599/r/", "https://and8.dance/en/stats/reports/3259/597/r/", "https://and8.dance/en/e/3234", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "double-d", reached = "top2", video = "https://youtu.be/58sGIxwKBo4" },
+  { entrant = "anton", reached = "top2", video = "https://youtu.be/58sGIxwKBo4" },
+  { entrant = "flexholik", reached = "top4", video = "https://youtu.be/5Hp5L--cAfc" },
+  { entrant = "qube", reached = "top4", video = "https://youtu.be/Rv2gtYvXn0g" },
+  { entrant = "artform", reached = "top8", video = "https://youtu.be/eDLCdFd8wO0" },
+  { entrant = "noindex", reached = "top8", video = "https://youtu.be/fhWKdtwlRKg" },
+  { entrant = "light", reached = "top8", video = "https://youtu.be/zLbryYLjMBM" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "frost", reached = "top2", video = "https://youtu.be/zTEikkXGDFI" },
+  { entrant = "loopi", reached = "top2", video = "https://youtu.be/zTEikkXGDFI" },
+  { entrant = "viola-luba", reached = "top4", video = "https://youtu.be/md2hzE_1UiQ" },
+  { entrant = "joelle-camarell", reached = "top4", video = "https://youtu.be/5Pt40WL0NkQ" },
+]

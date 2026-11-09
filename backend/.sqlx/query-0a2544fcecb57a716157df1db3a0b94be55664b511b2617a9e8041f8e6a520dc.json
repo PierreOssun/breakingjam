@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set merged_into_id = (select id from dancers where data_key = 'kastet')\n         where data_key = 'lee'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "0a2544fcecb57a716157df1db3a0b94be55664b511b2617a9e8041f8e6a520dc"
+}

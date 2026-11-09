@@ -1,0 +1,30 @@
+name = "Red Bull BC One Cypher Germany 2022"
+starts_on = 2022-07-08
+ends_on = 2022-07-09
+timezone = "Europe/Berlin"
+city = "Dresden"
+country = "DE"
+lat = 51.0509
+lng = 13.7383
+sources = ["https://www.redbull.com/int-en/events/red-bull-bc-one-germany-cypher", "https://and8.dance/en/e/4002", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "chau-lin", reached = "winner", video = "https://youtu.be/uEAA18Axz08" },
+  { entrant = "double-d", reached = "top2", video = "https://youtu.be/uEAA18Axz08" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "jojo", reached = "winner", video = "https://youtu.be/QiVn_hJnO6k" },
+  { entrant = "prudance", reached = "top2", video = "https://youtu.be/QiVn_hJnO6k" },
+]

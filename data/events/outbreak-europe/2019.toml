@@ -8,7 +8,7 @@ country = "SK"
 lat = 48.7357
 lng = 19.1280
 venue = "Aqualand"
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://en.wikipedia.org/w/index.php?oldid=909527419", "https://www.teraz.sk/regiony/medzinarodny-festival-the-legits-blast/406705-clanok.html", "https://and8.dance/en/e/3142"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://en.wikipedia.org/w/index.php?oldid=909527419", "https://www.teraz.sk/regiony/medzinarodny-festival-the-legits-blast/406705-clanok.html", "https://and8.dance/en/e/3142", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
 judges = []
 mcs = []
 djs = []
@@ -58,9 +58,39 @@ angry-boy-grom = { members = ["grom", "angry-boy"] }
 key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
-results = [
-  { entrant = "russia", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "usa", b = "russia", winner = "russia", video = "https://youtu.be/sQZehjmpToA" },
+  { round = "top16", a = "ukraine", b = "italy", winner = "italy", video = "https://youtu.be/sNMvp9uNKpw" },
+  { round = "top16", a = "spain", b = "brazil", winner = "brazil", video = "https://youtu.be/xb8QcIn9Ncs" },
+  { round = "top16", a = "poland", b = "belgium", winner = "belgium", video = "https://youtu.be/O-szG8Vq7rI" },
+  { round = "top16", a = "germany", b = "morocco", winner = "morocco", video = "https://youtu.be/uredmlQyZEk" },
+  { round = "top16", a = "kazakhstan", b = "belarus", winner = "belarus", video = "https://youtu.be/ebq1_ydYLkk" },
+  { round = "top16", a = "venezuela", b = "slovakia", winner = "slovakia", video = "https://youtu.be/jlqjW3BJEFc" },
+  { round = "top16", a = "uk", b = "portugal", winner = "uk", video = "https://youtu.be/Lv-Y3B5kzIQ" },
+  { round = "top8", a = "brazil", b = "belgium", winner = "brazil", video = "https://youtu.be/1CGioUw5uhw" },
+  { round = "top8", a = "russia", b = "italy", winner = "russia", video = "https://youtu.be/-B2XX39EUCM" },
+  { round = "top8", a = "slovakia", b = "uk", winner = "uk", video = "https://youtu.be/Cv7JVuqjQM4" },
+  { round = "top8", a = "morocco", b = "belarus", winner = "morocco", video = "https://youtu.be/HzsIrhdGMBQ" },
+  { round = "top4", a = "russia", b = "brazil", winner = "russia", video = "https://youtu.be/b5_0BHYag18" },
+  { round = "top4", a = "morocco", b = "uk", winner = "uk", video = "https://youtu.be/F2UL0lSCynA" },
+  { round = "final", a = "russia", b = "uk", winner = "russia", video = "https://youtu.be/ulCvdR_38LE" },
 ]
 
 [battles.teams]
+belarus = { name = "Belarus" }
+belgium = { name = "Belgium" }
+brazil = { name = "Brazil" }
+germany = { name = "Germany" }
+italy = { name = "Italy" }
+kazakhstan = { name = "Kazakhstan" }
+morocco = { name = "Morocco" }
+poland = { name = "Poland" }
+portugal = { name = "Portugal" }
 russia = { name = "Russia" }
+slovakia = { name = "Slovakia" }
+spain = { name = "Spain" }
+uk = { name = "UK" }
+ukraine = { name = "Ukraine" }
+usa = { name = "USA" }
+venezuela = { name = "Venezuela" }

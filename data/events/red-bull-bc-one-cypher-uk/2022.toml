@@ -1,0 +1,31 @@
+name = "Red Bull BC One Cypher UK 2022"
+starts_on = 2022-05-14
+ends_on = 2022-05-15
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+venue = "Electric Brixton"
+lat = 51.5085
+lng = -0.1257
+sources = ["https://and8.dance/e/3963", "https://www.timeout.com/london/dance/red-bull-bc-one-cypher-uk", "https://www.electricbrixton.uk.com/?p=2494", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "jacks", reached = "winner", video = "https://youtu.be/5VCL4SzSeb8" },
+  { entrant = "mclane", reached = "top2", video = "https://youtu.be/5VCL4SzSeb8" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "roxy", reached = "winner", video = "https://youtu.be/JpdGUHNhME8" },
+  { entrant = "stefani", reached = "top2", video = "https://youtu.be/JpdGUHNhME8" },
+]

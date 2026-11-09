@@ -1,0 +1,30 @@
+name = "Red Bull BC One Cypher Belgium 2023"
+starts_on = 2023-04-29
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "KVS"
+lat = 50.8505
+lng = 4.3488
+sources = ["https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "source", reached = "winner", video = "https://youtu.be/qFJUMqSSQNs" },
+  { entrant = "djibril", reached = "top2", video = "https://youtu.be/qFJUMqSSQNs" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "camine", reached = "winner", video = "https://youtu.be/DGRqp2aUSFQ" },
+  { entrant = "ilvy", reached = "top2", video = "https://youtu.be/DGRqp2aUSFQ" },
+]

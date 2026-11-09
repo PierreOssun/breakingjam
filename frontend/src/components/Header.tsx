@@ -17,7 +17,7 @@ const navLink = `${buttonClasses("ghost", "sm")} relative aria-[current=page]:af
 const sheetLink =
   "flex h-14 items-center rounded-md px-3 text-title transition-colors duration-fast hover:bg-surface-raised aria-[current=page]:text-primary-text";
 
-/** Site header: wordmark, the three nav links, language, account, and "Register a jam" (DESIGN.md §4.6). */
+/** Site header: wordmark, the three nav links, language and account; the menu sheet adds "Register a jam" (DESIGN.md §4.6). */
 export function Header({ sticky = true }: { sticky?: boolean }) {
   const { t } = useTranslation();
   const me = useMe();
@@ -29,7 +29,8 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
       // Positioned either way: the account sheet hangs from its bottom edge.
       className={`${sticky ? "sticky top-0" : "relative"} z-40 h-header border-b border-border bg-bg lg:h-header-lg`}
     >
-      <div className="mx-auto flex h-full max-w-content items-center gap-2 px-4 md:px-6 lg:px-8">
+      {/* Below 360px (iPhone SE and the like) the bar tightens, so the menu button stays on screen. */}
+      <div className="mx-auto flex h-full max-w-content items-center gap-2 px-4 max-[359px]:gap-1 md:px-6 lg:px-8">
         <Wordmark logo="mark" />
         <nav aria-label={t("nav.menu")} className="ml-4 hidden gap-1 xl:flex">
           <NavLinks className={navLink} />
@@ -46,10 +47,6 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
               />
             )
           )}
-          <Link to="/org/jams/new" className={buttonClasses("primary", "sm")}>
-            <Plus size={16} weight="bold" aria-hidden />
-            {t("nav.registerJam")}
-          </Link>
         </div>
         {me.data ? (
           <div className="xl:hidden">

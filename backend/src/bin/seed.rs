@@ -354,7 +354,7 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!(
         events = EVENTS.len() + IN_REVIEW.len() + imported.events,
-        dancers = new_dancers + imported.dancers.len(),
+        dancers = new_dancers + imported.new_dancers,
         crews = CREWS.len() + imported.crews,
         "seeded; log in as {}, {} or {} with SEED_PASSWORD",
         ADMIN.email,

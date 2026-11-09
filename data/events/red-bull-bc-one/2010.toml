@@ -16,13 +16,13 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "gravity", b = "lil-g", winner = "lil-g", votes = [2, 3] },
-  { round = "top16", a = "thesis", b = "toshiki", winner = "toshiki", votes = [1, 4] },
-  { round = "top16", a = "kleju", b = "marcio", winner = "marcio", votes = [2, 3] },
-  { round = "top16", a = "keyz", b = "neguin", winner = "neguin", votes = [1, 4] },
+  { round = "top16", a = "gravity", b = "lil-g", winner = "lil-g", votes = [2, 3], video = "https://youtu.be/iR2r5Jkrkng" },
+  { round = "top16", a = "thesis", b = "toshiki", winner = "toshiki", votes = [1, 4], video = "https://youtu.be/ST6KWvePhRU" },
+  { round = "top16", a = "kleju", b = "marcio", winner = "marcio", votes = [2, 3], video = "https://youtu.be/7gvQPb9qn9A" },
+  { round = "top16", a = "keyz", b = "neguin", winner = "neguin", votes = [1, 4], video = "https://youtu.be/8ZqVTXksYa4" },
   { round = "top16", a = "airdit", b = "beast", winner = "airdit", votes = [5, 0] },
   { round = "top16", a = "kill", b = "niek", winner = "niek", votes = [1, 3] },
-  { round = "top16", a = "pluto", b = "taisuke", winner = "pluto", votes = [4, 1] },
+  { round = "top16", a = "pluto", b = "taisuke", winner = "pluto", votes = [4, 1], video = "https://youtu.be/dRkNhR2MTvw" },
   { round = "top16", a = "kapu", b = "luigi", winner = "luigi", votes = [2, 3] },
   { round = "top8", a = "lil-g", b = "toshiki", winner = "lil-g", votes = [5, 0] },
   { round = "top8", a = "marcio", b = "neguin", winner = "neguin", votes = [0, 5] },

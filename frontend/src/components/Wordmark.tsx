@@ -14,7 +14,7 @@ export function Wordmark({ logo }: { logo: keyof typeof LOGOS }) {
     <Link
       to="/"
       aria-label={t("nav.home")}
-      className="inline-flex min-h-11 shrink-0 items-center gap-2 font-display text-[16px] font-extrabold lg:gap-2.5 lg:text-[18px]"
+      className="inline-flex min-h-11 shrink-0 items-center gap-2 font-display text-[16px] font-extrabold max-[359px]:text-[15px] lg:gap-2.5 lg:text-[18px]"
     >
       <img src={LOGOS[logo].src} alt="" className={LOGOS[logo].className} />
       <span>

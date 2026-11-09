@@ -1,0 +1,50 @@
+name = "Red Bull BC One Cypher Belgium 2025"
+starts_on = 2025-04-26
+timezone = "Europe/Brussels"
+city = "Charleroi"
+country = "BE"
+venue = "Rockerill"
+lat = 50.4114
+lng = 4.4445
+sources = ["https://eventbrite.be/e/tickets-red-bull-bc-one-cypher-belgium-1116494618459", "https://www.redbull.com/int-en/bc-one-line-up-invited-b-boys", "https://www.lalibre.be/sports/omnisports/2025/11/13/djibril-brille-parmi-lelite-mondiale-du-break-a-tokyo-5L7WYAMYZVEZ5B35PUQPDGKXLI/", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "martino", b = "cis", winner = "cis", video = "https://youtu.be/YspkG2ngrBk" },
+  { round = "top16", a = "emilio", b = "bounoux", winner = "bounoux", video = "https://youtu.be/kEMaBeuIEZE" },
+  { round = "top16", a = "nille", b = "xl", winner = "xl", video = "https://youtu.be/7O-k6UV4PQg" },
+  { round = "top16", a = "fabab", b = "anthony", winner = "anthony", video = "https://youtu.be/ogCaWYON_Kc" },
+  { round = "top16", a = "rateb", b = "g-vybz", winner = "rateb", video = "https://youtu.be/gcADwxB_dSU" },
+  { round = "top16", a = "lucky", b = "wayan", winner = "lucky", video = "https://youtu.be/Z-yZa_Cn8C8" },
+  { round = "top16", a = "jurre", b = "narko", winner = "jurre", video = "https://youtu.be/UM9HpkZQHkk" },
+  { round = "top16", a = "djibril", b = "petito", winner = "djibril", video = "https://youtu.be/XsdlP9g9jWc" },
+  { round = "top8", a = "cis", b = "xl", winner = "cis", video = "https://youtu.be/F6L_ZoLdcXc" },
+  { round = "top8", a = "bounoux", b = "lucky", winner = "lucky", video = "https://youtu.be/RHs9JxbfSlg" },
+  { round = "top8", a = "jurre", b = "anthony", winner = "anthony", video = "https://youtu.be/B1K_6Ucn1FI" },
+  { round = "top8", a = "rateb", b = "djibril", winner = "djibril", video = "https://youtu.be/A-sHQOhsW_w" },
+  { round = "top4", a = "cis", b = "lucky", winner = "cis", video = "https://youtu.be/6fKREldMsxc" },
+  { round = "top4", a = "anthony", b = "djibril", winner = "djibril", video = "https://youtu.be/Z53ALoAoYQA" },
+  { round = "final", a = "cis", b = "djibril", winner = "djibril", video = "https://youtu.be/mPeNR4YxWsw" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "madmax", b = "moon", winner = "madmax", video = "https://youtu.be/ooLoMl_25qA" },
+  { round = "top8", a = "luna", b = "comix", winner = "luna", video = "https://youtu.be/Sb_BbBmAgUM" },
+  { round = "top8", a = "valentina", b = "lena", winner = "lena", video = "https://youtu.be/aunmZEkzs4A" },
+  { round = "top8", a = "badli", b = "camine", winner = "camine", video = "https://youtu.be/Bdl94URaUOQ" },
+  { round = "top4", a = "luna", b = "camine", winner = "camine", video = "https://youtu.be/yI1qVq2xYhI" },
+  { round = "top4", a = "madmax", b = "lena", winner = "madmax", video = "https://youtu.be/e31TLfLObac" },
+  { round = "final", a = "madmax", b = "camine", winner = "camine", video = "https://youtu.be/RTSrrRM0v_k" },
+]

@@ -7,7 +7,7 @@ country = "SK"
 lat = 48.7309
 lng = 19.1375
 venue = "Europa SC"
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.teraz.sk/regiony/na-sutaz-outbreak-europe-pricestuje-e/893137-clanok.html", "https://and8.dance/en/e/4832"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.teraz.sk/regiony/na-sutaz-outbreak-europe-pricestuje-e/893137-clanok.html", "https://and8.dance/en/e/4832", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
 judges = []
 mcs = []
 djs = []
@@ -18,37 +18,37 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 32
 matches = [
-  { round = "top32", a = "ouki", b = "allef", winner = "allef", votes = [1, 4] },
-  { round = "top32", a = "mace", b = "jasper", winner = "mace", votes = [4, 1] },
+  { round = "top32", a = "ouki", b = "allef", winner = "allef", votes = [1, 4], video = "https://youtu.be/4-pCPCGIReQ" },
+  { round = "top32", a = "mace", b = "jasper", winner = "mace", votes = [4, 1], video = "https://youtu.be/5EcC8z2i2zY" },
   { round = "top32", a = "beetle", b = "isaki", winner = "isaki", votes = [2, 3] },
-  { round = "top32", a = "ziprock", b = "ryoga", winner = "ziprock", votes = [4, 1] },
-  { round = "top32", a = "killian", b = "nicolas", winner = "killian", votes = [3, 2] },
-  { round = "top32", a = "sunni", b = "cyga", winner = "cyga", votes = [2, 3] },
-  { round = "top32", a = "tabrin", b = "shiny", winner = "tabrin", votes = [4, 1] },
-  { round = "top32", a = "onel", b = "quake", winner = "quake", votes = [2, 3] },
-  { round = "top32", a = "lion", b = "gimnast", winner = "gimnast", votes = [0, 5] },
-  { round = "top32", a = "johnny-fox", b = "andy", winner = "johnny-fox", votes = [5, 0] },
-  { round = "top32", a = "jeian", b = "djibril", winner = "jeian", votes = [4, 1] },
+  { round = "top32", a = "ziprock", b = "ryoga", winner = "ziprock", votes = [4, 1], video = "https://youtu.be/o40rYuKXT98" },
+  { round = "top32", a = "killian", b = "nicolas", winner = "killian", votes = [3, 2], video = "https://youtu.be/uXB8lKAUjqM" },
+  { round = "top32", a = "sunni", b = "cyga", winner = "cyga", votes = [2, 3], video = "https://youtu.be/y-Wbh23pJ34" },
+  { round = "top32", a = "tabrin", b = "shiny", winner = "tabrin", votes = [4, 1], video = "https://youtu.be/dvwKn-W_L_U" },
+  { round = "top32", a = "onel", b = "quake", winner = "quake", votes = [2, 3], video = "https://youtu.be/gCsuhnrAD18" },
+  { round = "top32", a = "lion", b = "gimnast", winner = "gimnast", votes = [0, 5], video = "https://youtu.be/sPfKqXoR5kQ" },
+  { round = "top32", a = "johnny-fox", b = "andy", winner = "johnny-fox", votes = [5, 0], video = "https://youtu.be/CVSGlghUyc8" },
+  { round = "top32", a = "jeian", b = "djibril", winner = "jeian", votes = [4, 1], video = "https://youtu.be/qHvArSOuvRM" },
   { round = "top32", a = "hiro10", b = "millie-mil", winner = "hiro10", votes = [5, 0] },
-  { round = "top32", a = "grom", b = "emilio", winner = "grom", votes = [5, 0] },
-  { round = "top32", a = "louis", b = "twister", winner = "twister", votes = [0, 5] },
-  { round = "top32", a = "amaro", b = "ceebri", winner = "amaro", votes = [3, 2] },
-  { round = "top32", a = "yu-ki", b = "marlone", winner = "marlone", votes = [0, 5] },
-  { round = "top16", a = "allef", b = "mace", winner = "mace" },
-  { round = "top16", a = "isaki", b = "ziprock", winner = "ziprock" },
-  { round = "top16", a = "killian", b = "cyga", winner = "killian" },
-  { round = "top16", a = "tabrin", b = "quake", winner = "quake" },
-  { round = "top16", a = "gimnast", b = "johnny-fox", winner = "gimnast" },
-  { round = "top16", a = "jeian", b = "hiro10", winner = "hiro10" },
-  { round = "top16", a = "grom", b = "twister", winner = "grom" },
-  { round = "top16", a = "amaro", b = "marlone", winner = "marlone" },
-  { round = "top8", a = "mace", b = "ziprock", winner = "ziprock" },
-  { round = "top8", a = "killian", b = "quake", winner = "quake" },
-  { round = "top8", a = "gimnast", b = "hiro10", winner = "hiro10" },
-  { round = "top8", a = "grom", b = "marlone", winner = "grom" },
-  { round = "top4", a = "ziprock", b = "quake", winner = "ziprock" },
-  { round = "top4", a = "hiro10", b = "grom", winner = "hiro10" },
-  { round = "final", a = "ziprock", b = "hiro10", winner = "hiro10" },
+  { round = "top32", a = "grom", b = "emilio", winner = "grom", votes = [5, 0], video = "https://youtu.be/DsyHrr_2fvU" },
+  { round = "top32", a = "louis", b = "twister", winner = "twister", votes = [0, 5], video = "https://youtu.be/DORoEy3wSBI" },
+  { round = "top32", a = "amaro", b = "ceebri", winner = "amaro", votes = [3, 2], video = "https://youtu.be/cuZgF3z155Q" },
+  { round = "top32", a = "yu-ki", b = "marlone", winner = "marlone", votes = [0, 5], video = "https://youtu.be/IZ5qXVqUFq4" },
+  { round = "top16", a = "allef", b = "mace", winner = "mace", video = "https://youtu.be/GNzlT3-K5D4" },
+  { round = "top16", a = "isaki", b = "ziprock", winner = "ziprock", video = "https://youtu.be/KGWAQ1o2pVg" },
+  { round = "top16", a = "killian", b = "cyga", winner = "killian", video = "https://youtu.be/tuiE8Pj7G-A" },
+  { round = "top16", a = "tabrin", b = "quake", winner = "quake", video = "https://youtu.be/f3o9zDCRyBI" },
+  { round = "top16", a = "gimnast", b = "johnny-fox", winner = "gimnast", video = "https://youtu.be/evTslyOtb7M" },
+  { round = "top16", a = "jeian", b = "hiro10", winner = "hiro10", video = "https://youtu.be/zMs_LdEBK3U" },
+  { round = "top16", a = "grom", b = "twister", winner = "grom", video = "https://youtu.be/p0D18j0i65g" },
+  { round = "top16", a = "amaro", b = "marlone", winner = "marlone", video = "https://youtu.be/UO5VYfUmo9c" },
+  { round = "top8", a = "mace", b = "ziprock", winner = "ziprock", video = "https://youtu.be/K2hxA7AX2NY" },
+  { round = "top8", a = "killian", b = "quake", winner = "quake", video = "https://youtu.be/gcNxLYn9N6E" },
+  { round = "top8", a = "gimnast", b = "hiro10", winner = "hiro10", video = "https://youtu.be/08EL6DNA3ZA" },
+  { round = "top8", a = "grom", b = "marlone", winner = "grom", video = "https://youtu.be/ZUDKwe5KrV0" },
+  { round = "top4", a = "ziprock", b = "quake", winner = "ziprock", video = "https://youtu.be/4I493visuls" },
+  { round = "top4", a = "hiro10", b = "grom", winner = "hiro10", video = "https://youtu.be/cE8alG79nAc" },
+  { round = "final", a = "ziprock", b = "hiro10", winner = "hiro10", video = "https://youtu.be/CwsfsLt_iw0" },
 ]
 
 [[battles]]
@@ -57,37 +57,37 @@ name = "1v1 Bgirl"
 gender = "bgirl"
 bracket_size = 32
 matches = [
-  { round = "top32", a = "starry", b = "ram", winner = "starry", votes = [3, 2] },
-  { round = "top32", a = "kimie", b = "emka", winner = "kimie", votes = [5, 0] },
-  { round = "top32", a = "alesandrina", b = "syssy", winner = "syssy", votes = [0, 5] },
-  { round = "top32", a = "spidergirl", b = "karla", winner = "spidergirl", votes = [4, 1] },
-  { round = "top32", a = "stefani", b = "kristina", winner = "stefani", votes = [5, 0] },
-  { round = "top32", a = "posya-rock", b = "tata", winner = "tata", votes = [2, 3] },
-  { round = "top32", a = "nika", b = "chimpa", winner = "nika", votes = [4, 1] },
-  { round = "top32", a = "ayane", b = "badli", winner = "ayane", votes = [4, 1] },
+  { round = "top32", a = "starry", b = "ram", winner = "starry", votes = [3, 2], video = "https://youtu.be/_Uead1LjUUQ" },
+  { round = "top32", a = "kimie", b = "emka", winner = "kimie", votes = [5, 0], video = "https://youtu.be/-Bz0I7_fz1w" },
+  { round = "top32", a = "alesandrina", b = "syssy", winner = "syssy", votes = [0, 5], video = "https://youtu.be/F_8S_Qx4Bqc" },
+  { round = "top32", a = "spidergirl", b = "karla", winner = "spidergirl", votes = [4, 1], video = "https://youtu.be/6XBnORfUMkI" },
+  { round = "top32", a = "stefani", b = "kristina", winner = "stefani", votes = [5, 0], video = "https://youtu.be/PhLfbIfUCaI" },
+  { round = "top32", a = "posya-rock", b = "tata", winner = "tata", votes = [2, 3], video = "https://youtu.be/3ZoN-Gk287c" },
+  { round = "top32", a = "nika", b = "chimpa", winner = "nika", votes = [4, 1], video = "https://youtu.be/7zoZv2k_okI" },
+  { round = "top32", a = "ayane", b = "badli", winner = "ayane", votes = [4, 1], video = "https://youtu.be/HbfdUlBSo48" },
   { round = "top32", a = "kotya", b = "chris", winner = "chris", votes = [1, 4] },
-  { round = "top32", a = "yuina", b = "sonya", winner = "yuina", votes = [5, 0] },
-  { round = "top32", a = "la-vix", b = "swami", winner = "swami", votes = [2, 3] },
-  { round = "top32", a = "kate", b = "izanami", winner = "kate", votes = [5, 0] },
-  { round = "top32", a = "hami", b = "mery-berry", winner = "hami", votes = [3, 2] },
-  { round = "top32", a = "carla", b = "yuika", winner = "yuika", votes = [1, 4] },
-  { round = "top32", a = "mia", b = "jazzy", winner = "jazzy", votes = [2, 3] },
-  { round = "top32", a = "masha-uragan", b = "nicka", winner = "nicka", votes = [0, 5] },
-  { round = "top16", a = "starry", b = "kimie", winner = "kimie" },
-  { round = "top16", a = "syssy", b = "spidergirl", winner = "syssy" },
-  { round = "top16", a = "stefani", b = "tata", winner = "stefani" },
-  { round = "top16", a = "nika", b = "ayane", winner = "ayane" },
-  { round = "top16", a = "chris", b = "yuina", winner = "yuina" },
-  { round = "top16", a = "swami", b = "kate", winner = "kate" },
-  { round = "top16", a = "hami", b = "yuika", winner = "hami" },
-  { round = "top16", a = "jazzy", b = "nicka", winner = "nicka" },
-  { round = "top8", a = "kimie", b = "syssy", winner = "kimie" },
-  { round = "top8", a = "stefani", b = "ayane", winner = "ayane" },
-  { round = "top8", a = "yuina", b = "kate", winner = "kate" },
-  { round = "top8", a = "hami", b = "nicka", winner = "nicka" },
-  { round = "top4", a = "kimie", b = "ayane", winner = "kimie" },
-  { round = "top4", a = "kate", b = "nicka", winner = "nicka" },
-  { round = "final", a = "kimie", b = "nicka", winner = "nicka" },
+  { round = "top32", a = "yuina", b = "sonya", winner = "yuina", votes = [5, 0], video = "https://youtu.be/j3W-ERKzYrQ" },
+  { round = "top32", a = "la-vix", b = "swami", winner = "swami", votes = [2, 3], video = "https://youtu.be/2-MO2mL_9OQ" },
+  { round = "top32", a = "kate", b = "izanami", winner = "kate", votes = [5, 0], video = "https://youtu.be/RLmXh99qJmw" },
+  { round = "top32", a = "hami", b = "mery-berry", winner = "hami", votes = [3, 2], video = "https://youtu.be/KKOdaQ-2a5g" },
+  { round = "top32", a = "carla", b = "yuika", winner = "yuika", votes = [1, 4], video = "https://youtu.be/HKItUpcd-po" },
+  { round = "top32", a = "mia", b = "jazzy", winner = "jazzy", votes = [2, 3], video = "https://youtu.be/3HfFOA6HAf8" },
+  { round = "top32", a = "masha-uragan", b = "nicka", winner = "nicka", votes = [0, 5], video = "https://youtu.be/leuareVAwbo" },
+  { round = "top16", a = "starry", b = "kimie", winner = "kimie", video = "https://youtu.be/-v_XDhQoeug" },
+  { round = "top16", a = "syssy", b = "spidergirl", winner = "syssy", video = "https://youtu.be/QyO0LwyvK-o" },
+  { round = "top16", a = "stefani", b = "tata", winner = "stefani", video = "https://youtu.be/HngOqrdFPUk" },
+  { round = "top16", a = "nika", b = "ayane", winner = "ayane", video = "https://youtu.be/XaO-stoEjyo" },
+  { round = "top16", a = "chris", b = "yuina", winner = "yuina", video = "https://youtu.be/T0iqIMKyPQo" },
+  { round = "top16", a = "swami", b = "kate", winner = "kate", video = "https://youtu.be/xweT6WnmL0U" },
+  { round = "top16", a = "hami", b = "yuika", winner = "hami", video = "https://youtu.be/nVqWS4HjEWU" },
+  { round = "top16", a = "jazzy", b = "nicka", winner = "nicka", video = "https://youtu.be/7U5DSBOC3Rc" },
+  { round = "top8", a = "kimie", b = "syssy", winner = "kimie", video = "https://youtu.be/DfQsX9cqvlk" },
+  { round = "top8", a = "stefani", b = "ayane", winner = "ayane", video = "https://youtu.be/vrqlZ-V-7K4" },
+  { round = "top8", a = "yuina", b = "kate", winner = "kate", video = "https://youtu.be/uou6pwZKW5s" },
+  { round = "top8", a = "hami", b = "nicka", winner = "nicka", video = "https://youtu.be/FLC83jkGfkw" },
+  { round = "top4", a = "kimie", b = "ayane", winner = "kimie", video = "https://youtu.be/wMdt0l1or84" },
+  { round = "top4", a = "kate", b = "nicka", winner = "nicka", video = "https://youtu.be/Ng8H0C9_PD8" },
+  { round = "final", a = "kimie", b = "nicka", winner = "nicka", video = "https://youtu.be/HIqG-hUDCC0" },
 ]
 
 [[battles]]
@@ -107,20 +107,65 @@ key = "kids"
 name = "Kids"
 gender = "mixed"
 age = "kids"
-results = [
-  { entrant = "saturn", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "soul-tim", b = "hadi", winner = "hadi", video = "https://youtu.be/gfF7tFBL558" },
+  { round = "top16", a = "timeo", b = "saturn", winner = "saturn", video = "https://youtu.be/LXZCOUd7H_A" },
+  { round = "top16", a = "fima", b = "seigo", winner = "seigo", video = "https://youtu.be/oxvaVFujK8U" },
+  { round = "top16", a = "phil-one", b = "ill-will", winner = "phil-one", video = "https://youtu.be/S8iHKGfavQw" },
+  { round = "top16", a = "nyusha", b = "berserk", winner = "berserk", video = "https://youtu.be/BPyxTfC0dXo" },
+  { round = "top16", a = "orlan", b = "kimba", winner = "orlan", video = "https://youtu.be/5ui0JcUMSKU" },
+  { round = "top16", a = "david", b = "edo", winner = "edo", video = "https://youtu.be/YyDbvfaNKKA" },
+  { round = "top16", a = "jonah", b = "z", winner = "z", video = "https://youtu.be/z6yBnqGJDWI" },
+  { round = "top8", a = "seigo", b = "saturn", winner = "saturn", video = "https://youtu.be/lR82PtiejZU" },
+  { round = "top8", a = "berserk", b = "phil-one", winner = "berserk", video = "https://youtu.be/f5ctDHMBt3U" },
+  { round = "top8", a = "z", b = "orlan", winner = "z", video = "https://youtu.be/Ew2vv9LU0No" },
+  { round = "top8", a = "hadi", b = "edo", winner = "edo", video = "https://youtu.be/JAU8O-T5ARI" },
+  { round = "top4", a = "berserk", b = "saturn", winner = "saturn", video = "https://youtu.be/s-fxrqxSQDE" },
+  { round = "top4", a = "edo", b = "z", winner = "edo", video = "https://youtu.be/as3sYUrMvts" },
+  { round = "final", a = "edo", b = "saturn", winner = "saturn", video = "https://youtu.be/Z8wfSztOivo" },
 ]
 
 [[battles]]
 key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
-results = [
-  { entrant = "japan", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "australia", b = "france", winner = "france", video = "https://youtu.be/0JojiWkDtzU" },
+  { round = "top16", a = "belgium", b = "mexico", winner = "belgium", video = "https://youtu.be/8kfrYS1HlCs" },
+  { round = "top16", a = "poland", b = "japan", winner = "japan", video = "https://youtu.be/lARGF3ZwYcQ" },
+  { round = "top16", a = "latvia", b = "italy", winner = "italy", video = "https://youtu.be/WJV8vD4-j4A" },
+  { round = "top16", a = "netherlands", b = "colombia", winner = "netherlands", video = "https://youtu.be/YwMISXCEkWA" },
+  { round = "top16", a = "romania", b = "taiwan", winner = "taiwan", video = "https://youtu.be/-HY1bjaRotI" },
+  { round = "top16", a = "ukraine", b = "ireland", winner = "ukraine", video = "https://youtu.be/taW7YKh_MV4" },
+  { round = "top16", a = "venezuela", b = "brazil", winner = "venezuela", video = "https://youtu.be/KWV9qJ4O0tM" },
+  { round = "top8", a = "netherlands", b = "ukraine", winner = "ukraine", video = "https://youtu.be/ILSnuBuWaTo" },
+  { round = "top8", a = "belgium", b = "taiwan", winner = "taiwan", video = "https://youtu.be/2UM8uxTUJbE" },
+  { round = "top8", a = "italy", b = "japan", winner = "japan", video = "https://youtu.be/h2ZnvoK9E-c" },
+  { round = "top8", a = "venezuela", b = "france", winner = "france", video = "https://youtu.be/37QP6WvM1rg" },
+  { round = "top4", a = "japan", b = "ukraine", winner = "japan", video = "https://youtu.be/cq7gUuzO7B8" },
+  { round = "top4", a = "taiwan", b = "france", winner = "france", video = "https://youtu.be/5Z0G1YYJoaY" },
+  { round = "final", a = "japan", b = "france", winner = "japan", video = "https://youtu.be/EvV8XrNGgJ4" },
 ]
 
 [battles.teams]
+australia = { name = "Australia" }
+belgium = { name = "Belgium" }
+brazil = { name = "Brazil" }
+colombia = { name = "Colombia" }
+france = { name = "France" }
+ireland = { name = "Ireland" }
+italy = { name = "Italy" }
 japan = { name = "Japan" }
+latvia = { name = "Latvia" }
+mexico = { name = "Mexico" }
+netherlands = { name = "Netherlands" }
+poland = { name = "Poland" }
+romania = { name = "Romania" }
+taiwan = { name = "Taiwan" }
+ukraine = { name = "Ukraine" }
+venezuela = { name = "Venezuala" }
 
 [[battles]]
 key = "footwork"

@@ -6,7 +6,7 @@ city = "Heerlen"
 country = "NL"
 lat = 50.8837
 lng = 5.9815
-sources = ["https://fujifilm.com/pt/en/news/FUJIFILM-INSTAX-UNDISPUTED-MASTERS-Returns-To-The-Notorious-IBE-This-August", "https://www.fujifilm.com/hr/en/news/FUJIFILM_instax_Undisputed_Masters_Celebrates_Record_Attendance"]
+sources = ["https://fujifilm.com/pt/en/news/FUJIFILM-INSTAX-UNDISPUTED-MASTERS-Returns-To-The-Notorious-IBE-This-August", "https://www.fujifilm.com/hr/en/news/FUJIFILM_instax_Undisputed_Masters_Celebrates_Record_Attendance", "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw"]
 judges = []
 mcs = []
 djs = []
@@ -28,16 +28,44 @@ green-panda = { crew = "green-panda" }
 key = "bboy"
 name = "Undisputed Masters Solo Men"
 gender = "bboy"
-results = [
-  { entrant = "alvin", reached = "winner" },
-  { entrant = "quake", reached = "top2" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "lotus", b = "alvin", winner = "alvin", video = "https://youtu.be/qaqCgISyr_I" },
+  { round = "top16", a = "alexis", b = "jubei", winner = "jubei", video = "https://youtu.be/uKsvTTtATS8" },
+  { round = "top16", a = "kleyslan", b = "killian", winner = "killian", video = "https://youtu.be/IDE49Y8sHQw" },
+  { round = "top16", a = "shinshan", b = "anthony", winner = "anthony", video = "https://youtu.be/OR_XghrqfBo" },
+  { round = "top16", a = "lucky", b = "cis", winner = "cis", video = "https://youtu.be/FgLbnUR8GqA" },
+  { round = "top16", a = "ceebri", b = "bart", winner = "bart", video = "https://youtu.be/Qmuzo56QERY" },
+  { round = "top16", a = "mace", b = "damani", winner = "mace", video = "https://youtu.be/Fsjf6e2IRdc" },
+  { round = "top16", a = "djibril", b = "quake", winner = "quake", video = "https://youtu.be/khhtFKhpsMw" },
+  { round = "top8", a = "alvin", b = "jubei", winner = "alvin", video = "https://youtu.be/ISuUFuFZPgw" },
+  { round = "top8", a = "killian", b = "anthony", winner = "killian", video = "https://youtu.be/NByEMN6FCG8" },
+  { round = "top8", a = "cis", b = "bart", winner = "cis", video = "https://youtu.be/rXBm_DeMIQ8" },
+  { round = "top8", a = "mace", b = "quake", winner = "quake", video = "https://youtu.be/keSXyvqrlp8" },
+  { round = "top4", a = "alvin", b = "killian", winner = "alvin", video = "https://youtu.be/Q1tntzdcyvo" },
+  { round = "top4", a = "quake", b = "cis", winner = "quake", video = "https://youtu.be/nqZSqLJRUQA" },
+  { round = "final", a = "alvin", b = "quake", winner = "alvin", video = "https://youtu.be/Op5Z82bY7_k" },
 ]
 
 [[battles]]
 key = "bgirl"
 name = "Undisputed Masters Solo Women"
 gender = "bgirl"
-results = [
-  { entrant = "syssy", reached = "winner" },
-  { entrant = "stefani", reached = "top2" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "toquinha", b = "ayu", winner = "ayu", video = "https://youtu.be/Dqs7kORBPAY" },
+  { round = "top16", a = "rule", b = "nanaka", winner = "nanaka", video = "https://youtu.be/8QWIhzQ-aXs" },
+  { round = "top16", a = "maia", b = "stefani", winner = "stefani", video = "https://youtu.be/dvgdGBFX--c" },
+  { round = "top16", a = "solid", b = "sayora", winner = "sayora", video = "https://youtu.be/DiGqWERknHM" },
+  { round = "top16", a = "pauline", b = "camine", winner = "pauline", video = "https://youtu.be/b7690G21rZ4" },
+  { round = "top16", a = "celestia", b = "paulina", winner = "paulina", video = "https://youtu.be/VkD1YyNsAFQ" },
+  { round = "top16", a = "jazzy", b = "syssy", winner = "syssy", video = "https://youtu.be/szpAb35odLw" },
+  { round = "top16", a = "jia-li", b = "la-vix", winner = "la-vix", video = "https://youtu.be/UHunk_zFjQA" },
+  { round = "top8", a = "ayu", b = "nanaka", winner = "ayu", video = "https://youtu.be/CkQsa87Vkbs" },
+  { round = "top8", a = "stefani", b = "sayora", winner = "stefani", video = "https://youtu.be/9AQaZWDHOes" },
+  { round = "top8", a = "pauline", b = "paulina", winner = "paulina", video = "https://youtu.be/Wiq4MLiGOj4" },
+  { round = "top8", a = "syssy", b = "la-vix", winner = "syssy", video = "https://youtu.be/I-rwvGTJ-4Y" },
+  { round = "top4", a = "stefani", b = "ayu", winner = "stefani", video = "https://youtu.be/paWC02s_zcw" },
+  { round = "top4", a = "syssy", b = "paulina", winner = "syssy", video = "https://youtu.be/RI0Rc-c61js" },
+  { round = "final", a = "syssy", b = "stefani", winner = "syssy", video = "https://youtu.be/aAK0lbeAFTc" },
 ]

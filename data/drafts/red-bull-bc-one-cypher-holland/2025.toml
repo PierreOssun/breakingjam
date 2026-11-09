@@ -1,0 +1,20 @@
+name = "Red Bull BC One Cypher Holland 2025"
+starts_on = 2025-03-30
+timezone = "Europe/Amsterdam"
+city = "Holland"
+country = "NL"
+lat = 52.5125
+lng = 6.0944
+sources = ["https://nz.trip.com/events/red-bull-bc-one-cypher-holland-2025-20250210", "https://and8.dance/en/e/5297", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "lorenzo", reached = "winner", video = "https://youtu.be/LlOPKH2shdg" },
+  { entrant = "sem-delivery", reached = "top2", video = "https://youtu.be/LlOPKH2shdg" },
+]

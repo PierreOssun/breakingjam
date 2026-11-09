@@ -6,7 +6,7 @@ city = "Banská Bystrica"
 country = "SK"
 lat = 48.7354
 lng = 19.1457
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
 judges = ["abstrak", "nasty-ray", "bgirl-at", "dyzee", "lil-john"]
 mcs = ["mario-bee", "lil-pablo", "osto"]
 djs = ["lean-rock", "fleg", "ervin-arana", "renegade", "scream", "plash", "smirnoff", "felix", "shimo"]
@@ -17,29 +17,44 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "kuzya", b = "shigekix", winner = "kuzya" },
-  { round = "top16", a = "kleju", b = "mini-joe", winner = "kleju" },
-  { round = "top16", a = "thomaz", b = "klesio", winner = "thomaz" },
-  { round = "top16", a = "hulk", b = "twister", winner = "hulk" },
-  { round = "top16", a = "sunni", b = "sapa", winner = "sunni" },
-  { round = "top16", a = "milhouse", b = "yarko", winner = "milhouse" },
-  { round = "top16", a = "niek", b = "t-rock", winner = "niek" },
+  { round = "top16", a = "kuzya", b = "shigekix", winner = "kuzya", video = "https://youtu.be/VxMMmbZswcE" },
+  { round = "top16", a = "kleju", b = "mini-joe", winner = "kleju", video = "https://youtu.be/DqhsllB9zs0" },
+  { round = "top16", a = "thomaz", b = "klesio", winner = "thomaz", video = "https://youtu.be/hY1So30bGsY" },
+  { round = "top16", a = "hulk", b = "twister", winner = "hulk", video = "https://youtu.be/XspPmFuk5nw" },
+  { round = "top16", a = "sunni", b = "sapa", winner = "sunni", video = "https://youtu.be/gMlsfL98riI" },
+  { round = "top16", a = "milhouse", b = "yarko", winner = "milhouse", video = "https://youtu.be/asm0Jm7YI5Q" },
+  { round = "top16", a = "niek", b = "t-rock", winner = "niek", video = "https://youtu.be/2bglYu_tmRk" },
   { round = "top16", a = "lil-g", b = "noindex", winner = "lil-g" },
-  { round = "top8", a = "kuzya", b = "kleju", winner = "kuzya" },
-  { round = "top8", a = "thomaz", b = "hulk", winner = "thomaz" },
-  { round = "top8", a = "sunni", b = "milhouse", winner = "sunni" },
-  { round = "top8", a = "niek", b = "lil-g", winner = "niek" },
-  { round = "top4", a = "kuzya", b = "thomaz", winner = "kuzya" },
-  { round = "top4", a = "sunni", b = "niek", winner = "sunni" },
-  { round = "final", a = "kuzya", b = "sunni", winner = "kuzya" },
+  { round = "top8", a = "kuzya", b = "kleju", winner = "kuzya", video = "https://youtu.be/ZbqPaKpH29s" },
+  { round = "top8", a = "thomaz", b = "hulk", winner = "thomaz", video = "https://youtu.be/BUD_Tn3NpMU" },
+  { round = "top8", a = "sunni", b = "milhouse", winner = "sunni", video = "https://youtu.be/AYEPiM3uJeg" },
+  { round = "top8", a = "niek", b = "lil-g", winner = "niek", video = "https://youtu.be/4ILipjuMm2I" },
+  { round = "top4", a = "kuzya", b = "thomaz", winner = "kuzya", video = "https://youtu.be/GcFMbVbOKXA" },
+  { round = "top4", a = "sunni", b = "niek", winner = "sunni", video = "https://youtu.be/TWWArLQJOaU" },
+  { round = "final", a = "kuzya", b = "sunni", winner = "kuzya", video = "https://youtu.be/7YXWwFTAgeY" },
 ]
 
 [[battles]]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "paulina", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "alessandrina", b = "law", winner = "law", video = "https://youtu.be/TgCpa-yxkKQ" },
+  { round = "top16", a = "sunny", b = "sona", winner = "sunny", video = "https://youtu.be/6lF1KQKqx7I" },
+  { round = "top16", a = "meelisa", b = "maxime", winner = "meelisa", video = "https://youtu.be/-bv4xfg_J8I" },
+  { round = "top16", a = "sarah-bee", b = "lady-fury", winner = "sarah-bee", video = "https://youtu.be/1YLWMNetBfQ" },
+  { round = "top16", a = "paulina", b = "vanessa", winner = "paulina", video = "https://youtu.be/81nIxVqy8-g" },
+  { round = "top16", a = "jeskillz", b = "narcis", winner = "jeskillz", video = "https://youtu.be/yBhEJB-DnoU" },
+  { round = "top16", a = "emilka", b = "san-andrea", winner = "san-andrea", video = "https://youtu.be/Th40Ugf4JiI" },
+  { round = "top16", a = "bo", b = "anita", winner = "anita", video = "https://youtu.be/TAObRNf_hZ4" },
+  { round = "top8", a = "anita", b = "san-andrea", winner = "san-andrea", video = "https://youtu.be/K06SYoqvR1o" },
+  { round = "top8", a = "law", b = "jeskillz", winner = "jeskillz", video = "https://youtu.be/U2DEEpgLcSQ" },
+  { round = "top8", a = "paulina", b = "sarah-bee", winner = "paulina", video = "https://youtu.be/P4NWs43XuvE" },
+  { round = "top8", a = "meelisa", b = "sunny", winner = "sunny", video = "https://youtu.be/hGrUNEuqX4s" },
+  { round = "top4", a = "san-andrea", b = "jeskillz", winner = "san-andrea", video = "https://youtu.be/rCPJ6DYR7XM" },
+  { round = "top4", a = "paulina", b = "sunny", winner = "paulina", video = "https://youtu.be/tSkJGfcdv2Q" },
+  { round = "final", a = "san-andrea", b = "paulina", winner = "paulina", video = "https://youtu.be/mUFil8n6dm8" },
 ]
 
 [[battles]]

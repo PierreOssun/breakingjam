@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher UK 2020"
+starts_on = 2020-03-01
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+lat = 51.5085
+lng = -0.1257
+sources = ["https://www.universe.com/events/red-bull-bc-one-uk-open-cypher-competitor-registration-18-tickets-7JT0FR", "https://and8.dance/en/a/J6QA", "https://bgirlbboy.com/?p=4788", "https://watch.plex.tv/da/person/karam-singh-1", "https://redbull.com/id-id/b-girl-vanessa-career-portrait", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "kid-karam", b = "izaak", winner = "kid-karam", video = "https://youtu.be/eUlo5PjJIGw" },
+  { round = "top4", a = "jackson", b = "aj-the-cypher-cat", winner = "jackson", video = "https://youtu.be/s204CRcO1oQ" },
+  { round = "final", a = "jackson", b = "kid-karam", winner = "kid-karam", video = "https://youtu.be/Kcl2a0zVTEw" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "angel", b = "vanessa", winner = "vanessa", video = "https://youtu.be/xY8_0rCpJRo" },
+  { round = "top4", a = "rawgina", b = "labyrinth", winner = "rawgina", video = "https://youtu.be/nAOw1w5eecA" },
+  { round = "final", a = "rawgina", b = "vanessa", winner = "rawgina", video = "https://youtu.be/nt2zqSgTWqg" },
+]

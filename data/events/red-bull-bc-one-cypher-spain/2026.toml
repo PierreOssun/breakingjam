@@ -1,0 +1,13 @@
+name = "Red Bull BC One Cypher Spain 2026"
+starts_on = 2026-03-14
+ends_on = 2026-03-15
+timezone = "Europe/Madrid"
+city = "Madrid"
+country = "ES"
+lat = 40.4165
+lng = -3.7026
+sources = ["https://www.elespanol.com/deportes/otros-deportes/20260320/grazy-lola-reinan-madrid-conquistan-final-nacional-red-bull-bc-one/1003744177120_0.html", "https://www.redbull.com/nz-en/events/red-bull-bc-one-cypher-spain", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+

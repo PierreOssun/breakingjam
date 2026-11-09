@@ -25,13 +25,13 @@ matches = [
   { round = "top16", a = "killa-kolya", b = "sapa", winner = "killa-kolya" },
   { round = "top16", a = "twister", b = "milky-rock", winner = "twister" },
   { round = "top16", a = "kuzya", b = "freeman", winner = "kuzya" },
-  { round = "top8", a = "kleju", b = "tyson", winner = "kleju" },
-  { round = "top8", a = "kosto", b = "alkolil", winner = "kosto" },
-  { round = "top8", a = "greku", b = "killa-kolya", winner = "killa-kolya" },
+  { round = "top8", a = "kleju", b = "tyson", winner = "kleju", video = "https://youtu.be/bmI0PFoSqLk" },
+  { round = "top8", a = "kosto", b = "alkolil", winner = "kosto", video = "https://youtu.be/R1UO9uIqQVU" },
+  { round = "top8", a = "greku", b = "killa-kolya", winner = "killa-kolya", video = "https://youtu.be/RQrTjOfUiUo" },
   { round = "top8", a = "twister", b = "kuzya", winner = "kuzya" },
-  { round = "top4", a = "kleju", b = "kosto", winner = "kleju" },
-  { round = "top4", a = "killa-kolya", b = "kuzya", winner = "killa-kolya" },
-  { round = "final", a = "kleju", b = "killa-kolya", winner = "kleju" },
+  { round = "top4", a = "kleju", b = "kosto", winner = "kleju", video = "https://youtu.be/EpR3vOHLLdE" },
+  { round = "top4", a = "killa-kolya", b = "kuzya", winner = "killa-kolya", video = "https://youtu.be/zNrtuPhtwPg" },
+  { round = "final", a = "kleju", b = "killa-kolya", winner = "kleju", video = "https://youtu.be/DGdz4rvHRqM" },
 ]
 
 [[battles]]

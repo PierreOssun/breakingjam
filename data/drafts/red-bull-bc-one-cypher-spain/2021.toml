@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher Spain 2021"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Madrid"
+city = "Spain"
+country = "ES"
+lat = 38.4254
+lng = -6.4173
+sources = ["https://highxtar.com/en/breakdancing-takes-to-madrid-this-weekend-with-red-bull-bc-one-spanish-final/", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "mou-g", b = "johnny-fox", winner = "johnny-fox", video = "https://youtu.be/hCNVYd8LlU0", at = 175 },
+  { round = "top4", a = "grazy", b = "cibils", winner = "grazy", video = "https://youtu.be/hCNVYd8LlU0" },
+  { round = "final", a = "grazy", b = "johnny-fox", winner = "grazy", video = "https://youtu.be/H0b0mYMVbNo" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "a-n-g", b = "law", winner = "law", video = "https://youtu.be/LkuZ8p2mCl4", at = 163 },
+  { round = "top4", a = "bpanther", b = "furia", winner = "furia", video = "https://youtu.be/LkuZ8p2mCl4" },
+  { round = "final", a = "law", b = "furia", winner = "law", video = "https://youtu.be/1G77So-IFyo" },
+]

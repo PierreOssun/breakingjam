@@ -1,0 +1,28 @@
+name = "Red Bull BC One Cypher UK 2025"
+starts_on = 2025-09-27
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+venue = "83 Rivington Street"
+lat = 51.5085
+lng = -0.1257
+sources = ["https://www.redbull.com/gb-en/events/red-bull-bc-one-cypher-uk-2025", "https://dice.fm/event/6d58b3-red-bull-bc-one-cypher-uk-27th-sep-83-rivington-street-london-tickets", "https://billetto.co.uk/e/uk-s-best-b-boys-and-b-girls-compete-for-a-shot-at-world-glory-red-bull-bc-one-world-final-toronto-2026-tickets-1892974", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "sheku", reached = "winner" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "solid", reached = "winner" },
+]

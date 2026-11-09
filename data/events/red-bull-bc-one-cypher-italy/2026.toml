@@ -1,0 +1,13 @@
+name = "Red Bull BC One Cypher Italy 2026"
+starts_on = 2026-05-22
+ends_on = 2026-05-23
+timezone = "Europe/Rome"
+city = "L'Aquila"
+country = "IT"
+lat = 42.3505
+lng = 13.3995
+sources = ["https://www.redbull.com/it-it/events/red-bull-bc-one-italy-2026", "https://sport.quotidiano.net/en/ultimaora/torna-red-bull-bc-one-d010d432", "https://and8.dance/en/a/A7ZC", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+

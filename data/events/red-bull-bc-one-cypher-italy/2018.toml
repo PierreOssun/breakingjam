@@ -1,0 +1,23 @@
+name = "Red Bull BC One Cypher Italy 2018"
+starts_on = 2018-05-12
+ends_on = 2018-05-13
+timezone = "Europe/Rome"
+city = "Rome"
+country = "IT"
+lat = 41.8919
+lng = 12.5113
+sources = ["https://www.rollingstone.it/cinema-tv/news-cinema-tv/mowgli-vola-in-finale-al-red-bull-bc-one-world-final/430288/", "https://and8.dance/it/a/C1ZB", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "dezz-it", b = "movy-cube", winner = "movy-cube", video = "https://youtu.be/OpRKwBYXl2Y" },
+  { round = "top4", a = "mowgly", b = "kulebra", winner = "mowgly", video = "https://youtu.be/IlU82C_jJZk" },
+  { round = "final", a = "mowgly", b = "movy-cube", winner = "mowgly", video = "https://youtu.be/_IsaJHPNgQU" },
+]

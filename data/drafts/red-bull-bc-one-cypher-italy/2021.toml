@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher Italy 2021"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Rome"
+city = "Italy"
+country = "IT"
+lat = 36.9515
+lng = 14.5279
+sources = ["https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "mowgly", b = "boogie-gun", winner = "mowgly", video = "https://youtu.be/lqJxG94sXPQ" },
+  { round = "top4", a = "pesto", b = "side", winner = "pesto", video = "https://youtu.be/hDR27coqDQo" },
+  { round = "final", a = "pesto", b = "mowgly", winner = "pesto", video = "https://youtu.be/Pv7meQzU5AE" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "alessandrina", b = "elettra", winner = "alessandrina", video = "https://youtu.be/GcjOrPB_rfk" },
+  { round = "top4", a = "anti", b = "solid", winner = "anti", video = "https://youtu.be/IuLaE3q-_d8" },
+  { round = "final", a = "anti", b = "alessandrina", winner = "anti", video = "https://youtu.be/d1ATuN1qV2M" },
+]

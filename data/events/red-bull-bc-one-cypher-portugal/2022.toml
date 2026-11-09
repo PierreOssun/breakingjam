@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher Portugal 2022"
+starts_on = 2022-04-29
+ends_on = 2022-04-30
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+venue = "Hard Club"
+lat = 41.1485
+lng = -8.6110
+sources = ["https://www.record.pt/modalidades/desportos-radicais/detalhe/emblematico-hard-club-vai-receber-final-nacional-do-red-bull-bc-one", "https://www.record.pt/modalidades/desportos-radicais/detalhe/b-boy-deeogo-e-b-girl-vanessa-carimbam-passaporte-para-a-final-mundial-do-red-bull-bc-one", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "deeogo", reached = "winner", video = "https://youtu.be/wsRb-RnUDQs" },
+  { entrant = "found-kid", reached = "top2", video = "https://youtu.be/wsRb-RnUDQs" },
+  { entrant = "viegas", reached = "top16", video = "https://youtu.be/p9TuUnqD7ZU" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "vanessa", reached = "winner", video = "https://youtu.be/JuRWL2Lye7M" },
+  { entrant = "nastya", reached = "top2", video = "https://youtu.be/JuRWL2Lye7M" },
+  { entrant = "ceecee", reached = "top4", video = "https://youtu.be/DXukC6v-ksE" },
+]

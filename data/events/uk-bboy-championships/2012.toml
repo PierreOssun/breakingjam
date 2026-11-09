@@ -19,10 +19,10 @@ bracket_size = 8
 matches = [
   { round = "top8", a = "jinjo-crew", b = "dead-prezz", winner = "jinjo-crew" },
   { round = "top8", a = "shmetta-skwad", b = "foundnation", winner = "foundnation" },
-  { round = "top8", a = "soul-meezy", b = "havikoro", winner = "havikoro" },
-  { round = "top8", a = "arcopom", b = "soul-mavericks", winner = "soul-mavericks" },
+  { round = "top8", a = "soul-meezy", b = "havikoro", winner = "havikoro", video = "https://youtu.be/QvEsG05zMxc" },
+  { round = "top8", a = "arcopom", b = "soul-mavericks", winner = "soul-mavericks", video = "https://youtu.be/WPnysyAmLVQ" },
   { round = "top4", a = "jinjo-crew", b = "foundnation", winner = "jinjo-crew" },
-  { round = "top4", a = "havikoro", b = "soul-mavericks", winner = "soul-mavericks" },
+  { round = "top4", a = "havikoro", b = "soul-mavericks", winner = "soul-mavericks", video = "https://youtu.be/E62z9nftZts" },
   { round = "final", a = "jinjo-crew", b = "soul-mavericks", winner = "jinjo-crew" },
 ]
 
@@ -42,21 +42,21 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "kareem", b = "yu-seng", winner = "kareem" },
-  { round = "top16", a = "sunni", b = "hoo-hoo", winner = "sunni" },
-  { round = "top16", a = "moy", b = "tawfiq", winner = "moy" },
-  { round = "top16", a = "spin", b = "darwin", winner = "spin" },
-  { round = "top16", a = "chakal", b = "vicious-victor", winner = "vicious-victor" },
-  { round = "top16", a = "morris", b = "sambo", winner = "morris" },
+  { round = "top16", a = "kareem", b = "yu-seng", winner = "kareem", video = "https://youtu.be/c5dfV5Y5U-s" },
+  { round = "top16", a = "sunni", b = "hoo-hoo", winner = "sunni", video = "https://youtu.be/M7CFbK42S10" },
+  { round = "top16", a = "moy", b = "tawfiq", winner = "moy", video = "https://youtu.be/ojjW4gPeK2g" },
+  { round = "top16", a = "spin", b = "darwin", winner = "spin", video = "https://youtu.be/594U8Bzh3SM" },
+  { round = "top16", a = "chakal", b = "vicious-victor", winner = "vicious-victor", video = "https://youtu.be/bY8YxVTXUr8" },
+  { round = "top16", a = "morris", b = "sambo", winner = "morris", video = "https://youtu.be/v1AGh2ihcFA" },
   { round = "top16", a = "hill", b = "yuya", winner = "hill" },
-  { round = "top16", a = "roxy", b = "niek", winner = "niek" },
-  { round = "top8", a = "kareem", b = "sunni", winner = "kareem" },
-  { round = "top8", a = "moy", b = "spin", winner = "moy" },
-  { round = "top8", a = "vicious-victor", b = "morris", winner = "morris" },
-  { round = "top8", a = "hill", b = "niek", winner = "niek" },
+  { round = "top16", a = "roxy", b = "niek", winner = "niek", video = "https://youtu.be/uxu0MAGsgWg" },
+  { round = "top8", a = "kareem", b = "sunni", winner = "kareem", video = "https://youtu.be/5P0PdU8L5vY" },
+  { round = "top8", a = "moy", b = "spin", winner = "moy", video = "https://youtu.be/p2f6ItU9XI4" },
+  { round = "top8", a = "vicious-victor", b = "morris", winner = "morris", video = "https://youtu.be/qRvi7cVVXoc" },
+  { round = "top8", a = "hill", b = "niek", winner = "niek", video = "https://youtu.be/TK5WKfFuAqc" },
   { round = "top4", a = "kareem", b = "moy", winner = "kareem" },
-  { round = "top4", a = "morris", b = "niek", winner = "niek" },
-  { round = "final", a = "kareem", b = "niek", winner = "kareem" },
+  { round = "top4", a = "morris", b = "niek", winner = "niek", video = "https://youtu.be/hUwnlpawrHs" },
+  { round = "final", a = "kareem", b = "niek", winner = "kareem", video = "https://youtu.be/IFyQzwO3DCU" },
 ]
 
 [[battles]]

@@ -1,0 +1,30 @@
+name = "Red Bull BC One Cypher Spain 2022"
+starts_on = 2022-09-17
+timezone = "Europe/Madrid"
+city = "Madrid"
+country = "ES"
+venue = "X-Madrid"
+lat = 40.4165
+lng = -3.7026
+sources = ["https://highxtar.com/en/?p=308220", "https://highxtar.com/en/breakdancing-takes-to-madrid-this-weekend-with-red-bull-bc-one-spanish-final/", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "grazy", reached = "top2", video = "https://youtu.be/f0T0u2-sGnk" },
+  { entrant = "mini-joe", reached = "top2", video = "https://youtu.be/f0T0u2-sGnk" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "furia", reached = "winner", video = "https://youtu.be/AwfXQ9Fk0-s" },
+  { entrant = "law", reached = "top2", video = "https://youtu.be/AwfXQ9Fk0-s" },
+]

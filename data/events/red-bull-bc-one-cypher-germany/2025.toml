@@ -1,0 +1,13 @@
+name = "Red Bull BC One Cypher Germany 2025"
+starts_on = 2025-03-30
+timezone = "Europe/Berlin"
+city = "Berlin"
+country = "DE"
+venue = "Alte Münze"
+lat = 52.5244
+lng = 13.4105
+sources = ["https://and8.dance/en/e/5324", "https://uk.trip.com/events/6509525-2025-03-berlin-collection", "https://www.redbull.com/au-en/red-bull-bc-one-last-chance-cypher-competitors", "https://and8.dance/en/e/5297", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+

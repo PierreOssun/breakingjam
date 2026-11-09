@@ -1,0 +1,31 @@
+name = "Red Bull BC One Cypher Portugal 2021"
+starts_on = 2021-09-10
+ends_on = 2021-09-11
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+venue = "Silo Auto"
+lat = 41.1485
+lng = -8.6110
+sources = ["https://www.record.pt/modalidades/desportos-radicais/detalhe/red-bull-bc-one-de-regresso-a-portugal", "https://www.record.pt/modalidades/desportos-radicais/detalhe/porto-recebe-final-nacional-do-red-bull-bc-one-este-sabado", "https://www.record.pt/modalidades/desportos-radicais/detalhe/red-bull-bc-one-vanessa-e-xxl-representam-portugal-na-final-mundial", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "xxl", reached = "winner", video = "https://youtu.be/ZtFLK7SrJt0" },
+  { entrant = "titas", reached = "top2", video = "https://youtu.be/ZtFLK7SrJt0" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "vanessa", reached = "winner", video = "https://youtu.be/Qv-nrD4wthI" },
+  { entrant = "stereo", reached = "top2", video = "https://youtu.be/Qv-nrD4wthI" },
+]

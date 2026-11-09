@@ -521,3 +521,153 @@ dutch = { name = "Dutch Duo", members = ["menno", "lee"] }
         .collect();
     assert_eq!(rows, [("Flow Mo", Some(1)), ("Dutch Duo", Some(2))]);
 }
+
+#[sqlx::test]
+async fn running_again_adds_only_the_new_jams_and_keeps_the_sites_edits(pool: PgPool) {
+    let dir = data_dir();
+    let (data, _) = load(&dir);
+    let owner = organizer(&pool).await;
+    let mut tx = pool.begin().await.unwrap();
+    insert_all(&mut tx, &data, owner).await.unwrap();
+    tx.commit().await.unwrap();
+
+    // On the site: Menno's page is renamed, and Lee's merged into Kastet's.
+    sqlx::query!("update dancers set dancer_name = 'Menno B.' where data_key = 'menno'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    sqlx::query!(
+        "update dancers set merged_into_id = (select id from dancers where data_key = 'kastet')
+         where data_key = 'lee'"
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+    // In data/: a new jam, judged by a new dancer, and a new crew only Lee, imported already, names.
+    let dancers = fs::read_to_string(dir.join("dancers.toml")).unwrap();
+    fs::write(
+        dir.join("dancers.toml"),
+        dancers.replace(
+            "lee = { name = \"Lee\", country = \"NL\" }",
+            "lee = { name = \"Lee\", country = \"NL\", crews = [\"flow\"] }",
+        ) + "neo = { name = \"Neo\", country = \"FR\" }\n",
+    )
+    .unwrap();
+    let crews = fs::read_to_string(dir.join("crews.toml")).unwrap();
+    fs::write(
+        dir.join("crews.toml"),
+        crews + "flow = { name = \"Flow Mo\", country = \"FI\" }\n",
+    )
+    .unwrap();
+    fs::write(
+        dir.join("events/bc-one/2025.toml"),
+        r#"name = "BC One 2025"
+starts_on = 2025-10-21
+timezone = "Europe/Paris"
+city = "Paris"
+country = "FR"
+judges = ["neo"]
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 2
+matches = [{ round = "final", a = "menno", b = "lee", winner = "menno" }]
+
+[[battles]]
+key = "duo"
+name = "2v2"
+gender = "mixed"
+results = [{ entrant = "duo", reached = "winner" }]
+
+[battles.teams]
+duo = { name = "Duo", members = ["lee", "kastet"] }
+"#,
+    )
+    .unwrap();
+    let (data, unreadable) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    assert!(unreadable.is_empty(), "{unreadable:?}");
+
+    let mut tx = pool.begin().await.unwrap();
+    let imported = insert_all(&mut tx, &data, owner).await.unwrap();
+    tx.commit().await.unwrap();
+
+    assert_eq!(
+        (imported.events, imported.events_before),
+        (1, 1),
+        "only BC One 2025 is new"
+    );
+    // Flow Mo would have no member: Lee's crews aren't changed, as an imported dancer.
+    assert_eq!((imported.new_dancers, imported.crews), (1, 0));
+    assert_eq!(
+        imported.skipped,
+        ["bc-one/2024: breaks a rule of `data check`"]
+    );
+    // Lee and Kastet are one page now, so one member of the duo.
+    let duo = sqlx::query_scalar!(
+        r#"select d.dancer_name from entries en
+           join entry_members em on em.entry_id = en.id
+           join dancers d on d.id = em.dancer_id
+           where en.team_name = 'Duo'"#
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    assert_eq!(duo, ["Kastet"]);
+    let jams = sqlx::query_scalar!("select count(*) from events")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(jams, Some(2));
+    // The new final names the pages as the site left them.
+    let final_2025 = sqlx::query_scalar!(
+        r#"select d.dancer_name from battle_matches m
+           join events e on e.data_key = 'bc-one/2025'
+           join battles b on b.id = m.battle_id and b.event_id = e.id and b.name = '1v1 Bboy'
+           join entry_members em on em.entry_id in (m.winner_id, m.loser_id)
+           join dancers d on d.id = em.dancer_id
+           order by em.entry_id = m.loser_id"#
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    assert_eq!(final_2025, ["Menno B.", "Kastet"]);
+    let names =
+        sqlx::query_scalar!("select count(*) from dancers where dancer_name in ('Menno', 'Lee')")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(
+        names,
+        Some(1),
+        "only the merged Lee row, nothing written again"
+    );
+}
+
+#[sqlx::test]
+async fn a_database_filled_before_jams_had_keys_is_refused(pool: PgPool) {
+    let dir = data_dir();
+    let (data, _) = load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    let owner = organizer(&pool).await;
+    let mut tx = pool.begin().await.unwrap();
+    insert_all(&mut tx, &data, owner).await.unwrap();
+    tx.commit().await.unwrap();
+    // As UAT was seeded: the same rows, without their keys.
+    for table in [
+        "update events set data_key = null",
+        "update dancers set data_key = null",
+    ] {
+        sqlx::query(table).execute(&pool).await.unwrap();
+    }
+
+    let mut tx = pool.begin().await.unwrap();
+    let refused = insert_all(&mut tx, &data, owner).await.unwrap_err();
+
+    assert_eq!(
+        refused.to_string(),
+        "1 jams of data/ are already in the database without a key (bc-one/2023…): it was filled before jams had keys, so import into a fresh one"
+    );
+}

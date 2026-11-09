@@ -1,0 +1,32 @@
+name = "Red Bull BC One Cypher Belgium 2021"
+starts_on = 2021-05-22
+timezone = "Europe/Brussels"
+city = "Ghent"
+country = "BE"
+venue = "Danspunt"
+lat = 51.0500
+lng = 3.7167
+sources = ["https://www.redbull.com/be-nl/bc-one-report", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "lucky", b = "sambo", winner = "lucky", video = "https://youtu.be/3c2KqNwwLY8" },
+  { round = "top4", a = "titris", b = "anthony", winner = "titris", video = "https://youtu.be/fiLAjKbKNcw" },
+  { round = "final", a = "lucky", b = "titris", winner = "lucky", video = "https://youtu.be/ICn2SP-YpEI" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "kato", reached = "winner", video = "https://youtu.be/k1cq08syUFY" },
+  { entrant = "alyssa", reached = "top2", video = "https://youtu.be/k1cq08syUFY" },
+]

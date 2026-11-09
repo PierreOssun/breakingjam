@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set dancer_name = 'Menno B.' where data_key = 'menno'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "297a593bf6730aef7779c8ce638356d251b0675067ac863d20153c63014976fd"
+}

@@ -54,6 +54,16 @@ just check      # everything CI runs
 - **Web:** Vitest and Testing Library in `frontend/tests/`, mirroring `src/`. Pages are tested against a mocked API, the map against a stand-in for MapLibre.
 - **Edge:** `deploy/tests/` for the Worker's helpers.
 
+Before pushing a UI change, look at it on phones:
+
+```sh
+just shots                  # main pages at 320 and 375px, light and dark, into frontend/shots
+just shots /jams/<slug>     # just these paths
+SHOTS_LANG=de just shots    # in German (or fr): the longest labels
+```
+
+It needs `just dev` running and Chrome installed, and fails on anything that runs past the screen's edge, naming it.
+
 ## Deploying
 
 Production and UAT run on Cloudflare. `main` is for development; pushing to the `uat` or `prod` branch runs CI, snapshots and migrates Neon and deploys that target. The one-time setup, secrets and operations are in [`deploy/README.md`](deploy/README.md).

@@ -1,0 +1,20 @@
+name = "Red Bull BC One Cypher Spain 2025"
+starts_on = 2025-05-17
+timezone = "Europe/Madrid"
+city = "Valencia"
+country = "ES"
+lat = 39.4739
+lng = -0.3797
+sources = ["https://www.redbull.com/nz-en/events/red-bull-bc-one-cypher-spain", "https://www.redbull.com/us-en/red-bull-bc-one-last-chance-cypher-competitors", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "lukas", reached = "top2" },
+  { entrant = "grazy", reached = "top2" },
+]

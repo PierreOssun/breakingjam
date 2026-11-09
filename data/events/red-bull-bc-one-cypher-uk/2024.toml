@@ -1,0 +1,30 @@
+name = "Red Bull BC One Cypher UK 2024"
+starts_on = 2024-09-21
+ends_on = 2024-09-22
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+lat = 51.5085
+lng = -0.1257
+sources = ["https://camerajabber.com/?p=1409598", "https://vergemagazine.co.uk/b-boy-cri6-and-b-girl-solid-crowned-winners-of-red-bull-bc-one-cypher-uk/", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "cri6", reached = "winner", video = "https://youtu.be/sKP51FirZt8" },
+  { entrant = "sheku", reached = "top2", video = "https://youtu.be/sKP51FirZt8" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "solid", reached = "winner", video = "https://youtu.be/OEKGfJIkyQY" },
+  { entrant = "munirat", reached = "top2", video = "https://youtu.be/OEKGfJIkyQY" },
+]

@@ -1,0 +1,30 @@
+name = "Red Bull BC One Cypher Spain 2019"
+starts_on = 2019-10-05
+timezone = "Europe/Madrid"
+city = "Spain"
+country = "ES"
+lat = 38.4254
+lng = -6.4173
+sources = ["https://and8.dance/e/3234", "https://bgirlbboy.com/bboy-grazy/", "https://bgirlbboy.com/?p=5691", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "grazy", reached = "winner", video = "https://youtu.be/XEg4fUyyEFQ" },
+  { entrant = "alvarone", reached = "top2", video = "https://youtu.be/XEg4fUyyEFQ" },
+  { entrant = "v-o", reached = "top4", video = "https://youtu.be/qHO6KgBMzic" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "law", reached = "winner", video = "https://youtu.be/YhI52UXSf6o" },
+  { entrant = "sofi", reached = "top2", video = "https://youtu.be/YhI52UXSf6o" },
+]

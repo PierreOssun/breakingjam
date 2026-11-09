@@ -31,7 +31,7 @@ describe("LandingPage", () => {
     const router = renderApp("/");
     const page = await main();
 
-    // The title, its subtitle, then the search: the page's only heading once the sections
+    // The title, its subtitle, the search, then Register a jam: the page's only heading once the sections
     // below, which hold their place while loading, find nothing to show.
     const title = page.getByRole("heading", {
       level: 1,
@@ -42,7 +42,10 @@ describe("LandingPage", () => {
       "All of breaking, in one search",
     );
     await waitFor(() => expect(page.getAllByRole("heading")).toHaveLength(1));
-    expect(page.queryByRole("link", { name: "Register a jam" })).toBeNull();
+    expect(page.getByRole("link", { name: "Register a jam" })).toHaveAttribute(
+      "href",
+      "/org/jams/new",
+    );
     expect(document.title).toBe("BreakingJam");
 
     await userEvent.type(

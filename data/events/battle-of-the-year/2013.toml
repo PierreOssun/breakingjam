@@ -34,21 +34,21 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "pocket", b = "mat", winner = "pocket" },
-  { round = "top16", a = "issei", b = "hulk", winner = "issei" },
-  { round = "top16", a = "tonio", b = "menno", winner = "menno" },
-  { round = "top16", a = "nori", b = "lil-zoo", winner = "nori" },
-  { round = "top16", a = "slav", b = "thesis", winner = "thesis" },
-  { round = "top16", a = "wing", b = "bootuz", winner = "wing" },
-  { round = "top16", a = "lil-g", b = "titris", winner = "lil-g" },
-  { round = "top16", a = "cherry", b = "robin", winner = "robin" },
-  { round = "top8", a = "pocket", b = "issei", winner = "issei" },
-  { round = "top8", a = "menno", b = "nori", winner = "menno" },
-  { round = "top8", a = "thesis", b = "wing", winner = "thesis" },
-  { round = "top8", a = "lil-g", b = "robin", winner = "lil-g" },
-  { round = "top4", a = "issei", b = "menno", winner = "menno" },
-  { round = "top4", a = "thesis", b = "lil-g", winner = "thesis" },
-  { round = "final", a = "menno", b = "thesis", winner = "menno" },
+  { round = "top16", a = "pocket", b = "mat", winner = "pocket", video = "https://youtu.be/GfAUlksxONI" },
+  { round = "top16", a = "issei", b = "hulk", winner = "issei", video = "https://youtu.be/LUaBk6kjwEU" },
+  { round = "top16", a = "tonio", b = "menno", winner = "menno", video = "https://youtu.be/yL4ZF1GI6TU" },
+  { round = "top16", a = "nori", b = "lil-zoo", winner = "nori", video = "https://youtu.be/4gY2rGlOCGE" },
+  { round = "top16", a = "slav", b = "thesis", winner = "thesis", video = "https://youtu.be/Hfx9bbde9Ck" },
+  { round = "top16", a = "wing", b = "bootuz", winner = "wing", video = "https://youtu.be/ISe1kCkHRh0" },
+  { round = "top16", a = "lil-g", b = "titris", winner = "lil-g", video = "https://youtu.be/xev_oZwWA0A" },
+  { round = "top16", a = "cherry", b = "robin", winner = "robin", video = "https://youtu.be/3yg5dKvXwM4" },
+  { round = "top8", a = "pocket", b = "issei", winner = "issei", video = "https://youtu.be/rroYHPFszeA" },
+  { round = "top8", a = "menno", b = "nori", winner = "menno", video = "https://youtu.be/Xxv94d7mQ3Q" },
+  { round = "top8", a = "thesis", b = "wing", winner = "thesis", video = "https://youtu.be/H_hbUjwTr5o" },
+  { round = "top8", a = "lil-g", b = "robin", winner = "lil-g", video = "https://youtu.be/45T9UsicIqo" },
+  { round = "top4", a = "issei", b = "menno", winner = "menno", video = "https://youtu.be/9nmzeqL0ZlM" },
+  { round = "top4", a = "thesis", b = "lil-g", winner = "thesis", video = "https://youtu.be/ixihkgw_HGo" },
+  { round = "final", a = "menno", b = "thesis", winner = "menno", video = "https://youtu.be/X1OI10-0IAw" },
 ]
 
 [[battles]]

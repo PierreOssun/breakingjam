@@ -1,5 +1,5 @@
 //! The `data/` tool: `check` validates the files; `draft-*` draft new ones from Wikipedia or
-//! YouTube; `places` loads the GeoNames cities into the database.
+//! YouTube; `import` adds the jams to the database; `places` loads the GeoNames cities into it.
 
 use std::{
     collections::BTreeMap,
@@ -15,8 +15,12 @@ use breakingjam::dataset::{
     youtube::{self, Video},
 };
 use breakingjam::{
+    dataset::import,
     db,
-    domain::place::{NewPlace, parse_geonames_line},
+    domain::{
+        place::{NewPlace, parse_geonames_line},
+        user::Role,
+    },
 };
 
 const USAGE: &str = "usage: data check [DIR]
@@ -24,6 +28,8 @@ const USAGE: &str = "usage: data check [DIR]
        data fetch-youtube SERIES [DIR]     list the series' channel into DIR/.cache (needs YOUTUBE_API_KEY in DIR/.env)
        data draft-youtube SERIES [DIR]     draft from that list
        data search-youtube QUERY           print the videos matching QUERY, across all of YouTube (101 quota units)
+       data import OWNER_EMAIL [DIR]       add DIR's jams that no earlier import wrote to the database
+                                           (DATABASE_URL), owned by that seed_admin or admin account
        data places [FILE]                  replace the database's places (DATABASE_URL) with FILE,
                                            by default data/places/cities15000.tsv
 DIR defaults to the repository's data/.";
@@ -62,12 +68,53 @@ fn main() -> anyhow::Result<()> {
             }
             write_draft(&dir, series, youtube::draft(&videos, &record, source))
         }
+        ["import", owner, ..] if args.len() <= 3 => import_data(&dir(args.get(2)), owner),
         ["places", ..] if args.len() <= 2 => {
             let default = repo_data.join("places/cities15000.tsv");
             import_places(&args.get(1).map_or(default, PathBuf::from))
         }
         _ => bail!(USAGE),
     }
+}
+
+/// Adds the jams of `dir` that no earlier import wrote, with their dancers and crews, in one
+/// transaction; what is already there stays as the site left it.
+fn import_data(dir: &Path, owner: &str) -> anyhow::Result<()> {
+    let (data, unreadable) = dataset::load(dir);
+    dotenvy::dotenv().ok();
+    let url = std::env::var("DATABASE_URL").context("DATABASE_URL must be set")?;
+    tokio::runtime::Runtime::new()?.block_on(async {
+        let pool = sqlx::PgPool::connect(&url).await?;
+        let owner = db::users::find_credentials(&pool, owner)
+            .await?
+            .with_context(|| format!("no account {owner}: sign up with it first"))?
+            .user;
+        // The jams are past, so locked for an ordinary organiser; the team keeps them editable.
+        ensure!(
+            owner.role >= Role::SeedAdmin,
+            "{} must be a seed_admin or admin to own the jams",
+            owner.email
+        );
+        let mut tx = pool.begin().await?;
+        let imported = import::insert_all(&mut tx, &data, owner.id).await?;
+        tx.commit().await?;
+        for error in &unreadable {
+            println!("left out: {error}");
+        }
+        for why in &imported.skipped {
+            println!("left out: {why}");
+        }
+        println!(
+            "{} jams added ({} already there), {} dancers, {} crews, owned by {}; {} left out",
+            imported.events,
+            imported.events_before,
+            imported.new_dancers,
+            imported.crews,
+            owner.display_name,
+            unreadable.len() + imported.skipped.len(),
+        );
+        anyhow::Ok(())
+    })
 }
 
 /// Replaces the places of the database at `DATABASE_URL` (the environment, else `backend/.env`)

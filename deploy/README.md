@@ -107,6 +107,9 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
 13. **Email Service** (M27), before the first deploy that has the `send_email` binding: Cloudflare dashboard → Compute → Email Service → Email Sending → onboard `breakingjam.com`. The DNS is on Cloudflare, so it adds the SPF, DKIM and DMARC records itself. Both targets send as `noreply@breakingjam.com` (`FROM` in `src/mail.ts`).
     - It needs the Workers Paid plan, which the containers already need. Until the domain is onboarded, mail only reaches the account's verified addresses; new accounts start with a small daily quota that grows with good sending.
     - Optional: a WAF rate-limiting rule on `POST /api/auth/*` per IP, in front of the API's own limits (5 tries per code, one code a minute, 10 a day).
+14. **Curated jams** (`data/`), after the first deploy with `events.data_key`, and again whenever `data/` gains jams: Actions → **Import data** → Run workflow, from `uat` or `prod`, with the owner account's email. It adds the jams, dancers and crews no earlier run wrote, in one transaction, as the owner role; it never changes what is already there.
+    - **Production:** the owner is a team account, shown as the jams' organiser. Sign up with it on the site, named "BreakingJam Team", then in Neon's SQL editor: `update app_users set role = 'seed_admin' where email = '<team email>';`
+    - **UAT:** the seed already imported `data/` into its team account (`seed@breakingjam.local`); jams seeded before `events.data_key` existed have no key, so run Import data on UAT only after a fresh seed, or it adds them a second time.
 
 ## Releasing
 

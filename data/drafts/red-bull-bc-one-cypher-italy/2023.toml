@@ -1,0 +1,29 @@
+name = "Red Bull BC One Cypher Italy 2023"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Rome"
+city = "Italy"
+country = "IT"
+lat = 36.9515
+lng = 14.5279
+sources = ["https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "amaro", reached = "winner", video = "https://youtu.be/hkpuLMNQ_CA" },
+  { entrant = "pesto", reached = "top2", video = "https://youtu.be/hkpuLMNQ_CA" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "agne", reached = "winner", video = "https://youtu.be/WZTw_X-7vNQ" },
+  { entrant = "alessandrina", reached = "top2", video = "https://youtu.be/WZTw_X-7vNQ" },
+]

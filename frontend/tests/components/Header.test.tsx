@@ -109,7 +109,7 @@ describe("Header", () => {
     expect(calls(fetch)).toContain("POST /api/auth/logout");
   });
 
-  it("shows the three nav links, then language, log in and Register a jam", async () => {
+  it("shows the three nav links, then language and log in; Register a jam is on the landing", async () => {
     mockApi({ "GET /api/auth/me": LOGGED_OUT });
     renderApp("/");
     const bar = await header();
@@ -123,9 +123,7 @@ describe("Header", () => {
     expect(
       await bar.findByRole("link", { name: "Log in" }),
     ).toBeInTheDocument();
-    expect(
-      bar.getAllByRole("link", { name: "Register a jam" })[0],
-    ).toHaveAttribute("href", "/org/jams/new");
+    expect(bar.queryByRole("link", { name: "Register a jam" })).toBeNull();
     expect(bar.queryByRole("link", { name: "My jams" })).toBeNull();
   });
 

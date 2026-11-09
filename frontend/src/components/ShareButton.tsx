@@ -9,8 +9,8 @@ type ShareButtonProps = {
   title: string;
   /** What to share; the current page when unset. */
   url?: string;
-  /** `icon`: a secondary icon button (map sheet, the jam page's top bar on phones) ·
-   * `ghost`: a small text button (top bars) · `secondary`: a full button, e.g. the action bar's. */
+  /** `icon`: a secondary icon button (map sheet, the jam page's top and action bars on phones) ·
+   * `ghost`: a small text button (top bars) · `secondary`: a full button, e.g. the action card's. */
   look?: "icon" | "ghost" | "secondary";
   /** The text of `ghost` and `secondary` buttons; "Share" when unset. */
   label?: string;

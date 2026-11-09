@@ -1,0 +1,30 @@
+name = "Red Bull BC One Cypher Portugal 2024"
+starts_on = 2024-04-13
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+venue = "Hard Club"
+lat = 41.1485
+lng = -8.6110
+sources = ["https://www.record.pt/modalidades/desportos-radicais/detalhe/b-girl-vanessa-e-b-boy-deeogo-vencem-red-bull-bc-one-cypher-portugal", "https://agenda-porto.pt/en/evento/hard-club-red-bull-bc-one-cypher-portugal-2024", "https://www.theportugalnews.com/news/2024-04-12/best-breakers-competing-in-porto/87835", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "deeogo", reached = "winner", video = "https://youtu.be/eZF89FaQpAg" },
+  { entrant = "titas", reached = "top2", video = "https://youtu.be/eZF89FaQpAg" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "vanessa", reached = "winner", video = "https://youtu.be/6u6nTv58Oco" },
+  { entrant = "cat", reached = "top2", video = "https://youtu.be/6u6nTv58Oco" },
+]

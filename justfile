@@ -26,6 +26,10 @@ frontend:
 media:
     cd deploy && npx wrangler dev -c wrangler.media.jsonc
 
+# Phone screenshots (320 and 375px, light and dark) of the main pages, or of the paths given, into frontend/shots; names what runs past the screen's edge. Needs `just dev` and Chrome.
+shots *paths:
+    cd frontend && node scripts/shots.mjs {{paths}}
+
 # Backend, frontend and media bucket (Ctrl-C stops all); `uat` or `prod` runs that target's Worker, site and API container on :8787.
 dev target="": db
     #!/usr/bin/env bash

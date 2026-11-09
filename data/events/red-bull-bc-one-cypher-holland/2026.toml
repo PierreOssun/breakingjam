@@ -1,0 +1,49 @@
+name = "Red Bull BC One Cypher Holland 2026"
+starts_on = 2026-03-29
+timezone = "Europe/Amsterdam"
+city = "Rotterdam"
+country = "NL"
+venue = "Theater Rotterdam (Schouwburg)"
+lat = 51.9225
+lng = 4.4792
+sources = ["https://www.redbull.com/nl-nl/events/bc-one-cypher-holland", "https://and8.dance/en/e/5408", "https://www.theaterrotterdam.nl/agenda/red-bull-bc-one-cypher-holland-2026-l5r4", "https://and8.dance/en/e/5688", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "hd", reached = "top2", video = "https://youtu.be/o3w88pw9F7I" },
+  { entrant = "sem-delivery", reached = "top2", video = "https://youtu.be/o3w88pw9F7I" },
+  { entrant = "cyz", reached = "top4", video = "https://youtu.be/N9Xkl01GUw0" },
+  { entrant = "federico", reached = "top4", video = "https://youtu.be/u7nId-17vWA" },
+  { entrant = "brandon", reached = "top8", video = "https://youtu.be/dL0HgbNjCms" },
+  { entrant = "dimma", reached = "top8", video = "https://youtu.be/sVcoP6x53bw" },
+  { entrant = "david", reached = "top8", video = "https://youtu.be/c15bLkGXmYs" },
+  { entrant = "it", reached = "top8", video = "https://youtu.be/i4qODBqhxxM" },
+  { entrant = "d-tales", reached = "top16", video = "https://youtu.be/2y6rNih5FsU" },
+  { entrant = "black-j", reached = "top16", video = "https://youtu.be/CL4HE4BjygQ" },
+  { entrant = "dullart", reached = "top16", video = "https://youtu.be/Kk2gP0jc-3M" },
+  { entrant = "bentwood", reached = "top16", video = "https://youtu.be/XPssKS5ht_I" },
+  { entrant = "flowmer", reached = "top16", video = "https://youtu.be/gD7oXnYonuc" },
+  { entrant = "stepper", reached = "top16", video = "https://youtu.be/gQVmAAGOnoM" },
+  { entrant = "hookup", reached = "top16", video = "https://youtu.be/tOuVVLmyWQQ" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "cha-ja", reached = "top2", video = "https://youtu.be/DXe3W2lDX64" },
+  { entrant = "zoe", reached = "top2", video = "https://youtu.be/DXe3W2lDX64" },
+  { entrant = "feather", reached = "top4", video = "https://youtu.be/uaEdAsHS5aM" },
+  { entrant = "alt", reached = "top4", video = "https://youtu.be/Zc-H9LjHcuU" },
+  { entrant = "salala", reached = "top8", video = "https://youtu.be/14ofNgmB5sk" },
+  { entrant = "kat", reached = "top8", video = "https://youtu.be/cgfY3q4_Hog" },
+  { entrant = "roxanne", reached = "top8", video = "https://youtu.be/ktD96qN--p0" },
+  { entrant = "timmy", reached = "top8", video = "https://youtu.be/ru5UecicyPs" },
+]

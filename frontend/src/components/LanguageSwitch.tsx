@@ -28,9 +28,15 @@ export function LanguageSwitch() {
         onClick={() =>
           menu.toggle(LANGUAGES.findIndex((l) => l.code === current.code))
         }
-        className={buttonClasses("ghost", "sm")}
+        // Below 360px the code alone, so the header's menu button still fits.
+        className={`${buttonClasses("ghost", "sm")} max-[359px]:min-w-11 max-[359px]:px-2`}
       >
-        <Globe size={16} weight="bold" aria-hidden />
+        <Globe
+          size={16}
+          weight="bold"
+          className="max-[359px]:hidden"
+          aria-hidden
+        />
         <span>{current.code.toUpperCase()}</span>
         <CaretDown
           size={16}

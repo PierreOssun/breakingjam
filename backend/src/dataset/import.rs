@@ -18,7 +18,7 @@ use crate::{
             BattleAge, BattleFields, BattleFormat, EntryFields, EntryStatus, MatchFields,
             MatchRound, StaffRole, canonical_video,
         },
-        event::{EventFields, EventStatus},
+        event::EventFields,
     },
 };
 
@@ -27,8 +27,12 @@ use crate::{
 pub struct Imported {
     /// Jams written.
     pub events: usize,
-    /// Ids of the dancers written, by dancer key.
+    /// Jams an earlier import wrote, left as they are.
+    pub events_before: usize,
+    /// Ids of the dancers by key, written now or before.
     pub dancers: BTreeMap<String, Uuid>,
+    /// Dancers written.
+    pub new_dancers: usize,
     /// Crews written.
     pub crews: usize,
     /// Jams and battles left out, each with why.
@@ -44,6 +48,18 @@ pub enum ImportError {
     /// A jam names a dancer or crew the import didn't write; `check` should have caught it.
     #[error("{0} is not in the dataset")]
     Unknown(String),
+    /// Jams of `data/` the database already holds without a key: it was filled before jams had
+    /// keys, and writing them would show each one twice.
+    #[error(
+        "{count} jams of data/ are already in the database without a key ({first}…): it was filled \
+         before jams had keys, so import into a fresh one"
+    )]
+    AlreadyThere {
+        /// How many.
+        count: usize,
+        /// The first few, by key.
+        first: String,
+    },
 }
 
 /// Who owns the imported jams, and the ids written so far.
@@ -54,43 +70,51 @@ struct Context<'a> {
     crews: BTreeMap<String, Uuid>,
 }
 
-/// Writes every jam that passes `check`, published and owned by `organizer`; its dates say
-/// whether it is over.
+/// Writes every jam that passes `check` and no earlier import wrote, published and owned by
+/// `organizer`; its dates say whether it is over. What is already there stays as the site left it.
 pub async fn insert_all(
     conn: &mut PgConnection,
     data: &Dataset,
     organizer: Uuid,
 ) -> Result<Imported, ImportError> {
+    let before: BTreeSet<String> = db::dataset::event_keys(conn).await?.into_iter().collect();
     let errors = check(data).errors;
-    let (events, skipped) = importable(data, &errors);
-    let (dancer_keys, crew_keys) = needed(data, &events, &errors);
+    let (events, skipped) = importable(data, &errors, &before);
+    refuse_unkeyed(conn, data, &events).await?;
     let mut cx = Context {
         data,
         organizer,
-        dancers: BTreeMap::new(),
-        crews: BTreeMap::new(),
+        dancers: db::dataset::dancer_keys(conn).await?,
+        crews: db::dataset::crew_keys(conn).await?,
+    };
+    let (dancer_keys, crew_keys) = needed(data, &events, &errors, &cx.dancers);
+    let mut imported = Imported {
+        skipped,
+        events_before: data.events.keys().filter(|k| before.contains(*k)).count(),
+        ..Imported::default()
     };
     for key in crew_keys {
-        cx.crews.insert(
-            key.to_owned(),
-            db::dataset::insert_crew(conn, &data.crews[key]).await?,
-        );
+        if cx.crews.contains_key(key) {
+            continue;
+        }
+        let id = db::dataset::insert_crew(conn, key, &data.crews[key]).await?;
+        cx.crews.insert(key.to_owned(), id);
+        imported.crews += 1;
     }
     for key in dancer_keys {
+        if cx.dancers.contains_key(key) {
+            continue;
+        }
         let dancer = &data.dancers[key];
         let id = db::dataset::insert_dancer(conn, key, dancer, organizer).await?;
         for crew in dancer.crews.iter().filter_map(|crew| cx.crews.get(crew)) {
             db::dataset::add_membership(conn, id, *crew).await?;
         }
         cx.dancers.insert(key.to_owned(), id);
+        imported.new_dancers += 1;
     }
-    let mut imported = Imported {
-        skipped,
-        crews: cx.crews.len(),
-        ..Imported::default()
-    };
     for key in &events {
-        match insert_event(conn, &data.events[*key], &cx).await? {
+        match insert_event(conn, key, &cx).await? {
             Written::Event { skipped_battles } => {
                 imported.events += 1;
                 imported
@@ -104,15 +128,48 @@ pub async fn insert_all(
     Ok(imported)
 }
 
-/// The jams with no broken rule, naming no dancer or crew with one; the others, with why.
-fn importable<'a>(data: &'a Dataset, problems: &[Problem]) -> (Vec<&'a str>, Vec<String>) {
+/// Refuses jams the database already holds without a key, found by name and first day, rather
+/// than write them twice.
+async fn refuse_unkeyed(
+    conn: &mut PgConnection,
+    data: &Dataset,
+    events: &[&str],
+) -> Result<(), ImportError> {
+    let unkeyed: BTreeSet<_> = db::dataset::unkeyed_events(conn)
+        .await?
+        .into_iter()
+        .collect();
+    let twice: Vec<&str> = events
+        .iter()
+        .copied()
+        .filter(|key| {
+            let event = &data.events[*key];
+            unkeyed.contains(&(event.name.trim().to_owned(), event.starts_on))
+        })
+        .collect();
+    match twice.len() {
+        0 => Ok(()),
+        count => Err(ImportError::AlreadyThere {
+            count,
+            first: twice[..count.min(3)].join(", "),
+        }),
+    }
+}
+
+/// The jams not written `before`, with no broken rule and naming no dancer or crew with one; the
+/// others not written before, with why.
+fn importable<'a>(
+    data: &'a Dataset,
+    problems: &[Problem],
+    before: &BTreeSet<String>,
+) -> (Vec<&'a str>, Vec<String>) {
     let (bad_events, bad_dancers, bad_crews) = (
         broken(problems, Kind::Event),
         broken(problems, Kind::Dancer),
         broken(problems, Kind::Crew),
     );
     let (mut events, mut skipped) = (Vec::new(), Vec::new());
-    for (key, event) in &data.events {
+    for (key, event) in data.events.iter().filter(|(key, _)| !before.contains(*key)) {
         let bad_dancer = dancers_of(event).find(|d| bad_dancers.contains(d));
         let bad_crew = crews_of(data, event).find(|c| bad_crews.contains(c));
         match (bad_events.contains(key.as_str()), bad_dancer, bad_crew) {
@@ -134,12 +191,14 @@ fn broken(problems: &[Problem], kind: Kind) -> BTreeSet<&str> {
         .collect()
 }
 
-/// Every dancer of `dancers.toml`, in a jam or not, and the crews the jams' teams and those
-/// dancers name; none that breaks a rule.
+/// Every dancer of `dancers.toml`, in a jam or not, and the crews that `events`' teams and the
+/// dancers not yet `known` name; none that breaks a rule. A known dancer's crews aren't, so a crew
+/// isn't written without the membership or entry that names it.
 fn needed<'a>(
     data: &'a Dataset,
     events: &[&str],
     problems: &[Problem],
+    known: &BTreeMap<String, Uuid>,
 ) -> (BTreeSet<&'a str>, BTreeSet<&'a str>) {
     let (bad_dancers, bad_crews) = (broken(problems, Kind::Dancer), broken(problems, Kind::Crew));
     let dancers: BTreeSet<&str> = data
@@ -159,6 +218,7 @@ fn needed<'a>(
         });
     let members = dancers
         .iter()
+        .filter(|key| !known.contains_key(**key))
         .flat_map(|key| &data.dancers[*key].crews)
         .map(String::as_str)
         .filter(|crew| data.crews.contains_key(*crew) && !bad_crews.contains(crew));
@@ -215,12 +275,13 @@ enum Written {
     Refused(String),
 }
 
-/// Writes one jam with its staff and battles, unless the API's rules refuse it.
+/// Writes the jam of `key` with its staff and battles, unless the API's rules refuse it.
 async fn insert_event(
     conn: &mut PgConnection,
-    event: &EventRecord,
+    key: &str,
     cx: &Context<'_>,
 ) -> Result<Written, ImportError> {
+    let event = &cx.data.events[key];
     let fields = event_fields(event);
     if let Err(errors) = fields.validate() {
         return Ok(Written::Refused(format!(
@@ -237,7 +298,7 @@ async fn insert_event(
     let id = db::events::insert(&mut *conn, Uuid::now_v7(), cx.organizer, &fields)
         .await?
         .id;
-    db::dataset::set_status(conn, id, EventStatus::Published).await?;
+    db::dataset::publish_imported(conn, id, key).await?;
     for (role, keys) in [
         (StaffRole::Judge, &event.judges),
         (StaffRole::Mc, &event.mcs),
@@ -391,11 +452,14 @@ fn entry(
             let crew_name = crew
                 .and_then(|c| cx.data.crews.get(c))
                 .map(|c| c.name.clone());
-            let members = team
+            let mut members: Vec<Uuid> = team
                 .members
                 .iter()
                 .map(|m| dancer_id(cx, m))
                 .collect::<Result<_, _>>()?;
+            // Two keys merged into one page on the site are one member.
+            let mut seen = BTreeSet::new();
+            members.retain(|id| seen.insert(*id));
             (
                 team.name.clone().or(crew_name),
                 crew.and_then(|c| cx.crews.get(c)).copied(),

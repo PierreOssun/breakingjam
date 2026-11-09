@@ -10,7 +10,7 @@ data/
   events/<series>/<edition>.toml    # one jam per file, e.g. events/red-bull-bc-one/2019.toml
 ```
 
-The dev seed (`cargo run --bin seed`, from `backend/`) imports every jam here that passes `check`, so fixing a file brings its jam into local and UAT data.
+The dev seed (`cargo run --bin seed`, from `backend/`) imports every jam here that passes `check` into a fresh local or UAT database. Production gets them through the **Import data** workflow (`cargo run --bin data -- import OWNER_EMAIL`), which adds only the jams, dancers and crews no earlier run wrote: a new file reaches a database that already has the others, but a fix to a jam already imported does not (fix it on the site, as the team).
 
 Check everything, as CI does:
 
@@ -207,7 +207,7 @@ Drafted from Wikipedia on 2026-10-19. The 22 World Finals from 2004 to 2025 have
 - **Still open:**
   - the countries of 2005's DJ Ace and DJ Billy Brown;
   - whether bgirl Mess is Dutch or Russian (flagged both ways);
-  - no videos yet.
+  - videos for 43 of 437 battles, mostly 2004–2010 and the 2022 and 2025 b-girl brackets (`reports/battle-videos.md`).
 
 ## DPC Jam and Battle of Sun
 
@@ -282,3 +282,18 @@ Drafted from YouTube on 2026-10-19.
 - **The main battle is drafted as a crew battle,** with 1v1, bgirl and kids beside it.
 - **Formats changed over the years** (3v3, 2v2 bgirl in 2025…), and many videos are missing, so expect the most review here.
 - **City:** unknown.
+
+## Groove Session
+
+Harvested on 2026-11-09 from the battle videos of the organiser, New Dance TV, LawkSam and stance (`reports/groove-session.md`). Neuchâtel, 2017–2026; no edition in 2020 or 2021, and 2026 was the last.
+
+- **What's there:** the 2v2 kid & adult, each duo a star and a kid drawn at random, every year; the crew battle from 2022. Full brackets with every video for 2017, 2018 and 2023–2026; placings with videos for the 2019 and 2022 2v2s and the 2022 crew battle.
+- **Still open:** the 2022 crew champion; the two missing top 16 videos; judges of 2023, 2025 and 2026; crew members; the 2016 edition.
+
+## Red Bull BC One Cyphers: Italy, Spain, Portugal, Belgium, Germany, Holland, UK
+
+Harvested on 2026-11-09, 2018–2026 (`reports/red-bull-bc-one-cyphers.md`). Luxembourg has no Cypher.
+
+- **What's there:** 34 jams; full brackets where every battle was filmed (Belgium 2024–2026, Holland 2019, top 4 brackets for most 2018–2021 editions), otherwise the finalists and semi-finalists with their videos.
+- **Drafts:** 17 editions whose date or city rests on one source are in `data/drafts/`, battles included; confirm the missing fact and move them.
+- **Still open:** Spain 2022's b-boy champion (Grazy or Minijoe), the champions listed as single-source in the report, and every judge, MC and DJ.

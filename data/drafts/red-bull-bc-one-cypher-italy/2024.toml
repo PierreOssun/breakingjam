@@ -1,0 +1,29 @@
+name = "Red Bull BC One Cypher Italy 2024"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Rome"
+city = "Italy"
+country = "IT"
+lat = 36.9515
+lng = 14.5279
+sources = ["https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "lele", reached = "winner", video = "https://youtu.be/5yCfRBevHnk" },
+  { entrant = "snap", reached = "top2", video = "https://youtu.be/5yCfRBevHnk" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "agne", reached = "winner", video = "https://youtu.be/5CB5BBkHpdE" },
+  { entrant = "anti", reached = "top2", video = "https://youtu.be/5CB5BBkHpdE" },
+]

@@ -5,7 +5,7 @@ city = "Banská Bystrica"
 country = "SK"
 lat = 48.7354
 lng = 19.1457
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
 judges = ["lamine", "el-nino", "nasty-ray"]
 mcs = ["mario-bee", "lil-pablo", "mex-one"]
 djs = ["lean-rock", "renegade", "woo-d", "piggo"]
@@ -14,8 +14,15 @@ djs = ["lean-rock", "renegade", "woo-d", "piggo"]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "movie-one", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "emilka", b = "movie-one", winner = "movie-one", video = "https://youtu.be/l0LMosJ_BOI" },
+  { round = "top8", a = "tanya", b = "kim-bgirl", winner = "kim-bgirl", video = "https://youtu.be/AHlY26oWuNg" },
+  { round = "top8", a = "tamala", b = "zofia", winner = "zofia", video = "https://youtu.be/Kf6kHi9EAHQ" },
+  { round = "top8", a = "nadia", b = "belka", winner = "nadia", video = "https://youtu.be/v3U96NLA1wk" },
+  { round = "top4", a = "nadia", b = "zofia", winner = "nadia", video = "https://youtu.be/ME6-6R1rArY" },
+  { round = "top4", a = "movie-one", b = "kim-bgirl", winner = "movie-one", video = "https://youtu.be/URbNCIoNz1s" },
+  { round = "final", a = "nadia", b = "movie-one", winner = "movie-one", video = "https://youtu.be/Me6nuIP93wQ" },
 ]
 
 [[battles]]
@@ -23,9 +30,23 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "blanka-neguin", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "step-one-sto-ballov", b = "intact-pluto", winner = "intact-pluto", video = "https://youtu.be/DujDk0_DdtY" },
+  { round = "top8", a = "beetle-joystick", b = "chuchu-kleju", winner = "beetle-joystick", video = "https://youtu.be/Nhy-cXQbk2w" },
+  { round = "top8", a = "crash-tematic", b = "greku-yarko", winner = "greku-yarko", video = "https://youtu.be/Tkf56ZIpjwE" },
+  { round = "top8", a = "blanka-neguin", b = "dwelz-vicious", winner = "blanka-neguin", video = "https://youtu.be/lvLHZerpo14" },
+  { round = "top4", a = "beetle-joystick", b = "intact-pluto", winner = "intact-pluto", video = "https://youtu.be/oO0IDAhdVXY" },
+  { round = "top4", a = "blanka-neguin", b = "greku-yarko", winner = "blanka-neguin", video = "https://youtu.be/vSKUGRjv_DY" },
+  { round = "final", a = "blanka-neguin", b = "intact-pluto", winner = "blanka-neguin", video = "https://youtu.be/aaA78Dd8Ry4" },
 ]
 
 [battles.teams]
+beetle-joystick = { members = ["beetle", "joystick"] }
 blanka-neguin = { members = ["neguin", "blanka"] }
+chuchu-kleju = { members = ["kleju", "chuchu"] }
+crash-tematic = { members = ["crash", "tematic"] }
+dwelz-vicious = { members = ["dwelz", "vicious"] }
+greku-yarko = { members = ["yarko", "greku"] }
+intact-pluto = { members = ["intact", "pluto"] }
+step-one-sto-ballov = { members = ["step-one", "sto-ballov"] }

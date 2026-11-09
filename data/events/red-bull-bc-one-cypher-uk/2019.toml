@@ -1,0 +1,34 @@
+name = "Red Bull BC One Cypher UK 2019"
+starts_on = 2019-04-13
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+venue = "Village Underground"
+lat = 51.5085
+lng = -0.1257
+sources = ["https://and8.dance/en/e/3619", "https://www.iamhiphopmagazine.com/?p=13756", "https://and8.dance/en/a/J6QA", "https://redbull.com/id-id/b-girl-vanessa-career-portrait", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "infante", b = "jackson", winner = "jackson", video = "https://youtu.be/FU5d4X2wmR0" },
+  { round = "top4", a = "sheku", b = "izaak", winner = "izaak", video = "https://youtu.be/sZBdyQ0E_oc" },
+  { round = "final", a = "jackson", b = "izaak", winner = "jackson", video = "https://youtu.be/a8qoG7N96NU" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "munirat", b = "vanessa", winner = "vanessa", video = "https://youtu.be/pEO58HNGcIQ" },
+  { round = "top4", a = "rawgina", b = "shortbread", winner = "rawgina", video = "https://youtu.be/63a1RKJ8fek" },
+  { round = "final", a = "rawgina", b = "vanessa", winner = "vanessa", video = "https://youtu.be/MuJ6WZ4xgLo" },
+]

@@ -1,0 +1,29 @@
+name = "Red Bull BC One Cypher Holland 2024"
+starts_on = 2024-03-24
+timezone = "Europe/Amsterdam"
+city = "Holland"
+country = "NL"
+lat = 52.5125
+lng = 6.0944
+sources = ["https://nz.trip.com/events/red-bull-bc-one-cypher-holland-20240219", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "shinshan", reached = "winner", video = "https://youtu.be/_2GAKjOPukE" },
+  { entrant = "redo", reached = "top2", video = "https://youtu.be/_2GAKjOPukE" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "alicia", reached = "winner", video = "https://youtu.be/VU5ec9zoPdA" },
+  { entrant = "zoe", reached = "top2", video = "https://youtu.be/VU5ec9zoPdA" },
+]

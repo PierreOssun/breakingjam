@@ -1,0 +1,28 @@
+name = "Red Bull BC One Cypher Holland 2022"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Amsterdam"
+city = "Holland"
+country = "NL"
+lat = 52.5125
+lng = 6.0944
+sources = ["https://and8.dance/en/a/J4ZD", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "ozzi", reached = "winner", video = "https://youtu.be/cooqNn_m6ZI" },
+  { entrant = "kid-colombia", reached = "top2", video = "https://youtu.be/cooqNn_m6ZI" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "cha-ja", reached = "winner" },
+]

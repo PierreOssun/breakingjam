@@ -1,0 +1,80 @@
+name = "Groove Session 2025"
+starts_on = 2025-09-13
+ends_on = 2025-09-14
+timezone = "Europe/Zurich"
+city = "Neuchâtel"
+country = "CH"
+venue = "Halle de la Riveraine"
+lat = 46.9918
+lng = 6.9310
+sources = ["https://www.j3l.ch/en/P40755", "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw", "https://www.youtube.com/channel/UCzpSzFXLLX0cg8ZC_B4ELiw"]
+judges = []
+mcs = []
+djs = ["dj-nobunaga", "dj-khanfu"]
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "stray-path", b = "3-16", winner = "3-16", video = "https://youtu.be/4OeqJRCNGj8" },
+  { round = "top8", a = "stranger-thingz", b = "flipside-technique", winner = "flipside-technique", video = "https://youtu.be/5iwGiCrirR8" },
+  { round = "top8", a = "dancing-for-love", b = "predatorz", winner = "predatorz", video = "https://youtu.be/iEPj_c68A4I" },
+  { round = "top8", a = "antithesis-x-vissick-stylez", b = "against-all-odds", winner = "antithesis-x-vissick-stylez", video = "https://youtu.be/zvY5r7j2uus" },
+  { round = "top4", a = "3-16", b = "flipside-technique", winner = "flipside-technique", video = "https://youtu.be/Z_a5BsL4hT4" },
+  { round = "top4", a = "antithesis-x-vissick-stylez", b = "predatorz", winner = "predatorz", video = "https://youtu.be/yv29uqt_2mg" },
+  { round = "final", a = "flipside-technique", b = "predatorz", winner = "predatorz", video = "https://youtu.be/0BJDoKqD6KI" },
+]
+
+[battles.teams]
+3-16 = { crew = "3-16" }
+against-all-odds = { crew = "against-all-odds" }
+antithesis-x-vissick-stylez = { crew = "antithesis-x-vissick-stylez" }
+dancing-for-love = { crew = "dancing-for-love" }
+flipside-technique = { crew = "flipside-technique" }
+predatorz = { crew = "predatorz" }
+stranger-thingz = { crew = "stranger-thingz" }
+stray-path = { crew = "stray-path" }
+
+[[battles]]
+key = "2v2"
+name = "2v2 Kid & Adult"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "allef-zixin", b = "neo-undr", winner = "allef-zixin", video = "https://youtu.be/Guvyt0gzRPU" },
+  { round = "top16", a = "lee-third-bro", b = "purple-carolinho", winner = "lee-third-bro", video = "https://youtu.be/xkbDZHzw2DU" },
+  { round = "top16", a = "wingzero-nora-leah", b = "cyz-angela", winner = "cyz-angela", video = "https://youtu.be/rF_MFQ0TWJE" },
+  { round = "top16", a = "nelzwon-shuji", b = "phumlailai-minix", winner = "nelzwon-shuji", video = "https://youtu.be/CBhj6AH2cjo" },
+  { round = "top16", a = "lotus-soul-tim", b = "ziprock-seigo", winner = "lotus-soul-tim", video = "https://youtu.be/cC1vqwHRfkE" },
+  { round = "top16", a = "noneski-eph", b = "ronnie-ruen-tnt", winner = "ronnie-ruen-tnt", video = "https://youtu.be/mQBlZ0H37Dw" },
+  { round = "top16", a = "ichigo-thaumas", b = "philip-buch", winner = "ichigo-thaumas", video = "https://youtu.be/4rBaZwbdgYM" },
+  { round = "top16", a = "dias-niu-niu", b = "royal-cesar", winner = "dias-niu-niu", video = "https://youtu.be/KxDh5Te3_RM" },
+  { round = "top8", a = "allef-zixin", b = "lee-third-bro", winner = "lee-third-bro", video = "https://youtu.be/S-H85PTm0VE" },
+  { round = "top8", a = "cyz-angela", b = "nelzwon-shuji", winner = "nelzwon-shuji", video = "https://youtu.be/T_s86zuOtgs" },
+  { round = "top8", a = "lotus-soul-tim", b = "ronnie-ruen-tnt", winner = "ronnie-ruen-tnt", video = "https://youtu.be/X973cybX248" },
+  { round = "top8", a = "ichigo-thaumas", b = "dias-niu-niu", winner = "dias-niu-niu", video = "https://youtu.be/t4fjqyAI4Os" },
+  { round = "top4", a = "nelzwon-shuji", b = "lee-third-bro", winner = "lee-third-bro", video = "https://youtu.be/qLYU6u9ZLj4" },
+  { round = "top4", a = "ronnie-ruen-tnt", b = "dias-niu-niu", winner = "dias-niu-niu", video = "https://youtu.be/6lrNqCoaGxo" },
+  { round = "final", a = "lee-third-bro", b = "dias-niu-niu", winner = "dias-niu-niu", video = "https://youtu.be/p79-Y-s78oQ" },
+]
+
+[battles.teams]
+allef-zixin = { members = ["allef", "zixin"] }
+cyz-angela = { members = ["cyz", "angela"] }
+dias-niu-niu = { members = ["dias", "niu-niu"] }
+ichigo-thaumas = { members = ["ichigo", "thaumas"] }
+lee-third-bro = { members = ["lee", "third-bro"] }
+lotus-soul-tim = { members = ["lotus", "soul-tim"] }
+nelzwon-shuji = { members = ["nelzwon", "shuji"] }
+neo-undr = { members = ["neo", "undr"] }
+noneski-eph = { members = ["noneski", "eph"] }
+philip-buch = { members = ["philip", "buch"] }
+phumlailai-minix = { members = ["phumlailai", "minix"] }
+purple-carolinho = { members = ["purple", "carolinho"] }
+ronnie-ruen-tnt = { members = ["ronnie-ruen", "tnt"] }
+royal-cesar = { members = ["royal", "cesar"] }
+wingzero-nora-leah = { members = ["wingzero", "nora-leah"] }
+ziprock-seigo = { members = ["ziprock", "seigo"] }

@@ -1,0 +1,80 @@
+name = "Groove Session 2022"
+starts_on = 2022-10-21
+ends_on = 2022-10-23
+timezone = "Europe/Zurich"
+city = "Neuchâtel"
+country = "CH"
+venue = "Halle de la Riveraine"
+lat = 46.9918
+lng = 6.9310
+sources = ["https://and8.dance/de/e/4035", "https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA"]
+judges = ["born", "stripes"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "crew"
+name = "Crew battle"
+gender = "mixed"
+# The final's winner was not found.
+results = [
+  { entrant = "from-downtown", reached = "top2", video = "https://youtu.be/xwy1wt4CBA8" },
+  { entrant = "style-invaders", reached = "top2", video = "https://youtu.be/xwy1wt4CBA8" },
+  { entrant = "rivers-crew", reached = "top4", video = "https://youtu.be/27lMghB7_UY" },
+  { entrant = "five-guys", reached = "top4", video = "https://youtu.be/TjuPp7L1ZQg" },
+  { entrant = "swiss-knife-crew", reached = "top8", video = "https://youtu.be/QUgppAXfe4c" },
+  { entrant = "dangerous-crew", reached = "top8", video = "https://youtu.be/DwdPa3JKxqA" },
+  { entrant = "style-matters", reached = "top8", video = "https://youtu.be/ojX0gW-pNFQ" },
+  { entrant = "killjoys", reached = "top8", video = "https://youtu.be/w00FdqmcITU" },
+]
+
+[battles.teams]
+dangerous-crew = { crew = "dangerous-crew" }
+five-guys = { crew = "five-guys" }
+from-downtown = { crew = "from-downtown" }
+killjoys = { crew = "killjoys" }
+rivers-crew = { crew = "rivers-crew" }
+style-invaders = { crew = "style-invaders" }
+style-matters = { crew = "style-matters" }
+swiss-knife-crew = { crew = "swiss-knife-crew" }
+
+[[battles]]
+key = "2v2"
+name = "2v2 Kid & Adult"
+gender = "mixed"
+team_size = 2
+# One top 16 battle (Kastet & Smail Devil's) has no video, so the bracket is incomplete.
+results = [
+  { entrant = "hijack-maloy", reached = "winner", video = "https://youtu.be/q0YpWHllubY" },
+  { entrant = "kae-petaira", reached = "top2", video = "https://youtu.be/q0YpWHllubY" },
+  { entrant = "nord-diamond-hulk", reached = "top4", video = "https://youtu.be/sw1rS7JvUy0" },
+  { entrant = "kastet-smail-devil", reached = "top4", video = "https://youtu.be/vDhoX3PO_0k" },
+  { entrant = "point-danger", reached = "top8", video = "https://youtu.be/2_e6OMWj3os" },
+  { entrant = "metal-wato", reached = "top8", video = "https://youtu.be/GyD-GhaZJ-Y" },
+  { entrant = "phil-nana", reached = "top8", video = "https://youtu.be/JFTkZ5A9Fco" },
+  { entrant = "mixar-gera", reached = "top8", video = "https://youtu.be/w-BmOOdsV1k" },
+  { entrant = "hd-eliam", reached = "top16", video = "https://youtu.be/-daMjuSATuo" },
+  { entrant = "neo-soul-tim", reached = "top16", video = "https://youtu.be/MrhsTWjoAfs" },
+  { entrant = "pashker-naborito", reached = "top16", video = "https://youtu.be/cOsVVdVXWYo" },
+  { entrant = "laziness-phil-one", reached = "top16", video = "https://youtu.be/cxkQS8hwVZY" },
+  { entrant = "timbo-izzy-monkey", reached = "top16", video = "https://youtu.be/d2OSHq-O-uM" },
+  { entrant = "madmax-king-king", reached = "top16", video = "https://youtu.be/dVoXPphaEwQ" },
+  { entrant = "epiks-denver", reached = "top16", video = "https://youtu.be/vHus8SFeM04" },
+]
+
+[battles.teams]
+epiks-denver = { members = ["epiks", "denver"] }
+hd-eliam = { members = ["hd", "eliam"] }
+hijack-maloy = { members = ["hijack", "maloy"] }
+kae-petaira = { members = ["kae", "petaira"] }
+kastet-smail-devil = { members = ["kastet", "smail-devil"] }
+laziness-phil-one = { members = ["laziness", "phil-one"] }
+madmax-king-king = { members = ["madmax", "king-king"] }
+metal-wato = { members = ["metal", "wato"] }
+mixar-gera = { members = ["mixar", "gera"] }
+neo-soul-tim = { members = ["neo", "soul-tim"] }
+nord-diamond-hulk = { members = ["nord-diamond", "hulk"] }
+pashker-naborito = { members = ["pashker", "naborito"] }
+phil-nana = { members = ["phil", "nana"] }
+point-danger = { members = ["point", "danger"] }
+timbo-izzy-monkey = { members = ["timbo", "izzy-monkey"] }

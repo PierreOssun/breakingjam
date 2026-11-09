@@ -1,0 +1,43 @@
+name: Import data
+
+# Adds the curated past jams of data/ to a target's database, with their dancers and crews: the
+# ones no earlier run wrote, in one transaction. What is already there stays as the site left it,
+# so run it by hand from `uat` or `prod` (Actions → Import data → Run workflow) whenever data/
+# gains jams. The owner account must exist and be a seed_admin or admin (deploy/README.md).
+on:
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: "Email of the account that owns the jams (the team's)"
+        required: true
+
+# Shares the target's deploy group: never imports while a deploy migrates.
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: github.ref_name == 'uat' || github.ref_name == 'prod'
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # Queries compile against the committed .sqlx data, not the database.
+      SQLX_OFFLINE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      # rust-toolchain.toml pins the version; rustup installs it on first use.
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - name: Import the jams
+        env:
+          # The owner role, as for migrations.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Through the environment, never pasted into the script.
+          OWNER: ${{ inputs.owner }}
+        run: cargo run --release --bin data -- import "$OWNER"

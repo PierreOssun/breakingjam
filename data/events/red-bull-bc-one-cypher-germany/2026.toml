@@ -1,0 +1,31 @@
+name = "Red Bull BC One Cypher Germany 2026"
+starts_on = 2026-03-28
+ends_on = 2026-03-29
+timezone = "Europe/Berlin"
+city = "Berlin"
+country = "DE"
+venue = "Kesselhaus in der Kulturbrauerei"
+lat = 52.5244
+lng = 13.4105
+sources = ["https://www.redbull.com/de-de/events/red-bull-bc-one-germany", "https://and8.dance/en/e/5325", "https://and8.dance/en/e/5688", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "flo", reached = "winner" },
+  { entrant = "vic", reached = "top2" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "vinilla", reached = "winner" },
+  { entrant = "sanam", reached = "top2" },
+]

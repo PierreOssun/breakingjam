@@ -17,13 +17,13 @@ name = "Crew battle"
 gender = "mixed"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "5-crew-dynasty", b = "originals", winner = "originals" },
-  { round = "top8", a = "smac-19", b = "morning-of-owl", winner = "morning-of-owl" },
+  { round = "top8", a = "5-crew-dynasty", b = "originals", winner = "originals", video = "https://youtu.be/iMkae6tpW5Q" },
+  { round = "top8", a = "smac-19", b = "morning-of-owl", winner = "morning-of-owl", video = "https://youtu.be/Q2EsLEMs6mA" },
   { round = "top8", a = "the-ruggeds", b = "massive-monkeys", winner = "the-ruggeds" },
-  { round = "top8", a = "rain-crew", b = "flooriorz", winner = "flooriorz" },
-  { round = "top4", a = "originals", b = "morning-of-owl", winner = "morning-of-owl" },
-  { round = "top4", a = "the-ruggeds", b = "flooriorz", winner = "flooriorz" },
-  { round = "final", a = "morning-of-owl", b = "flooriorz", winner = "morning-of-owl" },
+  { round = "top8", a = "rain-crew", b = "flooriorz", winner = "flooriorz", video = "https://youtu.be/KqMESsfxc7s" },
+  { round = "top4", a = "originals", b = "morning-of-owl", winner = "morning-of-owl", video = "https://youtu.be/YRMjJphtuiI" },
+  { round = "top4", a = "the-ruggeds", b = "flooriorz", winner = "flooriorz", video = "https://youtu.be/CY0Wnb6kZQA" },
+  { round = "final", a = "morning-of-owl", b = "flooriorz", winner = "morning-of-owl", video = "https://youtu.be/LehAisCMqhY" },
 ]
 
 [battles.teams]
@@ -42,21 +42,21 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "menno", b = "heavy-haiku", winner = "menno" },
-  { round = "top16", a = "sunni", b = "apache", winner = "sunni" },
+  { round = "top16", a = "menno", b = "heavy-haiku", winner = "menno", video = "https://youtu.be/dIHZpvAGIJc" },
+  { round = "top16", a = "sunni", b = "apache", winner = "sunni", video = "https://youtu.be/LnpvTRnSQBE" },
   { round = "top16", a = "ryuichu", b = "honza", winner = "honza" },
-  { round = "top16", a = "gravity", b = "wen", winner = "gravity" },
-  { round = "top16", a = "pluto", b = "hamza", winner = "pluto" },
-  { round = "top16", a = "lussy-sky", b = "thesis", winner = "lussy-sky" },
-  { round = "top16", a = "taisuke", b = "tazzmanio", winner = "taisuke" },
-  { round = "top16", a = "nasty-ray", b = "katsuya", winner = "nasty-ray" },
-  { round = "top8", a = "menno", b = "sunni", winner = "menno" },
-  { round = "top8", a = "honza", b = "gravity", winner = "gravity" },
-  { round = "top8", a = "pluto", b = "lussy-sky", winner = "pluto" },
-  { round = "top8", a = "taisuke", b = "nasty-ray", winner = "taisuke" },
-  { round = "top4", a = "menno", b = "gravity", winner = "menno" },
-  { round = "top4", a = "pluto", b = "taisuke", winner = "taisuke" },
-  { round = "final", a = "menno", b = "taisuke", winner = "menno" },
+  { round = "top16", a = "gravity", b = "wen", winner = "gravity", video = "https://youtu.be/1AyO_JcxvOA" },
+  { round = "top16", a = "pluto", b = "hamza", winner = "pluto", video = "https://youtu.be/KvmXUVwxHko" },
+  { round = "top16", a = "lussy-sky", b = "thesis", winner = "lussy-sky", video = "https://youtu.be/pS1k4LgFaTE" },
+  { round = "top16", a = "taisuke", b = "tazzmanio", winner = "taisuke", video = "https://youtu.be/t-QoKfuN_QU" },
+  { round = "top16", a = "nasty-ray", b = "katsuya", winner = "nasty-ray", video = "https://youtu.be/l8J5PcGjdjY" },
+  { round = "top8", a = "menno", b = "sunni", winner = "menno", video = "https://youtu.be/5Dx7Mo4QOdY" },
+  { round = "top8", a = "honza", b = "gravity", winner = "gravity", video = "https://youtu.be/qYbzX9jPhns" },
+  { round = "top8", a = "pluto", b = "lussy-sky", winner = "pluto", video = "https://youtu.be/4OYfLFK5cBY" },
+  { round = "top8", a = "taisuke", b = "nasty-ray", winner = "taisuke", video = "https://youtu.be/EFAvvZ35NME" },
+  { round = "top4", a = "menno", b = "gravity", winner = "menno", video = "https://youtu.be/zVg-_0RIo9w" },
+  { round = "top4", a = "pluto", b = "taisuke", winner = "taisuke", video = "https://youtu.be/Boyk9vn2fzk" },
+  { round = "final", a = "menno", b = "taisuke", winner = "menno", video = "https://youtu.be/W1ORCKUofOk" },
 ]
 
 [[battles]]

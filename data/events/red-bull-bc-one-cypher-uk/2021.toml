@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher UK 2021"
+starts_on = 2021-08-08
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+lat = 51.5085
+lng = -0.1257
+sources = ["https://sportsgazette.co.uk/?p=33399", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "magic", b = "aj-the-cypher-cat", winner = "aj-the-cypher-cat", video = "https://youtu.be/zvqzl0cMiAI" },
+  { round = "top4", a = "lb", b = "sheku", winner = "sheku", video = "https://youtu.be/zvqzl0cMiAI", at = 188 },
+  { round = "final", a = "sheku", b = "aj-the-cypher-cat", winner = "sheku", video = "https://youtu.be/x7uVCh6piLw" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "shortbread", b = "stefani", winner = "stefani", video = "https://youtu.be/dHR-X2dElTg" },
+  { round = "top4", a = "labyrinth", b = "fidget", winner = "fidget", video = "https://youtu.be/dHR-X2dElTg", at = 190 },
+  { round = "final", a = "stefani", b = "fidget", winner = "stefani", video = "https://youtu.be/zWqBW3l-LIE" },
+]

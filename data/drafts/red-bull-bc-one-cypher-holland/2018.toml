@@ -1,0 +1,34 @@
+name = "Red Bull BC One Cypher Holland 2018"
+starts_on = 2018-08-11
+timezone = "Europe/Amsterdam"
+city = "Holland"
+country = "NL"
+lat = 52.5125
+lng = 6.0944
+sources = ["https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "open"
+name = "1v1 Open"
+gender = "mixed"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "conni", b = "rawneal", winner = "conni", video = "https://youtu.be/OtahgwclgMQ" },
+  { round = "top16", a = "finn", b = "arjuna", winner = "arjuna", video = "https://youtu.be/dUEkp9rLrc8" },
+  { round = "top16", a = "guus", b = "oniz", winner = "guus", video = "https://youtu.be/cf1GMpAPPY8" },
+  { round = "top16", a = "kenji", b = "marciano", winner = "kenji", video = "https://youtu.be/67ZW01ZvwiQ" },
+  { round = "top16", a = "nazgul", b = "joey", winner = "nazgul", video = "https://youtu.be/ClT0Qw1MMVs" },
+  { round = "top16", a = "ozzi", b = "daryl", winner = "ozzi", video = "https://youtu.be/uIoAGmtDoPE" },
+  { round = "top16", a = "shane", b = "neal", winner = "shane", video = "https://youtu.be/TmqRqE2GKGs" },
+  { round = "top16", a = "tim", b = "alicia", winner = "tim", video = "https://youtu.be/shfQxG9uu0s" },
+  { round = "top8", a = "arjuna", b = "guus", winner = "arjuna", video = "https://youtu.be/2QOPUksJ8HY" },
+  { round = "top8", a = "conni", b = "kenji", winner = "conni", video = "https://youtu.be/eahriguiXdk" },
+  { round = "top8", a = "shane", b = "nazgul", winner = "shane", video = "https://youtu.be/79wJ8C5M3pg" },
+  { round = "top8", a = "tim", b = "ozzi", winner = "ozzi", video = "https://youtu.be/s3uoLYroXnI" },
+  { round = "top4", a = "shane", b = "ozzi", winner = "ozzi", video = "https://youtu.be/dvcXPlWiYMc" },
+  { round = "top4", a = "conni", b = "arjuna", winner = "arjuna", video = "https://youtu.be/BlGlbAjGW6Y" },
+  { round = "final", a = "arjuna", b = "ozzi", winner = "ozzi", video = "https://youtu.be/o_Qi7tE6sMw" },
+]

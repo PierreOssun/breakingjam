@@ -1,0 +1,21 @@
+name = "Red Bull BC One Cypher Italy 2025"
+starts_on = 2025-04-26
+ends_on = 2025-04-27
+timezone = "Europe/Rome"
+city = "Florence"
+country = "IT"
+venue = "Stazione Leopolda"
+lat = 43.7792
+lng = 11.2463
+sources = ["https://sport.quotidiano.net/en/ultimaora/red-bull-bc-one-cypher-1421c722", "https://sport.quotidiano.net/en/ultimaora/firenze-ospita-il-red-bull-b91b33b5", "https://sport.quotidiano.net/en/ultimaora/torna-red-bull-bc-one-d010d432", "https://www.redbull.com/eu-en/events/red-bull-bc-one-world-final-tokyo/last-chance-cypher-2025", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "pesto", reached = "winner" },
+]

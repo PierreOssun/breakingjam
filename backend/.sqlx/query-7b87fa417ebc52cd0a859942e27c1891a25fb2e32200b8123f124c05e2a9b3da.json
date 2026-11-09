@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select data_key as \"key!\", id from crews where data_key is not null",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key!",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "data_key"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true,
+      false
+    ]
+  },
+  "hash": "7b87fa417ebc52cd0a859942e27c1891a25fb2e32200b8123f124c05e2a9b3da"
+}

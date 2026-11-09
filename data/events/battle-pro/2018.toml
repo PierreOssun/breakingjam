@@ -19,10 +19,10 @@ bracket_size = 8
 matches = [
   { round = "top8", a = "body-carnival", b = "funky-belgianz", winner = "body-carnival" },
   { round = "top8", a = "gamblerz", b = "east-side-bboys", winner = "gamblerz" },
-  { round = "top8", a = "predatorz", b = "hfc", winner = "predatorz" },
+  { round = "top8", a = "predatorz", b = "hfc", winner = "predatorz", video = "https://youtu.be/0vk4ilxpsgQ" },
   { round = "top8", a = "arabiq-flavour", b = "mega-breaks", winner = "arabiq-flavour" },
   { round = "top4", a = "body-carnival", b = "gamblerz", winner = "gamblerz" },
-  { round = "top4", a = "predatorz", b = "arabiq-flavour", winner = "arabiq-flavour" },
+  { round = "top4", a = "predatorz", b = "arabiq-flavour", winner = "arabiq-flavour", video = "https://youtu.be/whvBMjwIvIQ" },
   { round = "final", a = "gamblerz", b = "arabiq-flavour", winner = "gamblerz" },
 ]
 
@@ -41,5 +41,6 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "issei", reached = "winner" },
+  { entrant = "issei", reached = "winner", video = "https://youtu.be/tOqQdd75_-A" },
+  { entrant = "dany", reached = "top2", video = "https://youtu.be/tOqQdd75_-A" },
 ]

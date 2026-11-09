@@ -1,0 +1,50 @@
+name = "Red Bull BC One Cypher Belgium 2024"
+starts_on = 2024-02-24
+timezone = "Europe/Brussels"
+city = "Liège"
+country = "BE"
+venue = "Manège de la Caserne Fonck"
+lat = 50.6337
+lng = 5.5675
+sources = ["https://www.redbull.com/be-nl/bc-one-cypher-belgium-luik", "https://www.redbull.com/be-nl/events/bc-one-cypher-brussel", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "titris", b = "emilio", winner = "emilio", video = "https://youtu.be/xDlLBiKS3JI" },
+  { round = "top16", a = "rateb", b = "wayan", winner = "rateb", video = "https://youtu.be/VormAwwp0VI" },
+  { round = "top16", a = "mighty-jimm", b = "liam", winner = "mighty-jimm", video = "https://youtu.be/w-Ciiv4Fi7w" },
+  { round = "top16", a = "martino", b = "djibril", winner = "djibril", video = "https://youtu.be/_Vawe_o_U8M" },
+  { round = "top16", a = "lucky", b = "xl", winner = "lucky", video = "https://youtu.be/3t90MDtULFo" },
+  { round = "top16", a = "cis", b = "petito", winner = "cis", video = "https://youtu.be/0WpKLFfw838" },
+  { round = "top16", a = "chosen-one", b = "tiro", winner = "tiro", video = "https://youtu.be/ZijO-I7C1fk" },
+  { round = "top16", a = "anthony", b = "mighty-max", winner = "anthony", video = "https://youtu.be/99D7tT3uNiE" },
+  { round = "top8", a = "mighty-jimm", b = "rateb", winner = "mighty-jimm", video = "https://youtu.be/vSejk-1wROc" },
+  { round = "top8", a = "emilio", b = "djibril", winner = "emilio", video = "https://youtu.be/0C3RJqcr71s" },
+  { round = "top8", a = "cis", b = "lucky", winner = "cis", video = "https://youtu.be/kNFRZh5_IBc" },
+  { round = "top8", a = "anthony", b = "tiro", winner = "anthony", video = "https://youtu.be/zlJWrDtnIu4" },
+  { round = "top4", a = "cis", b = "anthony", winner = "anthony", video = "https://youtu.be/3ryZJXCkkXY" },
+  { round = "top4", a = "mighty-jimm", b = "emilio", winner = "mighty-jimm", video = "https://youtu.be/hD9kN6EVZ30" },
+  { round = "final", a = "anthony", b = "mighty-jimm", winner = "anthony", video = "https://youtu.be/JmDcgv_PENE" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 8
+matches = [
+  { round = "top8", a = "valentina", b = "ilvy", winner = "ilvy", video = "https://youtu.be/ZDKYjRMXg68" },
+  { round = "top8", a = "softly", b = "madmax", winner = "madmax", video = "https://youtu.be/pUe8Fu-nvQM" },
+  { round = "top8", a = "badli", b = "maite", winner = "badli", video = "https://youtu.be/SXI1ByJiBOA" },
+  { round = "top8", a = "camine", b = "luna", winner = "camine", video = "https://youtu.be/0GYqdRkBnmA" },
+  { round = "top4", a = "camine", b = "badli", winner = "badli", video = "https://youtu.be/-Sgq6V1T4eg" },
+  { round = "top4", a = "ilvy", b = "madmax", winner = "madmax", video = "https://youtu.be/gUYQBsX8BNA" },
+  { round = "final", a = "madmax", b = "badli", winner = "madmax", video = "https://youtu.be/G8yHbCXxvbU" },
+]

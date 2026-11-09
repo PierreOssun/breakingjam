@@ -6,7 +6,7 @@ country = "DE"
 lat = 51.4311
 lng = 6.9976
 venue = "Grugahalle"
-sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20171001052056/http://www.battleoftheyear.de/"]
+sources = ["https://en.wikipedia.org/wiki/Battle_of_the_Year", "https://web.archive.org/web/20171001052056/http://www.battleoftheyear.de/", "https://www.youtube.com/channel/UC5fCFsSpHz49f1QAV0wtpew"]
 judges = []
 mcs = []
 djs = []
@@ -32,9 +32,12 @@ vagabonds = { crew = "vagabonds" }
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "mowgly", reached = "top2" },
-  { entrant = "onel", reached = "winner" },
+# The top 4 came out of groups (BOTY's "Round 1" and "Round 2" videos), which have no home in the model.
+bracket_size = 4
+matches = [
+  { round = "top4", a = "spin", b = "onel", winner = "onel", video = "https://youtu.be/zBPGOJ7Zf1w" },
+  { round = "top4", a = "ziprock", b = "mowgly", winner = "mowgly", video = "https://youtu.be/oe_dDWLiR5k" },
+  { round = "final", a = "mowgly", b = "onel", winner = "onel", video = "https://youtu.be/ycG1K-dWgqo" },
 ]
 
 [[battles]]

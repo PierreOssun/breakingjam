@@ -1,5 +1,9 @@
-//! Rows the curated `data/` import writes inside one transaction, besides jams, battles and entries.
+//! Rows the curated `data/` import writes inside one transaction, besides jams, battles and entries,
+//! and the keys of those it wrote before.
 
+use std::collections::BTreeMap;
+
+use chrono::NaiveDate;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -35,12 +39,17 @@ pub async fn insert_dancer(
     Ok(id)
 }
 
-/// A crew from `crews.toml`.
-pub async fn insert_crew(conn: &mut PgConnection, crew: &CrewRecord) -> sqlx::Result<Uuid> {
+/// A crew from `crews.toml`, under its key.
+pub async fn insert_crew(
+    conn: &mut PgConnection,
+    key: &str,
+    crew: &CrewRecord,
+) -> sqlx::Result<Uuid> {
     let id = Uuid::now_v7();
     sqlx::query!(
-        "insert into crews (id, name, country) values ($1, $2, $3)",
+        "insert into crews (id, data_key, name, country) values ($1, $2, $3, $4)",
         id,
+        key,
         crew.name,
         crew.country,
     )
@@ -83,7 +92,61 @@ pub async fn add_staff(
     Ok(())
 }
 
-/// Sets a jam's status directly: imported jams arrive already past or announced, not via review.
+/// The ids of the dancers an earlier import wrote, by key; a merged one's is the page it went into.
+pub async fn dancer_keys(conn: &mut PgConnection) -> sqlx::Result<BTreeMap<String, Uuid>> {
+    let rows = sqlx::query!(
+        r#"select data_key as "key!", coalesce(merged_into_id, id) as "id!"
+           from dancers where data_key is not null"#
+    )
+    .fetch_all(conn)
+    .await?;
+    Ok(rows.into_iter().map(|r| (r.key, r.id)).collect())
+}
+
+/// The ids of the crews an earlier import wrote, by key.
+pub async fn crew_keys(conn: &mut PgConnection) -> sqlx::Result<BTreeMap<String, Uuid>> {
+    let rows =
+        sqlx::query!(r#"select data_key as "key!", id from crews where data_key is not null"#)
+            .fetch_all(conn)
+            .await?;
+    Ok(rows.into_iter().map(|r| (r.key, r.id)).collect())
+}
+
+/// The keys of the jams an earlier import wrote.
+pub async fn event_keys(conn: &mut PgConnection) -> sqlx::Result<Vec<String>> {
+    sqlx::query_scalar!(r#"select data_key as "key!" from events where data_key is not null"#)
+        .fetch_all(conn)
+        .await
+}
+
+/// The name and first day of every live jam without a key: written by hand, or imported before
+/// jams had keys.
+pub async fn unkeyed_events(conn: &mut PgConnection) -> sqlx::Result<Vec<(String, NaiveDate)>> {
+    let rows = sqlx::query!(
+        "select name, starts_on from events where data_key is null and deleted_at is null"
+    )
+    .fetch_all(conn)
+    .await?;
+    Ok(rows.into_iter().map(|r| (r.name, r.starts_on)).collect())
+}
+
+/// Publishes a jam the import just wrote, under its key: it arrives past or announced, not via review.
+pub async fn publish_imported(
+    conn: &mut PgConnection,
+    event_id: Uuid,
+    key: &str,
+) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update events set status = 'published', data_key = $2 where id = $1",
+        event_id,
+        key,
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
+/// Sets a jam's status directly: the seed's invented jams arrive in any status, not via review.
 pub async fn set_status(
     conn: &mut PgConnection,
     event_id: Uuid,

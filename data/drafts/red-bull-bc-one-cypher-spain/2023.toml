@@ -1,0 +1,29 @@
+name = "Red Bull BC One Cypher Spain 2023"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Madrid"
+city = "Madrid"
+country = "ES"
+lat = 40.4165
+lng = -3.7026
+sources = ["https://highxtar.com/en/lola-and-grazy-are-the-red-bull-bc-one-national-champions/", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "grazy", reached = "winner", video = "https://youtu.be/qyS3aefXrUo" },
+  { entrant = "assasin-cris", reached = "top2", video = "https://youtu.be/qyS3aefXrUo" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "lola", reached = "winner", video = "https://youtu.be/4dLp_xiCGTo" },
+  { entrant = "estrella", reached = "top2", video = "https://youtu.be/4dLp_xiCGTo" },
+]

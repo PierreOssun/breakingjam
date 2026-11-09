@@ -1,0 +1,22 @@
+name = "Red Bull BC One Cypher Spain 2018"
+starts_on = 2018-03-31
+timezone = "Europe/Madrid"
+city = "Madrid"
+country = "ES"
+lat = 40.4165
+lng = -3.7026
+sources = ["https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "lil-dani", b = "guille", winner = "lil-dani", video = "https://youtu.be/YdFks87GYMk" },
+  { round = "top4", a = "elihu", b = "break-bern", winner = "elihu", video = "https://youtu.be/WR-qNDymQw4" },
+  { round = "final", a = "elihu", b = "lil-dani", winner = "lil-dani", video = "https://youtu.be/21YWPv4vmL8" },
+]

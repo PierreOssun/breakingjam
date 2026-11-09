@@ -1,0 +1,23 @@
+name = "Red Bull BC One Cypher Belgium 2018"
+starts_on = 2018-03-17
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "KVS"
+lat = 50.8505
+lng = 4.3488
+sources = ["https://www.redbull.com/be-fr/events/red-bull-bc-one-belgium-cypher-2018", "https://www.redbull.com/be-fr/lucky-unbreakable", "https://and8.dance/e/3617", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "titris", b = "lucky", winner = "lucky", video = "https://youtu.be/kWHcOuuIMA0" },
+  { round = "top4", a = "tirock", b = "snelle-jelle", winner = "tirock", video = "https://youtu.be/-5-J5iPaXhM" },
+  { round = "final", a = "tirock", b = "lucky", winner = "tirock", video = "https://youtu.be/7sOcs715d3A" },
+]

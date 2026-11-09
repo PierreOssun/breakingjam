@@ -25,13 +25,13 @@ gender = "bboy"
 bracket_size = 8
 matches = [
   { round = "top8", a = "dany-dann", b = "kuzya", winner = "dany-dann" },
-  { round = "top8", a = "lee", b = "wigor", winner = "lee" },
+  { round = "top8", a = "lee", b = "wigor", winner = "lee", video = "https://youtu.be/iS93LTb7Lcw" },
   { round = "top8", a = "menno", b = "kid-karam", winner = "menno" },
   { round = "top8", a = "lil-zoo", b = "lagaet", winner = "lil-zoo" },
   { round = "top4", a = "dany-dann", b = "lee", winner = "dany-dann" },
   { round = "top4", a = "menno", b = "lil-zoo", winner = "menno" },
   { round = "final", a = "menno", b = "dany-dann", winner = "dany-dann" },
-  { round = "third", a = "lil-zoo", b = "lee", winner = "lil-zoo" },
+  { round = "third", a = "lil-zoo", b = "lee", winner = "lil-zoo", video = "https://youtu.be/x_IwQjxqoLk" },
 ]
 
 [[battles]]

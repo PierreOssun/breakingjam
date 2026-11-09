@@ -47,5 +47,5 @@ matches = [
   { round = "top4", a = "ami", b = "india", winner = "ami" },
   { round = "top4", a = "671", b = "nicka", winner = "nicka" },
   { round = "final", a = "ami", b = "nicka", winner = "ami" },
-  { round = "third", a = "india", b = "671", winner = "671" },
+  { round = "third", a = "india", b = "671", winner = "671", video = "https://youtu.be/QloD5VvNwhk" },
 ]

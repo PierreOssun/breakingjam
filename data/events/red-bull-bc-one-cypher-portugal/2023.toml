@@ -1,0 +1,30 @@
+name = "Red Bull BC One Cypher Portugal 2023"
+starts_on = 2023-03-17
+ends_on = 2023-03-18
+timezone = "Europe/Lisbon"
+city = "Lisbon"
+country = "PT"
+venue = "Suspenso"
+lat = 38.7251
+lng = -9.1498
+sources = ["https://www.timeout.pt/lisboa/pt/noticias/etapa-nacional-do-maior-campeonato-de-breaking-do-mundo-chega-a-lisboa-021523", "https://and8.dance/e/4353", "https://www.record.pt/modalidades/desportos-radicais/detalhe/manuel-e-valeria-levam-breaking-portugues-a-roland-garros-de-olho-em-paris2024", "https://www.rtp.pt/play/p6406/e687526/holofote", "https://www.redbull.com/in-en/videos/behind-the-scenes-post-bc-one-final", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "found-kid", reached = "winner" },
+  { entrant = "deeogo", reached = "top2" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "valeria", reached = "winner" },
+]

@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher Germany 2021"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Berlin"
+city = "Germany"
+country = "DE"
+lat = 50.7272
+lng = 12.4884
+sources = ["https://and8.dance/en/e/3678", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "said", b = "erik-daily", winner = "said", video = "https://youtu.be/S5d2OyJk9wY" },
+  { round = "top4", a = "anton", b = "cicov", winner = "anton", video = "https://youtu.be/S5d2OyJk9wY", at = 290 },
+  { round = "final", a = "said", b = "anton", winner = "said", video = "https://youtu.be/uedPJGnN0Hc" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "jojo", b = "tina", winner = "jojo", video = "https://youtu.be/57rYtbf5lHE" },
+  { round = "top4", a = "jilou", b = "alicia", winner = "jilou", video = "https://youtu.be/57rYtbf5lHE", at = 205 },
+  { round = "final", a = "jilou", b = "jojo", winner = "jilou", video = "https://youtu.be/hAvUD6UtLiE" },
+]

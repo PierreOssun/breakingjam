@@ -1,0 +1,33 @@
+name = "Red Bull BC One Cypher Holland 2021"
+# starts_on = unknown (see reports/red-bull-bc-one-cyphers.md)
+timezone = "Europe/Amsterdam"
+city = "Rotterdam"
+country = "NL"
+lat = 51.9225
+lng = 4.4792
+sources = ["https://and8.dance/en/e/3735", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "duzk", b = "nazgul", winner = "nazgul", video = "https://youtu.be/t4OeXXIOyAQ", at = 1 },
+  { round = "top4", a = "ozzi", b = "shane", winner = "shane", video = "https://youtu.be/t4OeXXIOyAQ", at = 253 },
+  { round = "final", a = "shane", b = "nazgul", winner = "shane", video = "https://youtu.be/4Z1C_nrPpSA" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "alicia", b = "pauline", winner = "pauline", video = "https://youtu.be/OpohcIW2sIg", at = 2 },
+  { round = "top4", a = "bo", b = "cha-ja", winner = "cha-ja", video = "https://youtu.be/OpohcIW2sIg" },
+  { round = "final", a = "pauline", b = "cha-ja", winner = "pauline", video = "https://youtu.be/2BHZIOKTX4Y" },
+]

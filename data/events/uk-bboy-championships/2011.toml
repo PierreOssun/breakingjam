@@ -17,12 +17,12 @@ name = "Crew battle"
 gender = "mixed"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "vagabonds", b = "the-ruggeds", winner = "vagabonds" },
+  { round = "top8", a = "vagabonds", b = "the-ruggeds", winner = "vagabonds", video = "https://youtu.be/DglnYa6Tx34" },
   { round = "top8", a = "pm-conspiracy", b = "foundnation", winner = "foundnation" },
   { round = "top8", a = "jinjo-crew", b = "la-smala", winner = "jinjo-crew" },
-  { round = "top8", a = "dynamic-rockers", b = "soul-mavericks", winner = "soul-mavericks" },
+  { round = "top8", a = "dynamic-rockers", b = "soul-mavericks", winner = "soul-mavericks", video = "https://youtu.be/oA1QYG7ckaw" },
   { round = "top4", a = "vagabonds", b = "foundnation", winner = "vagabonds" },
-  { round = "top4", a = "jinjo-crew", b = "soul-mavericks", winner = "jinjo-crew" },
+  { round = "top4", a = "jinjo-crew", b = "soul-mavericks", winner = "jinjo-crew", video = "https://youtu.be/LTxSBbT2yvI" },
   { round = "final", a = "vagabonds", b = "jinjo-crew", winner = "vagabonds" },
 ]
 

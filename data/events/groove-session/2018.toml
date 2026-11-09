@@ -1,0 +1,53 @@
+name = "Groove Session 2018"
+starts_on = 2018-11-24
+timezone = "Europe/Zurich"
+city = "Neuchâtel"
+country = "CH"
+lat = 46.9918
+lng = 6.9310
+sources = ["https://www.youtube.com/channel/UCLRCoLpDImkbFw8D3qXFpUQ", "https://www.youtube.com/channel/UCzpSzFXLLX0cg8ZC_B4ELiw"]
+judges = ["xisco", "megas", "hulk"]
+mcs = []
+djs = []
+
+[[battles]]
+key = "2v2"
+name = "2v2 Kid & Adult"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "bruce-almighty-grom", b = "lil-g-neo", winner = "bruce-almighty-grom", video = "https://youtu.be/Wt_9-GdywmI" },
+  { round = "top16", a = "wingzero-lil-e", b = "stuart-malik", winner = "wingzero-lil-e", video = "https://youtu.be/QfxAHzG4Z7A" },
+  { round = "top16", a = "locks-shinigabry", b = "promo-lorenzo", winner = "promo-lorenzo", video = "https://youtu.be/54h05T1MJ3Y" },
+  { round = "top16", a = "jimmy-raptor", b = "timo-sam-well", winner = "jimmy-raptor", video = "https://youtu.be/FpHNn7pwh3s" },
+  { round = "top16", a = "pac-pac-karterio", b = "sisko-frederico", winner = "pac-pac-karterio", video = "https://youtu.be/eKpA-Q8kL00" },
+  { round = "top16", a = "stripes-lotus", b = "kaneki-cis", winner = "stripes-lotus", video = "https://youtu.be/6Q47Dx_KL9U" },
+  { round = "top16", a = "bigeye-kevi-kev", b = "uzee-rock-smile", winner = "uzee-rock-smile", video = "https://youtu.be/_5nX801kv-U" },
+  { round = "top16", a = "skeeter-comix", b = "shaymin-malish", winner = "shaymin-malish", video = "https://youtu.be/iiJjUupiYsQ" },
+  { round = "top8", a = "bruce-almighty-grom", b = "wingzero-lil-e", winner = "bruce-almighty-grom", video = "https://youtu.be/7IXhRXUepCE" },
+  { round = "top8", a = "promo-lorenzo", b = "jimmy-raptor", winner = "promo-lorenzo", video = "https://youtu.be/tsz1Ybfw1ec" },
+  { round = "top8", a = "pac-pac-karterio", b = "stripes-lotus", winner = "stripes-lotus", video = "https://youtu.be/MiHA2S-yCcU" },
+  { round = "top8", a = "uzee-rock-smile", b = "shaymin-malish", winner = "shaymin-malish", video = "https://youtu.be/1Qwk1ulEghQ" },
+  { round = "top4", a = "bruce-almighty-grom", b = "promo-lorenzo", winner = "bruce-almighty-grom", video = "https://youtu.be/w_aAKnFkTps" },
+  { round = "top4", a = "stripes-lotus", b = "shaymin-malish", winner = "stripes-lotus", video = "https://youtu.be/ay1OlfzRqJY" },
+  { round = "final", a = "bruce-almighty-grom", b = "stripes-lotus", winner = "stripes-lotus", video = "https://youtu.be/TYhUPGkw8LE" },
+]
+
+[battles.teams]
+bigeye-kevi-kev = { members = ["bigeye", "kevi-kev"] }
+bruce-almighty-grom = { members = ["bruce-almighty", "grom"] }
+jimmy-raptor = { members = ["jimmy", "raptor"] }
+kaneki-cis = { members = ["kaneki", "cis"] }
+lil-g-neo = { members = ["lil-g", "neo"] }
+locks-shinigabry = { members = ["locks", "shinigabry"] }
+pac-pac-karterio = { members = ["pac-pac", "karterio"] }
+promo-lorenzo = { members = ["promo", "lorenzo"] }
+shaymin-malish = { members = ["shaymin", "malish"] }
+sisko-frederico = { members = ["sisko", "frederico"] }
+skeeter-comix = { members = ["skeeter", "comix"] }
+stripes-lotus = { members = ["stripes", "lotus"] }
+stuart-malik = { members = ["stuart", "malik"] }
+timo-sam-well = { members = ["timo", "sam-well"] }
+uzee-rock-smile = { members = ["uzee-rock", "smile"] }
+wingzero-lil-e = { members = ["wingzero", "lil-e"] }

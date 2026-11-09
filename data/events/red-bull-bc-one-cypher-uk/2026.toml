@@ -1,0 +1,34 @@
+name = "Red Bull BC One Cypher UK 2026"
+starts_on = 2026-04-11
+timezone = "Europe/London"
+city = "London"
+country = "GB"
+venue = "Shoreditch Town Hall"
+lat = 51.5085
+lng = -0.1257
+sources = ["https://www.fatsoma.com/e/wnrrvjyf/uk-s-best-b-boys-and-b-girls-compete-for-a-shot-at-world-glory-red-bull-bc-one-world-final-toronto-2026", "https://ground.news/article/red-bulls-breakdancing-competition-returns-to-crown-uk-champion-in-london", "https://vergemagazine.co.uk/red-bull-bc-one-cypher-uk-2026-winners-crowned-as-b-boy-sheku-and-b-girl-stefani-head-to-world-final/", "https://nationaldancecats.co.uk/exeter-cat-teacher-to-represent-uk/", "https://www.youtube.com/channel/UC9oEzPGZiTE692KucAsTY1g"]
+judges = []
+mcs = []
+djs = []
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 4
+matches = [
+  { round = "top4", a = "cri6", b = "gribz", winner = "gribz", video = "https://youtu.be/B7DxWYmY4yI" },
+  { round = "top4", a = "sheku", b = "boogie", winner = "sheku", video = "https://youtu.be/RTV2D6MmDjc" },
+  { round = "final", a = "sheku", b = "gribz", winner = "sheku", video = "https://youtu.be/-6ZWECzcgIk" },
+]
+
+[[battles]]
+key = "bgirl"
+name = "1v1 Bgirl"
+gender = "bgirl"
+results = [
+  { entrant = "munirat", reached = "top2", video = "https://youtu.be/zm4HyLNTUGQ" },
+  { entrant = "stefani", reached = "top2", video = "https://youtu.be/zm4HyLNTUGQ" },
+  { entrant = "qiu-qiu", reached = "top4", video = "https://youtu.be/cD1l10QV048" },
+  { entrant = "ambush", reached = "top4", video = "https://youtu.be/lKNhTx746Xk" },
+]

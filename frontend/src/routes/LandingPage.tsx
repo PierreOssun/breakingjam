@@ -1,4 +1,7 @@
+import { Plus } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
+import { buttonClasses } from "../components/buttonClasses";
 import { HeroSearch } from "../components/HeroSearch";
 import { NextUp } from "../features/landing/NextUp";
 import { SceneSoFar } from "../features/landing/SceneSoFar";
@@ -15,7 +18,7 @@ export function LandingPage() {
   );
 }
 
-/** The title and subtitle over the search, on one set of rings centred behind the block. */
+/** The title and subtitle over the search, then Register a jam, on one set of rings centred behind the block. */
 function Hero() {
   const { t } = useTranslation();
   return (
@@ -40,6 +43,13 @@ function Hero() {
             to="/search"
           />
         </div>
+        <Link
+          to="/org/jams/new"
+          className={`${buttonClasses("primary", "lg")} mt-6 lg:mt-8`}
+        >
+          <Plus size={20} weight="bold" aria-hidden />
+          {t("nav.registerJam")}
+        </Link>
       </div>
     </section>
   );
