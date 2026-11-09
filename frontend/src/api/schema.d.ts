@@ -2217,29 +2217,21 @@ export interface components {
             next_cursor?: string | null;
         };
         /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
-        Page_EventResponse: {
-            /** @description At most `limit` rows. */
-            items: (components["schemas"]["Event"] & {
-                /**
-                 * @description Whether the caller may edit its details, flyer and lineup or delete it; no longer for its
-                 *     organiser once it is public and over.
-                 */
-                can_edit: boolean;
-                /** @description Whether the caller may edit its battles, entries and results; still true once it is over. */
-                can_edit_battles: boolean;
-                /** @description The status changes the caller may make now. */
-                actions: components["schemas"]["Transition"][];
-                organizer?: components["schemas"]["OrganizerRef"] | null;
-            })[];
-            /** @description Pass as `?cursor=` for the next page; null on the last one. */
-            next_cursor?: string | null;
-        };
-        /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
         Page_OrganizerClaimForReview: {
             /** @description At most `limit` rows. */
             items: (components["schemas"]["OrganizerClaim"] & {
                 /** @description Who is asking. */
                 user: components["schemas"]["ClaimUser"];
+            })[];
+            /** @description Pass as `?cursor=` for the next page; null on the last one. */
+            next_cursor?: string | null;
+        };
+        /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
+        Page_ReviewItem: {
+            /** @description At most `limit` rows. */
+            items: (components["schemas"]["EventResponse"] & {
+                /** @description The organiser's login email, confirmed since M27; for the team only, never on a public page. */
+                organizer_email: string;
             })[];
             /** @description Pass as `?cursor=` for the next page; null on the last one. */
             next_cursor?: string | null;
@@ -2333,6 +2325,11 @@ export interface components {
             code: string;
             /** @description New plain password, 8 to 128 characters. */
             password: string;
+        };
+        /** @description A jam waiting for review, with how to reach the account that registered it. */
+        ReviewItem: components["schemas"]["EventResponse"] & {
+            /** @description The organiser's login email, confirmed since M27; for the team only, never on a public page. */
+            organizer_email: string;
         };
         /**
          * @description Account role; declaration order is privilege order, so `>=` means "at least".
@@ -3040,7 +3037,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Invalid fields, an unknown timezone, or a jam past draft losing its city, country or pin (`place`) */
+            /** @description Invalid fields, an unknown timezone, a jam past draft losing its city, country or pin (`place`), or a jam in review losing both its Instagram link and its contact email (`contact`) */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -3166,7 +3163,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description `submit` or `publish` before the venue is on the map and a battle exists; `fields` names `place` and `battles` */
+            /** @description `submit` or `publish` before the venue is on the map, a battle exists and an Instagram link or contact email is set; `fields` names `place`, `battles` and `contact` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -5209,7 +5206,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Page_EventResponse"];
+                    "application/json": components["schemas"]["Page_ReviewItem"];
                 };
             };
             /** @description No valid session */
@@ -5297,7 +5294,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description The venue left the map or the battles are gone; `fields` names `place` and `battles` */
+            /** @description The venue left the map, the battles are gone or the contact is; `fields` names `place`, `battles` and `contact` */
             422: {
                 headers: {
                     [name: string]: unknown;

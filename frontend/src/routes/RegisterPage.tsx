@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -10,15 +9,16 @@ import { Button } from "../components/Button";
 import { TextField } from "../components/TextField";
 import { splitFieldErrors } from "../lib/apiErrors";
 import { AuthShell } from "../features/auth/AuthShell";
+import { useMailLanguage } from "../features/auth/codes";
+import { GoogleSignIn } from "../features/auth/GoogleSignIn";
 import { afterSignUp, safeNext, withNext } from "../features/auth/safeNext";
-import { ME_KEY } from "../features/auth/useMe";
 
 export function RegisterPage() {
   const { t } = useTranslation();
   const [params] = useSearchParams();
   const next = safeNext(params.get("next"));
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const language = useMailLanguage();
 
   // Mirrors `RegisterRequest` in the API; the server stays authoritative (§6 Forms).
   const schema = useMemo(
@@ -47,11 +47,14 @@ export function RegisterPage() {
   const onSubmit = handleSubmit(async (body) => {
     try {
       const { data, error, response } = await api.POST("/api/auth/register", {
-        body,
+        body: { ...body, language },
       });
       if (data) {
-        queryClient.setQueryData(ME_KEY, data);
-        navigate(afterSignUp(next), { replace: true });
+        // The account logs in once the code mailed to it confirms the address (M27).
+        navigate(withNext("/verify-email", afterSignUp(next)), {
+          replace: true,
+          state: { email: data.email },
+        });
         return;
       }
       if (response.status === 409) {
@@ -75,7 +78,6 @@ export function RegisterPage() {
   return (
     <AuthShell
       title={t("auth.register.title")}
-      next={next}
       error={errors.root?.message}
       footer={
         <>
@@ -118,6 +120,7 @@ export function RegisterPage() {
             : t("auth.register.submit")}
         </Button>
       </form>
+      <GoogleSignIn next={next} />
     </AuthShell>
   );
 }

@@ -56,7 +56,8 @@
       "submit": "Log in",
       "submitting": "Logging in…",
       "switchPrompt": "New here?",
-      "switchLink": "Create an account"
+      "switchLink": "Create an account",
+      "forgot": "Forgot password?"
     },
     "register": {
       "title": "Create an account",
@@ -79,6 +80,27 @@
       "emailTaken": "This email already has an account. Log in instead.",
       "google": "Google sign-in didn’t work. Try again or use your email.",
       "generic": "Something went wrong. Try again."
+    },
+    "code": {
+      "title": "Check your email",
+      "sentTo": "We sent a 6-digit code to {{email}}. Enter it here: it works for 15 minutes.",
+      "askEmail": "Enter your email and the 6-digit code we sent to it.",
+      "label": "Code",
+      "submit": "Confirm",
+      "invalid": "Enter the 6 digits from the email.",
+      "wrong": "This code is wrong or has expired. Check it, or send a new one.",
+      "resend": "Send a new code",
+      "resendIn": "Send a new code in {{seconds}} s",
+      "resent": "A new code is on its way.",
+      "backToLogin": "Back to log in"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "intro": "Enter your account’s email. We’ll send you a code to set a new password.",
+      "send": "Send the code",
+      "sentTo": "If {{email}} has an account, a 6-digit code is on its way. It works for 15 minutes.",
+      "newPassword": "New password",
+      "submit": "Set password and log in"
     }
   },
   "validation": {
@@ -240,6 +262,12 @@
       "battles_other": "{{count}} battles",
       "showBattles_one": "Show the battle",
       "showBattles_other": "Show the {{count}} battles"
+    },
+    "organiserWanted": {
+      "title": "You’re the organiser?",
+      "body": "The BreakingJam team added this jam. Write to us to run its page yourself, or to fix what’s wrong.",
+      "cta": "Contact us",
+      "subject": "Organiser of {{name}}:"
     }
   },
   "dancer": {
@@ -385,7 +413,8 @@
       "contactEmailHint": "Public: shown on the jam page so dancers can write to you.",
       "endsOnHint": "Leave it empty for a one-day jam.",
       "opensAt": "Opens",
-      "closesAt": "Ends"
+      "closesAt": "Ends",
+      "instagramUrlHint": "Instagram or contact email: one is needed to publish, so the BreakingJam team can reach you."
     },
     "status": {
       "title": "Status",
@@ -629,7 +658,8 @@
         "name": "Name",
         "dates": "Dates",
         "place": "City and map pin",
-        "battle": "At least one battle"
+        "battle": "At least one battle",
+        "contact": "Instagram or contact email"
       },
       "add": "Add",
       "private": "Until then only you can see this page.",
@@ -801,7 +831,8 @@
       "sentBack": "{{name}} went back to its organiser.",
       "sendBackTitle": "Send {{name}} back?",
       "note": "What should the organiser change?",
-      "noteHint": "They see this in their jam editor."
+      "noteHint": "They see this in their jam editor.",
+      "incomplete": "Not ready to publish: {{items}}."
     }
   },
   "organizer": {

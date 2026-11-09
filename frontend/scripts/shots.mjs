@@ -144,6 +144,18 @@ async function shoot(send, path, { width, theme }) {
   return { file, overflow };
 }
 
+// Chrome would screenshot its own "can't be reached" page and find nothing past the edge.
+const up = await fetch(BASE).then(
+  (r) => r.ok,
+  () => false,
+);
+if (!up) {
+  console.error(
+    `${BASE} doesn't answer: start it with \`just dev\` (or \`just frontend\`).`,
+  );
+  process.exit(1);
+}
+
 const profile = mkdtempSync(join(tmpdir(), "shots-"));
 mkdirSync(OUT, { recursive: true });
 const { send, close } = await connect(profile);

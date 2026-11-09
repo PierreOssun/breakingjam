@@ -74,8 +74,9 @@ fn transitions_reject_everything_else() {
 }
 
 #[test]
-fn the_publish_checklist_wants_a_placed_venue_and_a_battle() {
+fn the_publish_checklist_wants_a_placed_venue_a_battle_and_a_contact() {
     let mut jam = bare_draft();
+    jam.contact_email = Some("crew@example.com".into());
     assert_eq!(jam.missing(0), [Missing::Place, Missing::Battle]);
     assert_eq!(jam.missing(2), [Missing::Place]);
     jam.city = Some("Zürich".into());
@@ -87,6 +88,22 @@ fn the_publish_checklist_wants_a_placed_venue_and_a_battle() {
     assert!(jam.missing(1).is_empty());
     assert_eq!(Missing::Place.as_field().0, "place");
     assert_eq!(Missing::Battle.as_field().0, "battles");
+}
+
+#[test]
+fn the_team_reaches_the_organiser_by_instagram_or_email() {
+    let mut jam = bare_draft();
+    jam.city = Some("Zürich".into());
+    jam.country = Some("CH".into());
+    jam.lat = Some(47.38);
+    jam.lng = Some(8.54);
+    assert_eq!(jam.missing(1), [Missing::Contact]);
+    assert_eq!(Missing::Contact.as_field().0, "contact");
+    jam.instagram_url = Some("https://www.instagram.com/zurich.jam".into());
+    assert!(jam.missing(1).is_empty(), "Instagram is enough");
+    jam.instagram_url = None;
+    jam.contact_email = Some("crew@example.com".into());
+    assert!(jam.missing(1).is_empty(), "so is an email");
 }
 
 #[test]
@@ -129,6 +146,42 @@ fn only_a_place_it_has_can_be_lost() {
     jam.lat = Some(48.86);
     assert!(jam.loses_place(&fields(Some("Paris"), Some("FR"), None)));
     assert!(!jam.loses_place(&fields(Some("Paris"), Some("FR"), Some(45.7))));
+}
+
+#[test]
+fn the_last_contact_can_be_lost_but_not_one_of_two() {
+    let fields = |instagram: Option<&str>, email: Option<&str>| EventFields {
+        name: "Jam".into(),
+        description: None,
+        starts_on: chrono::NaiveDate::from_ymd_opt(2030, 6, 1).unwrap(),
+        ends_on: chrono::NaiveDate::from_ymd_opt(2030, 6, 1).unwrap(),
+        timezone: "Europe/Paris".into(),
+        opens_at: None,
+        closes_at: None,
+        venue_name: None,
+        address: None,
+        city: None,
+        country: None,
+        lat: None,
+        lng: None,
+        registration_url: None,
+        instagram_url: instagram.map(Into::into),
+        website_url: None,
+        contact_email: email.map(Into::into),
+    };
+    let mut jam = bare_draft();
+    assert!(!jam.loses_contact(&fields(None, None)), "nothing to lose");
+
+    jam.instagram_url = Some("https://www.instagram.com/zurich.jam".into());
+    assert!(jam.loses_contact(&fields(None, None)));
+    assert!(
+        jam.loses_contact(&fields(Some("  "), None)),
+        "blank is none"
+    );
+    assert!(
+        !jam.loses_contact(&fields(None, Some("crew@example.com"))),
+        "an email instead"
+    );
 }
 
 #[test]

@@ -730,7 +730,7 @@
             }
           },
           "422": {
-            "description": "Invalid fields, an unknown timezone, or a jam past draft losing its city, country or pin (`place`)",
+            "description": "Invalid fields, an unknown timezone, a jam past draft losing its city, country or pin (`place`), or a jam in review losing both its Instagram link and its contact email (`contact`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -902,7 +902,7 @@
             }
           },
           "422": {
-            "description": "`submit` or `publish` before the venue is on the map and a battle exists; `fields` names `place` and `battles`",
+            "description": "`submit` or `publish` before the venue is on the map, a battle exists and an Instagram link or contact email is set; `fields` names `place`, `battles` and `contact`",
             "content": {
               "application/json": {
                 "schema": {
@@ -3766,7 +3766,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Page_EventResponse"
+                  "$ref": "#/components/schemas/Page_ReviewItem"
                 }
               }
             }
@@ -3879,7 +3879,7 @@
             }
           },
           "422": {
-            "description": "The venue left the map or the battles are gone; `fields` names `place` and `battles`",
+            "description": "The venue left the map, the battles are gone or the contact is; `fields` names `place`, `battles` and `contact`",
             "content": {
               "application/json": {
                 "schema": {
@@ -7500,71 +7500,6 @@
           }
         }
       },
-      "Page_EventResponse": {
-        "type": "object",
-        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
-        "required": [
-          "items"
-        ],
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Event",
-                  "description": "The jam itself."
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "can_edit",
-                    "can_edit_battles",
-                    "actions"
-                  ],
-                  "properties": {
-                    "can_edit": {
-                      "type": "boolean",
-                      "description": "Whether the caller may edit its details, flyer and lineup or delete it; no longer for its\norganiser once it is public and over."
-                    },
-                    "can_edit_battles": {
-                      "type": "boolean",
-                      "description": "Whether the caller may edit its battles, entries and results; still true once it is over."
-                    },
-                    "actions": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Transition"
-                      },
-                      "description": "The status changes the caller may make now."
-                    },
-                    "organizer": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/OrganizerRef",
-                          "description": "Who runs it: the jam page's organiser card (M12c); null when the BreakingJam team\nentered it, as the team is not its organiser."
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
-              "description": "A jam page: the jam, and what the caller may do with it."
-            },
-            "description": "At most `limit` rows."
-          },
-          "next_cursor": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Pass as `?cursor=` for the next page; null on the last one."
-          }
-        }
-      },
       "Page_OrganizerClaimForReview": {
         "type": "object",
         "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
@@ -7594,6 +7529,46 @@
                 }
               ],
               "description": "An organiser claim in the admin review queue."
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
+      "Page_ReviewItem": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/EventResponse"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "organizer_email"
+                  ],
+                  "properties": {
+                    "organizer_email": {
+                      "type": "string",
+                      "description": "The organiser's login email, confirmed since M27; for the team only, never on a public page."
+                    }
+                  }
+                }
+              ],
+              "description": "A jam waiting for review, with how to reach the account that registered it."
             },
             "description": "At most `limit` rows."
           },
@@ -7837,6 +7812,26 @@
             "description": "New plain password, 8 to 128 characters."
           }
         }
+      },
+      "ReviewItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EventResponse"
+          },
+          {
+            "type": "object",
+            "required": [
+              "organizer_email"
+            ],
+            "properties": {
+              "organizer_email": {
+                "type": "string",
+                "description": "The organiser's login email, confirmed since M27; for the team only, never on a public page."
+              }
+            }
+          }
+        ],
+        "description": "A jam waiting for review, with how to reach the account that registered it."
       },
       "Role": {
         "type": "string",

@@ -102,14 +102,34 @@ describe("jam fields", () => {
       checklist(...args)
         .filter((item) => !item.done)
         .map((item) => item.key);
-    const bare = { city: null, country: null, lat: null, lng: null };
+    const bare = {
+      city: null,
+      country: null,
+      lat: null,
+      lng: null,
+      instagram_url: null,
+      contact_email: "crew@example.com",
+    };
     expect(missing(bare, 0)).toEqual(["place", "battle"]);
     expect(missing({ ...bare, city: "Zürich", country: "CH" }, 1)).toEqual([
       "place",
     ]);
-    const placed = { city: "Zürich", country: "CH", lat: 47.38, lng: 8.54 };
+    const placed = {
+      ...bare,
+      city: "Zürich",
+      country: "CH",
+      lat: 47.38,
+      lng: 8.54,
+    };
     expect(missing(placed, 1)).toEqual([]);
     expect(checklist(placed, 0).find((i) => !i.done)?.block).toBe("battles");
+    // A way for the BreakingJam team to reach the organiser: Instagram or an email.
+    const unreachable = { ...placed, contact_email: null };
+    expect(missing(unreachable, 1)).toEqual(["contact"]);
+    expect(checklist(unreachable, 1).at(-1)?.block).toBe("links");
+    expect(
+      missing({ ...unreachable, instagram_url: "https://instagram.com/x" }, 1),
+    ).toEqual([]);
   });
 });
 

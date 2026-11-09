@@ -15,10 +15,9 @@ import { Button } from "../components/Button";
 import { buttonClasses } from "../components/buttonClasses";
 import { useToast } from "../components/useToast";
 import { copyText } from "../lib/clipboard";
+import { CONTACT_EMAIL as EMAIL, mailtoUs as mailto } from "../lib/contact";
 import { BREAKINGJAM_INSTAGRAM } from "../lib/instagram";
 import { useMetaDescription } from "../lib/useMetaDescription";
-
-const EMAIL = "breakingjamtv@gmail.com";
 
 const TOPICS = [
   { key: "idea", icon: Lightbulb },
@@ -26,12 +25,6 @@ const TOPICS = [
   { key: "fix", icon: PencilSimple },
   { key: "hello", icon: Handshake },
 ] as const;
-
-/** A mailto: link to us, its subject prefilled so the writer carries on after it. */
-const mailto = (subject?: string) =>
-  subject
-    ? `mailto:${EMAIL}?subject=${encodeURIComponent(`${subject} `)}`
-    : `mailto:${EMAIL}`;
 
 /** `/contact`: how to reach us, by email or Instagram; no form and no backend. */
 export function ContactPage() {

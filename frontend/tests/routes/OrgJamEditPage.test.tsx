@@ -73,6 +73,8 @@ const jam = (extra: object = {}) => ({
   country: "FR",
   lat: null,
   lng: null,
+  // The publish checklist's way to reach the organiser (Instagram or email).
+  contact_email: "crew@example.com",
   review_note: null,
   created_at: at,
   updated_at: at,
@@ -204,10 +206,10 @@ describe("the jam editor", () => {
     const card = await screen.findByRole("region", {
       name: "Ready to publish?",
     });
-    expect(within(card).getByText("2 of 4")).toBeInTheDocument();
+    expect(within(card).getByText("3 of 5")).toBeInTheDocument();
     expect(within(card).getByRole("progressbar")).toHaveAttribute(
       "aria-valuenow",
-      "2",
+      "3",
     );
     expect(
       within(card).getByRole("button", { name: "Publish · 2 left" }),
@@ -527,6 +529,35 @@ describe("the jam editor", () => {
     expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
   });
 
+  it("wants an Instagram link or a contact email, and leads to the links to add one", async () => {
+    editApi({
+      [`GET /api/events/${ID}`]: {
+        status: 200,
+        body: page({ contact_email: null }),
+      },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+    const card = await screen.findByRole("region", {
+      name: "Ready to publish?",
+    });
+    expect(
+      within(card).getByRole("button", { name: "Publish · 3 left" }),
+    ).toBeDisabled();
+
+    await userEvent.click(
+      within(card).getByRole("button", {
+        name: "Add: Instagram or contact email",
+      }),
+    );
+
+    const links = screen.getByRole("region", { name: "Links" });
+    expect(
+      within(links).getByText(
+        "Instagram or contact email: one is needed to publish, so the BreakingJam team can reach you.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("opens the checklist as a sheet from the bar on phones", async () => {
     editApi();
     renderApp(`/org/jams/${ID}/edit`);
@@ -682,8 +713,9 @@ describe("the jam editor", () => {
     renderApp(`/org/jams/${ID}/edit`);
     const puts = () => calls(fetch).filter((c) => c === PUT);
 
+    // The links already hold the contact email the checklist wants.
     const links = await screen.findByRole("region", { name: "Links" });
-    await user.click(within(links).getByRole("button", { name: "Add" }));
+    await user.click(within(links).getByRole("button", { name: "Edit" }));
     await user.type(screen.getByLabelText(/^Website/), "www.myjam.com");
     await user.click(screen.getByRole("button", { name: "Done" }));
 
@@ -983,7 +1015,7 @@ describe("the jam editor", () => {
     const card = await screen.findByRole("region", {
       name: "Ready to publish?",
     });
-    expect(within(card).getByText("4 of 4")).toBeInTheDocument();
+    expect(within(card).getByText("5 of 5")).toBeInTheDocument();
     // Organisers don't publish directly: a BreakingJam admin reviews each jam first.
     expect(card).toHaveTextContent(/A BreakingJam admin checks it/);
 

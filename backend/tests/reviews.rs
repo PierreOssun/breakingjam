@@ -24,11 +24,12 @@ async fn world(pool: PgPool) -> World {
 }
 
 impl World {
-    /// A new draft by `cookie`, with the venue and the battle it needs to go public; returns its id.
+    /// A new draft by `cookie`, with the venue, the battle and the contact it needs to go public;
+    /// returns its id.
     async fn draft(&self, cookie: &str, name: &str) -> String {
         let body = json!({ "name": name, "starts_on": "2030-06-01", "ends_on": "2030-06-01",
                            "timezone": "Europe/Paris", "city": "Paris", "country": "FR",
-                           "lat": 48.86, "lng": 2.35 });
+                           "lat": 48.86, "lng": 2.35, "contact_email": "crew@example.com" });
         let id = id_of(&send(&self.app, post("/api/events", body, Some(cookie))).await);
         let battle = json!({ "format": "team", "team_size": 1, "gender": "mixed", "age": "adult", "age_min": 18 });
         self.call(&format!("/api/events/{id}/battles"), battle, Some(cookie))
@@ -83,6 +84,8 @@ async fn organisers_submit_and_admins_approve(pool: PgPool) {
     let queue = w.read("/api/admin/events", Some(&w.admin)).await;
     assert_eq!(queue.json["items"][0]["id"], jam.as_str());
     assert_eq!(queue.json["items"][0]["organizer"]["display_name"], "Test");
+    // For the team, never on a public page: how to reach whoever registered it.
+    assert_eq!(queue.json["items"][0]["organizer_email"], "org@example.com");
     assert_eq!(
         w.read("/api/admin/events", Some(&w.organizer)).await.status,
         StatusCode::FORBIDDEN

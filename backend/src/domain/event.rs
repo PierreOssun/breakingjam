@@ -111,6 +111,9 @@ pub enum Missing {
     Place,
     /// At least one battle.
     Battle,
+    /// An Instagram link or a contact email, so the BreakingJam team can reach the organiser
+    /// before it goes public.
+    Contact,
 }
 
 impl Missing {
@@ -119,6 +122,7 @@ impl Missing {
         match self {
             Self::Place => ("place", "add the city and the map pin"),
             Self::Battle => ("battles", "add at least one battle"),
+            Self::Contact => ("contact", "add an Instagram link or a contact email"),
         }
     }
 }
@@ -297,6 +301,14 @@ impl Event {
             || (self.lat.is_some() && fields.lat.is_none())
     }
 
+    /// Whether `fields` would take away the last way to reach its organiser (Instagram or contact
+    /// email) while it has one; blank counts as none.
+    pub fn loses_contact(&self, fields: &EventFields) -> bool {
+        let blank = |value: &Option<String>| value.as_deref().is_none_or(|v| v.trim().is_empty());
+        let has = self.instagram_url.is_some() || self.contact_email.is_some();
+        has && blank(&fields.instagram_url) && blank(&fields.contact_email)
+    }
+
     /// What keeps the jam from going public, given how many battles it has; empty when ready.
     pub fn missing(&self, battles: usize) -> Vec<Missing> {
         let mut missing = Vec::new();
@@ -305,6 +317,9 @@ impl Event {
         }
         if battles == 0 {
             missing.push(Missing::Battle);
+        }
+        if self.instagram_url.is_none() && self.contact_email.is_none() {
+            missing.push(Missing::Contact);
         }
         missing
     }

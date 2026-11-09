@@ -56,7 +56,8 @@
       "submit": "Anmelden",
       "submitting": "Anmeldung…",
       "switchPrompt": "Neu hier?",
-      "switchLink": "Konto erstellen"
+      "switchLink": "Konto erstellen",
+      "forgot": "Passwort vergessen?"
     },
     "register": {
       "title": "Konto erstellen",
@@ -79,6 +80,27 @@
       "emailTaken": "Für diese E-Mail gibt es schon ein Konto. Melde dich stattdessen an.",
       "google": "Die Google-Anmeldung hat nicht geklappt. Versuch es nochmal oder nutze deine E-Mail.",
       "generic": "Etwas ist schiefgelaufen. Versuch es nochmal."
+    },
+    "code": {
+      "title": "Schau in deine E-Mails",
+      "sentTo": "Wir haben einen 6-stelligen Code an {{email}} geschickt. Gib ihn hier ein: Er gilt 15 Minuten.",
+      "askEmail": "Gib deine E-Mail-Adresse und den 6-stelligen Code ein, den wir dorthin geschickt haben.",
+      "label": "Code",
+      "submit": "Bestätigen",
+      "invalid": "Gib die 6 Ziffern aus der E-Mail ein.",
+      "wrong": "Dieser Code ist falsch oder abgelaufen. Prüfe ihn oder fordere einen neuen an.",
+      "resend": "Neuen Code senden",
+      "resendIn": "Neuer Code in {{seconds}} s",
+      "resent": "Ein neuer Code ist unterwegs.",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "forgot": {
+      "title": "Passwort zurücksetzen",
+      "intro": "Gib die E-Mail-Adresse deines Kontos ein. Wir schicken dir einen Code, mit dem du ein neues Passwort festlegst.",
+      "send": "Code senden",
+      "sentTo": "Wenn {{email}} ein Konto hat, ist ein 6-stelliger Code unterwegs. Er gilt 15 Minuten.",
+      "newPassword": "Neues Passwort",
+      "submit": "Passwort speichern und anmelden"
     }
   },
   "validation": {
@@ -240,6 +262,12 @@
       "battles_other": "{{count}} Battles",
       "showBattles_one": "Battle zeigen",
       "showBattles_other": "Alle {{count}} Battles zeigen"
+    },
+    "organiserWanted": {
+      "title": "Du organisierst diesen Jam?",
+      "body": "Das BreakingJam-Team hat diesen Jam eingetragen. Schreib uns, um seine Seite selbst zu führen oder Fehler zu korrigieren.",
+      "cta": "Kontakt",
+      "subject": "Organisator von {{name}}:"
     }
   },
   "dancer": {
@@ -385,7 +413,8 @@
       "contactEmailHint": "Öffentlich: steht auf der Jam-Seite, damit Tänzer:innen dir schreiben können.",
       "endsOnHint": "Leer lassen für eine eintägige Jam.",
       "opensAt": "Beginn",
-      "closesAt": "Ende"
+      "closesAt": "Ende",
+      "instagramUrlHint": "Instagram oder Kontakt-E-Mail: Eins von beiden brauchst du zum Veröffentlichen, damit das BreakingJam-Team dich erreicht."
     },
     "status": {
       "title": "Status",
@@ -629,7 +658,8 @@
         "name": "Name",
         "dates": "Daten",
         "place": "Stadt und Karten-Pin",
-        "battle": "Mindestens ein Battle"
+        "battle": "Mindestens ein Battle",
+        "contact": "Instagram oder Kontakt-E-Mail"
       },
       "add": "Hinzufügen",
       "private": "Bis dahin siehst nur du diese Seite.",
@@ -801,7 +831,8 @@
       "sentBack": "{{name}} ging an die Veranstalter:innen zurück.",
       "sendBackTitle": "{{name}} zurückschicken?",
       "note": "Was sollen die Veranstalter:innen ändern?",
-      "noteHint": "Sichtbar im Jam-Editor."
+      "noteHint": "Sichtbar im Jam-Editor.",
+      "incomplete": "Noch nicht bereit zum Veröffentlichen: {{items}}."
     }
   },
   "organizer": {

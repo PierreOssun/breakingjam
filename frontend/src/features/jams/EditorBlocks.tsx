@@ -141,6 +141,7 @@ export function LinksBlock({ draft, open, onOpen, onClose }: BlockProps) {
       <TextField
         type="url"
         label={<OptionalLabel label={t("org.fields.instagramUrl")} />}
+        hint={t("org.fields.instagramUrlHint")}
         placeholder="https://www.instagram.com/"
         {...draft.field("instagram_url")}
       />

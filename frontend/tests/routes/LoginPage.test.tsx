@@ -1,6 +1,13 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { LIL_G, LOGGED_OUT, calls, mockApi, renderApp } from "../support/app";
+import {
+  LIL_G,
+  LOGGED_OUT,
+  bodyOf,
+  calls,
+  mockApi,
+  renderApp,
+} from "../support/app";
 
 async function fillAndSubmit(email: string, password: string) {
   const main = within(await screen.findByRole("main"));
@@ -85,6 +92,50 @@ describe("LoginPage", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Google sign-in didn’t work.",
+    );
+  });
+
+  it("takes an unconfirmed account to the code the API just mailed", async () => {
+    const fetch = mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "POST /api/auth/login": {
+        status: 403,
+        body: { error: { code: "email_unverified", message: "confirm" } },
+      },
+    });
+    const router = renderApp("/login?next=%2Forg%2Fjams");
+
+    await fillAndSubmit("lilg@example.com", "correct horse");
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe("/verify-email"),
+    );
+    // Confirming ends the sign-up: the welcome step comes first, then the page asked for.
+    expect(router.state.location.search).toBe(
+      "?next=%2Fwelcome%3Fnext%3D%252Forg%252Fjams",
+    );
+    expect(
+      await screen.findByText(/We sent a 6-digit code to lilg@example.com/),
+    ).toBeInTheDocument();
+    expect(await bodyOf(fetch, "POST /api/auth/login")).toMatchObject({
+      language: "en",
+    });
+  });
+
+  it("leads to Forgot password with the email typed so far", async () => {
+    mockApi({ "GET /api/auth/me": LOGGED_OUT });
+    const router = renderApp("/login?next=%2Forg%2Fjams");
+    const main = within(await screen.findByRole("main"));
+
+    await userEvent.type(main.getByLabelText("Email"), "lilg@example.com");
+    await userEvent.click(main.getByRole("link", { name: "Forgot password?" }));
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe("/forgot-password"),
+    );
+    expect(router.state.location.search).toBe("?next=%2Forg%2Fjams");
+    expect(await screen.findByLabelText("Email")).toHaveValue(
+      "lilg@example.com",
     );
   });
 });

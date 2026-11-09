@@ -21,7 +21,9 @@ fn jam(name: &str) -> Value {
         "lat": 48.8566,
         "lng": 2.3522,
         "registration_url": "https://example.com/register",
-        "instagram_url": null
+        "instagram_url": null,
+        // The publish checklist wants a way to reach the organiser (Instagram or email).
+        "contact_email": "crew@example.com"
     })
 }
 
@@ -249,11 +251,12 @@ async fn opening_hours_are_clock_times(pool: PgPool) {
 }
 
 #[sqlx::test]
-async fn going_public_needs_the_place_and_a_battle(pool: PgPool) {
+async fn going_public_needs_the_place_a_battle_and_a_contact(pool: PgPool) {
     let app = app(pool.clone());
     let owner = sign_up(&app, &pool, "org@example.com").await;
     let mut unplaced = jam("Jam");
     unplaced["city"] = Value::Null;
+    unplaced["contact_email"] = Value::Null;
     let id = draft_id(&app, &owner, unplaced).await;
 
     let refused = act(&app, &owner, &id, "submit").await;
@@ -264,7 +267,7 @@ async fn going_public_needs_the_place_and_a_battle(pool: PgPool) {
         .iter()
         .map(|f| f["field"].as_str().unwrap())
         .collect();
-    assert_eq!(fields, ["place", "battles"]);
+    assert_eq!(fields, ["place", "battles", "contact"]);
 
     let placed = send(
         &app,
@@ -991,6 +994,26 @@ async fn the_checklist_holds_once_submitted(pool: PgPool) {
         act(&app, &owner, &id, "submit").await.status,
         StatusCode::OK
     );
+
+    // In review, the way to reach the organiser stays: swapped for another, never dropped.
+    let mut unreachable = jam("Jam");
+    unreachable["contact_email"] = json!("  ");
+    let dropped = send(
+        &app,
+        put(&format!("/api/events/{id}"), unreachable, Some(&owner)),
+    )
+    .await;
+    assert_eq!(dropped.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(dropped.json["error"]["fields"][0]["field"], "contact");
+    let mut swapped = jam("Jam");
+    swapped["contact_email"] = Value::Null;
+    swapped["instagram_url"] = json!("https://www.instagram.com/paris.jam");
+    let swapped = send(
+        &app,
+        put(&format!("/api/events/{id}"), swapped, Some(&owner)),
+    )
+    .await;
+    assert_eq!(swapped.status, StatusCode::OK, "{}", swapped.json);
 
     let battles = send(
         &app,

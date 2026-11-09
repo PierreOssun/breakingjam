@@ -56,7 +56,8 @@
       "submit": "Se connecter",
       "submitting": "Connexion…",
       "switchPrompt": "Nouveau ici ?",
-      "switchLink": "Créer un compte"
+      "switchLink": "Créer un compte",
+      "forgot": "Mot de passe oublié ?"
     },
     "register": {
       "title": "Créer un compte",
@@ -79,6 +80,27 @@
       "emailTaken": "Cet e-mail a déjà un compte. Connectez-vous plutôt.",
       "google": "La connexion Google n’a pas fonctionné. Réessayez ou utilisez votre e-mail.",
       "generic": "Une erreur s’est produite. Réessayez."
+    },
+    "code": {
+      "title": "Vérifiez vos e-mails",
+      "sentTo": "Nous avons envoyé un code à 6 chiffres à {{email}}. Saisissez-le ici : il est valable 15 minutes.",
+      "askEmail": "Saisissez votre e-mail et le code à 6 chiffres que nous y avons envoyé.",
+      "label": "Code",
+      "submit": "Confirmer",
+      "invalid": "Saisissez les 6 chiffres de l’e-mail.",
+      "wrong": "Ce code est faux ou a expiré. Vérifiez-le ou demandez-en un nouveau.",
+      "resend": "Envoyer un nouveau code",
+      "resendIn": "Nouveau code dans {{seconds}} s",
+      "resent": "Un nouveau code est en route.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "forgot": {
+      "title": "Réinitialiser le mot de passe",
+      "intro": "Saisissez l’e-mail de votre compte. Nous vous enverrons un code pour choisir un nouveau mot de passe.",
+      "send": "Envoyer le code",
+      "sentTo": "Si {{email}} a un compte, un code à 6 chiffres est en route. Il est valable 15 minutes.",
+      "newPassword": "Nouveau mot de passe",
+      "submit": "Enregistrer et se connecter"
     }
   },
   "validation": {
@@ -240,6 +262,12 @@
       "battles_other": "{{count}} battles",
       "showBattles_one": "Voir le battle",
       "showBattles_other": "Voir les {{count}} battles"
+    },
+    "organiserWanted": {
+      "title": "Vous êtes l’organisateur ?",
+      "body": "L’équipe BreakingJam a ajouté ce jam. Écrivez-nous pour gérer sa page vous-même ou corriger ce qui ne va pas.",
+      "cta": "Nous contacter",
+      "subject": "Organisateur de {{name}} :"
     }
   },
   "dancer": {
@@ -385,7 +413,8 @@
       "contactEmailHint": "Public : affiché sur la page du jam pour que les danseur·ses puissent vous écrire.",
       "endsOnHint": "Laissez vide pour un jam d’une journée.",
       "opensAt": "Ouverture",
-      "closesAt": "Fin"
+      "closesAt": "Fin",
+      "instagramUrlHint": "Instagram ou e-mail de contact : l’un des deux est nécessaire pour publier, afin que l’équipe BreakingJam puisse vous joindre."
     },
     "status": {
       "title": "Statut",
@@ -629,7 +658,8 @@
         "name": "Nom",
         "dates": "Dates",
         "place": "Ville et épingle sur la carte",
-        "battle": "Au moins un battle"
+        "battle": "Au moins un battle",
+        "contact": "Instagram ou e-mail de contact"
       },
       "add": "Ajouter",
       "private": "D’ici là, vous seul·e voyez cette page.",
@@ -801,7 +831,8 @@
       "sentBack": "{{name}} a été renvoyé à son organisateur·ice.",
       "sendBackTitle": "Renvoyer {{name}} ?",
       "note": "Que doit changer l’organisateur·ice ?",
-      "noteHint": "Visible dans l’éditeur du jam."
+      "noteHint": "Visible dans l’éditeur du jam.",
+      "incomplete": "Pas prêt à publier : {{items}}."
     }
   },
   "organizer": {

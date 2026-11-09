@@ -3,6 +3,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
+import type { TFunction } from "i18next";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -16,10 +17,11 @@ import { TextAreaField } from "../components/TextAreaField";
 import { useToast } from "../components/useToast";
 import { VerifiedTick } from "../components/VerifiedTick";
 import { placeLine } from "../features/jams/jamDetail";
+import type { ChecklistItem } from "../features/jams/jamFields";
 import { formatDateRange } from "../lib/dates";
 import { instagramLabel } from "../lib/instagram";
 
-type Jam = Schemas["EventResponse"];
+type Jam = Schemas["ReviewItem"];
 /** Approve, or send back with a note for the organiser. */
 type Decision = { approve: true } | { approve: false; note: string };
 
@@ -77,8 +79,7 @@ function JamToReview({ jam }: { jam: Jam }) {
             params,
             body: { note: decision.note },
           });
-      if (!response.ok)
-        throw new Error(error?.error.message ?? t("errors.generic"));
+      if (!response.ok) throw new Error(refusal(error, t));
     },
     onSuccess: (_, decision) => {
       void queryClient.invalidateQueries({ queryKey: ["admin"] });
@@ -121,6 +122,13 @@ function JamToReview({ jam }: { jam: Jam }) {
                 {organizer.display_name}
               </Link>
               {organizer.verified && <VerifiedTick />}
+              {/* The account's own address, confirmed at sign-up: for the team, never public. */}
+              <a
+                href={`mailto:${jam.organizer_email}`}
+                className="font-bold text-primary-text underline"
+              >
+                {jam.organizer_email}
+              </a>
               {organizer.instagram_handle && (
                 <ExternalLink
                   href={`https://instagram.com/${organizer.instagram_handle}`}
@@ -173,4 +181,22 @@ function JamToReview({ jam }: { jam: Jam }) {
       )}
     </div>
   );
+}
+
+/** The checklist items the API names when a jam can't go public, as the editor words them. */
+const CHECKLIST_ITEMS: Record<string, ChecklistItem["key"] | undefined> = {
+  place: "place",
+  battles: "battle",
+  contact: "contact",
+};
+
+/** Why a decision was refused: the checklist's missing items when it was that, else the API's message. */
+function refusal(error: Schemas["ErrorEnvelope"] | undefined, t: TFunction) {
+  const items = (error?.error.fields ?? [])
+    .map((f) => CHECKLIST_ITEMS[f.field])
+    .filter((key) => key !== undefined)
+    .map((key) => t(`org.publish.items.${key}`));
+  if (items.length > 0)
+    return t("admin.jams.incomplete", { items: items.join(", ") });
+  return error?.error.message ?? t("errors.generic");
 }

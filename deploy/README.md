@@ -46,7 +46,7 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
    - For `www`: a proxied `AAAA www 100::` record, and a Redirect Rule (Rules → Redirect Rules → "Redirect from WWW to root", status 301, keep the query string).
    - Subscribe to Workers Paid (containers).
    - Create an API token with *Workers Scripts: Edit*, *Workers Routes: Edit*, *Containers: Edit*, *Zone: Read* and *DNS: Edit* on the zone; copy your account id.
-2. **Neon:** one project per target (`breakingjam`, `breakingjam-uat`), each with a database `breakingjam`, in a region close to your users (e.g. `aws-eu-central-1`).
+2. **Neon:** one project per target (`breakingjam`, `breakingjam-uat`), with a database `breakingjam_prod` (production) or `breakingjam` (UAT), so a connection string that touches production says so, in a region close to your users (e.g. `aws-eu-central-1`).
    - Use **separate projects**, not a branch of production: a branch starts with production's data, and separate projects have separate credentials.
    - Copy the owner's **direct** (not `-pooler`) connection string, with `?sslmode=require`. Only migrations use it.
    - Create a project-scoped API key (Project settings → API keys) and note the project id. The deploy snapshots the database with them.

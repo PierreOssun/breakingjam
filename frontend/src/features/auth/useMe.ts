@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { api, unwrap } from "../../api/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
+import { api, unwrap, type Schemas } from "../../api/client";
 
 export const ME_KEY = ["me"] as const;
 
@@ -15,4 +16,14 @@ export function useMe() {
     // `me` also slides the session forward, so one call per visit is enough.
     staleTime: Infinity,
   });
+}
+
+/** Takes in the account the API has just logged in, then goes to `next`. */
+export function useLogIn(next: string) {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  return (me: Schemas["UserResponse"]) => {
+    queryClient.setQueryData(ME_KEY, me);
+    navigate(next, { replace: true });
+  };
 }

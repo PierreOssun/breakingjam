@@ -42,12 +42,14 @@ Until M27, `POST /auth/register` logged in straight away and nothing checked `ap
    - the pepper in `auth/password.rs` and the seed;
    - `deploy/src/mail.ts` and the wrangler bindings;
    - `openapi.json`, tests, deploy README.
-2. Frontend:
+2. Frontend — done 2026-11-09, found missing on UAT (sign-up mailed a code nobody could enter):
    - `/verify-email` (one numeric `one-time-code` field, Resend with a 60 s countdown);
    - `/forgot-password` (email, then code and new password on the same page);
    - register and login lead there, plus "Forgot password?" under the login password;
    - the router, i18n in en/fr/de, DESIGN.md §4.38 "Code entry";
    - the regenerated `schema.d.ts`, and tests.
+
+   - Also: register and login send the site's language, so the code email is in it; "or Continue with Google" moved out of `AuthShell` into `GoogleSignIn`, as the code pages don't offer it.
 
 ## Before deploying
 

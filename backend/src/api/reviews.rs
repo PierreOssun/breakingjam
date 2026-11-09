@@ -1,7 +1,7 @@
 //! Jam reviews: the admins' queue of jams waiting to go public, and their decisions.
 
 use axum::{Json, extract::State};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
@@ -50,6 +50,15 @@ pub struct RejectRequest {
     pub note: String,
 }
 
+/// A jam waiting for review, with how to reach the account that registered it.
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ReviewItem {
+    #[serde(flatten)]
+    pub jam: EventResponse,
+    /// The organiser's login email, confirmed since M27; for the team only, never on a public page.
+    pub organizer_email: String,
+}
+
 /// Jams waiting for an admin's approval, the soonest first.
 #[utoipa::path(
     get,
@@ -59,7 +68,7 @@ pub struct RejectRequest {
     params(ReviewQuery),
     security(("session" = [])),
     responses(
-        (status = OK, body = Page<EventResponse>),
+        (status = OK, body = Page<ReviewItem>),
         Unauthorized,
         NotAdmin,
         InvalidCursor,
@@ -69,18 +78,23 @@ async fn queue(
     State(state): State<AppState>,
     current: CurrentUser,
     Query(query): Query<ReviewQuery>,
-) -> Result<Json<Page<EventResponse>>, AppError> {
+) -> Result<Json<Page<ReviewItem>>, AppError> {
     current.require(Role::Admin)?;
     let limit = page::limit(query.limit);
     let offset = page::offset(query.cursor.as_deref())?;
     let jams = db::events::in_review(&state.pool, page::window(limit, offset)).await?;
     let ids: Vec<Uuid> = jams.iter().map(|jam| jam.organizer_id).collect();
     let organizers = db::organizers::references(&state.pool, &ids).await?;
+    let emails = db::users::emails(&state.pool, &ids).await?;
     let rows = jams
         .into_iter()
         .map(|event| {
             let organizer = organizers.get(&event.organizer_id).cloned();
-            EventResponse::new(event, Some(&current.user), organizer)
+            let organizer_email = emails.get(&event.organizer_id).cloned().unwrap_or_default();
+            ReviewItem {
+                jam: EventResponse::new(event, Some(&current.user), organizer),
+                organizer_email,
+            }
         })
         .collect();
     Ok(Json(Page::from_offset(rows, limit, offset)))
@@ -100,7 +114,7 @@ async fn queue(
         NotAdmin,
         (status = NOT_FOUND, description = "No such jam", body = ErrorEnvelope),
         (status = CONFLICT, description = "Not in review", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "The venue left the map or the battles are gone; `fields` names `place` and `battles`", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "The venue left the map, the battles are gone or the contact is; `fields` names `place`, `battles` and `contact`", body = ErrorEnvelope),
     )
 )]
 async fn approve(

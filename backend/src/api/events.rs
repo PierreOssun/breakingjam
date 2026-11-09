@@ -352,7 +352,7 @@ async fn create(
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+", body = ErrorEnvelope),
         JamNotVisible,
         JamOver,
-        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields, an unknown timezone, or a jam past draft losing its city, country or pin (`place`)", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "Invalid fields, an unknown timezone, a jam past draft losing its city, country or pin (`place`), or a jam in review losing both its Instagram link and its contact email (`contact`)", body = ErrorEnvelope),
     )
 )]
 async fn update(
@@ -388,6 +388,11 @@ async fn check_update(
     // it has can be lost: a jam published without a pin before the checklist keeps saving.
     if event.status != EventStatus::Draft && event.loses_place(fields) {
         AppError::check(vec![Missing::Place.as_field()])?;
+    }
+    // In review, the approval runs the checklist again: the contact it was sent with stays. Once
+    // public, the team has reached the organiser, so the jam may drop it (M30).
+    if event.status == EventStatus::InReview && event.loses_contact(fields) {
+        AppError::check(vec![Missing::Contact.as_field()])?;
     }
     // Moved into the past, a public jam would lock its organiser out of moving it back.
     if event.status.is_public() && current.user.role < Role::SeedAdmin {
@@ -479,7 +484,7 @@ async fn delete(
         (status = FORBIDDEN, description = "Not the organiser nor `seed_admin`+, or `publish` by an organiser", body = ErrorEnvelope),
         JamNotVisible,
         (status = CONFLICT, description = "The current status does not allow it, or the jam is public and over", body = ErrorEnvelope),
-        (status = UNPROCESSABLE_ENTITY, description = "`submit` or `publish` before the venue is on the map and a battle exists; `fields` names `place` and `battles`", body = ErrorEnvelope),
+        (status = UNPROCESSABLE_ENTITY, description = "`submit` or `publish` before the venue is on the map, a battle exists and an Instagram link or contact email is set; `fields` names `place`, `battles` and `contact`", body = ErrorEnvelope),
     )
 )]
 async fn transition(

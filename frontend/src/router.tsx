@@ -77,6 +77,19 @@ export const routes: RouteObject[] = [
         }),
       },
       {
+        path: "/verify-email",
+        lazy: async () => ({
+          Component: (await import("./routes/VerifyEmailPage")).VerifyEmailPage,
+        }),
+      },
+      {
+        path: "/forgot-password",
+        lazy: async () => ({
+          Component: (await import("./routes/ForgotPasswordPage"))
+            .ForgotPasswordPage,
+        }),
+      },
+      {
         element: <RequireAuth />,
         children: [
           {

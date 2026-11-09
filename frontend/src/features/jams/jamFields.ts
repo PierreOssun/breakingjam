@@ -228,15 +228,19 @@ export function timezones(current: string): string[] {
 
 /** One line of the publish checklist; `block` is where a missing one gets filled in. */
 export type ChecklistItem = {
-  key: "name" | "dates" | "place" | "battle";
+  key: "name" | "dates" | "place" | "battle" | "contact";
   done: boolean;
-  block?: "venue" | "battles";
+  block?: "venue" | "battles" | "links";
 };
 
 /** The publish checklist (M24), as the API checks it: name and dates always exist, the venue
- * needs a city, country and pin, and there must be a battle. */
+ * needs a city, country and pin, there must be a battle, and an Instagram link or a contact
+ * email so the BreakingJam team can reach the organiser. */
 export function checklist(
-  jam: Pick<Jam, "city" | "country" | "lat" | "lng">,
+  jam: Pick<
+    Jam,
+    "city" | "country" | "lat" | "lng" | "instagram_url" | "contact_email"
+  >,
   battles: number,
 ): ChecklistItem[] {
   const placed = Boolean(
@@ -247,5 +251,10 @@ export function checklist(
     { key: "dates", done: true },
     { key: "place", done: placed, block: "venue" },
     { key: "battle", done: battles > 0, block: "battles" },
+    {
+      key: "contact",
+      done: Boolean(jam.instagram_url || jam.contact_email),
+      block: "links",
+    },
   ];
 }

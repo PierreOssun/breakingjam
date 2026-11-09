@@ -1,5 +1,7 @@
 //! `app_users` queries.
 
+use std::collections::HashMap;
+
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
@@ -204,4 +206,15 @@ pub async fn owns_dancer(pool: &PgPool, id: Uuid) -> sqlx::Result<bool> {
     )
     .fetch_one(pool)
     .await
+}
+
+/// The login emails of `ids`, keyed by account id.
+pub async fn emails(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, String>> {
+    let rows = sqlx::query!(
+        r#"select id, email::text as "email!" from app_users where id = any($1)"#,
+        ids,
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(rows.into_iter().map(|r| (r.id, r.email)).collect())
 }

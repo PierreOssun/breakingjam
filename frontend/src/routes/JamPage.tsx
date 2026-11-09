@@ -47,6 +47,7 @@ import {
   formatDateRange,
   formatShortDateRange,
 } from "../lib/dates";
+import { mailtoUs } from "../lib/contact";
 import { instagramLabel } from "../lib/instagram";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -200,15 +201,17 @@ function JamDetail({ jam }: { jam: Jam }) {
 
           <Venue jam={jam} />
 
-          {/* The BreakingJam team lists jams it doesn't run: no organiser then. */}
-          {jam.organizer && (
-            <Section title={t("jam.organiser")}>
+          {/* The BreakingJam team lists jams it doesn't run: no organiser then, so it asks for one. */}
+          <Section title={t("jam.organiser")}>
+            {jam.organizer ? (
               <OrganizerCard
                 organizer={jam.organizer}
                 email={jam.contact_email}
               />
-            </Section>
-          )}
+            ) : (
+              <OrganiserWanted jam={jam} />
+            )}
+          </Section>
         </div>
       </div>
 
@@ -514,6 +517,30 @@ function Fact({
         <dt className="text-label text-muted uppercase">{label}</dt>
         <dd className="text-body">{children}</dd>
       </div>
+    </div>
+  );
+}
+
+/** On a jam the team added: "You're the organiser? Contact us", by email, its name in the subject. */
+function OrganiserWanted({ jam }: { jam: Jam }) {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-start gap-3 rounded-lg border border-dashed border-border-strong p-4">
+      <div className="flex flex-col gap-1">
+        <p className="text-body font-extrabold">
+          {t("jam.organiserWanted.title")}
+        </p>
+        <p className="text-body-sm text-muted">
+          {t("jam.organiserWanted.body")}
+        </p>
+      </div>
+      <a
+        href={mailtoUs(t("jam.organiserWanted.subject", { name: jam.name }))}
+        className={buttonClasses("secondary", "sm")}
+      >
+        <EnvelopeSimple size={16} weight="bold" aria-hidden />
+        {t("jam.organiserWanted.cta")}
+      </a>
     </div>
   );
 }

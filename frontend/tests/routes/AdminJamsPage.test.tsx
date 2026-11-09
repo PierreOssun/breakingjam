@@ -25,6 +25,7 @@ const JAM = {
     instagram_handle: "cypher.collective",
     verified: false,
   },
+  organizer_email: "crew@cypher.ch",
 };
 
 /** The queue holds the jam until the first decision, then is empty. */
@@ -59,6 +60,10 @@ describe("AdminJamsPage", () => {
     expect(
       screen.getByRole("link", { name: "@cypher.collective" }),
     ).toHaveAttribute("href", "https://instagram.com/cypher.collective");
+    // How the team reaches whoever registered it (M30).
+    expect(
+      screen.getByRole("link", { name: "crew@cypher.ch" }),
+    ).toHaveAttribute("href", "mailto:crew@cypher.ch");
 
     await userEvent.click(screen.getByRole("button", { name: "Approve" }));
     expect(
@@ -99,5 +104,36 @@ describe("AdminJamsPage", () => {
     expect(await bodyOf(fetch, `POST /api/admin/events/${ID}/reject`)).toEqual({
       note: "Add the venue.",
     });
+  });
+
+  it("says what keeps a jam from going public when approving is refused", async () => {
+    api({
+      [`POST /api/admin/events/${ID}/approve`]: {
+        status: 422,
+        body: {
+          error: {
+            code: "validation",
+            message: "validation failed",
+            fields: [
+              {
+                field: "contact",
+                message: "add an Instagram link or a contact email",
+              },
+            ],
+          },
+        },
+      },
+    });
+    renderApp("/admin/jams");
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Approve" }),
+    );
+
+    expect(
+      await screen.findByText(
+        "Not ready to publish: Instagram or contact email.",
+      ),
+    ).toBeInTheDocument();
   });
 });
