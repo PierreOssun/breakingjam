@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LOGGED_OUT, mockApi, renderApp } from "../support/app";
 
@@ -42,7 +42,8 @@ describe("TeamPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(INTRO)).toBeInTheDocument();
     expect(document.title).toBe("Team · BreakingJam");
-    expect(tag.content).toBe(INTRO);
+    // Set in an effect, which may land just after the heading on a slow runner.
+    await waitFor(() => expect(tag.content).toBe(INTRO));
 
     const ikiCard = within(screen.getByRole("article", { name: "Iki" }));
     expect(ikiCard.getByRole("heading", { name: "Iki" })).toBeInTheDocument();
