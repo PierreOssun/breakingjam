@@ -1,10 +1,10 @@
-//! `dancer_claims` queries.
+//! `dancer_claims` queries, and the history of every claim decision.
 
 use sqlx::{PgConnection, PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::domain::{
-    claim::{Claim, ClaimForReview, ClaimStatus, ClaimUser, new_code},
+    claim::{Claim, ClaimDecision, ClaimForReview, ClaimStatus, ClaimUser, new_code},
     dancer::DancerRef,
 };
 
@@ -116,6 +116,72 @@ pub async fn list(
                 reviewed_at: r.reviewed_at,
                 created_at: r.created_at,
             },
+        })
+        .collect())
+}
+
+/// Every decided claim, on dancer and organiser pages alike, the most recent decision first (M31).
+pub async fn history(pool: &PgPool, window: super::Window) -> sqlx::Result<Vec<ClaimDecision>> {
+    let rows = sqlx::query!(
+        r#"select c.id as "id!", c.status as "status!: ClaimStatus", c.decided_at as "decided_at!",
+                  c.admin_email, c.user_id as "user_id!", u.email::text as "email!",
+                  u.display_name as "display_name!", c.instagram_handle,
+                  d.id as "dancer_id?", d.dancer_name as "dancer_name?", d.country as "country?",
+                  d.country2, d.avatar_url, d.avatar_parts,
+                  d.deleted_at is not null as "deleted?"
+           from (
+             select c.id, c.status, coalesce(c.reviewed_at, c.created_at) as decided_at,
+                    a.email::text as admin_email, c.user_id, c.dancer_id,
+                    d.instagram_handle
+             from dancer_claims c
+             join dancers d on d.id = c.dancer_id
+             left join app_users a on a.id = c.reviewed_by
+             where c.status <> 'pending'
+             union all
+             select c.id, c.status, coalesce(c.reviewed_at, c.created_at),
+                    a.email::text, c.user_id, null, c.instagram_handle
+             from organizer_claims c
+             left join app_users a on a.id = c.reviewed_by
+             where c.status <> 'pending'
+           ) c
+           join app_users u on u.id = c.user_id
+           left join dancers d on d.id = c.dancer_id
+           order by c.decided_at desc, c.id desc
+           limit $1 offset $2"#,
+        window.limit,
+        window.offset,
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(rows
+        .into_iter()
+        .map(|r| {
+            let dancer = match (r.dancer_id, r.dancer_name, r.country) {
+                (Some(id), Some(dancer_name), Some(country)) => Some(DancerRef {
+                    id,
+                    dancer_name,
+                    country,
+                    country2: r.country2,
+                    instagram_handle: r.instagram_handle.clone(),
+                    avatar_url: r.avatar_url,
+                    avatar_parts: r.avatar_parts,
+                    deleted: r.deleted.unwrap_or_default(),
+                }),
+                _ => None,
+            };
+            ClaimDecision {
+                id: r.id,
+                status: r.status,
+                decided_at: r.decided_at,
+                admin_email: r.admin_email,
+                user: ClaimUser {
+                    id: r.user_id,
+                    email: r.email,
+                    display_name: r.display_name,
+                },
+                instagram_handle: r.instagram_handle,
+                dancer,
+            }
         })
         .collect())
 }

@@ -5,12 +5,16 @@ use uuid::Uuid;
 
 use crate::domain::user::{Role, User};
 
-/// Creates a session with a random (v4) id, valid for `ttl_days`.
+/// Creates a session with a random (v4) id, valid for `ttl_days`; the account is seen now.
 pub async fn create(pool: &PgPool, user_id: Uuid, ttl_days: i32) -> sqlx::Result<Uuid> {
     let id = Uuid::new_v4();
     sqlx::query!(
-        "insert into sessions (id, user_id, expires_at)
-         values ($1, $2, now() + make_interval(days => $3))",
+        "with session as (
+           insert into sessions (id, user_id, expires_at)
+           values ($1, $2, now() + make_interval(days => $3))
+           returning user_id
+         )
+         update app_users set last_seen_at = now() where id = (select user_id from session)",
         id,
         user_id,
         ttl_days,
@@ -33,10 +37,14 @@ pub async fn find_user(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<User>> {
     .await
 }
 
-/// Pushes the expiry to `ttl_days` from now.
+/// Pushes the expiry to `ttl_days` from now; the account is seen now.
 pub async fn extend(pool: &PgPool, id: Uuid, ttl_days: i32) -> sqlx::Result<()> {
     sqlx::query!(
-        "update sessions set expires_at = now() + make_interval(days => $2) where id = $1",
+        "with session as (
+           update sessions set expires_at = now() + make_interval(days => $2) where id = $1
+           returning user_id
+         )
+         update app_users set last_seen_at = now() where id = (select user_id from session)",
         id,
         ttl_days,
     )

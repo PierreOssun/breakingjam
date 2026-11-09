@@ -139,6 +139,58 @@ async fn claim_then_approve_hands_the_page_over(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn decided_claims_make_the_history(pool: PgPool) {
+    let w = world(pool).await;
+    let dancer = w.dancer("Lil G", Some("lilg")).await;
+    let lilg = sign_up(&w.app, &w.pool, "lilg@example.com").await;
+    let rival = sign_up(&w.app, &w.pool, "rival@example.com").await;
+    let claim = w.claim(&dancer, &lilg).await.json;
+    w.claim(&dancer, &rival).await;
+    let history = || send(&w.app, get("/api/admin/claims/history", Some(&w.admin)));
+    assert_eq!(history().await.json["items"], json!([]));
+
+    // Approving rejects the rival's claim in the same breath, by the same admin.
+    w.review(&claim, "approve").await;
+    let items = history().await.json["items"].as_array().unwrap().clone();
+    assert_eq!(items.len(), 2);
+    assert_eq!(items[0]["status"], "rejected");
+    assert_eq!(items[0]["user"]["email"], "rival@example.com");
+    assert_eq!(items[1]["status"], "approved");
+    assert_eq!(items[1]["dancer"]["id"], dancer.as_str());
+    assert_eq!(items[1]["instagram_handle"], "lilg");
+    for item in &items {
+        assert_eq!(item["admin_email"], "admin@example.com");
+    }
+}
+
+#[sqlx::test]
+async fn claims_a_merge_rejects_are_the_merging_admin_s(pool: PgPool) {
+    let w = world(pool).await;
+    let survivor = w.dancer("Lil G", Some("lilg")).await;
+    let loser = w.dancer("Lil Gee", None).await;
+    let lilg = sign_up(&w.app, &w.pool, "lilg@example.com").await;
+    let rival = sign_up(&w.app, &w.pool, "rival@example.com").await;
+    let owned = w.claim(&survivor, &lilg).await.json;
+    w.review(&owned, "approve").await;
+    w.claim(&loser, &rival).await;
+
+    // The survivor is verified: the claim on the duplicate is moot once merged.
+    let uri = format!("/api/admin/dancers/{loser}/merge");
+    let merged = send(
+        &w.app,
+        post(&uri, json!({ "into": survivor }), Some(&w.admin)),
+    )
+    .await;
+    assert_eq!(merged.status, StatusCode::OK);
+
+    let history = send(&w.app, get("/api/admin/claims/history", Some(&w.admin))).await;
+    let rejected = &history.json["items"][0];
+    assert_eq!(rejected["user"]["email"], "rival@example.com");
+    assert_eq!(rejected["status"], "rejected");
+    assert_eq!(rejected["admin_email"], "admin@example.com");
+}
+
+#[sqlx::test]
 async fn rejected_claims_can_be_retried(pool: PgPool) {
     let w = world(pool).await;
     let dancer = w.dancer("Lil G", None).await;
@@ -397,55 +449,6 @@ async fn verified_dancers_cannot_be_merged_away(pool: PgPool) {
     )
     .await;
     assert_eq!(response.status, StatusCode::OK);
-}
-
-#[sqlx::test]
-async fn admins_change_roles_but_not_their_own(pool: PgPool) {
-    let w = world(pool).await;
-    sign_up(&w.app, &w.pool, "user@example.com").await;
-    let user_id = sqlx::query_scalar!("select id from app_users where email = 'user@example.com'")
-        .fetch_one(&w.pool)
-        .await
-        .unwrap();
-    let admin_id =
-        sqlx::query_scalar!("select id from app_users where email = 'admin@example.com'")
-            .fetch_one(&w.pool)
-            .await
-            .unwrap();
-
-    let promoted = send(
-        &w.app,
-        put(
-            &format!("/api/admin/users/{user_id}/role"),
-            json!({ "role": "seed_admin" }),
-            Some(&w.admin),
-        ),
-    )
-    .await;
-    assert_eq!(promoted.status, StatusCode::OK);
-    assert_eq!(promoted.json["role"], "seed_admin");
-
-    let own = send(
-        &w.app,
-        put(
-            &format!("/api/admin/users/{admin_id}/role"),
-            json!({ "role": "user" }),
-            Some(&w.admin),
-        ),
-    )
-    .await;
-    assert_eq!(own.status, StatusCode::UNPROCESSABLE_ENTITY);
-
-    let by_organizer = send(
-        &w.app,
-        put(
-            &format!("/api/admin/users/{user_id}/role"),
-            json!({ "role": "admin" }),
-            Some(&w.organizer),
-        ),
-    )
-    .await;
-    assert_eq!(by_organizer.status, StatusCode::FORBIDDEN);
 }
 
 #[sqlx::test]

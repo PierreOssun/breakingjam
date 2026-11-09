@@ -1,6 +1,7 @@
 // Screenshots the main pages as phones see them, light and dark, through the installed Chrome, and
-// names any element that runs past the screen's edge. `just shots [path…]`, SHOTS_LANG=de for German;
-// the dev server must be up.
+// names any element that runs past the screen's edge. `just shots [path…]`, SHOTS_LANG=de for German,
+// SHOTS_EMAIL and SHOTS_PASSWORD to shoot as that account (e.g. `/admin/accounts`); the dev server
+// must be up.
 import { spawn } from "node:child_process";
 import {
   mkdirSync,
@@ -20,6 +21,9 @@ const CHROME =
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 // The app's language (bj.lang): German and French labels run longest.
 const LANG = process.env.SHOTS_LANG ?? "en";
+// Pages behind an account (the admin area, My jams) need a session.
+const EMAIL = process.env.SHOTS_EMAIL;
+const PASSWORD = process.env.SHOTS_PASSWORD;
 const WIDTHS = [320, 375];
 const THEMES = ["light", "dark"];
 const HEIGHT = 812;
@@ -50,6 +54,21 @@ async function pages() {
     jam && `/jams/${jam.slug}`,
     dancer && `/dancers/${dancer.id}`,
   ].filter(Boolean);
+}
+
+/** Logs in as SHOTS_EMAIL the way the login page does; returns the session cookie's value. */
+async function logIn() {
+  const response = await fetch(`${BASE}/api/auth/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
+  });
+  const session = response.headers
+    .getSetCookie()
+    .find((cookie) => cookie.startsWith("bj_session="));
+  if (!response.ok || !session)
+    throw new Error(`Logging in as ${EMAIL} failed (${response.status}).`);
+  return session.split(";")[0].slice("bj_session=".length);
 }
 
 /** Starts a headless Chrome on a free port and connects to its first tab. */
@@ -181,6 +200,15 @@ const { send, close } = await connect(profile);
 let problems = 0;
 try {
   await send("Emulation.setTouchEmulationEnabled", { enabled: true });
+  if (EMAIL) {
+    const value = await logIn();
+    await send("Network.setCookie", {
+      name: "bj_session",
+      value,
+      url: BASE,
+      httpOnly: true,
+    });
+  }
   // The language is the site's to remember: store it once, every page then opens in it.
   await send("Page.navigate", { url: BASE });
   await wait(500);

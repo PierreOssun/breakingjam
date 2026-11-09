@@ -3350,6 +3350,82 @@
         ]
       }
     },
+    "/api/admin/claims/history": {
+      "get": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Every decided claim, on dancer and organiser pages alike, the most recent first (M31).",
+        "operationId": "list_claim_decisions",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ClaimDecision"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/admin/claims/{id}/approve": {
       "post": {
         "tags": [
@@ -3549,6 +3625,108 @@
         ]
       }
     },
+    "/api/admin/accounts": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Accounts for the admin Accounts tab: last seen, new, unconfirmed, organisers or the team.",
+        "operationId": "list_accounts",
+        "parameters": [
+          {
+            "name": "view",
+            "in": "query",
+            "description": "Which accounts, in which order; defaults to `last_seen`.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Which accounts the Accounts tab lists, and in which order (M31).",
+              "enum": [
+                "last_seen",
+                "new",
+                "unconfirmed",
+                "organizers",
+                "team"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Keeps the accounts whose email contains it.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_AccountRow"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/admin/dancers/{id}/merge": {
       "post": {
         "tags": [
@@ -3651,7 +3829,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Change an account's role (not your own).",
+        "summary": "Put an account on the team, change its place there or take it off (not your own); the super\nadmin manages admins, admins manage seed admins (M31).",
         "operationId": "set_user_role",
         "parameters": [
           {
@@ -3696,7 +3874,7 @@
             }
           },
           "403": {
-            "description": "Not an admin",
+            "description": "Not an admin, or not allowed to change this account or grant this role",
             "content": {
               "application/json": {
                 "schema": {
@@ -3767,6 +3945,82 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Page_ReviewItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/admin/events/history": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Every approval and rejection, the newest first (M31).",
+        "operationId": "list_event_decisions",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`next_cursor` of the previous page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, defaulted and clamped by `page::limit`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_JamDecision"
                 }
               }
             }
@@ -4623,6 +4877,93 @@
   },
   "components": {
     "schemas": {
+      "Account": {
+        "type": "object",
+        "description": "A row of the admin Accounts tab (M31).",
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "role",
+          "created_at",
+          "public_jams",
+          "private_jams"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Account id."
+          },
+          "email": {
+            "type": "string",
+            "description": "Login email."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Public name."
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role",
+            "description": "Privilege level."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Sign-up time."
+          },
+          "email_verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the email was confirmed; null while it is not."
+          },
+          "last_seen_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Last login or visit; null when never seen since M31 and without a session."
+          },
+          "public_jams": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Its own public jams (the team's left out)."
+          },
+          "private_jams": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Its own drafts and jams in review."
+          }
+        }
+      },
+      "AccountRow": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Account",
+            "description": "The account itself."
+          },
+          {
+            "type": "object",
+            "required": [
+              "team_roles"
+            ],
+            "properties": {
+              "team_roles": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TeamRole"
+                },
+                "description": "The team roles the viewer may give it; empty for their own account and those above them."
+              }
+            }
+          }
+        ],
+        "description": "An account as the Accounts tab shows it to one admin, with what that admin may change."
+      },
       "AddMemberRequest": {
         "type": "object",
         "description": "Body of `POST /crews/{id}/members`.",
@@ -4644,6 +4985,16 @@
             "description": "Join date; omit when unknown."
           }
         }
+      },
+      "AdminAction": {
+        "type": "string",
+        "description": "What an admin did.",
+        "enum": [
+          "jam_approved",
+          "jam_rejected",
+          "dancer_merged",
+          "role_changed"
+        ]
       },
       "Battle": {
         "type": "object",
@@ -5075,6 +5426,61 @@
             "type": "string",
             "format": "date-time",
             "description": "When the claim was opened."
+          }
+        }
+      },
+      "ClaimDecision": {
+        "type": "object",
+        "description": "A decided claim on a dancer or organiser page, for the history under the claims queue (M31).",
+        "required": [
+          "id",
+          "status",
+          "decided_at",
+          "user"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Claim id."
+          },
+          "status": {
+            "$ref": "#/components/schemas/ClaimStatus",
+            "description": "`approved` or `rejected`."
+          },
+          "decided_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When it was decided."
+          },
+          "admin_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The admin who decided; null when the site did (the handle changed meanwhile)."
+          },
+          "user": {
+            "$ref": "#/components/schemas/ClaimUser",
+            "description": "The account that claimed."
+          },
+          "instagram_handle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The handle the claim was about."
+          },
+          "dancer": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DancerRef",
+                "description": "The dancer page claimed; null for an organiser's claim, which is on `user`'s page."
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
@@ -6473,6 +6879,53 @@
           }
         }
       },
+      "JamDecision": {
+        "type": "object",
+        "description": "An approval or a rejection, for the history under the jam queue.",
+        "required": [
+          "id",
+          "action",
+          "decided_at",
+          "admin_email",
+          "organizer_email",
+          "jam"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Log entry id."
+          },
+          "action": {
+            "$ref": "#/components/schemas/AdminAction",
+            "description": "`jam_approved` or `jam_rejected`."
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The rejection note; null for an approval."
+          },
+          "decided_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When it was decided."
+          },
+          "admin_email": {
+            "type": "string",
+            "description": "The admin who decided."
+          },
+          "organizer_email": {
+            "type": "string",
+            "description": "The login email of the account that owns the jam now."
+          },
+          "jam": {
+            "$ref": "#/components/schemas/EventRef",
+            "description": "The jam."
+          }
+        }
+      },
       "Language": {
         "type": "string",
         "description": "Language of the emails the site sends; the frontend passes its own.",
@@ -7079,6 +7532,125 @@
         ],
         "description": "The account's own page (`GET /auth/me`): linked by an approved claim, or made by the account\nand waiting for one."
       },
+      "Page_AccountRow": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Account",
+                  "description": "The account itself."
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "team_roles"
+                  ],
+                  "properties": {
+                    "team_roles": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TeamRole"
+                      },
+                      "description": "The team roles the viewer may give it; empty for their own account and those above them."
+                    }
+                  }
+                }
+              ],
+              "description": "An account as the Accounts tab shows it to one admin, with what that admin may change."
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
+      "Page_ClaimDecision": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "A decided claim on a dancer or organiser page, for the history under the claims queue (M31).",
+              "required": [
+                "id",
+                "status",
+                "decided_at",
+                "user"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Claim id."
+                },
+                "status": {
+                  "$ref": "#/components/schemas/ClaimStatus",
+                  "description": "`approved` or `rejected`."
+                },
+                "decided_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When it was decided."
+                },
+                "admin_email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The admin who decided; null when the site did (the handle changed meanwhile)."
+                },
+                "user": {
+                  "$ref": "#/components/schemas/ClaimUser",
+                  "description": "The account that claimed."
+                },
+                "instagram_handle": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The handle the claim was about."
+                },
+                "dancer": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DancerRef",
+                      "description": "The dancer page claimed; null for an organiser's claim, which is on `user`'s page."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
       "Page_ClaimForReview": {
         "type": "object",
         "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
@@ -7500,6 +8072,73 @@
           }
         }
       },
+      "Page_JamDecision": {
+        "type": "object",
+        "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "An approval or a rejection, for the history under the jam queue.",
+              "required": [
+                "id",
+                "action",
+                "decided_at",
+                "admin_email",
+                "organizer_email",
+                "jam"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Log entry id."
+                },
+                "action": {
+                  "$ref": "#/components/schemas/AdminAction",
+                  "description": "`jam_approved` or `jam_rejected`."
+                },
+                "note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The rejection note; null for an approval."
+                },
+                "decided_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When it was decided."
+                },
+                "admin_email": {
+                  "type": "string",
+                  "description": "The admin who decided."
+                },
+                "organizer_email": {
+                  "type": "string",
+                  "description": "The login email of the account that owns the jam now."
+                },
+                "jam": {
+                  "$ref": "#/components/schemas/EventRef",
+                  "description": "The jam."
+                }
+              }
+            },
+            "description": "At most `limit` rows."
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `?cursor=` for the next page; null on the last one."
+          }
+        }
+      },
       "Page_OrganizerClaimForReview": {
         "type": "object",
         "description": "One page of a list endpoint; `next_cursor` is null on the last page.",
@@ -7840,7 +8479,8 @@
           "user",
           "organizer",
           "seed_admin",
-          "admin"
+          "admin",
+          "super_admin"
         ]
       },
       "RoleRequest": {
@@ -7851,8 +8491,8 @@
         ],
         "properties": {
           "role": {
-            "$ref": "#/components/schemas/Role",
-            "description": "The new role."
+            "$ref": "#/components/schemas/TeamRole",
+            "description": "The account's place on the team; the super admin grants `admin`, admins only `seed_admin`."
           }
         }
       },
@@ -8051,6 +8691,15 @@
             "description": "Organiser claims waiting for review."
           }
         }
+      },
+      "TeamRole": {
+        "type": "string",
+        "description": "A place on the BreakingJam team, or none: what `PUT /admin/users/{id}/role` sets.",
+        "enum": [
+          "none",
+          "seed_admin",
+          "admin"
+        ]
       },
       "Transition": {
         "type": "string",

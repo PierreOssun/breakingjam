@@ -19,7 +19,15 @@ export function useSearchText(): [string, (text: string) => void, string] {
     if (q !== pushed.current || settled !== text.trim() || settled === q)
       return;
     pushed.current = settled;
-    setParams(settled ? { q: settled } : {}, { replace: true });
+    // Other parameters (a view, a filter) stay as they are.
+    setParams(
+      (params) => {
+        if (settled) params.set("q", settled);
+        else params.delete("q");
+        return params;
+      },
+      { replace: true },
+    );
   }, [settled, text, q, setParams]);
   // A `q` this page did not push (back, forward, the header's link) replaces what was typed.
   useEffect(() => {

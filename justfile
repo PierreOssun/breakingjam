@@ -26,7 +26,7 @@ frontend:
 media:
     cd deploy && npx wrangler dev -c wrangler.media.jsonc
 
-# Phone screenshots (320 and 375px, light and dark) of the main pages, or of the paths given, into frontend/shots; names what runs past the screen's edge. Needs `just dev` and Chrome.
+# Phone screenshots (320 and 375px, light and dark) of the main pages, or of the paths given, into frontend/shots; names what runs past the screen's edge. Needs `just dev` and Chrome; SHOTS_EMAIL and SHOTS_PASSWORD shoot as that account (`/admin/accounts`).
 shots *paths:
     cd frontend && node scripts/shots.mjs {{paths}}
 

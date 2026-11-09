@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink, Outlet } from "react-router";
+import { NavLink, Outlet, useLocation } from "react-router";
 import { useAdminStats } from "./queries";
 
 /** `/admin/*`: the admin area's title, then a tab per tool with the size of its queue (§6). */
@@ -9,10 +9,23 @@ export function AdminLayout() {
   const stats = useAdminStats().data;
   const claims =
     stats && stats.dancer_claims_pending + stats.organizer_claims_pending;
+  const tabs = useRef<HTMLElement>(null);
+  const { pathname } = useLocation();
+  // On a phone the tabs scroll sideways: the lit one may sit past the edge, so bring it in, and
+  // again once the fonts and the counts are in, as both widen the tabs. jsdom has neither API.
+  useEffect(() => {
+    const bringIn = () =>
+      tabs.current
+        ?.querySelector('[aria-current="page"]')
+        ?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+    bringIn();
+    void document.fonts?.ready.then(bringIn);
+  }, [pathname, stats]);
   return (
     <div className="mx-auto flex max-w-content flex-col gap-8 px-4 py-10 md:px-6 lg:px-8">
       <h1 className="font-display text-display-lg">{t("admin.title")}</h1>
       <nav
+        ref={tabs}
         aria-label={t("admin.sections")}
         className="-mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0"
       >
@@ -25,6 +38,7 @@ export function AdminLayout() {
         <Tab to="/admin/claims" count={claims}>
           {t("admin.claims.tab")}
         </Tab>
+        <Tab to="/admin/accounts">{t("admin.accounts.tab")}</Tab>
       </nav>
       <Outlet />
     </div>

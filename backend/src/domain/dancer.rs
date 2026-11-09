@@ -37,7 +37,7 @@ impl DancerSource {
     pub fn for_creator(role: Role) -> Self {
         match role {
             Role::User | Role::Organizer => Self::Organizer,
-            Role::SeedAdmin | Role::Admin => Self::Seed,
+            Role::SeedAdmin | Role::Admin | Role::SuperAdmin => Self::Seed,
         }
     }
 }

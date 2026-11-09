@@ -29,24 +29,40 @@ pub async fn find(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<Organizer>> {
 
 /// The organiser of a jam, for its page; none when the BreakingJam team entered it, since the
 /// team lists jams it doesn't run.
-pub async fn reference(pool: &PgPool, id: Uuid) -> sqlx::Result<Option<OrganizerRef>> {
-    Ok(references(pool, &[id]).await?.remove(&id))
+pub async fn reference(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Option<OrganizerRef>> {
+    Ok(references(pool, &[event_id]).await?.remove(&event_id))
 }
 
-/// The organiser cards of `ids`, keyed by account id; team accounts have none.
-pub async fn references(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, OrganizerRef>> {
-    let refs = sqlx::query_as!(
-        OrganizerRef,
-        r#"select id, display_name, instagram_handle, verified_at is not null as "verified!",
-                  (select count(*) from events e
-                   where e.organizer_id = app_users.id and e.deleted_at is null
-                     and e.status not in ('draft', 'in_review')) as "jams!"
-           from app_users where id = any($1) and role not in ('seed_admin', 'admin')"#,
-        ids,
+/// The organiser cards of the jams `event_ids`, keyed by jam id; the team's jams have none.
+pub async fn references(
+    pool: &PgPool,
+    event_ids: &[Uuid],
+) -> sqlx::Result<HashMap<Uuid, OrganizerRef>> {
+    let rows = sqlx::query!(
+        r#"select e.id as event_id, u.id, u.display_name, u.instagram_handle,
+                  u.verified_at is not null as "verified!",
+                  (select count(*) from events o
+                   where o.organizer_id = u.id and o.deleted_at is null and not o.entered_by_team
+                     and o.status not in ('draft', 'in_review')) as "jams!"
+           from events e join app_users u on u.id = e.organizer_id
+           where e.id = any($1) and not e.entered_by_team"#,
+        event_ids,
     )
     .fetch_all(pool)
     .await?;
-    Ok(refs.into_iter().map(|r| (r.id, r)).collect())
+    Ok(rows
+        .into_iter()
+        .map(|r| {
+            let card = OrganizerRef {
+                id: r.id,
+                display_name: r.display_name,
+                instagram_handle: r.instagram_handle,
+                verified: r.verified,
+                jams: r.jams,
+            };
+            (r.event_id, card)
+        })
+        .collect())
 }
 
 /// Replaces the page's fields; a new handle drops the tick and the pending claim on the old one.
@@ -89,7 +105,7 @@ pub async fn update(
     Ok(organizer)
 }
 
-/// The organiser's public jams (drafts and jams in review left out), oldest first.
+/// The organiser's public jams (drafts, jams in review and the team's left out), oldest first.
 pub async fn events(pool: &PgPool, organizer_id: Uuid) -> sqlx::Result<Vec<EventRef>> {
     sqlx::query_as!(
         EventRef,
@@ -97,7 +113,8 @@ pub async fn events(pool: &PgPool, organizer_id: Uuid) -> sqlx::Result<Vec<Event
                   status as "status: EventStatus",
                   jam_phase(starts_on, ends_on, timezone) as "phase!: Phase"
            from events
-           where organizer_id = $1 and deleted_at is null and status not in ('draft', 'in_review')
+           where organizer_id = $1 and deleted_at is null and not entered_by_team
+             and status not in ('draft', 'in_review')
            order by starts_on, id"#,
         organizer_id,
     )

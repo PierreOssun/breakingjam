@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "insert into events\n             (id, organizer_id, slug, name, description, starts_on, ends_on, timezone,\n              venue_name, address, city, country, lat, lng, registration_url, instagram_url,\n              website_url, contact_email, opens_at, closes_at)\n           values ($1, $2, $3, btrim($4), nullif(btrim($5), ''), $6, $7, $8,\n                   nullif(btrim($9), ''), nullif(btrim($10), ''), nullif(btrim($11), ''), $12,\n                   $13, $14, nullif(btrim($15), ''), nullif(btrim($16), ''),\n                   nullif(btrim($17), ''), nullif(btrim($18), ''), $19, $20)\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     jam_phase(starts_on, ends_on, timezone) as \"phase!: Phase\", starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at",
+  "query": "insert into events\n             (id, organizer_id, slug, name, description, starts_on, ends_on, timezone,\n              venue_name, address, city, country, lat, lng, registration_url, instagram_url,\n              website_url, contact_email, opens_at, closes_at, entered_by_team)\n           values ($1, $2, $3, btrim($4), nullif(btrim($5), ''), $6, $7, $8,\n                   nullif(btrim($9), ''), nullif(btrim($10), ''), nullif(btrim($11), ''), $12,\n                   $13, $14, nullif(btrim($15), ''), nullif(btrim($16), ''),\n                   nullif(btrim($17), ''), nullif(btrim($18), ''), $19, $20,\n                   (select role >= 'seed_admin' from app_users where id = $2))\n           returning id, organizer_id, name, slug, description, status as \"status: EventStatus\",\n                     jam_phase(starts_on, ends_on, timezone) as \"phase!: Phase\", starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,\n                     registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -374,5 +374,5 @@
       false
     ]
   },
-  "hash": "6835c3897b9d493b652fbb7270707c7195630e2dcc44fd684dfca3c7de01c28b"
+  "hash": "cedf496dbcd85dd09dda40613ed07d30db6e841ac9a8834f1f457e0b8465a009"
 }

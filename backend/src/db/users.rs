@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::{
     auth::google::Profile,
-    domain::user::{Role, User},
+    domain::user::{Account, AccountView, Role, User},
 };
 
 /// Inserts a password account with the default `user` role.
@@ -185,16 +185,80 @@ pub async fn promote_to_organizer(conn: &mut PgConnection, id: Uuid) -> sqlx::Re
     Ok(())
 }
 
-/// Sets an account's role.
-pub async fn set_role(pool: &PgPool, id: Uuid, role: Role) -> sqlx::Result<User> {
+/// Locks an account, so two role changes on it run one after the other.
+pub async fn find_for_update(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<Option<User>> {
     sqlx::query_as!(
         User,
-        r#"update app_users set role = $2 where id = $1
+        r#"select id, email::text as "email!", display_name, role as "role: Role"
+           from app_users where id = $1 for update"#,
+        id,
+    )
+    .fetch_optional(conn)
+    .await
+}
+
+/// Sets an account's role; `None` gives `organizer` when it owns a jam, else `user`.
+pub async fn set_role(conn: &mut PgConnection, id: Uuid, role: Option<Role>) -> sqlx::Result<User> {
+    sqlx::query_as!(
+        User,
+        r#"update app_users set role = coalesce($2, case
+             when exists(select 1 from events where organizer_id = $1 and deleted_at is null)
+             then 'organizer'::user_role else 'user'::user_role end)
+           where id = $1
            returning id, email::text as "email!", display_name, role as "role: Role""#,
         id,
-        role as Role,
+        role as Option<Role>,
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
+    .await
+}
+
+/// One page of the admin Accounts tab; `email` keeps the addresses that contain it (M31).
+pub async fn accounts(
+    pool: &PgPool,
+    view: AccountView,
+    email: Option<&str>,
+    window: super::Window,
+) -> sqlx::Result<Vec<Account>> {
+    let view = match view {
+        AccountView::LastSeen => "last_seen",
+        AccountView::New => "new",
+        AccountView::Unconfirmed => "unconfirmed",
+        AccountView::Organizers => "organizers",
+        AccountView::Team => "team",
+    };
+    // The team's jams are left out: they are not their enterer's own.
+    sqlx::query_as!(
+        Account,
+        r#"select u.id, u.email::text as "email!", u.display_name, u.role as "role: Role",
+                  u.created_at, u.email_verified_at, u.last_seen_at,
+                  count(e.id) filter (where e.status not in ('draft', 'in_review')) as "public_jams!",
+                  count(e.id) filter (where e.status in ('draft', 'in_review')) as "private_jams!"
+           from app_users u
+           left join events e
+             on e.organizer_id = u.id and e.deleted_at is null and not e.entered_by_team
+           where case $1
+                   when 'last_seen' then u.last_seen_at is not null
+                   when 'new' then u.email_verified_at is not null
+                   when 'unconfirmed' then u.email_verified_at is null
+                   when 'team' then u.role >= 'seed_admin'
+                   else true
+                 end
+             and ($2::text is null or u.email::text ilike $2)
+           group by u.id
+           having $1 <> 'organizers' or count(e.id) > 0
+           order by case $1
+                      when 'last_seen' then u.last_seen_at
+                      when 'new' then u.email_verified_at
+                      else u.created_at
+                    end desc, u.id desc
+           limit $3 offset $4"#,
+        view,
+        email.map(super::contains_pattern),
+        window.limit,
+        window.offset,
+    )
+    .fetch_all(pool)
     .await
 }
 

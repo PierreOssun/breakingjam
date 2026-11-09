@@ -22,7 +22,8 @@
                 "user",
                 "organizer",
                 "seed_admin",
-                "admin"
+                "admin",
+                "super_admin"
               ]
             }
           }

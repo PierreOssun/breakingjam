@@ -1,11 +1,22 @@
 //! Cursor pagination: `?limit=&cursor=` in, `{ items, next_cursor }` out (§5 Handlers).
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use utoipa::IntoParams;
 
 use crate::{db, error::AppError};
 
 const DEFAULT_LIMIT: i64 = 50;
 const MAX_LIMIT: i64 = 200;
+
+/// Query of a list that only pages.
+#[derive(Debug, Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct PageQuery {
+    /// `next_cursor` of the previous page.
+    pub cursor: Option<String>,
+    /// Page size, defaulted and clamped by `page::limit`.
+    pub limit: Option<i64>,
+}
 
 /// One page of a list endpoint; `next_cursor` is null on the last page.
 #[derive(Debug, Serialize, utoipa::ToSchema)]

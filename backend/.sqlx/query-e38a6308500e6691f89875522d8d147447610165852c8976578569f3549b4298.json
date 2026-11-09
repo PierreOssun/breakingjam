@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, name, slug, starts_on, ends_on, city, country,\n                  status as \"status: EventStatus\",\n                  jam_phase(starts_on, ends_on, timezone) as \"phase!: Phase\"\n           from events\n           where organizer_id = $1 and deleted_at is null and status not in ('draft', 'in_review')\n           order by starts_on, id",
+  "query": "select id, name, slug, starts_on, ends_on, city, country,\n                  status as \"status: EventStatus\",\n                  jam_phase(starts_on, ends_on, timezone) as \"phase!: Phase\"\n           from events\n           where organizer_id = $1 and deleted_at is null and not entered_by_team\n             and status not in ('draft', 'in_review')\n           order by starts_on, id",
   "describe": {
     "columns": [
       {
@@ -139,5 +139,5 @@
       null
     ]
   },
-  "hash": "5066146658743e8b8344e5e2b8e60f579055c637eef498728d9445e08cfc24ee"
+  "hash": "e38a6308500e6691f89875522d8d147447610165852c8976578569f3549b4298"
 }

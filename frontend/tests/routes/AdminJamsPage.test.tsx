@@ -36,6 +36,10 @@ function api(replies: Parameters<typeof mockApi>[0]) {
       status: 200,
       body: { items: n === 0 ? [JAM] : [], next_cursor: null },
     }),
+    "GET /api/admin/events/history": {
+      status: 200,
+      body: { items: [], next_cursor: null },
+    },
     ...replies,
   });
 }
@@ -104,6 +108,43 @@ describe("AdminJamsPage", () => {
     expect(await bodyOf(fetch, `POST /api/admin/events/${ID}/reject`)).toEqual({
       note: "Add the venue.",
     });
+  });
+
+  it("lists past decisions under the queue, with who decided", async () => {
+    api({
+      "GET /api/admin/events/history": {
+        status: 200,
+        body: {
+          items: [
+            {
+              id: "01930000-0000-7000-8000-0000000000d1",
+              action: "jam_rejected",
+              note: "Add the venue.",
+              decided_at: "2026-11-08T18:30:00Z",
+              admin_email: "admin@breakingjam.com",
+              organizer_email: "crew@cypher.ch",
+              jam: { ...JAM, phase: "upcoming" },
+            },
+          ],
+          next_cursor: null,
+        },
+      },
+    });
+    renderApp("/admin/jams");
+
+    const history = within(
+      await screen.findByRole("region", { name: "History" }),
+    );
+    expect(
+      await history.findByRole("link", { name: "Geneva Lakeside Battle" }),
+    ).toHaveAttribute("href", `/jams/${JAM.slug}`);
+    expect(history.getByText("Sent back")).toBeInTheDocument();
+    expect(history.getByText("Note: Add the venue.")).toBeInTheDocument();
+    expect(
+      history.getByText(
+        /by admin@breakingjam\.com · organiser crew@cypher\.ch/,
+      ),
+    ).toBeInTheDocument();
   });
 
   it("says what keeps a jam from going public when approving is refused", async () => {

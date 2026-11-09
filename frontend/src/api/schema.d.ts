@@ -683,6 +683,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/claims/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every decided claim, on dancer and organiser pages alike, the most recent first (M31). */
+        get: operations["list_claim_decisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/claims/{id}/approve": {
         parameters: {
             query?: never;
@@ -734,6 +751,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Accounts for the admin Accounts tab: last seen, new, unconfirmed, organisers or the team. */
+        get: operations["list_accounts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/dancers/{id}/merge": {
         parameters: {
             query?: never;
@@ -759,7 +793,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Change an account's role (not your own). */
+        /**
+         * Put an account on the team, change its place there or take it off (not your own); the super
+         *     admin manages admins, admins manage seed admins (M31).
+         */
         put: operations["set_user_role"];
         post?: never;
         delete?: never;
@@ -777,6 +814,23 @@ export interface paths {
         };
         /** Jams waiting for an admin's approval, the soonest first. */
         get: operations["list_events_in_review"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/events/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every approval and rejection, the newest first (M31). */
+        get: operations["list_event_decisions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -965,6 +1019,50 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description A row of the admin Accounts tab (M31). */
+        Account: {
+            /**
+             * Format: uuid
+             * @description Account id.
+             */
+            id: string;
+            /** @description Login email. */
+            email: string;
+            /** @description Public name. */
+            display_name: string;
+            /** @description Privilege level. */
+            role: components["schemas"]["Role"];
+            /**
+             * Format: date-time
+             * @description Sign-up time.
+             */
+            created_at: string;
+            /**
+             * Format: date-time
+             * @description When the email was confirmed; null while it is not.
+             */
+            email_verified_at?: string | null;
+            /**
+             * Format: date-time
+             * @description Last login or visit; null when never seen since M31 and without a session.
+             */
+            last_seen_at?: string | null;
+            /**
+             * Format: int64
+             * @description Its own public jams (the team's left out).
+             */
+            public_jams: number;
+            /**
+             * Format: int64
+             * @description Its own drafts and jams in review.
+             */
+            private_jams: number;
+        };
+        /** @description An account as the Accounts tab shows it to one admin, with what that admin may change. */
+        AccountRow: components["schemas"]["Account"] & {
+            /** @description The team roles the viewer may give it; empty for their own account and those above them. */
+            team_roles: components["schemas"]["TeamRole"][];
+        };
         /** @description Body of `POST /crews/{id}/members`. */
         AddMemberRequest: {
             /**
@@ -978,6 +1076,11 @@ export interface components {
              */
             since?: string | null;
         };
+        /**
+         * @description What an admin did.
+         * @enum {string}
+         */
+        AdminAction: "jam_approved" | "jam_rejected" | "dancer_merged" | "role_changed";
         /** @description A competition inside a jam, e.g. "1v1 Bboy". */
         Battle: {
             /**
@@ -1205,6 +1308,28 @@ export interface components {
              * @description When the claim was opened.
              */
             created_at: string;
+        };
+        /** @description A decided claim on a dancer or organiser page, for the history under the claims queue (M31). */
+        ClaimDecision: {
+            /**
+             * Format: uuid
+             * @description Claim id.
+             */
+            id: string;
+            /** @description `approved` or `rejected`. */
+            status: components["schemas"]["ClaimStatus"];
+            /**
+             * Format: date-time
+             * @description When it was decided.
+             */
+            decided_at: string;
+            /** @description The admin who decided; null when the site did (the handle changed meanwhile). */
+            admin_email?: string | null;
+            /** @description The account that claimed. */
+            user: components["schemas"]["ClaimUser"];
+            /** @description The handle the claim was about. */
+            instagram_handle?: string | null;
+            dancer?: components["schemas"]["DancerRef"] | null;
         };
         /** @description A claim in the admin review queue, with who is claiming which page. */
         ClaimForReview: components["schemas"]["Claim"] & {
@@ -1779,6 +1904,29 @@ export interface components {
             /** @description Crate version of the running binary. */
             version: string;
         };
+        /** @description An approval or a rejection, for the history under the jam queue. */
+        JamDecision: {
+            /**
+             * Format: uuid
+             * @description Log entry id.
+             */
+            id: string;
+            /** @description `jam_approved` or `jam_rejected`. */
+            action: components["schemas"]["AdminAction"];
+            /** @description The rejection note; null for an approval. */
+            note?: string | null;
+            /**
+             * Format: date-time
+             * @description When it was decided.
+             */
+            decided_at: string;
+            /** @description The admin who decided. */
+            admin_email: string;
+            /** @description The login email of the account that owns the jam now. */
+            organizer_email: string;
+            /** @description The jam. */
+            jam: components["schemas"]["EventRef"];
+        };
         /**
          * @description Language of the emails the site sends; the frontend passes its own.
          * @enum {string}
@@ -2055,6 +2203,43 @@ export interface components {
             verified: boolean;
         };
         /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
+        Page_AccountRow: {
+            /** @description At most `limit` rows. */
+            items: (components["schemas"]["Account"] & {
+                /** @description The team roles the viewer may give it; empty for their own account and those above them. */
+                team_roles: components["schemas"]["TeamRole"][];
+            })[];
+            /** @description Pass as `?cursor=` for the next page; null on the last one. */
+            next_cursor?: string | null;
+        };
+        /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
+        Page_ClaimDecision: {
+            /** @description At most `limit` rows. */
+            items: {
+                /**
+                 * Format: uuid
+                 * @description Claim id.
+                 */
+                id: string;
+                /** @description `approved` or `rejected`. */
+                status: components["schemas"]["ClaimStatus"];
+                /**
+                 * Format: date-time
+                 * @description When it was decided.
+                 */
+                decided_at: string;
+                /** @description The admin who decided; null when the site did (the handle changed meanwhile). */
+                admin_email?: string | null;
+                /** @description The account that claimed. */
+                user: components["schemas"]["ClaimUser"];
+                /** @description The handle the claim was about. */
+                instagram_handle?: string | null;
+                dancer?: components["schemas"]["DancerRef"] | null;
+            }[];
+            /** @description Pass as `?cursor=` for the next page; null on the last one. */
+            next_cursor?: string | null;
+        };
+        /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
         Page_ClaimForReview: {
             /** @description At most `limit` rows. */
             items: (components["schemas"]["Claim"] & {
@@ -2217,6 +2402,34 @@ export interface components {
             next_cursor?: string | null;
         };
         /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
+        Page_JamDecision: {
+            /** @description At most `limit` rows. */
+            items: {
+                /**
+                 * Format: uuid
+                 * @description Log entry id.
+                 */
+                id: string;
+                /** @description `jam_approved` or `jam_rejected`. */
+                action: components["schemas"]["AdminAction"];
+                /** @description The rejection note; null for an approval. */
+                note?: string | null;
+                /**
+                 * Format: date-time
+                 * @description When it was decided.
+                 */
+                decided_at: string;
+                /** @description The admin who decided. */
+                admin_email: string;
+                /** @description The login email of the account that owns the jam now. */
+                organizer_email: string;
+                /** @description The jam. */
+                jam: components["schemas"]["EventRef"];
+            }[];
+            /** @description Pass as `?cursor=` for the next page; null on the last one. */
+            next_cursor?: string | null;
+        };
+        /** @description One page of a list endpoint; `next_cursor` is null on the last page. */
         Page_OrganizerClaimForReview: {
             /** @description At most `limit` rows. */
             items: (components["schemas"]["OrganizerClaim"] & {
@@ -2335,11 +2548,11 @@ export interface components {
          * @description Account role; declaration order is privilege order, so `>=` means "at least".
          * @enum {string}
          */
-        Role: "user" | "organizer" | "seed_admin" | "admin";
+        Role: "user" | "organizer" | "seed_admin" | "admin" | "super_admin";
         /** @description Body of `PUT /admin/users/{id}/role`. */
         RoleRequest: {
-            /** @description The new role. */
-            role: components["schemas"]["Role"];
+            /** @description The account's place on the team; the super admin grants `admin`, admins only `seed_admin`. */
+            role: components["schemas"]["TeamRole"];
         };
         /** @description Body of `POST /auth/email/resend` and `POST /auth/password/forgot`. */
         SendCodeRequest: {
@@ -2468,6 +2681,11 @@ export interface components {
              */
             organizer_claims_pending: number;
         };
+        /**
+         * @description A place on the BreakingJam team, or none: what `PUT /admin/users/{id}/role` sets.
+         * @enum {string}
+         */
+        TeamRole: "none" | "seed_admin" | "admin";
         /**
          * @description An explicit status change: the last segment of `POST /events/{id}/{transition}`.
          * @enum {string}
@@ -4901,6 +5119,57 @@ export interface operations {
             };
         };
     };
+    list_claim_decisions: {
+        parameters: {
+            query?: {
+                /** @description `next_cursor` of the previous page. */
+                cursor?: string;
+                /** @description Page size, defaulted and clamped by `page::limit`. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ClaimDecision"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid cursor */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     approve_claim: {
         parameters: {
             query?: never;
@@ -5054,6 +5323,61 @@ export interface operations {
             };
         };
     };
+    list_accounts: {
+        parameters: {
+            query?: {
+                /** @description Which accounts, in which order; defaults to `last_seen`. */
+                view?: "last_seen" | "new" | "unconfirmed" | "organizers" | "team";
+                /** @description Keeps the accounts whose email contains it. */
+                q?: string;
+                /** @description `next_cursor` of the previous page. */
+                cursor?: string;
+                /** @description Page size, defaulted and clamped by `page::limit`. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_AccountRow"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid cursor */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     merge_dancers: {
         parameters: {
             query?: never;
@@ -5158,7 +5482,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Not an admin */
+            /** @description Not an admin, or not allowed to change this account or grant this role */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5207,6 +5531,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Page_ReviewItem"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid cursor */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_event_decisions: {
+        parameters: {
+            query?: {
+                /** @description `next_cursor` of the previous page. */
+                cursor?: string;
+                /** @description Page size, defaulted and clamped by `page::limit`. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_JamDecision"];
                 };
             };
             /** @description No valid session */

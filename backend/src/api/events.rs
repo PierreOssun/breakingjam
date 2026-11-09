@@ -303,7 +303,7 @@ async fn show(
     Path(id_or_slug): Path<String>,
 ) -> Result<Json<EventResponse>, AppError> {
     let event = readable(&state, &current, &id_or_slug).await?;
-    let organizer = db::organizers::reference(&state.pool, event.organizer_id).await?;
+    let organizer = db::organizers::reference(&state.pool, event.id).await?;
     let user = current.as_ref().map(|c| &c.user);
     Ok(Json(EventResponse::new(event, user, organizer)))
 }

@@ -1,7 +1,8 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { LIL_G, mockApi, renderApp } from "../support/app";
 
 const ADMIN = { status: 200, body: { ...LIL_G, role: "admin" } };
+const EMPTY = { status: 200, body: { items: [], next_cursor: null } };
 
 const claim = (n: number, name: string, deleted: boolean) => ({
   id: `0193000${n}-0000-7000-8000-000000000000`,
@@ -39,10 +40,8 @@ describe("AdminClaimsPage", () => {
           next_cursor: null,
         },
       },
-      "GET /api/admin/organizer-claims": {
-        status: 200,
-        body: { items: [], next_cursor: null },
-      },
+      "GET /api/admin/organizer-claims": EMPTY,
+      "GET /api/admin/claims/history": EMPTY,
     });
     renderApp("/admin/claims");
 
@@ -54,5 +53,60 @@ describe("AdminClaimsPage", () => {
     expect(
       screen.queryByRole("link", { name: "Gone" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("lists past decisions, and the ones the site withdrew", async () => {
+    const { dancer, user } = claim(1, "Nova", false);
+    mockApi({
+      "GET /api/auth/me": ADMIN,
+      "GET /api/admin/claims": EMPTY,
+      "GET /api/admin/organizer-claims": EMPTY,
+      "GET /api/admin/claims/history": {
+        status: 200,
+        body: {
+          items: [
+            {
+              id: "01930001-0000-7000-8000-0000000000e1",
+              status: "approved",
+              decided_at: "2026-11-08T18:30:00Z",
+              admin_email: "admin@breakingjam.com",
+              user,
+              instagram_handle: "nova",
+              dancer,
+            },
+            {
+              id: "01930001-0000-7000-8000-0000000000e2",
+              status: "rejected",
+              decided_at: "2026-11-07T18:30:00Z",
+              admin_email: null,
+              user,
+              instagram_handle: "floor.lords",
+              dancer: null,
+            },
+          ],
+          next_cursor: null,
+        },
+      },
+    });
+    renderApp("/admin/claims");
+
+    const rows = await screen.findAllByRole("listitem");
+    const [approved, withdrawn] = rows.slice(-2).map((row) => within(row));
+    expect(approved!.getByRole("link", { name: "Nova" })).toHaveAttribute(
+      "href",
+      `/dancers/${dancer.id}`,
+    );
+    expect(approved!.getByText("Approved")).toBeInTheDocument();
+    expect(
+      approved!.getByText(/by admin@breakingjam\.com/),
+    ).toBeInTheDocument();
+    // An organiser's claim is about their own page.
+    expect(withdrawn!.getByRole("link", { name: "Claimer" })).toHaveAttribute(
+      "href",
+      `/organizers/${user.id}`,
+    );
+    expect(
+      withdrawn!.getByText(/withdrawn: the handle changed/),
+    ).toBeInTheDocument();
   });
 });

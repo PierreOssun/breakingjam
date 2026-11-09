@@ -30,7 +30,7 @@ export function MoreList<T extends { id: string }>({
   children,
 }: MoreListProps<T>) {
   const { t } = useTranslation();
-  const items = query.data?.pages.flatMap((page) => page.items) ?? [];
+  const items = unique(query.data?.pages.flatMap((page) => page.items) ?? []);
   return (
     <>
       {query.isPending && <RowsSkeleton />}
@@ -52,4 +52,17 @@ export function MoreList<T extends { id: string }>({
       )}
     </>
   );
+}
+
+/**
+ * Each row once: a list can shift between two pages (an account seen meanwhile moves to the top),
+ * so the next page may repeat a row already shown.
+ */
+function unique<T extends { id: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
 }

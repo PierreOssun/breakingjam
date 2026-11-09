@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "update app_users set role = $2 where id = $1\n           returning id, email::text as \"email!\", display_name, role as \"role: Role\"",
+  "query": "update app_users set role = coalesce($2, case\n             when exists(select 1 from events where organizer_id = $1 and deleted_at is null)\n             then 'organizer'::user_role else 'user'::user_role end)\n           where id = $1\n           returning id, email::text as \"email!\", display_name, role as \"role: Role\"",
   "describe": {
     "columns": [
       {
@@ -42,7 +42,8 @@
                 "user",
                 "organizer",
                 "seed_admin",
-                "admin"
+                "admin",
+                "super_admin"
               ]
             }
           }
@@ -66,7 +67,8 @@
                 "user",
                 "organizer",
                 "seed_admin",
-                "admin"
+                "admin",
+                "super_admin"
               ]
             }
           }
@@ -80,5 +82,5 @@
       false
     ]
   },
-  "hash": "1d75cfe1749739e8fa69d1acc043eb4ff836aaf66e9c568aecb20752dfbdb06e"
+  "hash": "b3551a915b3c7e277d95de13a70c7682865263c5bb74743421e838ff9d092076"
 }

@@ -84,7 +84,7 @@ fn valid_body(method: &str, path: &str) -> Value {
         ("post", "/api/crews/{id}/members") => json!({ "dancer_id": id() }),
         ("post", "/api/admin/dancers/{id}/merge") => json!({ "into": id() }),
         ("post", "/api/admin/events/{id}/reject") => json!({ "note": "Add the venue" }),
-        ("put", "/api/admin/users/{id}/role") => json!({ "role": "user" }),
+        ("put", "/api/admin/users/{id}/role") => json!({ "role": "none" }),
         ("put", "/api/organizers/{id}") => json!({ "display_name": "Floor Lords" }),
         _ => json!({}),
     }
@@ -158,8 +158,8 @@ async fn every_paged_list_rejects_a_garbled_cursor(pool: PgPool) {
         checked += 1;
     }
     assert_eq!(
-        checked, 6,
-        "events, dancers, crews, jams in review and both claim queues are paged"
+        checked, 9,
+        "events, dancers, crews, jams in review, both claim queues, both histories and the accounts are paged"
     );
 }
 
@@ -380,6 +380,9 @@ async fn admin_routes_are_for_admins_only(pool: PgPool) {
     let id = Uuid::now_v7();
     let cases: Vec<(&str, String, Value)> = vec![
         ("get", "/api/admin/claims".into(), json!({})),
+        ("get", "/api/admin/claims/history".into(), json!({})),
+        ("get", "/api/admin/events/history".into(), json!({})),
+        ("get", "/api/admin/accounts".into(), json!({})),
         ("post", format!("/api/admin/claims/{id}/approve"), json!({})),
         ("post", format!("/api/admin/claims/{id}/reject"), json!({})),
         ("get", "/api/admin/organizer-claims".into(), json!({})),

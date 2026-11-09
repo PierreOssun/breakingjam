@@ -16,7 +16,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 - Jam flyer upload (M19): whoever may edit a jam uploads a flyer that replaces the generated one everywhere (jam page, cards, lists, map). The browser crops it to 4:5 and encodes it; it goes live at once, without review, and admins remove unsuitable ones (decided in M19). The generated flyer stays the fallback and the share image.
 - Contact page (`/contact`): how to reach BreakingJam by email or Instagram, with topic cards as `mailto:` links that prefill a subject. No form and no backend.
 - Team page (`/team`): the people who run BreakingJam (role, Instagram, their dancer page when they have one) and a last card asking for organisers, to the contact page. A static config in `frontend/src/content/team.ts`, not a table; it names each person's dancer by its `data/dancers.toml` key, found with `GET /api/dancers/by-key/{key}`. Linked from the footer and the Contact page.
-- Admin area (`/admin`, M14): counts of jams, dancers, organisers and accounts with verification rates, the jams waiting for review, and the Instagram claims. One tab per tool, so new tools join as tabs.
+- Admin area (`/admin`, M14): counts of jams, dancers, organisers and accounts with verification rates, the jams waiting for review, and the Instagram claims. One tab per tool, so new tools join as tabs. M31 adds the Accounts tab (last seen, new, unconfirmed, organisers, the team and its roles) and the history of decisions under the jam and claim queues; one super admin manages the admins.
 - Dancer CRUD via the API, used inside the jam flows (search-before-create when adding entry members or staff).
 - Dancer page (`/dancers/{id}`): name, crew(s), country flag(s), Instagram link, generated avatar, a stats strip (jams, countries, years active, podiums, from past jams; added in M10), and the dancer's jams split into **upcoming** and **past** (with the battle, the stage reached and, once the manager exists, the full result). Reached from a dancer on a jam page, or from **Find someone** (`/dancers`): a public search by name, alias or handle over everyone (bboys, bgirls, DJs, MCs, judges), notable dancers first (`GET /api/dancers`).
 - Organiser page (`/organizers/{id}`, added in M12c): like a dancer page without battles: the organiser's name, Instagram, country, city, bio and public jams, upcoming and past. Organisers verify their Instagram handle with the same code-and-review flow as dancers. The jam page links to it from its organiser card, which is left out for jams the BreakingJam team entered (seed admins and admins list jams they don't run, such as the imported historical ones).
@@ -121,7 +121,7 @@ Single backend crate for now. Split into a Cargo workspace only when compile tim
 ### Tables
 
 ```sql
-create type user_role as enum ('user', 'organizer', 'seed_admin', 'admin');
+create type user_role as enum ('user', 'organizer', 'seed_admin', 'admin', 'super_admin');   -- super_admin: M31
 create type dancer_source as enum ('seed', 'organizer', 'self');
 create type dancer_title as enum ('bboy', 'bgirl', 'breaker', 'dj', 'mc', 'judge');   -- M25
 create type claim_status as enum ('pending', 'approved', 'rejected');
@@ -151,11 +151,13 @@ create table app_users (
   city text,
   bio text,
   verified_at timestamptz,            -- set when an admin confirms the handle; cleared when it changes
+  last_seen_at timestamptz,           -- M31: set when a session starts and when `GET /auth/me` slides it
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 create unique index app_users_instagram_handle_key        -- verification reserves a handle,
   on app_users (lower(instagram_handle)) where verified_at is not null;   -- typing it doesn't (M26)
+create unique index app_users_one_super_admin on app_users (role) where role = 'super_admin';   -- M31
 
 create table sessions (
   id uuid primary key,
@@ -251,6 +253,22 @@ create table dancer_edits (            -- audit log of every edit on unverified 
 );
 create index on dancer_edits (dancer_id, created_at);
 
+-- M31: what admins decided that no other table records; claim decisions stay on the claims.
+create type admin_action as enum ('jam_approved', 'jam_rejected', 'dancer_merged', 'role_changed');
+create table admin_actions (
+  id uuid primary key,
+  admin_id uuid not null references app_users(id),
+  action admin_action not null,
+  event_id uuid references events(id),        -- jam_approved, jam_rejected
+  dancer_id uuid references dancers(id),      -- dancer_merged: the page merged away
+  user_id uuid references app_users(id),      -- role_changed: whose role
+  role user_role,                             -- role_changed: the new one
+  note text,                                  -- jam_rejected
+  created_at timestamptz not null default now()
+  -- each column is set exactly for its actions (checks in the migration)
+);
+create index on admin_actions (action, created_at);
+
 create table crews (
   id uuid primary key,
   data_key text unique,               -- its key in data/crews.toml when the curated import wrote it
@@ -299,6 +317,7 @@ create table events (
   flyer_url text,                     -- the uploaded 1080×1350 flyer on R2; null = the generated flyer (M19)
   flyer_card_url text,                -- the same at 540×675, for cards, lists and the map
   data_key text unique,               -- its file in data/events (e.g. red-bull-bc-one/2019) when the curated import wrote it
+  entered_by_team boolean not null default false,   -- M31: a seed_admin+ created it; stays the team's after they leave
   deleted_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -483,19 +502,21 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 - Password hashing: `argon2` (Argon2id, default params) keyed with the site's pepper, `PASSWORD_PEPPER` (a Worker secret, never in the database; M27). The browser sends the plain password over HTTPS.
 - Email codes (M27): 6 digits from the OS's secure generator, 15 minutes, 5 tries (each try counted in the same statement that compares, so parallel guesses can't skip the count), one new code a minute per account and purpose, and at most 10 a day (so 50 guesses a day, and no email flood). The email goes out in a background task, in the language the frontend sends (en, fr, de). Register does not log in: `POST /auth/email/verify` does. A reset also confirms the email, as the code proves who reads it. A code that confirms an email also unlinks a Google account linked before anyone proved the address (the reverse of `link_google`). Google sign-in needs no code.
 - Sessions: `sessions` table, cookie `bj_session` (HttpOnly, Secure, SameSite=Lax, 30-day expiry, rolling). Session id is a UUIDv4 (random, not v7).
-- Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `RequireRole(Organizer)` helper. Roles are ordered `user < organizer < seed_admin < admin`; a check for a role passes for any higher role.
+- Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `RequireRole(Organizer)` helper. Roles are ordered `user < organizer < seed_admin < admin < super_admin`; a check for a role passes for any higher role. The role is read on every request, so a change takes effect at once.
 - Roles:
   - `user`: can claim a dancer, make their own page (one), edit the unverified dancers they created, set the titles of their verified page, see everything public.
   - `organizer`: everything above + create jams and manage their own jams (battles, entries, staff), submit them for review, create dancers/crews from within a jam (`POST /api/dancers` is `organizer`+; M25). A `user` who creates their first jam is promoted to `organizer` automatically (jams start as drafts), so one draft is enough to make pages for others: `organizer`+ keeps plain visitors out, not determined accounts. Once one of their public jams is past, only its battles stay theirs to edit (M26).
   - `seed_admin` ("breakingjam_admin_seed"): everything above + create and edit **any** jam, dancer or crew, including seeding the initial ~200 dancers and historical jams, editing jams that are over, and publish jams without review. Cannot review jams or claims, merge dancers or manage users.
-  - `admin`: everything. Reviews jams and claims, merges dancers, changes roles, sees the overview counts.
+  - `admin`: everything above + reviews jams and claims, merges dancers, sees the overview counts and the accounts, puts accounts on the team as `seed_admin` or takes seed admins off it.
+  - `super_admin` (M31): everything, and the only one who makes, changes or removes admins. One at most (a unique index), set with SQL; nobody changes their own role.
+  - Taking someone off the team sets `organizer` when they own a jam, else `user`; the team's jams they entered pass to whoever removed them, and stay the team's (`events.entered_by_team`: no organiser card, not on their organiser page).
 - Google OAuth: authorization-code flow with PKCE via `oauth2` crate; on first login create `app_users` row with `google_sub`; on later logins match by `google_sub`, then by verified email.
 - Authorization rules:
   - Event write: `organizer_id == user.id`, or `seed_admin`+.
   - Dancer write (unverified): its creator (`created_by`), or `seed_admin`+; logged in `dancer_edits`. Dancer write (verified): `dancer.user_id == user.id`, or `seed_admin`+.
   - Dancer create: `organizer`+ (from a jam), or `user` for their own page (`source = self`).
   - Crew create: `organizer`+ (from the entry sheet). Crew edit, delete and memberships: `seed_admin`+ (M26: a first draft makes any account an organiser, so `organizer`+ meant anyone; membership self-service later).
-  - Jam review, claims review, merge, role changes, overview counts: `admin` only.
+  - Jam review, claims review, merge, team roles (seed admins only), overview counts, accounts and histories: `admin`+. Admin roles: `super_admin` only.
 
 ### Routes
 ```
@@ -560,13 +581,16 @@ POST   /api/dancers/{id}/avatar          multipart image, owner only   (deferred
 
 GET    /api/admin/stats                  overview counts: jams by status, dancers and organisers (verified, with Instagram), accounts (new in 30 days), pending claims   admin
 GET    /api/admin/events                 jams in review, soonest first, with their organiser and its login email (`organizer_email`, for the team only)   admin
+GET    /api/admin/events/history         every approval and rejection, newest first: the jam, the note, the admin's and the owner's emails (M31)   admin
 POST   /api/admin/events/{id}/approve    in_review → published, if the checklist still holds (else 422)   admin
 POST   /api/admin/events/{id}/reject     {note} in_review → draft   admin
 GET    /api/admin/claims                 ?status=pending   admin
+GET    /api/admin/claims/history         every decided dancer and organiser claim, newest first, with the deciding admin's email (null when the site withdrew it) (M31)   admin
 POST   /api/admin/claims/{id}/approve    admin
 POST   /api/admin/claims/{id}/reject     admin
 POST   /api/admin/dancers/{id}/merge     {into: uuid}      admin
-PUT    /api/admin/users/{id}/role        admin
+PUT    /api/admin/users/{id}/role        {role: none|seed_admin|admin}; admins grant seed_admin only, the super admin manages admins; logged (M31)   admin
+GET    /api/admin/accounts               ?view=last_seen|new|unconfirmed|organizers|team&q=<email part>: email, role, dates, own jam counts (M31)   admin
 
 GET    /api/organizers/{id}              organiser page + can_edit; 404 below `organizer` (M12c)
 PUT    /api/organizers/{id}              own page only
@@ -608,7 +632,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Vite + React + TS strict. ESLint + Prettier with defaults.
 - Data fetching: TanStack Query only. No global state library. Auth state = `useQuery(['me'])`.
 - API client: `openapi-typescript` generates `src/api/schema.d.ts` from `backend` OpenAPI (`npm run gen:api` fetches `http://localhost:8080/api/openapi.json`). Calls go through `openapi-fetch`.
-- Routing: `/` (landing), `/map`, `/jams` (Find a jam, the list), `/jams/{slug}`, `/search` (jams and people), `/dancers` (Find someone), `/dancers/{id}`, `/contact`, `/login`, `/register`, `/verify-email` and `/forgot-password` (M27, the mailed codes; DESIGN.md §4.38), `/welcome` (M25, after sign-up), `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review), `/admin/claims` and `/admin/dancers/{id}/merge`. No `/crews` routes yet; crews render inline.
+- Routing: `/` (landing), `/map`, `/jams` (Find a jam, the list), `/jams/{slug}`, `/search` (jams and people), `/dancers` (Find someone), `/dancers/{id}`, `/contact`, `/login`, `/register`, `/verify-email` and `/forgot-password` (M27, the mailed codes; DESIGN.md §4.38), `/welcome` (M25, after sign-up), `/org/jams` (organiser list), `/org/jams/new`, `/org/jams/{id}/edit`, `/organizers/{id}` (M12c), and for admins `/admin` (overview), `/admin/jams` (review and its history), `/admin/claims` (with its history), `/admin/accounts` (M31) and `/admin/dancers/{id}/merge`. No `/crews` routes yet; crews render inline.
 - Dancer page (`/dancers/{id}`): header (avatar, dancer name, one or two country flags, city, current crews, Instagram link, verified tick when `verified_at` is set, "Verify me" button for logged-in non-owners while unverified, "Edit" for whoever is allowed), then the lists of `GET /api/dancers/{id}/events` (fetched from the URL id, beside the page) — **Live now** (only when a jam runs today, M26), **Upcoming** (jams starting after today in their own timezone, link to `/jams/{slug}`) and **Past** (reverse chronological, with battle name, role, a result badge (`final_rank` as "1st/2nd/3rd", else `reached` as "Top 8"…), and the **▶ Video** pill when the entry has a `video_url`, DESIGN.md §4.37; M28). Empty states for each. This page is the seed of the "where does this bboy go / what did he do" feature; the only edit affordances are those in §4 "Dancer identity".
 - Video embeds: the **▶ Video** pill on an entry (jam page Battles, dancer page past rows; DESIGN.md §4.37) opens a modal with the official YouTube iframe (`youtube-nocookie.com/embed/{id}?start={offset}&rel=0`). Only YouTube URLs are accepted, validated server-side (`youtube.com/watch`, `youtu.be`, `youtube.com/live`); the video id is parsed once on save. Nothing is ever downloaded or hosted.
 - Landing page (`/`), in order (M18, DESIGN.md §6 Landing):
@@ -733,6 +757,6 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 28. Video links (M28): the **▶ Video** pill on battle results (dancer page past rows, the jam's Battles), "Videos available" on the previews of jams with videos, which open at `#battles`; `has_videos` on `events.geojson`. Several videos per battle wait for match videos.
 29. Battle results by round (M29): `battle_matches` (the final made from 1st vs 2nd for existing results), the import storing every curated match, the jam page by round (final card, crowned match cards, placings where pairings are unknown, rounds below Top 8 folded on phones). a) data, API, jam page — done; b) organisers enter matches (a "Results" step in the battle sheet) — done.
 30. Reaching organisers (M30): the publish checklist wants an Instagram link or a contact email, the review queue shows the organiser's login email, and jams the team added end with "You’re the organiser? Contact us" — done (`milestones/30-organiser-contact.md`).
-31. Admin panel (M31): one super admin who manages the team (admins manage seed admins only), an Accounts tab (last seen, new, unconfirmed, organisers, team), and the history of jam and claim decisions under their queues, from an `admin_actions` log. a) schema, API; b) frontend (`milestones/31-admin-panel.md`).
+31. Admin panel (M31): one super admin who manages the team (admins manage seed admins only), an Accounts tab (last seen, new, unconfirmed, organisers, team), and the history of jam and claim decisions under their queues, from an `admin_actions` log. a) schema, API; b) frontend — done (`milestones/31-admin-panel.md`).
 
 For Every suggested build order point, save it in milestones/ with a filename matching the build order point.

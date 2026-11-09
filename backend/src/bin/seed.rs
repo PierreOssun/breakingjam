@@ -30,6 +30,11 @@ struct User {
     role: Role,
 }
 
+const SUPER_ADMIN: User = User {
+    email: "super@breakingjam.local",
+    display_name: "Super Admin",
+    role: Role::SuperAdmin,
+};
 const ADMIN: User = User {
     email: "admin@breakingjam.local",
     display_name: "Admin",
@@ -324,7 +329,7 @@ async fn main() -> anyhow::Result<()> {
     .await?;
     if seeded {
         // Their *.local emails get no reset code, so a new pepper or password is applied here.
-        for user in [&ADMIN, &SEED_ADMIN, &ORGANIZER] {
+        for user in [&SUPER_ADMIN, &ADMIN, &SEED_ADMIN, &ORGANIZER] {
             accounts.reset_password(&pool, user).await?;
         }
         tracing::info!("already seeded: only the seed accounts' passwords were set again");
@@ -332,6 +337,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let mut tx = pool.begin().await?;
+    accounts.insert(&mut tx, &SUPER_ADMIN).await?;
     accounts.insert(&mut tx, &ADMIN).await?;
     let seed_admin = accounts.insert(&mut tx, &SEED_ADMIN).await?;
     let organizer = accounts.insert(&mut tx, &ORGANIZER).await?;

@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set role = 'super_admin' where email = 'admin@example.com'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "69105d73fc7bf26507a68871b0ad6855dabd92bd7f8824da17b5f75806232fd6"
+}

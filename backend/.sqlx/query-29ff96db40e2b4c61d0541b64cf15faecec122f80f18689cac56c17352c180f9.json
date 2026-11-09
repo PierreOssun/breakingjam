@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update events set organizer_id = $2 where organizer_id = $1 and entered_by_team",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "29ff96db40e2b4c61d0541b64cf15faecec122f80f18689cac56c17352c180f9"
+}

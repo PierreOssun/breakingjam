@@ -63,6 +63,25 @@ pub struct ClaimUser {
     pub display_name: String,
 }
 
+/// A decided claim on a dancer or organiser page, for the history under the claims queue (M31).
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct ClaimDecision {
+    /// Claim id.
+    pub id: Uuid,
+    /// `approved` or `rejected`.
+    pub status: ClaimStatus,
+    /// When it was decided.
+    pub decided_at: DateTime<Utc>,
+    /// The admin who decided; null when the site did (the handle changed meanwhile).
+    pub admin_email: Option<String>,
+    /// The account that claimed.
+    pub user: ClaimUser,
+    /// The handle the claim was about.
+    pub instagram_handle: Option<String>,
+    /// The dancer page claimed; null for an organiser's claim, which is on `user`'s page.
+    pub dancer: Option<DancerRef>,
+}
+
 /// No 0/O, 1/I/L: the code is read off a screen and typed into Instagram.
 pub(crate) const CODE_ALPHABET: &[u8] = b"23456789ABCDEFGHJKMNPQRSTUVWXYZ";
 

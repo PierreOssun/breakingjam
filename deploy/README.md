@@ -154,15 +154,15 @@ On each push to `uat` or `prod`, `.github/workflows/deploy.yml`:
   ```
   Then delete the throwaway.
 
-## First admin
+## Super admin
 
 Sign up on the site, then in Neon's SQL editor:
 
 ```sql
-update app_users set role = 'admin' where email = 'you@example.com';
+update app_users set role = 'super_admin' where email = 'you@example.com';
 ```
 
-Admins see **Admin** in the header (`/admin`: an overview, the jam review queue and the Instagram claims) and the merge tool on dancer pages. On UAT the seed already created admin accounts.
+There is one super admin at most (M31): it makes and removes admins, and admins put people on the team as seed admins. Admins see **Admin** in the header (`/admin`: an overview, the jam review queue and the Instagram claims) and the merge tool on dancer pages. On UAT the seed already created admin accounts; a database seeded before M31 has no seeded super admin, so set UAT's with the same SQL.
 
 ## Costs
 

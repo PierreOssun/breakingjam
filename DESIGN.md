@@ -666,7 +666,7 @@ What the avatar button opens, logged in (§4.6). One `role="menu"` named "Accoun
   1. **Profile block** → the account's page (`/dancers/<id>`): 52px avatar, the name in `display-sm` with the verified tick when an approved claim linked it, then in `primary-text` "View my page", or "Not verified yet · Verify it" for a page the account made that waits for its claim (M25; the page has "This is me"), a `CaretRight`. `p-3 rounded-[14px]`, hover and focus `bg-surface`.
   2. *Sheet only:* **Jam map** (`MapPin`), **Find a jam** (`MagnifyingGlass`), **Find someone** (`User`), then a separator when My jams follows.
   3. **My jams** (`Ticket`) → `/org/jams`, with "N drafts" when there are drafts. Only for accounts that have registered a jam (the first one makes the account an organiser), the team and admins: a dancer sees their page, the theme and Log out.
-  4. **Admin** (`ShieldCheck`) → `/admin`, **admins only**, with "N to review" (jams in review plus pending dancer and organiser claims).
+  4. **Admin** (`ShieldCheck`) → `/admin`, **admins and the super admin only**, with "N to review" (jams in review plus pending dancer and organiser claims).
   5. Separator, then **Theme**: a `label` "Theme" (muted, upper case) over a three-way segmented control, **Light** (`Sun`) / **Dark** (`Moon`) / **Auto** (`Monitor`), full width: `rounded-full border border-border bg-surface p-1`, options `h-11 rounded-full`, the chosen one `bg-surface-raised border border-border-strong`, the others muted. It is the site's only theme switch.
   6. Separator, then **Log out** (`SignOut`), in muted text, without confirmation.
   7. *Sheet only:* a full-width primary lg **Register a jam**.
@@ -741,6 +741,17 @@ The 6-digit codes the API mails (sign-up, log-in to an unconfirmed address, forg
 - **Reset your password** (`/forgot-password?next=…`), from **Forgot password?**, a `body-sm` bold link under the log-in password, which brings the email typed so far.
   - First the email: "Enter your account’s email. We’ll send you a code to set a new password." and **Send the code**.
   - Then on the same page: "If <email> has an account, a 6-digit code is on its way. It works for 15 minutes." (the API says the same either way), **Code** as above, **New password** ("At least 8 characters."), primary **Set password and log in**, and the same Resend.
+
+### 4.39 Admin tabs *(M31)*
+
+The admin area (`/admin`): `<h1>` "Admin", then one filter-chip-shaped tab per tool, scrolling sideways on phones: **Overview**, **Jams** and **Claims** (each with the size of its queue in a `bg-primary` count), **Accounts**. Each tab is a section with an `<h2>` in `display-md` and a muted intro.
+
+- **Accounts:** a chip row "Show" (one lit at a time, kept in `?view=`): **Last seen**, **New** (newest confirmed), **Unconfirmed**, **Organisers** (accounts with a jam of their own), **Team**. Under it a search field, "Search by email" (kept in `?q=`, searched as typing pauses). Then a paged list of cards (`rounded-lg border bg-surface p-4`):
+  - the email as a bold `mailto:` link that wraps anywhere, with a meta tag for the role when it isn't a plain account (Organiser, Seed admin, Admin, Super admin);
+  - in `body-sm` muted: the display name, "signed up …", "confirmed …" or "email not confirmed", "last seen …" or "never seen", as date and time in the reader's timezone;
+  - "2 public jams · 1 not public yet" when it has jams of its own;
+  - a ghost sm **Team role**, only when the viewer may change it (the API's `team_roles`): never on the viewer's own card or one above them. It opens a short dialog, "Team role of <email>": a select of the roles allowed (**Not on the team**, **Seed admin**, **Admin**), a muted line saying what the chosen one does (taking someone off the team says their team jams pass to you), and **Save**, disabled until the choice changes. A toast confirms: "<email>: Seed admin."
+- **History**, under the queues of **Jams** and **Claims**: an `<h3>` "History" in `display-sm`, then the decisions, newest first, as lighter rows (`rounded-lg border p-3`, no fill): the jam or page as a bold link, a meta tag (**Approved**, **Sent back**, **Rejected**), then in muted `body-sm` "<date> by <admin email>" and, for a jam, its organiser's email, for a claim who asked. A rejection's note follows in `body-sm`. A claim the site withdrew (its handle changed during review) says so instead of an admin.
 
 ## 5. Layout rules
 

@@ -131,6 +131,34 @@ async fn rejected_jams_go_back_to_draft_with_a_note(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn decisions_make_the_history_newest_first(pool: PgPool) {
+    let w = world(pool).await;
+    let approved = w.draft(&w.organizer, "Paris Cypher").await;
+    let rejected = w.draft(&w.organizer, "Lyon Cypher").await;
+    for jam in [&approved, &rejected] {
+        let submit = format!("/api/events/{jam}/submit");
+        w.call(&submit, json!({}), Some(&w.organizer)).await;
+    }
+    let approve = format!("/api/admin/events/{approved}/approve");
+    w.call(&approve, json!({}), Some(&w.admin)).await;
+    let reject = format!("/api/admin/events/{rejected}/reject");
+    w.call(&reject, json!({ "note": "Add the venue." }), Some(&w.admin))
+        .await;
+
+    let history = w.read("/api/admin/events/history", Some(&w.admin)).await;
+    let items = history.json["items"].as_array().unwrap();
+    assert_eq!(items.len(), 2);
+    assert_eq!(items[0]["action"], "jam_rejected");
+    assert_eq!(items[0]["note"], "Add the venue.");
+    assert_eq!(items[0]["jam"]["id"], rejected.as_str());
+    assert_eq!(items[0]["admin_email"], "admin@example.com");
+    assert_eq!(items[0]["organizer_email"], "org@example.com");
+    assert_eq!(items[1]["action"], "jam_approved");
+    assert_eq!(items[1]["note"], Value::Null);
+    assert_eq!(items[1]["jam"]["id"], approved.as_str());
+}
+
+#[sqlx::test]
 async fn a_jam_sent_back_needs_its_venue_to_return(pool: PgPool) {
     let w = world(pool).await;
     let jam = w.draft(&w.organizer, "Paris Cypher").await;

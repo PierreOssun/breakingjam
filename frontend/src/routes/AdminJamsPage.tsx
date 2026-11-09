@@ -13,19 +13,24 @@ import { Dialog } from "../components/Dialog";
 import { ExternalLink } from "../components/ExternalLink";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { MoreList } from "../components/MoreList";
+import { MetaTag } from "../components/Tag";
 import { TextAreaField } from "../components/TextAreaField";
 import { useToast } from "../components/useToast";
 import { VerifiedTick } from "../components/VerifiedTick";
 import { placeLine } from "../features/jams/jamDetail";
 import type { ChecklistItem } from "../features/jams/jamFields";
-import { formatDateRange } from "../lib/dates";
+import { formatDateRange, formatMoment } from "../lib/dates";
 import { instagramLabel } from "../lib/instagram";
 
 type Jam = Schemas["ReviewItem"];
+type JamDecision = Schemas["JamDecision"];
 /** Approve, or send back with a note for the organiser. */
 type Decision = { approve: true } | { approve: false; note: string };
 
-/** `/admin/jams`: jams waiting to go public, the soonest first (§4 "Event status"). */
+/**
+ * `/admin/jams`: jams waiting to go public, the soonest first (§4 "Event status"), then every
+ * past decision (M31).
+ */
 export function AdminJamsPage() {
   const { t } = useTranslation();
   const queue = useInfiniteQuery({
@@ -36,6 +41,18 @@ export function AdminJamsPage() {
           params: { query: { cursor: pageParam } },
         }),
         "jams in review",
+      ),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next_cursor ?? undefined,
+  });
+  const history = useInfiniteQuery({
+    queryKey: ["admin", "jams", "history"],
+    queryFn: async ({ pageParam }) =>
+      unwrap(
+        await api.GET("/api/admin/events/history", {
+          params: { query: { cursor: pageParam } },
+        }),
+        "jam decisions",
       ),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
@@ -60,7 +77,53 @@ export function AdminJamsPage() {
       >
         {(jam) => <JamToReview jam={jam} />}
       </MoreList>
+      <section aria-labelledby="jams-history" className="flex flex-col gap-3">
+        <h3 id="jams-history" className="font-display text-display-sm">
+          {t("admin.history.title")}
+        </h3>
+        <MoreList
+          query={history}
+          empty={<InlineEmpty>{t("admin.history.none")}</InlineEmpty>}
+          more={t("org.showMore")}
+          className="flex flex-col gap-2"
+        >
+          {(decision) => <JamDecisionRow decision={decision} />}
+        </MoreList>
+      </section>
     </section>
+  );
+}
+
+function JamDecisionRow({ decision }: { decision: JamDecision }) {
+  const { t, i18n } = useTranslation();
+  const approved = decision.action === "jam_approved";
+  return (
+    <div className="flex flex-col gap-1 rounded-lg border border-border p-3">
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <Link
+          to={`/jams/${decision.jam.slug}`}
+          className="text-body font-extrabold underline"
+        >
+          {decision.jam.name}
+        </Link>
+        <MetaTag>
+          {t(approved ? "admin.history.approved" : "admin.history.sentBack")}
+        </MetaTag>
+      </p>
+      <p className="text-body-sm break-words text-muted">
+        {t("admin.history.decided", {
+          date: formatMoment(decision.decided_at, i18n.language),
+          admin: decision.admin_email,
+        })}
+        {" · "}
+        {t("admin.history.organizer", { email: decision.organizer_email })}
+      </p>
+      {decision.note && (
+        <p className="text-body-sm">
+          {t("admin.history.note", { note: decision.note })}
+        </p>
+      )}
+    </div>
   );
 }
 

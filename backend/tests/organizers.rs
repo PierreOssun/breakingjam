@@ -205,6 +205,14 @@ async fn a_handle_changed_during_review_cannot_be_approved(pool: PgPool) {
     let page = send(&app, get(&format!("/api/organizers/{id}"), None)).await;
     assert_eq!(page.json["verified_at"], Value::Null);
 
+    // The withdrawn claim is history, decided by the site rather than an admin.
+    let history = send(&app, get("/api/admin/claims/history", Some(&admin))).await;
+    let withdrawn = &history.json["items"][0];
+    assert_eq!(withdrawn["status"], "rejected");
+    assert_eq!(withdrawn["instagram_handle"], "floor.lords");
+    assert_eq!(withdrawn["admin_email"], Value::Null);
+    assert_eq!(withdrawn["dancer"], Value::Null);
+
     // A fresh claim is for the new handle.
     let fresh = claim(&app, &id, &cookie).await;
     assert_eq!(fresh.json["instagram_handle"], "someone.else");

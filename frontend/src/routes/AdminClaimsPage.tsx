@@ -10,11 +10,14 @@ import { Button } from "../components/Button";
 import { ExternalLink } from "../components/ExternalLink";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { MoreList } from "../components/MoreList";
+import { MetaTag } from "../components/Tag";
 import { useToast } from "../components/useToast";
 import { ME_KEY } from "../features/auth/useMe";
+import { formatMoment } from "../lib/dates";
 import { BREAKINGJAM_INSTAGRAM } from "../lib/instagram";
 
 type Decision = "approve" | "reject";
+type ClaimDecision = Schemas["ClaimDecision"];
 
 /** One claim as a row shows it, whichever queue it comes from. */
 type Review = {
@@ -34,8 +37,8 @@ type DecideFn = (
 ) => Promise<{ error?: Schemas["ErrorEnvelope"]; response: Response }>;
 
 /**
- * `/admin/claims`: pending dancer claims, then organiser claims, oldest first. The admin
- * checks Instagram by hand (§4 "Verify me").
+ * `/admin/claims`: pending dancer claims, then organiser claims, oldest first, then every past
+ * decision (M31). The admin checks Instagram by hand (§4 "Verify me").
  */
 export function AdminClaimsPage() {
   const { t } = useTranslation();
@@ -74,6 +77,19 @@ export function AdminClaimsPage() {
     };
   });
 
+  const history = useInfiniteQuery({
+    queryKey: ["admin", "claims", "history"],
+    queryFn: async ({ pageParam }) =>
+      unwrap(
+        await api.GET("/api/admin/claims/history", {
+          params: { query: { cursor: pageParam } },
+        }),
+        "claim decisions",
+      ),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => page.next_cursor ?? undefined,
+  });
+
   return (
     <section aria-labelledby="claims-title" className="flex flex-col gap-8">
       <title>{`${t("admin.claims.title")} · ${t("admin.title")} · BreakingJam`}</title>
@@ -105,7 +121,70 @@ export function AdminClaimsPage() {
             : api.POST("/api/admin/organizer-claims/{id}/reject", { params });
         }}
       />
+      <section aria-labelledby="claims-history" className="flex flex-col gap-3">
+        <h3 id="claims-history" className="font-display text-display-sm">
+          {t("admin.history.title")}
+        </h3>
+        <MoreList
+          query={history}
+          empty={<InlineEmpty>{t("admin.history.none")}</InlineEmpty>}
+          more={t("org.showMore")}
+          className="flex flex-col gap-2"
+        >
+          {(decision) => <ClaimDecisionRow decision={decision} />}
+        </MoreList>
+      </section>
     </section>
+  );
+}
+
+/** Whose page a decided claim was about: the dancer's, or the claimant's organiser page. */
+function claimedPage(decision: ClaimDecision): {
+  name: string;
+  to: string | null;
+} {
+  const { dancer, user } = decision;
+  if (!dancer) return { name: user.display_name, to: `/organizers/${user.id}` };
+  return {
+    name: dancer.dancer_name,
+    to: dancer.deleted ? null : `/dancers/${dancer.id}`,
+  };
+}
+
+function ClaimDecisionRow({ decision }: { decision: ClaimDecision }) {
+  const { t, i18n } = useTranslation();
+  const page = claimedPage(decision);
+  const date = formatMoment(decision.decided_at, i18n.language);
+  return (
+    <div className="flex flex-col gap-1 rounded-lg border border-border p-3">
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        {page.to ? (
+          <Link to={page.to} className="text-body font-extrabold underline">
+            {page.name}
+          </Link>
+        ) : (
+          <span className="text-body font-extrabold">{page.name}</span>
+        )}
+        {decision.instagram_handle && (
+          <span className="text-body-sm">@{decision.instagram_handle}</span>
+        )}
+        <MetaTag>
+          {decision.status === "approved"
+            ? t("admin.history.approved")
+            : t("admin.history.rejected")}
+        </MetaTag>
+      </p>
+      <p className="text-body-sm break-words text-muted">
+        {t("admin.history.claimedBy", {
+          name: decision.user.display_name,
+          email: decision.user.email,
+        })}
+        {" · "}
+        {decision.admin_email
+          ? t("admin.history.decided", { date, admin: decision.admin_email })
+          : t("admin.history.withdrawn", { date })}
+      </p>
+    </div>
   );
 }
 

@@ -37,6 +37,7 @@ The map starts on the visitor's country, which Cloudflare provides in production
 
 The seeded accounts use `SEED_PASSWORD` from `backend/.env`:
 
+- `super@breakingjam.local`: the super admin, who also makes and removes admins (M31). Only a fresh seed creates it: on a database seeded before M31, run `just reset-db` or set one with SQL.
 - `admin@breakingjam.local`: the admin area (`/admin`), with two jams waiting for review.
 - `seed@breakingjam.local` ("BreakingJam Team"): runs the demo jams; manage their dancers and lineups from their pages.
 - `organizer@breakingjam.local` ("Cypher Collective"): an ordinary organiser whose jams wait for review.

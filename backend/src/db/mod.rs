@@ -1,5 +1,6 @@
 //! sqlx queries, one module per aggregate.
 
+pub mod admin_actions;
 pub mod battles;
 pub mod claims;
 pub mod crews;

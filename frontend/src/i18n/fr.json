@@ -833,6 +833,63 @@
       "note": "Que doit changer l’organisateur·ice ?",
       "noteHint": "Visible dans l’éditeur du jam.",
       "incomplete": "Pas prêt à publier : {{items}}."
+    },
+    "accounts": {
+      "tab": "Comptes",
+      "title": "Comptes",
+      "intro": "Qui revient, qui vient d’arriver, qui n’a jamais confirmé son e-mail, qui organise des jams, et l’équipe. Seul le super admin nomme ou retire des admins.",
+      "view": "Afficher",
+      "views": {
+        "last_seen": "Dernières visites",
+        "new": "Nouveaux",
+        "unconfirmed": "Non confirmés",
+        "organizers": "Organisations",
+        "team": "Équipe"
+      },
+      "search": "Rechercher par e-mail",
+      "none": "Aucun compte ici.",
+      "signedUp": "inscription le {{date}}",
+      "confirmed": "confirmé le {{date}}",
+      "unconfirmed": "e-mail non confirmé",
+      "seen": "dernière visite le {{date}}",
+      "neverSeen": "aucune visite",
+      "publicJams_one": "{{count}} jam public",
+      "publicJams_other": "{{count}} jams publics",
+      "privateJams_one": "{{count}} pas encore public",
+      "privateJams_other": "{{count}} pas encore publics",
+      "roles": {
+        "organizer": "Organisation",
+        "seed_admin": "Seed admin",
+        "admin": "Admin",
+        "super_admin": "Super admin"
+      },
+      "changeRole": "Rôle dans l’équipe",
+      "roleTitle": "Rôle de {{email}} dans l’équipe",
+      "teamRole": "Rôle dans l’équipe",
+      "teamRoles": {
+        "none": "Hors de l’équipe",
+        "seed_admin": "Seed admin",
+        "admin": "Admin"
+      },
+      "explain": {
+        "none": "Hors de l’équipe, le compte redevient organisation (s’il a ses propres jams) ou simple compte. Les jams de l’équipe qu’il a saisis vous reviennent.",
+        "seed_admin": "Saisit et corrige n’importe quel jam, danseur·se ou crew. Ne valide rien.",
+        "admin": "Valide aussi les jams et les demandes, fusionne les danseur·ses et gère les seed admins."
+      },
+      "save": "Enregistrer",
+      "changed": "{{email}} : {{role}}."
+    },
+    "history": {
+      "title": "Historique",
+      "none": "Aucune décision pour l’instant.",
+      "approved": "Approuvé",
+      "sentBack": "Renvoyé",
+      "rejected": "Refusé",
+      "decided": "le {{date}} par {{admin}}",
+      "organizer": "organisation {{email}}",
+      "note": "Note : {{note}}",
+      "claimedBy": "Demandé par {{name}} ({{email}})",
+      "withdrawn": "le {{date}}, retiré : le compte Instagram a changé"
     }
   },
   "organizer": {

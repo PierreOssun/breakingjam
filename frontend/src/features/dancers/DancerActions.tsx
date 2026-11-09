@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import type { Schemas } from "../../api/client";
 import { Button } from "../../components/Button";
 import { buttonClasses } from "../../components/buttonClasses";
+import { atLeast } from "../auth/roles";
 import { useMe } from "../auth/useMe";
 import { AddHandleButton } from "../verify/AddHandleButton";
 import { VerifyButton } from "../verify/VerifyButton";
@@ -47,7 +48,7 @@ export function DancerActions({
           {t("dancerEdit.open")}
         </Button>
       )}
-      {me.role === "admin" && (
+      {atLeast(me.role, "admin") && (
         <Link
           to={`/admin/dancers/${dancer.id}/merge`}
           className={`${buttonClasses("ghost", "sm")} self-start`}

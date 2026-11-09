@@ -10,7 +10,7 @@ use crate::domain::{
     crew::CrewRef,
     dancer::{
         BattleRef, Dancer, DancerFields, DancerRef, DancerSource, DancerSummary, DancerTitle,
-        EventRef, FieldChange, OwnPage, Participation, default_look,
+        EventRef, FieldChange, OwnPage, Participation, default_look, merged_aliases,
     },
     event::{EventStatus, Phase},
 };
@@ -284,19 +284,22 @@ pub async fn log_edits(
     Ok(())
 }
 
-/// Moves everything that points at `loser` to `survivor` and turns `loser` into a redirect (§4 "Merge").
+/// Moves everything that points at `loser` to `survivor` and turns `loser` into a redirect
+/// (§4 "Merge"), as `admin` decided; returns the survivor's aliases, now with the loser's names.
 pub async fn merge(
     conn: &mut PgConnection,
     loser: &Dancer,
     survivor: &Dancer,
-    aliases: &[String],
-) -> sqlx::Result<()> {
+    admin: Uuid,
+) -> sqlx::Result<Vec<String>> {
     let (from, into) = (loser.id, survivor.id);
+    let aliases = merged_aliases(survivor, loser);
     move_entry_members(conn, from, into).await?;
     move_staff(conn, from, into).await?;
     move_memberships(conn, from, into).await?;
-    move_claims(conn, from, into, survivor.verified_at.is_some()).await?;
-    redirect(conn, loser, into, aliases).await
+    move_claims(conn, from, survivor, admin).await?;
+    redirect(conn, loser, into, &aliases).await?;
+    Ok(aliases)
 }
 
 /// A battle where both dancers are in different active entries, as "Jam · Battle": merging
@@ -380,21 +383,24 @@ async fn move_memberships(conn: &mut PgConnection, from: Uuid, into: Uuid) -> sq
     Ok(())
 }
 
-/// Claims move; a user with pending claims on both keeps one, and claims on a verified survivor are moot.
+/// Claims move; a user with pending claims on both keeps one, and claims on a verified survivor
+/// are moot: `admin`, who merges, rejects them.
 async fn move_claims(
     conn: &mut PgConnection,
     from: Uuid,
-    into: Uuid,
-    survivor_verified: bool,
+    survivor: &Dancer,
+    admin: Uuid,
 ) -> sqlx::Result<()> {
+    let into = survivor.id;
     sqlx::query!(
-        "update dancer_claims set status = 'rejected', reviewed_at = now()
+        "update dancer_claims set status = 'rejected', reviewed_by = $4, reviewed_at = now()
          where dancer_id = $1 and status = 'pending'
            and ($3 or user_id in (select user_id from dancer_claims
                                   where dancer_id = $2 and status = 'pending'))",
         from,
         into,
-        survivor_verified,
+        survivor.verified_at.is_some(),
+        admin,
     )
     .execute(&mut *conn)
     .await?;

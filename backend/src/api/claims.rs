@@ -9,14 +9,14 @@ use uuid::Uuid;
 
 use super::extract::{Path, Query};
 use super::{
-    page::{self, Page},
+    page::{self, Page, PageQuery},
     transaction,
 };
 use crate::{
     auth::session::CurrentUser,
     db::{self, dancers::MergeLock},
     domain::{
-        claim::{Claim, ClaimForReview, ClaimStatus},
+        claim::{Claim, ClaimDecision, ClaimForReview, ClaimStatus},
         dancer::Dancer,
         user::Role,
     },
@@ -29,6 +29,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(mine, open))
         .routes(routes!(queue))
+        .routes(routes!(history))
         .routes(routes!(approve))
         .routes(routes!(reject))
 }
@@ -156,6 +157,33 @@ async fn queue(
     let offset = page::offset(query.cursor.as_deref())?;
     let status = query.status.unwrap_or(ClaimStatus::Pending);
     let rows = db::claims::list(&state.pool, status, page::window(limit, offset)).await?;
+    Ok(Json(Page::from_offset(rows, limit, offset)))
+}
+
+/// Every decided claim, on dancer and organiser pages alike, the most recent first (M31).
+#[utoipa::path(
+    get,
+    path = "/admin/claims/history",
+    tag = "claims",
+    operation_id = "list_claim_decisions",
+    params(PageQuery),
+    security(("session" = [])),
+    responses(
+        (status = OK, body = Page<ClaimDecision>),
+        Unauthorized,
+        NotAdmin,
+        InvalidCursor,
+    )
+)]
+async fn history(
+    State(state): State<AppState>,
+    current: CurrentUser,
+    Query(query): Query<PageQuery>,
+) -> Result<Json<Page<ClaimDecision>>, AppError> {
+    current.require(Role::Admin)?;
+    let limit = page::limit(query.limit);
+    let offset = page::offset(query.cursor.as_deref())?;
+    let rows = db::claims::history(&state.pool, page::window(limit, offset)).await?;
     Ok(Json(Page::from_offset(rows, limit, offset)))
 }
 

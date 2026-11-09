@@ -132,3 +132,11 @@ export function formatBattleStart(
     timeZone: "UTC",
   }).format(new Date(`${startsAt}Z`));
 }
+
+/** A moment (a login, a decision) as "9 Nov 2026, 14:03", in the reader's own timezone. */
+export function formatMoment(iso: string, language: string): string {
+  return new Intl.DateTimeFormat(localeOf(language), {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(iso));
+}

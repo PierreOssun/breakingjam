@@ -833,6 +833,63 @@
       "note": "What should the organiser change?",
       "noteHint": "They see this in their jam editor.",
       "incomplete": "Not ready to publish: {{items}}."
+    },
+    "accounts": {
+      "tab": "Accounts",
+      "title": "Accounts",
+      "intro": "Who comes back, who just joined, who never confirmed their email, who runs jams, and the team. Only the super admin makes or removes admins.",
+      "view": "Show",
+      "views": {
+        "last_seen": "Last seen",
+        "new": "New",
+        "unconfirmed": "Unconfirmed",
+        "organizers": "Organisers",
+        "team": "Team"
+      },
+      "search": "Search by email",
+      "none": "No accounts here.",
+      "signedUp": "signed up {{date}}",
+      "confirmed": "confirmed {{date}}",
+      "unconfirmed": "email not confirmed",
+      "seen": "last seen {{date}}",
+      "neverSeen": "never seen",
+      "publicJams_one": "{{count}} public jam",
+      "publicJams_other": "{{count}} public jams",
+      "privateJams_one": "{{count}} not public yet",
+      "privateJams_other": "{{count}} not public yet",
+      "roles": {
+        "organizer": "Organiser",
+        "seed_admin": "Seed admin",
+        "admin": "Admin",
+        "super_admin": "Super admin"
+      },
+      "changeRole": "Team role",
+      "roleTitle": "Team role of {{email}}",
+      "teamRole": "Team role",
+      "teamRoles": {
+        "none": "Not on the team",
+        "seed_admin": "Seed admin",
+        "admin": "Admin"
+      },
+      "explain": {
+        "none": "Off the team, the account goes back to organiser (with jams of its own) or user. The team’s jams it entered pass to you.",
+        "seed_admin": "Enters and fixes any jam, dancer or crew. Doesn’t review.",
+        "admin": "Also reviews jams and claims, merges dancers and manages seed admins."
+      },
+      "save": "Save",
+      "changed": "{{email}}: {{role}}."
+    },
+    "history": {
+      "title": "History",
+      "none": "Nothing decided yet.",
+      "approved": "Approved",
+      "sentBack": "Sent back",
+      "rejected": "Rejected",
+      "decided": "{{date}} by {{admin}}",
+      "organizer": "organiser {{email}}",
+      "note": "Note: {{note}}",
+      "claimedBy": "Claimed by {{name}} ({{email}})",
+      "withdrawn": "{{date}}, withdrawn: the handle changed"
     }
   },
   "organizer": {

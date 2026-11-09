@@ -833,6 +833,63 @@
       "note": "Was sollen die Veranstalter:innen ändern?",
       "noteHint": "Sichtbar im Jam-Editor.",
       "incomplete": "Noch nicht bereit zum Veröffentlichen: {{items}}."
+    },
+    "accounts": {
+      "tab": "Konten",
+      "title": "Konten",
+      "intro": "Wer wiederkommt, wer neu ist, wer die E-Mail nie bestätigt hat, wer Jams veranstaltet, und das Team. Nur der Super-Admin ernennt oder entfernt Admins.",
+      "view": "Anzeigen",
+      "views": {
+        "last_seen": "Zuletzt gesehen",
+        "new": "Neu",
+        "unconfirmed": "Unbestätigt",
+        "organizers": "Veranstalter:innen",
+        "team": "Team"
+      },
+      "search": "Nach E-Mail suchen",
+      "none": "Keine Konten hier.",
+      "signedUp": "registriert am {{date}}",
+      "confirmed": "bestätigt am {{date}}",
+      "unconfirmed": "E-Mail nicht bestätigt",
+      "seen": "zuletzt gesehen am {{date}}",
+      "neverSeen": "nie gesehen",
+      "publicJams_one": "{{count}} öffentliche Jam",
+      "publicJams_other": "{{count}} öffentliche Jams",
+      "privateJams_one": "{{count}} noch nicht öffentlich",
+      "privateJams_other": "{{count}} noch nicht öffentlich",
+      "roles": {
+        "organizer": "Veranstalter:in",
+        "seed_admin": "Seed-Admin",
+        "admin": "Admin",
+        "super_admin": "Super-Admin"
+      },
+      "changeRole": "Rolle im Team",
+      "roleTitle": "Rolle von {{email}} im Team",
+      "teamRole": "Rolle im Team",
+      "teamRoles": {
+        "none": "Nicht im Team",
+        "seed_admin": "Seed-Admin",
+        "admin": "Admin"
+      },
+      "explain": {
+        "none": "Außerhalb des Teams wird das Konto wieder Veranstalter:in (mit eigenen Jams) oder normales Konto. Die Team-Jams, die es eingetragen hat, gehen an dich.",
+        "seed_admin": "Trägt jede Jam, Person und Crew ein und korrigiert sie. Prüft nichts.",
+        "admin": "Prüft auch Jams und Anfragen, führt Personen zusammen und verwaltet Seed-Admins."
+      },
+      "save": "Speichern",
+      "changed": "{{email}}: {{role}}."
+    },
+    "history": {
+      "title": "Verlauf",
+      "none": "Noch nichts entschieden.",
+      "approved": "Freigegeben",
+      "sentBack": "Zurückgeschickt",
+      "rejected": "Abgelehnt",
+      "decided": "am {{date}} von {{admin}}",
+      "organizer": "Veranstalter:in {{email}}",
+      "note": "Notiz: {{note}}",
+      "claimedBy": "Angefragt von {{name}} ({{email}})",
+      "withdrawn": "am {{date}} zurückgezogen: das Instagram-Konto hat sich geändert"
     }
   },
   "organizer": {

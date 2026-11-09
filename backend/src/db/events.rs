@@ -48,7 +48,8 @@ pub struct MapPoint {
     pub has_videos: bool,
 }
 
-/// Inserts a draft jam; optional text fields are trimmed and `""` becomes null.
+/// Inserts a draft jam, the team's when a `seed_admin`+ enters it; optional text fields are
+/// trimmed and `""` becomes null.
 pub async fn insert(
     db: impl PgExecutor<'_>,
     id: Uuid,
@@ -60,11 +61,12 @@ pub async fn insert(
         r#"insert into events
              (id, organizer_id, slug, name, description, starts_on, ends_on, timezone,
               venue_name, address, city, country, lat, lng, registration_url, instagram_url,
-              website_url, contact_email, opens_at, closes_at)
+              website_url, contact_email, opens_at, closes_at, entered_by_team)
            values ($1, $2, $3, btrim($4), nullif(btrim($5), ''), $6, $7, $8,
                    nullif(btrim($9), ''), nullif(btrim($10), ''), nullif(btrim($11), ''), $12,
                    $13, $14, nullif(btrim($15), ''), nullif(btrim($16), ''),
-                   nullif(btrim($17), ''), nullif(btrim($18), ''), $19, $20)
+                   nullif(btrim($17), ''), nullif(btrim($18), ''), $19, $20,
+                   (select role >= 'seed_admin' from app_users where id = $2))
            returning id, organizer_id, name, slug, description, status as "status: EventStatus",
                      jam_phase(starts_on, ends_on, timezone) as "phase!: Phase", starts_on, ends_on, timezone, opens_at, closes_at, venue_name, address, city, country, lat, lng,
                      registration_url, instagram_url, website_url, contact_email, flyer_url, flyer_card_url, review_note, created_at, updated_at"#,
@@ -228,6 +230,22 @@ pub async fn set_status(
     )
     .fetch_optional(db)
     .await
+}
+
+/// Hands the team jams `from` entered to `to`, as `from` leaves the team (M31).
+pub async fn hand_over_team_jams(
+    conn: &mut PgConnection,
+    from: Uuid,
+    to: Uuid,
+) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update events set organizer_id = $2 where organizer_id = $1 and entered_by_team",
+        from,
+        to,
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
 }
 
 /// Jams waiting for review, the soonest first since they are the most urgent.

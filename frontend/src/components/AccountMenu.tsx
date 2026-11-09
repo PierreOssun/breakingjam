@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 import type { Schemas } from "../api/client";
 import { useAdminStats } from "../features/admin/queries";
+import { atLeast } from "../features/auth/roles";
 import { withNext } from "../features/auth/safeNext";
 import { useLogout } from "../features/auth/useLogout";
 import { DancerAvatar } from "../features/dancers/DancerAvatar";
@@ -56,7 +57,7 @@ export function AccountMenu({
   const sheet = layout === "sheet";
   // A plain user has no jam: registering the first one makes the account an organiser.
   const organises = me.role !== "user";
-  const admin = me.role === "admin";
+  const admin = atLeast(me.role, "admin");
   // The arrows' order, top to bottom.
   const keys = [
     "profile",

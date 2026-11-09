@@ -141,6 +141,13 @@ export const routes: RouteObject[] = [
                         .AdminClaimsPage,
                     }),
                   },
+                  {
+                    path: "accounts",
+                    lazy: async () => ({
+                      Component: (await import("./routes/AdminAccountsPage"))
+                        .AdminAccountsPage,
+                    }),
+                  },
                 ],
               },
               {

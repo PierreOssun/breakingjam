@@ -20,6 +20,8 @@ struct Race {
     app: Router,
     pool: PgPool,
     admin: String,
+    /// The admin's account, for merges run straight on the database.
+    admin_id: Uuid,
     event: String,
     battle: String,
 }
@@ -37,10 +39,16 @@ async fn race(pool: PgPool) -> Race {
     let body = json!({ "format": "team", "team_size": 1, "gender": "bboy", "age": "adult", "age_min": 18 });
     let uri = format!("/api/events/{event}/battles");
     let battle = id_of(&send(&app, post(&uri, body, Some(&admin))).await);
+    let admin_id =
+        sqlx::query_scalar!("select id from app_users where email = 'admin@example.com'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
     Race {
         app,
         pool,
         admin,
+        admin_id,
         event,
         battle,
     }
@@ -161,7 +169,7 @@ async fn editing_an_entry_during_a_merge_of_its_dancer_answers_both(pool: PgPool
 
     let finish_merge = async {
         tokio::time::sleep(Duration::from_millis(100)).await;
-        db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, &[])
+        db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, race.admin_id)
             .await
             .unwrap();
         merge.commit().await.unwrap();
@@ -274,7 +282,7 @@ async fn a_staff_save_waits_for_a_merge_of_a_dancer_it_removes(pool: PgPool) {
         !save.is_finished(),
         "the save went ahead while the merge held the loser"
     );
-    db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, &[])
+    db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, race.admin_id)
         .await
         .unwrap();
     merge.commit().await.unwrap();
@@ -430,7 +438,7 @@ async fn a_save_naming_a_merged_dancer_during_a_merge_is_refused(pool: PgPool) {
         send(&app, put(&uri, staff, Some(&admin))).await
     });
     tokio::time::sleep(Duration::from_millis(300)).await;
-    db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, &[])
+    db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, race.admin_id)
         .await
         .unwrap();
     merge.commit().await.unwrap();
@@ -510,7 +518,7 @@ async fn an_approval_between_two_merges_of_its_dancer_goes_in_turn(pool: PgPool)
         send(&app, post(&uri, json!({ "into": last }), Some(&admin))).await
     });
     tokio::time::sleep(Duration::from_millis(200)).await;
-    db::dancers::merge(&mut first, &locked_loser, &locked_survivor, &[])
+    db::dancers::merge(&mut first, &locked_loser, &locked_survivor, race.admin_id)
         .await
         .unwrap();
     first.commit().await.unwrap();
@@ -589,7 +597,7 @@ async fn a_claim_waits_for_a_merge_of_its_dancer(pool: PgPool) {
         tokio::spawn(async move { send(&app, post(&uri, json!({}), Some(&claimant))).await });
     tokio::time::sleep(Duration::from_millis(300)).await;
     assert!(!claim.is_finished(), "the claim didn't wait for the merge");
-    db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, &[])
+    db::dancers::merge(&mut merge, &locked_loser, &locked_survivor, race.admin_id)
         .await
         .unwrap();
     merge.commit().await.unwrap();

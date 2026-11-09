@@ -1,5 +1,6 @@
 //! Domain types and their invariants; no SQL here.
 
+pub mod admin_action;
 pub mod battle;
 pub mod claim;
 pub mod crew;
