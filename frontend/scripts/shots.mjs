@@ -98,19 +98,38 @@ async function connect(profile) {
   return { send, close };
 }
 
-// Runs in the page: elements whose right edge passes the screen's, outside the strips meant to scroll.
-// The screen's width is passed in: a page that overflows widens innerWidth on a phone.
-const overflowOf = (width) => `(() => {
-  const scrolls = (el) => ["auto", "scroll", "hidden", "clip"].includes(getComputedStyle(el).overflowX);
-  const inStrip = (el) => { for (let p = el.parentElement; p; p = p.parentElement) if (scrolls(p)) return true; return false; };
-  const name = (el) => el.tagName.toLowerCase() + (el.getAttribute("aria-label") ? '[' + el.getAttribute("aria-label") + ']' : "") + (el.textContent.trim() ? ' "' + el.textContent.trim().slice(0, 30) + '"' : "");
+// Runs in the page, sent as its source: elements whose right edge passes the screen's, outside the
+// strips meant to scroll. The screen's width is passed in: a page that overflows widens innerWidth
+// on a phone.
+function pastTheEdge(width) {
+  const scrolls = (el) =>
+    ["auto", "scroll", "hidden", "clip"].includes(
+      getComputedStyle(el).overflowX,
+    );
+  const inStrip = (el) => {
+    for (let p = el.parentElement; p; p = p.parentElement)
+      if (scrolls(p)) return true;
+    return false;
+  };
+  const name = (el) => {
+    const label = el.getAttribute("aria-label");
+    const text = el.textContent.trim();
+    return (
+      el.tagName.toLowerCase() +
+      (label ? `[${label}]` : "") +
+      (text ? ` "${text.slice(0, 30)}"` : "")
+    );
+  };
   const out = [...document.body.querySelectorAll("*")].filter((el) => {
     const box = el.getBoundingClientRect();
-    return box.width > 0 && box.right > ${width} + 1 && !inStrip(el);
+    return box.width > 0 && box.right > width + 1 && !inStrip(el);
   });
   // Only the outermost: its children overflow with it.
-  return out.filter((el) => !out.includes(el.parentElement)).slice(0, 5).map(name);
-})()`;
+  return out
+    .filter((el) => !out.includes(el.parentElement))
+    .slice(0, 5)
+    .map(name);
+}
 
 /** Loads `path` at `width` in `theme`, saves its screenshot and returns what overflows. */
 async function shoot(send, path, { width, theme }) {
@@ -127,7 +146,7 @@ async function shoot(send, path, { width, theme }) {
   // The page asks the API after it loads; fonts and images follow.
   await wait(2000);
   const { result } = await send("Runtime.evaluate", {
-    expression: `document.fonts.ready.then(() => [document.documentElement.scrollHeight, ${overflowOf(width)}])`,
+    expression: `document.fonts.ready.then(() => [document.documentElement.scrollHeight, (${pastTheEdge})(${width})])`,
     awaitPromise: true,
     returnByValue: true,
   });

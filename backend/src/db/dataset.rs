@@ -1,7 +1,7 @@
 //! Rows the curated `data/` import writes inside one transaction, besides jams, battles and entries,
 //! and the keys of those it wrote before.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use chrono::NaiveDate;
 use sqlx::PgConnection;
@@ -121,7 +121,9 @@ pub async fn event_keys(conn: &mut PgConnection) -> sqlx::Result<Vec<String>> {
 
 /// The name and first day of every live jam without a key: written by hand, or imported before
 /// jams had keys.
-pub async fn unkeyed_events(conn: &mut PgConnection) -> sqlx::Result<Vec<(String, NaiveDate)>> {
+pub async fn unkeyed_events(
+    conn: &mut PgConnection,
+) -> sqlx::Result<BTreeSet<(String, NaiveDate)>> {
     let rows = sqlx::query!(
         "select name, starts_on from events where data_key is null and deleted_at is null"
     )

@@ -295,7 +295,6 @@ impl Event {
 
     /// Whether `fields` would take away the city, country or pin it has; blank counts as none.
     pub fn loses_place(&self, fields: &EventFields) -> bool {
-        let blank = |value: &Option<String>| value.as_deref().is_none_or(|v| v.trim().is_empty());
         (self.city.is_some() && blank(&fields.city))
             || (self.country.is_some() && blank(&fields.country))
             || (self.lat.is_some() && fields.lat.is_none())
@@ -304,7 +303,6 @@ impl Event {
     /// Whether `fields` would take away the last way to reach its organiser (Instagram or contact
     /// email) while it has one; blank counts as none.
     pub fn loses_contact(&self, fields: &EventFields) -> bool {
-        let blank = |value: &Option<String>| value.as_deref().is_none_or(|v| v.trim().is_empty());
         let has = self.instagram_url.is_some() || self.contact_email.is_some();
         has && blank(&fields.instagram_url) && blank(&fields.contact_email)
     }
@@ -323,6 +321,11 @@ impl Event {
         }
         missing
     }
+}
+
+/// Whether an optional text field is missing or only whitespace.
+fn blank(value: &Option<String>) -> bool {
+    value.as_deref().is_none_or(|v| v.trim().is_empty())
 }
 
 /// Everything an organiser sets when creating or editing a jam.

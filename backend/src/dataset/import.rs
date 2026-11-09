@@ -87,24 +87,18 @@ pub async fn insert_all(
         dancers: db::dataset::dancer_keys(conn).await?,
         crews: db::dataset::crew_keys(conn).await?,
     };
-    let (dancer_keys, crew_keys) = needed(data, &events, &errors, &cx.dancers);
+    let (dancer_keys, crew_keys) = needed(&cx, &events, &errors);
     let mut imported = Imported {
         skipped,
         events_before: data.events.keys().filter(|k| before.contains(*k)).count(),
         ..Imported::default()
     };
     for key in crew_keys {
-        if cx.crews.contains_key(key) {
-            continue;
-        }
         let id = db::dataset::insert_crew(conn, key, &data.crews[key]).await?;
         cx.crews.insert(key.to_owned(), id);
         imported.crews += 1;
     }
     for key in dancer_keys {
-        if cx.dancers.contains_key(key) {
-            continue;
-        }
         let dancer = &data.dancers[key];
         let id = db::dataset::insert_dancer(conn, key, dancer, organizer).await?;
         for crew in dancer.crews.iter().filter_map(|crew| cx.crews.get(crew)) {
@@ -135,10 +129,7 @@ async fn refuse_unkeyed(
     data: &Dataset,
     events: &[&str],
 ) -> Result<(), ImportError> {
-    let unkeyed: BTreeSet<_> = db::dataset::unkeyed_events(conn)
-        .await?
-        .into_iter()
-        .collect();
+    let unkeyed = db::dataset::unkeyed_events(conn).await?;
     let twice: Vec<&str> = events
         .iter()
         .copied()
@@ -191,21 +182,21 @@ fn broken(problems: &[Problem], kind: Kind) -> BTreeSet<&str> {
         .collect()
 }
 
-/// Every dancer of `dancers.toml`, in a jam or not, and the crews that `events`' teams and the
-/// dancers not yet `known` name; none that breaks a rule. A known dancer's crews aren't, so a crew
-/// isn't written without the membership or entry that names it.
+/// Every dancer of `dancers.toml` not yet written, in a jam or not, and the crews not yet written
+/// that `events`' teams and those dancers name; none that breaks a rule. A dancer written before
+/// keeps its crews, so a crew isn't written without the membership or entry that names it.
 fn needed<'a>(
-    data: &'a Dataset,
+    cx: &Context<'a>,
     events: &[&str],
     problems: &[Problem],
-    known: &BTreeMap<String, Uuid>,
 ) -> (BTreeSet<&'a str>, BTreeSet<&'a str>) {
+    let data = cx.data;
     let (bad_dancers, bad_crews) = (broken(problems, Kind::Dancer), broken(problems, Kind::Crew));
     let dancers: BTreeSet<&str> = data
         .dancers
         .keys()
         .map(String::as_str)
-        .filter(|key| !bad_dancers.contains(key))
+        .filter(|key| !bad_dancers.contains(key) && !cx.dancers.contains_key(*key))
         .collect();
     let teams = events
         .iter()
@@ -218,11 +209,13 @@ fn needed<'a>(
         });
     let members = dancers
         .iter()
-        .filter(|key| !known.contains_key(**key))
         .flat_map(|key| &data.dancers[*key].crews)
         .map(String::as_str)
         .filter(|crew| data.crews.contains_key(*crew) && !bad_crews.contains(crew));
-    let crews = teams.chain(members).collect();
+    let crews = teams
+        .chain(members)
+        .filter(|crew| !cx.crews.contains_key(*crew))
+        .collect();
     (dancers, crews)
 }
 
