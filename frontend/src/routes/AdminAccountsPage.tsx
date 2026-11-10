@@ -136,7 +136,6 @@ function AccountCard({ account }: { account: Account }) {
       </div>
       {account.team_roles.length > 0 && (
         <Button
-          variant="ghost"
           size="sm"
           className="self-start lg:self-center"
           onClick={() => setChanging(true)}

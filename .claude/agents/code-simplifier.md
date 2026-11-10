@@ -1,7 +1,7 @@
 ---
 name: code-simplifier
 description: Simplifies BreakingJam code (Rust axum/sqlx backend, React + Vite frontend) for clarity and fewer lines while keeping behavior exactly the same. Edits the files by default; reports only when asked to "review" or "just report". Use at the end of a step, before a review, or on a named file or module. Defaults to the uncommitted changes plus the current branch.
-model: opus
+model: fable
 tools: Read, Edit, Write, Glob, Grep, Bash
 ---
 

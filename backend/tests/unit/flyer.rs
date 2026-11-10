@@ -1,5 +1,7 @@
 //! Unit tests of `crate::flyer`.
 
+use std::time::Duration;
+
 use sha1::{Digest, Sha1};
 
 use chrono::NaiveTime;
@@ -438,6 +440,18 @@ fn og_png_is_a_1200_by_630_png() {
     // IHDR: width and height as big-endian u32 at bytes 16..24.
     assert_eq!(u32::from_be_bytes(png[16..20].try_into().unwrap()), 1200);
     assert_eq!(u32::from_be_bytes(png[20..24].try_into().unwrap()), 630);
+}
+
+#[tokio::test]
+async fn render_og_waits_for_a_free_slot() {
+    let (text, palette) = sample("long");
+    let slots = OG_PNG_SLOTS.acquire_many(2).await.unwrap();
+    let mut render = tokio::spawn(render_og(og_svg(&text, palette, "og")));
+    let waiting = tokio::time::timeout(Duration::from_millis(200), &mut render).await;
+    assert!(waiting.is_err(), "rendered with every slot taken");
+    drop(slots);
+    let png = render.await.unwrap().unwrap();
+    assert_eq!(&png[..8], b"\x89PNG\r\n\x1a\n");
 }
 
 #[test]

@@ -863,7 +863,7 @@
         "admin": "Admin",
         "super_admin": "Super admin"
       },
-      "changeRole": "Rôle dans l’équipe",
+      "changeRole": "Définir le rôle dans l’équipe",
       "roleTitle": "Rôle de {{email}} dans l’équipe",
       "teamRole": "Rôle dans l’équipe",
       "teamRoles": {

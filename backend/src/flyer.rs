@@ -17,9 +17,10 @@ use chrono::{Datelike, NaiveTime};
 use resvg::{tiny_skia, usvg};
 use serde::Deserialize;
 use sha1::{Digest, Sha1};
+use tokio::sync::Semaphore;
 use utoipa::ToSchema;
 
-use crate::domain::event::Event;
+use crate::{domain::event::Event, error::AppError};
 
 const DISPLAY: &str = "'Unbounded Variable', Unbounded, 'Arial Black', sans-serif";
 const BODY: &str = "'Manrope Variable', Manrope, 'Helvetica Neue', Arial, sans-serif";
@@ -622,4 +623,24 @@ pub fn og_png(svg: &str) -> Result<Vec<u8>, RasterError> {
     pixmap
         .encode_png()
         .map_err(|err| RasterError::Png(err.to_string()))
+}
+
+/// Share images rendering at once; anonymous floods of `og.png` queue here.
+// Each render takes a 3 MiB pixmap and a CPU slice: two keep the 1 GiB, 1/4 vCPU container alive.
+pub(crate) static OG_PNG_SLOTS: Semaphore = Semaphore::const_new(2);
+
+/// Rasterises an `og_svg` document off the request threads once a slot is free.
+pub async fn render_og(svg: String) -> Result<Vec<u8>, AppError> {
+    let slot = OG_PNG_SLOTS
+        .acquire()
+        .await
+        .map_err(|err| AppError::Internal(err.into()))?;
+    tokio::task::spawn_blocking(move || {
+        // Held until the render ends, even if the client hangs up and the request is dropped.
+        let _slot = slot;
+        og_png(&svg)
+    })
+    .await
+    .map_err(|err| AppError::Internal(err.into()))?
+    .map_err(|err| AppError::Internal(err.into()))
 }

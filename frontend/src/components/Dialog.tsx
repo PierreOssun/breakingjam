@@ -81,7 +81,12 @@ export function Dialog({
       className={`mx-0 mt-auto mb-0 max-h-[calc(100dvh-40px)] w-full max-w-none flex-col rounded-t-xl border-t border-border-strong bg-surface-raised p-0 text-text shadow-lg backdrop:bg-scrim open:flex lg:m-auto lg:mt-[12vh] lg:max-h-[80vh] lg:rounded-lg lg:border ${shape}`}
     >
       <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 lg:px-6 lg:pt-6">
-        <h2 id={titleId} className="font-display text-display-md">
+        {/* A title may hold an email or a long name with no space to wrap at: it breaks
+            anywhere rather than widening the dialog. */}
+        <h2
+          id={titleId}
+          className="min-w-0 font-display text-display-md wrap-anywhere"
+        >
           {title}
         </h2>
         <IconButton label={t("dialog.close")} onClick={requestClose}>

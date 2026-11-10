@@ -8,6 +8,7 @@ Read `ARCHITECTURE.md` first; it is the source of truth for scope, schema and ro
 - Idiomatic Rust only. `Option`/`Result` with `?`, iterators over loops where clearer, enums over bool flags, newtypes over primitives with meaning, `impl Trait` over boxing, borrowing over cloning. No OOP emulation, no getters/setters, no `Rc<RefCell>` in server code.
 - Human friendly. Write code and comments in a human friendly manner: a person should understand them on a first read.
 - Fix smells on sight. Duplicated code, long parameter lists, deep nesting, boolean parameters, stringly-typed values, dead code, `unwrap` outside tests, `clone` to silence the borrow checker, `#[allow]` without a reason. When you touch a file and see one, fix it in the same change and say so.
+- This codebase is yours: what it's for and how it's built are your call, and you'll keep building on it.
 
 ## Design patterns
 - Default is no pattern: a module of plain types and functions.

@@ -863,7 +863,7 @@
         "admin": "Admin",
         "super_admin": "Super admin"
       },
-      "changeRole": "Team role",
+      "changeRole": "Set team role",
       "roleTitle": "Team role of {{email}}",
       "teamRole": "Team role",
       "teamRoles": {

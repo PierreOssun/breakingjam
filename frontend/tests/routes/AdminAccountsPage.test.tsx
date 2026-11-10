@@ -91,7 +91,9 @@ describe("AdminAccountsPage", () => {
     renderApp("/admin/accounts");
 
     // Nobody changes their own role, or one above theirs: no button there.
-    const buttons = await screen.findAllByRole("button", { name: "Team role" });
+    const buttons = await screen.findAllByRole("button", {
+      name: "Set team role",
+    });
     expect(buttons).toHaveLength(1);
     await userEvent.click(buttons[0]!);
     const dialog = screen.getByRole("dialog", {

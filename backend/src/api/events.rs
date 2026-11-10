@@ -575,11 +575,7 @@ async fn og_png(
 ) -> Result<Response, AppError> {
     let (event, text) = flyer_text(&state, &current, &id_or_slug, query.lang).await?;
     let svg = flyer::og_svg(&text, flyer::seed(&event.id.to_string()), "og");
-    // Rasterising takes tens of milliseconds of CPU; keep it off the request threads.
-    let png = tokio::task::spawn_blocking(move || flyer::og_png(&svg))
-        .await
-        .map_err(|err| AppError::Internal(err.into()))?
-        .map_err(|err| AppError::Internal(err.into()))?;
+    let png = flyer::render_og(svg).await?;
     Ok(([(CACHE_CONTROL, cache_control(&event))], Png(png)).into_response())
 }
 
