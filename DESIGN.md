@@ -854,7 +854,7 @@ Where an avatar's parts are picked, each by looking at it; a fighter-select scre
    - Hidden without any.
 5. **BreakingJam so far:** the stats band (§4.42), no `border-t`. Public jams only, never cancelled ones. A battle is past once its jam ended before today, upcoming from the day it ends; countries are those of the upcoming battles. Numbers use the locale's thousands separator; captions agree with the number.
 6. **Footer** (every content page, the same at every width).
-   - The round Bounce logo at 56px next to the wordmark, then at the far end **Contact**, **Team** and **Instagram** (`InstagramLogo` 16 + "Instagram"), `body-sm font-bold`, 44px targets, underlined on hover. Instagram opens in a new tab.
+   - The round Bounce logo at 56px next to the wordmark, then at the far end **Contact**, **Team**, **Privacy** and **Instagram** (`InstagramLogo` 16 + "Instagram"), `body-sm font-bold`, 44px targets, underlined on hover. Instagram opens in a new tab.
    - Nothing else: the header holds the other links and the language switch.
    - One row (`justify-between`); below about 400px it wraps, the links under the logo. Nothing hangs past the page's side padding.
 
@@ -921,6 +921,8 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Two contact cards** (`bg-surface border rounded-lg p-5 gap-3`), side by side from `sm`, stacked below: Email with the address in bold, selectable and always visible since `mailto:` doesn't work for everyone, a secondary sm **Copy** (toast "Email copied") and a primary sm **Write an email**; Instagram with the handle in bold and a primary sm **Send a DM**, opening `ig.me/m/<handle>` in a new tab.
 - **"What you can write about":** a `label`, then a 2×2 grid of small cards (one column below `sm`), each wholly a `mailto:` link with a prefilled subject, translated with the page: An idea (`Lightbulb`, "Idea:"), A bug (`Bug`, "Bug:"), Wrong info (`PencilSimple`, "Fix:"), Work together (`Handshake`, "Hello:").
 - **Caption** at the end: "We read every message.", then a `primary-text` bold link **Who's behind BreakingJam?** to `/team`.
+
+**Privacy page** (`/privacy`, linked from the footer): the Contact page's column (`max-w-prose`, `px-4 pt-8 pb-16`). Title `display-lg`, the intro in muted `body`, "Last updated" in muted `caption`; then one section per topic, an `h2` in `display-xs` over plain `body` paragraphs; last, the contact line with the address as a `primary-text` mailto link. Plain words, no legal boilerplate, in the three languages.
 
 **Team page** (`/team`, "Team — idea A" on the canvas; linked from the footer and the Contact page): who runs BreakingJam. The people are a static config (`frontend/src/content/team.ts`: name, role, Instagram handle, and their dancer's key in `data/dancers.toml`); the words are in i18n.
 - `max-w-content` with the page's side padding, `pt-8 pb-16` on phones, `py-20` from lg.

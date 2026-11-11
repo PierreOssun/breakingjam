@@ -5,6 +5,8 @@ use std::{
     fmt,
 };
 
+use chrono::Utc;
+
 use super::{BattleRecord, Dataset, EventRecord, is_key, spelling};
 use crate::domain::{battle::youtube_id, event::iana_timezone, upper_ascii_code};
 
@@ -225,6 +227,15 @@ fn check_event_fields(event: &EventRecord, errors: &mut Vec<String>) {
         .is_some_and(|ends_on| ends_on < event.starts_on)
     {
         errors.push("ends_on is before starts_on".into());
+    }
+    // Curated jams are a record: one still to come or going on is entered on the site, by hand.
+    // A day's margin, so it is over in every timezone.
+    let last_day = event.ends_on.unwrap_or(event.starts_on);
+    if last_day
+        .succ_opt()
+        .is_none_or(|next| next >= Utc::now().date_naive())
+    {
+        errors.push("the jam is not over yet: data/ holds past jams only".into());
     }
     match (event.lat, event.lng) {
         (Some(lat), Some(lng)) => {

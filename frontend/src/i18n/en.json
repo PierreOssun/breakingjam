@@ -19,7 +19,8 @@
     "accountMenuOf": "Account menu, {{name}}",
     "contact": "Contact",
     "team": "Team",
-    "accountSettings": "Account"
+    "accountSettings": "Account",
+    "privacy": "Privacy"
   },
   "account": {
     "viewPage": "View my page",
@@ -125,7 +126,8 @@
     "jams": "Jams",
     "search": "Search",
     "contact": "Contact",
-    "team": "Team"
+    "team": "Team",
+    "privacy": "Privacy"
   },
   "notFound": {
     "title": "Page not found",
@@ -1133,5 +1135,58 @@
     "organiserName": "Organiser name",
     "signIn": "Sign-in",
     "changePassword": "Change password"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "updated": "Last updated: 11 November 2026",
+    "intro": "BreakingJam lists breaking jams and their results. This page says what we keep about you, why, and how to have it changed or removed.",
+    "sections": [
+      {
+        "title": "Who runs the site",
+        "body": [
+          "BreakingJam is run by its team, a small group of dancers. We are the ones responsible for the data on this site."
+        ]
+      },
+      {
+        "title": "Your account",
+        "body": [
+          "With an email sign-up we keep your email, your name and a hash of your password, never the password itself.",
+          "With Google sign-in we receive your email, your name and Google’s identifier for your account. We never see your Google password.",
+          "We email you only the codes that confirm your address or reset your password.",
+          "One cookie keeps you logged in. Your language and theme are remembered in your browser. There are no ads, no trackers and no analytics."
+        ]
+      },
+      {
+        "title": "Dancer pages and results",
+        "body": [
+          "A dancer page shows a stage name, countries, a city, a bio, an Instagram handle and battle results. These are public.",
+          "Pages are created by the team from published results, and by organisers when they enter a battle. So there may be a page about you that you did not make.",
+          "If it is you, “This is me” on the page lets you claim it, edit it and hide your Instagram. Or write to us and we correct or remove it.",
+          "Changes to a page nobody has claimed yet are logged with the account that made them."
+        ]
+      },
+      {
+        "title": "Jams you register",
+        "body": [
+          "A jam’s details, flyer and organiser name are public once the jam is approved."
+        ]
+      },
+      {
+        "title": "Services we rely on",
+        "body": [
+          "Cloudflare hosts the site and the uploaded flyers, and sends our emails. The database is at Neon, in Frankfurt.",
+          "The map loads its tiles from Protomaps, and the place search asks Photon (Komoot) for what you type. A video plays from YouTube, in its privacy-enhanced mode, only when you start it.",
+          "Your country, read from your connection, sets where the map starts. Your position is used only if you allow it, for the search you ask for; we don’t save either."
+        ]
+      },
+      {
+        "title": "How long, and your rights",
+        "body": [
+          "We keep your account until you ask us to delete it. Results stay as a record of the jam, unless you ask us to remove your name.",
+          "You can ask what we hold about you, and have it corrected or deleted. We don’t sell or share your data for advertising."
+        ]
+      }
+    ],
+    "contact": "Questions, a correction or a removal? Write to us:"
   }
 }

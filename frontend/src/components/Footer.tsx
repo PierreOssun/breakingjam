@@ -7,7 +7,7 @@ import { Wordmark } from "./Wordmark";
 const LINK =
   "inline-flex min-h-11 items-center gap-2 text-body-sm font-bold underline-offset-2 hover:underline";
 
-/** Content-page footer: the round logo, Contact, Team and Instagram; the header holds the rest (§6). */
+/** Content-page footer: the round logo, Contact, Team, Privacy and Instagram; the header holds the rest (§6). */
 export function Footer() {
   const { t } = useTranslation();
   return (
@@ -21,6 +21,9 @@ export function Footer() {
           </Link>
           <Link to="/team" className={LINK}>
             {t("nav.team")}
+          </Link>
+          <Link to="/privacy" className={LINK}>
+            {t("nav.privacy")}
           </Link>
           <a
             href={`https://instagram.com/${BREAKINGJAM_INSTAGRAM}`}

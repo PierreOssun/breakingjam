@@ -102,6 +102,18 @@ fn errors_name_the_file_and_the_rule() {
 }
 
 #[test]
+fn a_jam_that_is_not_over_is_an_error() {
+    let mut data = dataset();
+    assert_eq!(errors_of(&data), Vec::<String>::new());
+    // Today is its last day: still going on somewhere.
+    event(&mut data).ends_on = Some(chrono::Utc::now().date_naive());
+    assert_eq!(
+        errors_of(&data),
+        ["events/bc-one/2023.toml: the jam is not over yet: data/ holds past jams only"]
+    );
+}
+
+#[test]
 fn bracket_errors_are_reported_per_battle() {
     let mut data = dataset();
     event(&mut data).battles[0].matches[0].winner = "storm".into();

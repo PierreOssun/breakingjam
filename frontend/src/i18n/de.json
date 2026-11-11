@@ -19,7 +19,8 @@
     "accountMenuOf": "Kontomenü, {{name}}",
     "contact": "Kontakt",
     "team": "Team",
-    "accountSettings": "Konto"
+    "accountSettings": "Konto",
+    "privacy": "Datenschutz"
   },
   "account": {
     "viewPage": "Meine Seite ansehen",
@@ -125,7 +126,8 @@
     "jams": "Jams",
     "search": "Suche",
     "contact": "Kontakt",
-    "team": "Team"
+    "team": "Team",
+    "privacy": "Datenschutz"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -1133,5 +1135,58 @@
     "organiserName": "Name als Veranstalter:in",
     "signIn": "Anmeldung",
     "changePassword": "Passwort ändern"
+  },
+  "privacy": {
+    "title": "Datenschutz",
+    "updated": "Zuletzt aktualisiert: 11. November 2026",
+    "intro": "BreakingJam listet Breaking-Jams und ihre Ergebnisse. Diese Seite sagt, was wir über dich speichern, warum, und wie du es ändern oder löschen lässt.",
+    "sections": [
+      {
+        "title": "Wer die Seite betreibt",
+        "body": [
+          "BreakingJam wird von seinem Team betrieben, einer kleinen Gruppe von Tänzern. Wir sind für die Daten auf dieser Seite verantwortlich."
+        ]
+      },
+      {
+        "title": "Dein Konto",
+        "body": [
+          "Bei der Anmeldung mit E-Mail speichern wir deine E-Mail, deinen Namen und einen Hash deines Passworts, nie das Passwort selbst.",
+          "Bei der Anmeldung mit Google erhalten wir deine E-Mail, deinen Namen und Googles Kennung deines Kontos. Dein Google-Passwort sehen wir nie.",
+          "Wir mailen dir nur die Codes, die deine Adresse bestätigen oder dein Passwort zurücksetzen.",
+          "Ein Cookie hält dich angemeldet. Sprache und Design merkt sich dein Browser. Es gibt keine Werbung, keine Tracker und keine Analyse."
+        ]
+      },
+      {
+        "title": "Tänzerseiten und Ergebnisse",
+        "body": [
+          "Eine Tänzerseite zeigt einen Künstlernamen, Länder, eine Stadt, eine Bio, einen Instagram-Namen und Battle-Ergebnisse. Das ist öffentlich.",
+          "Seiten werden vom Team aus veröffentlichten Ergebnissen angelegt, und von Veranstaltern, wenn sie ein Battle eintragen. Es kann also eine Seite über dich geben, die du nicht angelegt hast.",
+          "Wenn du das bist, kannst du die Seite mit „Das bin ich“ beanspruchen, bearbeiten und dein Instagram verbergen. Oder schreib uns, und wir korrigieren oder löschen sie.",
+          "Änderungen an einer Seite, die noch niemand beansprucht hat, werden mit dem Konto protokolliert, das sie gemacht hat."
+        ]
+      },
+      {
+        "title": "Jams, die du einträgst",
+        "body": [
+          "Die Angaben eines Jams, sein Flyer und der Name des Veranstalters sind öffentlich, sobald der Jam freigegeben ist."
+        ]
+      },
+      {
+        "title": "Dienste, die wir nutzen",
+        "body": [
+          "Cloudflare hostet die Seite und die hochgeladenen Flyer und verschickt unsere E-Mails. Die Datenbank liegt bei Neon in Frankfurt.",
+          "Die Karte lädt ihre Kacheln von Protomaps, und die Ortssuche fragt Photon (Komoot) nach dem, was du tippst. Ein Video wird von YouTube abgespielt, im erweiterten Datenschutzmodus, erst wenn du es startest.",
+          "Dein Land, aus deiner Verbindung gelesen, bestimmt, wo die Karte startet. Dein Standort wird nur genutzt, wenn du es erlaubst, für die Suche, die du auslöst; wir speichern keins von beiden."
+        ]
+      },
+      {
+        "title": "Wie lange, und deine Rechte",
+        "body": [
+          "Wir behalten dein Konto, bis du uns bittest, es zu löschen. Ergebnisse bleiben als Protokoll des Jams, außer du bittest uns, deinen Namen zu entfernen.",
+          "Du kannst fragen, was wir über dich haben, und es korrigieren oder löschen lassen. Wir verkaufen oder teilen deine Daten nicht für Werbung."
+        ]
+      }
+    ],
+    "contact": "Eine Frage, eine Korrektur oder eine Löschung? Schreib uns:"
   }
 }

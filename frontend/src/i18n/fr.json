@@ -19,7 +19,8 @@
     "accountMenuOf": "Menu du compte, {{name}}",
     "contact": "Contact",
     "team": "Équipe",
-    "accountSettings": "Compte"
+    "accountSettings": "Compte",
+    "privacy": "Confidentialité"
   },
   "account": {
     "viewPage": "Voir ma page",
@@ -125,7 +126,8 @@
     "jams": "Jams",
     "search": "Recherche",
     "contact": "Contact",
-    "team": "Équipe"
+    "team": "Équipe",
+    "privacy": "Confidentialité"
   },
   "notFound": {
     "title": "Page introuvable",
@@ -1133,5 +1135,58 @@
     "organiserName": "Nom d’organisateur·rice",
     "signIn": "Connexion",
     "changePassword": "Changer le mot de passe"
+  },
+  "privacy": {
+    "title": "Confidentialité",
+    "updated": "Dernière mise à jour : 11 novembre 2026",
+    "intro": "BreakingJam recense les jams de breaking et leurs résultats. Cette page dit ce que nous gardons sur toi, pourquoi, et comment le faire corriger ou supprimer.",
+    "sections": [
+      {
+        "title": "Qui gère le site",
+        "body": [
+          "BreakingJam est géré par son équipe, un petit groupe de danseurs. Nous sommes responsables des données de ce site."
+        ]
+      },
+      {
+        "title": "Ton compte",
+        "body": [
+          "Avec une inscription par email, nous gardons ton email, ton nom et une empreinte de ton mot de passe, jamais le mot de passe lui-même.",
+          "Avec la connexion Google, nous recevons ton email, ton nom et l’identifiant Google de ton compte. Nous ne voyons jamais ton mot de passe Google.",
+          "Nous ne t’envoyons par email que les codes qui confirment ton adresse ou réinitialisent ton mot de passe.",
+          "Un cookie te garde connecté. Ta langue et ton thème sont retenus dans ton navigateur. Il n’y a ni publicité, ni traceur, ni mesure d’audience."
+        ]
+      },
+      {
+        "title": "Pages de danseurs et résultats",
+        "body": [
+          "Une page de danseur montre un nom de scène, des pays, une ville, une bio, un compte Instagram et des résultats de battles. Tout cela est public.",
+          "Les pages sont créées par l’équipe à partir de résultats publiés, et par les organisateurs quand ils saisissent un battle. Il peut donc exister une page sur toi que tu n’as pas créée.",
+          "Si c’est toi, « C’est moi » sur la page te permet de la réclamer, de la modifier et de masquer ton Instagram. Ou écris-nous et nous la corrigeons ou la supprimons.",
+          "Les modifications d’une page que personne n’a encore réclamée sont enregistrées avec le compte qui les a faites."
+        ]
+      },
+      {
+        "title": "Les jams que tu inscris",
+        "body": [
+          "Les informations d’un jam, son flyer et le nom de l’organisateur sont publics une fois le jam approuvé."
+        ]
+      },
+      {
+        "title": "Les services que nous utilisons",
+        "body": [
+          "Cloudflare héberge le site et les flyers, et envoie nos emails. La base de données est chez Neon, à Francfort.",
+          "La carte charge ses tuiles chez Protomaps, et la recherche de lieux envoie ce que tu tapes à Photon (Komoot). Une vidéo est lue depuis YouTube, en mode confidentialité avancée, seulement quand tu la lances.",
+          "Ton pays, lu depuis ta connexion, décide où la carte s’ouvre. Ta position n’est utilisée que si tu l’autorises, pour la recherche que tu demandes ; nous ne gardons ni l’un ni l’autre."
+        ]
+      },
+      {
+        "title": "Durée, et tes droits",
+        "body": [
+          "Nous gardons ton compte jusqu’à ce que tu nous demandes de le supprimer. Les résultats restent comme trace du jam, sauf si tu nous demandes de retirer ton nom.",
+          "Tu peux demander ce que nous avons sur toi, et le faire corriger ou supprimer. Nous ne vendons ni ne partageons tes données à des fins publicitaires."
+        ]
+      }
+    ],
+    "contact": "Une question, une correction ou une suppression ? Écris-nous :"
   }
 }
