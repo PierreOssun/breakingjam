@@ -16,7 +16,7 @@ key = "bboy"
 name = "Super Solo Bboy Battle"
 gender = "bboy"
 results = [
-  { entrant = "tonio", reached = "winner" },
+  { entrant = "tonio", reached = "winner", video = "https://youtu.be/2JR-tR40Zhg" },
 ]
 
 [[battles]]
@@ -25,5 +25,5 @@ name = "Seven to Smoke"
 gender = "bboy"
 format = "seven_to_smoke"
 results = [
-  { entrant = "jazzy-gypz", reached = "winner" },
+  { entrant = "jazzy-gypz", reached = "winner", video = "https://youtu.be/kj2yPo9UWo4" },
 ]

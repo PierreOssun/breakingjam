@@ -38,8 +38,23 @@ matches = [
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "kate", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "aga", b = "furia", winner = "aga", video = "https://youtu.be/ghvhNDPttHQ" },
+  { round = "top16", a = "alessandrina", b = "san-andrea", winner = "alessandrina", video = "https://youtu.be/JsheaSGkFVk" },
+  { round = "top16", a = "elettra", b = "jilou", winner = "jilou", video = "https://youtu.be/rt6zOj88D4E" },
+  { round = "top16", a = "flexie", b = "tazz", winner = "tazz", video = "https://youtu.be/EHrTYrpFLTg" },
+  { round = "top16", a = "kami", b = "becca", winner = "becca", video = "https://youtu.be/Y56xm9_i-iU" },
+  { round = "top16", a = "kate", b = "fidget", winner = "kate", video = "https://youtu.be/9hS3sCukjO4" },
+  { round = "top16", a = "madmax", b = "paulina", winner = "paulina", video = "https://youtu.be/h8Ff1jtg7hE" },
+  { round = "top16", a = "yana", b = "anita", winner = "anita", video = "https://youtu.be/zFVY_8pWvDo" },
+  { round = "top8", a = "aga", b = "alessandrina", winner = "aga", video = "https://youtu.be/iUxUC9FDhsw" },
+  { round = "top8", a = "anita", b = "kate", winner = "kate", video = "https://youtu.be/hRfFIlAQBU4" },
+  { round = "top8", a = "jilou", b = "becca", winner = "jilou", video = "https://youtu.be/Sdil7-cgtdU" },
+  { round = "top8", a = "paulina", b = "tazz", winner = "tazz", video = "https://youtu.be/Wtcs8ShxBB0" },
+  { round = "top4", a = "aga", b = "kate", winner = "kate", video = "https://youtu.be/auchwxeaTtE" },
+  { round = "top4", a = "tazz", b = "jilou", winner = "jilou", video = "https://youtu.be/oWy1zIMuCX8" },
+  { round = "final", a = "kate", b = "jilou", winner = "kate", video = "https://youtu.be/v6NMMhsNxg0" },
 ]
 
 [[battles]]
@@ -90,20 +105,64 @@ name = "Kids 2v2"
 gender = "mixed"
 age = "kids"
 team_size = 2
-results = [
-  { entrant = "malik-raptor", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "kesl-pauk", b = "red-boy-rodione", winner = "kesl-pauk", video = "https://youtu.be/jey-wxVtG9I" },
+  { round = "top8", a = "gustas-jet-zai", b = "malik-raptor", winner = "malik-raptor", video = "https://youtu.be/1hs17XK88wc" },
+  { round = "top8", a = "deadbull-monster", b = "madmax-wigor", winner = "madmax-wigor", video = "https://youtu.be/JhEa3vIXOwY" },
+  { round = "top8", a = "boomer-pankick", b = "lee-on", winner = "boomer-pankick", video = "https://youtu.be/n36_GLwQjI4" },
+  { round = "top4", a = "kesl-pauk", b = "boomer-pankick", winner = "kesl-pauk", video = "https://youtu.be/sV4fxmAehCs" },
+  { round = "top4", a = "madmax-wigor", b = "malik-raptor", winner = "malik-raptor", video = "https://youtu.be/CcnldKb3_Lg" },
+  { round = "final", a = "kesl-pauk", b = "malik-raptor", winner = "malik-raptor", video = "https://youtu.be/U36arGzRN_M" },
 ]
 
 [battles.teams]
+kesl-pauk = { members = ["pauk", "kesl"] }
+red-boy-rodione = { members = ["red-boy", "rodione"] }
+gustas-jet-zai = { members = ["gustas", "jet-zai"] }
+deadbull-monster = { members = ["monster", "deadbull"] }
+madmax-wigor = { members = ["wigor", "madmax"] }
+boomer-pankick = { members = ["pankick", "boomer"] }
+lee-on = { name = "Lee-On" }
 malik-raptor = { members = ["raptor", "malik"] }
 
 [[battles]]
 key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
-results = [
-  { entrant = "france", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "brazil", b = "belarus", winner = "belarus", video = "https://youtu.be/XOgzV6UlEOU" },
+  { round = "top16", a = "venezuela", b = "poland", winner = "poland", video = "https://youtu.be/YlTMZYE-CY0" },
+  { round = "top16", a = "france", b = "young-hong-kong", winner = "france", video = "https://youtu.be/fu5Rzr1hQZs" },
+  { round = "top16", a = "italy", b = "united-kingdom", winner = "united-kingdom", video = "https://youtu.be/BXtPc6JSVfc" },
+  { round = "top16", a = "mexico", b = "ukraine", winner = "ukraine", video = "https://youtu.be/CxKLZXJei2o" },
+  { round = "top16", a = "kazakhstan", b = "spain", winner = "kazakhstan", video = "https://youtu.be/O-UXQyvedG4" },
+  { round = "top16", a = "morocco", b = "belgium", winner = "morocco", video = "https://youtu.be/Ww4m053efXE" },
+  { round = "top16", a = "germany", b = "russia", winner = "russia", video = "https://youtu.be/vqPYFKD80ro" },
+  { round = "top8", a = "united-kingdom", b = "france", winner = "france", video = "https://youtu.be/HcWt4wX96QA" },
+  { round = "top8", a = "poland", b = "ukraine", winner = "ukraine", video = "https://youtu.be/ntQqEBLSu-o" },
+  { round = "top8", a = "russia", b = "belarus", winner = "russia", video = "https://youtu.be/tYIq7FxgiDo" },
+  { round = "top8", a = "morocco", b = "kazakhstan", winner = "morocco", video = "https://youtu.be/3S3W40cfBHM" },
+  { round = "top4", a = "ukraine", b = "russia", winner = "ukraine", video = "https://youtu.be/iPIEVJ7Cp2k" },
+  { round = "top4", a = "morocco", b = "france", winner = "france", video = "https://youtu.be/WWao7_n_DEI" },
+  { round = "final", a = "ukraine", b = "france", winner = "france", video = "https://youtu.be/RULhx5fuVmM" },
 ]
 
 [battles.teams]
+brazil = { name = "Brazil" }
+belarus = { name = "Belarus" }
+venezuela = { name = "Venezuela" }
+poland = { name = "Poland" }
+young-hong-kong = { name = "Young Hong Kong" }
+italy = { name = "Italy" }
+united-kingdom = { name = "United Kingdom" }
+mexico = { name = "Mexico" }
+ukraine = { name = "Ukraine" }
+kazakhstan = { name = "Kazakhstan" }
+spain = { name = "Spain" }
+morocco = { name = "Morocco" }
+belgium = { name = "Belgium" }
+germany = { name = "Germany" }
+russia = { name = "Russia" }
 france = { name = "France" }

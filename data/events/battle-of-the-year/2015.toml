@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "flooriorz", reached = "winner" },
-  { entrant = "u-taipei", reached = "top4" },
-  { entrant = "doble-k-o", reached = "top4" },
-  { entrant = "kienjuice", reached = "top2" },
+  { entrant = "flooriorz", reached = "winner", video = "https://youtu.be/_zswMjtnivo" },
+  { entrant = "u-taipei", reached = "top4", video = "https://youtu.be/4kL5pZg_rz0" },
+  { entrant = "doble-k-o", reached = "top4", video = "https://youtu.be/cy62kEMq5MU" },
+  { entrant = "kienjuice", reached = "top2", video = "https://youtu.be/_zswMjtnivo" },
 ]
 
 [battles.teams]
@@ -57,7 +57,7 @@ name = "2v2 Bgirl"
 gender = "bgirl"
 team_size = 2
 results = [
-  { entrant = "ayane-noa", reached = "winner" },
+  { entrant = "ayane-noa", reached = "winner", video = "https://youtu.be/CzKREP2gzuQ" },
 ]
 
 [battles.teams]

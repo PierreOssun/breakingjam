@@ -16,8 +16,8 @@ key = "crew"
 name = "Undisputed Masters Crew"
 gender = "mixed"
 results = [
-  { entrant = "green-panda", reached = "winner" },
-  { entrant = "formless", reached = "top2" },
+  { entrant = "green-panda", reached = "winner", video = "https://youtu.be/Jv13Zt1VDqU" },
+  { entrant = "formless", reached = "top2", video = "https://youtu.be/Jv13Zt1VDqU" },
 ]
 
 [battles.teams]

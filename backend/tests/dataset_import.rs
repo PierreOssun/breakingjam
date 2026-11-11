@@ -281,7 +281,7 @@ async fn a_dancers_look_comes_from_dancers_toml_alone(pool: PgPool) {
     tx.commit().await.unwrap();
 
     let looks = sqlx::query!(
-        "select id, avatar_parts from dancers where dancer_name in ('Lee', 'Menno') order by dancer_name"
+        "select id, avatar from dancers where dancer_name in ('Lee', 'Menno') order by dancer_name"
     )
     .fetch_all(&pool)
     .await
@@ -289,10 +289,10 @@ async fn a_dancers_look_comes_from_dancers_toml_alone(pool: PgPool) {
     // Both dance the bboy battle: Lee has the look from dancers.toml, Menno none, as a battle
     // never draws one.
     assert_eq!(
-        looks[0].avatar_parts,
+        looks[0].avatar,
         default_look(looks[0].id, BattleGender::Bgirl)
     );
-    assert_eq!(looks[1].avatar_parts, None);
+    assert_eq!(looks[1].avatar, None);
 }
 
 #[sqlx::test]

@@ -280,7 +280,7 @@ async fn entering_a_battle_leaves_the_avatar_as_it_was(pool: PgPool) {
     // A page someone has seen keeps its face: the battle draws no look over it.
     for dancer in [&ami, &menno] {
         let page = send(&jam.app, get(&format!("/api/dancers/{dancer}"), None)).await;
-        assert_eq!(page.json["avatar_parts"], Value::Null);
+        assert_eq!(page.json["avatar"], Value::Null);
     }
 }
 

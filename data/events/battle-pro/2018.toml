@@ -18,7 +18,7 @@ gender = "mixed"
 bracket_size = 8
 matches = [
   { round = "top8", a = "body-carnival", b = "funky-belgianz", winner = "body-carnival" },
-  { round = "top8", a = "gamblerz", b = "east-side-bboys", winner = "gamblerz" },
+  { round = "top8", a = "gamblerz", b = "east-side-bboys", winner = "gamblerz", video = "https://youtu.be/zYfs1t1UA68" },
   { round = "top8", a = "predatorz", b = "hfc", winner = "predatorz", video = "https://youtu.be/0vk4ilxpsgQ" },
   { round = "top8", a = "arabiq-flavour", b = "mega-breaks", winner = "arabiq-flavour" },
   { round = "top4", a = "body-carnival", b = "gamblerz", winner = "gamblerz" },

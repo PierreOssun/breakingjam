@@ -23,8 +23,8 @@ matches = [
   { round = "top16", a = "hulk", b = "twister", winner = "hulk", video = "https://youtu.be/XspPmFuk5nw" },
   { round = "top16", a = "sunni", b = "sapa", winner = "sunni", video = "https://youtu.be/gMlsfL98riI" },
   { round = "top16", a = "milhouse", b = "yarko", winner = "milhouse", video = "https://youtu.be/asm0Jm7YI5Q" },
-  { round = "top16", a = "niek", b = "t-rock", winner = "niek", video = "https://youtu.be/2bglYu_tmRk" },
-  { round = "top16", a = "lil-g", b = "noindex", winner = "lil-g" , video = "https://youtu.be/VX4Uu4O2r4g" },
+  { round = "top16", a = "niek", b = "tirock", winner = "niek", video = "https://youtu.be/2bglYu_tmRk" },
+  { round = "top16", a = "lil-g", b = "noindex", winner = "lil-g", video = "https://youtu.be/VX4Uu4O2r4g" },
   { round = "top8", a = "kuzya", b = "kleju", winner = "kuzya", video = "https://youtu.be/ZbqPaKpH29s" },
   { round = "top8", a = "thomaz", b = "hulk", winner = "thomaz", video = "https://youtu.be/BUD_Tn3NpMU" },
   { round = "top8", a = "sunni", b = "milhouse", winner = "sunni", video = "https://youtu.be/AYEPiM3uJeg" },
@@ -75,16 +75,30 @@ name = "Kids"
 gender = "mixed"
 age = "kids"
 results = [
-  { entrant = "shigekix", reached = "winner" },
+  { entrant = "shigekix", reached = "winner", video = "https://youtu.be/F9OPgvuCYy4" },
 ]
 
 [[battles]]
 key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
-results = [
-  { entrant = "france", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "italy", b = "france", winner = "france", video = "https://youtu.be/ZNvjuaVI2as" },
+  { round = "top8", a = "venezuela", b = "belgium", winner = "belgium", video = "https://youtu.be/GZAd_q4dIFQ" },
+  { round = "top8", a = "poland", b = "usa", winner = "poland", video = "https://youtu.be/PlCpQkpx7JI" },
+  { round = "top8", a = "united-kingdom", b = "ukraine", winner = "ukraine", video = "https://youtu.be/QjW4VoIINMM" },
+  { round = "top4", a = "poland", b = "ukraine", winner = "poland", video = "https://youtu.be/3QfoAwrMBf8" },
+  { round = "top4", a = "belgium", b = "france", winner = "france", video = "https://youtu.be/CUklCwYPaGg" },
+  { round = "final", a = "poland", b = "france", winner = "france", video = "https://youtu.be/oVjaGYkTHgE" },
 ]
 
 [battles.teams]
+italy = { name = "Italy" }
+venezuela = { name = "Venezuela" }
+belgium = { name = "Belgium" }
+poland = { name = "Poland" }
+usa = { name = "USA" }
+united-kingdom = { name = "United Kingdom" }
+ukraine = { name = "Ukraine" }
 france = { name = "France" }

@@ -16,14 +16,22 @@ djs = []
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "the-ruggeds", reached = "winner" },
-  { entrant = "body-carnival", reached = "top4" },
-  { entrant = "quite-boom", reached = "top4" },
-  { entrant = "foundnation", reached = "top2" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "body-carnival", b = "bomb-jam-crew", winner = "body-carnival", video = "https://youtu.be/Iea-eRY39zI" },
+  { round = "top8", a = "the-ruggeds", b = "fusion-mc", winner = "the-ruggeds", video = "https://youtu.be/QRb0kckZfYk" },
+  { round = "top8", a = "quite-boom", b = "rad-crew", winner = "quite-boom", video = "https://youtu.be/UmqupJYp87s" },
+  { round = "top8", a = "foundnation", b = "battle-droids", winner = "foundnation", video = "https://youtu.be/ACAsK6OJCu8" },
+  { round = "top4", a = "quite-boom", b = "foundnation", winner = "foundnation", video = "https://youtu.be/ZHTR3DzUKu0" },
+  { round = "top4", a = "body-carnival", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/2EU0z0H9zvs" },
+  { round = "final", a = "the-ruggeds", b = "foundnation", winner = "the-ruggeds", video = "https://youtu.be/SQykA6PiUOA" },
 ]
 
 [battles.teams]
+bomb-jam-crew = { name = "Bomb Jam Crew" }
+fusion-mc = { crew = "fusion-mc" }
+rad-crew = { name = "RAD Crew" }
+battle-droids = { crew = "battle-droids" }
 body-carnival = { crew = "body-carnival" }
 foundnation = { crew = "foundnation" }
 quite-boom = { crew = "quite-boom" }

@@ -14,11 +14,23 @@ djs = []
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "pockemon", reached = "winner" },
-  { entrant = "top-9", reached = "top2" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "legiteam-obstruxion", b = "top-9", winner = "top-9", video = "https://youtu.be/6MdCKzdlTLU" },
+  { round = "top8", a = "reckless-bunch", b = "pockemon", winner = "pockemon", video = "https://youtu.be/KXWtj6EL1Dw" },
+  { round = "top8", a = "rivers-crew", b = "chasseurs-de-trip", winner = "chasseurs-de-trip", video = "https://youtu.be/5L8hgdigpJo" },
+  { round = "top8", a = "x-fenz", b = "bboy-france", winner = "bboy-france", video = "https://youtu.be/t6dJhL-LdhM" },
+  { round = "top4", a = "top-9", b = "chasseurs-de-trip", winner = "top-9", video = "https://youtu.be/fwKR1RB9WdE" },
+  { round = "top4", a = "pockemon", b = "bboy-france", winner = "pockemon", video = "https://youtu.be/4i0iDqClQTI" },
+  { round = "final", a = "pockemon", b = "top-9", winner = "pockemon", video = "https://youtu.be/2tnohNiLWqY" },
 ]
 
 [battles.teams]
+legiteam-obstruxion = { crew = "legiteam-obstruxion" }
+reckless-bunch = { name = "Reckless Bunch" }
+rivers-crew = { crew = "rivers-crew" }
+chasseurs-de-trip = { name = "Chasseurs de Trip" }
+x-fenz = { crew = "x-fenz" }
+bboy-france = { name = "Bboy France" }
 pockemon = { crew = "pockemon" }
 top-9 = { crew = "top-9" }

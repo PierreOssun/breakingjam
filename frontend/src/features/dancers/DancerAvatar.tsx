@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { partsOf } from "./avatarParts";
+import { avatarOf } from "./avatarSeed";
 import { PixelAvatar } from "./PixelAvatar";
 
 const SHAPES = {
@@ -19,7 +19,7 @@ type DancerAvatarProps = {
     id: string;
     dancer_name: string;
     avatar_url?: string | null;
-    avatar_parts?: string | null;
+    avatar?: object | null;
   };
   /** `page`: the identity card · `card`: a team card · `mini`: a battle result's avatar stack · `form`: the edit sheet's preview · `row`: a person row · `chip`: a dancer chip · `stack`: the jam page's "Who's in" · `pill`, `button`: the account menu's triggers (DESIGN.md §4.16, §4.31, §4.34). */
   size?: keyof typeof SHAPES;
@@ -28,11 +28,8 @@ type DancerAvatarProps = {
 /** Rounded-square avatar: the uploaded photo, else the generated pixel bust. */
 export function DancerAvatar({ dancer, size = "page" }: DancerAvatarProps) {
   const shape = `${SHAPES[size]} shrink-0 overflow-hidden border border-border`;
-  const { id, avatar_parts } = dancer;
-  const parts = useMemo(
-    () => partsOf({ id, avatar_parts }),
-    [id, avatar_parts],
-  );
+  const { id, avatar } = dancer;
+  const spec = useMemo(() => avatarOf({ id, avatar }), [id, avatar]);
   if (dancer.avatar_url) {
     return (
       <img
@@ -44,7 +41,7 @@ export function DancerAvatar({ dancer, size = "page" }: DancerAvatarProps) {
   }
   return (
     <PixelAvatar
-      parts={parts}
+      spec={spec}
       label={dancer.dancer_name}
       className={`${shape} block`}
     />

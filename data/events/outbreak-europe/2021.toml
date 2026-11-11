@@ -17,7 +17,7 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "nord-diamond", reached = "winner" },
+  { entrant = "nord-diamond", reached = "winner", video = "https://youtu.be/KV1hiSl6etk" },
 ]
 
 [[battles]]
@@ -25,7 +25,7 @@ key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
 results = [
-  { entrant = "nicka", reached = "winner" },
+  { entrant = "nicka", reached = "winner", video = "https://youtu.be/fx5mJ0csu8w" },
 ]
 
 [[battles]]
@@ -34,7 +34,7 @@ name = "2v2"
 gender = "mixed"
 team_size = 2
 results = [
-  { entrant = "jordi-robb", reached = "winner" },
+  { entrant = "jordi-robb", reached = "winner", video = "https://youtu.be/X6AUnuRpteg" },
 ]
 
 [battles.teams]
@@ -46,16 +46,30 @@ name = "Kids"
 gender = "mixed"
 age = "kids"
 results = [
-  { entrant = "point", reached = "winner" },
+  { entrant = "point", reached = "winner", video = "https://youtu.be/4Y1klCPbRac" },
 ]
 
 [[battles]]
 key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
-results = [
-  { entrant = "belgium", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "italy", b = "netherlands", winner = "italy", video = "https://youtu.be/esoYYxAEmg4" },
+  { round = "top8", a = "slovakia", b = "belarus", winner = "belarus", video = "https://youtu.be/1KgFN_K04n4" },
+  { round = "top8", a = "belgium", b = "latvia", winner = "belgium", video = "https://youtu.be/XSd8uIS2QzI" },
+  { round = "top8", a = "israel", b = "ukraine", winner = "ukraine", video = "https://youtu.be/sLafodC0WS8" },
+  { round = "top4", a = "belgium", b = "belarus", winner = "belgium", video = "https://youtu.be/s7824yDkJLk" },
+  { round = "top4", a = "italy", b = "ukraine", winner = "ukraine", video = "https://youtu.be/W35UsT4yRMQ" },
+  { round = "final", a = "ukraine", b = "belgium", winner = "belgium", video = "https://youtu.be/QDs4K9w12hQ" },
 ]
 
 [battles.teams]
+italy = { name = "Italy" }
+netherlands = { name = "Netherlands" }
+slovakia = { name = "Slovakia" }
+belarus = { name = "Belarus" }
+latvia = { name = "Latvia" }
+israel = { name = "Israel" }
+ukraine = { name = "Ukraine" }
 belgium = { name = "Belgium" }

@@ -1,8 +1,9 @@
 import { X } from "@phosphor-icons/react";
-import { type ReactNode, useId, useLayoutEffect, useRef } from "react";
+import { type ReactNode, useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
 import { IconButton } from "./IconButton";
+import { useModal } from "./useModal";
 
 /** The footer's primary button: what it says and what it does; Cancel beside it closes. */
 export type DialogAction = {
@@ -39,24 +40,8 @@ export function Dialog({
   children,
 }: DialogProps) {
   const { t } = useTranslation();
-  const ref = useRef<HTMLDialogElement>(null);
+  const ref = useModal();
   const titleId = useId();
-
-  // A layout effect, so the dialog also closes (and gives focus back) before it is removed.
-  useLayoutEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
-    dialog.showModal();
-    // A frame later: StrictMode closes and reopens on mount, and a field focused before that
-    // close is blurred by it, which marks it touched and shows "Required." on an empty form.
-    const frame = requestAnimationFrame(() =>
-      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus(),
-    );
-    return () => {
-      cancelAnimationFrame(frame);
-      dialog.close();
-    };
-  }, []);
 
   const requestClose = () => {
     if (confirmClose && !window.confirm(confirmClose)) return;

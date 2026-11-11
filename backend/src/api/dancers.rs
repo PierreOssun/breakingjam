@@ -2,6 +2,8 @@
 
 use axum::{Json, extract::State, http::StatusCode};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use sqlx::PgConnection;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
@@ -16,9 +18,11 @@ use crate::{
     db::{self, dancers::MergeLock},
     domain::{
         crew::CrewRef,
-        dancer::{self, Dancer, DancerFields, DancerSource, DancerSummary, Participation},
+        dancer::{
+            self, AvatarFields, Dancer, DancerFields, DancerSource, DancerSummary, Participation,
+        },
         event::by_phase,
-        user::Role,
+        user::{Role, User},
     },
     error::{AppError, ErrorEnvelope, InvalidCursor, InvalidFields, Unauthorized},
     state::AppState,
@@ -30,6 +34,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list, create))
         .routes(routes!(create_mine))
         .routes(routes!(show, update, delete))
+        .routes(routes!(update_avatar))
         .routes(routes!(show_by_key))
         .routes(routes!(events))
 }
@@ -191,7 +196,7 @@ async fn page(
     responses(
         (status = CREATED, body = DancerResponse),
         Unauthorized,
-        (status = FORBIDDEN, description = "Below `organizer`, or titles below `seed_admin`", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Below `organizer`, or titles or `instagram_hidden` below `seed_admin`", body = ErrorEnvelope),
         (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
         InvalidFields,
     )
@@ -221,7 +226,7 @@ async fn create(
     responses(
         (status = CREATED, body = DancerResponse),
         Unauthorized,
-        (status = FORBIDDEN, description = "Titles below `seed_admin`: they come with verification", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Titles or `instagram_hidden` below `seed_admin`: they come with verification", body = ErrorEnvelope),
         (status = CONFLICT, description = "The account already has a page, or the Instagram handle is taken", body = ErrorEnvelope),
         InvalidFields,
     )
@@ -250,10 +255,12 @@ async fn create_mine(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-/// A new page is unverified, so only `seed_admin`+ may say what its dancer does.
+/// A new page is unverified, so only `seed_admin`+ may say what its dancer does or hide their
+/// Instagram.
 fn check_new_titles(fields: &DancerFields, current: &CurrentUser) -> Result<(), AppError> {
     let titled = fields.titles.as_ref().is_some_and(|t| !t.is_empty());
-    if titled && current.user.role < Role::SeedAdmin {
+    let hidden = fields.instagram_hidden == Some(true);
+    if (titled || hidden) && current.user.role < Role::SeedAdmin {
         return Err(AppError::Forbidden);
     }
     Ok(())
@@ -271,7 +278,7 @@ fn check_new_titles(fields: &DancerFields, current: &CurrentUser) -> Result<(), 
     responses(
         (status = OK, body = DancerResponse),
         Unauthorized,
-        (status = FORBIDDEN, description = "Not the creator (unverified), the owner (verified) nor `seed_admin`+; or titles from anyone but the verified owner and `seed_admin`+", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Not the creator (unverified), the owner (verified) nor `seed_admin`+; or titles or `instagram_hidden` from anyone but the verified owner and `seed_admin`+", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such dancer, or merged away", body = ErrorEnvelope),
         (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
         InvalidFields,
@@ -283,7 +290,50 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<DancerFields>,
 ) -> Result<Json<DancerResponse>, AppError> {
-    let (pool, user, fields) = (&state.pool, &current.user, &fields);
+    save(&state, &current, id, Edit::Profile(&fields)).await
+}
+
+/// Replace a dancer's generated avatar, from its builder; logged like any edit.
+#[utoipa::path(
+    put,
+    path = "/dancers/{id}/avatar",
+    tag = "dancers",
+    operation_id = "update_dancer_avatar",
+    params(("id" = Uuid, Path, description = "Dancer id")),
+    request_body = AvatarFields,
+    security(("session" = [])),
+    responses(
+        (status = OK, body = DancerResponse),
+        Unauthorized,
+        (status = FORBIDDEN, description = "Not the creator (unverified), the owner (verified) nor `seed_admin`+", body = ErrorEnvelope),
+        (status = NOT_FOUND, description = "No such dancer, or merged away", body = ErrorEnvelope),
+        InvalidFields,
+    )
+)]
+async fn update_avatar(
+    State(state): State<AppState>,
+    current: CurrentUser,
+    Path(id): Path<Uuid>,
+    ValidJson(fields): ValidJson<AvatarFields>,
+) -> Result<Json<DancerResponse>, AppError> {
+    save(&state, &current, id, Edit::Avatar(&fields.avatar)).await
+}
+
+/// What an editor saves: the profile, or the avatar alone.
+#[derive(Clone, Copy)]
+enum Edit<'a> {
+    Profile(&'a DancerFields),
+    Avatar(&'a Value),
+}
+
+/// Writes an edit for whoever may make it, and logs it while the dancer is unverified.
+async fn save(
+    state: &AppState,
+    current: &CurrentUser,
+    id: Uuid,
+    edit: Edit<'_>,
+) -> Result<Json<DancerResponse>, AppError> {
+    let (pool, user) = (&state.pool, &current.user);
     let new = transaction::retrying(move || async move {
         let mut tx = transaction::begin(pool, MergeLock::Shared).await?;
         // Locked, so the logged change is against the version the update replaces.
@@ -291,11 +341,13 @@ async fn update(
             .await?
             .filter(|d| d.merged_into_id.is_none())
             .ok_or(AppError::NotFound)?;
-        // Titles are the dancer's own word: a creator may fix the page, not say what they do.
-        if !old.can_edit(user) || (fields.titles.is_some() && !old.can_set_titles(user)) {
+        if !old.can_edit(user) {
             return Err(AppError::Forbidden);
         }
-        let new = db::dancers::update(&mut tx, id, fields).await?;
+        let new = match edit {
+            Edit::Profile(fields) => write_profile(&mut tx, &old, user, fields).await?,
+            Edit::Avatar(avatar) => db::dancers::set_avatar(&mut tx, id, avatar).await?,
+        };
         // §4: every change to an unverified dancer is kept in `dancer_edits`.
         if old.verified_at.is_none() {
             let changes = dancer::changes(&old, &new);
@@ -305,7 +357,28 @@ async fn update(
         Ok(new)
     })
     .await?;
-    respond(&state, new, Some(&current)).await.map(Json)
+    respond(state, new, Some(current)).await.map(Json)
+}
+
+/// The profile as `user` may write it: titles and privacy are the dancer's own word.
+async fn write_profile(
+    tx: &mut PgConnection,
+    old: &Dancer,
+    user: &User,
+    fields: &DancerFields,
+) -> Result<Dancer, AppError> {
+    let owner = old.can_set_titles(user);
+    // A creator may fix the page, not say what the dancer does or hide their Instagram.
+    if !owner && (fields.titles.is_some() || fields.instagram_hidden.is_some()) {
+        return Err(AppError::Forbidden);
+    }
+    // An editor who is not shown a hidden handle sends none back: that is not clearing it.
+    let handle = if old.instagram_hidden && !owner {
+        &old.instagram_handle
+    } else {
+        &fields.instagram_handle
+    };
+    Ok(db::dancers::update(tx, old.id, fields, handle.as_deref()).await?)
 }
 
 /// Soft-delete a dancer.
@@ -365,7 +438,7 @@ async fn events(
 
 async fn respond(
     state: &AppState,
-    dancer: Dancer,
+    mut dancer: Dancer,
     current: Option<&CurrentUser>,
 ) -> Result<DancerResponse, AppError> {
     let crews = db::dancers::current_crews(&state.pool, &[dancer.id])
@@ -374,6 +447,10 @@ async fn respond(
         .unwrap_or_default();
     let can_edit = current.is_some_and(|c| dancer.can_edit(&c.user));
     let can_set_titles = current.is_some_and(|c| dancer.can_set_titles(&c.user));
+    // A hidden handle goes to its owner and the team only (they edit it).
+    if dancer.instagram_hidden && !can_set_titles {
+        dancer.instagram_handle = None;
+    }
     Ok(DancerResponse {
         dancer,
         crews,

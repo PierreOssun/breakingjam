@@ -40,7 +40,7 @@ gender = "bgirl"
 bracket_size = 16
 matches = [
   { round = "top16", a = "logistx", b = "kastet", winner = "kastet", votes = [2, 3], video = "https://youtu.be/BtOVl4CjhP0" },
-  { round = "top16", a = "fen-qi", b = "yell", winner = "yell", votes = [0, 5] },
+  { round = "top16", a = "fen-qi", b = "yell", winner = "yell", votes = [0, 5] , video = "https://youtu.be/xGZ9OQl1VTc" },
   { round = "top16", a = "jilou", b = "alessandrina", winner = "jilou", votes = [5, 0], video = "https://youtu.be/2bKzvvV9NZc" },
   { round = "top16", a = "sarah-bee", b = "mimz", winner = "mimz", votes = [0, 5], video = "https://youtu.be/FwQNrlfnwqs" },
   { round = "top16", a = "san-andrea", b = "mess", winner = "san-andrea", votes = [5, 0], video = "https://youtu.be/vK-e36S5Fy4" },

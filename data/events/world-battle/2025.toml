@@ -106,7 +106,7 @@ matches = [
   { round = "top8", a = "tjr", b = "saturn", winner = "tjr" },
   { round = "top4", a = "holy-rain", b = "purple-one", winner = "holy-rain" },
   { round = "top4", a = "lukas", b = "tjr", winner = "tjr" },
-  { round = "final", a = "holy-rain", b = "tjr", winner = "holy-rain" },
+  { round = "final", a = "holy-rain", b = "tjr", winner = "holy-rain", video = "https://youtu.be/ptEqbicAR44" },
   { round = "third", a = "purple-one", b = "lukas", winner = "purple-one" },
 ]
 

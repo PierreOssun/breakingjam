@@ -16,8 +16,8 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "red-bull-bc-one-all-stars", reached = "winner" },
-  { entrant = "obc", reached = "top2" },
+  { entrant = "red-bull-bc-one-all-stars", reached = "winner", video = "https://youtu.be/Wce1hwpNx-A" },
+  { entrant = "obc", reached = "top2", video = "https://youtu.be/Wce1hwpNx-A" },
 ]
 
 [battles.teams]

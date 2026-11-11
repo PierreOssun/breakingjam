@@ -13,7 +13,7 @@ const NOVA = {
     country2: null,
     instagram_handle: "nova",
     avatar_url: null,
-    avatar_parts: null,
+    avatar: null,
     deleted: false,
     verified: true,
   },

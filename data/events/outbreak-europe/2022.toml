@@ -17,15 +17,30 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "lagaet", reached = "winner" },
+  { entrant = "lagaet", reached = "winner", video = "https://youtu.be/lujIAivzuPI" },
 ]
 
 [[battles]]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "671", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "anti", b = "kimie", winner = "anti", video = "https://youtu.be/DKeopNfGNPI" },
+  { round = "top16", a = "bo", b = "671", winner = "671", video = "https://youtu.be/OGZqqLN90V8" },
+  { round = "top16", a = "carlota", b = "ayane", winner = "ayane", video = "https://youtu.be/hWcvjjRg-gk" },
+  { round = "top16", a = "emma", b = "sarah-bee", winner = "sarah-bee", video = "https://youtu.be/KB_iQYiKO7A" },
+  { round = "top16", a = "india", b = "madmax", winner = "india", video = "https://youtu.be/vO1A7yLU6QA" },
+  { round = "top16", a = "jilou", b = "alessandrina", winner = "jilou", video = "https://youtu.be/4kD9Er-m5FU" },
+  { round = "top16", a = "nicka", b = "syssy", winner = "nicka", video = "https://youtu.be/f-M_fYSpHfA" },
+  { round = "top16", a = "vanessa", b = "narumi", winner = "vanessa", video = "https://youtu.be/lAAvFENhmJk" },
+  { round = "top8", a = "anti", b = "nicka", winner = "anti", video = "https://youtu.be/treopFvw2cs" },
+  { round = "top8", a = "ayane", b = "india", winner = "india", video = "https://youtu.be/W3VRAnboyC0" },
+  { round = "top8", a = "jilou", b = "671", winner = "671", video = "https://youtu.be/ghmzXrQXJ4Q" },
+  { round = "top8", a = "sarah-bee", b = "vanessa", winner = "vanessa", video = "https://youtu.be/RcRA2gTgXjI" },
+  { round = "top4", a = "671", b = "anti", winner = "671", video = "https://youtu.be/KCVM18rsbAo" },
+  { round = "top4", a = "vanessa", b = "india", winner = "india", video = "https://youtu.be/CrLoPR-TGpg" },
+  { round = "final", a = "671", b = "india", winner = "671", video = "https://youtu.be/eHdR9ZiLnn4" },
 ]
 
 [[battles]]
@@ -34,7 +49,7 @@ name = "2v2"
 gender = "mixed"
 team_size = 2
 results = [
-  { entrant = "lil-zoo-phil-wizard", reached = "winner" },
+  { entrant = "lil-zoo-phil-wizard", reached = "winner", video = "https://youtu.be/KrRV4alX0zg" },
 ]
 
 [battles.teams]
@@ -46,7 +61,7 @@ name = "Kids"
 gender = "mixed"
 age = "kids"
 results = [
-  { entrant = "danger", reached = "winner" },
+  { entrant = "danger", reached = "winner", video = "https://youtu.be/P4yDwPC_nyM" },
 ]
 
 [[battles]]

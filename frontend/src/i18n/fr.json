@@ -288,6 +288,7 @@
     }
   },
   "dancer": {
+    "instagramHidden": "Masqué : seuls vous et l’équipe BreakingJam le voyez.",
     "aka": "alias {{names}}",
     "verified": "Vérifié",
     "live": "En direct",
@@ -746,6 +747,158 @@
     "byHand": "Nous vérifions à la main, en général sous un jour.",
     "conflict": "Impossible de revendiquer cette page : elle est vérifiée, ou votre compte a déjà une page."
   },
+  "avatar": {
+    "title": "Ton avatar",
+    "done": "OK",
+    "save": "Enregistrer l’avatar",
+    "saved": "Avatar enregistré.",
+    "failed": "L’avatar n’a pas été enregistré. Réessaie.",
+    "change": "Changer d’avatar",
+    "rowHint": "Ton avatar en pixels, affiché sur ta page, dans les résultats et dans les menus.",
+    "rowHintOther": "Son avatar en pixels, affiché sur sa page, dans les résultats et dans les menus.",
+    "surprise": "Surprends-moi",
+    "undo": "Annuler le dernier choix",
+    "keep": "Continuer",
+    "discard": "Abandonner",
+    "alt": "Avatar en pixels : {{parts}}",
+    "tabs": {
+      "fighters": "Combattants",
+      "hair": "Cheveux",
+      "head": "Tête",
+      "face": "Visage",
+      "outfit": "Tenue",
+      "stage": "Scène"
+    },
+    "groups": {
+      "fighters": "Partir d’un combattant",
+      "style": "Coiffure",
+      "colour": "Couleur",
+      "headgear": "Couvre-chef",
+      "skin": "Teint",
+      "expression": "Expression",
+      "brows": "Sourcils",
+      "mouth": "Bouche",
+      "faceItem": "Sur le visage",
+      "details": "Détails",
+      "top": "Haut",
+      "trim": "Couleur des finitions",
+      "accessory": "Accessoire",
+      "effect": "Effet"
+    },
+    "sizes": {
+      "page": "Page",
+      "menu": "Menu",
+      "results": "Résultats"
+    },
+    "options": {
+      "skin": {
+        "light": "Clair",
+        "tan": "Hâlé",
+        "medium": "Mat",
+        "deep": "Foncé"
+      },
+      "style": {
+        "spiky": "En pointes",
+        "flame": "Pointes manga",
+        "sweep": "Mèche sur le côté",
+        "buzz": "Rasé",
+        "mohawk": "Crête",
+        "flattop": "Flat top",
+        "afro": "Afro",
+        "locs": "Locks",
+        "bun": "Chignon",
+        "long": "Longs",
+        "bangs": "Frange",
+        "bob": "Carré",
+        "pony": "Queue de cheval",
+        "highpony": "Queue de cheval haute",
+        "twintails": "Couettes",
+        "braids": "Tresses",
+        "puffs": "Puffs",
+        "space": "Space buns"
+      },
+      "hair": {
+        "black": "Noir",
+        "brown": "Brun",
+        "bleach": "Décoloré",
+        "red": "Rouge",
+        "pink": "Rose",
+        "blue": "Bleu",
+        "violet": "Violet"
+      },
+      "head": {
+        "none": "Aucun",
+        "headband": "Bandeau",
+        "bandana": "Bandana",
+        "bucket": "Bob",
+        "hood": "Capuche",
+        "cap": "Casquette",
+        "beanie": "Bonnet"
+      },
+      "accent": {
+        "white": "Blanc",
+        "red": "Rouge",
+        "blue": "Bleu",
+        "violet": "Violet",
+        "black": "Noir"
+      },
+      "brows": {
+        "set": "Calmes",
+        "fierce": "Féroces"
+      },
+      "mouth": {
+        "smirk": "Sourire en coin",
+        "grin": "Grand sourire"
+      },
+      "face": {
+        "none": "Rien",
+        "shades": "Lunettes noires",
+        "plaster": "Pansement",
+        "scar": "Cicatrice",
+        "mask": "Masque",
+        "paint": "Peinture de visage"
+      },
+      "outfit": {
+        "hoodie": "Hoodie",
+        "track": "Veste de survêtement",
+        "tank": "Débardeur",
+        "jersey": "Maillot",
+        "bomber": "Bomber"
+      },
+      "cloth": {
+        "ink": "Encre",
+        "white": "Blanc",
+        "blue": "Bleu",
+        "violet": "Violet",
+        "red": "Rouge"
+      },
+      "extra": {
+        "none": "Aucun",
+        "phones": "Casque",
+        "chain": "Chaîne"
+      },
+      "bg": {
+        "klein": "Bleu Klein",
+        "violet": "Violet",
+        "ink": "Encre",
+        "night": "Nuit",
+        "crimson": "Cramoisi",
+        "white": "Blanc"
+      },
+      "fx": {
+        "rings": "Anneaux",
+        "burst": "Lignes de vitesse",
+        "halftone": "Trame",
+        "aura": "Aura",
+        "city": "Ville"
+      }
+    },
+    "details": {
+      "lashes": "Cils relevés",
+      "lips": "Teinte sur les lèvres",
+      "hoops": "Créoles"
+    }
+  },
   "dancerEdit": {
     "open": "Modifier le profil",
     "title": "Modifier le profil",
@@ -757,57 +910,13 @@
     "country2": "Deuxième pays",
     "bio": "Bio",
     "avatar": "Avatar",
-    "avatarHint": "Dessiné à partir de ces éléments ; choisissez le bon teint de peau.",
     "addInstagram": "Ajouter Instagram",
-    "parts": {
-      "hair": {
-        "label": "Coiffure",
-        "options": [
-          "En pointes",
-          "Casquette",
-          "Bonnet",
-          "Chignon et bandeau",
-          "Afro",
-          "Rasé",
-          "Longs, mèche sur le côté",
-          "Space buns",
-          "Box braids",
-          "Afro puffs",
-          "Queue de cheval haute",
-          "Carré avec frange",
-          "Casquette sur cheveux longs"
-        ]
-      },
-      "skin": {
-        "label": "Teint",
-        "options": ["Clair", "Hâlé", "Mat", "Foncé"]
-      },
-      "hairColour": {
-        "label": "Couleur des cheveux",
-        "options": ["Noir", "Brun", "Décoloré", "Violet", "Bleu Klein"]
-      },
-      "hoodie": {
-        "label": "Hoodie",
-        "options": ["Encre", "Bleu Klein", "Violet", "Blanc", "Rouge"]
-      },
-      "extra": {
-        "label": "Accessoire",
-        "options": ["Aucun", "Casque", "Chaîne"]
-      },
-      "backdrop": {
-        "label": "Fond",
-        "options": ["Bleu Klein", "Violet", "Encre", "Nuit"]
-      },
-      "details": {
-        "lashes": "Cils relevés",
-        "lips": "Teinte sur les lèvres",
-        "hoops": "Créoles"
-      }
-    },
     "titlesMine": "Je suis…",
     "titles": "Rôles",
     "titlesHint": "Seule la personne, une fois vérifiée, et l’équipe BreakingJam les choisissent.",
-    "namesake": "Un·e autre danseur·se s’appelle déjà {{name}}. Vérifiez que ce n’est pas la même personne avant d’enregistrer."
+    "namesake": "Un·e autre danseur·se s’appelle déjà {{name}}. Vérifiez que ce n’est pas la même personne avant d’enregistrer.",
+    "hideInstagram": "Masquer mon Instagram sur ma page et dans la recherche",
+    "hideInstagramOther": "Masquer cet Instagram sur la page et dans la recherche"
   },
   "admin": {
     "claims": {

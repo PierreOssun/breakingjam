@@ -16,9 +16,9 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "flying-steps", reached = "winner" },
+  { entrant = "flying-steps", reached = "winner", video = "https://youtu.be/8iCR7nLItis" },
   { entrant = "south-african-allstars", reached = "top4", rank = 4 },
-  { entrant = "waseda-breakers", reached = "top2" },
+  { entrant = "waseda-breakers", reached = "top2", video = "https://youtu.be/8iCR7nLItis" },
   { entrant = "scrambling-feet", reached = "top4", rank = 3 },
 ]
 

@@ -1399,7 +1399,7 @@
             }
           },
           "403": {
-            "description": "Below `organizer`, or titles below `seed_admin`",
+            "description": "Below `organizer`, or titles or `instagram_hidden` below `seed_admin`",
             "content": {
               "application/json": {
                 "schema": {
@@ -1474,7 +1474,7 @@
             }
           },
           "403": {
-            "description": "Titles below `seed_admin`: they come with verification",
+            "description": "Titles or `instagram_hidden` below `seed_admin`: they come with verification",
             "content": {
               "application/json": {
                 "schema": {
@@ -1607,7 +1607,7 @@
             }
           },
           "403": {
-            "description": "Not the creator (unverified), the owner (verified) nor `seed_admin`+; or titles from anyone but the verified owner and `seed_admin`+",
+            "description": "Not the creator (unverified), the owner (verified) nor `seed_admin`+; or titles or `instagram_hidden` from anyone but the verified owner and `seed_admin`+",
             "content": {
               "application/json": {
                 "schema": {
@@ -1697,6 +1697,93 @@
           },
           "404": {
             "description": "No such dancer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/dancers/{id}/avatar": {
+      "put": {
+        "tags": [
+          "dancers"
+        ],
+        "summary": "Replace a dancer's generated avatar, from its builder; logged like any edit.",
+        "operationId": "update_dancer_avatar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Dancer id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvatarFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DancerResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the creator (unverified), the owner (verified) nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such dancer, or merged away",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
             "content": {
               "application/json": {
                 "schema": {
@@ -5019,6 +5106,23 @@
           "role_changed"
         ]
       },
+      "AvatarFields": {
+        "type": "object",
+        "description": "The avatar its builder saves, apart from the profile.",
+        "required": [
+          "avatar"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "object",
+            "description": "The generated avatar's spec (DESIGN.md §4.16), its missing slots at their default.",
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "Battle": {
         "type": "object",
         "description": "A competition inside a jam, e.g. \"1v1 Bboy\".",
@@ -5743,6 +5847,7 @@
           "dancer_name",
           "aliases",
           "country",
+          "instagram_hidden",
           "source",
           "titles",
           "created_at",
@@ -5797,6 +5902,10 @@
             ],
             "description": "Lower case, no `@`; the identity key when present."
           },
+          "instagram_hidden": {
+            "type": "boolean",
+            "description": "The owner keeps the handle to themselves: only they and the team are sent it."
+          },
           "source": {
             "$ref": "#/components/schemas/DancerSource",
             "description": "Where the row came from."
@@ -5816,12 +5925,16 @@
             ],
             "description": "Uploaded picture; null means the generated avatar."
           },
-          "avatar_parts": {
+          "avatar": {
             "type": [
-              "string",
+              "object",
               "null"
             ],
-            "description": "The generated avatar's parts, e.g. `h2-s1-c0-o3-e0-b1`; null means seeded from the id."
+            "description": "The generated avatar's chosen spec, a value per slot; null means seeded from the id.",
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            }
           },
           "titles": {
             "type": "array",
@@ -5933,12 +6046,16 @@
             ],
             "description": "`@handle` or `handle`; the identity key when present, unique case-insensitively."
           },
-          "avatar_parts": {
+          "avatar": {
             "type": [
-              "string",
+              "object",
               "null"
             ],
-            "description": "The generated avatar's parts (DESIGN.md §4.16); blank or absent means seeded from the id."
+            "description": "The generated avatar's spec (DESIGN.md §4.16), its missing slots at their default; absent seeds a new dancer from its id and keeps an edited one's.",
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            }
           },
           "titles": {
             "type": [
@@ -5949,6 +6066,13 @@
               "$ref": "#/components/schemas/DancerTitle"
             },
             "description": "What the dancer does; absent keeps what is stored. Only its verified owner or\n`seed_admin`+ may send it."
+          },
+          "instagram_hidden": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Keeps the handle off the page and out of search; absent keeps what is stored. Only its\nverified owner or `seed_admin`+ may send it."
           }
         }
       },
@@ -6019,12 +6143,16 @@
             ],
             "description": "Uploaded photo; null = the generated pixel avatar."
           },
-          "avatar_parts": {
+          "avatar": {
             "type": [
-              "string",
+              "object",
               "null"
             ],
-            "description": "The pixel avatar's chosen parts; null = seeded from the id."
+            "description": "The pixel avatar's chosen spec; null = seeded from the id.",
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            }
           },
           "deleted": {
             "type": "boolean",
@@ -6139,12 +6267,16 @@
             ],
             "description": "Uploaded picture, which replaces the generated avatar."
           },
-          "avatar_parts": {
+          "avatar": {
             "type": [
-              "string",
+              "object",
               "null"
             ],
-            "description": "The generated avatar's chosen parts; seeded from the id when null."
+            "description": "The generated avatar's chosen spec; seeded from the id when null.",
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            }
           },
           "crews": {
             "type": "array",
@@ -7937,12 +8069,16 @@
                   ],
                   "description": "Uploaded picture, which replaces the generated avatar."
                 },
-                "avatar_parts": {
+                "avatar": {
                   "type": [
-                    "string",
+                    "object",
                     "null"
                   ],
-                  "description": "The generated avatar's chosen parts; seeded from the id when null."
+                  "description": "The generated avatar's chosen spec; seeded from the id when null.",
+                  "additionalProperties": {},
+                  "propertyNames": {
+                    "type": "string"
+                  }
                 },
                 "crews": {
                   "type": "array",

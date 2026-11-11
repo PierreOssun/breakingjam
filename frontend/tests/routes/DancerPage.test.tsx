@@ -22,6 +22,7 @@ const DANCER = {
   titles: [],
   can_edit: false,
   can_set_titles: false,
+  instagram_hidden: false,
 };
 
 const jam = (n: number, startsOn: string, country = "FR") => ({
@@ -120,6 +121,8 @@ describe("DancerPage", () => {
     expect(card.getByRole("img", { name: "France" })).toBeInTheDocument();
     expect(card.getByRole("img", { name: "Morocco" })).toBeInTheDocument();
     expect(card.getByText("aka G · Lil Gee")).toBeInTheDocument();
+    // The city sits in the card, after the flags.
+    expect(card.getByText("Paris")).toBeInTheDocument();
     const instagram = card.getByRole("link", { name: "@lilg" });
     expect(instagram).toHaveAttribute("href", "https://instagram.com/lilg");
     expect(instagram).toHaveAttribute("target", "_blank");

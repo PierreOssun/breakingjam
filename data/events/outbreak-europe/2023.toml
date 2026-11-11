@@ -20,13 +20,13 @@ bracket_size = 32
 matches = [
   { round = "top32", a = "prorock", b = "lion", winner = "lion", votes = [1, 2], video = "https://youtu.be/GnAaIjrM3qU" },
   { round = "top32", a = "matita", b = "bowzee", winner = "matita", votes = [2, 1], video = "https://youtu.be/Mj3g4SailqU" },
-  { round = "top32", a = "nelzwhon", b = "bad-matty", winner = "nelzwhon", votes = [3, 0] },
+  { round = "top32", a = "nelzwhon", b = "bad-matty", winner = "nelzwhon", votes = [3, 0], video = "https://youtu.be/ktIjh2mx3CY" },
   { round = "top32", a = "lil-dani", b = "lithe-ing", winner = "lithe-ing", votes = [0, 3], video = "https://youtu.be/wUUCoHJyDt8" },
   { round = "top32", a = "mighty-jake", b = "x-rain", winner = "mighty-jake", votes = [3, 0], video = "https://youtu.be/AXL-06cqKXI" },
   { round = "top32", a = "cis", b = "nasty", winner = "nasty", votes = [0, 3], video = "https://youtu.be/esaq8s_1i24" },
-  { round = "top32", a = "shaymin", b = "mighty-jimm", winner = "mighty-jimm", votes = [0, 3] },
+  { round = "top32", a = "shaymin", b = "mighty-jimm", winner = "mighty-jimm", votes = [0, 3], video = "https://youtu.be/rXxe8K57sLg" },
   { round = "top32", a = "raptor", b = "johnnyfox", winner = "raptor", votes = [2, 1], video = "https://youtu.be/r9_N817iDiA" },
-  { round = "top32", a = "millie", b = "lil-g", winner = "millie", votes = [3, 0] },
+  { round = "top32", a = "millie", b = "lil-g", winner = "millie", votes = [3, 0], video = "https://youtu.be/SaLC2pnWi0E" },
   { round = "top32", a = "monkey-z", b = "xl", winner = "monkey-z", votes = [3, 0], video = "https://youtu.be/ocebATklgaw" },
   { round = "top32", a = "link-le-neil", b = "isaki", winner = "isaki", votes = [0, 3], video = "https://youtu.be/XQX-tm3tgMc" },
   { round = "top32", a = "samuka", b = "daniel", winner = "samuka", votes = [3, 0], video = "https://youtu.be/jaix3XpqdWs" },
@@ -35,10 +35,10 @@ matches = [
   { round = "top32", a = "sheku", b = "tiro", winner = "sheku", votes = [2, 1], video = "https://youtu.be/q2nv3BsFh4I" },
   { round = "top32", a = "ricky-rulez", b = "amaro", winner = "amaro", votes = [0, 3], video = "https://youtu.be/vb1OGlyIBEw" },
   { round = "top16", a = "lion", b = "matita", winner = "matita", video = "https://youtu.be/UIuFJHUcIz4" },
-  { round = "top16", a = "nelzwhon", b = "lithe-ing", winner = "lithe-ing" },
+  { round = "top16", a = "nelzwhon", b = "lithe-ing", winner = "lithe-ing", video = "https://youtu.be/aOqq7M1ggzM" },
   { round = "top16", a = "mighty-jake", b = "nasty", winner = "nasty", video = "https://youtu.be/VFQJ36aleSw" },
   { round = "top16", a = "mighty-jimm", b = "raptor", winner = "mighty-jimm", video = "https://youtu.be/bS5QTwtfSLA" },
-  { round = "top16", a = "millie", b = "monkey-z", winner = "monkey-z" },
+  { round = "top16", a = "millie", b = "monkey-z", winner = "monkey-z", video = "https://youtu.be/93oL-5dZOOo" },
   { round = "top16", a = "isaki", b = "samuka", winner = "samuka", video = "https://youtu.be/PRy0GbRnDRk" },
   { round = "top16", a = "gieras", b = "mini-joe", winner = "mini-joe", video = "https://youtu.be/A7QIdZ9tPi0" },
   { round = "top16", a = "sheku", b = "amaro", winner = "sheku", video = "https://youtu.be/17y54AQck9E" },
@@ -62,7 +62,7 @@ matches = [
   { round = "top32", a = "jilou", b = "carlota", winner = "jilou", votes = [3, 0], video = "https://youtu.be/v62M7NOLXyc" },
   { round = "top32", a = "vanessa", b = "narumi", winner = "vanessa", votes = [3, 0], video = "https://youtu.be/2kntyUeIpAc" },
   { round = "top32", a = "mia", b = "killa-kim", winner = "killa-kim", votes = [1, 2], video = "https://youtu.be/jUtpgr6t-ho" },
-  { round = "top32", a = "chris", b = "emmaaaa", winner = "emmaaaa", votes = [1, 2] },
+  { round = "top32", a = "chris", b = "emmaaaa", winner = "emmaaaa", votes = [1, 2], video = "https://youtu.be/ydtOfg3ftKk" },
   { round = "top32", a = "furia", b = "logistx", winner = "logistx", votes = [0, 3], video = "https://youtu.be/ETPJ1R9ZtjA" },
   { round = "top32", a = "konatsu", b = "elettra", winner = "konatsu", votes = [2, 1], video = "https://youtu.be/x80gDXwRyaw" },
   { round = "top32", a = "o-d-d", b = "plus-one", winner = "plus-one", votes = [0, 3] , video = "https://youtu.be/d2jxrVolwfY" },
@@ -75,17 +75,17 @@ matches = [
   { round = "top32", a = "agne", b = "nicka", winner = "nicka", votes = [0, 3], video = "https://youtu.be/8YuDR4UkkZo" },
   { round = "top16", a = "paulina", b = "syssy", winner = "syssy", video = "https://youtu.be/1jHabMnxFRU" },
   { round = "top16", a = "jilou", b = "vanessa", winner = "vanessa", video = "https://youtu.be/9pZVMxJY9pw" },
-  { round = "top16", a = "killa-kim", b = "emmaaaa", winner = "emmaaaa" },
+  { round = "top16", a = "killa-kim", b = "emmaaaa", winner = "emmaaaa", video = "https://youtu.be/hb8akCKB14U" },
   { round = "top16", a = "logistx", b = "konatsu", winner = "logistx", video = "https://youtu.be/ARoq6Zqg3_g" },
   { round = "top16", a = "plus-one", b = "isis", winner = "isis", video = "https://youtu.be/obGaSpjmWkw" },
   { round = "top16", a = "sarah-bee", b = "yingzi", winner = "yingzi", video = "https://youtu.be/9qXCHGPG-tE" },
   { round = "top16", a = "alessandrina", b = "bpanther", winner = "alessandrina", video = "https://youtu.be/fC2S_Sjqeww" },
   { round = "top16", a = "camine", b = "nicka", winner = "nicka", video = "https://youtu.be/Y_j1qLIaV2o" },
   { round = "top8", a = "syssy", b = "vanessa", winner = "syssy", video = "https://youtu.be/KetOHV31jOc" },
-  { round = "top8", a = "emmaaaa", b = "logistx", winner = "emmaaaa" },
+  { round = "top8", a = "emmaaaa", b = "logistx", winner = "emmaaaa", video = "https://youtu.be/xRQqsBD8jD4" },
   { round = "top8", a = "isis", b = "yingzi", winner = "yingzi", video = "https://youtu.be/B0rZU1GTIgU" },
   { round = "top8", a = "alessandrina", b = "nicka", winner = "nicka", video = "https://youtu.be/V4WsaTjFxqc" },
-  { round = "top4", a = "syssy", b = "emmaaaa", winner = "syssy" },
+  { round = "top4", a = "syssy", b = "emmaaaa", winner = "syssy", video = "https://youtu.be/vkPEUDoTkTo" },
   { round = "top4", a = "yingzi", b = "nicka", winner = "nicka", video = "https://youtu.be/yMoj4xl2RhU" },
   { round = "final", a = "syssy", b = "nicka", winner = "nicka", video = "https://youtu.be/kmROSBKEj5E" },
 ]
@@ -95,11 +95,73 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "kuzya-lil-zoo", reached = "winner" },
+bracket_size = 32
+matches = [
+  { round = "top32", a = "bart-smiglock", b = "bmf", winner = "bmf", video = "https://youtu.be/huwedrpQ8ho" },
+  { round = "top32", a = "caos-break", b = "mysterious-amir-stylish-allef", winner = "mysterious-amir-stylish-allef", video = "https://youtu.be/mlkY8FzmzPw" },
+  { round = "top32", a = "daniel-johnnyfox", b = "monster-energy-breakers", winner = "daniel-johnnyfox", video = "https://youtu.be/DdwrdLvlTik" },
+  { round = "top32", a = "from-downtown", b = "body-carnival-as", winner = "from-downtown", video = "https://youtu.be/qodx8ahq01c" },
+  { round = "top32", a = "fe-hong-10", b = "just4funk", winner = "fe-hong-10", video = "https://youtu.be/sn4t4HX2MuM" },
+  { round = "top32", a = "kuzya-lil-zoo", b = "apache-beat", winner = "kuzya-lil-zoo", video = "https://youtu.be/dT3b0Uiiylk" },
+  { round = "top32", a = "lottaboyz", b = "bad-matty-spider", winner = "lottaboyz", video = "https://youtu.be/L8B8Q4bP6TQ" },
+  { round = "top32", a = "osiris-silver-max", b = "body-carnival-ih", winner = "body-carnival-ih", video = "https://youtu.be/CwNExUq8Ncc" },
+  { round = "top32", a = "primal-instincts", b = "intact-lussy-sky", winner = "intact-lussy-sky", video = "https://youtu.be/D9g1vAYJnno" },
+  { round = "top32", a = "ruffneck-technique", b = "thesis-willastr8", winner = "ruffneck-technique", video = "https://youtu.be/Qx-D8_csneg" },
+  { round = "top32", a = "ruffneck-wonders", b = "alvin-lion", winner = "alvin-lion", video = "https://youtu.be/4bL_PKSZaeU" },
+  { round = "top32", a = "stranger-things", b = "phil-wizard-sunni", winner = "phil-wizard-sunni", video = "https://youtu.be/GEa-B-Q7s-s" },
+  { round = "top32", a = "cri6-the-wolfer", b = "dopedog-jester", winner = "cri6-the-wolfer", video = "https://youtu.be/1Lyt8XiuasU" },
+  { round = "top32", a = "hiro10-zeku", b = "hustle-kidz", winner = "hiro10-zeku", video = "https://youtu.be/MeNODNmALHI" },
+  { round = "top32", a = "coolkidz-mob-2", b = "cis-lorenzo", winner = "cis-lorenzo", video = "https://youtu.be/ABvJjiRJ2N0" },
+  { round = "top32", a = "coolkidz-mob", b = "671-syssy", winner = "coolkidz-mob", video = "https://youtu.be/PgVx2kRxIgw" },
+  { round = "top16", a = "fe-hong-10", b = "daniel-johnnyfox", winner = "fe-hong-10", video = "https://youtu.be/5drIiR6_mkM" },
+  { round = "top16", a = "alvin-lion", b = "kuzya-lil-zoo", winner = "kuzya-lil-zoo", video = "https://youtu.be/7DlQ9hl2kMo" },
+  { round = "top16", a = "cis-lorenzo", b = "intact-lussy-sky", winner = "intact-lussy-sky", video = "https://youtu.be/CkT2uuHuIU0" },
+  { round = "top16", a = "lottaboyz", b = "mysterious-amir-stylish-allef", winner = "mysterious-amir-stylish-allef", video = "https://youtu.be/QLtYi6cLGJE" },
+  { round = "top16", a = "phil-wizard-sunni", b = "hiro10-zeku", winner = "phil-wizard-sunni", video = "https://youtu.be/5VLWqjWqbGU" },
+  { round = "top16", a = "ruffneck-technique", b = "bmf", winner = "bmf", video = "https://youtu.be/8tYzlOpaocs" },
+  { round = "top16", a = "cri6-the-wolfer", b = "body-carnival-ih", winner = "body-carnival-ih", video = "https://youtu.be/UBnMiWjFT5Y" },
+  { round = "top16", a = "from-downtown", b = "coolkidz-mob", winner = "coolkidz-mob", video = "https://youtu.be/Ffh1qpECJ9k" },
+  { round = "top8", a = "fe-hong-10", b = "phil-wizard-sunni", winner = "fe-hong-10", video = "https://youtu.be/hzosRNzbBMI" },
+  { round = "top8", a = "kuzya-lil-zoo", b = "intact-lussy-sky", winner = "kuzya-lil-zoo", video = "https://youtu.be/gE1d0L4REws" },
+  { round = "top8", a = "mysterious-amir-stylish-allef", b = "bmf", winner = "mysterious-amir-stylish-allef", video = "https://youtu.be/PjzeVJ5CMos" },
+  { round = "top8", a = "coolkidz-mob", b = "body-carnival-ih", winner = "coolkidz-mob", video = "https://youtu.be/PnbFtou6ohc" },
+  { round = "top4", a = "fe-hong-10", b = "mysterious-amir-stylish-allef", winner = "mysterious-amir-stylish-allef", video = "https://youtu.be/HPcDaa_CvvQ" },
+  { round = "top4", a = "kuzya-lil-zoo", b = "coolkidz-mob", winner = "kuzya-lil-zoo", video = "https://youtu.be/l3GPMP-RgQE" },
+  { round = "final", a = "kuzya-lil-zoo", b = "mysterious-amir-stylish-allef", winner = "kuzya-lil-zoo", video = "https://youtu.be/IafiRlov-Gc" },
 ]
 
 [battles.teams]
+bart-smiglock = { members = ["bart", "smiglock"] }
+bmf = { name = "BMF" }
+caos-break = { name = "Caos Break" }
+mysterious-amir-stylish-allef = { members = ["stylish-allef", "mysterious-amir"] }
+daniel-johnnyfox = { members = ["daniel", "johnnyfox"] }
+monster-energy-breakers = { name = "Monster Energy Breakers" }
+from-downtown = { crew = "from-downtown" }
+body-carnival-as = { name = "Body Carnival AS" }
+fe-hong-10 = { members = ["hong-10", "fe"] }
+just4funk = { name = "Just4funk" }
+apache-beat = { members = ["apache", "beat"] }
+lottaboyz = { name = "LottaBoyz" }
+bad-matty-spider = { members = ["spider", "bad-matty"] }
+osiris-silver-max = { members = ["osiris", "silver-max"] }
+body-carnival-ih = { name = "Body Carnival IH" }
+primal-instincts = { crew = "primal-instincts" }
+intact-lussy-sky = { members = ["intact", "lussy-sky"] }
+ruffneck-technique = { name = "Ruffneck Technique" }
+thesis-willastr8 = { members = ["thesis", "willastr8"] }
+ruffneck-wonders = { name = "Ruffneck Wonders" }
+alvin-lion = { members = ["lion", "alvin"] }
+stranger-things = { name = "Stranger Things" }
+phil-wizard-sunni = { members = ["phil-wizard", "sunni"] }
+cri6-the-wolfer = { members = ["the-wolfer", "cri6"] }
+dopedog-jester = { members = ["jester", "dopedog"] }
+hiro10-zeku = { members = ["zeku", "hiro10"] }
+hustle-kidz = { crew = "hustle-kidz" }
+coolkidz-mob-2 = { name = "Coolkidz Mob 2" }
+cis-lorenzo = { members = ["lorenzo", "cis"] }
+coolkidz-mob = { crew = "coolkidz-mob" }
+671-syssy = { members = ["671", "syssy"] }
 kuzya-lil-zoo = { members = ["lil-zoo", "kuzya"] }
 
 [[battles]]
@@ -157,13 +219,20 @@ key = "footwork"
 name = "1v1 Footwork"
 gender = "mixed"
 results = [
-  { entrant = "chaubernard", reached = "winner" },
+  { entrant = "chaubernard", reached = "winner", video = "https://youtu.be/E4svPPErzNw" },
 ]
 
 [[battles]]
 key = "power"
 name = "1v1 Power Move"
 gender = "mixed"
-results = [
-  { entrant = "lion", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "denver", b = "buggy", winner = "denver", video = "https://youtu.be/lPVvnMf77aY" },
+  { round = "top8", a = "powerpaul", b = "salo", winner = "powerpaul", video = "https://youtu.be/m3r2Bl8uq20" },
+  { round = "top8", a = "guilty", b = "arnil", winner = "arnil", video = "https://youtu.be/drQ9CPD33C8" },
+  { round = "top8", a = "g-space", b = "lion", winner = "lion", video = "https://youtu.be/yRo17kp2c-s" },
+  { round = "top4", a = "denver", b = "powerpaul", winner = "denver", video = "https://youtu.be/4QosX7ftqS0" },
+  { round = "top4", a = "arnil", b = "lion", winner = "lion", video = "https://youtu.be/OrW7VV88quU" },
+  { round = "final", a = "denver", b = "lion", winner = "lion", video = "https://youtu.be/4JNcj5HjPVQ" },
 ]

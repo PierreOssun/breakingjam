@@ -13,8 +13,23 @@ judges = []
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "menno", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "menno", b = "keyz", winner = "menno", video = "https://youtu.be/OPHFbQwmoKY" },
+  { round = "top16", a = "morris", b = "vicious-victor", winner = "morris", video = "https://youtu.be/fp3oqVsA6d8" },
+  { round = "top16", a = "yan", b = "lawson", winner = "yan", video = "https://youtu.be/VRFtnYBQPgc" },
+  { round = "top16", a = "domkey", b = "pier", winner = "domkey", video = "https://youtu.be/OOQeF_XSRMY" },
+  { round = "top16", a = "wing", b = "gun", winner = "wing", video = "https://youtu.be/IcjTP5597fw" },
+  { round = "top16", a = "kleju", b = "skychief", winner = "kleju", video = "https://youtu.be/wQOkYa0DHnY" },
+  { round = "top16", a = "greku", b = "sam", winner = "greku", video = "https://youtu.be/qdyiWVgHUDI" },
+  { round = "top16", a = "lagaet", b = "yosshi", winner = "lagaet", video = "https://youtu.be/bcvQCWryOFQ" },
+  { round = "top8", a = "menno", b = "morris", winner = "menno", video = "https://youtu.be/rUVU-fGYOF4" },
+  { round = "top8", a = "yan", b = "domkey", winner = "yan", video = "https://youtu.be/jMulDquHtXg" },
+  { round = "top8", a = "wing", b = "kleju", winner = "wing", video = "https://youtu.be/bRyCfSY0Tj0" },
+  { round = "top8", a = "greku", b = "lagaet", winner = "greku", video = "https://youtu.be/WjFuxuLXn5w" },
+  { round = "top4", a = "menno", b = "yan", winner = "menno", video = "https://youtu.be/ndpRcsv5pNg" },
+  { round = "top4", a = "wing", b = "greku", winner = "wing", video = "https://youtu.be/rVWl68dlZvM" },
+  { round = "final", a = "menno", b = "wing", winner = "menno", video = "https://youtu.be/jfql3GDCIwg" },
 ]
 
 [[battles]]

@@ -18,7 +18,7 @@ gender = "bboy"
 bracket_size = 16
 matches = [
   { round = "top16", a = "menno", b = "kareem", winner = "menno", votes = [4, 1], video = "https://youtu.be/k7C3kABR6yo" },
-  { round = "top16", a = "kazuki-rock", b = "pocket", winner = "pocket", votes = [2, 3] },
+  { round = "top16", a = "kazuki-rock", b = "pocket", winner = "pocket", votes = [2, 3] , video = "https://youtu.be/YzmMXYOmHyk" },
   { round = "top16", a = "sunni", b = "bruce-almighty", winner = "bruce-almighty", votes = [1, 4], video = "https://youtu.be/ha2R_5TXjRk" },
   { round = "top16", a = "alkolil", b = "thomaz", winner = "alkolil", votes = [4, 1], video = "https://youtu.be/vh9fuCCSnqw" },
   { round = "top16", a = "leon", b = "lil-zoo", winner = "lil-zoo", votes = [2, 3], video = "https://youtu.be/l_UtkzLf_LM" },

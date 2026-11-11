@@ -1,0 +1,57 @@
+name = "The Floor is Flava 2021"
+starts_on = 2021-11-27
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "C12"
+lat = 50.8460
+lng = 4.3558
+sources = [
+  "https://and8.dance/en/e/3713",
+  "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw",
+]
+judges = ["rookie-roc", "omar", "differ"]
+djs = []
+mcs = []
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "jerry-the-metall-ralfinio", b = "blanka-mass", winner = "jerry-the-metall-ralfinio", video = "https://youtu.be/jHYSCiNx_1U" },
+  { round = "top16", a = "fe-jazzbear", b = "killa-xandin", winner = "fe-jazzbear", video = "https://youtu.be/O_coBTJ22FI" },
+  { round = "top16", a = "djibril-fababy", b = "illz-phil-wizard", winner = "illz-phil-wizard", video = "https://youtu.be/uwKlwSjkXMU" },
+  { round = "top16", a = "madmax-wigor", b = "emilio-sinx", winner = "emilio-sinx", video = "https://youtu.be/IcPO6FzYTVQ" },
+  { round = "top16", a = "daga-snap", b = "lucky-tirock", winner = "lucky-tirock", video = "https://youtu.be/Sph_puNuK6c" },
+  { round = "top16", a = "phil-pnut", b = "alvin-hiro10", winner = "alvin-hiro10", video = "https://youtu.be/mmDj2o7FZc0" },
+  { round = "top16", a = "aya-yung", b = "kastet-ukol", winner = "kastet-ukol", video = "https://youtu.be/kN49wOfBYtw" },
+  { round = "top16", a = "gimnast-kolobok", b = "cis-mighty-jim", winner = "cis-mighty-jim", video = "https://youtu.be/VlNa9gFdff0" },
+  { round = "top8", a = "lucky-tirock", b = "alvin-hiro10", winner = "alvin-hiro10", video = "https://youtu.be/4-LOvzoH434" },
+  { round = "top8", a = "kastet-ukol", b = "cis-mighty-jim", winner = "cis-mighty-jim", video = "https://youtu.be/esTlOkOWFlY" },
+  { round = "top8", a = "jerry-the-metall-ralfinio", b = "fe-jazzbear", winner = "jerry-the-metall-ralfinio", video = "https://youtu.be/yW7XgYmi3kY" },
+  { round = "top8", a = "illz-phil-wizard", b = "emilio-sinx", winner = "illz-phil-wizard", video = "https://youtu.be/IgOIGuA3TPo" },
+  { round = "top4", a = "cis-mighty-jim", b = "alvin-hiro10", winner = "alvin-hiro10", video = "https://youtu.be/x_WKUmOR99g" },
+  { round = "top4", a = "illz-phil-wizard", b = "jerry-the-metall-ralfinio", winner = "illz-phil-wizard", video = "https://youtu.be/KJISsCQjRlM" },
+  { round = "final", a = "illz-phil-wizard", b = "alvin-hiro10", winner = "illz-phil-wizard", video = "https://youtu.be/LLeGyzZM7Fw" },
+]
+
+[battles.teams]
+alvin-hiro10 = { members = ["hiro10", "alvin"] }
+aya-yung = { members = ["aya", "yung"] }
+blanka-mass = { members = ["mass", "blanka"] }
+cis-mighty-jim = { members = ["mighty-jim", "cis"] }
+daga-snap = { members = ["snap", "daga"] }
+djibril-fababy = { members = ["djibril", "fababy"] }
+emilio-sinx = { members = ["sinx", "emilio"] }
+fe-jazzbear = { members = ["fe", "jazzbear"] }
+gimnast-kolobok = { members = ["gimnast", "kolobok"] }
+illz-phil-wizard = { members = ["phil-wizard", "illz"] }
+jerry-the-metall-ralfinio = { members = ["jerry-the-metall", "ralfinio"] }
+kastet-ukol = { members = ["kastet", "ukol"] }
+killa-xandin = { members = ["xandin", "killa"] }
+lucky-tirock = { members = ["tirock", "lucky"] }
+madmax-wigor = { members = ["wigor", "madmax"] }
+phil-pnut = { members = ["phil", "pnut"] }

@@ -23,7 +23,7 @@ const person = (id: string, name: string) => ({
   instagram_handle: null,
   verified: false,
   avatar_url: null,
-  avatar_parts: null,
+  avatar: null,
   crews: [],
 });
 
@@ -39,6 +39,7 @@ const created = {
   updated_at: "2026-11-03T10:00:00Z",
   can_edit: true,
   can_set_titles: false,
+  instagram_hidden: false,
 };
 
 describe("WelcomePage", () => {

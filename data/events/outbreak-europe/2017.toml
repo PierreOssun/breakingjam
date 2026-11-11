@@ -18,7 +18,7 @@ gender = "bboy"
 bracket_size = 16
 matches = [
   { round = "top16", a = "victor", b = "kido", winner = "victor", video = "https://youtu.be/EK1F0OEvfMg" },
-  { round = "top16", a = "twister", b = "t-rock", winner = "twister" },
+  { round = "top16", a = "twister", b = "tirock", winner = "twister", video = "https://youtu.be/6DrAmypnycg" },
   { round = "top16", a = "thomaz", b = "shigekix", winner = "thomaz", video = "https://youtu.be/eQ3FcvRSyA4" },
   { round = "top16", a = "the-wolfer", b = "spin", winner = "the-wolfer", video = "https://youtu.be/SlLcAgz06ig" },
   { round = "top16", a = "uzee-rock", b = "roxrite", winner = "uzee-rock", video = "https://youtu.be/rSogie2KzPk" },
@@ -38,8 +38,23 @@ matches = [
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "kate", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "vinilla", b = "nanana", winner = "nanana", video = "https://youtu.be/PrAXkAaaPl0" },
+  { round = "top16", a = "flexie", b = "paulina", winner = "paulina", video = "https://youtu.be/7RiCCfMWUuA" },
+  { round = "top16", a = "kate", b = "zana", winner = "kate", video = "https://youtu.be/D6hMYaU2CZA" },
+  { round = "top16", a = "lady-fury", b = "loopi", winner = "loopi", video = "https://youtu.be/IN6FvutnBT8" },
+  { round = "top16", a = "maxime", b = "kami", winner = "maxime", video = "https://youtu.be/BI67yQRvbGo" },
+  { round = "top16", a = "ramona", b = "shadow-seeker", winner = "shadow-seeker", video = "https://youtu.be/Kzk38_XtQkQ" },
+  { round = "top16", a = "sarah-bee", b = "yurie", winner = "sarah-bee", video = "https://youtu.be/F-5wC0TogtU" },
+  { round = "top16", a = "tazz", b = "jilou", winner = "tazz", video = "https://youtu.be/XDOTelbt7ls" },
+  { round = "top8", a = "loopi", b = "kate", winner = "kate", video = "https://youtu.be/Scd9Ac9IUSc" },
+  { round = "top8", a = "nanana", b = "tazz", winner = "nanana", video = "https://youtu.be/_2v8F11Kj_w" },
+  { round = "top8", a = "paulina", b = "maxime", winner = "paulina", video = "https://youtu.be/NFX_KE68FEI" },
+  { round = "top8", a = "shadow-seeker", b = "sarah-bee", winner = "sarah-bee", video = "https://youtu.be/7O6ISul5fk4" },
+  { round = "top4", a = "nanana", b = "kate", winner = "kate", video = "https://youtu.be/4eLc-6GAU4s" },
+  { round = "top4", a = "paulina", b = "sarah-bee", winner = "sarah-bee", video = "https://youtu.be/YHHZxNa4-i4" },
+  { round = "final", a = "sarah-bee", b = "kate", winner = "kate", video = "https://youtu.be/PGGXLmVapFA" },
 ]
 
 [[battles]]
@@ -47,11 +62,41 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "ayumi-thesis", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "arsex-beatmaster-t", b = "narumi-wingzero", winner = "arsex-beatmaster-t", video = "https://youtu.be/tKyUXyybZpk" },
+  { round = "top16", a = "beetle-drud", b = "ayumi-thesis", winner = "ayumi-thesis", video = "https://youtu.be/NxWnTXL52LA" },
+  { round = "top16", a = "polskee-flavour", b = "andre-drummerman", winner = "polskee-flavour", video = "https://youtu.be/R2pcIuAZTe8" },
+  { round = "top16", a = "polskee-flavour-2", b = "bruce-almighty-lagaet", winner = "bruce-almighty-lagaet", video = "https://youtu.be/WwDu75Zmi-Y" },
+  { round = "top16", a = "kuzya-sapa", b = "epiks-twizter", winner = "kuzya-sapa", video = "https://youtu.be/QvFJ_A6puJA" },
+  { round = "top16", a = "tirock-titris", b = "kosto-nord-diamond", winner = "kosto-nord-diamond", video = "https://youtu.be/ongrf_3psYQ" },
+  { round = "top16", a = "tip-top-t-uzee-rock", b = "kastrito-kastrong", winner = "tip-top-t-uzee-rock", video = "https://youtu.be/ToIVQDYz3gU" },
+  { round = "top16", a = "lussy-sky-vados", b = "mighty-brick-skeeter", winner = "mighty-brick-skeeter", video = "https://youtu.be/6TUTxpBDTrE" },
+  { round = "top8", a = "kosto-nord-diamond", b = "mighty-brick-skeeter", winner = "kosto-nord-diamond", video = "https://youtu.be/EEYJW_4rPnA" },
+  { round = "top8", a = "bruce-almighty-lagaet", b = "arsex-beatmaster-t", winner = "bruce-almighty-lagaet", video = "https://youtu.be/GLFZEHmQLVQ" },
+  { round = "top8", a = "kuzya-sapa", b = "tip-top-t-uzee-rock", winner = "tip-top-t-uzee-rock", video = "https://youtu.be/gQQcaYh1yBQ" },
+  { round = "top8", a = "ayumi-thesis", b = "polskee-flavour", winner = "ayumi-thesis", video = "https://youtu.be/toro3P9GxVE" },
+  { round = "top4", a = "bruce-almighty-lagaet", b = "tip-top-t-uzee-rock", winner = "tip-top-t-uzee-rock", video = "https://youtu.be/-pAkqlKweBk" },
+  { round = "top4", a = "kosto-nord-diamond", b = "ayumi-thesis", winner = "ayumi-thesis", video = "https://youtu.be/mP86_bhvZfk" },
+  { round = "final", a = "ayumi-thesis", b = "tip-top-t-uzee-rock", winner = "ayumi-thesis", video = "https://youtu.be/OxjFcEm_LeI" },
 ]
 
 [battles.teams]
+arsex-beatmaster-t = { members = ["beatmaster-t", "arsex"] }
+narumi-wingzero = { members = ["wingzero", "narumi"] }
+beetle-drud = { members = ["drud", "beetle"] }
+polskee-flavour = { crew = "polskee-flavour" }
+andre-drummerman = { members = ["andre", "drummerman"] }
+polskee-flavour-2 = { crew = "polskee-flavour" }
+bruce-almighty-lagaet = { members = ["lagaet", "bruce-almighty"] }
+kuzya-sapa = { members = ["sapa", "kuzya"] }
+epiks-twizter = { members = ["twizter", "epiks"] }
+tirock-titris = { members = ["titris", "tirock"] }
+kosto-nord-diamond = { members = ["kosto", "nord-diamond"] }
+tip-top-t-uzee-rock = { members = ["uzee-rock", "tip-top-t"] }
+kastrito-kastrong = { members = ["kastrito", "kastrong"] }
+lussy-sky-vados = { members = ["vados", "lussy-sky"] }
+mighty-brick-skeeter = { members = ["skeeter", "mighty-brick"] }
 ayumi-thesis = { members = ["thesis", "ayumi"] }
 
 [[battles]]
@@ -60,11 +105,25 @@ name = "Kids 2v2"
 gender = "mixed"
 age = "kids"
 team_size = 2
-results = [
-  { entrant = "grom-shasty-rock", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "axel-madmax", b = "chechen-lumax", winner = "axel-madmax", video = "https://youtu.be/PqsRAWIZfAE" },
+  { round = "top8", a = "chlodny-deadbull", b = "air-flexie-danil", winner = "air-flexie-danil", video = "https://youtu.be/0AvZdSOel7Q" },
+  { round = "top8", a = "grom-shasty-rock", b = "bars-raptor", winner = "grom-shasty-rock", video = "https://youtu.be/zJxN5B47r0U" },
+  { round = "top8", a = "auteone-wigor", b = "hd-it", winner = "auteone-wigor", video = "https://youtu.be/HjOyI8BSzVU" },
+  { round = "top4", a = "axel-madmax", b = "auteone-wigor", winner = "axel-madmax", video = "https://youtu.be/O6hw7DHJzC8" },
+  { round = "top4", a = "grom-shasty-rock", b = "air-flexie-danil", winner = "grom-shasty-rock", video = "https://youtu.be/UckAQkQCAW0" },
+  { round = "final", a = "grom-shasty-rock", b = "axel-madmax", winner = "grom-shasty-rock", video = "https://youtu.be/6Lq1me_h3fU" },
 ]
 
 [battles.teams]
+axel-madmax = { members = ["axel", "madmax"] }
+chechen-lumax = { members = ["lumax", "chechen"] }
+chlodny-deadbull = { members = ["chlodny", "deadbull"] }
+air-flexie-danil = { members = ["danil", "air-flexie"] }
+bars-raptor = { members = ["raptor", "bars"] }
+auteone-wigor = { members = ["wigor", "auteone"] }
+hd-it = { members = ["it", "hd"] }
 grom-shasty-rock = { members = ["grom", "shasty-rock"] }
 
 [[battles]]
@@ -72,7 +131,7 @@ key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
 results = [
-  { entrant = "ukraine", reached = "winner" },
+  { entrant = "ukraine", reached = "winner", video = "https://youtu.be/StdYTl_m990" },
 ]
 
 [battles.teams]

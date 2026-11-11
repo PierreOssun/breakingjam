@@ -15,14 +15,22 @@ djs = []
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "predatorz", reached = "winner" },
-  { entrant = "the-ruggeds", reached = "top4" },
-  { entrant = "foundnation", reached = "top4" },
-  { entrant = "flow-xl", reached = "top2" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "the-ruggeds", b = "battle-droids", winner = "the-ruggeds", video = "https://youtu.be/Ie8lBpso75c" },
+  { round = "top8", a = "flow-xl", b = "hentai-unity", winner = "flow-xl", video = "https://youtu.be/GChAIwPnq0M" },
+  { round = "top8", a = "foundnation", b = "mortal-combat", winner = "foundnation", video = "https://youtu.be/YDlgpkUZhL8" },
+  { round = "top8", a = "predatorz", b = "super-cr3w", winner = "predatorz", video = "https://youtu.be/kk9Nl_fVAYE" },
+  { round = "top4", a = "the-ruggeds", b = "flow-xl", winner = "flow-xl", video = "https://youtu.be/2fcgLIRHaDU" },
+  { round = "top4", a = "foundnation", b = "predatorz", winner = "predatorz", video = "https://youtu.be/dQIvITb3LIE" },
+  { round = "final", a = "predatorz", b = "flow-xl", winner = "predatorz", video = "https://youtu.be/hPU4lF2jvxo" },
 ]
 
 [battles.teams]
+battle-droids = { crew = "battle-droids" }
+hentai-unity = { name = "Hentai Unity" }
+mortal-combat = { crew = "mortal-combat" }
+super-cr3w = { name = "Super Cr3w" }
 flow-xl = { crew = "flow-xl" }
 foundnation = { crew = "foundnation" }
 predatorz = { crew = "predatorz" }
@@ -36,12 +44,12 @@ gender = "bboy"
 results = [
   { entrant = "phil-wizard", reached = "winner" },
   { entrant = "onton", reached = "top2" },
-  { entrant = "kidquick", reached = "top4" },
-  { entrant = "taichi", reached = "top4" },
-  { entrant = "jonlemon", reached = "top8" },
-  { entrant = "m0nm0i", reached = "top8" },
-  { entrant = "nord-diamond", reached = "top8" },
-  { entrant = "sambo", reached = "top16" },
+  { entrant = "kidquick", reached = "top4", video = "https://youtu.be/Lojqy8zahf8" },
+  { entrant = "taichi", reached = "top4", video = "https://youtu.be/sWnGOL96sp8" },
+  { entrant = "jonlemon", reached = "top8", video = "https://youtu.be/T9xncHKndv8" },
+  { entrant = "m0nm0i", reached = "top8", video = "https://youtu.be/P86mTHUL22s" },
+  { entrant = "nord-diamond", reached = "top8", video = "https://youtu.be/IYOZbSMb7Ys" },
+  { entrant = "sambo", reached = "top16", video = "https://youtu.be/xZDkw90cW6I" },
   { entrant = "ichigo", reached = "top16" },
   { entrant = "bustabash", reached = "top16" },
   { entrant = "kossy", reached = "top16" },

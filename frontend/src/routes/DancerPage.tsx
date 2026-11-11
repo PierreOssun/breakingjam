@@ -1,4 +1,4 @@
-import { ArrowLeft, MapPin } from "@phosphor-icons/react";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
@@ -83,12 +83,14 @@ function DancerDetail({
             name={dancer.dancer_name}
             verified={Boolean(dancer.verified_at)}
             flags={[dancer.country, dancer.country2]}
+            city={dancer.city}
             aliases={dancer.aliases}
             titles={dancer.titles.map((title) => t(`dancer.titles.${title}`))}
             instagram={dancer.instagram_handle}
+            instagramHidden={dancer.instagram_hidden}
             avatar={<DancerAvatar dancer={dancer} />}
           />
-          {(dancer.crews.length > 0 || dancer.city) && (
+          {dancer.crews.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
               {dancer.crews.map((crew) => (
                 // Crews have no page in v0.1 (§6), so the chip is not a link.
@@ -99,16 +101,12 @@ function DancerDetail({
                   {crew.name}
                 </span>
               ))}
-              {dancer.city && (
-                <span className="inline-flex items-center gap-1.5 text-body-sm text-muted">
-                  <MapPin size={16} weight="bold" aria-hidden />
-                  {dancer.city}
-                </span>
-              )}
             </div>
           )}
           {dancer.bio && (
-            <p className="text-body whitespace-pre-line">{dancer.bio}</p>
+            <p className="text-body wrap-anywhere whitespace-pre-line">
+              {dancer.bio}
+            </p>
           )}
           <DancerActions dancer={dancer} />
           {events.data && (

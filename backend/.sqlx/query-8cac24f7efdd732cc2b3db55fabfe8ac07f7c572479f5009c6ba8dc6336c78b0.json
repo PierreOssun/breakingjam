@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "update dancers set\n             dancer_name = btrim($2), aliases = array(select btrim(a) from unnest($3::text[]) a),\n             country = $4, country2 = $5,\n             city = nullif(btrim($6), ''), bio = nullif(btrim($7), ''),\n             instagram_handle = nullif(lower(ltrim(btrim($8), '@')), ''),\n             avatar_parts = nullif(btrim($9), ''),\n             -- Absent titles keep the stored ones; the enum's order, without repeats.\n             titles = case when $10::dancer_title[] is null then titles\n                           else array(select distinct t from unnest($10) t order by t) end\n           where id = $1 and deleted_at is null\n           returning id, user_id, dancer_name, aliases, country, country2, city, bio,\n                     instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                     avatar_parts, titles as \"titles: Vec<DancerTitle>\",\n                     created_by, merged_into_id, created_at, updated_at",
+  "query": "select id, user_id, dancer_name, aliases, country, country2, city, bio,\n                  instagram_handle, instagram_hidden, source as \"source: DancerSource\", verified_at,\n                  avatar_url,\n                  avatar, titles as \"titles: Vec<DancerTitle>\",\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null",
   "describe": {
     "columns": [
       {
@@ -104,6 +104,17 @@
       },
       {
         "ordinal": 9,
+        "name": "instagram_hidden",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_hidden"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
         "name": "source: DancerSource",
         "type_info": {
           "Custom": {
@@ -125,7 +136,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "verified_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -136,7 +147,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "avatar_url",
         "type_info": "Text",
         "origin": {
@@ -147,18 +158,18 @@
         }
       },
       {
-        "ordinal": 12,
-        "name": "avatar_parts",
-        "type_info": "Text",
+        "ordinal": 13,
+        "name": "avatar",
+        "type_info": "Jsonb",
         "origin": {
           "Table": {
             "table": "dancers",
-            "name": "avatar_parts"
+            "name": "avatar"
           }
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "titles: Vec<DancerTitle>",
         "type_info": {
           "Custom": {
@@ -190,7 +201,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "created_by",
         "type_info": "Uuid",
         "origin": {
@@ -201,7 +212,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "merged_into_id",
         "type_info": "Uuid",
         "origin": {
@@ -212,7 +223,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -223,7 +234,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -236,37 +247,7 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Text",
-        "TextArray",
-        "Bpchar",
-        "Bpchar",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        {
-          "Custom": {
-            "name": "dancer_title[]",
-            "kind": {
-              "Array": {
-                "Custom": {
-                  "name": "dancer_title",
-                  "kind": {
-                    "Enum": [
-                      "bboy",
-                      "bgirl",
-                      "breaker",
-                      "dj",
-                      "mc",
-                      "judge"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
+        "Uuid"
       ]
     },
     "nullable": [
@@ -280,6 +261,7 @@
       true,
       true,
       false,
+      false,
       true,
       true,
       true,
@@ -290,5 +272,5 @@
       false
     ]
   },
-  "hash": "ed3eca00f7ff06ad1f07bd79c38afdfba4478897dfb1eed19a52fc5b04f4e45f"
+  "hash": "8cac24f7efdd732cc2b3db55fabfe8ac07f7c572479f5009c6ba8dc6336c78b0"
 }

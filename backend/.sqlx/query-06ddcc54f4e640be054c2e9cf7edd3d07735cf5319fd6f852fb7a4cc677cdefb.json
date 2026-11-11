@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select s.role as \"role: StaffRole\", d.id, d.dancer_name, d.country, d.country2,\n                  d.instagram_handle, d.avatar_url, d.avatar_parts,\n                  d.deleted_at is not null as \"deleted!\"\n           from event_staff s join dancers d on d.id = s.dancer_id\n           where s.event_id = $1\n           order by s.role, lower(d.dancer_name), d.id",
+  "query": "select s.role as \"role: StaffRole\", d.id, d.dancer_name, d.country, d.country2,\n                  case when d.instagram_hidden then null else d.instagram_handle end\n                    as instagram_handle,\n                  d.avatar_url, d.avatar, d.deleted_at is not null as \"deleted!\"\n           from event_staff s join dancers d on d.id = s.dancer_id\n           where s.event_id = $1\n           order by s.role, lower(d.dancer_name), d.id",
   "describe": {
     "columns": [
       {
@@ -75,12 +75,7 @@
         "ordinal": 5,
         "name": "instagram_handle",
         "type_info": "Text",
-        "origin": {
-          "Table": {
-            "table": "dancers",
-            "name": "instagram_handle"
-          }
-        }
+        "origin": "Expression"
       },
       {
         "ordinal": 6,
@@ -95,12 +90,12 @@
       },
       {
         "ordinal": 7,
-        "name": "avatar_parts",
-        "type_info": "Text",
+        "name": "avatar",
+        "type_info": "Jsonb",
         "origin": {
           "Table": {
             "table": "dancers",
-            "name": "avatar_parts"
+            "name": "avatar"
           }
         }
       },
@@ -122,11 +117,11 @@
       false,
       false,
       true,
-      true,
+      null,
       true,
       true,
       null
     ]
   },
-  "hash": "4715ab36a6c702733c39e7fa230db2e97fdc296d0713628c73290ad7fc893360"
+  "hash": "06ddcc54f4e640be054c2e9cf7edd3d07735cf5319fd6f852fb7a4cc677cdefb"
 }

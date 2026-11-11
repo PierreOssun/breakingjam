@@ -15,7 +15,7 @@ const visit = (path = "/team") => {
         id: IKI_ID,
         dancer_name: "Iki",
         avatar_url: "https://media.breakingjam.com/avatars/iki.jpg",
-        avatar_parts: null,
+        avatar: null,
       },
     },
     "GET /api/dancers/by-key/simba": {

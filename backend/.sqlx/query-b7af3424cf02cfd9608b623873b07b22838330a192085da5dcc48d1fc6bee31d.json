@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select c.id, c.dancer_id, c.user_id, c.code, c.status as \"status: ClaimStatus\",\n                  c.reviewed_at, c.created_at,\n                  d.dancer_name, d.country, d.country2, d.instagram_handle,\n                  d.avatar_url, d.avatar_parts, d.deleted_at is not null as \"deleted!\",\n                  u.email::text as \"email!\", u.display_name\n           from dancer_claims c\n           join dancers d on d.id = c.dancer_id\n           join app_users u on u.id = c.user_id\n           where c.status = $1\n           order by c.created_at, c.id\n           limit $2 offset $3",
+  "query": "select c.id, c.dancer_id, c.user_id, c.code, c.status as \"status: ClaimStatus\",\n                  c.reviewed_at, c.created_at,\n                  d.dancer_name, d.country, d.country2, d.instagram_handle,\n                  d.avatar_url, d.avatar, d.deleted_at is not null as \"deleted!\",\n                  u.email::text as \"email!\", u.display_name\n           from dancer_claims c\n           join dancers d on d.id = c.dancer_id\n           join app_users u on u.id = c.user_id\n           where c.status = $1\n           order by c.created_at, c.id\n           limit $2 offset $3",
   "describe": {
     "columns": [
       {
@@ -148,12 +148,12 @@
       },
       {
         "ordinal": 12,
-        "name": "avatar_parts",
-        "type_info": "Text",
+        "name": "avatar",
+        "type_info": "Jsonb",
         "origin": {
           "Table": {
             "table": "dancers",
-            "name": "avatar_parts"
+            "name": "avatar"
           }
         }
       },
@@ -218,5 +218,5 @@
       false
     ]
   },
-  "hash": "cf6f9301e348458725595846decc59533dee0d6244843d7de6a904dc800bdbb5"
+  "hash": "b7af3424cf02cfd9608b623873b07b22838330a192085da5dcc48d1fc6bee31d"
 }

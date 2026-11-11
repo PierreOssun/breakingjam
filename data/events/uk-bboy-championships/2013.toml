@@ -19,7 +19,7 @@ bracket_size = 8
 matches = [
   { round = "top8", a = "5-crew-dynasty", b = "originals", winner = "originals", video = "https://youtu.be/iMkae6tpW5Q" },
   { round = "top8", a = "smac-19", b = "morning-of-owl", winner = "morning-of-owl", video = "https://youtu.be/Q2EsLEMs6mA" },
-  { round = "top8", a = "the-ruggeds", b = "massive-monkeys", winner = "the-ruggeds" },
+  { round = "top8", a = "the-ruggeds", b = "massive-monkeys", winner = "the-ruggeds", video = "https://youtu.be/-7P6Vo0JPb4" },
   { round = "top8", a = "rain-crew", b = "flooriorz", winner = "flooriorz", video = "https://youtu.be/KqMESsfxc7s" },
   { round = "top4", a = "originals", b = "morning-of-owl", winner = "morning-of-owl", video = "https://youtu.be/YRMjJphtuiI" },
   { round = "top4", a = "the-ruggeds", b = "flooriorz", winner = "flooriorz", video = "https://youtu.be/CY0Wnb6kZQA" },
@@ -44,7 +44,7 @@ bracket_size = 16
 matches = [
   { round = "top16", a = "menno", b = "heavy-haiku", winner = "menno", video = "https://youtu.be/dIHZpvAGIJc" },
   { round = "top16", a = "sunni", b = "apache", winner = "sunni", video = "https://youtu.be/LnpvTRnSQBE" },
-  { round = "top16", a = "ryuichu", b = "honza", winner = "honza" },
+  { round = "top16", a = "ryuichu", b = "honza", winner = "honza", video = "https://youtu.be/0BUSYZ3gCd8" },
   { round = "top16", a = "gravity", b = "wen", winner = "gravity", video = "https://youtu.be/1AyO_JcxvOA" },
   { round = "top16", a = "pluto", b = "hamza", winner = "pluto", video = "https://youtu.be/KvmXUVwxHko" },
   { round = "top16", a = "lussy-sky", b = "thesis", winner = "lussy-sky", video = "https://youtu.be/pS1k4LgFaTE" },

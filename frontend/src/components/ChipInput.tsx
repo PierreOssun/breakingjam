@@ -1,4 +1,11 @@
-import { type KeyboardEvent, type ReactNode, useId, useState } from "react";
+import {
+  type KeyboardEvent,
+  type ReactNode,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import { Field } from "./Field";
 import { RemovableChip } from "./RemovableChip";
 
 type ChipInputProps = {
@@ -6,7 +13,10 @@ type ChipInputProps = {
   values: string[];
   onChange: (values: string[]) => void;
   max: number;
+  /** The longest a value may be. */
+  maxLength: number;
   hint: string;
+  error?: string;
 };
 
 /**
@@ -18,14 +28,19 @@ export function ChipInput({
   values,
   onChange,
   max,
+  maxLength,
   hint,
+  error,
 }: ChipInputProps) {
   const id = useId();
+  const input = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState("");
 
   const add = () => {
     const value = draft.trim().replace(/,$/, "").trim();
-    if (value && values.length < max && !values.includes(value)) {
+    // "Rocket" and "rocket" are one alias.
+    const known = values.some((v) => v.toLowerCase() === value.toLowerCase());
+    if (value && values.length < max && !known) {
       onChange([...values, value]);
     }
     setDraft("");
@@ -40,34 +55,36 @@ export function ChipInput({
   };
 
   return (
-    <div className="flex flex-col">
-      <label htmlFor={id} className="mb-2 text-label text-text uppercase">
-        {label}
-      </label>
-      <div className="flex min-h-12 flex-wrap items-center gap-1.5 rounded-md border border-border-strong bg-surface p-2 focus-within:border-text has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus has-focus-visible:outline-solid">
-        {values.map((value) => (
-          <RemovableChip
-            key={value}
-            name={value}
-            onRemove={() => onChange(values.filter((v) => v !== value))}
-          />
-        ))}
-        {values.length < max && (
+    <Field id={id} label={label} hint={hint} error={error}>
+      {(control) => (
+        <div className="flex min-h-12 flex-wrap items-center gap-1.5 rounded-md border border-border-strong bg-surface p-2 focus-within:border-text has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus has-focus-visible:outline-solid">
+          {values.map((value) => (
+            <RemovableChip
+              key={value}
+              name={value}
+              className="max-w-full"
+              onRemove={() => {
+                onChange(values.filter((v) => v !== value));
+                // The ✕ leaves with its chip: focus goes on to the input, not nowhere.
+                input.current?.focus();
+              }}
+            />
+          ))}
+          {/* Kept when full, read-only: it holds the focus, and Backspace still removes. */}
           <input
-            id={id}
+            ref={input}
+            {...control}
             value={draft}
-            aria-describedby={`${id}-hint`}
+            maxLength={maxLength}
+            readOnly={values.length >= max}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={onKeyDown}
             onBlur={add}
             // The ring is drawn on the field shell instead (§8).
             className="h-8 min-w-24 flex-1 bg-transparent px-1.5 text-body text-text outline-none"
           />
-        )}
-      </div>
-      <p id={`${id}-hint`} className="mt-2 text-caption text-muted">
-        {hint}
-      </p>
-    </div>
+        </div>
+      )}
+    </Field>
   );
 }

@@ -18,7 +18,7 @@ bracket_size = 16
 matches = [
   { round = "top16", a = "neguin", b = "lagaet", winner = "neguin", votes = [4, 1], video = "https://youtu.be/vxWt7B8L_R4" },
   { round = "top16", a = "menno", b = "kid-glyde", winner = "menno", votes = [4, 1] , video = "https://youtu.be/F86OjCojjqI" },
-  { round = "top16", a = "differ", b = "flying-buddha", winner = "differ" , video = "https://youtu.be/Z9TpkbobQGQ" },
+  { round = "top16", a = "differ", b = "flying-buddha", winner = "differ", video = "https://youtu.be/Z9TpkbobQGQ" },
   { round = "top16", a = "cloud", b = "kaku", winner = "cloud", votes = [5, 0], video = "https://youtu.be/omXmV0AP-Wo" },
   { round = "top16", a = "morris", b = "lil-g", winner = "morris", votes = [4, 1], video = "https://youtu.be/tXHNHijU750" },
   { round = "top16", a = "wing", b = "punisher", winner = "wing", votes = [3, 2], video = "https://youtu.be/nz3KbOXMJPQ" },

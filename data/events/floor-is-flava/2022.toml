@@ -1,0 +1,57 @@
+name = "The Floor is Flava 2022"
+starts_on = 2022-11-26
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "C12"
+lat = 50.8460
+lng = 4.3558
+sources = [
+  "https://panic39.com/pages/nov-2022",
+  "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw",
+]
+judges = ["luigi", "lawson", "ducky"]
+djs = ["dj-zulu-wail", "dj-vientiane", "dj-goss-one"]
+mcs = []
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "anthony-xl", b = "born-steezyskee", winner = "born-steezyskee", video = "https://youtu.be/ijpOiFizYmI" },
+  { round = "top16", a = "mowgly-pesto", b = "lagaet-zoopreme", winner = "lagaet-zoopreme", video = "https://youtu.be/cpNO2mQk-P8" },
+  { round = "top16", a = "alik-zip-rock", b = "marciano-neal", winner = "alik-zip-rock", video = "https://youtu.be/p7PwfCO1KkM" },
+  { round = "top16", a = "jerry-the-metall-kastet", b = "nord-diamond-zeku", winner = "nord-diamond-zeku", video = "https://youtu.be/2YHV_IiBYHY" },
+  { round = "top16", a = "djibril-fababy", b = "jackson-sheku", winner = "djibril-fababy", video = "https://youtu.be/hOuCC-dR1UU" },
+  { round = "top16", a = "justen-menno", b = "cheno-titris", winner = "justen-menno", video = "https://youtu.be/iX_hrezjjuU" },
+  { round = "top16", a = "apache-beat", b = "mace-weapon-x", winner = "mace-weapon-x", video = "https://youtu.be/eSD1gFtK8sI" },
+  { round = "top16", a = "arczek-gieras", b = "alex-shlag", winner = "arczek-gieras", video = "https://youtu.be/0ErZ9o3cQyY" },
+  { round = "top8", a = "djibril-fababy", b = "lagaet-zoopreme", winner = "lagaet-zoopreme", video = "https://youtu.be/mwVsH9WdRk4" },
+  { round = "top8", a = "justen-menno", b = "arczek-gieras", winner = "justen-menno", video = "https://youtu.be/f_SXJA6bHYk" },
+  { round = "top8", a = "born-steezyskee", b = "nord-diamond-zeku", winner = "nord-diamond-zeku", video = "https://youtu.be/RV6HrTg1HNQ" },
+  { round = "top8", a = "alik-zip-rock", b = "mace-weapon-x", winner = "alik-zip-rock", video = "https://youtu.be/MtjAoTGRNfM" },
+  { round = "top4", a = "justen-menno", b = "nord-diamond-zeku", winner = "nord-diamond-zeku", video = "https://youtu.be/kgFgV5shUuc" },
+  { round = "top4", a = "alik-zip-rock", b = "lagaet-zoopreme", winner = "lagaet-zoopreme", video = "https://youtu.be/YwnGRrDaD0k" },
+  { round = "final", a = "lagaet-zoopreme", b = "nord-diamond-zeku", winner = "lagaet-zoopreme", video = "https://youtu.be/bDTB8Z8DKHk" },
+]
+
+[battles.teams]
+alex-shlag = { members = ["shlag", "alex"] }
+alik-zip-rock = { members = ["zip-rock", "alik"] }
+anthony-xl = { members = ["xl", "anthony"] }
+apache-beat = { members = ["apache", "beat"] }
+arczek-gieras = { members = ["gieras", "arczek"] }
+born-steezyskee = { members = ["born", "steezyskee"] }
+cheno-titris = { members = ["cheno", "titris"] }
+djibril-fababy = { members = ["djibril", "fababy"] }
+jackson-sheku = { members = ["sheku", "jackson"] }
+jerry-the-metall-kastet = { members = ["jerry-the-metall", "kastet"] }
+justen-menno = { members = ["menno", "justen"] }
+lagaet-zoopreme = { members = ["zoopreme", "lagaet"] }
+mace-weapon-x = { members = ["mace", "weapon-x"] }
+marciano-neal = { members = ["neal", "marciano"] }
+mowgly-pesto = { members = ["mowgly", "pesto"] }
+nord-diamond-zeku = { members = ["nord-diamond", "zeku"] }

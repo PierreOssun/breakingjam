@@ -18,10 +18,10 @@ name = "Crew battle"
 gender = "mixed"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "arcopom", b = "gunsmoke-breakers", winner = "arcopom" , video = "https://youtu.be/002HG35yE0M" },
-  { round = "top8", a = "supreme-queenz", b = "pockemon", winner = "pockemon" },
+  { round = "top8", a = "arcopom", b = "gunsmoke-breakers", winner = "arcopom", video = "https://youtu.be/002HG35yE0M" },
+  { round = "top8", a = "supreme-queenz", b = "pockemon", winner = "pockemon", video = "https://youtu.be/E56XajgN1Kw" },
   { round = "top8", a = "soul-mavericks", b = "bunch-of-guys", winner = "soul-mavericks", video = "https://youtu.be/sKmtg0f0eNg" },
-  { round = "top8", a = "killa-tactics", b = "the-ruggeds", winner = "the-ruggeds" },
+  { round = "top8", a = "killa-tactics", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/ekt9PM6GJzc" },
   { round = "top4", a = "arcopom", b = "pockemon", winner = "arcopom", video = "https://youtu.be/6d4VJMwH7H0" },
   { round = "top4", a = "soul-mavericks", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/MTiRdIs22fQ" },
   { round = "final", a = "the-ruggeds", b = "arcopom", winner = "the-ruggeds", video = "https://youtu.be/L_Jjuz65BSA" },
@@ -43,16 +43,16 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "lilou", b = "kaneki", winner = "lilou" , video = "https://youtu.be/favwUeRVCpQ" },
+  { round = "top16", a = "lilou", b = "kaneki", winner = "lilou", video = "https://youtu.be/favwUeRVCpQ" },
   { round = "top16", a = "the-curse", b = "hill", winner = "hill" },
   { round = "top16", a = "neepy", b = "victor-j", winner = "neepy" },
   { round = "top16", a = "arex", b = "yosh", winner = "arex" },
   { round = "top16", a = "katsuya", b = "amaro-dz", winner = "katsuya" },
-  { round = "top16", a = "spin", b = "omen", winner = "spin" , video = "https://youtu.be/3kLT1Yhk2CU" },
-  { round = "top16", a = "boogie", b = "sunni", winner = "sunni" },
+  { round = "top16", a = "spin", b = "omen", winner = "spin", video = "https://youtu.be/3kLT1Yhk2CU" },
+  { round = "top16", a = "boogie", b = "sunni", winner = "sunni", video = "https://youtu.be/fd62s0jVRp0" },
   { round = "top16", a = "kareem", b = "ayumi", winner = "kareem", video = "https://youtu.be/P8AQStL-OOI" },
   { round = "top8", a = "lilou", b = "hill", winner = "lilou" },
-  { round = "top8", a = "neepy", b = "arex", winner = "arex" , video = "https://youtu.be/kiTeKoC-_jQ" },
+  { round = "top8", a = "neepy", b = "arex", winner = "arex", video = "https://youtu.be/kiTeKoC-_jQ" },
   { round = "top8", a = "spin", b = "katsuya", winner = "spin", video = "https://youtu.be/OrC44-bZnPU" },
   { round = "top8", a = "sunni", b = "kareem", winner = "kareem", video = "https://youtu.be/Q6RX2MIOm0Q" },
   { round = "top4", a = "lilou", b = "arex", winner = "lilou", video = "https://youtu.be/7H-ytSCDrtM" },

@@ -16,7 +16,7 @@ key = "bboy"
 name = "Super Solo Bboy Battle"
 gender = "bboy"
 results = [
-  { entrant = "sunni", reached = "winner" },
+  { entrant = "sunni", reached = "winner", video = "https://youtu.be/KiQ_FkdayDA" },
 ]
 
 [[battles]]
@@ -25,7 +25,7 @@ name = "Seven to Smoke Crew Edition"
 gender = "mixed"
 format = "seven_to_smoke"
 results = [
-  { entrant = "japan", reached = "winner" },
+  { entrant = "japan", reached = "winner", video = "https://youtu.be/VcxZNkOybS4" },
 ]
 
 [battles.teams]

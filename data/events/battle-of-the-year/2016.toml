@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "flooriorz", reached = "winner" },
-  { entrant = "body-carnival", reached = "top4" },
-  { entrant = "kienjuice", reached = "top4" },
-  { entrant = "melting-force", reached = "top2" },
+  { entrant = "flooriorz", reached = "winner", video = "https://youtu.be/LY70rm0LO3k" },
+  { entrant = "body-carnival", reached = "top4", video = "https://youtu.be/U7244kIc6Vg" },
+  { entrant = "kienjuice", reached = "top4", video = "https://youtu.be/1RoBNo-rGwY" },
+  { entrant = "melting-force", reached = "top2", video = "https://youtu.be/LY70rm0LO3k" },
 ]
 
 [battles.teams]
@@ -36,17 +36,17 @@ bracket_size = 16
 matches = [
   { round = "top16", a = "bruce-almighty", b = "inside", winner = "bruce-almighty", video = "https://youtu.be/_Y9ZXyoiSE4" },
   { round = "top16", a = "fernandinho", b = "elia", winner = "fernandinho", video = "https://youtu.be/QD5jid1vvTg" },
-  { round = "top16", a = "poter", b = "kid-colombia", winner = "poter" },
+  { round = "top16", a = "poter", b = "kid-colombia", winner = "poter", video = "https://youtu.be/Jj4d4WHQkFw" },
   { round = "top16", a = "ayumi", b = "zoob", winner = "ayumi", video = "https://youtu.be/yXlxuP9aVsg" },
   { round = "top16", a = "nasso", b = "aleks", winner = "nasso", video = "https://youtu.be/CZhngeqgnm4" },
-  { round = "top16", a = "lil-zoo", b = "admiracles", winner = "lil-zoo" },
+  { round = "top16", a = "lil-zoo", b = "admiracles", winner = "lil-zoo", video = "https://youtu.be/zkEenMHWbpM" },
   { round = "top16", a = "taisuke", b = "spin", winner = "taisuke", video = "https://youtu.be/ZcuPnO9AbKY" },
   { round = "top16", a = "pac-pac", b = "akorn", winner = "pac-pac", video = "https://youtu.be/2QXnwI_0ik8" },
   { round = "top8", a = "bruce-almighty", b = "fernandinho", winner = "bruce-almighty", video = "https://youtu.be/0Ke54JHvmdU" },
-  { round = "top8", a = "poter", b = "ayumi", winner = "poter" },
+  { round = "top8", a = "poter", b = "ayumi", winner = "poter", video = "https://youtu.be/ydbqyieqPvU" },
   { round = "top8", a = "nasso", b = "lil-zoo", winner = "nasso", video = "https://youtu.be/qeMoq2VIqlM" },
   { round = "top8", a = "taisuke", b = "pac-pac", winner = "taisuke", video = "https://youtu.be/v0ikNtp3CS8" },
-  { round = "top4", a = "bruce-almighty", b = "poter", winner = "bruce-almighty" },
+  { round = "top4", a = "bruce-almighty", b = "poter", winner = "bruce-almighty", video = "https://youtu.be/FC9KKBIlOGs" },
   { round = "top4", a = "nasso", b = "taisuke", winner = "nasso", video = "https://youtu.be/MTaZcwzmQkA" },
   { round = "final", a = "bruce-almighty", b = "nasso", winner = "bruce-almighty", video = "https://youtu.be/woV21kVCs8Q" },
 ]
@@ -57,7 +57,7 @@ name = "2v2 Bgirl"
 gender = "bgirl"
 team_size = 2
 results = [
-  { entrant = "ami-ayu", reached = "winner" },
+  { entrant = "ami-ayu", reached = "winner", video = "https://youtu.be/LkwLxoZwxEQ" },
 ]
 
 [battles.teams]

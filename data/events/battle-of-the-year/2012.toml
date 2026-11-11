@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "vagabonds", reached = "winner" },
-  { entrant = "pockemon", reached = "top4" },
-  { entrant = "morning-of-owl", reached = "top4" },
-  { entrant = "flooriorz", reached = "top2" },
+  { entrant = "vagabonds", reached = "winner", video = "https://youtu.be/iyJ3aNJwpMk" },
+  { entrant = "pockemon", reached = "top4", video = "https://youtu.be/EkGCI99wweI" },
+  { entrant = "morning-of-owl", reached = "top4", video = "https://youtu.be/ZJSNEBu1MXM" },
+  { entrant = "flooriorz", reached = "top2", video = "https://youtu.be/iyJ3aNJwpMk" },
 ]
 
 [battles.teams]
@@ -33,8 +33,8 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "hill", reached = "top2" },
-  { entrant = "niek", reached = "winner" },
+  { entrant = "hill", reached = "top2", video = "https://youtu.be/4Mc-We9O06k" },
+  { entrant = "niek", reached = "winner", video = "https://youtu.be/4Mc-We9O06k" },
 ]
 
 [[battles]]
@@ -43,7 +43,7 @@ name = "2v2 Bgirl"
 gender = "bgirl"
 team_size = 2
 results = [
-  { entrant = "nagi-nao", reached = "winner" },
+  { entrant = "nagi-nao", reached = "winner", video = "https://youtu.be/xSrk8megcUs" },
 ]
 
 [battles.teams]

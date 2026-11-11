@@ -16,5 +16,5 @@ key = "bboy"
 name = "Super Solo Bboy Battle"
 gender = "bboy"
 results = [
-  { entrant = "phil-wizard", reached = "winner" },
+  { entrant = "phil-wizard", reached = "winner", video = "https://youtu.be/316sekzPpLU" },
 ]

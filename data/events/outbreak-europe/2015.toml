@@ -25,12 +25,12 @@ matches = [
   { round = "top16", a = "kleju", b = "tricky", winner = "kleju" },
   { round = "top16", a = "lb", b = "hill", winner = "lb" },
   { round = "top16", a = "hulk", b = "conni", winner = "hulk" },
-  { round = "top8", a = "el-nino", b = "klesio", winner = "el-nino" , video = "https://youtu.be/0ZPyeSpypyw" },
-  { round = "top8", a = "twister", b = "perna", winner = "twister" , video = "https://youtu.be/3HZXBtgDF2U" },
-  { round = "top8", a = "fantum", b = "kleju", winner = "fantum" , video = "https://youtu.be/6Tg_ThWbgVQ" },
+  { round = "top8", a = "el-nino", b = "klesio", winner = "el-nino", video = "https://youtu.be/0ZPyeSpypyw" },
+  { round = "top8", a = "twister", b = "perna", winner = "twister", video = "https://youtu.be/3HZXBtgDF2U" },
+  { round = "top8", a = "fantum", b = "kleju", winner = "fantum", video = "https://youtu.be/6Tg_ThWbgVQ" },
   { round = "top8", a = "lb", b = "hulk", winner = "lb", video = "https://youtu.be/X-bVRtGxthE" },
-  { round = "top4", a = "el-nino", b = "twister", winner = "el-nino" , video = "https://youtu.be/3uCJbRRxuj0" },
-  { round = "top4", a = "fantum", b = "lb", winner = "fantum" , video = "https://youtu.be/S9UhmsPvWBc" },
+  { round = "top4", a = "el-nino", b = "twister", winner = "el-nino", video = "https://youtu.be/3uCJbRRxuj0" },
+  { round = "top4", a = "fantum", b = "lb", winner = "fantum", video = "https://youtu.be/S9UhmsPvWBc" },
   { round = "final", a = "el-nino", b = "fantum", winner = "el-nino", video = "https://youtu.be/peqGsu_bgU8" },
 ]
 
@@ -106,9 +106,23 @@ results = [
 key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
-results = [
-  { entrant = "poland", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "belarus", b = "united-kingdom", winner = "belarus", video = "https://youtu.be/bJ2XtqNRYlA" },
+  { round = "top8", a = "poland", b = "italy", winner = "poland", video = "https://youtu.be/6eNp2YBKWjA" },
+  { round = "top8", a = "ukraine", b = "mexico", winner = "ukraine", video = "https://youtu.be/sUZGPU4u8WI" },
+  { round = "top8", a = "belgium", b = "brazil", winner = "brazil", video = "https://youtu.be/J1locpcmZaE" },
+  { round = "top4", a = "belarus", b = "ukraine", winner = "ukraine", video = "https://youtu.be/7fyYf6m10ig" },
+  { round = "top4", a = "poland", b = "brazil", winner = "poland", video = "https://youtu.be/LLiTQBWnzy8" },
+  { round = "final", a = "ukraine", b = "poland", winner = "poland", video = "https://youtu.be/ydiJkn41sSA" },
 ]
 
 [battles.teams]
+belarus = { name = "Belarus" }
+united-kingdom = { name = "United Kingdom" }
+italy = { name = "Italy" }
+ukraine = { name = "Ukraine" }
+mexico = { name = "Mexico" }
+belgium = { name = "Belgium" }
+brazil = { name = "Brazil" }
 poland = { name = "Poland" }

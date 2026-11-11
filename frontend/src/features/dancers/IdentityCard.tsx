@@ -1,4 +1,4 @@
-import { InstagramLogo } from "@phosphor-icons/react";
+import { EyeSlash, InstagramLogo, MapPin } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { FlagChip } from "../../components/Flag";
@@ -10,10 +10,14 @@ type IdentityCardProps = {
   verified: boolean;
   /** Country codes; at most two chips show (§4.10). */
   flags: (string | null | undefined)[];
+  /** Where the dancer lives, shown after the flags. */
+  city?: string | null;
   aliases?: string[];
   /** What the dancer says they do ("I'm a…", M25), already in words. */
   titles?: string[];
   instagram?: string | null;
+  /** The handle is kept off the public page: whoever is sent it sees that it is. */
+  instagramHidden?: boolean;
   avatar: ReactNode;
   /** The name's heading: the page title on the dancer's own page, a sub-head elsewhere. */
   heading?: "h1" | "h3";
@@ -29,6 +33,7 @@ export function IdentityCard(props: IdentityCardProps) {
     verified,
     aliases = [],
     titles = [],
+    city,
     instagram,
     avatar,
   } = props;
@@ -46,9 +51,23 @@ export function IdentityCard(props: IdentityCardProps) {
           {name}
         </Heading>
         {verified && <VerifiedTick />}
-        {flags.map((code) => (
-          <FlagChip key={code} code={code} />
-        ))}
+        {/* One group: the city goes to the next line with its flags, never alone. */}
+        <span className="flex min-w-0 flex-wrap items-center gap-2">
+          {flags.map((code) => (
+            <FlagChip key={code} code={code} />
+          ))}
+          {city && (
+            <span className="inline-flex min-w-0 items-center gap-1 text-body-sm font-bold text-muted">
+              <MapPin
+                size={16}
+                weight="bold"
+                aria-hidden
+                className="shrink-0"
+              />
+              <span className="break-words">{city}</span>
+            </span>
+          )}
+        </span>
       </div>
       {titles.length > 0 && (
         <p className="relative text-label text-primary-text uppercase">
@@ -56,7 +75,7 @@ export function IdentityCard(props: IdentityCardProps) {
         </p>
       )}
       {aliases.length > 0 && (
-        <p className="relative text-body-sm font-semibold text-muted">
+        <p className="relative text-body-sm font-semibold wrap-anywhere text-muted">
           {t("dancer.aka", { names: aliases.join(" · ") })}
         </p>
       )}
@@ -69,6 +88,12 @@ export function IdentityCard(props: IdentityCardProps) {
         >
           <InstagramLogo size={20} weight="bold" aria-hidden />@{instagram}
         </a>
+      )}
+      {instagram && props.instagramHidden && (
+        <p className="relative -mt-3 inline-flex items-center gap-1.5 text-caption text-muted">
+          <EyeSlash size={14} weight="bold" aria-hidden />
+          {t("dancer.instagramHidden")}
+        </p>
       )}
     </section>
   );

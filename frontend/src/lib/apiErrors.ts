@@ -1,5 +1,6 @@
 import type { FieldValues, Path, UseFormSetError } from "react-hook-form";
 import type { Schemas } from "../api/client";
+import i18n from "../i18n";
 
 type Envelope = Schemas["ErrorEnvelope"] | undefined;
 
@@ -40,5 +41,7 @@ export function applyFieldErrors<Values extends FieldValues>(
   const { fields, rest } = splitFieldErrors(envelope, known);
   for (const [field, message] of fields)
     setError(rename[field] ?? (field as Path<Values>), { message });
-  if (rest) setError("root", { message: rest });
+  // A reply that is no envelope (a proxy's error page) says nothing: the form still must.
+  if (rest || fields.length === 0)
+    setError("root", { message: rest ?? i18n.t("errors.generic") });
 }

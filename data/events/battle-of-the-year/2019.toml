@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "last-squad", reached = "winner" },
-  { entrant = "body-carnival", reached = "top4" },
-  { entrant = "team-vinotinto", reached = "top4" },
-  { entrant = "artistreet", reached = "top2" },
+  { entrant = "last-squad", reached = "winner", video = "https://youtu.be/nB5-QGd4xVM" },
+  { entrant = "body-carnival", reached = "top4", video = "https://youtu.be/MwO-YYSqfpA" },
+  { entrant = "team-vinotinto", reached = "top4", video = "https://youtu.be/RhCxbQ8KJSQ" },
+  { entrant = "artistreet", reached = "top2", video = "https://youtu.be/nB5-QGd4xVM" },
 ]
 
 [battles.teams]

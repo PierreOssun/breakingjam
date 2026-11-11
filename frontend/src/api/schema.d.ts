@@ -414,6 +414,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dancers/{id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace a dancer's generated avatar, from its builder; logged like any edit. */
+        put: operations["update_dancer_avatar"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/dancers/by-key/{key}": {
         parameters: {
             query?: never;
@@ -1098,6 +1115,13 @@ export interface components {
          * @enum {string}
          */
         AdminAction: "jam_approved" | "jam_rejected" | "dancer_merged" | "role_changed";
+        /** @description The avatar its builder saves, apart from the profile. */
+        AvatarFields: {
+            /** @description The generated avatar's spec (DESIGN.md §4.16), its missing slots at their default. */
+            avatar: {
+                [key: string]: unknown;
+            };
+        };
         /** @description A competition inside a jam, e.g. "1v1 Bboy". */
         Battle: {
             /**
@@ -1465,6 +1489,8 @@ export interface components {
             bio?: string | null;
             /** @description Lower case, no `@`; the identity key when present. */
             instagram_handle?: string | null;
+            /** @description The owner keeps the handle to themselves: only they and the team are sent it. */
+            instagram_hidden: boolean;
             /** @description Where the row came from. */
             source: components["schemas"]["DancerSource"];
             /**
@@ -1474,8 +1500,10 @@ export interface components {
             verified_at?: string | null;
             /** @description Uploaded picture; null means the generated avatar. */
             avatar_url?: string | null;
-            /** @description The generated avatar's parts, e.g. `h2-s1-c0-o3-e0-b1`; null means seeded from the id. */
-            avatar_parts?: string | null;
+            /** @description The generated avatar's chosen spec, a value per slot; null means seeded from the id. */
+            avatar?: {
+                [key: string]: unknown;
+            } | null;
             /** @description What the dancer does, in a fixed order; empty until its owner or the team says. */
             titles: components["schemas"]["DancerTitle"][];
             /**
@@ -1519,13 +1547,20 @@ export interface components {
             bio?: string | null;
             /** @description `@handle` or `handle`; the identity key when present, unique case-insensitively. */
             instagram_handle?: string | null;
-            /** @description The generated avatar's parts (DESIGN.md §4.16); blank or absent means seeded from the id. */
-            avatar_parts?: string | null;
+            /** @description The generated avatar's spec (DESIGN.md §4.16), its missing slots at their default; absent seeds a new dancer from its id and keeps an edited one's. */
+            avatar?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * @description What the dancer does; absent keeps what is stored. Only its verified owner or
              *     `seed_admin`+ may send it.
              */
             titles?: components["schemas"]["DancerTitle"][] | null;
+            /**
+             * @description Keeps the handle off the page and out of search; absent keeps what is stored. Only its
+             *     verified owner or `seed_admin`+ may send it.
+             */
+            instagram_hidden?: boolean | null;
         };
         /** @description Body of `GET /dancers/{id}`: the page, or where a merged dancer now lives (§4 "Merge"). */
         DancerPage: {
@@ -1552,8 +1587,10 @@ export interface components {
             instagram_handle?: string | null;
             /** @description Uploaded photo; null = the generated pixel avatar. */
             avatar_url?: string | null;
-            /** @description The pixel avatar's chosen parts; null = seeded from the id. */
-            avatar_parts?: string | null;
+            /** @description The pixel avatar's chosen spec; null = seeded from the id. */
+            avatar?: {
+                [key: string]: unknown;
+            } | null;
             /** @description The page is gone: the name stays on past results, with nothing to link to. */
             deleted: boolean;
         };
@@ -1594,8 +1631,10 @@ export interface components {
             verified: boolean;
             /** @description Uploaded picture, which replaces the generated avatar. */
             avatar_url?: string | null;
-            /** @description The generated avatar's chosen parts; seeded from the id when null. */
-            avatar_parts?: string | null;
+            /** @description The generated avatar's chosen spec; seeded from the id when null. */
+            avatar?: {
+                [key: string]: unknown;
+            } | null;
             /** @description Current crews. */
             crews: components["schemas"]["CrewRef"][];
         };
@@ -2358,8 +2397,10 @@ export interface components {
                 verified: boolean;
                 /** @description Uploaded picture, which replaces the generated avatar. */
                 avatar_url?: string | null;
-                /** @description The generated avatar's chosen parts; seeded from the id when null. */
-                avatar_parts?: string | null;
+                /** @description The generated avatar's chosen spec; seeded from the id when null. */
+                avatar?: {
+                    [key: string]: unknown;
+                } | null;
                 /** @description Current crews. */
                 crews: components["schemas"]["CrewRef"][];
             }[];
@@ -3769,7 +3810,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Below `organizer`, or titles below `seed_admin` */
+            /** @description Below `organizer`, or titles or `instagram_hidden` below `seed_admin` */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3828,7 +3869,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Titles below `seed_admin`: they come with verification */
+            /** @description Titles or `instagram_hidden` below `seed_admin`: they come with verification */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3921,7 +3962,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Not the creator (unverified), the owner (verified) nor `seed_admin`+; or titles from anyone but the verified owner and `seed_admin`+ */
+            /** @description Not the creator (unverified), the owner (verified) nor `seed_admin`+; or titles or `instagram_hidden` from anyone but the verified owner and `seed_admin`+ */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3998,6 +4039,68 @@ export interface operations {
             };
             /** @description No such dancer */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    update_dancer_avatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Dancer id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvatarFields"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DancerResponse"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not the creator (unverified), the owner (verified) nor `seed_admin`+ */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such dancer, or merged away */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

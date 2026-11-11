@@ -11,7 +11,7 @@ const dancer: Schemas["DancerRef"] = {
   country2: null,
   instagram_handle: null,
   avatar_url: null,
-  avatar_parts: null,
+  avatar: null,
   deleted: false,
 };
 

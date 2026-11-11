@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "insert into dancers\n             (id, dancer_name, aliases, country, country2, city, bio,\n              instagram_handle, source, notable, created_by, avatar_parts, titles)\n           values ($1, btrim($2), array(select btrim(a) from unnest($3::text[]) a),\n                   $4, $5, nullif(btrim($6), ''), nullif(btrim($7), ''),\n                   nullif(lower(ltrim(btrim($8), '@')), ''), $9, $10, $11, nullif(btrim($12), ''),\n                   array(select distinct t from unnest($13::dancer_title[]) t order by t))\n           returning id, user_id, dancer_name, aliases, country, country2, city, bio,\n                     instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                     avatar_parts, titles as \"titles: Vec<DancerTitle>\",\n                     created_by, merged_into_id, created_at, updated_at",
+  "query": "select id, user_id, dancer_name, aliases, country, country2, city, bio,\n                  instagram_handle, instagram_hidden, source as \"source: DancerSource\", verified_at,\n                  avatar_url,\n                  avatar, titles as \"titles: Vec<DancerTitle>\",\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null\n           for update",
   "describe": {
     "columns": [
       {
@@ -104,6 +104,17 @@
       },
       {
         "ordinal": 9,
+        "name": "instagram_hidden",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_hidden"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
         "name": "source: DancerSource",
         "type_info": {
           "Custom": {
@@ -125,7 +136,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "verified_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -136,7 +147,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "avatar_url",
         "type_info": "Text",
         "origin": {
@@ -147,18 +158,18 @@
         }
       },
       {
-        "ordinal": 12,
-        "name": "avatar_parts",
-        "type_info": "Text",
+        "ordinal": 13,
+        "name": "avatar",
+        "type_info": "Jsonb",
         "origin": {
           "Table": {
             "table": "dancers",
-            "name": "avatar_parts"
+            "name": "avatar"
           }
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "titles: Vec<DancerTitle>",
         "type_info": {
           "Custom": {
@@ -190,7 +201,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "created_by",
         "type_info": "Uuid",
         "origin": {
@@ -201,7 +212,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "merged_into_id",
         "type_info": "Uuid",
         "origin": {
@@ -212,7 +223,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -223,7 +234,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -236,51 +247,7 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Text",
-        "TextArray",
-        "Bpchar",
-        "Bpchar",
-        "Text",
-        "Text",
-        "Text",
-        {
-          "Custom": {
-            "name": "dancer_source",
-            "kind": {
-              "Enum": [
-                "seed",
-                "organizer",
-                "self"
-              ]
-            }
-          }
-        },
-        "Bool",
-        "Uuid",
-        "Text",
-        {
-          "Custom": {
-            "name": "dancer_title[]",
-            "kind": {
-              "Array": {
-                "Custom": {
-                  "name": "dancer_title",
-                  "kind": {
-                    "Enum": [
-                      "bboy",
-                      "bgirl",
-                      "breaker",
-                      "dj",
-                      "mc",
-                      "judge"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
+        "Uuid"
       ]
     },
     "nullable": [
@@ -294,6 +261,7 @@
       true,
       true,
       false,
+      false,
       true,
       true,
       true,
@@ -304,5 +272,5 @@
       false
     ]
   },
-  "hash": "d751d23ae2f114c217875a0a1288959e3c19f5ba53017a1a727e366aa222b5c9"
+  "hash": "42ca1681250d8df4511d8c0f852a678a84b65212ce5c11c548ae5aeff5e22fd8"
 }

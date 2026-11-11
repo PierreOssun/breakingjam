@@ -1,10 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
-  formatParts,
-  seededParts,
-} from "../../src/features/dancers/avatarParts";
-import {
   LIL_G,
   LOGGED_OUT,
   bodyOf,
@@ -27,7 +23,7 @@ const DANCER = {
   source: "organizer",
   verified_at: null,
   avatar_url: null,
-  avatar_parts: null,
+  avatar: null,
   merged_into_id: null,
   created_at: at,
   updated_at: at,
@@ -35,6 +31,7 @@ const DANCER = {
   titles: [],
   can_edit: false,
   can_set_titles: false,
+  instagram_hidden: false,
 };
 const NO_EVENTS = {
   status: 200,
@@ -302,20 +299,11 @@ describe("dancer identity", () => {
     const city = within(dialog).getByLabelText(/^City/);
     await userEvent.clear(city);
     await userEvent.type(city, "Lyon");
-    await userEvent.selectOptions(
-      within(dialog).getByLabelText("Skin tone"),
-      "3",
-    );
-    await userEvent.selectOptions(within(dialog).getByLabelText("Hair"), "8");
-    // Details combine freely; whatever the seed had, end on lash flicks alone.
-    for (const [name, on] of [
-      ["Lash flicks", true],
-      ["Lip tint", false],
-      ["Hoop earrings", false],
-    ] as const) {
-      const box = within(dialog).getByRole("checkbox", { name });
-      if ((box as HTMLInputElement).checked !== on) await userEvent.click(box);
-    }
+    // The avatar's parts left this form for the builder (AvatarBuilder.test.tsx).
+    expect(within(dialog).queryByRole("combobox", { name: "Hair" })).toBeNull();
+    expect(
+      within(dialog).getByRole("button", { name: "Change avatar" }),
+    ).toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("Profile saved.")).toBeInTheDocument();
@@ -336,10 +324,63 @@ describe("dancer identity", () => {
       bio: null,
     });
     expect(body).not.toHaveProperty("real_name");
-    expect(body.avatar_parts).toMatch(/^h8-s3-c\d-o\d-e\d-b\d-d1$/);
+    // The avatar is the builder's to save: the profile names none, and the API keeps it.
+    expect(body).not.toHaveProperty("avatar");
     // This editor may not say what the dancer does: the sheet sends no titles to keep.
     expect(body).not.toHaveProperty("titles");
     expect(within(dialog).queryByRole("group", { name: /I’m a/ })).toBeNull();
+  });
+
+  it("lets the verified owner hide their Instagram, and says so on their page", async () => {
+    const mine = { ...LIL_G, dancer: { ...DANCER, verified: true } };
+    const owned = {
+      can_edit: true,
+      can_set_titles: true,
+      verified_at: at,
+      instagram_handle: "ventus",
+    };
+    const fetch = page({ status: 200, body: mine }, owned, {
+      [`PUT /api/dancers/${ID}`]: {
+        status: 200,
+        body: { ...DANCER, ...owned, instagram_hidden: true },
+      },
+    });
+    renderApp(`/dancers/${ID}`);
+
+    expect(
+      await screen.findByRole("link", { name: "@ventus" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/^Hidden:/)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Edit profile" }));
+    const dialog = screen.getByRole("dialog", { name: "Edit profile" });
+    const hide = within(dialog).getByRole("checkbox", {
+      name: "Hide my Instagram from my page and from search",
+    });
+    expect(hide).not.toBeChecked();
+    await userEvent.click(hide);
+    await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    expect(await bodyOf(fetch, `PUT /api/dancers/${ID}`)).toMatchObject({
+      instagram_handle: "ventus",
+      instagram_hidden: true,
+    });
+    // The owner is still sent the handle, with a word that visitors are not.
+    expect(
+      await screen.findByText(
+        "Hidden: only you and the BreakingJam team see it.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("leaves hiding the Instagram to the dancer: a creator gets no checkbox", async () => {
+    page({ status: 200, body: LIL_G }, { can_edit: true });
+    renderApp(`/dancers/${ID}`);
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Edit profile" }),
+    );
+    expect(
+      screen.queryByRole("checkbox", { name: /Hide my Instagram/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("lets the verified dancer say what they do, shown on their page", async () => {
@@ -388,7 +429,7 @@ describe("dancer identity", () => {
     });
   });
 
-  it("stores the avatar only once the picker is touched, even when it ends on the seed", async () => {
+  it("keeps aliases apart, short, and the same country once", async () => {
     const fetch = page(
       user,
       { can_edit: true },
@@ -400,34 +441,59 @@ describe("dancer identity", () => {
       },
     );
     renderApp(`/dancers/${ID}`);
-
-    // Untouched: null, so a bgirl or bboy battle may still suggest a look.
     await userEvent.click(
-      await screen.findByRole("button", { name: "Add Instagram" }),
+      await screen.findByRole("button", { name: "Edit profile" }),
     );
-    let dialog = screen.getByRole("dialog", { name: "Edit profile" });
-    await userEvent.type(within(dialog).getByLabelText(/^City/), "!");
-    await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
-    expect(await screen.findByText("Profile saved.")).toBeInTheDocument();
-    expect((await bodyOf(fetch, `PUT /api/dancers/${ID}`)).avatar_parts).toBe(
-      null,
-    );
+    const dialog = within(screen.getByRole("dialog", { name: "Edit profile" }));
+    const aliases = dialog.getByLabelText(/^Also known as/);
+    // "vent" is "Vent" again; a value stops at 100 characters.
+    await userEvent.type(aliases, `Vent,vent,${"L".repeat(120)},`);
+    const chips = dialog.getAllByRole("button", { name: /^Remove / });
+    expect(chips.map((chip) => chip.getAttribute("aria-label"))).toEqual([
+      "Remove Vent",
+      `Remove ${"L".repeat(100)}`,
+    ]);
+    // Removing a chip leaves the focus in the field, not nowhere.
+    await userEvent.click(chips[1]!);
+    expect(aliases).toHaveFocus();
+    // Full, the field stays, to hold the focus and take Backspace.
+    await userEvent.type(aliases, "b,c,d,e,f,");
+    expect(dialog.getAllByRole("button", { name: /^Remove / })).toHaveLength(5);
+    expect(aliases).toHaveFocus();
+    await userEvent.keyboard("{Backspace}");
+    expect(dialog.getAllByRole("button", { name: /^Remove / })).toHaveLength(4);
 
-    // Touched and put back: the seed's face, now the dancer's own choice.
-    await userEvent.click(
-      screen.getByRole("button", { name: "Add Instagram" }),
+    await userEvent.selectOptions(
+      dialog.getByLabelText(/^Second country/),
+      "FR",
     );
-    dialog = screen.getByRole("dialog", { name: "Edit profile" });
-    const hoops = within(dialog).getByRole("checkbox", {
-      name: "Hoop earrings",
-    });
-    await userEvent.click(hoops);
-    await userEvent.click(hoops);
-    await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
-    await vi.waitFor(async () =>
-      expect((await bodyOf(fetch, `PUT /api/dancers/${ID}`)).avatar_parts).toBe(
-        formatParts(seededParts(ID)),
-      ),
+    await userEvent.click(dialog.getByRole("button", { name: "Save" }));
+    await waitFor(async () =>
+      expect(await bodyOf(fetch, `PUT /api/dancers/${ID}`)).toMatchObject({
+        aliases: ["Vent", "b", "c", "d"],
+        country: "FR",
+        country2: null,
+      }),
+    );
+  });
+
+  it("says so when a save fails, whatever the server answers", async () => {
+    page(
+      user,
+      { can_edit: true },
+      {
+        // A proxy's error page, not the API's envelope.
+        [`PUT /api/dancers/${ID}`]: { status: 502, text: "Bad gateway" },
+      },
+    );
+    renderApp(`/dancers/${ID}`);
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Edit profile" }),
+    );
+    const dialog = within(screen.getByRole("dialog", { name: "Edit profile" }));
+    await userEvent.click(dialog.getByRole("button", { name: "Save" }));
+    expect(await dialog.findByRole("alert")).toHaveTextContent(
+      "Something went wrong",
     );
   });
 

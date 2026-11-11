@@ -15,6 +15,6 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "lukas", reached = "top2" },
-  { entrant = "grazy", reached = "top2" },
+  { entrant = "lukas", reached = "top2", video = "https://youtu.be/GMI4gGtGNxg" },
+  { entrant = "grazy", reached = "top2", video = "https://youtu.be/GMI4gGtGNxg" },
 ]

@@ -271,6 +271,51 @@ async fn update_rights_follow_verification(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn the_avatar_is_saved_apart_from_the_profile(pool: PgPool) {
+    let app = app(pool.clone());
+    let creator = organizer(&app, &pool, "creator@example.com").await;
+    let stranger = organizer(&app, &pool, "stranger@example.com").await;
+    let id = id_of(&create(&app, &creator, dancer("Lil G", Some("lilg"))).await);
+    let uri = format!("/api/dancers/{id}");
+    let avatar_uri = format!("{uri}/avatar");
+    let avatar = json!({ "style": "flame", "head": "bucket", "lashes": true });
+
+    let saved = send(
+        &app,
+        put(&avatar_uri, json!({ "avatar": avatar }), Some(&creator)),
+    )
+    .await;
+    assert_eq!(saved.status, StatusCode::OK);
+    // Nothing else moved, and it is logged like any edit to an unverified page.
+    assert_eq!(saved.json["avatar"], avatar);
+    assert_eq!(saved.json["instagram_handle"], "lilg");
+    let logged = sqlx::query_scalar!(
+        r#"select field from dancer_edits where dancer_id = $1::text::uuid"#,
+        id
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    assert_eq!(logged, ["avatar"]);
+
+    // A profile save that names no avatar keeps it.
+    let profile = send(
+        &app,
+        put(&uri, dancer("Lil G.", Some("lilg")), Some(&creator)),
+    )
+    .await;
+    assert_eq!(profile.json["avatar"], avatar);
+
+    // Same rights and the same checks as the profile.
+    let unknown = json!({ "avatar": { "style": "mullet" } });
+    let rejected = send(&app, put(&avatar_uri, unknown, Some(&creator))).await;
+    assert_eq!(rejected.status, StatusCode::UNPROCESSABLE_ENTITY);
+    let body = json!({ "avatar": {} });
+    let by_stranger = send(&app, put(&avatar_uri, body, Some(&stranger))).await;
+    assert_eq!(by_stranger.status, StatusCode::FORBIDDEN);
+}
+
+#[sqlx::test]
 async fn delete_is_seed_admin_only_and_soft(pool: PgPool) {
     let app = app(pool.clone());
     let organizer = organizer(&app, &pool, "org@example.com").await;
@@ -650,4 +695,99 @@ async fn titles_are_set_by_the_verified_owner_or_the_team_only(pool: PgPool) {
     send(&app, post(&merge, json!({ "into": owned }), Some(&admin))).await;
     let kept = send(&app, get(&format!("/api/dancers/{owned}"), None)).await;
     assert_eq!(kept.json["titles"], json!([]));
+}
+
+#[sqlx::test]
+async fn a_verified_owner_hides_their_instagram_from_everyone_else(pool: PgPool) {
+    let app = app(pool.clone());
+    let organizer = organizer(&app, &pool, "org@example.com").await;
+    let owner = sign_up(&app, &pool, "owner@example.com").await;
+    let hiding = |hidden: bool| {
+        let mut body = dancer("Lil G", Some("lilg"));
+        body["instagram_hidden"] = json!(hidden);
+        body
+    };
+
+    // Shown by default, and hiding is not the creator's call, on a new page or later.
+    let refused = create(&app, &organizer, hiding(true)).await;
+    assert_eq!(refused.status, StatusCode::FORBIDDEN);
+    let id = id_of(&create(&app, &organizer, dancer("Lil G", Some("lilg"))).await);
+    let uri = format!("/api/dancers/{id}");
+    let page = send(&app, get(&uri, None)).await.json;
+    assert_eq!(
+        (&page["instagram_handle"], &page["instagram_hidden"]),
+        (&json!("lilg"), &json!(false))
+    );
+    let by_creator = send(&app, put(&uri, hiding(true), Some(&organizer))).await;
+    assert_eq!(by_creator.status, StatusCode::FORBIDDEN);
+
+    verify(&pool, &id, "owner@example.com").await;
+    let hidden = send(&app, put(&uri, hiding(true), Some(&owner))).await;
+    assert_eq!(hidden.status, StatusCode::OK);
+    // The owner still gets the handle, to edit it; nobody else does.
+    assert_eq!(hidden.json["instagram_handle"], "lilg");
+    for visitor in [None, Some(&organizer)] {
+        let page = send(&app, get(&uri, visitor.map(String::as_str)))
+            .await
+            .json;
+        assert_eq!(
+            (&page["instagram_handle"], &page["instagram_hidden"]),
+            (&Value::Null, &json!(true))
+        );
+    }
+    // Search finds the dancer by name, without the handle, and no longer by the handle.
+    let by_name = send(&app, get("/api/dancers?q=lil%20g", None)).await;
+    assert_eq!(by_name.json["items"][0]["instagram_handle"], Value::Null);
+    let by_handle = send(&app, get("/api/dancers?q=@lilg", None)).await;
+    assert_eq!(names(&by_handle), Vec::<String>::new());
+
+    // An editor who isn't shown the handle sends none back, and that doesn't clear it.
+    let admin = sign_up(&app, &pool, "seed@example.com").await;
+    set_role(&pool, "seed@example.com", "seed_admin").await;
+    let other = id_of(&create(&app, &organizer, dancer("Kid Rocket", Some("kidrocket"))).await);
+    let other_uri = format!("/api/dancers/{other}");
+    let mut hide = dancer("Kid Rocket", Some("kidrocket"));
+    hide["instagram_hidden"] = json!(true);
+    send(&app, put(&other_uri, hide, Some(&admin))).await;
+    let by_creator = send(
+        &app,
+        put(&other_uri, dancer("Kid Rockett", None), Some(&organizer)),
+    )
+    .await;
+    assert_eq!(by_creator.json["dancer_name"], "Kid Rockett");
+    assert_eq!(by_creator.json["instagram_handle"], Value::Null);
+    let seen = send(&app, get(&other_uri, Some(&admin))).await.json;
+    assert_eq!(seen["instagram_handle"], "kidrocket");
+
+    // Hiding is an edit like any other on a page nobody owns: it is logged.
+    let logged = sqlx::query_scalar!(
+        r#"select new_value from dancer_edits
+           where dancer_id = $1::text::uuid and field = 'instagram_hidden'"#,
+        other
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    assert_eq!(logged, [Some("true".to_string())]);
+    // Merged into a page without a handle, the handle moves there as hidden as it was.
+    let twin = id_of(&create(&app, &organizer, dancer("Kid Rocket", None)).await);
+    let merge = format!("/api/admin/dancers/{other}/merge");
+    set_role(&pool, "seed@example.com", "admin").await;
+    let merged = send(&app, post(&merge, json!({ "into": twin }), Some(&admin))).await;
+    assert_eq!(merged.status, StatusCode::OK);
+    let twin_uri = format!("/api/dancers/{twin}");
+    let public = send(&app, get(&twin_uri, None)).await.json;
+    assert_eq!(
+        (&public["instagram_handle"], &public["instagram_hidden"]),
+        (&Value::Null, &json!(true))
+    );
+    let seen = send(&app, get(&twin_uri, Some(&admin))).await.json;
+    assert_eq!(seen["instagram_handle"], "kidrocket");
+
+    // A save that doesn't say keeps it hidden; the owner shows it again.
+    let kept = send(&app, put(&uri, dancer("Lil G", Some("lilg")), Some(&owner))).await;
+    assert_eq!(kept.json["instagram_hidden"], true);
+    send(&app, put(&uri, hiding(false), Some(&owner))).await;
+    let by_handle = send(&app, get("/api/dancers?q=@lilg", None)).await;
+    assert_eq!(names(&by_handle), ["Lil G"]);
 }

@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "rock-force", reached = "winner" },
-  { entrant = "suicidal-lifestyle", reached = "top4", rank = 4 },
-  { entrant = "the-family", reached = "top2" },
-  { entrant = "phase-2", reached = "top4", rank = 3 },
+  { entrant = "rock-force", reached = "winner", video = "https://youtu.be/6RsZMJK2jqs" },
+  { entrant = "suicidal-lifestyle", reached = "top4", rank = 4 , video = "https://youtu.be/1TQSteHhyaA" },
+  { entrant = "the-family", reached = "top2", video = "https://youtu.be/6RsZMJK2jqs" },
+  { entrant = "phase-2", reached = "top4", rank = 3 , video = "https://youtu.be/1TQSteHhyaA" },
 ]
 
 [battles.teams]

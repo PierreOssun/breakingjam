@@ -1,0 +1,56 @@
+name = "The Floor is Flava 2023"
+starts_on = 2023-11-18  # the Saturday before LawkSam posted the final (2023-11-19), as every other year; check
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "C12"
+lat = 50.8460
+lng = 4.3558
+sources = [
+  "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw",
+]
+judges = ["flying-buddha", "sam", "wing"]
+djs = ["dj-zulu-wail", "dj-cali", "dj-cleon"]
+mcs = []
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "amir-dias", b = "cis-hiro10", winner = "amir-dias", video = "https://youtu.be/vxHcoJwhBi8" },
+  { round = "top16", a = "india-justen", b = "ceebri-nasty", winner = "india-justen", video = "https://youtu.be/bHpjacXj1bY" },
+  { round = "top16", a = "nord-diamond-zeku", b = "lucky-titris", winner = "nord-diamond-zeku", video = "https://youtu.be/-e3W35L7mhw" },
+  { round = "top16", a = "nori-satoru", b = "hookup-sem-delivery", winner = "nori-satoru", video = "https://youtu.be/gsXakoe7YAI" },
+  { round = "top16", a = "djibril-tiro", b = "link-sheka", winner = "djibril-tiro", video = "https://youtu.be/u40jXQtx6jY" },
+  { round = "top16", a = "jeremy-palmer", b = "flowmer-it", winner = "jeremy-palmer", video = "https://youtu.be/fQkutUPo44A" },
+  { round = "top16", a = "lotus-mighty-max", b = "jin-t-four", winner = "jin-t-four", video = "https://youtu.be/QvYhkA9QTZU" },
+  { round = "top16", a = "chaubernard-wilfried", b = "pesto-zip-rock", winner = "pesto-zip-rock", video = "https://youtu.be/dF05YkAKnpU" },
+  { round = "top8", a = "pesto-zip-rock", b = "jin-t-four", winner = "pesto-zip-rock", video = "https://youtu.be/mW4DhKIfI_M" },
+  { round = "top8", a = "amir-dias", b = "jeremy-palmer", winner = "amir-dias", video = "https://youtu.be/nh7YgcgTUEg" },
+  { round = "top8", a = "nori-satoru", b = "india-justen", winner = "nori-satoru", video = "https://youtu.be/1m-oxm1TwWg" },
+  { round = "top8", a = "nord-diamond-zeku", b = "djibril-tiro", winner = "nord-diamond-zeku", video = "https://youtu.be/HckPNGW0og4" },
+  { round = "top4", a = "nord-diamond-zeku", b = "nori-satoru", winner = "nori-satoru", video = "https://youtu.be/L6Lz-Y7FV1k" },
+  { round = "top4", a = "amir-dias", b = "pesto-zip-rock", winner = "amir-dias", video = "https://youtu.be/WqvdkxMlZ8c" },
+  { round = "final", a = "nori-satoru", b = "amir-dias", winner = "amir-dias", video = "https://youtu.be/iOexck9Gtos" },
+]
+
+[battles.teams]
+amir-dias = { members = ["amir", "dias"] }
+ceebri-nasty = { members = ["nasty", "ceebri"] }
+chaubernard-wilfried = { members = ["chaubernard", "wilfried"] }
+cis-hiro10 = { members = ["hiro10", "cis"] }
+djibril-tiro = { members = ["tiro", "djibril"] }
+flowmer-it = { members = ["flowmer", "it"] }
+hookup-sem-delivery = { members = ["hookup", "sem-delivery"] }
+india-justen = { members = ["justen", "india"] }
+jeremy-palmer = { members = ["palmer", "jeremy"] }
+jin-t-four = { members = ["t-four", "jin"] }
+link-sheka = { members = ["link", "sheka"] }
+lotus-mighty-max = { members = ["lotus", "mighty-max"] }
+lucky-titris = { members = ["lucky", "titris"] }
+nord-diamond-zeku = { members = ["zeku", "nord-diamond"] }
+nori-satoru = { members = ["nori", "satoru"] }
+pesto-zip-rock = { members = ["zip-rock", "pesto"] }

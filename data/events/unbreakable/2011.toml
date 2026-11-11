@@ -14,7 +14,7 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "neguin", reached = "winner" },
+  { entrant = "neguin", reached = "winner", video = "https://youtu.be/ZiWk2cFKISc" },
 ]
 
 [[battles]]

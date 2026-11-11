@@ -1,43 +1,51 @@
 import { useId, useMemo } from "react";
-import { type AvatarParts, drawAvatar } from "./avatarParts";
+import { type AvatarSpec, renderAvatar } from "./avatar";
+
+type Run = { x: number; y: number; w: number; fill: string };
 
 /** Same-colour pixels of a row merged into one rect: ~300 rects instead of 1024. */
-function runs(grid: string[][]) {
-  const rects: { x: number; y: number; w: number; fill: string }[] = [];
-  grid.forEach((row, y) => {
-    let x = 0;
-    while (x < row.length) {
-      const fill = row[x]!;
+function runs(sprite: (string | null)[][]): Run[] {
+  return sprite.flatMap((row, y) => {
+    const rects: Run[] = [];
+    for (let x = 0; x < row.length;) {
+      const fill = row[x];
       let w = 1;
-      while (row[x + w] === fill) w++;
-      rects.push({ x, y, w, fill });
+      while (x + w < row.length && row[x + w] === fill) w++;
+      if (fill) rects.push({ x, y, w, fill });
       x += w;
     }
+    return rects;
   });
-  return rects;
 }
 
 /**
- * The pixel 2D-HD bust (DESIGN.md §4.16): crisp 32×32 pixels, then the HD layer, a soft glow
+ * The pixel 2D-HD bust (DESIGN.md §4.16): the stage, its effect, the crisp 32×32 sprite, then
+ * the HD layer, a soft glow
  * from the top-left and a bottom vignette, the only gradients allowed in the product.
  */
 export function PixelAvatar({
-  parts,
+  spec,
   label,
   className = "",
 }: {
-  parts: AvatarParts;
-  label: string;
+  spec: AvatarSpec;
+  /** Its name; left out where a label beside it already says what it shows. */
+  label?: string;
   className?: string;
 }) {
   // Gradient ids live in the page's id space; `useId` output is not a valid fragment.
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const rects = useMemo(() => runs(drawAvatar(parts)), [parts]);
+  const { background, ring, rim, fx, sprite } = useMemo(
+    () => renderAvatar(spec),
+    [spec],
+  );
+  const rects = useMemo(() => runs(sprite), [sprite]);
   return (
     <svg
       viewBox="0 0 32 32"
-      role="img"
+      role={label ? "img" : undefined}
       aria-label={label}
+      aria-hidden={label ? undefined : true}
       className={className}
     >
       <defs>
@@ -51,6 +59,19 @@ export function PixelAvatar({
         </linearGradient>
       </defs>
       <g shapeRendering="crispEdges">
+        <rect width="32" height="32" fill={background} />
+        {fx.map(([x, y, kind], i) => (
+          <rect
+            // An effect may paint a pixel twice, so the place alone is no key.
+            key={i}
+            x={x}
+            y={y}
+            width={1}
+            height={1}
+            fill={kind === "rim" ? rim : ring}
+            opacity={kind === "rim" ? 0.55 : undefined}
+          />
+        ))}
         {rects.map((r) => (
           <rect
             key={`${r.x}-${r.y}`}

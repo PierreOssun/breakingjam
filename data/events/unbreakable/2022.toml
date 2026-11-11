@@ -14,16 +14,62 @@ judges = []
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "menno", reached = "winner" },
+bracket_size = 32
+matches = [
+  { round = "top32", a = "amaro", b = "snap", winner = "snap", video = "https://youtu.be/8ZVkpyMScFU" },
+  { round = "top32", a = "bad-matty", b = "allef", winner = "allef", video = "https://youtu.be/JS7FSa4NL_c" },
+  { round = "top32", a = "beat-the-young-hustler", b = "lithe-ing", winner = "lithe-ing", video = "https://youtu.be/mFT5RP9uhUo" },
+  { round = "top32", a = "damani", b = "mowgly", winner = "damani", video = "https://youtu.be/xt92z7d6yjI" },
+  { round = "top32", a = "doudou", b = "menno", winner = "menno", video = "https://youtu.be/PI3naQVQHZg" },
+  { round = "top32", a = "dumbo", b = "lorenzo", winner = "lorenzo", video = "https://youtu.be/NL67PWU8OSY" },
+  { round = "top32", a = "hijack", b = "warner", winner = "hijack", video = "https://youtu.be/iw0CwQYw1nI" },
+  { round = "top32", a = "lee", b = "carlito", winner = "lee", video = "https://youtu.be/Cl4GLrUq9mM" },
+  { round = "top32", a = "leon", b = "daniel", winner = "daniel", video = "https://youtu.be/SXVupOt9HS0" },
+  { round = "top32", a = "mn-joe", b = "mass", winner = "mass", video = "https://youtu.be/tQ-pEAGL89Q" },
+  { round = "top32", a = "pesto", b = "leony", winner = "leony", video = "https://youtu.be/TstGctH0CNI" },
+  { round = "top32", a = "poter", b = "apache", winner = "poter", video = "https://youtu.be/o82_B--qzpg" },
+  { round = "top32", a = "ricky-rulez", b = "gohan", winner = "ricky-rulez", video = "https://youtu.be/5Deq9KGdHfM" },
+  { round = "top32", a = "tawfiq", b = "cis", winner = "cis", video = "https://youtu.be/McSyDQ_k2dQ" },
+  { round = "top32", a = "tiro", b = "salo", winner = "tiro", video = "https://youtu.be/WwCu0cSWsRQ" },
+  { round = "top32", a = "x-rain", b = "caligola", winner = "caligola", video = "https://youtu.be/wkD5bZ4dtjc" },
+  { round = "top16", a = "cis", b = "caligola", winner = "cis", video = "https://youtu.be/5npjfOPR_7s" },
+  { round = "top16", a = "lee", b = "hijack", winner = "lee", video = "https://youtu.be/gjQP7Kd0vIM" },
+  { round = "top16", a = "leony", b = "lithe-ing", winner = "leony", video = "https://youtu.be/WkVTEhubBo8" },
+  { round = "top16", a = "mass", b = "menno", winner = "menno", video = "https://youtu.be/Oqwn5MmukEw" },
+  { round = "top16", a = "poter", b = "daniel", winner = "daniel", video = "https://youtu.be/NJ7Jkw86XMQ" },
+  { round = "top16", a = "ricky-rulez", b = "damani", winner = "damani", video = "https://youtu.be/c267wMb2mII" },
+  { round = "top16", a = "snap", b = "lorenzo", winner = "lorenzo", video = "https://youtu.be/8e2h4kfZ6Sw" },
+  { round = "top16", a = "tiro", b = "allef", winner = "tiro", video = "https://youtu.be/pOio-odTO2s" },
+  { round = "top8", a = "damani", b = "leony", winner = "leony", video = "https://youtu.be/NE8SqTWCAn8" },
+  { round = "top8", a = "daniel", b = "cis", winner = "cis", video = "https://youtu.be/-0ehnwlld6o" },
+  { round = "top8", a = "lorenzo", b = "menno", winner = "menno", video = "https://youtu.be/PDkGng1-iaw" },
+  { round = "top8", a = "tiro", b = "lee", winner = "tiro", video = "https://youtu.be/JjZcoO--ILY" },
+  { round = "top4", a = "cis", b = "menno", winner = "menno", video = "https://youtu.be/Fk_bwHig98A" },
+  { round = "top4", a = "leony", b = "tiro", winner = "leony", video = "https://youtu.be/T9FFLSxjQCU" },
+  { round = "final", a = "leony", b = "menno", winner = "menno", video = "https://youtu.be/wu_YezQYNgY" },
 ]
 
 [[battles]]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "san-andrea", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "cha-ja", b = "carlota", winner = "carlota", video = "https://youtu.be/7k47u4Mx_RE" },
+  { round = "top16", a = "fanny", b = "nicka", winner = "nicka", video = "https://youtu.be/v2iUhGeOCTQ" },
+  { round = "top16", a = "isis", b = "india", winner = "india", video = "https://youtu.be/ILmk2gXGJSc" },
+  { round = "top16", a = "izanami", b = "anti", winner = "anti", video = "https://youtu.be/Qql3qKl7BFg" },
+  { round = "top16", a = "nadia", b = "camine", winner = "camine", video = "https://youtu.be/qHKKYgpU00o" },
+  { round = "top16", a = "san-andrea", b = "zoe", winner = "san-andrea", video = "https://youtu.be/dHGvzume8xI" },
+  { round = "top16", a = "sidi", b = "spidergirl", winner = "spidergirl", video = "https://youtu.be/_d6_SgiqFpk" },
+  { round = "top16", a = "syssy", b = "kami", winner = "syssy", video = "https://youtu.be/mz_mXeEjbVs" },
+  { round = "top8", a = "anti", b = "san-andrea", winner = "san-andrea", video = "https://youtu.be/U87dPyh0I1E" },
+  { round = "top8", a = "camine", b = "nicka", winner = "nicka", video = "https://youtu.be/eMRbTquhonw" },
+  { round = "top8", a = "carlota", b = "syssy", winner = "carlota", video = "https://youtu.be/2goQxyn0z7o" },
+  { round = "top8", a = "india", b = "spidergirl", winner = "india", video = "https://youtu.be/b-erH2qsoUQ" },
+  { round = "top4", a = "india", b = "carlota", winner = "india", video = "https://youtu.be/BOtRTRafiX8" },
+  { round = "top4", a = "nicka", b = "san-andrea", winner = "san-andrea", video = "https://youtu.be/9_fxdANVNYg" },
+  { round = "final", a = "india", b = "san-andrea", winner = "san-andrea", video = "https://youtu.be/9YrBQtvRZJw" },
 ]
 
 [[battles]]

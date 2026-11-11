@@ -210,7 +210,7 @@ async fn edits_to_unverified_dancers_are_logged(pool: PgPool) {
     let uri = format!("/api/dancers/{dancer}");
     let body = json!({ "dancer_name": "Lil G", "country": "FR", "city": "Lyon",
                        "instagram_handle": "@LilG", "aliases": ["G"],
-                       "avatar_parts": "h2-s1-c0-o3-e0-b1" });
+                       "avatar": { "style": "flame", "hoops": true } });
     assert_eq!(
         send(&w.app, put(&uri, body, Some(&w.organizer)))
             .await
@@ -240,15 +240,15 @@ async fn edits_to_unverified_dancers_are_logged(pool: PgPool) {
         logged,
         [
             ("aliases", None, Some("G")),
-            ("avatar_parts", None, Some("h2-s1-c0-o3-e0-b1")),
+            ("avatar", None, Some(r#"{"hoops":true,"style":"flame"}"#)),
             ("city", None, Some("Lyon")),
             ("instagram_handle", None, Some("lilg")),
         ]
     );
-    let bad = json!({ "dancer_name": "Lil G", "country": "FR", "avatar_parts": "h9-s1" });
+    let bad = json!({ "dancer_name": "Lil G", "country": "FR", "avatar": { "style": "cap" } });
     let rejected = send(&w.app, put(&uri, bad, Some(&w.organizer))).await;
     assert_eq!(rejected.status, StatusCode::UNPROCESSABLE_ENTITY);
-    assert_eq!(rejected.json["error"]["fields"][0]["field"], "avatar_parts");
+    assert_eq!(rejected.json["error"]["fields"][0]["field"], "avatar");
 
     // Verified pages are their owner's; their edits are not logged.
     sqlx::query!("update dancers set verified_at = now() where id = $1", id)

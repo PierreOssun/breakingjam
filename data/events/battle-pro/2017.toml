@@ -17,13 +17,13 @@ name = "Crew battle"
 gender = "mixed"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "vagabonds", b = "dead-prezz", winner = "vagabonds" },
+  { round = "top8", a = "vagabonds", b = "dead-prezz", winner = "vagabonds", video = "https://youtu.be/biIC-62LF_g" },
   { round = "top8", a = "mos-crew", b = "soul-burnz", winner = "mos-crew", video = "https://youtu.be/3bVB-CvyjHI" },
   { round = "top8", a = "red-bull-bc-one-all-stars", b = "too-much-underground", winner = "red-bull-bc-one-all-stars", video = "https://youtu.be/t2dc3DdOB8I" },
   { round = "top8", a = "dream-runnerz", b = "obc", winner = "obc" },
-  { round = "top4", a = "vagabonds", b = "mos-crew", winner = "vagabonds" },
+  { round = "top4", a = "vagabonds", b = "mos-crew", winner = "vagabonds", video = "https://youtu.be/UI-tkh_U0_I" },
   { round = "top4", a = "red-bull-bc-one-all-stars", b = "obc", winner = "red-bull-bc-one-all-stars" },
-  { round = "final", a = "vagabonds", b = "red-bull-bc-one-all-stars", winner = "vagabonds" },
+  { round = "final", a = "vagabonds", b = "red-bull-bc-one-all-stars", winner = "vagabonds", video = "https://youtu.be/Eohu5biNEig" },
 ]
 
 [battles.teams]
@@ -43,14 +43,14 @@ gender = "bboy"
 bracket_size = 16
 matches = [
   { round = "top16", a = "lussy-sky", b = "onel", winner = "lussy-sky", video = "https://youtu.be/EEaqFuuVi4U" },
-  { round = "top16", a = "justeen", b = "lunatic", winner = "justeen" },
+  { round = "top16", a = "justeen", b = "lunatic", winner = "justeen", video = "https://youtu.be/pCHxYwA9YHw" },
   { round = "top16", a = "hill", b = "sniper", winner = "hill", video = "https://youtu.be/AB7ytp7_Wew" },
   { round = "top16", a = "kid-karam", b = "sofiane", winner = "kid-karam", video = "https://youtu.be/PAbHzXFLvhY" },
   { round = "top16", a = "deny-rock", b = "simo", winner = "deny-rock", video = "https://youtu.be/uHuyKyuoIX4" },
   { round = "top16", a = "double-d", b = "eagle-one", winner = "double-d", video = "https://youtu.be/7zdw7QMTspw" },
   { round = "top16", a = "tonio", b = "miracle-smile", winner = "tonio", video = "https://youtu.be/k17Ts4xYHHA" },
   { round = "top16", a = "leony", b = "wen", winner = "leony", video = "https://youtu.be/wsVdQooKP0Y" },
-  { round = "top8", a = "lussy-sky", b = "justeen", winner = "lussy-sky" },
+  { round = "top8", a = "lussy-sky", b = "justeen", winner = "lussy-sky", video = "https://youtu.be/NsmW9HrJ7Gs" },
   { round = "top8", a = "hill", b = "kid-karam", winner = "hill", video = "https://youtu.be/mIwHX4LggUM" },
   { round = "top8", a = "deny-rock", b = "double-d", winner = "deny-rock", video = "https://youtu.be/Vqb8kgweL7Q" },
   { round = "top8", a = "tonio", b = "leony", winner = "tonio", video = "https://youtu.be/UbrHT5xJWBc" },

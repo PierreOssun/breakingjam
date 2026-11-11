@@ -17,7 +17,8 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "lotus", reached = "winner" },
+  { entrant = "lotus", reached = "winner", video = "https://youtu.be/Z93FSTUvI0c" },
+  { entrant = "zealuss", reached = "top2", video = "https://youtu.be/Z93FSTUvI0c" },  # Art of Movement's "FINAL - LOTUS VS ZELUSS"
   { entrant = "neo", reached = "top16" },
 ]
 

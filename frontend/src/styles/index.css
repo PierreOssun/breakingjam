@@ -207,6 +207,9 @@
   }
 }
 
+/* §4.44: a phone too short for the avatar builder's full stage (an SE, or landscape). */
+@custom-variant short (@media (max-height: 700px) and (max-width: 1023px));
+
 /* §9 decoration: thin outlined rings, at most one per screen. */
 @utility rings {
   position: absolute;

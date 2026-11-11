@@ -288,6 +288,7 @@
     }
   },
   "dancer": {
+    "instagramHidden": "Hidden: only you and the BreakingJam team see it.",
     "aka": "aka {{names}}",
     "verified": "Verified",
     "live": "Live now",
@@ -746,6 +747,158 @@
     "byHand": "We check by hand, usually within a day.",
     "conflict": "This page can’t be claimed: it’s verified, or your account already has a page."
   },
+  "avatar": {
+    "title": "Your avatar",
+    "done": "Done",
+    "save": "Save avatar",
+    "saved": "Avatar saved.",
+    "failed": "The avatar wasn’t saved. Try again.",
+    "change": "Change avatar",
+    "rowHint": "Your pixel avatar, shown on your page, in results and in menus.",
+    "rowHintOther": "Their pixel avatar, shown on their page, in results and in menus.",
+    "surprise": "Surprise me",
+    "undo": "Undo",
+    "keep": "Keep editing",
+    "discard": "Discard",
+    "alt": "Pixel avatar: {{parts}}",
+    "tabs": {
+      "fighters": "Fighters",
+      "hair": "Hair",
+      "head": "Head",
+      "face": "Face",
+      "outfit": "Outfit",
+      "stage": "Stage"
+    },
+    "groups": {
+      "fighters": "Start from a fighter",
+      "style": "Style",
+      "colour": "Colour",
+      "headgear": "Headgear",
+      "skin": "Skin tone",
+      "expression": "Expression",
+      "brows": "Brows",
+      "mouth": "Mouth",
+      "faceItem": "Face item",
+      "details": "Details",
+      "top": "Top",
+      "trim": "Trim colour",
+      "accessory": "Accessory",
+      "effect": "Effect"
+    },
+    "sizes": {
+      "page": "Page",
+      "menu": "Menu",
+      "results": "Results"
+    },
+    "options": {
+      "skin": {
+        "light": "Light",
+        "tan": "Tan",
+        "medium": "Medium",
+        "deep": "Deep"
+      },
+      "style": {
+        "spiky": "Spiky",
+        "flame": "Manga spikes",
+        "sweep": "Side sweep",
+        "buzz": "Buzz",
+        "mohawk": "Mohawk",
+        "flattop": "Flat top",
+        "afro": "Afro",
+        "locs": "Locs",
+        "bun": "Top bun",
+        "long": "Long",
+        "bangs": "Bangs",
+        "bob": "Bob",
+        "pony": "Ponytail",
+        "highpony": "High ponytail",
+        "twintails": "Twin tails",
+        "braids": "Braids",
+        "puffs": "Puffs",
+        "space": "Space buns"
+      },
+      "hair": {
+        "black": "Black",
+        "brown": "Brown",
+        "bleach": "Bleach",
+        "red": "Red",
+        "pink": "Pink",
+        "blue": "Blue",
+        "violet": "Violet"
+      },
+      "head": {
+        "none": "None",
+        "headband": "Headband",
+        "bandana": "Bandana",
+        "bucket": "Bucket hat",
+        "hood": "Hood up",
+        "cap": "Cap",
+        "beanie": "Beanie"
+      },
+      "accent": {
+        "white": "White",
+        "red": "Red",
+        "blue": "Blue",
+        "violet": "Violet",
+        "black": "Black"
+      },
+      "brows": {
+        "set": "Calm",
+        "fierce": "Fierce"
+      },
+      "mouth": {
+        "smirk": "Smirk",
+        "grin": "Grin"
+      },
+      "face": {
+        "none": "None",
+        "shades": "Shades",
+        "plaster": "Plaster",
+        "scar": "Scar",
+        "mask": "Mask",
+        "paint": "Face paint"
+      },
+      "outfit": {
+        "hoodie": "Hoodie",
+        "track": "Track jacket",
+        "tank": "Tank top",
+        "jersey": "Jersey",
+        "bomber": "Bomber"
+      },
+      "cloth": {
+        "ink": "Ink",
+        "white": "White",
+        "blue": "Blue",
+        "violet": "Violet",
+        "red": "Red"
+      },
+      "extra": {
+        "none": "None",
+        "phones": "Headphones",
+        "chain": "Chain"
+      },
+      "bg": {
+        "klein": "Klein blue",
+        "violet": "Violet",
+        "ink": "Ink",
+        "night": "Night",
+        "crimson": "Crimson",
+        "white": "White"
+      },
+      "fx": {
+        "rings": "Rings",
+        "burst": "Speed lines",
+        "halftone": "Halftone",
+        "aura": "Aura",
+        "city": "City"
+      }
+    },
+    "details": {
+      "lashes": "Lash flicks",
+      "lips": "Lip tint",
+      "hoops": "Hoops"
+    }
+  },
   "dancerEdit": {
     "open": "Edit profile",
     "title": "Edit profile",
@@ -757,57 +910,13 @@
     "country2": "Second country",
     "bio": "Bio",
     "avatar": "Avatar",
-    "avatarHint": "Drawn from these parts; pick the skin tone that fits.",
     "addInstagram": "Add Instagram",
-    "parts": {
-      "hair": {
-        "label": "Hair",
-        "options": [
-          "Spiky",
-          "Cap",
-          "Beanie",
-          "Bun and headband",
-          "Afro",
-          "Buzz cut",
-          "Long, side fringe",
-          "Space buns",
-          "Box braids",
-          "Afro puffs",
-          "High ponytail",
-          "Bob with bangs",
-          "Cap over long hair"
-        ]
-      },
-      "skin": {
-        "label": "Skin tone",
-        "options": ["Light", "Tan", "Medium", "Deep"]
-      },
-      "hairColour": {
-        "label": "Hair colour",
-        "options": ["Black", "Brown", "Bleached", "Violet", "Klein blue"]
-      },
-      "hoodie": {
-        "label": "Hoodie",
-        "options": ["Ink", "Klein blue", "Violet", "White", "Red"]
-      },
-      "extra": {
-        "label": "Extra",
-        "options": ["None", "Headphones", "Chain"]
-      },
-      "backdrop": {
-        "label": "Background",
-        "options": ["Klein blue", "Violet", "Ink", "Night"]
-      },
-      "details": {
-        "lashes": "Lash flicks",
-        "lips": "Lip tint",
-        "hoops": "Hoop earrings"
-      }
-    },
     "titlesMine": "I’m a…",
     "titles": "What they do",
     "titlesHint": "Only the dancer, once verified, and the BreakingJam team set these.",
-    "namesake": "Another dancer is already called {{name}}. Check it isn’t the same person before saving."
+    "namesake": "Another dancer is already called {{name}}. Check it isn’t the same person before saving.",
+    "hideInstagram": "Hide my Instagram from my page and from search",
+    "hideInstagramOther": "Hide this Instagram from the page and from search"
   },
   "admin": {
     "claims": {

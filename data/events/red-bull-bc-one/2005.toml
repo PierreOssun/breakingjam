@@ -18,7 +18,7 @@ gender = "bboy"
 bracket_size = 16
 matches = [
   { round = "top16", a = "lilou", b = "physicx", winner = "lilou", votes = [3, 2], video = "https://youtu.be/f0FKmTplbMo" },
-  { round = "top16", a = "omar", b = "benny", winner = "omar", votes = [5, 0] },
+  { round = "top16", a = "omar", b = "benny", winner = "omar", votes = [5, 0] , video = "https://youtu.be/u2VM5iPHMUk" },
   { round = "top16", a = "jora", b = "junior", winner = "junior", votes = [0, 5], video = "https://youtu.be/VwML1BavExw" },
   { round = "top16", a = "born", b = "ronnie", winner = "ronnie", votes = [1, 4], video = "https://youtu.be/R8Dt5oXZShw" },
   { round = "top16", a = "moy", b = "hong-10", winner = "hong-10", votes = [0, 5], video = "https://youtu.be/cZScTxE0lJY" },

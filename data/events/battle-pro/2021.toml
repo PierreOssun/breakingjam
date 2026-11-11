@@ -16,8 +16,8 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "body-carnival", reached = "winner" },
-  { entrant = "last-squad", reached = "top2" },
+  { entrant = "body-carnival", reached = "winner", video = "https://youtu.be/QoJ13QwbW-k" },
+  { entrant = "last-squad", reached = "top2", video = "https://youtu.be/QoJ13QwbW-k" },
 ]
 
 [battles.teams]
@@ -29,5 +29,5 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "sho", reached = "winner" },
+  { entrant = "sho", reached = "winner", video = "https://youtu.be/0-Iu2kJXNjg" },
 ]

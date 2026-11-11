@@ -15,8 +15,15 @@ djs = ["lean-rock", "renegade", "woo-d", "scream", "piggo"]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "eri", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "eri", b = "kim-bgirl", winner = "eri", video = "https://youtu.be/4WiBXBpUMnY" },
+  { round = "top8", a = "paulina", b = "zofia", winner = "paulina", video = "https://youtu.be/KOq6POENeKM" },
+  { round = "top8", a = "tania", b = "queen-marry", winner = "queen-marry", video = "https://youtu.be/DjwoQD1H2CM" },
+  { round = "top8", a = "yurie", b = "anastasia", winner = "yurie", video = "https://youtu.be/1z3mYYGIoJM" },
+  { round = "top4", a = "eri", b = "paulina", winner = "eri", video = "https://youtu.be/ZcxzNFgvzPM" },
+  { round = "top4", a = "yurie", b = "queen-marry", winner = "yurie", video = "https://youtu.be/5GiDcsGghzQ" },
+  { round = "final", a = "eri", b = "yurie", winner = "eri", video = "https://youtu.be/Xh63DAY5Yc0" },
 ]
 
 [[battles]]
@@ -24,9 +31,39 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "rukus-vlad", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "manny-spin", b = "bootuz-fast-foot", winner = "bootuz-fast-foot", video = "https://youtu.be/54f4_ZqoQnU" },
+  { round = "top16", a = "apache-tazzmanio", b = "eddy-twister-raffz", winner = "apache-tazzmanio", video = "https://youtu.be/AdVMTuGuN4Q" },
+  { round = "top16", a = "el-princhino-miniboj", b = "rukus-vlad", winner = "rukus-vlad", video = "https://youtu.be/jz0Ver5OLac" },
+  { round = "top16", a = "busta-bush-wingzero", b = "monkee-2-pupper", winner = "busta-bush-wingzero", video = "https://youtu.be/8fRDt7QEi-Y" },
+  { round = "top16", a = "abdul-tony", b = "vimcem-xak", winner = "abdul-tony", video = "https://youtu.be/cjwlbkjiMAs" },
+  { round = "top16", a = "insight-keebz", b = "cydrek-plesniak", winner = "insight-keebz", video = "https://youtu.be/3-3sv9D-XRo" },
+  { round = "top16", a = "kosto-step1", b = "crab-dwelz", winner = "kosto-step1", video = "https://youtu.be/E0zM3_fCrws" },
+  { round = "top16", a = "goofy-padre", b = "medjan-thomaz", winner = "goofy-padre", video = "https://youtu.be/sM0hBCYMzy4" },
+  { round = "top8", a = "rukus-vlad", b = "apache-tazzmanio", winner = "rukus-vlad", video = "https://youtu.be/IDKLISKCbQk" },
+  { round = "top8", a = "busta-bush-wingzero", b = "bootuz-fast-foot", winner = "busta-bush-wingzero", video = "https://youtu.be/Z6169AyLa2s" },
+  { round = "top8", a = "kosto-step1", b = "insight-keebz", winner = "kosto-step1", video = "https://youtu.be/ihkTpONHBsw" },
+  { round = "top8", a = "goofy-padre", b = "abdul-tony", winner = "goofy-padre", video = "https://youtu.be/5rz5-WOATmE" },
+  { round = "top4", a = "busta-bush-wingzero", b = "rukus-vlad", winner = "rukus-vlad", video = "https://youtu.be/vkvGbLmbIMk" },
+  { round = "top4", a = "goofy-padre", b = "kosto-step1", winner = "kosto-step1", video = "https://youtu.be/QpDoD-rJJuo" },
+  { round = "final", a = "kosto-step1", b = "rukus-vlad", winner = "rukus-vlad", video = "https://youtu.be/i_OWBQr77bo" },
 ]
 
 [battles.teams]
+manny-spin = { members = ["spin", "manny"] }
+bootuz-fast-foot = { members = ["bootuz", "fast-foot"] }
+apache-tazzmanio = { members = ["apache", "tazzmanio"] }
+eddy-twister-raffz = { members = ["eddy-twister", "raffz"] }
+el-princhino-miniboj = { members = ["miniboj", "el-princhino"] }
+busta-bush-wingzero = { members = ["busta-bush", "wingzero"] }
+monkee-2-pupper = { members = ["pupper", "monkee-2"] }
+abdul-tony = { members = ["abdul", "tony"] }
+vimcem-xak = { members = ["xak", "vimcem"] }
+insight-keebz = { members = ["keebz", "insight"] }
+cydrek-plesniak = { members = ["cydrek", "plesniak"] }
+kosto-step1 = { members = ["step1", "kosto"] }
+crab-dwelz = { members = ["dwelz", "crab"] }
+goofy-padre = { members = ["padre", "goofy"] }
+medjan-thomaz = { members = ["thomaz", "medjan"] }
 rukus-vlad = { members = ["vlad", "rukus"] }

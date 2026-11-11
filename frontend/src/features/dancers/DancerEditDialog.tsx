@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useId, useMemo, useRef } from "react";
+import { PencilSimple } from "@phosphor-icons/react";
+import { useId, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { api, type Schemas } from "../../api/client";
+import { Button } from "../../components/Button";
 import { ChipInput } from "../../components/ChipInput";
 import { ChipRow } from "../../components/ChipRow";
 import { CountrySelect } from "../../components/CountrySelect";
@@ -13,7 +15,6 @@ import { FormError } from "../../components/FormError";
 import { HandleField } from "../../components/HandleField";
 import { InlineNotice } from "../../components/InlineNotice";
 import { OptionalLabel } from "../../components/OptionalLabel";
-import { SelectField } from "../../components/SelectField";
 import { TextAreaField } from "../../components/TextAreaField";
 import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
@@ -21,14 +22,7 @@ import { applyFieldErrors } from "../../lib/apiErrors";
 import { toHandle } from "../../lib/instagram";
 import { useDebounced } from "../../lib/useDebounced";
 import { ME_KEY, useMe } from "../auth/useMe";
-import {
-  type AvatarParts,
-  DETAILS,
-  formatParts,
-  hasDetail,
-  PARTS,
-  partsOf,
-} from "./avatarParts";
+import { AvatarBuilder } from "./AvatarBuilder";
 import { DancerAvatar } from "./DancerAvatar";
 import { searchDancers } from "./search";
 
@@ -50,8 +44,8 @@ type Values = {
   country2: string;
   city: string;
   instagram_handle: string;
+  instagram_hidden: boolean;
   bio: string;
-  parts: AvatarParts;
   titles: Title[];
 };
 const FIELDS = [
@@ -72,8 +66,8 @@ function valuesOf(dancer: Dancer): Values {
     country2: dancer.country2 ?? "",
     city: dancer.city ?? "",
     instagram_handle: dancer.instagram_handle ?? "",
+    instagram_hidden: dancer.instagram_hidden,
     bio: dancer.bio ?? "",
-    parts: partsOf(dancer),
     titles: dancer.titles,
   };
 }
@@ -85,7 +79,7 @@ type DancerEditDialogProps = {
   focusHandle?: boolean;
 };
 
-/** The edit sheet (DESIGN.md §6): profile, flags, handle, bio and the avatar's parts. */
+/** The edit sheet (DESIGN.md §6): profile, flags, handle and bio; the avatar has its own builder. */
 export function DancerEditDialog({
   dancer,
   onClose,
@@ -104,10 +98,8 @@ export function DancerEditDialog({
   });
   const { register, control, handleSubmit, setError, watch } = form;
   const { errors, isDirty } = form.formState;
-  // Null parts mean nobody has drawn the dancer yet, so the seed draws them; once the picker
-  // is touched, the parts are a choice, even when they match the seed.
-  const drawn = useRef(false);
-  const [parts, bio, name] = watch(["parts", "bio", "dancer_name"]);
+  const [building, setBuilding] = useState(false);
+  const [bio, name] = watch(["bio", "dancer_name"]);
   const namesake = useNamesake(dancer, name);
 
   const save = useMutation({
@@ -118,16 +110,17 @@ export function DancerEditDialog({
           dancer_name: values.dancer_name.trim(),
           aliases: values.aliases,
           country: values.country,
-          country2: values.country2 || null,
+          // The same country twice is one country.
+          country2:
+            values.country2 === values.country ? null : values.country2 || null,
           city: values.city.trim() || null,
           instagram_handle: toHandle(values.instagram_handle) || null,
           bio: values.bio.trim() || null,
-          avatar_parts:
-            dancer.avatar_parts || drawn.current
-              ? formatParts(values.parts)
-              : null,
           // Sent only by who may set them; the API keeps them otherwise.
-          ...(dancer.can_set_titles && { titles: values.titles }),
+          ...(dancer.can_set_titles && {
+            titles: values.titles,
+            instagram_hidden: values.instagram_hidden,
+          }),
         },
       }),
     onSuccess: ({ data, error, response }) => {
@@ -138,7 +131,12 @@ export function DancerEditDialog({
         toast({ kind: "success", message: t("dancerEdit.saved") });
         onClose();
       } else if (response.status === 409) {
-        setError("instagram_handle", { message: t("picker.handleTaken") });
+        setError(
+          "instagram_handle",
+          { message: t("picker.handleTaken") },
+          // The field may be scrolled out of the sheet.
+          { shouldFocus: true },
+        );
       } else {
         applyFieldErrors(setError, error, FIELDS);
       }
@@ -147,195 +145,154 @@ export function DancerEditDialog({
   });
 
   return (
-    <Dialog
-      onClose={onClose}
-      size="form"
-      title={t("dancerEdit.title")}
-      confirmClose={isDirty ? t("form.discard") : undefined}
-      action={{ label: t("form.save"), form: formId, loading: save.isPending }}
-    >
-      {/* Not on one's own page: "until the dancer verifies it" is about someone else. */}
-      {!dancer.verified_at && !mine && (
-        <InlineNotice>{t("dancerEdit.logged")}</InlineNotice>
-      )}
-      <form
-        id={formId}
-        noValidate
-        className="flex flex-col gap-6"
-        onSubmit={handleSubmit((values) => save.mutate(values))}
+    <>
+      <Dialog
+        onClose={onClose}
+        size="form"
+        title={t("dancerEdit.title")}
+        confirmClose={isDirty ? t("form.discard") : undefined}
+        action={{
+          label: t("form.save"),
+          form: formId,
+          loading: save.isPending,
+        }}
       >
-        <TextField
-          label={t("picker.dancerName")}
-          data-autofocus={focusHandle ? undefined : true}
-          // A warning only: two dancers may share a name.
-          hint={
-            namesake ? t("dancerEdit.namesake", { name: namesake }) : undefined
-          }
-          error={errors.dancer_name?.message}
-          {...register("dancer_name")}
-        />
-        <Controller
-          control={control}
-          name="aliases"
-          render={({ field }) => (
-            <ChipInput
-              label={<OptionalLabel label={t("dancerEdit.aliases")} />}
-              values={field.value}
-              onChange={field.onChange}
-              max={5}
-              hint={t("dancerEdit.aliasesHint")}
-            />
-          )}
-        />
-        {dancer.can_set_titles && (
+        {/* Not on one's own page: "until the dancer verifies it" is about someone else. */}
+        {!dancer.verified_at && !mine && (
+          <InlineNotice>{t("dancerEdit.logged")}</InlineNotice>
+        )}
+        <form
+          id={formId}
+          noValidate
+          className="flex flex-col gap-6"
+          onSubmit={handleSubmit((values) => save.mutate(values))}
+        >
+          <div className="flex flex-col gap-2">
+            <p className="text-label text-text uppercase">
+              {t("dancerEdit.avatar")}
+            </p>
+            <div className="flex items-center gap-4 rounded-lg border border-border bg-surface p-4">
+              <DancerAvatar dancer={dancer} size="form" />
+              <div className="flex min-w-0 flex-col items-start gap-2">
+                <p className="text-body-sm text-muted">
+                  {mine ? t("avatar.rowHint") : t("avatar.rowHintOther")}
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setBuilding(true)}
+                >
+                  <PencilSimple size={18} weight="bold" aria-hidden />
+                  {t("avatar.change")}
+                </Button>
+              </div>
+            </div>
+          </div>
+          <TextField
+            label={t("picker.dancerName")}
+            data-autofocus={focusHandle ? undefined : true}
+            // A warning only: two dancers may share a name.
+            hint={
+              namesake
+                ? t("dancerEdit.namesake", { name: namesake })
+                : undefined
+            }
+            error={errors.dancer_name?.message}
+            {...register("dancer_name")}
+          />
           <Controller
             control={control}
-            name="titles"
+            name="aliases"
             render={({ field }) => (
-              <ChipRow
-                label={
-                  mine ? t("dancerEdit.titlesMine") : t("dancerEdit.titles")
-                }
-                hint={t("dancerEdit.titlesHint")}
-                chips={TITLES.map((title) => {
-                  const on = field.value.includes(title);
-                  return {
-                    key: title,
-                    label: t(`dancer.titles.${title}`),
-                    on,
-                    onPick: () =>
-                      field.onChange(
-                        on
-                          ? field.value.filter((other) => other !== title)
-                          : [...field.value, title],
-                      ),
-                  };
-                })}
+              <ChipInput
+                label={<OptionalLabel label={t("dancerEdit.aliases")} />}
+                values={field.value}
+                onChange={field.onChange}
+                max={5}
+                maxLength={100}
+                error={errors.aliases?.message}
+                hint={t("dancerEdit.aliasesHint")}
               />
             )}
           />
-        )}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <CountrySelect
-            label={t("dancerEdit.country")}
-            blank={t("org.fields.choose")}
-            error={errors.country?.message}
-            {...register("country")}
-          />
-          <CountrySelect
-            label={<OptionalLabel label={t("dancerEdit.country2")} />}
-            error={errors.country2?.message}
-            {...register("country2")}
-          />
-        </div>
-        <TextField
-          label={<OptionalLabel label={t("org.fields.city")} />}
-          error={errors.city?.message}
-          {...register("city")}
-        />
-        <HandleField
-          label={<OptionalLabel label={t("picker.instagram")} />}
-          data-autofocus={focusHandle ? true : undefined}
-          error={errors.instagram_handle?.message}
-          {...register("instagram_handle", { setValueAs: toHandle })}
-        />
-        <TextAreaField
-          label={<OptionalLabel label={t("dancerEdit.bio")} />}
-          counter={{ length: bio.length, max: 160 }}
-          error={errors.bio?.message}
-          {...register("bio")}
-        />
-        <AvatarPicker
-          dancer={dancer}
-          parts={parts}
-          onChange={(next) => {
-            drawn.current = true;
-            form.setValue("parts", next, { shouldDirty: true });
-          }}
-        />
-        <FormError message={errors.root?.message} />
-      </form>
-    </Dialog>
-  );
-}
-
-/** The avatar's six parts as selects and its details as checkboxes, with a live preview (§4.16). */
-function AvatarPicker({
-  dancer,
-  parts,
-  onChange,
-}: {
-  dancer: Dancer;
-  parts: AvatarParts;
-  onChange: (parts: AvatarParts) => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <fieldset className="flex flex-col gap-4">
-      <legend className="mb-2 text-label text-text uppercase">
-        {t("dancerEdit.avatar")}
-      </legend>
-      <div className="flex items-center gap-4">
-        <DancerAvatar
-          dancer={{
-            ...dancer,
-            avatar_url: null,
-            avatar_parts: formatParts(parts),
-          }}
-          size="form"
-        />
-        <p className="text-caption text-muted">{t("dancerEdit.avatarHint")}</p>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        {PARTS.map(({ part, options }) => {
-          const names: readonly string[] = t(
-            `dancerEdit.parts.${part}.options`,
-            {
-              returnObjects: true,
-            },
-          );
-          return (
-            <SelectField
-              key={part}
-              label={t(`dancerEdit.parts.${part}.label`)}
-              value={parts[part]}
-              onChange={(e) =>
-                onChange({ ...parts, [part]: Number(e.target.value) })
-              }
-            >
-              {options.map((option, index) => (
-                <option key={option} value={index}>
-                  {names[index] ?? option}
-                </option>
-              ))}
-            </SelectField>
-          );
-        })}
-      </div>
-      <div className="flex flex-wrap gap-x-6 gap-y-2">
-        {DETAILS.map(({ name, bit }) => (
-          <label
-            key={name}
-            className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-body"
-          >
-            <input
-              type="checkbox"
-              checked={hasDetail(parts, name)}
-              onChange={(e) =>
-                onChange({
-                  ...parts,
-                  details: e.target.checked
-                    ? parts.details | bit
-                    : parts.details & ~bit,
-                })
-              }
-              className="size-5 accent-primary"
+          {dancer.can_set_titles && (
+            <Controller
+              control={control}
+              name="titles"
+              render={({ field }) => (
+                <ChipRow
+                  label={
+                    mine ? t("dancerEdit.titlesMine") : t("dancerEdit.titles")
+                  }
+                  hint={t("dancerEdit.titlesHint")}
+                  chips={TITLES.map((title) => {
+                    const on = field.value.includes(title);
+                    return {
+                      key: title,
+                      label: t(`dancer.titles.${title}`),
+                      on,
+                      onPick: () =>
+                        field.onChange(
+                          on
+                            ? field.value.filter((other) => other !== title)
+                            : [...field.value, title],
+                        ),
+                    };
+                  })}
+                />
+              )}
             />
-            {t(`dancerEdit.parts.details.${name}`)}
-          </label>
-        ))}
-      </div>
-    </fieldset>
+          )}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <CountrySelect
+              label={t("dancerEdit.country")}
+              blank={t("org.fields.choose")}
+              error={errors.country?.message}
+              {...register("country")}
+            />
+            <CountrySelect
+              label={<OptionalLabel label={t("dancerEdit.country2")} />}
+              error={errors.country2?.message}
+              {...register("country2")}
+            />
+          </div>
+          <TextField
+            label={<OptionalLabel label={t("org.fields.city")} />}
+            error={errors.city?.message}
+            {...register("city")}
+          />
+          <HandleField
+            label={<OptionalLabel label={t("picker.instagram")} />}
+            data-autofocus={focusHandle ? true : undefined}
+            error={errors.instagram_handle?.message}
+            {...register("instagram_handle", { setValueAs: toHandle })}
+          />
+          {/* Privacy is the dancer's own word, like the titles; under the handle it hides. */}
+          {dancer.can_set_titles && (
+            <label className="-mt-3 inline-flex min-h-11 cursor-pointer items-center gap-2 text-body">
+              <input
+                type="checkbox"
+                className="size-5 shrink-0 accent-primary"
+                {...register("instagram_hidden")}
+              />
+              {mine
+                ? t("dancerEdit.hideInstagram")
+                : t("dancerEdit.hideInstagramOther")}
+            </label>
+          )}
+          <TextAreaField
+            label={<OptionalLabel label={t("dancerEdit.bio")} />}
+            counter={{ length: bio.length, max: 160 }}
+            error={errors.bio?.message}
+            {...register("bio")}
+          />
+          <FormError message={errors.root?.message} />
+        </form>
+      </Dialog>
+      {building && (
+        <AvatarBuilder dancer={dancer} onClose={() => setBuilding(false)} />
+      )}
+    </>
   );
 }
 
@@ -357,8 +314,8 @@ function useSchema() {
         instagram_handle: z
           .string()
           .regex(/^[A-Za-z0-9._]{0,30}$/, t("validation.handle")),
+        instagram_hidden: z.boolean(),
         bio: z.string().max(160, t("validation.tooLong", { max: 160 })),
-        parts: z.custom<AvatarParts>(),
         titles: z.custom<Title[]>(),
       }),
     [t],

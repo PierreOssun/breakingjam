@@ -15,11 +15,11 @@ djs = []
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "jinjo-crew", reached = "winner" },
-  { entrant = "gamblerz", reached = "top4" },
-  { entrant = "la-smala", reached = "top4" },
-  { entrant = "mortal-combat", reached = "top2" },
+bracket_size = 4
+matches = [
+  { round = "top4", a = "jinjo-crew", b = "gamblerz", winner = "jinjo-crew", video = "https://youtu.be/ZWIsbCQb8fo" },
+  { round = "top4", a = "mortal-combat", b = "la-smala", winner = "mortal-combat", video = "https://youtu.be/qIPfm0ZrLXc" },
+  { round = "final", a = "jinjo-crew", b = "mortal-combat", winner = "jinjo-crew", video = "https://youtu.be/LNO6AXyXdrk" },
 ]
 
 [battles.teams]
@@ -33,8 +33,8 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "alkolil", reached = "top2" },
-  { entrant = "thesis", reached = "winner" },
+  { entrant = "alkolil", reached = "top2", video = "https://youtu.be/N8eyqs6V6us" },
+  { entrant = "thesis", reached = "winner", video = "https://youtu.be/N8eyqs6V6us" },
 ]
 
 [[battles]]

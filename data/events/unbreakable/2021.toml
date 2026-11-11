@@ -14,8 +14,39 @@ judges = []
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "amir", reached = "winner" },
+bracket_size = 32
+matches = [
+  { round = "top32", a = "cis", b = "mowgly", winner = "mowgly", video = "https://youtu.be/Vbth-W3uNQc" },
+  { round = "top32", a = "daniel", b = "twister", winner = "twister", video = "https://youtu.be/7fdwSeiSeNg" },
+  { round = "top32", a = "erik-daily", b = "shane", winner = "shane", video = "https://youtu.be/rcCmVztKb8k" },
+  { round = "top32", a = "faisi", b = "kosto", winner = "kosto", video = "https://youtu.be/ZLjkg0GN4ao" },
+  { round = "top32", a = "flo", b = "shaymin", winner = "shaymin", video = "https://youtu.be/kVUiowJtZzg" },
+  { round = "top32", a = "klodison", b = "exaggerate", winner = "exaggerate", video = "https://youtu.be/lxbY2D4-PR4" },
+  { round = "top32", a = "lorenzo", b = "deadlydani", winner = "lorenzo", video = "https://youtu.be/uE0qOYdyS0Q" },
+  { round = "top32", a = "lucky", b = "mighty-jimm", winner = "mighty-jimm", video = "https://youtu.be/RXyMGjfpnb4" },
+  { round = "top32", a = "matita", b = "double-d", winner = "matita", video = "https://youtu.be/7yXJF5pjBhA" },
+  { round = "top32", a = "noe", b = "emilio", winner = "noe", video = "https://youtu.be/HkEGZfI-d0Q" },
+  { round = "top32", a = "sinx", b = "nasty", winner = "nasty", video = "https://youtu.be/02nIoEWSo2c" },
+  { round = "top32", a = "snap", b = "jeffro", winner = "jeffro", video = "https://youtu.be/AMJDlejnyts" },
+  { round = "top32", a = "tunde", b = "daga", winner = "tunde", video = "https://youtu.be/ZQ87NPDKMyc" },
+  { round = "top32", a = "xl", b = "illz", winner = "illz", video = "https://youtu.be/cyBvRNd_3kE" },
+  { round = "top32", a = "nord-diamond", b = "timbo", winner = "nord-diamond", video = "https://youtu.be/66FuocYqSis" },
+  { round = "top32", a = "sambo", b = "amir", winner = "amir", video = "https://youtu.be/q3rhxcgef1Y" },
+  { round = "top16", a = "illz", b = "noe", winner = "illz", video = "https://youtu.be/qzfIGzvGFDQ" },
+  { round = "top16", a = "lorenzo", b = "kosto", winner = "lorenzo", video = "https://youtu.be/NRmsi2qjzaI" },
+  { round = "top16", a = "mighty-jimm", b = "twister", winner = "mighty-jimm", video = "https://youtu.be/fV7IdT4A-1U" },
+  { round = "top16", a = "nasty", b = "exaggerate", winner = "exaggerate", video = "https://youtu.be/-4H6gBiArrQ" },
+  { round = "top16", a = "shane", b = "nord-diamond", winner = "nord-diamond", video = "https://youtu.be/sNKXHadWxz4" },
+  { round = "top16", a = "shaymin", b = "mowgly", winner = "mowgly", video = "https://youtu.be/L50iawabhto" },
+  { round = "top16", a = "jeffro", b = "amir", winner = "amir", video = "https://youtu.be/9dSmM-aKMGA" },
+  { round = "top16", a = "tunde", b = "matita", winner = "tunde", video = "https://youtu.be/oFVZalubJgM" },
+  { round = "top8", a = "exaggerate", b = "amir", winner = "amir", video = "https://youtu.be/GFclS0bMbBo" },
+  { round = "top8", a = "illz", b = "tunde", winner = "illz", video = "https://youtu.be/dBheXUpFOMk" },
+  { round = "top8", a = "mowgly", b = "nord-diamond", winner = "nord-diamond", video = "https://youtu.be/DozBofFv6nI" },
+  { round = "top8", a = "mighty-jimm", b = "lorenzo", winner = "mighty-jimm", video = "https://youtu.be/MjHZnorEIbI" },
+  { round = "top4", a = "mighty-jimm", b = "illz", winner = "mighty-jimm", video = "https://youtu.be/SK9lZdMWLuQ" },
+  { round = "top4", a = "nord-diamond", b = "amir", winner = "amir", video = "https://youtu.be/cyV5i0CW0co" },
+  { round = "final", a = "mighty-jimm", b = "amir", winner = "amir", video = "https://youtu.be/zq-khKW1Xes" },
 ]
 
 [[battles]]
@@ -61,11 +92,25 @@ matches = [
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "the-unbreakable-crew", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "lack-of-crowns", b = "battle-droids", winner = "lack-of-crowns", video = "https://youtu.be/ZLcJs0PG3Pg" },
+  { round = "top8", a = "lottaboyz", b = "9000-styles", winner = "lottaboyz", video = "https://youtu.be/08aFQx9Cflc" },
+  { round = "top8", a = "style-invaders", b = "last-alive", winner = "style-invaders", video = "https://youtu.be/YdLls1mJs10" },
+  { round = "top8", a = "the-unbreakable-crew", b = "slow-burners", winner = "the-unbreakable-crew", video = "https://youtu.be/V2LpCL49J_E" },
+  { round = "top4", a = "lack-of-crowns", b = "lottaboyz", winner = "lack-of-crowns", video = "https://youtu.be/7u54W4ZqD6g" },
+  { round = "top4", a = "the-unbreakable-crew", b = "style-invaders", winner = "the-unbreakable-crew", video = "https://youtu.be/yiHZLaUk11g" },
+  { round = "final", a = "lack-of-crowns", b = "the-unbreakable-crew", winner = "the-unbreakable-crew", video = "https://youtu.be/8eTrV1qElZc" },
 ]
 
 [battles.teams]
+lack-of-crowns = { name = "Lack of Crowns" }
+battle-droids = { crew = "battle-droids" }
+lottaboyz = { name = "Lottaboyz" }
+9000-styles = { name = "9000 Styles" }
+style-invaders = { crew = "style-invaders" }
+last-alive = { crew = "last-alive" }
+slow-burners = { name = "Slow Burners" }
 the-unbreakable-crew = { crew = "the-unbreakable-crew" }
 
 [[battles]]
@@ -73,9 +118,23 @@ key = "kids-crew"
 name = "Kids crew battle"
 gender = "mixed"
 age = "kids"
-results = [
-  { entrant = "grafters", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "battle-droids-red", b = "psycho", winner = "battle-droids-red", video = "https://youtu.be/AjC3SvQSSp0" },
+  { round = "top8", a = "grafters", b = "fresh-allstars", winner = "grafters", video = "https://youtu.be/Kin2ZgHot5g" },
+  { round = "top8", a = "battle-droids-blue", b = "flow-killerz", winner = "battle-droids-blue", video = "https://youtu.be/ZSjpd_vUyXI" },
+  { round = "top8", a = "floorknights", b = "busta-move", winner = "floorknights", video = "https://youtu.be/ua99dpFHXPg" },
+  { round = "top4", a = "floorknights", b = "battle-droids-red", winner = "floorknights", video = "https://youtu.be/p3BibgVMmBs" },
+  { round = "top4", a = "grafters", b = "battle-droids-blue", winner = "grafters", video = "https://youtu.be/gAFJTS-l5bI" },
+  { round = "final", a = "floorknights", b = "grafters", winner = "grafters", video = "https://youtu.be/o9WPwbYEILY" },
 ]
 
 [battles.teams]
+battle-droids-red = { name = "Battle Droids Red" }
+psycho = { name = "Psycho" }
+fresh-allstars = { crew = "fresh-allstars" }
+battle-droids-blue = { name = "Battle Droids Blue" }
+flow-killerz = { crew = "flow-killerz" }
+floorknights = { name = "Floorknights" }
+busta-move = { name = "Busta Move" }
 grafters = { crew = "grafters" }

@@ -51,7 +51,7 @@ const LILOU = {
   instagram_handle: null,
   verified: true,
   avatar_url: null,
-  avatar_parts: null,
+  avatar: null,
   crews: [],
 };
 

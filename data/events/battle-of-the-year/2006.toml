@@ -15,11 +15,11 @@ djs = []
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "vagabonds", reached = "winner" },
-  { entrant = "drifterz", reached = "top4" },
-  { entrant = "b-town-allstars", reached = "top4" },
-  { entrant = "last-for-one", reached = "top2" },
+bracket_size = 4
+matches = [
+  { round = "top4", a = "vagabonds", b = "drifterz", winner = "vagabonds", video = "https://youtu.be/inTa_UUxDHM" },
+  { round = "top4", a = "last-for-one", b = "b-town-allstars", winner = "last-for-one", video = "https://youtu.be/aABV7wvTIuM" },
+  { round = "final", a = "vagabonds", b = "last-for-one", winner = "vagabonds", video = "https://youtu.be/H_B8RzceHJo" },
 ]
 
 [battles.teams]

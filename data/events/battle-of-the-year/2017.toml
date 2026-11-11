@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "flooriorz", reached = "winner" },
-  { entrant = "kienjuice", reached = "top4" },
-  { entrant = "mortal-combat", reached = "top4" },
-  { entrant = "vagabonds", reached = "top2" },
+  { entrant = "flooriorz", reached = "winner", video = "https://youtu.be/KnWv4MA4x4Y" },
+  { entrant = "kienjuice", reached = "top4", video = "https://youtu.be/iTNDGytum-U" },
+  { entrant = "mortal-combat", reached = "top4", video = "https://youtu.be/_udrI_mxaw8" },
+  { entrant = "vagabonds", reached = "top2", video = "https://youtu.be/KnWv4MA4x4Y" },
 ]
 
 [battles.teams]
@@ -46,7 +46,7 @@ name = "2v2 Bgirl"
 gender = "bgirl"
 team_size = 2
 results = [
-  { entrant = "miju-yasmin", reached = "winner" },
+  { entrant = "miju-yasmin", reached = "winner", video = "https://youtu.be/EvsMJbn5POA" },
 ]
 
 [battles.teams]

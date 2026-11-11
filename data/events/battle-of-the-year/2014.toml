@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "predatorz", reached = "winner" },
-  { entrant = "body-carnival", reached = "top4" },
-  { entrant = "s-i-n-e-crew", reached = "top4" },
-  { entrant = "fusion-mc", reached = "top2" },
+  { entrant = "predatorz", reached = "winner", video = "https://youtu.be/yimGp0XUcEE" },
+  { entrant = "body-carnival", reached = "top4", video = "https://youtu.be/QQuDJxXr3QI" },
+  { entrant = "s-i-n-e-crew", reached = "top4", video = "https://youtu.be/SCZaDnGhWzU" },
+  { entrant = "fusion-mc", reached = "top2", video = "https://youtu.be/yimGp0XUcEE" },
 ]
 
 [battles.teams]
@@ -35,20 +35,20 @@ gender = "bboy"
 bracket_size = 16
 matches = [
   { round = "top16", a = "gravity", b = "hugga", winner = "gravity", video = "https://youtu.be/snqTKyKltIg" },
-  { round = "top16", a = "alkolil", b = "kacyo", winner = "alkolil" },
+  { round = "top16", a = "alkolil", b = "kacyo", winner = "alkolil", video = "https://youtu.be/maN0-SHb2bY" },
   { round = "top16", a = "kazuki-roc", b = "ziprock", winner = "kazuki-roc", video = "https://youtu.be/lC9YyTr9InI" },
-  { round = "top16", a = "kid-columbia", b = "rafastil", winner = "kid-columbia", video = "https://youtu.be/M-nlyZwdVtM" },
-  { round = "top16", a = "noe", b = "trock", winner = "trock", video = "https://youtu.be/FGqP9DENcnk" },
+  { round = "top16", a = "kid-colombia", b = "rafastil", winner = "kid-colombia", video = "https://youtu.be/M-nlyZwdVtM" },
+  { round = "top16", a = "noe", b = "tirock", winner = "tirock", video = "https://youtu.be/FGqP9DENcnk" },
   { round = "top16", a = "benny", b = "onel", winner = "benny", video = "https://youtu.be/HBIT3MW-4k8" },
   { round = "top16", a = "kleju", b = "mini-joe", winner = "kleju", video = "https://youtu.be/kBqM9nfKjEc" },
   { round = "top16", a = "lil-zoo", b = "khalil", winner = "lil-zoo", video = "https://youtu.be/a85CMjh-BEM" },
-  { round = "top8", a = "gravity", b = "alkolil", winner = "alkolil" },
-  { round = "top8", a = "kazuki-roc", b = "kid-columbia", winner = "kazuki-roc", video = "https://youtu.be/J6MzzGxgFgQ" },
-  { round = "top8", a = "trock", b = "benny", winner = "benny", video = "https://youtu.be/bhvvS8itADU" },
+  { round = "top8", a = "gravity", b = "alkolil", winner = "alkolil", video = "https://youtu.be/cQNZjqPkLHA" },
+  { round = "top8", a = "kazuki-roc", b = "kid-colombia", winner = "kazuki-roc", video = "https://youtu.be/J6MzzGxgFgQ" },
+  { round = "top8", a = "tirock", b = "benny", winner = "benny", video = "https://youtu.be/bhvvS8itADU" },
   { round = "top8", a = "kleju", b = "lil-zoo", winner = "kleju", video = "https://youtu.be/Zr-1E6evj20" },
-  { round = "top4", a = "alkolil", b = "kazuki-roc", winner = "alkolil" },
+  { round = "top4", a = "alkolil", b = "kazuki-roc", winner = "alkolil", video = "https://youtu.be/jdSbezlkxnk" },
   { round = "top4", a = "benny", b = "kleju", winner = "kleju", video = "https://youtu.be/lchI8hLLyjs" },
-  { round = "final", a = "alkolil", b = "kleju", winner = "alkolil" },
+  { round = "final", a = "alkolil", b = "kleju", winner = "alkolil", video = "https://youtu.be/5MrmPcSyltA" },
 ]
 
 [[battles]]
@@ -57,7 +57,7 @@ name = "2v2 Bgirl"
 gender = "bgirl"
 team_size = 2
 results = [
-  { entrant = "nagi-shie-chan", reached = "winner" },
+  { entrant = "nagi-shie-chan", reached = "winner", video = "https://youtu.be/AhkTIX4vh3c" },
 ]
 
 [battles.teams]

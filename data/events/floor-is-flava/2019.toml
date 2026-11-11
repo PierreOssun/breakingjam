@@ -1,0 +1,58 @@
+name = "The Floor is Flava 2019"
+starts_on = 2019-11-30
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "C12"
+lat = 50.8460
+lng = 4.3558
+sources = [
+  "https://and8.dance/en/e/3428",
+  "https://c12space.com/the-floor-is-flava-an-international-breakdance-battle-in-c12/",
+  "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw",
+]
+judges = ["laos", "iron-monkey", "fen-x"]
+djs = ["dj-cali", "dj-zulu-wail"]
+mcs = ["smurby", "mambo"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "admir-simon", b = "pac-pac-shaymin", winner = "pac-pac-shaymin", video = "https://youtu.be/JNhZHLDeY3k" },
+  { round = "top16", a = "shane-vicious", b = "victaz-warrior", winner = "shane-vicious", video = "https://youtu.be/fpExEMNPyes" },
+  { round = "top16", a = "den-pluto", b = "fababy-keang-size", winner = "den-pluto", video = "https://youtu.be/exV91O_1LYI" },
+  { round = "top16", a = "joey-skywalker", b = "milhouse-shinobi", winner = "milhouse-shinobi", video = "https://youtu.be/0f-L7Z1MfHk" },
+  { round = "top16", a = "blanka-snap", b = "daryl-ozzi", winner = "blanka-snap", video = "https://youtu.be/8ziHh8O6Vxk" },
+  { round = "top16", a = "faisi-xl", b = "lucky-tirock", winner = "lucky-tirock", video = "https://youtu.be/7J3iOjzPX3k" },
+  { round = "top16", a = "lawson-ratin", b = "djibril-nico", winner = "lawson-ratin", video = "https://youtu.be/VTWCrr3fSxg" },
+  { round = "top16", a = "kinder-slav", b = "docteur-desire-raph", winner = "kinder-slav", video = "https://youtu.be/9N-Ea76CCwQ" },
+  { round = "top8", a = "den-pluto", b = "milhouse-shinobi", winner = "den-pluto", video = "https://youtu.be/KOurhSUcgvY" },
+  { round = "top8", a = "pac-pac-shaymin", b = "shane-vicious", winner = "pac-pac-shaymin", video = "https://youtu.be/9cgR_txlZA8" },
+  { round = "top8", a = "kinder-slav", b = "lawson-ratin", winner = "kinder-slav", video = "https://youtu.be/jXdOoeFSLWI" },
+  { round = "top8", a = "blanka-snap", b = "lucky-tirock", winner = "lucky-tirock", video = "https://youtu.be/jfXhExjXtJI" },
+  { round = "top4", a = "kinder-slav", b = "lucky-tirock", winner = "lucky-tirock", video = "https://youtu.be/2r4pf7Mt5a4" },
+  { round = "top4", a = "den-pluto", b = "pac-pac-shaymin", winner = "den-pluto", video = "https://youtu.be/vck4AgIQ_vI" },
+  { round = "final", a = "den-pluto", b = "lucky-tirock", winner = "lucky-tirock", video = "https://youtu.be/Ob1JHfue8IM" },
+]
+
+[battles.teams]
+admir-simon = { members = ["simon", "admir"] }
+blanka-snap = { members = ["blanka", "snap"] }
+daryl-ozzi = { members = ["ozzi", "daryl"] }
+den-pluto = { members = ["den", "pluto"] }
+djibril-nico = { members = ["djibril", "nico"] }
+docteur-desire-raph = { members = ["raph", "docteur-desire"] }
+fababy-keang-size = { members = ["fababy", "keang-size"] }
+faisi-xl = { members = ["faisi", "xl"] }
+joey-skywalker = { members = ["joey", "skywalker"] }
+kinder-slav = { members = ["slav", "kinder"] }
+lawson-ratin = { members = ["ratin", "lawson"] }
+lucky-tirock = { members = ["tirock", "lucky"] }
+milhouse-shinobi = { members = ["shinobi", "milhouse"] }
+pac-pac-shaymin = { members = ["pac-pac", "shaymin"] }
+shane-vicious = { members = ["vicious", "shane"] }
+victaz-warrior = { members = ["warrior", "victaz"] }

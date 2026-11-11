@@ -15,8 +15,15 @@ djs = ["lean-rock", "renegade", "scream", "smirnoff", "ervin-arana", "plash"]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "kate", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "raza", b = "queen-marry", winner = "queen-marry", video = "https://youtu.be/aTz5wfK9UAM" },
+  { round = "top8", a = "bo", b = "alessandrina", winner = "bo", video = "https://youtu.be/Y4qNgt8bVp4" },
+  { round = "top8", a = "lina", b = "kate", winner = "kate", video = "https://youtu.be/31_2Q-l1T2U" },
+  { round = "top8", a = "zofia", b = "aga", winner = "zofia", video = "https://youtu.be/9fxEg4w1Zh4" },
+  { round = "top4", a = "queen-marry", b = "bo", winner = "bo", video = "https://youtu.be/t88dpRtfmPU" },
+  { round = "top4", a = "zofia", b = "kate", winner = "kate", video = "https://youtu.be/kTywySEjYLE" },
+  { round = "final", a = "bo", b = "kate", winner = "kate", video = "https://youtu.be/lZzSza2qAuQ" },
 ]
 
 [[battles]]
@@ -24,9 +31,39 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "greku-kleju", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "ruffneck-methodz", b = "bachchisaray-city-hardkor", winner = "bachchisaray-city-hardkor", video = "https://youtu.be/eqkG_pvhRpM" },
+  { round = "top16", a = "rock-so-furious", b = "bmt", winner = "bmt", video = "https://youtu.be/pjbL6lshtEk" },
+  { round = "top16", a = "south-front", b = "footwork-squad", winner = "south-front", video = "https://youtu.be/dpBvpuGLIl4" },
+  { round = "top16", a = "ruffneck-attack", b = "3-16", winner = "ruffneck-attack", video = "https://youtu.be/ja8eDOtjkZk" },
+  { round = "top16", a = "stred", b = "good-fellaz", winner = "good-fellaz", video = "https://youtu.be/P-siDF-UN8Q" },
+  { round = "top16", a = "greku-kleju", b = "breakers-without-fear", winner = "greku-kleju", video = "https://youtu.be/Izndh-qQBOs" },
+  { round = "top16", a = "zames-funk-fanatix", b = "hasta-la-muerte", winner = "zames-funk-fanatix", video = "https://youtu.be/qj_qLeRMk4k" },
+  { round = "top16", a = "marginalz", b = "magic-mad-men", winner = "magic-mad-men", video = "https://youtu.be/V4fRRXrOwWM" },
+  { round = "top8", a = "bachchisaray-city-hardkor", b = "bmt", winner = "bmt", video = "https://youtu.be/mcTPDkRiw9Q" },
+  { round = "top8", a = "ruffneck-attack", b = "south-front", winner = "south-front", video = "https://youtu.be/1WcfEChkBU4" },
+  { round = "top8", a = "good-fellaz", b = "greku-kleju", winner = "greku-kleju", video = "https://youtu.be/0HM_fvsrZ6A" },
+  { round = "top8", a = "magic-mad-men", b = "zames-funk-fanatix", winner = "magic-mad-men", video = "https://youtu.be/wkDBGRWuchY" },
+  { round = "top4", a = "south-front", b = "bmt", winner = "south-front", video = "https://youtu.be/9GMJUq-yADI" },
+  { round = "top4", a = "greku-kleju", b = "magic-mad-men", winner = "greku-kleju", video = "https://youtu.be/yo7VgIFq5aw" },
+  { round = "final", a = "greku-kleju", b = "south-front", winner = "greku-kleju", video = "https://youtu.be/9c2Cr63u5EI" },
 ]
 
 [battles.teams]
+ruffneck-methodz = { name = "Ruffneck Methodz" }
+bachchisaray-city-hardkor = { name = "Bachchisaray City Hardkor" }
+rock-so-furious = { name = "Rock So Furious" }
+bmt = { name = "BMT" }
+south-front = { crew = "south-front" }
+footwork-squad = { name = "Footwork Squad" }
+ruffneck-attack = { name = "Ruffneck Attack" }
+3-16 = { crew = "3-16" }
+stred = { name = "Stred" }
+good-fellaz = { name = "Good Fellaz" }
+breakers-without-fear = { name = "Breakers Without Fear" }
+zames-funk-fanatix = { name = "Zames / Funk Fanatix" }
+hasta-la-muerte = { name = "Hasta La Muerte" }
+marginalz = { name = "Marginalz" }
+magic-mad-men = { name = "Magic Mad Men" }
 greku-kleju = { members = ["greku", "kleju"] }

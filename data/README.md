@@ -207,7 +207,7 @@ Drafted from Wikipedia on 2026-10-19. The 22 World Finals from 2004 to 2025 have
 - **Still open:**
   - the countries of 2005's DJ Ace and DJ Billy Brown;
   - whether bgirl Mess is Dutch or Russian (flagged both ways);
-  - videos for 15 of 437 battles, mostly 2004–2010 (`reports/battle-videos.md`).
+  - none: every one of the 437 battles has its video since 2026-11-11 (`reports/battle-videos.md`).
 
 ## DPC Jam and Battle of Sun
 
@@ -222,6 +222,15 @@ DPC Jam 2025–2026 and Battle of Sun 2026 were drafted from YouTube on 2026-10-
 **Battle of Sun** (Saint-Louis, by Ossun Crew): 2018 (Vol. III, a full top 16 filmed by Breakingstras, SBX champion), 2025 (Battle of Sun X: date, venue and judges, no result found) and 2026 (2v2 top 16 and kids top 8).
 - **Drafts** in `data/drafts/battle-of-sun/`: 2013 and 2014 (friends' battles by Ossun Crew, no date), 2015 (the first public edition: five battles, no date or champion), 2017 (one listing) and 2021 (two battles, no date).
 - **Still open:** the winners of both 2026 finals; whether the 2026 kids battle is 1v1 (assumed); editions 2019, 2020 and 2022–2024, for which nothing was found; the organiser's numbering (2018 is the third, 2021 the fourth, 2025 the tenth).
+
+## The Floor is Flava
+
+Added on 2026-11-11 (`reports/floor-is-flava.md`). Brussels, at C12, by Future Art Movement: an international 2v2 of 10 invited and 6 qualified duos, every November from 2019 except 2020.
+
+- **What's there:** 2019 and 2021–2024, each a full top 16 bracket with every battle filmed by [LawkSam](https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw), each winner in the video's description, judges and DJs from the judges' showcase and final descriptions.
+- **Unified before drafting:** crew-named sides replaced by the duo their descriptions name (Belgium With Attitude = Tirock & Lucky, The Floorriorz = Nori & Satoru, Predatorz = Amir & Dias, and the 2019 crews), "Metal" as `jerry-the-metall` (3:16), "Mighty Jimm", "Djibril & Fabab".
+- **Left out:** the preliminaries and qualifiers (2021–2022), the 2022 and 2023 "Cypher King" four-way battles, and the 2024 Benelux qualifier.
+- **Still open:** 2023's date (the Saturday before the final's upload, marked `check`); 2021's DJs and hosts (TBA on and8); any 2025 edition (none found).
 
 ## Outbreak Europe and Battle of the Year
 

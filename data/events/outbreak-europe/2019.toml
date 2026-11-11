@@ -17,16 +17,62 @@ djs = []
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "victor", reached = "winner" },
+bracket_size = 32
+matches = [
+  { round = "top32", a = "amado", b = "quake", winner = "quake", video = "https://youtu.be/cTF1JxyFrqw" },
+  { round = "top32", a = "andre", b = "lagaet", winner = "lagaet", video = "https://youtu.be/zFUVxECaDvo" },
+  { round = "top32", a = "bootuz", b = "luan-san", winner = "luan-san", video = "https://youtu.be/oeOpEq-lMvY" },
+  { round = "top32", a = "axel", b = "daniel", winner = "axel", video = "https://youtu.be/22m0r2NnfrY" },
+  { round = "top32", a = "crazy-david", b = "sofian", winner = "crazy-david", video = "https://youtu.be/gBpT7BJPLKQ" },
+  { round = "top32", a = "double-d", b = "poter", winner = "double-d", video = "https://youtu.be/Lg1h9GmukRY" },
+  { round = "top32", a = "icey-ives", b = "sheku", winner = "icey-ives", video = "https://youtu.be/S_svxaFZd-E" },
+  { round = "top32", a = "lion", b = "kuzya", winner = "kuzya", video = "https://youtu.be/ldJiRmuSRws" },
+  { round = "top32", a = "nord-diamond", b = "tonio", winner = "nord-diamond", video = "https://youtu.be/04iU9QCK3qo" },
+  { round = "top32", a = "phil-wizard", b = "the-flaya", winner = "phil-wizard", video = "https://youtu.be/KCFE9knIOq8" },
+  { round = "top32", a = "shaymin", b = "lil-g", winner = "lil-g", video = "https://youtu.be/MFZkbtmnkHs" },
+  { round = "top32", a = "snap", b = "sunni", winner = "snap", video = "https://youtu.be/ljwbILIBrwQ" },
+  { round = "top32", a = "tawfiq", b = "faisi", winner = "tawfiq", video = "https://youtu.be/PJaEOhR59IU" },
+  { round = "top32", a = "twister", b = "simy", winner = "simy", video = "https://youtu.be/XMrl-XgqKq0" },
+  { round = "top32", a = "victor", b = "amaro", winner = "victor", video = "https://youtu.be/YsyKzt-MutU" },
+  { round = "top32", a = "volodya", b = "raptor", winner = "raptor", video = "https://youtu.be/yETbgSQfhrU" },
+  { round = "top16", a = "icey-ives", b = "raptor", winner = "icey-ives", video = "https://youtu.be/4PLql3cuGFI" },
+  { round = "top16", a = "kuzya", b = "tawfiq", winner = "kuzya", video = "https://youtu.be/WMAgDki7CFc" },
+  { round = "top16", a = "lagaet", b = "nord-diamond", winner = "nord-diamond", video = "https://youtu.be/tSphLKw71Zc" },
+  { round = "top16", a = "lil-g", b = "luan-san", winner = "lil-g", video = "https://youtu.be/NdCLu66axy8" },
+  { round = "top16", a = "phil-wizard", b = "axel", winner = "phil-wizard", video = "https://youtu.be/EjBLfpXCsRM" },
+  { round = "top16", a = "quake", b = "snap", winner = "quake", video = "https://youtu.be/hn6Cdraw-5g" },
+  { round = "top16", a = "simy", b = "crazy-david", winner = "simy", video = "https://youtu.be/IwQpBjvU9VA" },
+  { round = "top16", a = "victor", b = "double-d", winner = "victor", video = "https://youtu.be/275zRW-QzJE" },
+  { round = "top8", a = "icey-ives", b = "simy", winner = "icey-ives", video = "https://youtu.be/bJW9er4gSxY" },
+  { round = "top8", a = "phil-wizard", b = "kuzya", winner = "phil-wizard", video = "https://youtu.be/cUo-ybK4vYs" },
+  { round = "top8", a = "quake", b = "lil-g", winner = "lil-g", video = "https://youtu.be/lQWXJAkab8Y" },
+  { round = "top8", a = "victor", b = "nord-diamond", winner = "victor", video = "https://youtu.be/HC9rpfGybUg" },
+  { round = "top4", a = "lil-g", b = "victor", winner = "victor", video = "https://youtu.be/1PoJzNiw0yg" },
+  { round = "top4", a = "phil-wizard", b = "icey-ives", winner = "phil-wizard", video = "https://youtu.be/mn7ossDwaZ0" },
+  { round = "final", a = "victor", b = "phil-wizard", winner = "victor", video = "https://youtu.be/MnzR2_nOUyE" },
 ]
 
 [[battles]]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "san-andrea", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "alessandrina", b = "eri", winner = "eri", video = "https://youtu.be/75W4VAt1SP4" },
+  { round = "top16", a = "anita", b = "jilou", winner = "jilou", video = "https://youtu.be/7T7pwMzD_lc" },
+  { round = "top16", a = "kate", b = "kimie", winner = "kate", video = "https://youtu.be/qe3AgpgCwUE" },
+  { round = "top16", a = "kotya", b = "vanessa", winner = "vanessa", video = "https://youtu.be/UwBLoUxaUkw" },
+  { round = "top16", a = "madmax", b = "dr-c", winner = "dr-c", video = "https://youtu.be/GF9wwOfCHNQ" },
+  { round = "top16", a = "san-andrea", b = "maess-one", winner = "san-andrea", video = "https://youtu.be/dwLKPwCpdxI" },
+  { round = "top16", a = "tazz", b = "fen-qi", winner = "fen-qi", video = "https://youtu.be/iSeaMpigvLs" },
+  { round = "top16", a = "sarah-bee", b = "paulina", winner = "sarah-bee", video = "https://youtu.be/zrz8529kj4o" },
+  { round = "top8", a = "fen-qi", b = "dr-c", winner = "fen-qi", video = "https://youtu.be/RiD0wnScBkw" },
+  { round = "top8", a = "jilou", b = "sarah-bee", winner = "sarah-bee", video = "https://youtu.be/QBZI7NuI_5o" },
+  { round = "top8", a = "san-andrea", b = "eri", winner = "san-andrea", video = "https://youtu.be/FZ_SPYjZoNg" },
+  { round = "top8", a = "vanessa", b = "kate", winner = "kate", video = "https://youtu.be/MQOCC-giW6E" },
+  { round = "top4", a = "san-andrea", b = "sarah-bee", winner = "san-andrea", video = "https://youtu.be/Tqt_dNKkPvQ" },
+  { round = "top4", a = "fen-qi", b = "kate", winner = "fen-qi", video = "https://youtu.be/KQst_GoxO20" },
+  { round = "final", a = "san-andrea", b = "fen-qi", winner = "san-andrea", video = "https://youtu.be/_VmUaA8jGeg" },
 ]
 
 [[battles]]
@@ -34,11 +80,73 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "stripes-vicious", reached = "winner" },
+bracket_size = 32
+matches = [
+  { round = "top32", a = "fever-sofian", b = "kid-karam-lb", winner = "kid-karam-lb", video = "https://youtu.be/csY1LYyHqNw" },
+  { round = "top32", a = "alvin-becon", b = "dany-dann-lil-kev", winner = "dany-dann-lil-kev", video = "https://youtu.be/e65H6ggUiyw" },
+  { round = "top32", a = "deeogo-lagaet", b = "jimakeno", winner = "deeogo-lagaet", video = "https://youtu.be/xkS7DF1Ckhg" },
+  { round = "top32", a = "stripes-vicious", b = "daniel-kimbo", winner = "stripes-vicious", video = "https://youtu.be/plE61IxP8ag" },
+  { round = "top32", a = "grin-grom", b = "alis-daga", winner = "alis-daga", video = "https://youtu.be/NsNRgR0DBr8" },
+  { round = "top32", a = "kae-rasco", b = "fishskee-ukroper", winner = "kae-rasco", video = "https://youtu.be/01Kw5deyJUM" },
+  { round = "top32", a = "mighty-zulu-kingz", b = "madmax-wigor", winner = "mighty-zulu-kingz", video = "https://youtu.be/1l79fUU39XY" },
+  { round = "top32", a = "nothing-2-lose", b = "luan-san-pope", winner = "nothing-2-lose", video = "https://youtu.be/kfBcE_ahMs4" },
+  { round = "top32", a = "polskee-flavour", b = "amigo-gustas", winner = "polskee-flavour", video = "https://youtu.be/pBymQl2suVY" },
+  { round = "top32", a = "kulebra-rico", b = "icey-ives-phil-wizard", winner = "icey-ives-phil-wizard", video = "https://youtu.be/EOARO6q8JSM" },
+  { round = "top32", a = "ruffneck-attack", b = "two-style", winner = "ruffneck-attack", video = "https://youtu.be/yjrpkZ7cYM4" },
+  { round = "top32", a = "raigo-shade", b = "lussy-sky-shigekix", winner = "lussy-sky-shigekix", video = "https://youtu.be/I70tht8vtoc" },
+  { round = "top32", a = "admir-simy", b = "anjin-ratin", winner = "anjin-ratin", video = "https://youtu.be/3yXlb4RUEfI" },
+  { round = "top32", a = "sisko-the-flaya", b = "moa-shaymin", winner = "moa-shaymin", video = "https://youtu.be/CAdr0DViCdM" },
+  { round = "top32", a = "lion-roots-ukol", b = "tawfiq-zoopreme", winner = "tawfiq-zoopreme", video = "https://youtu.be/0OQdd-354Y8" },
+  { round = "top32", a = "johnnyfox-xak", b = "kate-madmax-2", winner = "johnnyfox-xak", video = "https://youtu.be/CV8o9lbW3Ts" },
+  { round = "top16", a = "anjin-ratin", b = "johnnyfox-xak", winner = "johnnyfox-xak", video = "https://youtu.be/Py5bt-uT-mE" },
+  { round = "top16", a = "dany-dann-lil-kev", b = "lussy-sky-shigekix", winner = "lussy-sky-shigekix", video = "https://youtu.be/y_PjWIwfHIs" },
+  { round = "top16", a = "deeogo-lagaet", b = "moa-shaymin", winner = "deeogo-lagaet", video = "https://youtu.be/h8aQa6gYnXo" },
+  { round = "top16", a = "kae-rasco", b = "ruffneck-attack", winner = "ruffneck-attack", video = "https://youtu.be/VBPsCt23S8s" },
+  { round = "top16", a = "kid-karam-lb", b = "stripes-vicious", winner = "stripes-vicious", video = "https://youtu.be/Wy-isTYa3q8" },
+  { round = "top16", a = "nothing-2-lose", b = "mighty-zulu-kingz", winner = "nothing-2-lose", video = "https://youtu.be/R97tiNnAE-k" },
+  { round = "top16", a = "icey-ives-phil-wizard", b = "tawfiq-zoopreme", winner = "icey-ives-phil-wizard", video = "https://youtu.be/t_K1BjUPyWg" },
+  { round = "top16", a = "polskee-flavour", b = "alis-daga", winner = "polskee-flavour", video = "https://youtu.be/bHr-kaYJ1aU" },
+  { round = "top8", a = "stripes-vicious", b = "nothing-2-lose", winner = "stripes-vicious", video = "https://youtu.be/iNDjOwlq5m8" },
+  { round = "top8", a = "deeogo-lagaet", b = "johnnyfox-xak", winner = "johnnyfox-xak", video = "https://youtu.be/jPjionSvFAU" },
+  { round = "top8", a = "icey-ives-phil-wizard", b = "lussy-sky-shigekix", winner = "icey-ives-phil-wizard", video = "https://youtu.be/aFVt3WyobH0" },
+  { round = "top8", a = "polskee-flavour", b = "ruffneck-attack", winner = "ruffneck-attack", video = "https://youtu.be/X86WHvoEsQs" },
+  { round = "top4", a = "stripes-vicious", b = "icey-ives-phil-wizard", winner = "stripes-vicious", video = "https://youtu.be/acIyU0wwESk" },
+  { round = "top4", a = "ruffneck-attack", b = "johnnyfox-xak", winner = "ruffneck-attack", video = "https://youtu.be/knSdVBtUxJ0" },
+  { round = "final", a = "ruffneck-attack", b = "stripes-vicious", winner = "stripes-vicious", video = "https://youtu.be/5ykBlJfzmOw" },
 ]
 
 [battles.teams]
+fever-sofian = { members = ["sofian", "fever"] }
+kid-karam-lb = { members = ["kid-karam", "lb"] }
+alvin-becon = { members = ["alvin", "becon"] }
+dany-dann-lil-kev = { members = ["dany-dann", "lil-kev"] }
+deeogo-lagaet = { members = ["deeogo", "lagaet"] }
+jimakeno = { name = "Jimakeno" }
+daniel-kimbo = { members = ["kimbo", "daniel"] }
+grin-grom = { members = ["grin", "grom"] }
+alis-daga = { members = ["daga", "alis"] }
+kae-rasco = { members = ["kae", "rasco"] }
+fishskee-ukroper = { members = ["ukroper", "fishskee"] }
+mighty-zulu-kingz = { crew = "mighty-zulu-kingz" }
+madmax-wigor = { members = ["wigor", "madmax"] }
+nothing-2-lose = { crew = "nothing-2-lose" }
+luan-san-pope = { members = ["luan-san", "pope"] }
+polskee-flavour = { crew = "polskee-flavour" }
+amigo-gustas = { members = ["amigo", "gustas"] }
+kulebra-rico = { members = ["rico", "kulebra"] }
+icey-ives-phil-wizard = { members = ["phil-wizard", "icey-ives"] }
+ruffneck-attack = { name = "Ruffneck Attack" }
+two-style = { name = "Two Style" }
+raigo-shade = { members = ["shade", "raigo"] }
+lussy-sky-shigekix = { members = ["lussy-sky", "shigekix"] }
+admir-simy = { members = ["simy", "admir"] }
+anjin-ratin = { members = ["anjin", "ratin"] }
+sisko-the-flaya = { members = ["sisko", "the-flaya"] }
+moa-shaymin = { members = ["shaymin", "moa"] }
+lion-roots-ukol = { members = ["ukol", "lion-roots"] }
+tawfiq-zoopreme = { members = ["tawfiq", "zoopreme"] }
+johnnyfox-xak = { members = ["xak", "johnnyfox"] }
+kate-madmax-2 = { members = ["madmax-2", "kate"] }
 stripes-vicious = { members = ["stripes", "vicious"] }
 
 [[battles]]
@@ -47,11 +155,25 @@ name = "Kids 2v2"
 gender = "mixed"
 age = "kids"
 team_size = 2
-results = [
-  { entrant = "angry-boy-grom", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "anthony-cis", b = "angry-boy-grom", winner = "angry-boy-grom", video = "https://youtu.be/A3m1JA9mMnw" },
+  { round = "top8", a = "gustas-mattix", b = "lotus-neo", winner = "lotus-neo", video = "https://youtu.be/SIlQ6WS8Lro" },
+  { round = "top8", a = "lorenzo-maxone", b = "funky-glen-sokol", winner = "lorenzo-maxone", video = "https://youtu.be/3Rl8EA7naP0" },
+  { round = "top8", a = "damani-mathis", b = "izami-prorock", winner = "damani-mathis", video = "https://youtu.be/_qpkw5p2jDY" },
+  { round = "top4", a = "lorenzo-maxone", b = "damani-mathis", winner = "damani-mathis", video = "https://youtu.be/auYjKVRxnPE" },
+  { round = "top4", a = "lotus-neo", b = "angry-boy-grom", winner = "angry-boy-grom", video = "https://youtu.be/EgVyrvyHKwM" },
+  { round = "final", a = "angry-boy-grom", b = "damani-mathis", winner = "angry-boy-grom", video = "https://youtu.be/0uyee7rV5aI" },
 ]
 
 [battles.teams]
+anthony-cis = { members = ["anthony", "cis"] }
+gustas-mattix = { members = ["gustas", "mattix"] }
+lotus-neo = { members = ["neo", "lotus"] }
+lorenzo-maxone = { members = ["lorenzo", "maxone"] }
+funky-glen-sokol = { members = ["funky-glen", "sokol"] }
+damani-mathis = { members = ["mathis", "damani"] }
+izami-prorock = { members = ["izami", "prorock"] }
 angry-boy-grom = { members = ["grom", "angry-boy"] }
 
 [[battles]]

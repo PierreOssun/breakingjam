@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "fusion-mc", reached = "winner" },
-  { entrant = "b-town-all-stars", reached = "top4" },
-  { entrant = "flooriorz", reached = "top4" },
-  { entrant = "the-ruggeds", reached = "top2" },
+  { entrant = "fusion-mc", reached = "winner", video = "https://youtu.be/0-Wizrt38TY" },
+  { entrant = "b-town-all-stars", reached = "top4", video = "https://youtu.be/GOMPxrK27Lo" },
+  { entrant = "flooriorz", reached = "top4", video = "https://youtu.be/0Mvg4wZgF6k" },
+  { entrant = "the-ruggeds", reached = "top2", video = "https://youtu.be/0-Wizrt38TY" },
 ]
 
 [battles.teams]
@@ -57,7 +57,7 @@ name = "2v2 Bgirl"
 gender = "bgirl"
 team_size = 2
 results = [
-  { entrant = "kanami-myw", reached = "winner" },
+  { entrant = "kanami-myw", reached = "winner", video = "https://youtu.be/OJvHjoCMyrI" },
 ]
 
 [battles.teams]

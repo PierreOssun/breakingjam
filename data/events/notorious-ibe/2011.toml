@@ -6,17 +6,21 @@ city = "Heerlen"
 country = "NL"
 lat = 50.8837
 lng = 5.9815
-sources = ["https://en.wikipedia.org/w/index.php?oldid=1020906746", "https://www.festivalinfo.nl/festival/13562/The-Notorious-IBE/2011/", "https://web.archive.org/web/20111010/http://bboychampionships.com/"]
+sources = ["https://en.wikipedia.org/w/index.php?oldid=1020906746", "https://www.festivalinfo.nl/festival/13562/The-Notorious-IBE/2011/", "https://web.archive.org/web/20111010/http://bboychampionships.com/", "https://www.youtube.com/channel/UCLRCoLpDImkbFw8D3qXFpUQ"]
 judges = []
 mcs = []
 djs = []
 
+# Pick-Up won the Super Solo (New Dance TV's final: "Winner : Pick-Up"); Niek won the Seven to Smoke. The cited Wikipedia revision credits Niek with both.
 [[battles]]
 key = "bboy"
 name = "Super Solo Bboy Battle"
 gender = "bboy"
-results = [
-  { entrant = "niek", reached = "winner" },
+bracket_size = 4
+matches = [
+  { round = "top4", a = "alkolil", b = "pick-up", winner = "pick-up", video = "https://youtu.be/Nrv82T3RBBs" },
+  { round = "top4", a = "roxy", b = "apache", winner = "apache", video = "https://youtu.be/ipIRwe6mtu0" },
+  { round = "final", a = "apache", b = "pick-up", winner = "pick-up", video = "https://youtu.be/R3wbHI5wXfU" },
 ]
 
 [[battles]]
@@ -25,5 +29,5 @@ name = "Seven to Smoke"
 gender = "bboy"
 format = "seven_to_smoke"
 results = [
-  { entrant = "niek", reached = "winner" },
+  { entrant = "niek", reached = "winner", video = "https://youtu.be/IHR9x-KZIzM" },
 ]

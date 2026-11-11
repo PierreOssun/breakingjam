@@ -17,7 +17,7 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "body-carnival", reached = "winner" },
+  { entrant = "body-carnival", reached = "winner", video = "https://youtu.be/5cZCRVTm-6g" },
 ]
 
 [battles.teams]
@@ -29,7 +29,7 @@ name = "2v2"
 gender = "mixed"
 team_size = 2
 results = [
-  { entrant = "lil-zoo-phil-wizard", reached = "winner" },
+  { entrant = "lil-zoo-phil-wizard", reached = "winner", video = "https://youtu.be/0mQb9htg9mE" },
 ]
 
 [battles.teams]

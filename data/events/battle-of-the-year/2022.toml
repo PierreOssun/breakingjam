@@ -17,7 +17,7 @@ name = "Crew battle"
 gender = "mixed"
 results = [
   { entrant = "the-ruggeds", reached = "winner", video = "https://youtu.be/EyYt4OjyREs" },
-  { entrant = "rock-force-crew", reached = "top4" },
+  { entrant = "rock-force-crew", reached = "top4", video = "https://youtu.be/KnoJ1zhQ1X0" },
   { entrant = "mortal-combat", reached = "top4", video = "https://youtu.be/bhTgSbhV7-0" },
   { entrant = "flooriorz", reached = "top2", video = "https://youtu.be/EyYt4OjyREs" },
 ]

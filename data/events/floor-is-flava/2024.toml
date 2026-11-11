@@ -1,0 +1,57 @@
+name = "The Floor is Flava 2024"
+starts_on = 2024-11-30
+timezone = "Europe/Brussels"
+city = "Brussels"
+country = "BE"
+venue = "C12"
+lat = 50.8460
+lng = 4.3558
+sources = [
+  "https://www.bruxelles-j.be/actus/the-floor-is-flava-le-battle-de-breakdance/",
+  "https://www.youtube.com/channel/UCDpTV6PL7WoPdHWPl-LoWXw",
+]
+judges = ["chucky", "yan", "physicx"]
+djs = ["dj-zulu-wail", "dj-vientiane", "dj-cleon"]
+mcs = []
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "bajou-exaggerate", b = "bumblebee-nord-diamond", winner = "bumblebee-nord-diamond", video = "https://youtu.be/eyCod-5qk7k" },
+  { round = "top16", a = "djibril-fababy", b = "johnny-fox-xak", winner = "djibril-fababy", video = "https://youtu.be/X7GsRR7XFuA" },
+  { round = "top16", a = "g-vybz-nille", b = "nicka-victor", winner = "nicka-victor", video = "https://youtu.be/V687x_WHqhM" },
+  { round = "top16", a = "lotus-smile", b = "cheerito-zip-rock", winner = "cheerito-zip-rock", video = "https://youtu.be/BxTD-wbkFeA" },
+  { round = "top16", a = "jayson-keimar", b = "andy-shura-meow", winner = "jayson-keimar", video = "https://youtu.be/NIz0uysOkVY" },
+  { round = "top16", a = "liam-wayan", b = "issin-ra1on", winner = "issin-ra1on", video = "https://youtu.be/cQBiy8MVhGg" },
+  { round = "top16", a = "rateb-simy", b = "jaguar-jimmy", winner = "jaguar-jimmy", video = "https://youtu.be/nic71MAgaR0" },
+  { round = "top16", a = "canarus-isaiah", b = "lucky-nasty", winner = "lucky-nasty", video = "https://youtu.be/trp8hj5MyyQ" },
+  { round = "top8", a = "djibril-fababy", b = "nicka-victor", winner = "nicka-victor", video = "https://youtu.be/t6neUYnF4KI" },
+  { round = "top8", a = "cheerito-zip-rock", b = "jayson-keimar", winner = "cheerito-zip-rock", video = "https://youtu.be/glD_vM0dE_M" },
+  { round = "top8", a = "jaguar-jimmy", b = "lucky-nasty", winner = "lucky-nasty", video = "https://youtu.be/TPmcP7aQ1uE" },
+  { round = "top8", a = "issin-ra1on", b = "bumblebee-nord-diamond", winner = "issin-ra1on", video = "https://youtu.be/FVjDA-8JlZA" },
+  { round = "top4", a = "nicka-victor", b = "cheerito-zip-rock", winner = "cheerito-zip-rock", video = "https://youtu.be/OR8TsA5_Rf8" },
+  { round = "top4", a = "issin-ra1on", b = "lucky-nasty", winner = "issin-ra1on", video = "https://youtu.be/LvT9ZBkl92o" },
+  { round = "final", a = "issin-ra1on", b = "cheerito-zip-rock", winner = "issin-ra1on", video = "https://youtu.be/II83rlz6oxM" },
+]
+
+[battles.teams]
+andy-shura-meow = { members = ["andy", "shura-meow"] }
+bajou-exaggerate = { members = ["exaggerate", "bajou"] }
+bumblebee-nord-diamond = { members = ["bumblebee", "nord-diamond"] }
+canarus-isaiah = { members = ["isaiah", "canarus"] }
+cheerito-zip-rock = { members = ["zip-rock", "cheerito"] }
+djibril-fababy = { members = ["djibril", "fababy"] }
+g-vybz-nille = { members = ["nille", "g-vybz"] }
+issin-ra1on = { members = ["ra1on", "issin"] }
+jaguar-jimmy = { members = ["jimmy", "jaguar"] }
+jayson-keimar = { members = ["jayson", "keimar"] }
+johnny-fox-xak = { members = ["xak", "johnny-fox"] }
+liam-wayan = { members = ["wayan", "liam"] }
+lotus-smile = { members = ["lotus", "smile"] }
+lucky-nasty = { members = ["nasty", "lucky"] }
+nicka-victor = { members = ["victor", "nicka"] }
+rateb-simy = { members = ["simy", "rateb"] }

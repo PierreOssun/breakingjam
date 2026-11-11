@@ -19,7 +19,7 @@ const claim = (n: number, name: string, deleted: boolean) => ({
     country2: null,
     instagram_handle: null,
     avatar_url: null,
-    avatar_parts: null,
+    avatar: null,
     deleted,
   },
   user: {

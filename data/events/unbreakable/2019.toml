@@ -14,8 +14,23 @@ judges = []
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "zoopreme", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "bart", b = "xl", winner = "bart", video = "https://youtu.be/2nWh2tfOb8Q" },
+  { round = "top16", a = "comet", b = "lorenzo", winner = "comet", video = "https://youtu.be/7u7tcIi8fRc" },
+  { round = "top16", a = "dc-flamingo", b = "tirock", winner = "dc-flamingo", video = "https://youtu.be/jPHJhM-I-gE" },
+  { round = "top16", a = "ura", b = "icey-ives", winner = "icey-ives", video = "https://youtu.be/qSgOxxEvm8A" },
+  { round = "top16", a = "tonio", b = "lego-sam", winner = "lego-sam", video = "https://youtu.be/3XQ5fZT5z0g" },
+  { round = "top16", a = "lee", b = "exaggerate", winner = "exaggerate", video = "https://youtu.be/1FKAdSidJs0" },
+  { round = "top16", a = "phil-wizard", b = "tawfiq", winner = "phil-wizard", video = "https://youtu.be/_ruDIm4Qe44" },
+  { round = "top16", a = "cheerito", b = "zoopreme", winner = "zoopreme", video = "https://youtu.be/UPKQ4kJetBo" },
+  { round = "top8", a = "bart", b = "comet", winner = "bart", video = "https://youtu.be/pfkE1moYeM8" },
+  { round = "top8", a = "dc-flamingo", b = "icey-ives", winner = "icey-ives", video = "https://youtu.be/FC2MBgBzKn8" },
+  { round = "top8", a = "lego-sam", b = "exaggerate", winner = "lego-sam", video = "https://youtu.be/0nGXCwXFzG4" },
+  { round = "top8", a = "phil-wizard", b = "zoopreme", winner = "zoopreme", video = "https://youtu.be/1QIxHw3xUj4" },
+  { round = "top4", a = "lego-sam", b = "bart", winner = "bart", video = "https://youtu.be/n_ErdgAjbmA" },
+  { round = "top4", a = "icey-ives", b = "zoopreme", winner = "zoopreme", video = "https://youtu.be/reWZecMjgzs" },
+  { round = "final", a = "bart", b = "zoopreme", winner = "zoopreme", video = "https://youtu.be/1ek-t7f5-Ak" },
 ]
 
 [[battles]]
@@ -24,7 +39,7 @@ name = "Bgirl 7 to smoke"
 gender = "bgirl"
 format = "seven_to_smoke"
 results = [
-  { entrant = "rawgina", reached = "winner" },
+  { entrant = "rawgina", reached = "winner", video = "https://youtu.be/RQGjzQSgeds" },
 ]
 
 [[battles]]
@@ -41,7 +56,7 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "back2school", reached = "winner" },
+  { entrant = "back2school", reached = "winner", video = "https://youtu.be/Z9YJ2zjxdwg" },
 ]
 
 [battles.teams]
@@ -53,7 +68,7 @@ name = "Kids crew battle"
 gender = "mixed"
 age = "kids"
 results = [
-  { entrant = "psychos", reached = "winner" },
+  { entrant = "psychos", reached = "winner", video = "https://youtu.be/00B2mxbhn6w" },
 ]
 
 [battles.teams]

@@ -27,6 +27,6 @@ key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
 results = [
-  { entrant = "carlota", reached = "winner" },
-  { entrant = "campanita", reached = "top2" },
+  { entrant = "carlota", reached = "winner", video = "https://youtu.be/nA4hjxiULGc" },
+  { entrant = "campanita", reached = "top2", video = "https://youtu.be/nA4hjxiULGc" },
 ]

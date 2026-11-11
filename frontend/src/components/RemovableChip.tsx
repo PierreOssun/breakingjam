@@ -20,12 +20,12 @@ export function RemovableChip({
     <span
       className={`inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-surface-raised pr-1 pl-3 text-body-sm font-bold ${className}`}
     >
-      {children ?? name}
+      {children ?? <span className="truncate">{name}</span>}
       <button
         type="button"
         aria-label={t("picker.remove", { name })}
         onClick={onRemove}
-        className="grid size-7 cursor-pointer place-items-center rounded-full hover:bg-surface"
+        className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-full hover:bg-surface"
       >
         <X size={14} weight="bold" aria-hidden />
       </button>

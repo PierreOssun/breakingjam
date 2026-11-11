@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "last-for-one", reached = "winner" },
-  { entrant = "phase-t", reached = "top4", rank = 4 },
-  { entrant = "ichigeki", reached = "top2" },
-  { entrant = "gamblerz", reached = "top4", rank = 3 },
+  { entrant = "last-for-one", reached = "winner", video = "https://youtu.be/j9BzbTmB7C0" },
+  { entrant = "phase-t", reached = "top4", rank = 4 , video = "https://youtu.be/sgBAf7kw6aQ" },
+  { entrant = "ichigeki", reached = "top2", video = "https://youtu.be/j9BzbTmB7C0" },
+  { entrant = "gamblerz", reached = "top4", rank = 3 , video = "https://youtu.be/sgBAf7kw6aQ" },
 ]
 
 [battles.teams]

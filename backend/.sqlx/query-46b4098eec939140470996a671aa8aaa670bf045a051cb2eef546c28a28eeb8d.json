@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, user_id, dancer_name, aliases, country, country2, city, bio,\n                  instagram_handle, source as \"source: DancerSource\", verified_at, avatar_url,\n                  avatar_parts, titles as \"titles: Vec<DancerTitle>\",\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null",
+  "query": "update dancers set avatar = $2 where id = $1 and deleted_at is null\n           returning id, user_id, dancer_name, aliases, country, country2, city, bio,\n                     instagram_handle, instagram_hidden, source as \"source: DancerSource\",\n                     verified_at, avatar_url, avatar, titles as \"titles: Vec<DancerTitle>\",\n                     created_by, merged_into_id, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -104,6 +104,17 @@
       },
       {
         "ordinal": 9,
+        "name": "instagram_hidden",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_hidden"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
         "name": "source: DancerSource",
         "type_info": {
           "Custom": {
@@ -125,7 +136,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "verified_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -136,7 +147,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "avatar_url",
         "type_info": "Text",
         "origin": {
@@ -147,18 +158,18 @@
         }
       },
       {
-        "ordinal": 12,
-        "name": "avatar_parts",
-        "type_info": "Text",
+        "ordinal": 13,
+        "name": "avatar",
+        "type_info": "Jsonb",
         "origin": {
           "Table": {
             "table": "dancers",
-            "name": "avatar_parts"
+            "name": "avatar"
           }
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "titles: Vec<DancerTitle>",
         "type_info": {
           "Custom": {
@@ -190,7 +201,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "created_by",
         "type_info": "Uuid",
         "origin": {
@@ -201,7 +212,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "merged_into_id",
         "type_info": "Uuid",
         "origin": {
@@ -212,7 +223,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -223,7 +234,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -236,7 +247,8 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Uuid",
+        "Jsonb"
       ]
     },
     "nullable": [
@@ -250,6 +262,7 @@
       true,
       true,
       false,
+      false,
       true,
       true,
       true,
@@ -260,5 +273,5 @@
       false
     ]
   },
-  "hash": "930257887697ee75864ec5b64777fc67903a90af667d300c5200c1124ded61ed"
+  "hash": "46b4098eec939140470996a671aa8aaa670bf045a051cb2eef546c28a28eeb8d"
 }

@@ -12,7 +12,7 @@ const person = (n: number, name: string, extra: object = {}) => ({
   instagram_handle: null,
   verified: false,
   avatar_url: null,
-  avatar_parts: null,
+  avatar: null,
   crews: [],
   ...extra,
 });

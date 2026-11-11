@@ -24,14 +24,14 @@ name = "WDSF World Series 1v1 Bboy"
 gender = "bboy"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "amir", b = "wigor", winner = "amir" , video = "https://youtu.be/q6eVEQAIk6Y" },
-  { round = "top8", a = "hong-10", b = "lagaet", winner = "lagaet" , video = "https://youtu.be/L5JmcP6ywBM" },
-  { round = "top8", a = "victor", b = "kuzya", winner = "victor" , video = "https://youtu.be/FPofJEl3BkM" },
-  { round = "top8", a = "issin", b = "shigekix", winner = "shigekix" , video = "https://youtu.be/p-3wmzxGAoA" },
-  { round = "top4", a = "amir", b = "lagaet", winner = "lagaet" , video = "https://youtu.be/Km2kt1QVuQI" },
-  { round = "top4", a = "victor", b = "shigekix", winner = "shigekix" , video = "https://youtu.be/bCu_502VHuE" },
-  { round = "final", a = "lagaet", b = "shigekix", winner = "shigekix" , video = "https://youtu.be/epqz0vYOC50" },
-  { round = "third", a = "victor", b = "amir", winner = "victor" , video = "https://youtu.be/JYJFFICHo3Y" },
+  { round = "top8", a = "amir", b = "wigor", winner = "amir", video = "https://youtu.be/q6eVEQAIk6Y" },
+  { round = "top8", a = "hong-10", b = "lagaet", winner = "lagaet", video = "https://youtu.be/L5JmcP6ywBM" },
+  { round = "top8", a = "victor", b = "kuzya", winner = "victor", video = "https://youtu.be/FPofJEl3BkM" },
+  { round = "top8", a = "issin", b = "shigekix", winner = "shigekix", video = "https://youtu.be/p-3wmzxGAoA" },
+  { round = "top4", a = "amir", b = "lagaet", winner = "lagaet", video = "https://youtu.be/Km2kt1QVuQI" },
+  { round = "top4", a = "victor", b = "shigekix", winner = "shigekix", video = "https://youtu.be/bCu_502VHuE" },
+  { round = "final", a = "lagaet", b = "shigekix", winner = "shigekix", video = "https://youtu.be/epqz0vYOC50" },
+  { round = "third", a = "victor", b = "amir", winner = "victor", video = "https://youtu.be/JYJFFICHo3Y" },
 ]
 
 [[battles]]
@@ -40,12 +40,12 @@ name = "WDSF World Series 1v1 Bgirl"
 gender = "bgirl"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "nicka", b = "riko", winner = "nicka" , video = "https://youtu.be/Ym5t3Tu42FM" },
-  { round = "top8", a = "vanessa", b = "anti", winner = "vanessa" , video = "https://youtu.be/UL4M4GWFx58" },
-  { round = "top8", a = "logistx", b = "fresh-bella", winner = "logistx" , video = "https://youtu.be/O5rS6SxhuB0" },
-  { round = "top8", a = "syssy", b = "ayane", winner = "syssy" , video = "https://youtu.be/uWaaWG3wNT0" },
-  { round = "top4", a = "nicka", b = "vanessa", winner = "nicka" , video = "https://youtu.be/KtEehWRJwps" },
-  { round = "top4", a = "logistx", b = "syssy", winner = "logistx" , video = "https://youtu.be/sG4tQsRohGg" },
-  { round = "final", a = "nicka", b = "logistx", winner = "nicka" , video = "https://youtu.be/Y-fHrvp54jM" },
-  { round = "third", a = "vanessa", b = "syssy", winner = "vanessa" , video = "https://youtu.be/UNt2g4c0DjA" },
+  { round = "top8", a = "nicka", b = "riko", winner = "nicka", video = "https://youtu.be/Ym5t3Tu42FM" },
+  { round = "top8", a = "vanessa", b = "anti", winner = "vanessa", video = "https://youtu.be/UL4M4GWFx58" },
+  { round = "top8", a = "logistx", b = "fresh-bella", winner = "logistx", video = "https://youtu.be/O5rS6SxhuB0" },
+  { round = "top8", a = "syssy", b = "ayane", winner = "syssy", video = "https://youtu.be/uWaaWG3wNT0" },
+  { round = "top4", a = "nicka", b = "vanessa", winner = "nicka", video = "https://youtu.be/KtEehWRJwps" },
+  { round = "top4", a = "logistx", b = "syssy", winner = "logistx", video = "https://youtu.be/sG4tQsRohGg" },
+  { round = "final", a = "nicka", b = "logistx", winner = "nicka", video = "https://youtu.be/Y-fHrvp54jM" },
+  { round = "third", a = "vanessa", b = "syssy", winner = "vanessa", video = "https://youtu.be/UNt2g4c0DjA" },
 ]

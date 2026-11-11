@@ -15,11 +15,11 @@ djs = []
 key = "crew"
 name = "Crew battle"
 gender = "mixed"
-results = [
-  { entrant = "top-9", reached = "winner" },
-  { entrant = "formosa", reached = "top4" },
-  { entrant = "smokemon", reached = "top4" },
-  { entrant = "t-i-p-crew", reached = "top2" },
+bracket_size = 4
+matches = [
+  { round = "top4", a = "t-i-p-crew", b = "formosa", winner = "t-i-p-crew", video = "https://youtu.be/4O8YG9UE-PQ" },
+  { round = "top4", a = "top-9", b = "smokemon", winner = "top-9", video = "https://youtu.be/UqIAZIuc_bM" },
+  { round = "final", a = "t-i-p-crew", b = "top-9", winner = "top-9", video = "https://youtu.be/pAOWjOUQLsc" },
 ]
 
 [battles.teams]

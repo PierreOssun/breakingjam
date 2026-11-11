@@ -1,6 +1,7 @@
 //! Unit tests of `crate::domain::dancer`.
 
 use chrono::Utc;
+use serde_json::json;
 use uuid::Uuid;
 
 use crate::domain::{
@@ -20,10 +21,11 @@ fn dancer(verified: bool, user_id: Option<Uuid>, created_by: Option<Uuid>) -> Da
         city: None,
         bio: None,
         instagram_handle: None,
+        instagram_hidden: false,
         source: DancerSource::Organizer,
         verified_at: verified.then(Utc::now),
         avatar_url: None,
-        avatar_parts: None,
+        avatar: None,
         titles: Vec::new(),
         created_by,
         merged_into_id: None,
@@ -86,50 +88,58 @@ fn merged_aliases_union_without_duplicates() {
 }
 
 #[test]
-fn avatar_parts_are_six_parts_in_range_then_optional_details() {
-    assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b1").is_ok());
-    assert!(avatar_parts_shape("h12-s3-c4-o4-e2-b3").is_ok());
-    assert!(avatar_parts_shape("h8-s1-c0-o3-e0-b1-d7").is_ok());
-    assert!(avatar_parts_shape("").is_ok());
+fn an_avatar_is_known_slots_with_known_values() {
+    let ok = |avatar| avatar_shape(&avatar).is_ok();
+    assert!(ok(json!({})), "every slot at its default");
+    assert!(ok(
+        json!({ "style": "flame", "head": "bucket", "fx": "aura", "lashes": true })
+    ));
+    assert!(ok(json!({
+        "skin": "deep", "style": "twintails", "hair": "pink", "head": "hood", "accent": "black",
+        "brows": "fierce", "mouth": "grin", "face": "mask", "outfit": "bomber", "cloth": "red",
+        "extra": "chain", "bg": "crimson", "fx": "city",
+        "lashes": false, "lips": true, "hoops": true,
+    })));
+    assert!(!ok(json!({ "style": "mullet" })), "unknown value");
+    assert!(!ok(json!({ "hat": "cap" })), "unknown slot");
+    assert!(!ok(json!({ "style": 3 })), "a slot holds a name");
+    assert!(!ok(json!({ "lashes": "yes" })), "a detail is on or off");
     assert!(
-        avatar_parts_shape("h13-s1-c0-o3-e0-b1").is_err(),
-        "hair out of range"
+        !ok(json!({ "style": "cap" })),
+        "headgear left the hair styles"
     );
     assert!(
-        avatar_parts_shape("h2-s1-c0-o3-e0-b1-d8").is_err(),
-        "details out of range"
+        !ok(json!("h2-s1-c0-o3-e0-b1")),
+        "the code from before the rework"
     );
-    assert!(
-        avatar_parts_shape("s1-h2-c0-o3-e0-b1").is_err(),
-        "parts out of order"
-    );
-    assert!(
-        avatar_parts_shape("h2-s1-c0-o3-e0").is_err(),
-        "a part missing"
-    );
-    assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b12").is_err());
-    assert!(avatar_parts_shape("h2-s1-c0-o3-e0-b1-x1").is_err());
-    assert!(avatar_parts_shape("h123-s1-c0-o3-e0-b1").is_err());
+    assert!(!ok(json!([])));
 }
 
 #[test]
 fn bgirls_get_long_hair_and_lashes_bboys_short_hair_mixed_nothing() {
-    let hair = |code: &str| code[1..code.find('-').unwrap()].parse::<u32>().unwrap();
+    const LONG: [&str; 7] = ["bun", "long", "space", "braids", "puffs", "pony", "bangs"];
     for _ in 0..200 {
         let id = Uuid::now_v7();
         let bgirl = default_look(id, BattleGender::Bgirl).unwrap();
-        assert!(avatar_parts_shape(&bgirl).is_ok(), "{bgirl}");
-        assert!(
-            [3, 6, 7, 8, 9, 10, 11, 12].contains(&hair(&bgirl)),
-            "{bgirl}"
-        );
-        let details: u32 = bgirl.rsplit_once("-d").unwrap().1.parse().unwrap();
-        assert_eq!(details & 1, 1, "lash flicks always: {bgirl}");
+        assert!(avatar_shape(&bgirl).is_ok(), "{bgirl}");
+        assert!(LONG.contains(&bgirl["style"].as_str().unwrap()), "{bgirl}");
+        assert_eq!(bgirl["lashes"], true, "lash flicks always: {bgirl}");
 
         let bboy = default_look(id, BattleGender::Bboy).unwrap();
-        assert!(avatar_parts_shape(&bboy).is_ok(), "{bboy}");
-        assert!([0, 1, 2, 4, 5].contains(&hair(&bboy)), "{bboy}");
-        assert!(!bboy.contains("-d"), "no details: {bboy}");
+        assert!(avatar_shape(&bboy).is_ok(), "{bboy}");
+        assert!(
+            ["spiky", "buzz", "afro"].contains(&bboy["style"].as_str().unwrap()),
+            "{bboy}"
+        );
+        assert_eq!(
+            [&bboy["lashes"], &bboy["lips"], &bboy["hoops"]],
+            [&json!(false); 3],
+            "no details: {bboy}"
+        );
+        // What is worn takes the hoodie's colour, ink reading as black.
+        let accent = bboy["accent"].as_str().unwrap();
+        let cloth = bboy["cloth"].as_str().unwrap();
+        assert_eq!(accent, if cloth == "ink" { "black" } else { cloth });
 
         assert_eq!(default_look(id, BattleGender::Mixed), None);
     }

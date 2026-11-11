@@ -41,5 +41,5 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "kid-karam", reached = "winner" },
+  { entrant = "kid-karam", reached = "winner", video = "https://youtu.be/BK4GN1kULdE" },
 ]

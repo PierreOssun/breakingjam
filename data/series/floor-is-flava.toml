@@ -1,0 +1,11 @@
+name = "The Floor is Flava"
+# Brussels, at C12 every edition so far (and8.dance, C12, Bruxelles-J); organised by Future Art Movement.
+city = "Brussels"
+country = "BE"
+timezone = "Europe/Brussels"
+
+[youtube]
+channels = ["UCDpTV6PL7WoPdHWPl-LoWXw"]   # LawkSam, who filmed every edition
+title = "The Floor is Flava"
+exclude = ["prelim", "qualifier", "judges", "cypher king"]
+battles = [{ key = "2v2", name = "2v2", gender = "mixed", team_size = 2 }]

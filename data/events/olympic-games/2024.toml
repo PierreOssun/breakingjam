@@ -24,14 +24,14 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "dany-dann", b = "jeffro", winner = "dany-dann" , video = "https://youtu.be/UJXDwd3qd1M" },
-  { round = "top8", a = "amir", b = "victor", winner = "victor" , video = "https://youtu.be/uYYFmx5jI-g" },
-  { round = "top8", a = "shigekix", b = "menno", winner = "shigekix" , video = "https://youtu.be/gKkC8PZnteY" },
-  { round = "top8", a = "lee", b = "phil-wizard", winner = "phil-wizard" , video = "https://youtu.be/3uyFn5HL6DA" },
-  { round = "top4", a = "dany-dann", b = "victor", winner = "dany-dann" , video = "https://youtu.be/2u0w0gDlNOc" },
-  { round = "top4", a = "shigekix", b = "phil-wizard", winner = "phil-wizard" , video = "https://youtu.be/A4p8uotPgtM" },
-  { round = "final", a = "dany-dann", b = "phil-wizard", winner = "phil-wizard" , video = "https://youtu.be/TfdDGEJDRRI" },
-  { round = "third", a = "victor", b = "shigekix", winner = "victor" , video = "https://youtu.be/4PCigU728yA" },
+  { round = "top8", a = "dany-dann", b = "jeffro", winner = "dany-dann", video = "https://youtu.be/UJXDwd3qd1M" },
+  { round = "top8", a = "amir", b = "victor", winner = "victor", video = "https://youtu.be/uYYFmx5jI-g" },
+  { round = "top8", a = "shigekix", b = "menno", winner = "shigekix", video = "https://youtu.be/gKkC8PZnteY" },
+  { round = "top8", a = "lee", b = "phil-wizard", winner = "phil-wizard", video = "https://youtu.be/3uyFn5HL6DA" },
+  { round = "top4", a = "dany-dann", b = "victor", winner = "dany-dann", video = "https://youtu.be/2u0w0gDlNOc" },
+  { round = "top4", a = "shigekix", b = "phil-wizard", winner = "phil-wizard", video = "https://youtu.be/A4p8uotPgtM" },
+  { round = "final", a = "dany-dann", b = "phil-wizard", winner = "phil-wizard", video = "https://youtu.be/TfdDGEJDRRI" },
+  { round = "third", a = "victor", b = "shigekix", winner = "victor", video = "https://youtu.be/4PCigU728yA" },
 ]
 
 [[battles]]
@@ -40,12 +40,12 @@ name = "1v1 Bgirl"
 gender = "bgirl"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "syssy", b = "ami", winner = "ami" , video = "https://youtu.be/q1d5lUqWrgw" },
-  { round = "top8", a = "ayumi", b = "india", winner = "india" , video = "https://youtu.be/gOM-CZ2eysw" },
-  { round = "top8", a = "671", b = "kate", winner = "671" , video = "https://youtu.be/SkJmPo2rIOc" },
-  { round = "top8", a = "yingzi", b = "nicka", winner = "nicka" , video = "https://youtu.be/8yV2-A1orMw" },
-  { round = "top4", a = "ami", b = "india", winner = "ami" , video = "https://youtu.be/gKrLMcxjDx0" },
-  { round = "top4", a = "671", b = "nicka", winner = "nicka" , video = "https://youtu.be/n9QBzUCJOR8" },
-  { round = "final", a = "ami", b = "nicka", winner = "ami" },
+  { round = "top8", a = "syssy", b = "ami", winner = "ami", video = "https://youtu.be/q1d5lUqWrgw" },
+  { round = "top8", a = "ayumi", b = "india", winner = "india", video = "https://youtu.be/gOM-CZ2eysw" },
+  { round = "top8", a = "671", b = "kate", winner = "671", video = "https://youtu.be/SkJmPo2rIOc" },
+  { round = "top8", a = "yingzi", b = "nicka", winner = "nicka", video = "https://youtu.be/8yV2-A1orMw" },
+  { round = "top4", a = "ami", b = "india", winner = "ami", video = "https://youtu.be/gKrLMcxjDx0" },
+  { round = "top4", a = "671", b = "nicka", winner = "nicka", video = "https://youtu.be/n9QBzUCJOR8" },
+  { round = "final", a = "ami", b = "nicka", winner = "ami", video = "https://youtu.be/PUrv2XNBY5s" },
   { round = "third", a = "india", b = "671", winner = "671", video = "https://youtu.be/QloD5VvNwhk" },
 ]

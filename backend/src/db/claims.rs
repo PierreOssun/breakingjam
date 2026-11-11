@@ -75,7 +75,7 @@ pub async fn list(
         r#"select c.id, c.dancer_id, c.user_id, c.code, c.status as "status: ClaimStatus",
                   c.reviewed_at, c.created_at,
                   d.dancer_name, d.country, d.country2, d.instagram_handle,
-                  d.avatar_url, d.avatar_parts, d.deleted_at is not null as "deleted!",
+                  d.avatar_url, d.avatar, d.deleted_at is not null as "deleted!",
                   u.email::text as "email!", u.display_name
            from dancer_claims c
            join dancers d on d.id = c.dancer_id
@@ -99,7 +99,7 @@ pub async fn list(
                 country2: r.country2,
                 instagram_handle: r.instagram_handle,
                 avatar_url: r.avatar_url,
-                avatar_parts: r.avatar_parts,
+                avatar: r.avatar,
                 deleted: r.deleted,
             },
             user: ClaimUser {
@@ -127,7 +127,7 @@ pub async fn history(pool: &PgPool, window: super::Window) -> sqlx::Result<Vec<C
                   c.admin_email, c.user_id as "user_id!", u.email::text as "email!",
                   u.display_name as "display_name!", c.instagram_handle,
                   d.id as "dancer_id?", d.dancer_name as "dancer_name?", d.country as "country?",
-                  d.country2, d.avatar_url, d.avatar_parts,
+                  d.country2, d.avatar_url, d.avatar,
                   d.deleted_at is not null as "deleted?"
            from (
              select c.id, c.status, coalesce(c.reviewed_at, c.created_at) as decided_at,
@@ -164,7 +164,7 @@ pub async fn history(pool: &PgPool, window: super::Window) -> sqlx::Result<Vec<C
                     country2: r.country2,
                     instagram_handle: r.instagram_handle.clone(),
                     avatar_url: r.avatar_url,
-                    avatar_parts: r.avatar_parts,
+                    avatar: r.avatar,
                     deleted: r.deleted.unwrap_or_default(),
                 }),
                 _ => None,

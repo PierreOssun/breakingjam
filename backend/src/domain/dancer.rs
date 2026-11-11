@@ -2,6 +2,7 @@
 
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
@@ -94,14 +95,17 @@ pub struct Dancer {
     pub bio: Option<String>,
     /// Lower case, no `@`; the identity key when present.
     pub instagram_handle: Option<String>,
+    /// The owner keeps the handle to themselves: only they and the team are sent it.
+    pub instagram_hidden: bool,
     /// Where the row came from.
     pub source: DancerSource,
     /// Set once a claim is approved; the UI shows a verified tick.
     pub verified_at: Option<DateTime<Utc>>,
     /// Uploaded picture; null means the generated avatar.
     pub avatar_url: Option<String>,
-    /// The generated avatar's parts, e.g. `h2-s1-c0-o3-e0-b1`; null means seeded from the id.
-    pub avatar_parts: Option<String>,
+    /// The generated avatar's chosen spec, a value per slot; null means seeded from the id.
+    #[schema(value_type = Option<std::collections::HashMap<String, Value>>)]
+    pub avatar: Option<Value>,
     /// What the dancer does, in a fixed order; empty until its owner or the team says.
     pub titles: Vec<DancerTitle>,
     #[serde(skip)]
@@ -126,7 +130,8 @@ impl Dancer {
         }
     }
 
-    /// Who may say what the dancer does: its verified owner, or `seed_admin`+.
+    /// Who may say what the dancer does and hide their Instagram: its verified owner, or
+    /// `seed_admin`+.
     pub fn can_set_titles(&self, user: &User) -> bool {
         user.role >= Role::SeedAdmin
             || (self.verified_at.is_some() && self.user_id == Some(user.id))
@@ -154,8 +159,9 @@ pub struct DancerSummary {
     pub verified: bool,
     /// Uploaded picture, which replaces the generated avatar.
     pub avatar_url: Option<String>,
-    /// The generated avatar's chosen parts; seeded from the id when null.
-    pub avatar_parts: Option<String>,
+    /// The generated avatar's chosen spec; seeded from the id when null.
+    #[schema(value_type = Option<std::collections::HashMap<String, Value>>)]
+    pub avatar: Option<Value>,
     /// Current crews.
     pub crews: Vec<CrewRef>,
 }
@@ -165,7 +171,7 @@ pub type FieldChange = (&'static str, Option<String>, Option<String>);
 
 /// The profile fields that differ between two versions of a dancer.
 pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
-    const FIELDS: [&str; 9] = [
+    const FIELDS: [&str; 10] = [
         "dancer_name",
         "aliases",
         "country",
@@ -173,11 +179,12 @@ pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
         "city",
         "bio",
         "instagram_handle",
-        "avatar_parts",
+        "instagram_hidden",
+        "avatar",
         "titles",
     ];
     let titles = |d: &Dancer| d.titles.iter().map(|t| t.as_str()).collect::<Vec<_>>();
-    let values = |d: &Dancer| -> [Option<String>; 9] {
+    let values = |d: &Dancer| -> [Option<String>; 10] {
         [
             Some(d.dancer_name.clone()),
             (!d.aliases.is_empty()).then(|| d.aliases.join(", ")),
@@ -186,7 +193,8 @@ pub fn changes(old: &Dancer, new: &Dancer) -> Vec<FieldChange> {
             d.city.clone(),
             d.bio.clone(),
             d.instagram_handle.clone(),
-            d.avatar_parts.clone(),
+            Some(d.instagram_hidden.to_string()),
+            d.avatar.as_ref().map(Value::to_string),
             (!d.titles.is_empty()).then(|| titles(d).join(", ")),
         ]
     };
@@ -233,8 +241,9 @@ pub struct DancerRef {
     pub instagram_handle: Option<String>,
     /// Uploaded photo; null = the generated pixel avatar.
     pub avatar_url: Option<String>,
-    /// The pixel avatar's chosen parts; null = seeded from the id.
-    pub avatar_parts: Option<String>,
+    /// The pixel avatar's chosen spec; null = seeded from the id.
+    #[schema(value_type = Option<std::collections::HashMap<String, Value>>)]
+    pub avatar: Option<Value>,
     /// The page is gone: the name stays on past results, with nothing to link to.
     pub deleted: bool,
 }
@@ -365,81 +374,162 @@ pub struct DancerFields {
     /// `@handle` or `handle`; the identity key when present, unique case-insensitively.
     #[validate(custom(function = "crate::domain::instagram_handle"))]
     pub instagram_handle: Option<String>,
-    /// The generated avatar's parts (DESIGN.md §4.16); blank or absent means seeded from the id.
-    #[validate(custom(function = "avatar_parts_shape"))]
-    pub avatar_parts: Option<String>,
+    /// The generated avatar's spec (DESIGN.md §4.16), its missing slots at their default; absent seeds a new dancer from its id and keeps an edited one's.
+    #[validate(custom(function = "avatar_shape"))]
+    #[schema(value_type = Option<std::collections::HashMap<String, Value>>)]
+    pub avatar: Option<Value>,
     /// What the dancer does; absent keeps what is stored. Only its verified owner or
     /// `seed_admin`+ may send it.
     #[serde(default)]
     pub titles: Option<Vec<DancerTitle>>,
+    /// Keeps the handle off the page and out of search; absent keeps what is stored. Only its
+    /// verified owner or `seed_admin`+ may send it.
+    #[serde(default)]
+    pub instagram_hidden: Option<bool>,
 }
 
-/// Each part's letter and highest option: hair, skin, hair colour, hoodie, extra, backdrop, then
-/// the optional details, a bitmask of lash flicks (1), lip tint (2) and hoops (4).
-const AVATAR_PARTS: [(char, u32); 7] = [
-    ('h', 12),
-    ('s', 3),
-    ('c', 4),
-    ('o', 4),
-    ('e', 2),
-    ('b', 3),
-    ('d', 7),
-];
+/// The avatar its builder saves, apart from the profile.
+#[derive(Debug, Deserialize, Validate, utoipa::ToSchema)]
+pub struct AvatarFields {
+    /// The generated avatar's spec (DESIGN.md §4.16), its missing slots at their default.
+    #[validate(custom(function = "avatar_shape"))]
+    #[schema(value_type = std::collections::HashMap<String, Value>)]
+    pub avatar: Value,
+}
 
-/// Blank, or the six parts in order and in range with the details optional, e.g. `h2-s1-c0-o3-e0-b1-d5`.
-pub(crate) fn avatar_parts_shape(value: &str) -> Result<(), ValidationError> {
-    let value = value.trim();
-    let parts: Vec<&str> = value.split('-').collect();
-    let in_range = |(part, &(letter, max)): (&&str, &(char, u32))| {
-        part.strip_prefix(letter)
-            .filter(|n| (1..=2).contains(&n.len()) && n.bytes().all(|b| b.is_ascii_digit()))
-            .and_then(|n| n.parse::<u32>().ok())
-            .is_some_and(|n| n <= max)
-    };
-    let shaped = matches!(parts.len(), 6 | 7) && parts.iter().zip(&AVATAR_PARTS).all(in_range);
-    if value.is_empty() || shaped {
+/// Each of the avatar's slots and what it may hold, as `frontend/src/features/dancers/avatar.ts`
+/// draws them. The server keeps the spec, it never draws it: names, not types.
+const AVATAR_SLOTS: [(&str, &[&str]); 13] = [
+    ("skin", &["light", "tan", "medium", "deep"]),
+    (
+        "style",
+        &[
+            "spiky",
+            "flame",
+            "sweep",
+            "buzz",
+            "mohawk",
+            "flattop",
+            "afro",
+            "locs",
+            "bun",
+            "long",
+            "bangs",
+            "bob",
+            "pony",
+            "highpony",
+            "twintails",
+            "braids",
+            "puffs",
+            "space",
+        ],
+    ),
+    (
+        "hair",
+        &["black", "brown", "bleach", "red", "pink", "blue", "violet"],
+    ),
+    (
+        "head",
+        &[
+            "none", "headband", "bandana", "bucket", "hood", "cap", "beanie",
+        ],
+    ),
+    ("accent", &["white", "red", "blue", "violet", "black"]),
+    ("brows", &["set", "fierce"]),
+    ("mouth", &["smirk", "grin"]),
+    (
+        "face",
+        &["none", "shades", "plaster", "scar", "mask", "paint"],
+    ),
+    ("outfit", &["hoodie", "track", "tank", "jersey", "bomber"]),
+    ("cloth", &["ink", "white", "blue", "violet", "red"]),
+    ("extra", &["none", "phones", "chain"]),
+    (
+        "bg",
+        &["klein", "violet", "ink", "night", "crimson", "white"],
+    ),
+    ("fx", &["rings", "burst", "halftone", "aura", "city"]),
+];
+/// The details an avatar has on or off.
+const AVATAR_DETAILS: [&str; 3] = ["lashes", "lips", "hoops"];
+
+/// An object of known slots holding known values, and details that are booleans.
+pub(crate) fn avatar_shape(value: &Value) -> Result<(), ValidationError> {
+    let known =
+        |(slot, value): (&String, &Value)| match AVATAR_SLOTS.iter().find(|(name, _)| name == slot)
+        {
+            Some((_, options)) => value.as_str().is_some_and(|v| options.contains(&v)),
+            None => AVATAR_DETAILS.contains(&slot.as_str()) && value.is_boolean(),
+        };
+    if value
+        .as_object()
+        .is_some_and(|slots| slots.iter().all(known))
+    {
         return Ok(());
     }
-    Err(ValidationError::new("avatar_parts")
-        .with_message("must be like h2-s1-c0-o3-e0-b1-d5".into()))
+    Err(ValidationError::new("avatar").with_message("unknown avatar slot or value".into()))
 }
 
-/// Long or tied-up hair: bun, long, space buns, box braids, afro puffs, ponytail, bob, cap over long hair.
-const LONG_HAIR: [u64; 8] = [3, 6, 7, 8, 9, 10, 11, 12];
-/// Short or covered hair: spiky, cap, beanie, afro, buzz.
-const SHORT_HAIR: [u64; 5] = [0, 1, 2, 4, 5];
-/// The hoodie each backdrop would swallow (klein, violet, ink, night), as the frontend's seed avoids.
+/// Long or tied-up hair, each with what is worn on it: the last is the backwards cap.
+const LONG_HAIR: [(&str, &str); 8] = [
+    ("bun", "none"),
+    ("long", "none"),
+    ("space", "none"),
+    ("braids", "none"),
+    ("puffs", "none"),
+    ("pony", "none"),
+    ("bangs", "none"),
+    ("long", "cap"),
+];
+/// Short or covered hair.
+const SHORT_HAIR: [(&str, &str); 5] = [
+    ("spiky", "none"),
+    ("buzz", "cap"),
+    ("buzz", "beanie"),
+    ("afro", "none"),
+    ("buzz", "none"),
+];
+const LOOK_SKINS: [&str; 4] = ["light", "tan", "medium", "deep"];
+const LOOK_HAIRS: [&str; 5] = ["black", "brown", "bleach", "violet", "blue"];
+/// A hoodie's cloth, and the accent of what is worn with it.
+const LOOK_HOODIES: [(&str, &str); 5] = [
+    ("ink", "black"),
+    ("blue", "blue"),
+    ("violet", "violet"),
+    ("white", "white"),
+    ("red", "red"),
+];
+const LOOK_EXTRAS: [&str; 3] = ["none", "phones", "chain"];
+const LOOK_STAGES: [&str; 4] = ["klein", "violet", "ink", "night"];
+/// The hoodie each stage would swallow (klein, violet, ink, night), as the frontend's seed avoids.
 const CLASHES: [u64; 4] = [1, 2, 0, 0];
 
 /// The avatar a bgirl or bboy battle suggests for a dancer nobody has drawn yet (DESIGN.md §4.16
 /// seeding): stable for the id; none for mixed battles, which say nothing about the dancer.
-pub fn default_look(id: Uuid, gender: BattleGender) -> Option<String> {
+pub fn default_look(id: Uuid, gender: BattleGender) -> Option<Value> {
     // The random half of a UUIDv7.
     let mut seed = u64::from_le_bytes(id.as_bytes()[8..].try_into().ok()?);
     let mut pick = |n: u64| {
         let value = seed % n;
         seed /= n;
-        value
+        value as usize
     };
-    let (hair, details) = match gender {
+    let ((style, head), [lashes, lips, hoops]) = match gender {
         // Lash flicks always; lip tint one time in two, hoops one in three.
-        BattleGender::Bgirl => (
-            LONG_HAIR[pick(8) as usize],
-            1 | if pick(2) == 0 { 2 } else { 0 } | if pick(3) == 0 { 4 } else { 0 },
-        ),
-        BattleGender::Bboy => (SHORT_HAIR[pick(5) as usize], 0),
+        BattleGender::Bgirl => (LONG_HAIR[pick(8)], [true, pick(2) == 0, pick(3) == 0]),
+        BattleGender::Bboy => (SHORT_HAIR[pick(5)], [false; 3]),
         BattleGender::Mixed => return None,
     };
-    let (skin, colour, mut hoodie, extra, backdrop) = (pick(4), pick(5), pick(5), pick(3), pick(4));
-    if CLASHES[backdrop as usize] == hoodie {
+    let (skin, hair, mut hoodie, extra, stage) = (pick(4), pick(5), pick(5), pick(3), pick(4));
+    if CLASHES[stage] == hoodie as u64 {
         hoodie += 1;
     }
-    let code = format!("h{hair}-s{skin}-c{colour}-o{hoodie}-e{extra}-b{backdrop}");
-    Some(if details == 0 {
-        code
-    } else {
-        format!("{code}-d{details}")
-    })
+    let (cloth, accent) = LOOK_HOODIES[hoodie];
+    Some(serde_json::json!({
+        "style": style, "head": head, "skin": LOOK_SKINS[skin], "hair": LOOK_HAIRS[hair],
+        "cloth": cloth, "accent": accent, "extra": LOOK_EXTRAS[extra], "bg": LOOK_STAGES[stage],
+        "lashes": lashes, "lips": lips, "hoops": hoops,
+    }))
 }
 
 fn aliases(values: &[String]) -> Result<(), ValidationError> {

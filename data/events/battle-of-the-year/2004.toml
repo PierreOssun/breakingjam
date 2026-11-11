@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "gamblerz", reached = "winner" },
-  { entrant = "break-the-funk", reached = "top4", rank = 4 },
-  { entrant = "fantastik-armada", reached = "top2" },
-  { entrant = "stuttguard", reached = "top4", rank = 3 },
+  { entrant = "gamblerz", reached = "winner", video = "https://youtu.be/EzglYPf7Ylk" },
+  { entrant = "break-the-funk", reached = "top4", rank = 4 , video = "https://youtu.be/ea6vDxKbkFw" },
+  { entrant = "fantastik-armada", reached = "top2", video = "https://youtu.be/EzglYPf7Ylk" },
+  { entrant = "stuttguard", reached = "top4", rank = 3 , video = "https://youtu.be/ea6vDxKbkFw" },
 ]
 
 [battles.teams]

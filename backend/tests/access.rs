@@ -80,6 +80,7 @@ fn valid_body(method: &str, path: &str) -> Value {
             json!({ "dancer_ids": [id()] })
         }
         ("put", "/api/dancers/{id}") => json!({ "dancer_name": "Lil G", "country": "FR" }),
+        ("put", "/api/dancers/{id}/avatar") => json!({ "avatar": {} }),
         ("put", "/api/crews/{id}") => json!({ "name": "Floor Lords" }),
         ("post", "/api/crews/{id}/members") => json!({ "dancer_id": id() }),
         ("post", "/api/admin/dancers/{id}/merge") => json!({ "into": id() }),

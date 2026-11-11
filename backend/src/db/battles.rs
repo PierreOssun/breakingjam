@@ -350,8 +350,10 @@ async fn members(
     entry_ids: &[Uuid],
 ) -> sqlx::Result<HashMap<Uuid, Vec<DancerRef>>> {
     let rows = sqlx::query!(
-        r#"select m.entry_id, d.id, d.dancer_name, d.country, d.country2, d.instagram_handle,
-                  d.avatar_url, d.avatar_parts, d.deleted_at is not null as "deleted!"
+        r#"select m.entry_id, d.id, d.dancer_name, d.country, d.country2,
+                  case when d.instagram_hidden then null else d.instagram_handle end
+                    as instagram_handle,
+                  d.avatar_url, d.avatar, d.deleted_at is not null as "deleted!"
            from entry_members m join dancers d on d.id = m.dancer_id
            where m.entry_id = any($1)
            order by lower(d.dancer_name), d.id"#,
@@ -368,7 +370,7 @@ async fn members(
             country2: r.country2,
             instagram_handle: r.instagram_handle,
             avatar_url: r.avatar_url,
-            avatar_parts: r.avatar_parts,
+            avatar: r.avatar,
             deleted: r.deleted,
         });
     }
@@ -504,8 +506,9 @@ pub async fn staff_ids(conn: &mut PgConnection, event_id: Uuid) -> sqlx::Result<
 pub async fn staff(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<StaffMember>> {
     let rows = sqlx::query!(
         r#"select s.role as "role: StaffRole", d.id, d.dancer_name, d.country, d.country2,
-                  d.instagram_handle, d.avatar_url, d.avatar_parts,
-                  d.deleted_at is not null as "deleted!"
+                  case when d.instagram_hidden then null else d.instagram_handle end
+                    as instagram_handle,
+                  d.avatar_url, d.avatar, d.deleted_at is not null as "deleted!"
            from event_staff s join dancers d on d.id = s.dancer_id
            where s.event_id = $1
            order by s.role, lower(d.dancer_name), d.id"#,
@@ -524,7 +527,7 @@ pub async fn staff(pool: &PgPool, event_id: Uuid) -> sqlx::Result<Vec<StaffMembe
                 country2: r.country2,
                 instagram_handle: r.instagram_handle,
                 avatar_url: r.avatar_url,
-                avatar_parts: r.avatar_parts,
+                avatar: r.avatar,
                 deleted: r.deleted,
             },
         })

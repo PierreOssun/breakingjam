@@ -16,7 +16,8 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "ilyes-zoo", reached = "winner" },
+  { entrant = "ilyes-zoo", reached = "winner", video = "https://youtu.be/QZaFkoQekgY" },
+  { entrant = "d12", reached = "top2", video = "https://youtu.be/QZaFkoQekgY" },  # Red Bull's description calls it the showdown for the title
 ]
 
 [[battles]]
@@ -24,5 +25,6 @@ key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
 results = [
-  { entrant = "syssy", reached = "winner" },
+  { entrant = "syssy", reached = "winner", video = "https://youtu.be/j9Ukk1CAXFc" },
+  { entrant = "chris", reached = "top2", video = "https://youtu.be/j9Ukk1CAXFc" },  # "Final battle" in Red Bull's description
 ]

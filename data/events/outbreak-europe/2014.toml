@@ -50,7 +50,7 @@ name = "2v2"
 gender = "mixed"
 team_size = 2
 results = [
-  { entrant = "fleau-vicious", reached = "winner" },
+  { entrant = "fleau-vicious", reached = "winner", video = "https://youtu.be/qi9oENe44_E" },
 ]
 
 [battles.teams]
@@ -62,16 +62,30 @@ name = "Kids"
 gender = "mixed"
 age = "kids"
 results = [
-  { entrant = "nick", reached = "winner" },
+  { entrant = "nick", reached = "winner", video = "https://youtu.be/4WFTdtYMBtU" },
 ]
 
 [[battles]]
 key = "rep-your-country"
 name = "Rep Your Country"
 gender = "mixed"
-results = [
-  { entrant = "poland", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "czech-republic", b = "ukraine", winner = "ukraine", video = "https://youtu.be/AbssUcL6nDE" },
+  { round = "top8", a = "mexico", b = "russia", winner = "russia", video = "https://youtu.be/xCfP9aCFLHo" },
+  { round = "top8", a = "poland", b = "kazakhstan", winner = "poland", video = "https://youtu.be/1uLi93yxi58" },
+  { round = "top8", a = "slovakia", b = "brazil", winner = "brazil", video = "https://youtu.be/2Yu6DUjFfkU" },
+  { round = "top4", a = "brazil", b = "ukraine", winner = "ukraine", video = "https://youtu.be/eTFS5CIJrx8" },
+  { round = "top4", a = "russia", b = "poland", winner = "poland", video = "https://youtu.be/w72jVL8XKgs" },
+  { round = "final", a = "poland", b = "ukraine", winner = "poland", video = "https://youtu.be/vta7ewVMk28" },
 ]
 
 [battles.teams]
+czech-republic = { name = "Czech Republic" }
+ukraine = { name = "Ukraine" }
+mexico = { name = "Mexico" }
+russia = { name = "Russia" }
+kazakhstan = { name = "Kazakhstan" }
+slovakia = { name = "Slovakia" }
+brazil = { name = "Brazil" }
 poland = { name = "Poland" }

@@ -18,34 +18,36 @@ sources = [
 judges = ["jurskee", "chardison", "steez", "intact", "jess", "valentine", "virus", "moy", "kowloon"]
 
 # WDSF's final places; the top 8 went from a round robin to a knockout whose pairings aren't published.
+# Official ranks 5-8: Jeffro, Hiro 10, Menno, Gravity. Videos: the Olympic Games finals stream, each `at` its title card.
 [[battles]]
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 8
-results = [
-  { entrant = "lee", reached = "winner" },
-  { entrant = "amir", reached = "top2" },
-  { entrant = "hong-10", reached = "top4", rank = 3 },
-  { entrant = "issin", reached = "top4", rank = 4 },
-  { entrant = "jeffro", reached = "top8", rank = 5 },
-  { entrant = "hiro-10", reached = "top8", rank = 6 },
-  { entrant = "menno", reached = "top8", rank = 7 },
-  { entrant = "gravity", reached = "top8", rank = 8 },
+matches = [
+  { round = "top8", a = "amir", b = "jeffro", winner = "amir", video = "https://youtu.be/Ufe-nmkZwXI", at = 3070 },
+  { round = "top8", a = "gravity", b = "issin", winner = "issin", video = "https://youtu.be/Ufe-nmkZwXI", at = 3600 },
+  { round = "top8", a = "lee", b = "hiro-10", winner = "lee", video = "https://youtu.be/Ufe-nmkZwXI", at = 4120 },
+  { round = "top8", a = "menno", b = "hong-10", winner = "hong-10", video = "https://youtu.be/Ufe-nmkZwXI", at = 4620 },
+  { round = "top4", a = "amir", b = "issin", winner = "amir", video = "https://youtu.be/Ufe-nmkZwXI", at = 6150 },
+  { round = "top4", a = "lee", b = "hong-10", winner = "lee", video = "https://youtu.be/Ufe-nmkZwXI", at = 6730 },
+  { round = "final", a = "amir", b = "lee", winner = "lee", video = "https://youtu.be/Ufe-nmkZwXI", at = 9950 },
+  { round = "third", a = "issin", b = "hong-10", winner = "hong-10", video = "https://youtu.be/Ufe-nmkZwXI", at = 8600 },
 ]
 
+# Official ranks 5-8: Logistx, Kate, Ying Zi, Anti.
 [[battles]]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
 bracket_size = 8
-results = [
-  { entrant = "ami", reached = "winner" },
-  { entrant = "ayumi", reached = "top2" },
-  { entrant = "riko", reached = "top4", rank = 3 },
-  { entrant = "syssy", reached = "top4", rank = 4 },
-  { entrant = "logistx", reached = "top8", rank = 5 },
-  { entrant = "kate", reached = "top8", rank = 6 },
-  { entrant = "yingzi", reached = "top8", rank = 7 },
-  { entrant = "anti", reached = "top8", rank = 8 },
+matches = [
+  { round = "top8", a = "yingzi", b = "ayumi", winner = "ayumi", video = "https://youtu.be/Ufe-nmkZwXI", at = 1240 },
+  { round = "top8", a = "syssy", b = "logistx", winner = "syssy", video = "https://youtu.be/Ufe-nmkZwXI", at = 1690 },
+  { round = "top8", a = "anti", b = "ami", winner = "ami", video = "https://youtu.be/Ufe-nmkZwXI", at = 2110 },
+  { round = "top8", a = "kate", b = "riko", winner = "riko", video = "https://youtu.be/Ufe-nmkZwXI", at = 2620 },
+  { round = "top4", a = "ayumi", b = "syssy", winner = "ayumi", video = "https://youtu.be/Ufe-nmkZwXI", at = 5090 },
+  { round = "top4", a = "ami", b = "riko", winner = "ami", video = "https://youtu.be/Ufe-nmkZwXI", at = 5580 },
+  { round = "final", a = "ayumi", b = "ami", winner = "ami", video = "https://youtu.be/Ufe-nmkZwXI", at = 9250 },
+  { round = "third", a = "syssy", b = "riko", winner = "riko", video = "https://youtu.be/Ufe-nmkZwXI", at = 8170 },
 ]

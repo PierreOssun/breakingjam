@@ -16,10 +16,10 @@ key = "crew"
 name = "Crew battle"
 gender = "mixed"
 results = [
-  { entrant = "jinjo-crew", reached = "winner" },
-  { entrant = "top-coalition", reached = "top4" },
-  { entrant = "vagabonds", reached = "top4" },
-  { entrant = "foundnation", reached = "top2" },
+  { entrant = "jinjo-crew", reached = "winner", video = "https://youtu.be/tyinATSEKMY" },
+  { entrant = "top-coalition", reached = "top4", video = "https://youtu.be/N7yWDP4ywFE" },
+  { entrant = "vagabonds", reached = "top4", video = "https://youtu.be/gJaUZK_4Eg0" },
+  { entrant = "foundnation", reached = "top2", video = "https://youtu.be/tyinATSEKMY" },
 ]
 
 [battles.teams]
@@ -32,9 +32,23 @@ vagabonds = { crew = "vagabonds" }
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "beetle", reached = "top2" },
-  { entrant = "dany", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "onel", b = "fack", winner = "onel", video = "https://youtu.be/xAuZt0JM1bs" },
+  { round = "top16", a = "felipinho", b = "akorn", winner = "akorn", video = "https://youtu.be/VRZqInHWG3I" },
+  { round = "top16", a = "beetle", b = "mouse-za", winner = "beetle", video = "https://youtu.be/Uz5u4PFTQrU" },
+  { round = "top16", a = "poter", b = "lb", winner = "lb", video = "https://youtu.be/TBUKxu2mVyM" },
+  { round = "top16", a = "tirock", b = "light", winner = "tirock", video = "https://youtu.be/DZN3ww8VxVY" },
+  { round = "top16", a = "jora", b = "whale", winner = "whale", video = "https://youtu.be/OwASl3CSvGc" },
+  { round = "top16", a = "dany", b = "exaggerate", winner = "dany", video = "https://youtu.be/VcgNqTCDUgg" },
+  { round = "top16", a = "docta-trey", b = "matita", winner = "docta-trey", video = "https://youtu.be/7xVMeyuEIkA" },
+  { round = "top8", a = "onel", b = "akorn", winner = "onel", video = "https://youtu.be/O6n5UNV9q4U" },
+  { round = "top8", a = "beetle", b = "lb", winner = "beetle", video = "https://youtu.be/Pe9z-EHmXFQ" },
+  { round = "top8", a = "tirock", b = "whale", winner = "tirock", video = "https://youtu.be/S2mgmMY4lao" },
+  { round = "top8", a = "dany", b = "docta-trey", winner = "dany", video = "https://youtu.be/6YGaLfVbtCQ" },
+  { round = "top4", a = "onel", b = "beetle", winner = "beetle", video = "https://youtu.be/vRBX9AaZlpQ" },
+  { round = "top4", a = "tirock", b = "dany", winner = "dany", video = "https://youtu.be/-KI68qOMlmw" },
+  { round = "final", a = "beetle", b = "dany", winner = "dany", video = "https://youtu.be/C1Md0M0VMEg" },
 ]
 
 [[battles]]

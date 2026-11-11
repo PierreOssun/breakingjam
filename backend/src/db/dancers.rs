@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use serde_json::Value;
 use sqlx::{PgConnection, PgExecutor, PgPool};
 use uuid::Uuid;
 
@@ -32,13 +33,16 @@ pub async fn search(
 ) -> sqlx::Result<Vec<DancerSummary>> {
     let pattern = filter.query.map(super::contains_pattern);
     let rows = sqlx::query!(
-        r#"select id, dancer_name, aliases, country, country2, city, instagram_handle,
-                  verified_at is not null as "verified!", avatar_url, avatar_parts
+        // A hidden handle is neither shown nor searched.
+        r#"select id, dancer_name, aliases, country, country2, city,
+                  case when instagram_hidden then null else instagram_handle end
+                    as instagram_handle,
+                  verified_at is not null as "verified!", avatar_url, avatar
            from dancers
            where deleted_at is null and merged_into_id is null
              and ($1::text is null
                   or dancer_name ilike $1
-                  or instagram_handle ilike $1
+                  or (instagram_handle ilike $1 and not instagram_hidden)
                   or exists (select 1 from unnest(aliases) a where a ilike $1))
              and ($2::text is null or country = $2 or country2 = $2)
            order by notable desc, lower(dancer_name), id
@@ -66,7 +70,7 @@ pub async fn search(
             instagram_handle: r.instagram_handle,
             verified: r.verified,
             avatar_url: r.avatar_url,
-            avatar_parts: r.avatar_parts,
+            avatar: r.avatar,
         })
         .collect())
 }
@@ -108,8 +112,9 @@ pub async fn find(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<Option<Danc
     sqlx::query_as!(
         Dancer,
         r#"select id, user_id, dancer_name, aliases, country, country2, city, bio,
-                  instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                  avatar_parts, titles as "titles: Vec<DancerTitle>",
+                  instagram_handle, instagram_hidden, source as "source: DancerSource", verified_at,
+                  avatar_url,
+                  avatar, titles as "titles: Vec<DancerTitle>",
                   created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null"#,
         id,
@@ -125,14 +130,14 @@ pub async fn own_page(pool: &PgPool, user_id: Uuid) -> sqlx::Result<Option<OwnPa
     // the page made for oneself by `created_by`.
     let row = sqlx::query!(
         r#"select id as "id!", dancer_name as "dancer_name!", country as "country!",
-                  country2, instagram_handle, avatar_url, avatar_parts, verified as "verified!"
+                  country2, instagram_handle, avatar_url, avatar, verified as "verified!"
            from (select p.id, p.dancer_name, p.country, p.country2, p.instagram_handle,
-                        p.avatar_url, p.avatar_parts, true as verified
+                        p.avatar_url, p.avatar, true as verified
                  from dancers p
                  where p.user_id = $1 and p.deleted_at is null and p.merged_into_id is null
                  union all
                  select p.id, p.dancer_name, p.country, p.country2, p.instagram_handle,
-                        p.avatar_url, p.avatar_parts, false
+                        p.avatar_url, p.avatar, false
                  from dancers mine
                  join dancers p on p.id = coalesce(mine.merged_into_id, mine.id)
                  where mine.created_by = $1 and mine.source = 'self' and mine.deleted_at is null
@@ -153,7 +158,7 @@ pub async fn own_page(pool: &PgPool, user_id: Uuid) -> sqlx::Result<Option<OwnPa
             country2: r.country2,
             instagram_handle: r.instagram_handle,
             avatar_url: r.avatar_url,
-            avatar_parts: r.avatar_parts,
+            avatar: r.avatar,
             deleted: false,
         },
         verified: r.verified,
@@ -171,14 +176,16 @@ pub async fn insert(
         Dancer,
         r#"insert into dancers
              (id, dancer_name, aliases, country, country2, city, bio,
-              instagram_handle, source, notable, created_by, avatar_parts, titles)
+              instagram_handle, source, notable, created_by, avatar, titles,
+              instagram_hidden)
            values ($1, btrim($2), array(select btrim(a) from unnest($3::text[]) a),
                    $4, $5, nullif(btrim($6), ''), nullif(btrim($7), ''),
-                   nullif(lower(ltrim(btrim($8), '@')), ''), $9, $10, $11, nullif(btrim($12), ''),
-                   array(select distinct t from unnest($13::dancer_title[]) t order by t))
+                   nullif(lower(ltrim(btrim($8), '@')), ''), $9, $10, $11, $12,
+                   array(select distinct t from unnest($13::dancer_title[]) t order by t), $14)
            returning id, user_id, dancer_name, aliases, country, country2, city, bio,
-                     instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                     avatar_parts, titles as "titles: Vec<DancerTitle>",
+                     instagram_handle, instagram_hidden, source as "source: DancerSource", verified_at,
+                  avatar_url,
+                     avatar, titles as "titles: Vec<DancerTitle>",
                      created_by, merged_into_id, created_at, updated_at"#,
         Uuid::now_v7(),
         fields.dancer_name,
@@ -192,18 +199,20 @@ pub async fn insert(
         // §4: seeded dancers are the notable ones; it only affects search ranking.
         source == DancerSource::Seed,
         created_by,
-        fields.avatar_parts,
+        fields.avatar.as_ref(),
         fields.titles.as_deref().unwrap_or_default() as &[DancerTitle],
+        fields.instagram_hidden.unwrap_or_default(),
     )
     .fetch_one(pool)
     .await
 }
 
-/// Replaces the editable fields with the same normalisation as `insert`.
+/// Replaces the editable fields with the same normalisation as `insert`, the handle being `instagram_handle`.
 pub async fn update(
     conn: &mut PgConnection,
     id: Uuid,
     fields: &DancerFields,
+    instagram_handle: Option<&str>,
 ) -> sqlx::Result<Dancer> {
     sqlx::query_as!(
         Dancer,
@@ -212,14 +221,17 @@ pub async fn update(
              country = $4, country2 = $5,
              city = nullif(btrim($6), ''), bio = nullif(btrim($7), ''),
              instagram_handle = nullif(lower(ltrim(btrim($8), '@')), ''),
-             avatar_parts = nullif(btrim($9), ''),
+             -- Absent keeps the stored avatar: its builder writes it, through `set_avatar`.
+             avatar = coalesce($9, avatar),
              -- Absent titles keep the stored ones; the enum's order, without repeats.
              titles = case when $10::dancer_title[] is null then titles
-                           else array(select distinct t from unnest($10) t order by t) end
+                           else array(select distinct t from unnest($10) t order by t) end,
+             instagram_hidden = coalesce($11, instagram_hidden)
            where id = $1 and deleted_at is null
            returning id, user_id, dancer_name, aliases, country, country2, city, bio,
-                     instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                     avatar_parts, titles as "titles: Vec<DancerTitle>",
+                     instagram_handle, instagram_hidden, source as "source: DancerSource", verified_at,
+                  avatar_url,
+                     avatar, titles as "titles: Vec<DancerTitle>",
                      created_by, merged_into_id, created_at, updated_at"#,
         id,
         fields.dancer_name,
@@ -228,9 +240,26 @@ pub async fn update(
         fields.country2,
         fields.city,
         fields.bio,
-        fields.instagram_handle,
-        fields.avatar_parts,
+        instagram_handle,
+        fields.avatar.as_ref(),
         fields.titles.as_deref() as Option<&[DancerTitle]>,
+        fields.instagram_hidden,
+    )
+    .fetch_one(conn)
+    .await
+}
+
+/// Replaces the generated avatar's spec alone.
+pub async fn set_avatar(conn: &mut PgConnection, id: Uuid, avatar: &Value) -> sqlx::Result<Dancer> {
+    sqlx::query_as!(
+        Dancer,
+        r#"update dancers set avatar = $2 where id = $1 and deleted_at is null
+           returning id, user_id, dancer_name, aliases, country, country2, city, bio,
+                     instagram_handle, instagram_hidden, source as "source: DancerSource",
+                     verified_at, avatar_url, avatar, titles as "titles: Vec<DancerTitle>",
+                     created_by, merged_into_id, created_at, updated_at"#,
+        id,
+        avatar,
     )
     .fetch_one(conn)
     .await
@@ -246,8 +275,9 @@ pub async fn find_for_update(conn: &mut PgConnection, id: Uuid) -> sqlx::Result<
     sqlx::query_as!(
         Dancer,
         r#"select id, user_id, dancer_name, aliases, country, country2, city, bio,
-                  instagram_handle, source as "source: DancerSource", verified_at, avatar_url,
-                  avatar_parts, titles as "titles: Vec<DancerTitle>",
+                  instagram_handle, instagram_hidden, source as "source: DancerSource", verified_at,
+                  avatar_url,
+                  avatar, titles as "titles: Vec<DancerTitle>",
                   created_by, merged_into_id, created_at, updated_at
            from dancers where id = $1 and deleted_at is null
            for update"#,
@@ -433,6 +463,9 @@ async fn redirect(
     // its titles too, when the survivor says none and has no owner to say so.
     sqlx::query!(
         "update dancers set aliases = $2, instagram_handle = coalesce(instagram_handle, $3),
+                -- A handle that moves stays as hidden as it was.
+                instagram_hidden = case when instagram_handle is null then $5
+                                        else instagram_hidden end,
                 titles = case when cardinality(titles) = 0 and verified_at is null then $4
                               else titles end
          where id = $1",
@@ -440,6 +473,7 @@ async fn redirect(
         aliases,
         loser.instagram_handle,
         &loser.titles as &[DancerTitle],
+        loser.instagram_hidden,
     )
     .execute(&mut *conn)
     .await?;

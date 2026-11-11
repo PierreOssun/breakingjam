@@ -21,6 +21,7 @@ const PAGE = {
   titles: [],
   can_edit: true,
   can_set_titles: false,
+  instagram_hidden: false,
 };
 const ORGANISER = {
   id: LIL_G.id,
@@ -37,7 +38,7 @@ const own = {
   id: PAGE.id,
   dancer_name: PAGE.dancer_name,
   avatar_url: null,
-  avatar_parts: null,
+  avatar: null,
   verified: false,
 };
 

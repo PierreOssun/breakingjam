@@ -401,7 +401,7 @@ One component that changes shape by viewport.
 ### 4.16 Avatar + verified tick
 
 - **Avatar:** `size-24 rounded-[28px] overflow-hidden border border-border` (`size-28 rounded-[32px]` in the ≥ lg left column, `size-[72px] rounded-[22px]` in forms, `size-[52px] rounded-[16px]` in person rows). It's a rounded square, so it never reads as a map marker or a social profile bubble.
-  - **Generated (default): pixel 2D-HD bust.** Pixel art with modern lighting on top. See the "Pixel avatar" artboard. The app draws it in `features/dancers/avatarParts.ts`.
+  - **Generated (default): pixel 2D-HD bust.** Pixel art with modern lighting on top. See the "Pixel avatar" artboard. The app draws it in `features/dancers/avatar.ts`, held pixel for pixel to the reference generator's golden avatars.
     - **Sprite:** a 32×32 grid rendered as SVG with `shape-rendering="crispEdges"`, or a PNG at 8× with `image-rendering: pixelated`. Never smooth the scaling.
     - **Drawing rules:**
       - A 1px ink (`#0B0D14`) outline around the silhouette.
@@ -412,23 +412,24 @@ One component that changes shape by viewport.
     - **HD layer**, on top of the pixels:
       - Soft radial glow from the top-left, white at 22% opacity.
       - Bottom vignette, black at 35% opacity.
-      - This is the only place gradients are allowed in the product.
-    - **Parts:**
-      - **Hair (13):**
-        - Short and covered: spiky · cap with side brim · beanie · buzz · afro.
-        - Long and up: bun with headband · long with centre part and side fringe · space buns · box braids · afro puffs · high ponytail · blunt bob with bangs · cap over long hair.
+      - This and the builder's stage (§4.44) are the only places gradients are allowed in the product, with the two landing exceptions of §9.
+    - **Parts** (Nov 2026 rework; each a slot of the stored spec, the first value its default):
       - **Skin:** light, tan, medium, deep.
-      - **Hair colour:** black, brown, bleached, violet, Klein blue.
-      - **Hoodie:** ink, Klein, violet, white, red.
+      - **Hair (18):** spiky · manga spikes · side sweep · buzz · mohawk · flat top · afro · locs · top bun · long · bangs · bob · ponytail · high ponytail · twin tails · braids · puffs · space buns.
+      - **Hair colour:** black, brown, bleached, red, pink, blue, violet.
+      - **Headwear:** none · headband · bandana · bucket hat · hood up · cap · beanie. A slot of its own: a cap or a beanie takes the hair's place (the cap worn backwards over long hair).
+      - **Accent:** white, red, blue, violet, black. Colours the headwear, mask, face paint, trims, hair ties and beads.
+      - **Brows:** calm, fierce. **Mouth:** smirk, grin.
+      - **Face:** none · shades · plaster · scar · mask · face paint.
+      - **Outfit:** hoodie · track jacket · tank top · jersey · bomber, in ink, white, blue, violet or red.
       - **Extras:** none, headphones, chain.
       - **Details** (optional, combinable): lash flicks · lip tint `#B4475F` · hoop earrings (silver).
-      - **Backdrop:** Klein, violet, ink or night, with pixel "record" rings.
-    - **Seeding:** parts are seeded from the dancer id, so the avatar is stable. Anyone who can edit the dancer can change the parts in the edit sheet (skin tone especially should never stay a random guess once someone cares).
+      - **Stage:** Klein, violet, ink, night, crimson or white, with one effect drawn under the sprite: pixel "record" rings · speed lines · halftone · aura · city (its lighter pixels at 55% opacity).
+    - **Seeding:** parts are seeded from the dancer id, so the avatar is stable. Anyone who can edit the dancer can change the parts in the avatar builder (§4.44; skin tone especially should never stay a random guess once someone cares).
       - No part is tied to a gender, and the schema has no gender field.
-      - The seed picks evenly across all 13 hair styles, and turns each detail on with a 1-in-3 chance.
-      - A dancer entered in a bgirl battle whom nobody has drawn yet gets a long or tied-up style with lash flicks (lip tint 1 in 2, hoops 1 in 3); one entered in a bboy battle gets a short or covered style without details. The battle is the only signal; it is stored as an ordinary choice, so it can be changed like any other.
-      - Anyone who can edit the dancer can change any part in the edit sheet.
-    - Reference implementation: `frontend/pixel-avatar-generator.py` (`make()`, `svg()`, `PRESETS`; bgirl presets `w1`–`w8`).
+      - The seed picks evenly across the 13 looks there were before the rework (ten hair styles, and a cap, a beanie or a backwards cap worn in the hoodie's colour), so no avatar changed when the new parts arrived, and turns each detail on with a 1-in-3 chance. The new parts are only ever chosen.
+      - A dancer the curated data (`data/dancers.toml`) names as a bgirl gets a long or tied-up style with lash flicks (lip tint 1 in 2, hoops 1 in 3); one it names as a bboy gets a short or covered style without details. It is stored as an ordinary choice, so it can be changed like any other; entering a battle never changes a look.
+    - Reference implementation: `milestones/avatar-rework/avatar-generator.py` (`make()`), with its golden avatars in `avatar-fixtures.json` and the twelve fighter presets in `fighter-presets.json`. (`frontend/pixel-avatar-generator.py` is the drawing before the rework.)
     - Never draw a flag, text, logo, or any existing character into the sprite.
   - **Photo (verified owners only):** `object-cover`, same mask.
   - `alt` is the dancer name.
@@ -439,10 +440,10 @@ One component that changes shape by viewport.
 - `relative overflow-hidden rounded-[28px] border border-border bg-surface p-5 flex flex-col gap-3`, with one `.rings` (300px) bleeding off the top-right.
 - Contents, top to bottom:
   1. avatar
-  2. name `font-display text-display-lg` + tick + flag chips (`flex flex-wrap items-center gap-2`; chips wrap under long names)
+  2. name `font-display text-display-lg` + tick + flag chips + the city, when set (`MapPin` 16 + `text-body-sm font-bold text-muted`), to the right of the flags (`flex flex-wrap items-center gap-2`; chips and city wrap under long names)
   3. titles, when the dancer has said (M25): `label uppercase text-primary-text`, joined with " · " ("BGIRL · DJ"); nothing when none are set, never a guess
   4. aliases `text-body-sm font-semibold text-muted` ("aka …", joined with " · ")
-  5. Instagram handle: Phosphor `InstagramLogo` 20 + `@handle` in `text-body font-extrabold text-text`, 44px min height. It opens `https://instagram.com/<handle>`, which the OS hands to the app.
+  5. Instagram handle: Phosphor `InstagramLogo` 20 + `@handle` in `text-body font-extrabold text-text`, 44px min height. It opens `https://instagram.com/<handle>`, which the OS hands to the app. A dancer who hid it shows none; they (and the team) still see it, with `EyeSlash` 14 + "Hidden: only you and the BreakingJam team see it." in `text-caption text-muted` under it.
 - It has to look complete when cropped on its own (screenshots). Nothing inside it depends on the page around it.
 - The **OG image** for `/d/<slug>` renders this same card at 1200×630.
 
@@ -778,6 +779,38 @@ The admin area (`/admin`): `<h1>` "Admin", then one filter-chip-shaped tab per t
 - A hairline, then up to two winner lines: the battle name (12px caps, muted, never cut: one column as wide as the card's longest name, 45% of the row at most, wrapping past it, so the crowns line up), the filled `Crown` 16 in `primary-text` (named "Winner"), the winner's name bold with an ellipsis, then the members' 22px avatars (`rounded-[7px]`, overlapping), each named by `title` and `aria-label`. "+N more" (muted) for the battles not shown.
 - **▶ Videos available**, when a battle has a video: `h-[26px] px-2.5 rounded-full border text-[12px] font-extrabold`, `Play` in `primary-text`, aligned left.
 
+### 4.44 Avatar builder *(Nov 2026)*
+
+Where an avatar's parts are picked, each by looking at it; a fighter-select screen. It opens from the **avatar row** of the edit sheet: the avatar at 72px, the line "Your pixel avatar, shown on your page, in results and in menus." and a secondary sm **Change avatar** with a `PencilSimple`, in a `rounded-lg border bg-surface p-4` card under the label "Avatar".
+
+- **Container:** a `<dialog>` of its own, over the edit sheet.
+  - **Below lg:** a full-screen sheet. A 56px top bar (close X, the title "Your avatar", a primary sm **Done**), then the stage, then the tabs and options, which alone scroll.
+  - **From lg:** 944px wide, `rounded-[28px]`, two columns. Left, 300px: the title, the stage, and the avatar at the sizes the site shows it, labelled **Page** (56px), **Menu** (36px), **Results** (22px). Right: the tabs, the options, and a footer with **Cancel** and a primary **Save avatar**.
+  - It saves by itself (the avatar alone, `PUT /api/dancers/{id}/avatar`), closes, and shows the toast "Avatar saved."; the edit sheet behind stays as it was. A failed save keeps it open with the error in the footer.
+  - **Closing with unsaved changes** asks in the footer, never with a browser `confirm()`: "Discard your changes?" · ghost sm **Keep editing** (focused) · secondary sm **Discard**.
+- **Stage:** `linear-gradient(160deg, #101a4d, #2a1660)` with faint white rings (6%), white text, the same in both themes.
+  - The avatar at 156px (184px from lg), corner radius 28%, `shadow-lg`. Its text alternative lists the main choices: "Pixel avatar: manga spikes, bleach, headband, tank top".
+  - **P1 tag** on its top-left corner: `bg-primary`, white, Unbounded 11px bold, rotated −6°.
+  - **Name plate:** a black bar skewed −10° with the name in Unbounded 18px caps, then what they do and their first crew ("BBOY · DYNAMO") in 11px `#B49BFF` caps; what is missing is left out.
+  - Two pills, `h-11`, white at 10% with a 25% white border: **Surprise me** (`DiceFive`; any value per slot, headgear and face item left off half the time) and an icon-only **Undo** (`ArrowUUpLeft`; one step back, up to 20, disabled with none).
+  - On a short phone (up to 700px tall) the stage lies down: the avatar at 96px on the left, the plate and the pills beside it; under 360px wide, Surprise me keeps its dice alone.
+- **Tabs:** pills `h-11 px-[18px] rounded-full` in one row that scrolls sideways, the active one `bg-text text-bg`, the others `bg-surface-raised text-muted`. `tablist` / `tab` / `tabpanel`; the arrow keys move between them.
+
+  | Tab | Groups |
+  |---|---|
+  | Fighters | **Start from a fighter**: the twelve presets, 92px, their names in display caps; 3 columns, 6 from lg. One applies its whole avatar. |
+  | Hair | **Style** · **Colour** |
+  | Head | **Headgear** · **Colour** (the accent) |
+  | Face | **Skin tone** · **Expression** (calm or fierce brows, smirk or grin) · **Face item** · **Details** (lash flicks, lip tint) |
+  | Outfit | **Top** · **Colour** · **Trim colour** (the same accent as on Head) · **Accessory** (and hoops) |
+  | Stage | **Effect** · **Colour** |
+
+- **Group label:** 12px extrabold caps, muted.
+- **Thumbnail option:** the avatar being built with that one change, 62px `rounded-[17px]`, a 12px bold label under it; 4 columns, 7 from lg. Picked: a 2px `primary` border 3px around it, a 20px round check badge on its top-right corner, the label in `text`. Only the open tab's thumbnails are drawn.
+- **Swatch:** a 34px disc inside a 44px ring (3px gap, 2px `primary` when picked), a 12px label under it.
+- Each single-choice group is a `radiogroup` of radios named by their labels; lash flicks, lip tint and hoops are checkboxes in the same thumbnail style. Nothing bounces when the preview changes.
+- Every part and fighter is original: none copies a character of a game, an anime or a manga.
+
 ## 5. Layout rules
 
 - **Container:** `mx-auto max-w-content px-4 md:px-6 lg:px-8` (1200px including padding). Reading column: `max-w-prose` (640px).
@@ -905,7 +938,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
   1. Header.
   2. Back/Share bar.
   3. Identity card (4.17).
-  4. Crew link chips + city (`MapPin` 16, muted).
+  4. Crew link chips (the city moved into the identity card, Nov 2026).
   5. Primary action, by state:
      - Unverified, logged out: nothing.
      - Unverified, logged in: full-width secondary **This is me**, which opens the verify modal.
@@ -922,7 +955,10 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
   - When someone else has already requested it: an inline notice above the code, and the request is still allowed.
   - Submitting moves the page to the pending state.
 - **Edit sheet** (4.9 + 4.20):
-  - Fields: stage name, aliases (chip input), then for the verified owner and the BreakingJam team only, "I’m a…" ("What they do" for the team): choice chips (§4.35 battle sheet), several at once, Bboy · Bgirl · Breaker · DJ · MC · Judge, with the hint "Only the dancer, once verified, and the BreakingJam team set these."; then country, second country (optional), city, Instagram, bio (160).
+  - First, the avatar row with **Change avatar**, which opens the avatar builder (§4.44); the avatar is not a field of this form.
+  - Fields: stage name, aliases (chip input), then for the verified owner and the BreakingJam team only, "I’m a…" ("What they do" for the team): choice chips (§4.35 battle sheet), several at once, Bboy · Bgirl · Breaker · DJ · MC · Judge, with the hint "Only the dancer, once verified, and the BreakingJam team set these."; then country, second country (optional), city, Instagram, and for the verified owner and the team only, the checkbox "Hide my Instagram from my page and from search" ("Hide this Instagram from the page and from search" for the team; off by default) right under it; bio (160).
+  - Aliases: 5 at most, 100 characters each, "Rocket" and "rocket" being one; a long one is cut with an ellipsis in its chip. The same country picked twice is saved once.
+  - A failed save always says so: the server's message on its field (focused when it may be scrolled away), else the form's error line, scrolled into view.
   - On unverified dancers: the notice "Edits by the community are logged." at the top.
   - Avatar upload (photo or "Use pixel avatar") only for the verified owner.
   - Desktop shows it as a 560px dialog with the two country selects side by side.
@@ -981,7 +1017,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Do** keep shapes rounded: pills for anything you press, 20px corners for containers, 12px for fields and thumbnails.
 - **Do** let the flyer carry the colour on cards and detail pages; the UI around it stays ink and white.
 - **Do** use the thin outlined rings (`.rings`) as the only decoration: at most one per screen, behind a hero or empty state, never behind body text. *The landing's stats band (§4.42) has its own faint white rings.*
-- **Don't** use gradients, glows, neon, or blue-to-violet blends. *Two agreed exceptions on the landing (v4): the large Register button (§4.41) and the stats band (§4.42), which also keeps `#002FA7` in dark mode.*
+- **Don't** use gradients, glows, neon, or blue-to-violet blends. *Agreed exceptions: on the landing (v4), the large Register button (§4.41) and the stats band (§4.42), which also keeps `#002FA7` in dark mode; and the avatar builder's stage (§4.44).*
 - **Don't** tilt, rotate or sticker-shadow anything. Don't use graffiti or distressed fonts.
 - **Don't** set Unbounded below 16px, or use it for buttons, labels or body text.
 - **Don't** put white text on violet or blue fills except through `on-primary`. Don't use `#002FA7` in dark mode.

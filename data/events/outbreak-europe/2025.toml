@@ -65,7 +65,7 @@ matches = [
   { round = "top32", a = "posya-rock", b = "tata", winner = "tata", votes = [2, 3], video = "https://youtu.be/3ZoN-Gk287c" },
   { round = "top32", a = "nika", b = "chimpa", winner = "nika", votes = [4, 1], video = "https://youtu.be/7zoZv2k_okI" },
   { round = "top32", a = "ayane", b = "badli", winner = "ayane", votes = [4, 1], video = "https://youtu.be/HbfdUlBSo48" },
-  { round = "top32", a = "kotya", b = "chris", winner = "chris", votes = [1, 4] },
+  { round = "top32", a = "kotya", b = "chris", winner = "chris", votes = [1, 4], video = "https://youtu.be/Ux48cFoX6xI" },
   { round = "top32", a = "yuina", b = "sonya", winner = "yuina", votes = [5, 0], video = "https://youtu.be/j3W-ERKzYrQ" },
   { round = "top32", a = "la-vix", b = "swami", winner = "swami", votes = [2, 3], video = "https://youtu.be/2-MO2mL_9OQ" },
   { round = "top32", a = "kate", b = "izanami", winner = "kate", votes = [5, 0], video = "https://youtu.be/RLmXh99qJmw" },
@@ -96,7 +96,7 @@ name = "2v2"
 gender = "mixed"
 team_size = 2
 results = [
-  { entrant = "ra1on-shigekix", reached = "winner" },
+  { entrant = "ra1on-shigekix", reached = "winner", video = "https://youtu.be/HO3cD53RHF4" },
 ]
 
 [battles.teams]
@@ -188,6 +188,13 @@ results = [
 key = "toprock"
 name = "1v1 Toprock"
 gender = "mixed"
-results = [
-  { entrant = "peaky-rock", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "frozen", b = "nicka", winner = "frozen", video = "https://youtu.be/z42A27A7iNQ" },
+  { round = "top8", a = "luan", b = "el-vasi", winner = "luan", video = "https://youtu.be/nza501j_V40" },
+  { round = "top8", a = "peaky-rock", b = "gomita", winner = "peaky-rock", video = "https://youtu.be/j3UnO6nKTRk" },
+  { round = "top8", a = "elettra", b = "shynoh", winner = "shynoh", video = "https://youtu.be/2ke0TGcYzCo" },
+  { round = "top4", a = "luan", b = "frozen", winner = "luan", video = "https://youtu.be/Br5yQlevWdI" },
+  { round = "top4", a = "peaky-rock", b = "shynoh", winner = "peaky-rock", video = "https://youtu.be/dlI48If2gJ0" },
+  { round = "final", a = "luan", b = "peaky-rock", winner = "peaky-rock", video = "https://youtu.be/L4GI7C5SdiQ" },
 ]

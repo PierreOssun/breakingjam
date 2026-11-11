@@ -1,0 +1,200 @@
+[
+ {
+  "id": "rook",
+  "name": "Rook",
+  "role": "bboy",
+  "avatar": {
+   "skin": "deep",
+   "hair": "black",
+   "style": "flattop",
+   "outfit": "bomber",
+   "cloth": "violet",
+   "bg": "klein",
+   "fx": "burst",
+   "brows": "fierce"
+  }
+ },
+ {
+  "id": "volt",
+  "name": "Volt",
+  "role": "bboy",
+  "avatar": {
+   "skin": "light",
+   "hair": "bleach",
+   "style": "flame",
+   "outfit": "tank",
+   "cloth": "ink",
+   "bg": "night",
+   "fx": "aura",
+   "brows": "fierce",
+   "mouth": "grin",
+   "face": "plaster"
+  }
+ },
+ {
+  "id": "onyx",
+  "name": "Onyx",
+  "role": "bboy",
+  "avatar": {
+   "skin": "medium",
+   "hair": "black",
+   "style": "locs",
+   "outfit": "track",
+   "cloth": "ink",
+   "accent": "red",
+   "bg": "ink",
+   "fx": "city"
+  }
+ },
+ {
+  "id": "dash",
+  "name": "Dash",
+  "role": "bboy",
+  "avatar": {
+   "skin": "tan",
+   "hair": "blue",
+   "style": "mohawk",
+   "outfit": "jersey",
+   "cloth": "blue",
+   "bg": "violet",
+   "fx": "halftone",
+   "face": "paint"
+  }
+ },
+ {
+  "id": "flint",
+  "name": "Flint",
+  "role": "bboy",
+  "avatar": {
+   "skin": "medium",
+   "hair": "black",
+   "style": "buzz",
+   "head": "bandana",
+   "accent": "blue",
+   "face": "shades",
+   "cloth": "ink",
+   "bg": "white",
+   "fx": "burst"
+  }
+ },
+ {
+  "id": "mako",
+  "name": "Mako",
+  "role": "bboy",
+  "avatar": {
+   "skin": "light",
+   "hair": "black",
+   "style": "sweep",
+   "head": "headband",
+   "accent": "white",
+   "outfit": "track",
+   "cloth": "white",
+   "bg": "crimson",
+   "fx": "burst",
+   "brows": "fierce"
+  }
+ },
+ {
+  "id": "riot",
+  "name": "Riot",
+  "role": "bgirl",
+  "avatar": {
+   "skin": "tan",
+   "hair": "violet",
+   "style": "highpony",
+   "outfit": "tank",
+   "cloth": "white",
+   "bg": "violet",
+   "fx": "burst",
+   "lashes": true,
+   "lips": true,
+   "brows": "fierce"
+  }
+ },
+ {
+  "id": "lynx",
+  "name": "Lynx",
+  "role": "bgirl",
+  "avatar": {
+   "skin": "light",
+   "hair": "bleach",
+   "style": "twintails",
+   "outfit": "track",
+   "cloth": "violet",
+   "bg": "klein",
+   "fx": "halftone",
+   "lashes": true,
+   "face": "paint",
+   "accent": "white"
+  }
+ },
+ {
+  "id": "ember",
+  "name": "Ember",
+  "role": "bgirl",
+  "avatar": {
+   "skin": "medium",
+   "hair": "red",
+   "style": "bob",
+   "outfit": "bomber",
+   "cloth": "ink",
+   "bg": "crimson",
+   "fx": "aura",
+   "lashes": true,
+   "lips": true,
+   "hoops": true
+  }
+ },
+ {
+  "id": "nyx",
+  "name": "Nyx",
+  "role": "bgirl",
+  "avatar": {
+   "skin": "deep",
+   "hair": "black",
+   "style": "puffs",
+   "head": "headband",
+   "accent": "violet",
+   "outfit": "jersey",
+   "cloth": "violet",
+   "bg": "night",
+   "fx": "city",
+   "lashes": true,
+   "lips": true
+  }
+ },
+ {
+  "id": "koko",
+  "name": "Koko",
+  "role": "bgirl",
+  "avatar": {
+   "skin": "light",
+   "hair": "pink",
+   "style": "space",
+   "cloth": "white",
+   "bg": "violet",
+   "fx": "halftone",
+   "lashes": true,
+   "lips": true,
+   "mouth": "grin"
+  }
+ },
+ {
+  "id": "pixel",
+  "name": "Pixel",
+  "role": "bgirl",
+  "avatar": {
+   "skin": "tan",
+   "hair": "blue",
+   "style": "long",
+   "head": "bucket",
+   "accent": "white",
+   "outfit": "track",
+   "cloth": "blue",
+   "bg": "ink",
+   "fx": "rings",
+   "lashes": true,
+   "face": "mask"
+  }
+ }
+]
