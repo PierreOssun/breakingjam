@@ -18,7 +18,7 @@ gender = "mixed"
 bracket_size = 8
 matches = [
   { round = "top8", a = "jinjo-crew", b = "dead-prezz", winner = "jinjo-crew" },
-  { round = "top8", a = "shmetta-skwad", b = "foundnation", winner = "foundnation" },
+  { round = "top8", a = "shmetta-skwad", b = "foundnation", winner = "foundnation" , video = "https://youtu.be/BV65g1SyxS0" },
   { round = "top8", a = "soul-meezy", b = "havikoro", winner = "havikoro", video = "https://youtu.be/QvEsG05zMxc" },
   { round = "top8", a = "arcopom", b = "soul-mavericks", winner = "soul-mavericks", video = "https://youtu.be/WPnysyAmLVQ" },
   { round = "top4", a = "jinjo-crew", b = "foundnation", winner = "jinjo-crew" },
@@ -48,7 +48,7 @@ matches = [
   { round = "top16", a = "spin", b = "darwin", winner = "spin", video = "https://youtu.be/594U8Bzh3SM" },
   { round = "top16", a = "chakal", b = "vicious-victor", winner = "vicious-victor", video = "https://youtu.be/bY8YxVTXUr8" },
   { round = "top16", a = "morris", b = "sambo", winner = "morris", video = "https://youtu.be/v1AGh2ihcFA" },
-  { round = "top16", a = "hill", b = "yuya", winner = "hill" },
+  { round = "top16", a = "hill", b = "yuya", winner = "hill" , video = "https://youtu.be/tmy3LCZoo4I" },
   { round = "top16", a = "roxy", b = "niek", winner = "niek", video = "https://youtu.be/uxu0MAGsgWg" },
   { round = "top8", a = "kareem", b = "sunni", winner = "kareem", video = "https://youtu.be/5P0PdU8L5vY" },
   { round = "top8", a = "moy", b = "spin", winner = "moy", video = "https://youtu.be/p2f6ItU9XI4" },

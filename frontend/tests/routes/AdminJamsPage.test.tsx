@@ -69,7 +69,13 @@ describe("AdminJamsPage", () => {
       screen.getByRole("link", { name: "crew@cypher.ch" }),
     ).toHaveAttribute("href", "mailto:crew@cypher.ch");
 
+    // Approve asks first: it sits right beside the next jam's.
     await userEvent.click(screen.getByRole("button", { name: "Approve" }));
+    const ask = await screen.findByRole("dialog", {
+      name: "Approve Geneva Lakeside Battle?",
+    });
+    expect(calls(fetch)).not.toContain(`POST /api/admin/events/${ID}/approve`);
+    await userEvent.click(within(ask).getByRole("button", { name: "Approve" }));
     expect(
       await screen.findByText("Geneva Lakeside Battle is on the map."),
     ).toBeInTheDocument();
@@ -169,6 +175,11 @@ describe("AdminJamsPage", () => {
 
     await userEvent.click(
       await screen.findByRole("button", { name: "Approve" }),
+    );
+    await userEvent.click(
+      within(await screen.findByRole("dialog")).getByRole("button", {
+        name: "Approve",
+      }),
     );
 
     expect(

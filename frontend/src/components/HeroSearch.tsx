@@ -44,7 +44,7 @@ export function HeroSearch({
 
   // The pill rings when its field has focus; a focused button keeps its own ring.
   const pill = landing
-    ? "h-16 gap-3 pr-1.5 pl-5 lg:h-20 lg:gap-3.5 lg:pr-2 lg:pl-[30px]"
+    ? "h-[60px] gap-3 pr-1.5 pl-5 lg:h-[72px] lg:gap-3.5 lg:pr-[7px] lg:pl-6"
     : "h-14 gap-2.5 pr-1.5 pl-5 lg:h-[60px]";
   return (
     <form
@@ -74,7 +74,11 @@ export function HeroSearch({
             aria-label={submit}
             className="shrink-0 rounded-full transition-transform duration-fast hover:scale-[1.04] motion-reduce:hover:scale-100"
           >
-            <img src="/favicon.svg" alt="" className="size-[52px] lg:size-16" />
+            <img
+              src="/favicon.svg"
+              alt=""
+              className="size-[50px] lg:size-[58px]"
+            />
           </button>
         ) : (
           // A wrapper hides the button, because its own `inline-flex` would win.

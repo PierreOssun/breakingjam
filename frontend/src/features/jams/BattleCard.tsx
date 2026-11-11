@@ -10,6 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
+import { Button } from "../../components/Button";
 import { IconButton } from "../../components/IconButton";
 import { ResultBadge } from "../../components/ResultBadge";
 import { MetaTag } from "../../components/Tag";
@@ -24,6 +25,7 @@ import { membersPerEntry, prizeLine } from "./battleFields";
 import { entryLabel } from "./entryFields";
 import { EntryChips } from "./EntryChips";
 import { EntryDialog } from "./EntryDialog";
+import { takesResults } from "./jamDetail";
 import { resultsOf } from "./rounds";
 
 type Entry = Schemas["Entry"];
@@ -49,13 +51,14 @@ type BattleCardProps = {
 
 /**
  * A battle on the jam page (DESIGN.md §6): its start, how full it is, prizes and format, then
- * who entered, best result first. Visitors see the results by round once there are any (M29),
- * else the entries as one wrapping row of chips; the jam's organiser gets a row per entry,
+ * who entered, best result first. Everyone sees the results by round once there are any (M29),
+ * else the entries as one wrapping row of chips; its editors switch to a row per entry,
  * withdrawn ones included, to add, edit and delete them.
  */
 export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<Entry | "new" | null>(null);
+  const [managing, setManaging] = useState(false);
   const remove = useDeleteEntry(battle.event_id);
   // Its organiser manages the results, even once the jam is over.
   const canEdit = jam.can_edit_battles;
@@ -65,7 +68,9 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
       (a.final_rank ?? STAGE_ORDER[a.reached]) -
       (b.final_rank ?? STAGE_ORDER[b.reached]),
   );
-  const results = canEdit ? null : resultsOf(battle);
+  const results = resultsOf(battle);
+  // Editors see the results as visitors do; without any, the rows are all there is to see.
+  const rows = canEdit && (managing || !results);
   const play = (entry: Entry) =>
     onPlay({
       url: entry.video_url ?? "",
@@ -79,10 +84,10 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
       {shown.length === 0 && (
         <p className="text-body-sm text-muted">{t("jam.noEntries")}</p>
       )}
-      {results && (
+      {results && !rows && (
         <BattleResults battle={battle} results={results} onPlay={onPlay} />
       )}
-      {shown.length > 0 && !canEdit && !results && (
+      {shown.length > 0 && !rows && !results && (
         // Solo battles: one wrapping row of chips; team battles: a block per team.
         <ul
           className={
@@ -96,21 +101,26 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
           ))}
         </ul>
       )}
-      {shown.length > 0 && canEdit && (
+      {shown.length > 0 && rows && (
         <ul className="divide-y divide-border">
           {shown.map((entry) => (
-            <li key={entry.id} className="flex items-center gap-2 py-2.5">
-              <EntryWho entry={entry} status={entry.status !== "confirmed"} />
-              {entry.video_url && (
-                <VideoPill
-                  name={entryLabel(entry)}
-                  onClick={() => play(entry)}
-                />
-              )}
-              <ResultBadge
-                finalRank={entry.final_rank}
-                reached={entry.reached}
-              />
+            <li key={entry.id} className="flex items-start gap-2 py-2.5">
+              {/* Badge and video under the names: beside them they cover the chips on phones. */}
+              <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                <EntryWho entry={entry} status={entry.status !== "confirmed"} />
+                <div className="flex flex-wrap items-center gap-2 empty:hidden">
+                  <ResultBadge
+                    finalRank={entry.final_rank}
+                    reached={entry.reached}
+                  />
+                  {entry.video_url && (
+                    <VideoPill
+                      name={entryLabel(entry)}
+                      onClick={() => play(entry)}
+                    />
+                  )}
+                </div>
+              </div>
               <IconButton
                 label={t("org.entries.editOne", { name: entryLabel(entry) })}
                 onClick={() => setEditing(entry)}
@@ -134,15 +144,37 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
       )}
       {canEdit && (
         <>
-          <div>
-            <AddChip
-              label={
-                membersPerEntry(battle) === 1
-                  ? t("org.entries.addDancer")
-                  : t("org.entries.addTeam")
-              }
-              onClick={() => setEditing("new")}
-            />
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            {rows && (
+              <AddChip
+                label={
+                  membersPerEntry(battle) === 1
+                    ? t("org.entries.addDancer")
+                    : t("org.entries.addTeam")
+                }
+                onClick={() => setEditing("new")}
+              />
+            )}
+            <div className="ml-auto flex flex-wrap justify-end gap-2">
+              {results && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-pressed={managing}
+                  onClick={() => setManaging(!managing)}
+                >
+                  {managing ? (
+                    t("org.entries.done")
+                  ) : (
+                    <>
+                      <PencilSimple size={18} weight="bold" aria-hidden />
+                      {t("org.entries.manage")}
+                    </>
+                  )}
+                </Button>
+              )}
+              <ResultsButton jam={jam} battle={battle} hasResults={!!results} />
+            </div>
           </div>
           {editing !== null && (
             <EntryDialog
@@ -208,40 +240,41 @@ function BattleHeader({
           </p>
         )}
       </div>
-      <div className="flex shrink-0 items-center gap-1">
-        {format && <MetaTag>{format}</MetaTag>}
-        <EditBattle jam={jam} battle={battle} />
-      </div>
+      {format && (
+        <div className="shrink-0">
+          <MetaTag>{format}</MetaTag>
+        </div>
+      )}
     </div>
   );
 }
 
-/** Once a public jam is over its editor is closed, but its organiser still fixes its battles
- * here (M26); before that, battles are edited in the editor. */
-function EditBattle({
+/** "Enter results" once the jam has started: the battle sheet on its Results step, its details a
+ * tab away (which is also how they are fixed once a public jam is over and its editor closed). */
+function ResultsButton({
   jam,
   battle,
+  hasResults,
 }: {
   jam: Schemas["EventResponse"];
   battle: Schemas["BattleDetail"];
+  hasResults: boolean;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  if (jam.can_edit || !jam.can_edit_battles) return null;
+  if (!jam.can_edit_battles || !takesResults(jam)) return null;
   return (
     <>
-      <IconButton
-        label={t("org.battles.editOne", { name: battle.name })}
-        onClick={() => setOpen(true)}
-      >
-        <PencilSimple size={20} weight="bold" aria-hidden />
-      </IconButton>
+      <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
+        <Trophy size={18} weight="bold" aria-hidden />
+        {t(hasResults ? "org.results.edit" : "org.results.enter")}
+      </Button>
       {open && (
         <BattleDialog
           jamId={jam.id}
           days={daysOf(jam.starts_on, jam.ends_on)}
+          country={jam.country}
           battle={battle}
-          // Over, the jam is about its results.
           step="results"
           onClose={() => setOpen(false)}
         />
@@ -277,9 +310,11 @@ function EntryWho({ entry, status }: { entry: Entry; status: boolean }) {
     .filter(Boolean)
     .join(" · ");
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+    <div className="flex min-w-0 flex-col gap-1.5">
       {entry.team_name && (
-        <p className="text-body font-extrabold">{entry.team_name}</p>
+        <p className="text-body font-extrabold break-words">
+          {entry.team_name}
+        </p>
       )}
       {meta && <p className="text-caption text-muted">{meta}</p>}
       {/* One member per line on phones: a wrapping row splits some duos and not others. */}

@@ -6,15 +6,17 @@ import {
   byDate,
   clusterLabel,
   distanceKm,
-  featuredJams,
+  filtersOf,
   firstView,
   inBounds,
+  jamsLink,
   jamsOf,
   matchesFilters,
   matchesSearch,
   narrow,
   otherJams,
   rangeOf,
+  writeFilters,
 } from "../../../src/features/map/jams";
 
 function jam(overrides: Partial<MapJam> = {}): MapJam {
@@ -178,62 +180,23 @@ describe("map jams", () => {
     expect(firstView([], "AT")).toEqual([9.5, 46.3, 17.2, 49.1]);
   });
 
-  it("features the visitor's country first, then the nearest jams", () => {
-    const at = (
-      name: string,
-      country: string,
-      lng: number,
-      lat: number,
-      starts_on = "2030-06-01",
-      phase: MapJam["phase"] = "upcoming",
-    ) =>
-      jam({
-        id: name,
-        name,
-        country,
-        lng,
-        lat,
-        starts_on,
-        ends_on: starts_on,
-        phase,
-      });
-    const jams = [
-      at("Over", "CH", 8.54, 47.37, "2026-10-01", "past"),
-      at("Zurich", "CH", 8.54, 47.37),
-      at("Seoul", "KR", 126.98, 37.57),
-      at("Paris", "FR", 2.35, 48.86),
-      at("Geneva", "CH", 6.14, 46.2, "2030-07-01"),
-      at("Berlin", "DE", 13.4, 52.52),
-    ];
-    const names = (country: string | null) =>
-      featuredJams(jams, country).map((j) => j.name);
+  it("reads and writes the /jams filters in the URL", () => {
+    expect(jamsLink({ when: "weekend" })).toBe("/jams?when=weekend");
+    expect(jamsLink({ categories: ["one_v_one", "kids"] })).toBe(
+      "/jams?battles=one_v_one,kids",
+    );
+    expect(jamsLink({})).toBe("/jams");
+    expect(
+      filtersOf(new URLSearchParams("q=zurich&when=past&battles=kids,bgirl")),
+    ).toEqual({ when: "past", categories: ["bgirl", "kids"] });
+    // Unknown values are dropped, not guessed.
+    expect(
+      filtersOf(new URLSearchParams("when=soon&battles=breaking,two_v_two")),
+    ).toEqual({ when: null, categories: ["two_v_two"] });
 
-    // Past jams never show; the country's own come first, in date order.
-    expect(names("CH")).toEqual([
-      "Zurich",
-      "Geneva",
-      "Paris",
-      "Berlin",
-      "Seoul",
-    ]);
-    // No jam in Austria: the nearest to its centre.
-    expect(names("AT")).toEqual([
-      "Zurich",
-      "Berlin",
-      "Geneva",
-      "Paris",
-      "Seoul",
-    ]);
-    // Unknown country: the soonest anywhere, at most six.
-    expect(names(null)).toEqual([
-      "Zurich",
-      "Seoul",
-      "Paris",
-      "Berlin",
-      "Geneva",
-    ]);
-    const many = Array.from({ length: 8 }, (_, i) => at(`J${i}`, "FR", 2, 48));
-    expect(featuredJams(many, "FR")).toHaveLength(6);
+    const params = new URLSearchParams("q=zurich&when=past");
+    writeFilters(params, { when: null, categories: ["crew"] });
+    expect(params.toString()).toBe("q=zurich&battles=crew");
   });
 
   it("writes cluster counts the DESIGN.md way", () => {

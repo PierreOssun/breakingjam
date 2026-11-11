@@ -8,6 +8,7 @@ import {
 import { useTranslation } from "react-i18next";
 import type { Schemas } from "../api/client";
 import { CountdownChip } from "../features/jams/CountdownChip";
+import { tellsVisitors } from "../features/jams/jamDetail";
 
 type Jam = { status: Schemas["EventStatus"]; phase: Schemas["Phase"] };
 /** What the badge says: the status, or `past` for a public jam that is over. */
@@ -63,9 +64,11 @@ export function StatusBadge({ jam }: { jam: Jam }) {
 /** The badge on a public card, only when it matters to a visitor (DESIGN.md §4.3): live now,
  * registration closed or cancelled. */
 export function CardStatus({ jam }: { jam: Jam }) {
-  if (jam.status === "cancelled") return <StatusBadge jam={jam} />;
-  if (jam.phase === "live") return <CountdownChip value={{ key: "live" }} />;
-  if (jam.status === "registration_closed" && jam.phase === "upcoming")
-    return <StatusBadge jam={jam} />;
-  return null;
+  if (jam.status !== "cancelled") {
+    if (jam.phase === "live") return <CountdownChip value={{ key: "live" }} />;
+    // A card of a past jam says so by its date.
+    if (jam.phase === "past") return null;
+  }
+  // The one rule for what a visitor needs told, shared with the jam page and the map.
+  return tellsVisitors(jam) ? <StatusBadge jam={jam} /> : null;
 }

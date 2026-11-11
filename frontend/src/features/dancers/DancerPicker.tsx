@@ -24,6 +24,8 @@ type DancerPickerProps = {
   onChange: (dancers: DancerRef[]) => void;
   /** How many dancers fit; the search hides once they are all chosen. */
   max: number;
+  /** The dialog opened to pick: its search takes the focus. */
+  autoFocus?: boolean;
 };
 
 /** Chosen dancers as removable chips, then search-before-create for more (§1, §6). */
@@ -32,6 +34,7 @@ export function DancerPicker({
   selected,
   onChange,
   max,
+  autoFocus,
 }: DancerPickerProps) {
   const { t } = useTranslation();
   const add = (dancer: LiveDancer) =>
@@ -62,6 +65,7 @@ export function DancerPicker({
           search={searchDancers}
           idOf={(d) => d.id}
           exclude={selected.map((d) => d.id)}
+          autoFocus={autoFocus}
           renderItem={(d) => <DancerLine dancer={d} />}
           onPick={(d) => add(d)}
           create={{

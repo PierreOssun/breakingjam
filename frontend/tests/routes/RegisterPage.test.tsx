@@ -45,7 +45,7 @@ describe("RegisterPage", () => {
     expect(calls(fetch)).not.toContain("POST /api/auth/register");
   });
 
-  it("asks for the mailed code, then welcomes the account and sends it home rather than to the jam form", async () => {
+  it("asks for the mailed code, then welcomes the account and goes on to the jam form", async () => {
     const fetch = mockApi({
       "GET /api/auth/me": LOGGED_OUT,
       "POST /api/auth/register": CODE_SENT,
@@ -75,12 +75,11 @@ describe("RegisterPage", () => {
     await waitFor(() =>
       expect(router.state.location.pathname).toBe("/welcome"),
     );
-    expect(router.state.location.search).toBe("?next=%2F");
+    expect(router.state.location.search).toBe("?next=%2Forg%2Fjams%2Fnew");
     await userEvent.click(await screen.findByRole("button", { name: /^Skip/ }));
-    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
-    expect(
-      screen.queryByRole("heading", { name: "Register a jam" }),
-    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe("/org/jams/new"),
+    );
   });
 
   it("brings a new account back to any other page it came from", async () => {

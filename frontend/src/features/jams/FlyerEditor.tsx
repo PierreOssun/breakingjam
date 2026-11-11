@@ -19,8 +19,8 @@ type Jam = Schemas["EventResponse"];
 type Problem = "type" | "size" | "small" | "unreadable";
 
 /**
- * On the editor's flyer (M24): whether it is the generated one or an upload, and the upload
- * itself; the pill sits over the flyer's top-right corner.
+ * Under the editor's flyer (M24): whether it is the generated one or an upload, and the upload
+ * itself; over the flyer, the pill covered its BreakingJam mark.
  */
 export function FlyerOverlay({ jam }: { jam: Jam }) {
   const { t } = useTranslation();
@@ -29,7 +29,7 @@ export function FlyerOverlay({ jam }: { jam: Jam }) {
   return (
     <>
       {flyer.input}
-      <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-text p-1 pl-3 text-caption font-bold text-bg shadow-md">
+      <div className="flex w-fit items-center gap-1 self-end rounded-full bg-text p-1 pl-3 text-caption font-bold text-bg">
         {t(uploaded ? "org.flyer.uploaded" : "org.flyer.generated")}
         <button
           type="button"

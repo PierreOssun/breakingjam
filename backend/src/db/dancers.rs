@@ -10,7 +10,7 @@ use crate::domain::{
     crew::CrewRef,
     dancer::{
         BattleRef, Dancer, DancerFields, DancerRef, DancerSource, DancerSummary, DancerTitle,
-        EventRef, FieldChange, OwnPage, Participation, default_look, merged_aliases,
+        EventRef, FieldChange, OwnPage, Participation, merged_aliases,
     },
     event::{EventStatus, Phase},
 };
@@ -554,32 +554,6 @@ pub async fn lock_merges(conn: &mut PgConnection, mode: MergeLock) -> sqlx::Resu
         MergeLock::Exclusive => sqlx::query!("select pg_advisory_xact_lock($1)", MERGE_LOCK),
         MergeLock::Shared => sqlx::query!("select pg_advisory_xact_lock_shared($1)", MERGE_LOCK),
     }
-    .execute(conn)
-    .await?;
-    Ok(())
-}
-
-/// Gives the dancers nobody has drawn yet the look a bgirl or bboy battle suggests; a mixed
-/// battle suggests none.
-pub async fn suggest_looks(
-    conn: &mut PgConnection,
-    dancer_ids: &[Uuid],
-    gender: BattleGender,
-) -> sqlx::Result<()> {
-    let (ids, looks): (Vec<Uuid>, Vec<String>) = dancer_ids
-        .iter()
-        .filter_map(|&id| Some((id, default_look(id, gender)?)))
-        .unzip();
-    if ids.is_empty() {
-        return Ok(());
-    }
-    sqlx::query!(
-        "update dancers set avatar_parts = suggested.look
-         from unnest($1::uuid[], $2::text[]) as suggested(id, look)
-         where dancers.id = suggested.id and dancers.avatar_parts is null",
-        &ids,
-        &looks,
-    )
     .execute(conn)
     .await?;
     Ok(())

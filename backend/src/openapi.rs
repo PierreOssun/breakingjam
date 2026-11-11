@@ -27,7 +27,8 @@ use crate::state::AppState;
         (name = "organizers", description = "Organiser pages and their Instagram verification"),
         (name = "geo", description = "Where the visitor is"),
         (name = "places", description = "The cities a search can name"),
-        (name = "stats", description = "Public counts for the landing page")
+        (name = "stats", description = "Public counts for the landing page"),
+        (name = "results", description = "The latest jams with battle winners")
     )
 )]
 struct ApiDoc;

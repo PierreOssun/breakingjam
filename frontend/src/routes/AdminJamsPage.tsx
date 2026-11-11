@@ -11,6 +11,7 @@ import { api, type Schemas, unwrap } from "../api/client";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { ExternalLink } from "../components/ExternalLink";
+import { FormError } from "../components/FormError";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { MoreList } from "../components/MoreList";
 import { MetaTag } from "../components/Tag";
@@ -131,7 +132,8 @@ function JamToReview({ jam }: { jam: Jam }) {
   const { t, i18n } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [sendingBack, setSendingBack] = useState(false);
+  // Both decisions ask first: Approve right beside the next jam's would take one slip to misfire.
+  const [asking, setAsking] = useState<"approve" | "sendBack" | null>(null);
   const [note, setNote] = useState("");
   const decide = useMutation({
     mutationFn: async (decision: Decision) => {
@@ -154,10 +156,15 @@ function JamToReview({ jam }: { jam: Jam }) {
           { name: jam.name },
         ),
       });
-      setSendingBack(false);
+      setAsking(null);
     },
-    onError: (error) => toast({ kind: "error", message: error.message }),
+    // Shown in the dialog that asked: a toast would sit under it.
   });
+  const refused = <FormError message={decide.error?.message} />;
+  const close = () => {
+    decide.reset();
+    setAsking(null);
+  };
   const { organizer } = jam;
 
   return (
@@ -209,20 +216,30 @@ function JamToReview({ jam }: { jam: Jam }) {
         </p>
       </div>
       <div className="flex gap-2">
-        <Button
-          size="sm"
-          loading={decide.isPending && decide.variables.approve}
-          onClick={() => decide.mutate({ approve: true })}
-        >
+        <Button size="sm" onClick={() => setAsking("approve")}>
           {t("admin.jams.approve")}
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => setSendingBack(true)}>
+        <Button variant="ghost" size="sm" onClick={() => setAsking("sendBack")}>
           {t("admin.jams.sendBack")}
         </Button>
       </div>
-      {sendingBack && (
+      {asking === "approve" && (
         <Dialog
-          onClose={() => setSendingBack(false)}
+          onClose={close}
+          title={t("admin.jams.approveTitle", { name: jam.name })}
+          action={{
+            label: t("admin.jams.approve"),
+            loading: decide.isPending,
+            onClick: () => decide.mutate({ approve: true }),
+          }}
+        >
+          <p className="text-body text-muted">{t("admin.jams.approveBody")}</p>
+          {refused}
+        </Dialog>
+      )}
+      {asking === "sendBack" && (
+        <Dialog
+          onClose={close}
           title={t("admin.jams.sendBackTitle", { name: jam.name })}
           action={{
             label: t("admin.jams.sendBack"),
@@ -240,6 +257,7 @@ function JamToReview({ jam }: { jam: Jam }) {
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
+          {refused}
         </Dialog>
       )}
     </div>

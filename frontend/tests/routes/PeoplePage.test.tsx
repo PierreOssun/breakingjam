@@ -44,9 +44,9 @@ describe("PeoplePage", () => {
     renderApp("/dancers");
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Find someone" }),
+      await screen.findByRole("heading", { level: 1, name: "Dancers" }),
     ).toBeInTheDocument();
-    const list = screen.getByRole("list", { name: "Find someone" });
+    const list = screen.getByRole("list", { name: "Dancers" });
     const rows = await within(list).findAllByRole("link");
     expect(rows.map((row) => row.getAttribute("href"))).toEqual([
       `/dancers/${MENNO.id}`,
@@ -118,7 +118,7 @@ describe("PeoplePage", () => {
 
     await userEvent.click(
       within(screen.getByRole("banner")).getByRole("link", {
-        name: "Find someone",
+        name: "Dancers",
       }),
     );
 
@@ -158,12 +158,10 @@ describe("PeoplePage", () => {
     renderApp("/");
     const header = within(await screen.findByRole("banner"));
 
-    await userEvent.click(
-      await header.findByRole("link", { name: "Find someone" }),
-    );
+    await userEvent.click(await header.findByRole("link", { name: "Dancers" }));
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Find someone" }),
+      await screen.findByRole("heading", { level: 1, name: "Dancers" }),
     ).toBeInTheDocument();
   });
 });

@@ -41,7 +41,7 @@ describe("Header", () => {
     await userEvent.click(screen.getByRole("option", { name: "Français" }));
 
     expect(
-      await (await header()).findByRole("link", { name: "Trouver un jam" }),
+      await (await header()).findByRole("link", { name: "Danseurs" }),
     ).toBeInTheDocument();
     expect(document.documentElement.lang).toBe("fr");
     expect(localStorage.getItem("bj.lang")).toBe("fr");
@@ -61,7 +61,7 @@ describe("Header", () => {
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}");
 
     expect(
-      await (await header()).findByRole("link", { name: "Jam finden" }),
+      await (await header()).findByRole("link", { name: "Tänzer" }),
     ).toBeInTheDocument();
     expect(
       (await header()).getByRole("button", { name: "Sprache: Deutsch" }),
@@ -118,8 +118,9 @@ describe("Header", () => {
     expect(
       nav.getAllByRole("link").map((link) => link.getAttribute("href")),
     ).toEqual(["/map", "/jams", "/dancers"]);
-    expect(nav.getByRole("link", { name: "Jam map" })).toBeInTheDocument();
-    expect(nav.getByRole("link", { name: "Find a jam" })).toBeInTheDocument();
+    expect(nav.getByRole("link", { name: "Map" })).toBeInTheDocument();
+    expect(nav.getByRole("link", { name: "Jams" })).toBeInTheDocument();
+    expect(nav.getByRole("link", { name: "Dancers" })).toBeInTheDocument();
     expect(
       await bar.findByRole("link", { name: "Log in" }),
     ).toBeInTheDocument();

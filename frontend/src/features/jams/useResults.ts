@@ -7,6 +7,7 @@ import {
   type Draft,
   draftOf,
   entryVideo,
+  firstRoundFor,
   matchesBody,
   roundsOf,
   type Slot,
@@ -29,7 +30,11 @@ export function useResults(jamId: string, battle: Battle | undefined) {
   const [draft, setDraft] = useState<Draft>(() =>
     draftOf(rounds, battle?.matches ?? []),
   );
-  const [round, setRound] = useState<Round | undefined>(rounds[0]);
+  const entrants =
+    battle?.entries.filter((e) => e.status !== "withdrawn").length ?? 0;
+  const [round, setRound] = useState<Round | undefined>(() =>
+    firstRoundFor(rounds, entrants),
+  );
   const [state, setState] = useState<SaveState>("saved");
   const [error, setError] = useState<string | null>(null);
   const latest = useRef(draft);

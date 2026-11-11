@@ -6,7 +6,7 @@ import { PersonRow } from "../features/dancers/PersonRow";
 import { useDancerSearch } from "../features/dancers/search";
 import { useSearchText } from "../lib/useSearchText";
 
-/** `/dancers`, "Find someone": bboys, bgirls, DJs and MCs by name, alias or handle, notable first. */
+/** `/dancers`, "Dancers": bboys, bgirls, DJs and MCs by name, alias or handle, notable first. */
 export function PeoplePage() {
   const { t } = useTranslation();
   const [text, setText, q] = useSearchText();

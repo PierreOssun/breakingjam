@@ -1,0 +1,57 @@
+name = "DPC Jam 2021"
+starts_on = 2021-10-23
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+venue = "GZ Heuried"
+lat = 47.3673
+lng = 8.5038
+sources = [
+  "https://and8.dance/en/e/3710",
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+]
+judges = ["illjaz", "lil-zoo", "cho"]
+djs = ["dj-catch", "jon-kwizera", "dj-dash", "dj-creem", "ob-one"]
+mcs = ["godfather"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "tru-pac", b = "phil-wizard-sunni", winner = "phil-wizard-sunni", video = "https://youtu.be/n4tMZyGICr0" },
+  { round = "top16", a = "alvin-kastrito", b = "kaneki-the-kalameet-laziness", winner = "alvin-kastrito", video = "https://youtu.be/cKP_UFR-3gQ" },
+  { round = "top16", a = "naki-tasic", b = "mowgly-snap", winner = "mowgly-snap", video = "https://youtu.be/v5Y7yLmz8Cg" },
+  { round = "top16", a = "ruff-n-x", b = "gun-muha", winner = "gun-muha", video = "https://youtu.be/eFP7WmDMtKg" },
+  { round = "top16", a = "cha-ja-nazgul", b = "alis-funny666", winner = "alis-funny666", video = "https://youtu.be/dEii4MdFlK8" },
+  { round = "top16", a = "jetleg-mattix", b = "lucky-mighty-jim", winner = "jetleg-mattix", video = "https://youtu.be/B_3Q0FFQOOk" },
+  { round = "top16", a = "jerry-the-metall-ralfinio", b = "tru-cru", winner = "tru-cru", video = "https://youtu.be/AUzkxZ0dxw8" },
+  { round = "top16", a = "agency-of-entries", b = "first-class", winner = "first-class", video = "https://youtu.be/khwi1IJi2II" },
+  { round = "top8", a = "alis-funny666", b = "alvin-kastrito", winner = "alvin-kastrito", video = "https://youtu.be/tCKF5JHCuXg" },
+  { round = "top8", a = "gun-muha", b = "jetleg-mattix", winner = "gun-muha", video = "https://youtu.be/PdkjjofGtqs" },
+  { round = "top8", a = "mowgly-snap", b = "phil-wizard-sunni", winner = "phil-wizard-sunni", video = "https://youtu.be/U_RAewOiv5c" },
+  { round = "top8", a = "first-class", b = "tru-cru", winner = "tru-cru", video = "https://youtu.be/qzJh4kf-MbA" },
+  { round = "top4", a = "gun-muha", b = "phil-wizard-sunni", winner = "phil-wizard-sunni", video = "https://youtu.be/8UApk8gFFTM" },
+  { round = "top4", a = "alvin-kastrito", b = "tru-cru", winner = "tru-cru", video = "https://youtu.be/7NXILEFEBi4" },
+  { round = "final", a = "phil-wizard-sunni", b = "tru-cru", winner = "phil-wizard-sunni", video = "https://youtu.be/q9pM6-ZaLnc" },
+]
+
+[battles.teams]
+agency-of-entries = { name = "Agency Of Entries" }
+alis-funny666 = { members = ["alis", "funny666"] }
+alvin-kastrito = { crew = "formless-corp", members = ["alvin", "kastrito"] }
+cha-ja-nazgul = { members = ["nazgul", "cha-ja"] }
+first-class = { name = "First Class", members = ["pac-pac", "nord-diamond"] }
+gun-muha = { members = ["gun", "muha"] }
+jerry-the-metall-ralfinio = { crew = "3-16", members = ["jerry-the-metall", "ralfinio"] }
+jetleg-mattix = { members = ["jet-leg", "mattix"] }
+kaneki-the-kalameet-laziness = { members = ["laziness", "kaneki"] }
+lucky-mighty-jim = { members = ["mighty-jim", "lucky"] }
+mowgly-snap = { members = ["mowgly", "snap"] }
+naki-tasic = { members = ["tasic", "naki"] }
+phil-wizard-sunni = { members = ["phil-wizard", "sunni"] }
+ruff-n-x = { name = "Ruff'n'x" }
+tru-cru = { crew = "tru-cru", members = ["chau-lin", "light"] }
+tru-pac = { name = "Tru Pac" }

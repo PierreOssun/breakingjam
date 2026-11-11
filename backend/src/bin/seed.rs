@@ -603,7 +603,7 @@ async fn insert_events(
                     .id;
             for entrant in battle.entrants {
                 let entry = ids.entry(battle, entrant)?;
-                db::battles::insert_entry(conn, battle_id, fields.gender, &entry).await?;
+                db::battles::insert_entry(conn, battle_id, &entry).await?;
             }
         }
     }

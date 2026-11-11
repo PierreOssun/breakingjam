@@ -13,7 +13,12 @@ import { applyFieldErrors } from "../../lib/apiErrors";
 import { CrewPicker } from "../crews/CrewPicker";
 import { DancerPicker } from "../dancers/DancerPicker";
 import { membersPerEntry } from "./battleFields";
-import { entryBody, type EntryFormValues, entryValues } from "./entryFields";
+import {
+  entryBody,
+  type EntryFormValues,
+  entryLabel,
+  entryValues,
+} from "./entryFields";
 
 const FIELDS = [
   "team_name",
@@ -35,7 +40,7 @@ const STAGES: Schemas["BracketStage"][] = [
 ];
 
 type EntryDialogProps = {
-  battle: Schemas["Battle"];
+  battle: Schemas["BattleDetail"];
   /** The entry to edit; a new one when absent. */
   entry?: Schemas["Entry"];
   onClose: () => void;
@@ -51,8 +56,17 @@ export function EntryDialog({ battle, entry, onClose }: EntryDialogProps) {
   const [members, setMembers] = useState(entry?.members ?? []);
   const [crew, setCrew] = useState(entry?.crew ?? null);
   const form = useForm<EntryFormValues>({ defaultValues: entryValues(entry) });
-  const { register, handleSubmit, setError, formState } = form;
+  const { register, handleSubmit, setError, setValue, watch, formState } = form;
   const { errors, isDirty } = formState;
+  const teamName = watch("team_name").trim();
+  // Two entries under one name can't be told apart where results are entered.
+  const taken =
+    teamName !== "" &&
+    battle.entries.some(
+      (other) =>
+        other.id !== entry?.id &&
+        entryLabel(other).toLowerCase() === teamName.toLowerCase(),
+    );
 
   const save = useMutation({
     mutationFn: async (body: Schemas["EntryFields"]) =>
@@ -116,18 +130,27 @@ export function EntryDialog({ battle, entry, onClose }: EntryDialogProps) {
           selected={members}
           onChange={setMembers}
           max={size}
+          // A new entry starts with who: an edit, more likely with its result.
+          autoFocus={!entry}
         />
         {size > 1 && (
           <>
             <TextField
               label={<OptionalLabel label={t("org.entries.teamName")} />}
+              hint={taken ? t("org.entries.teamNameTaken") : undefined}
               error={errors.team_name?.message}
               {...register("team_name")}
             />
             <CrewPicker
               label={t("org.entries.crew")}
               value={crew}
-              onChange={setCrew}
+              onChange={(picked) => {
+                setCrew(picked);
+                // A team entered for its crew goes by it, unless it already has a name.
+                if (picked && teamName === "") {
+                  setValue("team_name", picked.name, { shouldDirty: true });
+                }
+              }}
             />
           </>
         )}

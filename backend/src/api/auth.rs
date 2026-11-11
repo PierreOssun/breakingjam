@@ -335,11 +335,9 @@ async fn finish_google(
     Ok((cookies, Redirect::to(&target)).into_response())
 }
 
-/// Where a new account goes: the welcome step ("Are you on BreakingJam?", M25), then `next`,
-/// anywhere but the jam form, as it may only dance or watch (mirrored in the frontend's
-/// `afterSignUp`).
+/// Where a new account goes: the welcome step ("Are you on BreakingJam?", M25), then `next`
+/// (mirrored in the frontend's `afterSignUp`).
 pub(crate) fn after_sign_up(next: &str) -> String {
-    let next = if next == "/org/jams/new" { "/" } else { next };
     let next: String = url::form_urlencoded::byte_serialize(next.as_bytes()).collect();
     format!("/welcome?next={next}")
 }

@@ -276,7 +276,7 @@ async fn create_entry(
         AppError::check(fields.errors_for(&battle))?;
         check_members(&mut tx, &fields.dancer_ids, &[]).await?;
         check_entry(&mut tx, &battle, fields, None).await?;
-        let id = db::battles::insert_entry(&mut tx, battle_id, battle.gender, fields).await?;
+        let id = db::battles::insert_entry(&mut tx, battle_id, fields).await?;
         tx.commit().await?;
         Ok(id)
     })
@@ -328,7 +328,7 @@ async fn update_entry(
         AppError::check(fields.errors_for(&battle))?;
         check_members(&mut tx, &fields.dancer_ids, &members).await?;
         check_entry(&mut tx, &battle, fields, Some(&entry)).await?;
-        db::battles::update_entry(&mut tx, id, battle.gender, fields).await?;
+        db::battles::update_entry(&mut tx, id, fields).await?;
         Ok(tx.commit().await?)
     })
     .await?;

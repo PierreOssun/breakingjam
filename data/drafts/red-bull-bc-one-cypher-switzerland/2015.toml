@@ -1,0 +1,36 @@
+name = "Red Bull BC One Cypher Switzerland 2015"
+# starts_on = unknown: the battle videos went up on 3 May 2015, so probably 2 May (no source yet)
+timezone = "Europe/Zurich"
+city = "Zürich"  # Red Bull's hall of fame (search snippet) only
+country = "CH"
+lat = 47.3769
+lng = 8.5417
+sources = [
+  "https://www.youtube.com/channel/UCGuvgZU2QcEzg_dZQUQrvOw",
+  "https://www.redbull.com/ch-de/red-bull-bc-one-switzerland-hall-of-fame",
+  "https://en.wikipedia.org/wiki/Red_Bull_BC_One_Western_European_Finals",
+]
+judges = ["junior", "menno", "mounir"]  # every MK.Battles description
+
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "dade", b = "yu-seng", winner = "yu-seng", video = "https://youtu.be/6ilEzl-Wokc" },
+  { round = "top16", a = "fab-yo", b = "moa", winner = "moa", video = "https://youtu.be/QWU0lXPxhz0" },
+  { round = "top16", a = "buz", b = "jitsou", winner = "buz", video = "https://youtu.be/8zjjfuzzEDc" },
+  { round = "top16", a = "michel", b = "wen", winner = "wen", video = "https://youtu.be/cstCtkbdGfs" },
+  { round = "top16", a = "no-mercy", b = "jimmy-frost", winner = "no-mercy", video = "https://youtu.be/TO6Bj1j6d6Q" },
+  { round = "top16", a = "be-nasty", b = "basil", winner = "be-nasty", video = "https://youtu.be/tJyXbKpfWE8" },
+  { round = "top16", a = "kamikaze", b = "joniboy", winner = "joniboy", video = "https://youtu.be/rn4aPH7FLwQ" },
+  { round = "top16", a = "zohair", b = "jason-lausanne", winner = "zohair", video = "https://youtu.be/1GiqcMZMPZg" },
+  { round = "top8", a = "yu-seng", b = "moa", winner = "moa", video = "https://youtu.be/lA4rYOIGfPw" },
+  { round = "top8", a = "buz", b = "wen", winner = "wen", video = "https://youtu.be/4oIlEtJHxhk" },
+  { round = "top8", a = "no-mercy", b = "be-nasty", winner = "no-mercy", video = "https://youtu.be/5cv6MPDz94U" },
+  { round = "top8", a = "joniboy", b = "zohair", winner = "joniboy", video = "https://youtu.be/A033vpikQaE" },
+  { round = "top4", a = "no-mercy", b = "moa", winner = "moa", video = "https://youtu.be/ZThud1M6RS8" },
+  { round = "top4", a = "wen", b = "joniboy", winner = "wen", video = "https://youtu.be/LoWRsdutMyQ" },
+  { round = "final", a = "moa", b = "wen", winner = "moa", video = "https://youtu.be/TM9oGNPhXt0" },
+]

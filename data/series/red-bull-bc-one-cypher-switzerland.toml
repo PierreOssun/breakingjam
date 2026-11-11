@@ -3,7 +3,7 @@ country = "CH"
 timezone = "Europe/Zurich"
 
 [youtube]
-channels = ["UC9oEzPGZiTE692KucAsTY1g"]   # Red Bull BC One
+channels = ["UC9oEzPGZiTE692KucAsTY1g", "UCGuvgZU2QcEzg_dZQUQrvOw"]   # Red Bull BC One, Rec. (MK.Battles)
 title = "Switzerland"
 battles = [
   { key = "bboy", name = "1v1 Bboy", gender = "bboy", words = ["b-boy", "bboy"] },

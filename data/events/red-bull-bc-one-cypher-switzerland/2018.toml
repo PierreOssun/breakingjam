@@ -11,15 +11,31 @@ sources = [
   "https://www.bboyevent.com/special/2/red_bull_bc_one",
   "https://www.redbull.com/ch-de/red-bull-bc-one-switzerland-hall-of-fame",
   "https://www.nau.ch/ort/baden/red-bull-bc-one-cypher-breakdance-spektakel-im-vollen-trafo-baden-66199553",
+  "https://www.youtube.com/channel/UCGuvgZU2QcEzg_dZQUQrvOw",
 ]
+judges = ["lilou", "menno", "tuff-kid"]  # MK.Battles' descriptions and and8's line-up
+djs = ["ob-one", "foxhound"]
 
+# Mixed: b-girl Becca played the top 16.
 [[battles]]
 key = "bboy"
-name = "1v1 Bboy"
-gender = "bboy"
-results = [
-  { entrant = "baby-og", reached = "winner", video = "https://youtu.be/Ch6HCqXucak" },
-  { entrant = "shaymin", reached = "top2", video = "https://youtu.be/Ch6HCqXucak" },
-  { entrant = "moa", reached = "top4", video = "https://youtu.be/DXYL-VhQo7Q" },
-  { entrant = "yu-seng", reached = "top4", video = "https://youtu.be/GNh8GDezM2o" },
+name = "1v1"
+gender = "mixed"
+bracket_size = 16
+matches = [
+  { round = "top16", a = "lucas-paul", b = "jitsou", winner = "lucas-paul", video = "https://youtu.be/WKGF08HbXOk" },
+  { round = "top16", a = "simeon", b = "baby-og", winner = "baby-og", video = "https://youtu.be/NVKG5mxfc8c" },
+  { round = "top16", a = "yu-seng", b = "wara", winner = "yu-seng", video = "https://youtu.be/_rdmEbQDb88" },
+  { round = "top16", a = "nestor", b = "fox", winner = "nestor", video = "https://youtu.be/tHvpd9OSoV4" },
+  { round = "top16", a = "basil", b = "moussa", winner = "moussa", video = "https://youtu.be/5wNzX4EYG6U" },
+  { round = "top16", a = "moa", b = "banana-joe", winner = "moa", video = "https://youtu.be/VZuIxiUkEXE" },
+  { round = "top16", a = "david", b = "zoo-rock", winner = "zoo-rock", video = "https://youtu.be/TF3j6Uxu-xU" },
+  { round = "top16", a = "shaymin", b = "becca", winner = "shaymin", video = "https://youtu.be/yTMkKqSXH-Q" },
+  { round = "top8", a = "baby-og", b = "lucas-paul", winner = "baby-og", video = "https://youtu.be/qr1MRm90zZc" },
+  { round = "top8", a = "yu-seng", b = "nestor", winner = "yu-seng", video = "https://youtu.be/ID3VL7XPYsc" },
+  { round = "top8", a = "moussa", b = "moa", winner = "moa", video = "https://youtu.be/gEgQz6VhAZc" },
+  { round = "top8", a = "shaymin", b = "zoo-rock", winner = "shaymin", video = "https://youtu.be/rO1gqFIYbzk" },
+  { round = "top4", a = "yu-seng", b = "baby-og", winner = "baby-og", video = "https://youtu.be/GNh8GDezM2o" },
+  { round = "top4", a = "moa", b = "shaymin", winner = "shaymin", video = "https://youtu.be/DXYL-VhQo7Q" },
+  { round = "final", a = "baby-og", b = "shaymin", winner = "baby-og", video = "https://youtu.be/Ch6HCqXucak" },
 ]

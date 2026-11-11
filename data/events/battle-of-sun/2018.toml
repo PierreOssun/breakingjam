@@ -1,0 +1,59 @@
+name = "Battle of Sun 2018"
+starts_on = 2018-09-22
+timezone = "Europe/Paris"
+city = "Saint-Louis"
+country = "FR"
+venue = "Forum Jean-Marie Zoellé"  # "salle des fêtes du Forum, place Gissy", during the Art de Rue festival
+lat = 47.5894
+lng = 7.5647
+sources = [
+  "https://and8.dance/en/e/2893",
+  "https://www.youtube.com/watch?v=J-QL16XdIaE",
+  "https://www.youtube.com/channel/UC4C0dCBNWxN68ni1M5ef9vA",
+]
+judges = ["noe", "don-hoang", "thug"]
+djs = ["dj-yann"]
+mcs = ["jox"]
+
+# "Battle of SUN Vol. III", by Ossun Crew and the town's youth council; every battle filmed by Breakingstras.
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "sbx", b = "full-connection", winner = "sbx", video = "https://youtu.be/SgjdSuMdDXk" },
+  { round = "top16", a = "nextape-1", b = "dare2dance", winner = "nextape-1", video = "https://youtu.be/G8BPCBdL170" },
+  { round = "top16", a = "pere-et-fille", b = "toxic-cdqd", winner = "pere-et-fille", video = "https://youtu.be/D4N9OK-Lg1U" },
+  { round = "top16", a = "ruthless", b = "illusion-team", winner = "ruthless", video = "https://youtu.be/Z8cUW2cMQnw" },
+  { round = "top16", a = "al4as", b = "nextape-3", winner = "al4as", video = "https://youtu.be/V8Wds1NtkDU" },
+  { round = "top16", a = "originz", b = "toxic-crew", winner = "toxic-crew", video = "https://youtu.be/VyvlxHo6R-Q" },
+  { round = "top16", a = "strs", b = "keep-it-real", winner = "strs", video = "https://youtu.be/oeep8vK3BhI" },
+  { round = "top16", a = "nextape-2", b = "caballeros", winner = "nextape-2", video = "https://youtu.be/wVgHJev72vA" },
+  { round = "top8", a = "sbx", b = "nextape-1", winner = "sbx", video = "https://youtu.be/Wog6j2AVayg" },
+  { round = "top8", a = "pere-et-fille", b = "ruthless", winner = "pere-et-fille", video = "https://youtu.be/zNE6nhKI5as" },
+  { round = "top8", a = "al4as", b = "toxic-crew", winner = "al4as", video = "https://youtu.be/Yz67y1bj18o" },
+  { round = "top8", a = "strs", b = "nextape-2", winner = "strs", video = "https://youtu.be/cGW1yhWGFzo" },
+  { round = "top4", a = "sbx", b = "pere-et-fille", winner = "sbx", video = "https://youtu.be/NXPAvApZ-U8" },
+  { round = "top4", a = "al4as", b = "strs", winner = "al4as", video = "https://youtu.be/8k_CdJRriHM" },
+  { round = "final", a = "sbx", b = "al4as", winner = "sbx", video = "https://youtu.be/hJ45jouH00g" },
+]
+
+[battles.teams]
+sbx = { name = "SBX", members = ["djevo", "bew"] }
+full-connection = { name = "Full Connection" }
+nextape-1 = { name = "Nextape 1" }
+dare2dance = { name = "Dare2Dance" }
+pere-et-fille = { name = "Père et Fille" }
+toxic-cdqd = { name = "Toxic CDQD" }
+ruthless = { name = "Ruthless" }
+illusion-team = { name = "Illusion Team" }
+al4as = { name = "Al4as" }
+nextape-3 = { name = "Nextape 3" }
+originz = { name = "Origin'z" }
+toxic-crew = { name = "Toxic Crew" }
+strs = { name = "STRS" }
+keep-it-real = { name = "Keep it Real" }
+nextape-2 = { name = "Nextape 2" }
+caballeros = { name = "Caballeros" }

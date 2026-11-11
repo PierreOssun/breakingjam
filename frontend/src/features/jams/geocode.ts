@@ -90,7 +90,8 @@ export function placeOf({ geometry, properties: p }: Feature): Place {
   };
 }
 
-/** Up to five places for what was typed, nearer ones first when there is a pin to go by. */
+/** Up to five places for what was typed, nearer ones first when there is a pin to go by; a place
+ * mapped twice (as a point and as a building) shows once. */
 export async function search(
   query: string,
   {
@@ -101,7 +102,8 @@ export async function search(
 ): Promise<Place[]> {
   const params = new URLSearchParams({
     q: query,
-    limit: "5",
+    // A few spare, for the twins dropped below.
+    limit: "8",
     lang: photonLang(language),
   });
   if (near) {
@@ -111,7 +113,16 @@ export async function search(
   const response = await fetch(`${ENDPOINT}/api/?${params}`, { signal });
   if (!response.ok) throw new Error(`geocode: ${response.status}`);
   const { features } = (await response.json()) as { features: Feature[] };
-  return features.map(placeOf);
+  const rows = new Set<string>();
+  return features
+    .map(placeOf)
+    .filter((place) => {
+      const row = `${place.title}\n${place.subtitle}`;
+      if (rows.has(row)) return false;
+      rows.add(row);
+      return true;
+    })
+    .slice(0, 5);
 }
 
 /** What is at a point, for a pin dropped before any search; null in the middle of nowhere. */

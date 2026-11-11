@@ -47,8 +47,15 @@ export function Dialog({
     const dialog = ref.current;
     if (!dialog) return;
     dialog.showModal();
-    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
-    return () => dialog.close();
+    // A frame later: StrictMode closes and reopens on mount, and a field focused before that
+    // close is blurred by it, which marks it touched and shows "Required." on an empty form.
+    const frame = requestAnimationFrame(() =>
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus(),
+    );
+    return () => {
+      cancelAnimationFrame(frame);
+      dialog.close();
+    };
   }, []);
 
   const requestClose = () => {

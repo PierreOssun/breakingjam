@@ -411,11 +411,10 @@ pub async fn already_entered(
     .await
 }
 
-/// Inserts an entry (already normalised) and its members into a battle of `gender`.
+/// Inserts an entry (already normalised) and its members into a battle.
 pub async fn insert_entry(
     conn: &mut PgConnection,
     battle_id: Uuid,
-    gender: BattleGender,
     fields: &EntryFields,
 ) -> sqlx::Result<Uuid> {
     let id = Uuid::now_v7();
@@ -436,15 +435,14 @@ pub async fn insert_entry(
     )
     .execute(&mut *conn)
     .await?;
-    replace_members(conn, id, &fields.dancer_ids, gender).await?;
+    replace_members(conn, id, &fields.dancer_ids).await?;
     Ok(id)
 }
 
-/// Replaces an entry's fields and members; `gender` is its battle's.
+/// Replaces an entry's fields and members.
 pub async fn update_entry(
     conn: &mut PgConnection,
     id: Uuid,
-    gender: BattleGender,
     fields: &EntryFields,
 ) -> sqlx::Result<()> {
     sqlx::query!(
@@ -463,14 +461,13 @@ pub async fn update_entry(
     )
     .execute(&mut *conn)
     .await?;
-    replace_members(conn, id, &fields.dancer_ids, gender).await
+    replace_members(conn, id, &fields.dancer_ids).await
 }
 
 async fn replace_members(
     conn: &mut PgConnection,
     entry_id: Uuid,
     dancer_ids: &[Uuid],
-    gender: BattleGender,
 ) -> sqlx::Result<()> {
     sqlx::query!("delete from entry_members where entry_id = $1", entry_id)
         .execute(&mut *conn)
@@ -480,9 +477,9 @@ async fn replace_members(
         entry_id,
         dancer_ids,
     )
-    .execute(&mut *conn)
+    .execute(conn)
     .await?;
-    super::dancers::suggest_looks(conn, dancer_ids, gender).await
+    Ok(())
 }
 
 /// Deletes an entry and its members.

@@ -9,7 +9,7 @@ import { SelectField } from "../../components/SelectField";
 import { TextField } from "../../components/TextField";
 import { SaveIndicator } from "./EditorBar";
 import { entryLabel } from "./entryFields";
-import { badLink, type Slot } from "./results";
+import { badLink, roundDone, type Slot } from "./results";
 import type { Results } from "./useResults";
 
 type Battle = Schemas["BattleDetail"];
@@ -48,7 +48,10 @@ export function ResultsStep({
         label={t("org.results.round")}
         chips={rounds.map((r) => ({
           key: r,
-          label: t(`jam.rounds.${r}`),
+          // A finished round wears a tick: what's left to enter shows at a glance.
+          label: roundDone(draft[r])
+            ? t("org.results.roundDone", { round: t(`jam.rounds.${r}`) })
+            : t(`jam.rounds.${r}`),
           on: r === round,
           onPick: () => results.setRound(r),
         }))}

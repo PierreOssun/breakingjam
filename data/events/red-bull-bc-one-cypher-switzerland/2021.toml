@@ -16,20 +16,20 @@ sources = [
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "deijva", reached = "winner", video = "https://youtu.be/kDso94O3C7c" },
-  { entrant = "haku", reached = "top2", video = "https://youtu.be/kDso94O3C7c" },
-  { entrant = "lino", reached = "top4", video = "https://youtu.be/GXl_OQ1fU4k" },
-  { entrant = "nestor", reached = "top4", video = "https://youtu.be/GXl_OQ1fU4k" },
+bracket_size = 4
+matches = [
+  { round = "top4", a = "lino", b = "deijva", winner = "deijva", video = "https://youtu.be/GXl_OQ1fU4k" },
+  { round = "top4", a = "haku", b = "nestor", winner = "haku", video = "https://youtu.be/GXl_OQ1fU4k", at = 175 },
+  { round = "final", a = "deijva", b = "haku", winner = "deijva", video = "https://youtu.be/kDso94O3C7c" },
 ]
 
 [[battles]]
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "leaf", reached = "winner", video = "https://youtu.be/ex_sc6QtCUo" },
-  { entrant = "jazzy-jes", reached = "top2", video = "https://youtu.be/ex_sc6QtCUo" },
-  { entrant = "becca", reached = "top4", video = "https://youtu.be/m17IPIAMTh0" },
-  { entrant = "anna", reached = "top4", video = "https://youtu.be/m17IPIAMTh0" },
+bracket_size = 4
+matches = [
+  { round = "top4", a = "leaf", b = "becca", winner = "leaf", video = "https://youtu.be/m17IPIAMTh0" },
+  { round = "top4", a = "anna", b = "jazzy-jes", winner = "jazzy-jes", video = "https://youtu.be/m17IPIAMTh0", at = 216 },
+  { round = "final", a = "leaf", b = "jazzy-jes", winner = "leaf", video = "https://youtu.be/ex_sc6QtCUo" },
 ]

@@ -10,7 +10,7 @@ const JAMS = geojson(
 );
 
 const list = async () =>
-  within(await screen.findByRole("list", { name: "Find a jam" }));
+  within(await screen.findByRole("list", { name: "Jams" }));
 
 describe("JamsPage", () => {
   beforeEach(() => freezeToday());
@@ -23,7 +23,7 @@ describe("JamsPage", () => {
     renderApp("/jams");
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Find a jam" }),
+      await screen.findByRole("heading", { level: 1, name: "Jams" }),
     ).toBeInTheDocument();
     await waitFor(async () =>
       expect((await list()).getAllByRole("link")).toHaveLength(2),
@@ -41,6 +41,31 @@ describe("JamsPage", () => {
       "href",
       "/jams/paris-old-school-3",
     );
+  });
+
+  it("opens on the filters a link asks for, and keeps them in the URL", async () => {
+    mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "GET /api/events.geojson": geojson(
+        jamFeature(1, "Solo Jam", { categories: ["one_v_one"] }),
+        jamFeature(2, "Duo Jam", { categories: ["two_v_two"] }),
+      ),
+    });
+    const router = renderApp("/jams?battles=one_v_one");
+
+    await waitFor(async () =>
+      expect(
+        (await list()).getAllByRole("link").map((link) => link.textContent),
+      ).toEqual([expect.stringContaining("Solo Jam")]),
+    );
+    expect(screen.getByRole("button", { name: "1v1" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "2v2" }));
+    expect(router.state.location.search).toBe("?battles=one_v_one%2Ctwo_v_two");
+    expect((await list()).getAllByRole("link")).toHaveLength(2);
   });
 
   it("marks only the jams with videos, and links them to their battles", async () => {

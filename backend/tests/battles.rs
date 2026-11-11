@@ -263,7 +263,7 @@ async fn entries_enforce_one_entry_per_dancer_and_team_size(pool: PgPool) {
 }
 
 #[sqlx::test]
-async fn entering_a_bgirl_or_bboy_battle_draws_an_avatar_nobody_chose(pool: PgPool) {
+async fn entering_a_battle_leaves_the_avatar_as_it_was(pool: PgPool) {
     let jam = jam(pool).await;
     let mut bgirl_battle = one_v_one();
     bgirl_battle["gender"] = json!("bgirl");
@@ -271,34 +271,17 @@ async fn entering_a_bgirl_or_bboy_battle_draws_an_avatar_nobody_chose(pool: PgPo
     let bboys = id_of(&jam.battle(one_v_one()).await);
     let ami = jam.dancer("Ami").await;
     let menno = jam.dancer("Menno").await;
-    let chosen = jam.dancer("Chosen").await;
-    let parts = |id: &str| {
-        let uri = format!("/api/dancers/{id}");
-        let app = jam.app.clone();
-        async move { send(&app, get(&uri, None)).await.json["avatar_parts"].clone() }
-    };
-    let body =
-        json!({ "dancer_name": "Chosen", "country": "FR", "avatar_parts": "h0-s0-c0-o0-e0-b1" });
-    let saved = send(
-        &jam.app,
-        put(&format!("/api/dancers/{chosen}"), body, Some(&jam.owner)),
-    )
-    .await;
-    assert_eq!(saved.status, StatusCode::OK);
 
-    for (battle, dancer) in [(&bgirls, &ami), (&bboys, &menno), (&bgirls, &chosen)] {
+    for (battle, dancer) in [(&bgirls, &ami), (&bboys, &menno)] {
         let body = json!({ "dancer_ids": [dancer] });
         assert_eq!(jam.entry(battle, body).await.status, StatusCode::CREATED);
     }
 
-    // A bgirl gets long or tied-up hair and lash flicks; a bboy short hair, no details.
-    let ami = parts(&ami).await;
-    let ami = ami.as_str().unwrap();
-    assert!(ami.contains("-d"), "{ami}");
-    let menno = parts(&menno).await;
-    assert!(!menno.as_str().unwrap().contains("-d"), "{menno}");
-    // Somebody's choice is never replaced.
-    assert_eq!(parts(&chosen).await, "h0-s0-c0-o0-e0-b1");
+    // A page someone has seen keeps its face: the battle draws no look over it.
+    for dancer in [&ami, &menno] {
+        let page = send(&jam.app, get(&format!("/api/dancers/{dancer}"), None)).await;
+        assert_eq!(page.json["avatar_parts"], Value::Null);
+    }
 }
 
 #[sqlx::test]

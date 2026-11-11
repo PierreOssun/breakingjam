@@ -1,10 +1,10 @@
 name = "DPC Jam"
-# From the stance video descriptions ("from Zurich, Switzerland"); check it holds for every edition.
+# Zurich every year (and8.dance), at GZ Heuried from 2017; 2019 is titled Kappel am Albis on and8 but held at GZ Heuried.
 city = "Zurich"
 country = "CH"
 timezone = "Europe/Zurich"
 
 [youtube]
-channels = ["UCgiz3Pm3FBhDyy3g_fP5OVA"]   # stance
+channels = ["UCgiz3Pm3FBhDyy3g_fP5OVA", "UCqzSbOMDzVX1lVia0KAxEbg"]   # stance, DPC JAM (the organiser, 2014–2024)
 title = "DPC Jam"
 battles = [{ key = "2v2", name = "2v2", team_size = 2 }]

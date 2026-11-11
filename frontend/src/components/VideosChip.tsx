@@ -2,14 +2,19 @@ import { Play } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 
 // DESIGN.md §4.3: over a photo, so the same dark glass in both themes.
-const glass = "rounded-full bg-[#0B0D14]/72 text-white backdrop-blur";
+const glass = "rounded-full bg-[#0B0D14]/72 text-on-primary backdrop-blur";
 
 /**
  * "Videos available" on a jam preview whose battles have videos (DESIGN.md §4.3): over a card's
- * flyer, as a ▶ badge on a thumbnail, or as "▶ Videos" at the end of a list row. Never a link
+ * flyer, as a ▶ badge on a thumbnail, as "▶ Videos" at the end of a list row, or as an outlined
+ * "▶ Videos available" on a landing result card (§4.43). Never a link
  * of its own: the preview it sits in opens the jam's battles.
  */
-export function VideosChip({ on }: { on: "flyer" | "thumbnail" | "row" }) {
+export function VideosChip({
+  on,
+}: {
+  on: "flyer" | "thumbnail" | "row" | "card";
+}) {
   const { t } = useTranslation();
   const label = t("jam.videosAvailable");
   if (on === "thumbnail") {
@@ -19,6 +24,19 @@ export function VideosChip({ on }: { on: "flyer" | "thumbnail" | "row" }) {
       >
         <Play size={12} weight="fill" aria-hidden />
         <span className="sr-only">{label}</span>
+      </span>
+    );
+  }
+  if (on === "card") {
+    return (
+      <span className="inline-flex h-[26px] items-center gap-1.5 self-start rounded-full border border-border px-2.5 text-[12px] font-extrabold">
+        <Play
+          size={12}
+          weight="fill"
+          className="text-primary-text"
+          aria-hidden
+        />
+        {label}
       </span>
     );
   }

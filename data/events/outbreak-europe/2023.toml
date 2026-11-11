@@ -65,7 +65,7 @@ matches = [
   { round = "top32", a = "chris", b = "emmaaaa", winner = "emmaaaa", votes = [1, 2] },
   { round = "top32", a = "furia", b = "logistx", winner = "logistx", votes = [0, 3], video = "https://youtu.be/ETPJ1R9ZtjA" },
   { round = "top32", a = "konatsu", b = "elettra", winner = "konatsu", votes = [2, 1], video = "https://youtu.be/x80gDXwRyaw" },
-  { round = "top32", a = "o-d-d", b = "plus-one", winner = "plus-one", votes = [0, 3] },
+  { round = "top32", a = "o-d-d", b = "plus-one", winner = "plus-one", votes = [0, 3] , video = "https://youtu.be/d2jxrVolwfY" },
   { round = "top32", a = "alicia", b = "isis", winner = "isis", votes = [1, 2], video = "https://youtu.be/oLAyGCF8odg" },
   { round = "top32", a = "ziyan", b = "sarah-bee", winner = "sarah-bee", votes = [1, 2], video = "https://youtu.be/PYJJy-X5cEA" },
   { round = "top32", a = "yingzi", b = "firebird", winner = "yingzi", votes = [3, 0], video = "https://youtu.be/3QFcq1ujuGw" },

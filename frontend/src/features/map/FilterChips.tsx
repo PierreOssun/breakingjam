@@ -1,7 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { CATEGORIES, type Category, type Filters, type When } from "./jams";
-
-const WHEN: When[] = ["weekend", "month", "past"];
+import {
+  CATEGORIES,
+  type Category,
+  type Filters,
+  type When,
+  WHENS,
+} from "./jams";
 
 type FilterChipsProps = {
   filters: Filters;
@@ -31,7 +35,7 @@ export function FilterChips({ filters, onChange, variant }: FilterChipsProps) {
   const groups = [
     {
       title: t("map.when"),
-      chips: WHEN.map((when) => (
+      chips: WHENS.map((when) => (
         <Chip
           key={when}
           on={filters.when === when}

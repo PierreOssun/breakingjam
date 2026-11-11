@@ -24,11 +24,15 @@ export type BlockProps = {
 
 const ICON = { size: 20, weight: "bold" as const };
 
+/** The date field a date chip opens the Dates block on. */
+export type DateField = "starts_on" | "ends_on" | "opens_at";
+
 /** First and last day, opening hours and timezone; opened from the date chips, so never empty. */
 export function DatesBlock({
   draft,
+  focus,
   onClose,
-}: Pick<BlockProps, "draft" | "onClose">) {
+}: Pick<BlockProps, "draft" | "onClose"> & { focus: DateField }) {
   const { t } = useTranslation();
   return (
     <BlockCard
@@ -40,6 +44,7 @@ export function DatesBlock({
         <TextField
           type="date"
           label={t("org.fields.startsOn")}
+          autoFocus={focus === "starts_on"}
           {...draft.field("starts_on")}
         />
         <TextField
@@ -47,11 +52,13 @@ export function DatesBlock({
           label={<OptionalLabel label={t("org.fields.endsOn")} />}
           hint={t("org.fields.endsOnHint")}
           min={draft.values.starts_on}
+          autoFocus={focus === "ends_on"}
           {...draft.field("ends_on")}
         />
         <TextField
           type="time"
           label={<OptionalLabel label={t("org.fields.opensAt")} />}
+          autoFocus={focus === "opens_at"}
           {...draft.field("opens_at")}
         />
         <TextField
@@ -140,7 +147,8 @@ export function LinksBlock({ draft, open, onOpen, onClose }: BlockProps) {
       />
       <TextField
         type="url"
-        label={<OptionalLabel label={t("org.fields.instagramUrl")} />}
+        // Not "optional": this or the email is needed to publish, as both hints say.
+        label={t("org.fields.instagramUrl")}
         hint={t("org.fields.instagramUrlHint")}
         placeholder="https://www.instagram.com/"
         {...draft.field("instagram_url")}
@@ -155,7 +163,7 @@ export function LinksBlock({ draft, open, onOpen, onClose }: BlockProps) {
       <TextField
         type="email"
         autoComplete="email"
-        label={<OptionalLabel label={t("org.fields.contactEmail")} />}
+        label={t("org.fields.contactEmail")}
         hint={t("org.fields.contactEmailHint")}
         {...draft.field("contact_email")}
       />

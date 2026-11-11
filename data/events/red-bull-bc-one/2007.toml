@@ -17,17 +17,17 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "hong-10", b = "daniel-qdm", winner = "hong-10" },
-  { round = "top16", a = "spee-d", b = "dark-marc", winner = "spee-d" },
+  { round = "top16", a = "hong-10", b = "daniel-qdm", winner = "hong-10" , video = "https://youtu.be/K0rFYY2fs7U" },
+  { round = "top16", a = "spee-d", b = "dark-marc", winner = "spee-d" , video = "https://youtu.be/G8D6wWqzldE" },
   { round = "top16", a = "taisuke", b = "sebastien", winner = "taisuke", video = "https://youtu.be/whAAnx8_PzQ" },
   { round = "top16", a = "ronnie", b = "drunk", winner = "ronnie", video = "https://youtu.be/gNGnI3FBMeo" },
   { round = "top16", a = "roxrite", b = "bootuz", winner = "roxrite", video = "https://youtu.be/vXbwFbWTy0k" },
   { round = "top16", a = "jed", b = "cico", winner = "cico", video = "https://youtu.be/dUG1P_FRPDo" },
   { round = "top16", a = "ben-j", b = "lilou", winner = "lilou", video = "https://youtu.be/OpP4stWso30" },
   { round = "top16", a = "benny", b = "twixx", winner = "benny", video = "https://youtu.be/daFYm7Eo0TY" },
-  { round = "top8", a = "hong-10", b = "spee-d", winner = "hong-10" },
+  { round = "top8", a = "hong-10", b = "spee-d", winner = "hong-10" , video = "https://youtu.be/rz320tT-6f0" },
   { round = "top8", a = "taisuke", b = "ronnie", winner = "ronnie", video = "https://youtu.be/YJTkeMptHVo" },
-  { round = "top8", a = "roxrite", b = "cico", winner = "roxrite" },
+  { round = "top8", a = "roxrite", b = "cico", winner = "roxrite" , video = "https://youtu.be/zwPcDuGnbZ8" },
   { round = "top8", a = "lilou", b = "benny", winner = "lilou", video = "https://youtu.be/EquHl_rEfR0" },
   { round = "top4", a = "hong-10", b = "ronnie", winner = "ronnie", video = "https://youtu.be/gcM3UpkuekI" },
   { round = "top4", a = "roxrite", b = "lilou", winner = "roxrite", video = "https://youtu.be/k7HQHEHbo7U" },

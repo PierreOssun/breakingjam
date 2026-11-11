@@ -14,3 +14,8 @@ data/.cache/
 
 # `just shots` screenshots.
 frontend/shots/
+
+# Serena (code-search tool used by some Claude plugins): local state.
+.serena/
+
+.playwright-mcp

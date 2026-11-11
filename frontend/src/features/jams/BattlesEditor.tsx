@@ -14,10 +14,11 @@ import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
 import { IconButton } from "../../components/IconButton";
 import { useToast } from "../../components/useToast";
-import { daysOf } from "../../lib/dates";
+import { daysOf, formatBattleStart } from "../../lib/dates";
 import { BattleDialog } from "./BattleDialog";
 import { BlockCard, EmptyBlock } from "./EditorBlock";
 import { battleSummary } from "./battleFields";
+import { takesResults } from "./jamDetail";
 import { useBattles } from "./queries";
 
 type Battle = Schemas["BattleDetail"];
@@ -29,7 +30,7 @@ export function BattlesEditor({
 }: {
   jam: Pick<
     Schemas["EventResponse"],
-    "id" | "status" | "starts_on" | "ends_on"
+    "id" | "status" | "starts_on" | "ends_on" | "phase" | "country"
   >;
 }) {
   const jamId = jam.id;
@@ -37,7 +38,11 @@ export function BattlesEditor({
   const toast = useToast();
   const queryClient = useQueryClient();
   const battles = useBattles(jamId);
-  const [editing, setEditing] = useState<Battle | "new" | null>(null);
+  // The battle sheet: a new battle, or one opened on its details or its results.
+  const [editing, setEditing] = useState<{
+    battle?: Battle;
+    step: "details" | "results";
+  } | null>(null);
   const [deleting, setDeleting] = useState<Battle | null>(null);
   const key = ["event", jamId, "battles"];
 
@@ -84,7 +89,9 @@ export function BattlesEditor({
         <BattleDialog
           jamId={jamId}
           days={daysOf(jam.starts_on, jam.ends_on)}
-          battle={editing === "new" ? undefined : editing}
+          country={jam.country}
+          battle={editing.battle}
+          step={editing.step}
           onClose={() => setEditing(null)}
         />
       )}
@@ -115,7 +122,7 @@ export function BattlesEditor({
           title={t("jam.battles")}
           required
           hint={t("org.blocks.battlesHint")}
-          onAdd={() => setEditing("new")}
+          onAdd={() => setEditing({ step: "details" })}
         />
         {dialogs}
       </>
@@ -133,43 +140,73 @@ export function BattlesEditor({
             key={battle.id}
             className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4"
           >
-            <div className="flex items-start gap-2">
+            {/* Actions under the name on phones: beside it, four buttons leave the name a sliver. */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
               <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <h3 className="font-display text-display-xs break-words">
                   {battle.name}
                 </h3>
                 <p className="text-caption text-muted">
-                  {battleSummary(battle, t, i18n.language)}
+                  {[
+                    battle.starts_at &&
+                      t("jam.battleStart", {
+                        when: formatBattleStart(
+                          battle.starts_at,
+                          jam.starts_on === jam.ends_on,
+                          i18n.language,
+                        ),
+                      }),
+                    battleSummary(battle, t, i18n.language),
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               </div>
-              <IconButton
-                label={t("org.battles.moveUp", { name: battle.name })}
-                disabled={index === 0 || reorder.isPending}
-                onClick={() => move(index, -1)}
-              >
-                <ArrowUp size={20} weight="bold" aria-hidden />
-              </IconButton>
-              <IconButton
-                label={t("org.battles.moveDown", { name: battle.name })}
-                disabled={index === list.length - 1 || reorder.isPending}
-                onClick={() => move(index, 1)}
-              >
-                <ArrowDown size={20} weight="bold" aria-hidden />
-              </IconButton>
-              <IconButton
-                label={t("org.battles.editOne", { name: battle.name })}
-                onClick={() => setEditing(battle)}
-              >
-                <PencilSimple size={20} weight="bold" aria-hidden />
-              </IconButton>
-              {!keepsLast && (
-                <IconButton
-                  label={t("org.battles.deleteOne", { name: battle.name })}
-                  onClick={() => setDeleting(battle)}
-                >
-                  <Trash size={20} weight="bold" aria-hidden />
-                </IconButton>
-              )}
+              {/* Wraps on phones, the icons as one group: with the button they don't fit a line. */}
+              <div className="-mb-1 flex flex-wrap items-center justify-end gap-1">
+                {/* Once the jam has started, its results are what's left to fill in. */}
+                {takesResults(jam) && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="mr-auto"
+                    onClick={() => setEditing({ battle, step: "results" })}
+                  >
+                    <Trophy size={18} weight="bold" aria-hidden />
+                    {t("org.results.enter")}
+                  </Button>
+                )}
+                <div className="flex gap-1">
+                  <IconButton
+                    label={t("org.battles.moveUp", { name: battle.name })}
+                    disabled={index === 0 || reorder.isPending}
+                    onClick={() => move(index, -1)}
+                  >
+                    <ArrowUp size={20} weight="bold" aria-hidden />
+                  </IconButton>
+                  <IconButton
+                    label={t("org.battles.moveDown", { name: battle.name })}
+                    disabled={index === list.length - 1 || reorder.isPending}
+                    onClick={() => move(index, 1)}
+                  >
+                    <ArrowDown size={20} weight="bold" aria-hidden />
+                  </IconButton>
+                  <IconButton
+                    label={t("org.battles.editOne", { name: battle.name })}
+                    onClick={() => setEditing({ battle, step: "details" })}
+                  >
+                    <PencilSimple size={20} weight="bold" aria-hidden />
+                  </IconButton>
+                  {!keepsLast && (
+                    <IconButton
+                      label={t("org.battles.deleteOne", { name: battle.name })}
+                      onClick={() => setDeleting(battle)}
+                    >
+                      <Trash size={20} weight="bold" aria-hidden />
+                    </IconButton>
+                  )}
+                </div>
+              </div>
             </div>
           </li>
         ))}
@@ -177,7 +214,7 @@ export function BattlesEditor({
       <Button
         variant="secondary"
         className="self-start"
-        onClick={() => setEditing("new")}
+        onClick={() => setEditing({ step: "details" })}
       >
         <Plus size={20} weight="bold" aria-hidden />
         {t("org.battles.add")}

@@ -1,0 +1,57 @@
+name = "DPC Jam 2017"
+starts_on = 2017-10-14
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+venue = "GZ Heuried"
+lat = 47.3673
+lng = 8.5038
+sources = [
+  "https://and8.dance/en/e/1432",
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+]
+judges = ["xak", "buz", "max"]
+djs = ["dj-vientiane", "ob-one"]
+mcs = ["godfather"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "bruce-almighty-lagaet", b = "banana-joe-becca", winner = "bruce-almighty-lagaet", video = "https://youtu.be/5rxTPOvMT0Q" },
+  { round = "top16", a = "mario-renato", b = "hulk-tricky", winner = "hulk-tricky", video = "https://youtu.be/FiWYSNPzmH8" },
+  { round = "top16", a = "kill-sunni", b = "tru-cru", winner = "kill-sunni", video = "https://youtu.be/IG_I_PnD5bA" },
+  { round = "top16", a = "junior-redo", b = "disfunctional-art", winner = "junior-redo", video = "https://youtu.be/-rgSLaezhbc" },
+  { round = "top16", a = "ghostrockz", b = "bootuz-lil-zoo", winner = "bootuz-lil-zoo", video = "https://youtu.be/IXUohzSDPR4" },
+  { round = "top16", a = "bandits", b = "sekou-wilfried", winner = "bandits", video = "https://youtu.be/SVCq2qECChs" },
+  { round = "top16", a = "conquistador", b = "art-one-moa", winner = "art-one-moa", video = "https://youtu.be/c3dTncTU6hQ" },
+  { round = "top16", a = "baby-og-basil", b = "code-mori", winner = "code-mori", video = "https://youtu.be/MLIzX5P6D7s" },
+  { round = "top8", a = "junior-redo", b = "bruce-almighty-lagaet", winner = "junior-redo", video = "https://youtu.be/8xhbvXm-FEg" },
+  { round = "top8", a = "kill-sunni", b = "hulk-tricky", winner = "kill-sunni", video = "https://youtu.be/DMdqMsxcMB4" },
+  { round = "top8", a = "bandits", b = "bootuz-lil-zoo", winner = "bootuz-lil-zoo", video = "https://youtu.be/xcfuqFy_0y4" },
+  { round = "top8", a = "art-one-moa", b = "code-mori", winner = "code-mori", video = "https://youtu.be/zZzIXQvrPwY" },
+  { round = "top4", a = "kill-sunni", b = "code-mori", winner = "kill-sunni", video = "https://youtu.be/jSiJ83pGok4" },
+  { round = "top4", a = "junior-redo", b = "bootuz-lil-zoo", winner = "bootuz-lil-zoo", video = "https://youtu.be/9QoG2FWv7Sc" },
+  { round = "final", a = "kill-sunni", b = "bootuz-lil-zoo", winner = "bootuz-lil-zoo", video = "https://youtu.be/z4JzTuApwvQ" },
+]
+
+[battles.teams]
+art-one-moa = { members = ["art-one", "moa"] }
+bootuz-lil-zoo = { members = ["lil-zoo", "bootuz"] }
+baby-og-basil = { members = ["baby-og", "basil"] }
+banana-joe-becca = { members = ["becca", "banana-joe"] }
+bandits = { name = "Bandits" }
+bruce-almighty-lagaet = { members = ["bruce-almighty", "lagaet"] }
+code-mori = { members = ["mori", "code"] }
+conquistador = { name = "Conquistador" }
+disfunctional-art = { name = "Disfunctional Art" }
+ghostrockz = { name = "GhostRockz" }
+hulk-tricky = { members = ["hulk", "tricky"] }
+junior-redo = { members = ["junior", "redo"] }
+kill-sunni = { members = ["kill", "sunni"] }
+mario-renato = { members = ["renato", "mario"] }
+sekou-wilfried = { members = ["sekou", "wilfried"] }
+tru-cru = { name = "Tru Cru" }

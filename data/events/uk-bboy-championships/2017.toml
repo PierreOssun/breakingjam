@@ -18,10 +18,10 @@ name = "Crew battle"
 gender = "mixed"
 bracket_size = 8
 matches = [
-  { round = "top8", a = "monster-b-boys", b = "hfc", winner = "monster-b-boys" },
+  { round = "top8", a = "monster-b-boys", b = "hfc", winner = "monster-b-boys" , video = "https://youtu.be/8Ysx2Mh1xjI" },
   { round = "top8", a = "everyone-else", b = "the-italians", winner = "the-italians", video = "https://youtu.be/DwisBFOBJwk" },
   { round = "top8", a = "soul-mavericks", b = "skilluminated", winner = "soul-mavericks", video = "https://youtu.be/AnOzqqyV4nk" },
-  { round = "top8", a = "freestyle-idiot", b = "ariya", winner = "ariya" },
+  { round = "top8", a = "freestyle-idiot", b = "ariya", winner = "ariya" , video = "https://youtu.be/fSxuJT37vac" },
   { round = "top4", a = "monster-b-boys", b = "the-italians", winner = "monster-b-boys", video = "https://youtu.be/_qEB_gk07R0" },
   { round = "top4", a = "soul-mavericks", b = "ariya", winner = "soul-mavericks", video = "https://youtu.be/Scdw1NCm8XA" },
   { round = "final", a = "monster-b-boys", b = "soul-mavericks", winner = "monster-b-boys", video = "https://youtu.be/ciOfaIIgxAY" },
@@ -43,14 +43,14 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "sunni", b = "echo", winner = "sunni" },
+  { round = "top16", a = "sunni", b = "echo", winner = "sunni" , video = "https://youtu.be/0sLJdTbgTeU" },
   { round = "top16", a = "kacyo", b = "moa", winner = "moa", video = "https://youtu.be/8DuKf4SFiX8" },
-  { round = "top16", a = "fever", b = "lil-hong", winner = "fever" },
-  { round = "top16", a = "infante", b = "kaneki", winner = "kaneki" },
+  { round = "top16", a = "fever", b = "lil-hong", winner = "fever" , video = "https://youtu.be/AGqZwx7ErG0" },
+  { round = "top16", a = "infante", b = "kaneki", winner = "kaneki" , video = "https://youtu.be/JZc5VAHpWR4" },
   { round = "top16", a = "kid-karam", b = "t-rock", winner = "kid-karam" },
-  { round = "top16", a = "stepper", b = "wen", winner = "stepper" },
+  { round = "top16", a = "stepper", b = "wen", winner = "stepper" , video = "https://youtu.be/lJyVN5562UI" },
   { round = "top16", a = "mowgly", b = "spin", winner = "spin", video = "https://youtu.be/IFE41-yKg58" },
-  { round = "top16", a = "hayato1", b = "onel", winner = "hayato1" },
+  { round = "top16", a = "hayato1", b = "onel", winner = "hayato1" , video = "https://youtu.be/xqctsKOlW8c" },
   { round = "top8", a = "sunni", b = "moa", winner = "sunni", video = "https://youtu.be/FWv674gYRyI" },
   { round = "top8", a = "fever", b = "kaneki", winner = "fever", video = "https://youtu.be/b8hKQP5qo4Q" },
   { round = "top8", a = "kid-karam", b = "stepper", winner = "kid-karam" },

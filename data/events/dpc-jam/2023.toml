@@ -1,0 +1,58 @@
+name = "DPC Jam 2023"
+starts_on = 2023-10-14
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+venue = "GZ Heuried"
+lat = 47.3673
+lng = 8.5038
+sources = [
+  "https://and8.dance/en/e/4503",
+  "https://and8.dance/en/stats/reports/4503/1875/r/",
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+]
+judges = ["the-end", "bojin", "buz"]
+djs = ["jon-kwizera", "dj-catch", "ob-one"]
+mcs = ["godfather"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "tru-cru", b = "leon-lunatic", winner = "leon-lunatic", video = "https://youtu.be/pNrwkrQE5CA" },
+  { round = "top16", a = "dopedog-jester", b = "gustas-raptor", winner = "dopedog-jester", video = "https://youtu.be/tyAZp1htxm4" },
+  { round = "top16", a = "lotus-shaymin", b = "sheku-thesis", winner = "sheku-thesis", video = "https://youtu.be/fqPaxDW6XYU" },
+  { round = "top16", a = "arex-popster", b = "taichi-yu-ki", winner = "taichi-yu-ki", video = "https://youtu.be/fA0V1GY3oOs" },
+  { round = "top16", a = "tasic-wilson", b = "hiro10-mighty-jake", winner = "hiro10-mighty-jake", video = "https://youtu.be/0vs3uj199EI" },
+  { round = "top16", a = "floorthodox-giants", b = "gekkon-tiger", winner = "gekkon-tiger", video = "https://youtu.be/274HpydIYgQ" },
+  { round = "top16", a = "perninha-samuka", b = "elina-high5", winner = "perninha-samuka", video = "https://youtu.be/L3AjnQ0WOH8" },
+  { round = "top16", a = "dol-rush", b = "simox-syneone", winner = "dol-rush", video = "https://youtu.be/trDFfkBprLE" },
+  { round = "top8", a = "leon-lunatic", b = "dopedog-jester", winner = "leon-lunatic", video = "https://youtu.be/7qV7SPen9aY" },
+  { round = "top8", a = "sheku-thesis", b = "taichi-yu-ki", winner = "sheku-thesis", video = "https://youtu.be/D5wo95mhAok" },
+  { round = "top8", a = "perninha-samuka", b = "dol-rush", winner = "perninha-samuka", video = "https://youtu.be/S7OSxvgQ-mY" },
+  { round = "top8", a = "hiro10-mighty-jake", b = "gekkon-tiger", winner = "hiro10-mighty-jake", video = "https://youtu.be/zv9NlofgVSA" },
+  { round = "top4", a = "leon-lunatic", b = "sheku-thesis", winner = "leon-lunatic", video = "https://youtu.be/zjKNOUZr9ek" },
+  { round = "top4", a = "hiro10-mighty-jake", b = "perninha-samuka", winner = "hiro10-mighty-jake", video = "https://youtu.be/JYF4IS63yqA" },
+  { round = "final", a = "leon-lunatic", b = "hiro10-mighty-jake", winner = "hiro10-mighty-jake", video = "https://youtu.be/pI7C7Tn7Z7o" },
+]
+
+[battles.teams]
+arex-popster = { members = ["arex", "popster"] }
+dol-rush = { members = ["dol", "rush"] }
+dopedog-jester = { members = ["jester", "dopedog"] }
+elina-high5 = { members = ["high5", "elina"] }
+floorthodox-giants = { name = "Floorthodox Giants" }
+gekkon-tiger = { members = ["gekkon", "tiger"] }
+gustas-raptor = { members = ["raptor", "gustas"] }
+hiro10-mighty-jake = { crew = "formless-corp", members = ["hiro10", "mighty-jake"] }
+leon-lunatic = { crew = "fusion-mc", members = ["leon", "lunatic"] }
+lotus-shaymin = { members = ["shaymin", "lotus"] }
+perninha-samuka = { members = ["samuka", "perninha"] }
+sheku-thesis = { members = ["thesis", "sheku"] }
+simox-syneone = { members = ["simox", "syneone"] }
+taichi-yu-ki = { members = ["taichi", "yu-ki"] }
+tasic-wilson = { members = ["tasic", "wilson"] }
+tru-cru = { name = "Tru Cru" }

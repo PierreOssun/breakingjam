@@ -6,7 +6,7 @@ city = "Banská Bystrica"
 country = "SK"
 lat = 48.7354
 lng = 19.1457
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCv8V_79zZ1RUlUNFbMDSPBg"]
 judges = ["poe-one", "hong-10", "neguin"]
 mcs = ["mario-bee", "lil-pablo", "niko", "osto"]
 djs = ["renegade", "scream", "plash", "smirnoff", "fleg", "felix", "skizo", "rawkuts"]
@@ -23,12 +23,12 @@ matches = [
   { round = "top16", a = "alkolil", b = "spin", winner = "alkolil" },
   { round = "top16", a = "greku", b = "chereb", winner = "greku" },
   { round = "top16", a = "killa-kolya", b = "sapa", winner = "killa-kolya" },
-  { round = "top16", a = "twister", b = "milky-rock", winner = "twister" },
+  { round = "top16", a = "twister", b = "milky-rock", winner = "milky-rock" },  # Wikipedia says Twister; The Bboy Spot's top 8 video is Kuzya vs Milky Rock
   { round = "top16", a = "kuzya", b = "freeman", winner = "kuzya" },
   { round = "top8", a = "kleju", b = "tyson", winner = "kleju", video = "https://youtu.be/bmI0PFoSqLk" },
   { round = "top8", a = "kosto", b = "alkolil", winner = "kosto", video = "https://youtu.be/R1UO9uIqQVU" },
   { round = "top8", a = "greku", b = "killa-kolya", winner = "killa-kolya", video = "https://youtu.be/RQrTjOfUiUo" },
-  { round = "top8", a = "twister", b = "kuzya", winner = "kuzya" },
+  { round = "top8", a = "milky-rock", b = "kuzya", winner = "kuzya", video = "https://youtu.be/GltbQvG8LNs" },
   { round = "top4", a = "kleju", b = "kosto", winner = "kleju", video = "https://youtu.be/EpR3vOHLLdE" },
   { round = "top4", a = "killa-kolya", b = "kuzya", winner = "killa-kolya", video = "https://youtu.be/zNrtuPhtwPg" },
   { round = "final", a = "kleju", b = "killa-kolya", winner = "kleju", video = "https://youtu.be/DGdz4rvHRqM" },
@@ -39,7 +39,9 @@ key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
 results = [
-  { entrant = "paulina", reached = "winner" },
+  { entrant = "paulina", reached = "winner", video = "https://youtu.be/F-_l35fyG6o" },
+  { entrant = "zofia", reached = "top2", video = "https://youtu.be/F-_l35fyG6o" },
+  { entrant = "kate", reached = "top4", video = "https://youtu.be/rtaeGMlAvys" },
 ]
 
 [[battles]]

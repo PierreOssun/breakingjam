@@ -1,0 +1,7 @@
+name = "Battle of Sun 2017"
+starts_on = 2017-09-09  # BboyEvent's listing only
+timezone = "Europe/Paris"
+city = "Saint-Louis"
+country = "FR"
+sources = ["https://www.bboyevent.com/event-list/past/start-date"]
+# "Battle Of Sun 2", 2v2, 600 € prize, at a salle des fêtes; one listing, no video or result.

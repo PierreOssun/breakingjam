@@ -1,8 +1,8 @@
 {
   "nav": {
     "home": "BreakingJam home",
-    "findJam": "Find a jam",
-    "findSomeone": "Find someone",
+    "jams": "Jams",
+    "dancers": "Dancers",
     "myJams": "My jams",
     "registerJam": "Register a jam",
     "logIn": "Log in",
@@ -13,12 +13,13 @@
     "skipToContent": "Skip to content",
     "language": "Language: {{name}}",
     "admin": "Admin",
-    "jamMap": "Jam map",
+    "map": "Map",
     "account": "Account",
     "accountMenu": "Account menu",
     "accountMenuOf": "Account menu, {{name}}",
     "contact": "Contact",
-    "team": "Team"
+    "team": "Team",
+    "accountSettings": "Account"
   },
   "account": {
     "viewPage": "View my page",
@@ -37,8 +38,8 @@
   "welcome": {
     "title": "Are you on BreakingJam?",
     "intro": "Dancers, DJs, MCs and judges each have a page with their jams. Find yours and tap “This is me” on it to verify it.",
-    "search": "Your name in the scene",
-    "searchHint": "Your name, an alias or your Instagram handle.",
+    "search": "Your stage name",
+    "searchHint": "Your stage name, an alias or your Instagram handle.",
     "found": "Pages that match",
     "nobody": "No page matches “{{q}}” yet.",
     "notHere": "Not here yet?",
@@ -100,7 +101,9 @@
       "send": "Send the code",
       "sentTo": "If {{email}} has an account, a 6-digit code is on its way. It works for 15 minutes.",
       "newPassword": "New password",
-      "submit": "Set password and log in"
+      "submit": "Set password and log in",
+      "changeTitle": "Change your password",
+      "changeIntro": "We’ll send a code to your email to confirm it’s you, then you set the new password."
     }
   },
   "validation": {
@@ -114,12 +117,12 @@
     "handle": "Use letters, digits, . or _ (30 at most)."
   },
   "pages": {
-    "map": "Jam map",
-    "people": "Find someone",
+    "map": "Map",
+    "people": "Dancers",
     "orgJams": "Your jams",
     "orgJamNew": "Register a jam",
     "orgJamEdit": "Edit jam",
-    "jams": "Find a jam",
+    "jams": "Jams",
     "search": "Search",
     "contact": "Contact",
     "team": "Team"
@@ -137,9 +140,9 @@
       "title": "Next up near you",
       "around": "Around {{place}}",
       "aroundYou": "Around you",
-      "worldwide": "Worldwide",
       "change": "change",
-      "map": "See all on the map"
+      "map": "See all on the map",
+      "mapShort": "Map"
     },
     "scene": {
       "title": "BreakingJam so far",
@@ -149,7 +152,6 @@
       "battles_other": "battles",
       "dancers_one": "dancer",
       "dancers_other": "dancers",
-      "in": "in",
       "countries_one": "country",
       "countries_other": "countries"
     },
@@ -157,7 +159,19 @@
     "search": "Search jams and people",
     "searchPlaceholder": "Jam, city, battle, bgirl, bboy, DJ…",
     "searchSubmit": "Search",
-    "subtitle": "All of breaking, in one search"
+    "subtitle": "All of breaking, in one search",
+    "searchPlaceholderShort": "Jam, city, battle, dancer…",
+    "quickFilters": "Quick filters",
+    "nearMe": "Near me",
+    "results": {
+      "title": "Just happened",
+      "sub": "Winners and battle videos from the latest jams",
+      "subShort": "Winners and battle videos",
+      "all": "All results",
+      "allShort": "All",
+      "more_one": "+{{count}} more",
+      "more_other": "+{{count}} more"
+    }
   },
   "status": {
     "draft": "Draft",
@@ -201,6 +215,8 @@
     "countdown": {
       "days_one": "In {{count}} day",
       "days_other": "In {{count}} days",
+      "weeks_one": "In {{count}} week",
+      "weeks_other": "In {{count}} weeks",
       "tomorrow": "Tomorrow",
       "today": "Today",
       "live": "Live now"
@@ -216,7 +232,8 @@
       "dj": "DJ {{name}}",
       "djs": "{{count}} DJs",
       "mc": "MC {{name}}",
-      "mcs": "{{count}} MCs"
+      "mcs": "{{count}} MCs",
+      "judge": "Judge {{name}}"
     },
     "calendar": "Add to calendar",
     "results": "See results",
@@ -410,7 +427,7 @@
       "instagramUrl": "Instagram page",
       "websiteUrl": "Website",
       "contactEmail": "Contact email",
-      "contactEmailHint": "Public: shown on the jam page so dancers can write to you.",
+      "contactEmailHint": "Public: shown on the jam page so dancers can write to you. This or Instagram is needed to publish.",
       "endsOnHint": "Leave it empty for a one-day jam.",
       "opensAt": "Opens",
       "closesAt": "Ends",
@@ -475,6 +492,7 @@
         "powermove": "Powermove"
       },
       "formatChips": {
+        "top4": "Top 4",
         "top8": "Top 8",
         "top16": "Top 16",
         "top32": "Top 32",
@@ -531,9 +549,13 @@
         "label": "Battle sheet step",
         "details": "Details",
         "results": "Results"
-      }
+      },
+      "prizeSuggested": "For this jam",
+      "prizeAll": "All currencies"
     },
     "entries": {
+      "manage": "Edit entries",
+      "done": "Done",
       "add": "Add an entry",
       "edit": "Edit entry",
       "editOne": "Edit {{name}}",
@@ -572,7 +594,8 @@
       "videoStart": "Starts at",
       "videoStartHint": "For a livestream: where this battle starts, e.g. 1:02:03.",
       "addDancer": "Add a dancer",
-      "addTeam": "Add a team"
+      "addTeam": "Add a team",
+      "teamNameTaken": "Another entry in this battle already goes by this name. Give this one its own, like “… A”."
     },
     "staff": {
       "remove": "Remove {{name}} ({{role}})",
@@ -647,13 +670,11 @@
       "linksHint": "Website, Instagram, contact email"
     },
     "publish": {
-      "title": "Ready to publish?",
       "almost": "Almost there",
       "progress": "{{done}} of {{total}}",
       "toPublish": "{{done}} of {{total}} to publish",
-      "action": "Publish",
-      "left_one": "Publish · {{count}} left",
-      "left_other": "Publish · {{count}} left",
+      "left_one": "{{action}} · {{count}} left",
+      "left_other": "{{action}} · {{count}} left",
       "items": {
         "name": "Name",
         "dates": "Dates",
@@ -667,7 +688,18 @@
       "team": "As the BreakingJam team, you publish it directly.",
       "missing_one": "One thing left before your jam goes on the map.",
       "missing_other": "{{count}} things left before your jam goes on the map.",
-      "ready": "Everything is in. Publish when you’re ready."
+      "ready": {
+        "publish": "Everything is in. Publish when you’re ready.",
+        "submit": "Everything is in. Send it when you’re ready."
+      },
+      "actions": {
+        "publish": "Publish",
+        "submit": "Send for review"
+      },
+      "titles": {
+        "publish": "Ready to publish?",
+        "submit": "Ready to send for review?"
+      }
     },
     "venue": {
       "find": "Find the place",
@@ -686,13 +718,16 @@
       "hint": "Pick who battled whom, then tap the crown of the winner: they move on to the next round by themselves. Every change saves itself.",
       "battle": "Battle {{n}}",
       "side": "side {{n}}",
-      "won": "{{name}} won",
+      "won": "Mark {{name}} as the winner",
       "pick": "Pick an entrant",
       "video": "Video link",
       "invalid": "These results don't make a bracket: each entrant battles once a round, and not again once knocked out.",
       "needsBracket": "Pick a bracket (Top 8, Top 16…) under Details to enter the battles round by round.",
       "needsEntries": "Add at least two entrants to this battle first.",
-      "videoInvalid": "Paste a YouTube link: this one isn’t saved."
+      "videoInvalid": "Paste a YouTube link: this one isn’t saved.",
+      "enter": "Enter results",
+      "edit": "Edit results",
+      "roundDone": "{{round}} ✓"
     }
   },
   "verify": {
@@ -771,7 +806,8 @@
     },
     "titlesMine": "I’m a…",
     "titles": "What they do",
-    "titlesHint": "Only the dancer, once verified, and the BreakingJam team set these."
+    "titlesHint": "Only the dancer, once verified, and the BreakingJam team set these.",
+    "namesake": "Another dancer is already called {{name}}. Check it isn’t the same person before saving."
   },
   "admin": {
     "claims": {
@@ -832,7 +868,9 @@
       "sendBackTitle": "Send {{name}} back?",
       "note": "What should the organiser change?",
       "noteHint": "They see this in their jam editor.",
-      "incomplete": "Not ready to publish: {{items}}."
+      "incomplete": "Not ready to publish: {{items}}.",
+      "approveTitle": "Approve {{name}}?",
+      "approveBody": "It goes on the map and its page goes public right away."
     },
     "accounts": {
       "tab": "Accounts",
@@ -978,5 +1016,13 @@
       "cta": "Get in touch"
     },
     "page": "Page"
+  },
+  "accountPage": {
+    "title": "Account",
+    "stageName": "Stage name",
+    "noPage": "You have no dancer page yet: find yours or make it, and its name is your stage name.",
+    "organiserName": "Organiser name",
+    "signIn": "Sign-in",
+    "changePassword": "Change password"
   }
 }

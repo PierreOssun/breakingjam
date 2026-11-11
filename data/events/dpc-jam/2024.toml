@@ -1,0 +1,59 @@
+name = "DPC Jam World Final 2024"
+starts_on = 2024-10-05
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+venue = "GZ Heuried"
+lat = 47.3673
+lng = 8.5038
+sources = [
+  "https://and8.dance/en/e/4601",
+  "https://and8.dance/en/stats/reports/4601/2577/r/",
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+  "https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA",
+]
+judges = ["hill", "poe-one", "tuff-kid"]
+djs = ["dj-catch", "dj-senka", "ob-one"]
+mcs = ["godfather", "remo"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "gekkon-tiger", b = "cms2p", winner = "gekkon-tiger", video = "https://youtu.be/UmPWasqjBwk" },
+  { round = "top16", a = "bart-perninha", b = "sung-goku-tiger5", winner = "bart-perninha", video = "https://youtu.be/Y5UITr9X6D0" },
+  { round = "top16", a = "firebird-sanam", b = "slynk-strong", winner = "firebird-sanam", video = "https://youtu.be/Rs6TelugAyQ" },
+  { round = "top16", a = "malish-zooty-zoot", b = "against-all-odds", winner = "malish-zooty-zoot", video = "https://youtu.be/eXjdCxUNKIc" },
+  { round = "top16", a = "alvin-tsukki", b = "david-seigo", winner = "alvin-tsukki", video = "https://youtu.be/RPHLEp4I3Hk" },
+  { round = "top16", a = "lotus-moa", b = "raven-wigor", winner = "lotus-moa", video = "https://youtu.be/--PCXaAoCXI" },
+  { round = "top16", a = "chau-lin-light", b = "bad-troopers", winner = "chau-lin-light", video = "https://youtu.be/OYb5AD0wZok" },
+  { round = "top16", a = "hiro10-mighty-jake", b = "cicov-guti", winner = "hiro10-mighty-jake", video = "https://youtu.be/JcazHC21bEQ" },
+  { round = "top8", a = "lotus-moa", b = "alvin-tsukki", winner = "alvin-tsukki", video = "https://youtu.be/k-mFU9Oto_w" },
+  { round = "top8", a = "malish-zooty-zoot", b = "firebird-sanam", winner = "malish-zooty-zoot", video = "https://youtu.be/2lLNBE_CsQ8" },
+  { round = "top8", a = "hiro10-mighty-jake", b = "chau-lin-light", winner = "hiro10-mighty-jake", video = "https://youtu.be/z-QeT9l5yao" },
+  { round = "top8", a = "bart-perninha", b = "gekkon-tiger", winner = "bart-perninha" },  # not filmed: the only pairing left, as and8's ranking confirms
+  { round = "top4", a = "alvin-tsukki", b = "hiro10-mighty-jake", winner = "hiro10-mighty-jake", video = "https://youtu.be/CbxzoNkjBuE" },
+  { round = "top4", a = "bart-perninha", b = "malish-zooty-zoot", winner = "malish-zooty-zoot", video = "https://youtu.be/UEtJVZUV0ag" },
+  { round = "final", a = "malish-zooty-zoot", b = "hiro10-mighty-jake", winner = "hiro10-mighty-jake", video = "https://youtu.be/EUrKuZN899A" },
+]
+
+[battles.teams]
+against-all-odds = { name = "Against All Odds" }
+alvin-tsukki = { members = ["tsukki", "alvin"] }
+bad-troopers = { name = "Bad Troopers" }
+bart-perninha = { members = ["bart", "perninha"] }
+chau-lin-light = { members = ["chau-lin", "light"] }
+cicov-guti = { members = ["guti", "cicov"] }
+cms2p = { name = "CMS2P" }
+david-seigo = { members = ["david", "seigo"] }
+firebird-sanam = { members = ["firebird", "sanam"] }
+gekkon-tiger = { members = ["tiger", "gekkon"] }
+hiro10-mighty-jake = { members = ["hiro10", "mighty-jake"] }
+lotus-moa = { members = ["moa", "lotus"] }
+malish-zooty-zoot = { members = ["malish", "zooty-zoot"] }
+raven-wigor = { members = ["wigor", "raven"] }
+slynk-strong = { members = ["slynk", "strong"] }
+sung-goku-tiger5 = { members = ["sung-goku", "tiger5"] }

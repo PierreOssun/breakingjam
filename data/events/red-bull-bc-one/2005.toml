@@ -32,5 +32,5 @@ matches = [
   { round = "top4", a = "lilou", b = "ronnie", winner = "lilou", votes = [5, 0], video = "https://youtu.be/OqK9onDvDeU" },
   { round = "top4", a = "hong-10", b = "pelezinho", winner = "hong-10", votes = [4, 1], video = "https://youtu.be/82KFTvUaVpE" },
   { round = "final", a = "lilou", b = "hong-10", winner = "lilou", votes = [3, 0], video = "https://youtu.be/wT00d1mv3NI" },
-  { round = "third", a = "ronnie", b = "pelezinho", winner = "ronnie", votes = [4, 1] },
+  { round = "third", a = "ronnie", b = "pelezinho", winner = "ronnie", votes = [4, 1] , video = "https://youtu.be/NYcYgtWokkw" },
 ]

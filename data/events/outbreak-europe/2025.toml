@@ -20,7 +20,7 @@ bracket_size = 32
 matches = [
   { round = "top32", a = "ouki", b = "allef", winner = "allef", votes = [1, 4], video = "https://youtu.be/4-pCPCGIReQ" },
   { round = "top32", a = "mace", b = "jasper", winner = "mace", votes = [4, 1], video = "https://youtu.be/5EcC8z2i2zY" },
-  { round = "top32", a = "beetle", b = "isaki", winner = "isaki", votes = [2, 3] },
+  { round = "top32", a = "beetle", b = "isaki", winner = "isaki", votes = [2, 3] , video = "https://youtu.be/O2kmurcnx_c" },
   { round = "top32", a = "ziprock", b = "ryoga", winner = "ziprock", votes = [4, 1], video = "https://youtu.be/o40rYuKXT98" },
   { round = "top32", a = "killian", b = "nicolas", winner = "killian", votes = [3, 2], video = "https://youtu.be/uXB8lKAUjqM" },
   { round = "top32", a = "sunni", b = "cyga", winner = "cyga", votes = [2, 3], video = "https://youtu.be/y-Wbh23pJ34" },
@@ -29,7 +29,7 @@ matches = [
   { round = "top32", a = "lion", b = "gimnast", winner = "gimnast", votes = [0, 5], video = "https://youtu.be/sPfKqXoR5kQ" },
   { round = "top32", a = "johnny-fox", b = "andy", winner = "johnny-fox", votes = [5, 0], video = "https://youtu.be/CVSGlghUyc8" },
   { round = "top32", a = "jeian", b = "djibril", winner = "jeian", votes = [4, 1], video = "https://youtu.be/qHvArSOuvRM" },
-  { round = "top32", a = "hiro10", b = "millie-mil", winner = "hiro10", votes = [5, 0] },
+  { round = "top32", a = "hiro10", b = "millie-mil", winner = "hiro10", votes = [5, 0] , video = "https://youtu.be/Xd7g-CgOn3g" },
   { round = "top32", a = "grom", b = "emilio", winner = "grom", votes = [5, 0], video = "https://youtu.be/DsyHrr_2fvU" },
   { round = "top32", a = "louis", b = "twister", winner = "twister", votes = [0, 5], video = "https://youtu.be/DORoEy3wSBI" },
   { round = "top32", a = "amaro", b = "ceebri", winner = "amaro", votes = [3, 2], video = "https://youtu.be/cuZgF3z155Q" },

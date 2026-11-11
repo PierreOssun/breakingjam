@@ -30,7 +30,8 @@ export function EditorBar({
   const { t } = useTranslation();
   return (
     <div className="sticky top-14 z-10 border-b border-border bg-surface lg:top-16">
-      <div className="mx-auto flex max-w-content items-center gap-3 px-4 py-2.5 md:px-6 lg:px-8">
+      {/* Wraps at 320px: a long status, "Saved" and Preview don't fit one line there. */}
+      <div className="mx-auto flex max-w-content flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 md:px-6 lg:px-8">
         <StatusBadge jam={jam} />
         <span className="hidden text-body font-bold sm:inline">
           {t("org.editor.editing")}

@@ -1,5 +1,6 @@
 import {
   CaretRight,
+  GearSix,
   MagnifyingGlass,
   MapPin,
   Monitor,
@@ -64,6 +65,7 @@ export function AccountMenu({
     ...(sheet ? ["map", "jams", "dancers"] : []),
     ...(organises ? ["myJams"] : []),
     ...(admin ? ["admin"] : []),
+    "account",
     ...THEMES,
     "logOut",
     ...(sheet ? ["register"] : []),
@@ -154,13 +156,13 @@ export function AccountMenu({
           {sheet && (
             <>
               <MenuLink to="/map" icon={MapPin} roving={item("map")}>
-                {t("nav.jamMap")}
+                {t("nav.map")}
               </MenuLink>
               <MenuLink to="/jams" icon={MagnifyingGlass} roving={item("jams")}>
-                {t("nav.findJam")}
+                {t("nav.jams")}
               </MenuLink>
               <MenuLink to="/dancers" icon={User} roving={item("dancers")}>
-                {t("nav.findSomeone")}
+                {t("nav.dancers")}
               </MenuLink>
             </>
           )}
@@ -179,6 +181,10 @@ export function AccountMenu({
               )}
             </>
           )}
+          <Separator />
+          <MenuLink to="/account" icon={GearSix} roving={item("account")}>
+            {t("nav.accountSettings")}
+          </MenuLink>
           <Separator />
           <ThemeChoice item={item} />
           <Separator />

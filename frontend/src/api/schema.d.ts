@@ -873,6 +873,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The three announced jams that ended last and have a battle winner, the latest first. */
+        get: operations["latest_results"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stats": {
         parameters: {
             query?: never;
@@ -1927,6 +1944,40 @@ export interface components {
             /** @description The jam. */
             jam: components["schemas"]["EventRef"];
         };
+        /** @description A jam that is over, with its first battles' winners. */
+        JamResults: {
+            /**
+             * Format: uuid
+             * @description Jam id.
+             */
+            id: string;
+            /** @description Display name. */
+            name: string;
+            /** @description Link target `/jams/{slug}`. */
+            slug: string;
+            /**
+             * Format: date
+             * @description First day.
+             */
+            starts_on: string;
+            /**
+             * Format: date
+             * @description Last day.
+             */
+            ends_on: string;
+            /** @description City. */
+            city: string;
+            /** @description ISO 3166-1 alpha-2. */
+            country: string;
+            /** @description The uploaded flyer at 540×675; null means the generated one. */
+            flyer_card_url?: string | null;
+            /** @description Whether a battle of the jam has a video. */
+            has_videos: boolean;
+            /** @description Every battle of the jam, with or without a winner. */
+            battle_count: number;
+            /** @description At most two winners, in battle display order. */
+            winners: components["schemas"]["Winner"][];
+        };
         /**
          * @description Language of the emails the site sends; the frontend passes its own.
          * @enum {string}
@@ -2712,6 +2763,13 @@ export interface components {
             email: string;
             /** @description The 6 digits mailed to it. */
             code: string;
+        };
+        /** @description Who won one battle. */
+        Winner: {
+            /** @description The battle's display name. */
+            battle: string;
+            /** @description The winning entry, with its members. */
+            entry: components["schemas"]["Entry"];
         };
     };
     responses: never;
@@ -5747,6 +5805,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    latest_results: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JamResults"][];
                 };
             };
         };

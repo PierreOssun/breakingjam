@@ -56,6 +56,23 @@ export function roundsOf(size: number | null | undefined): Round[] {
   return rounds.includes("top4") ? [...rounds, "third"] : rounds;
 }
 
+/** Where the Results step opens: the smallest round that seats every entrant (Top 4 for four
+ * teams in a Top 8), else the bracket's first. */
+export function firstRoundFor(
+  rounds: Round[],
+  entrants: number,
+): Round | undefined {
+  const seats = rounds.filter(
+    (r) => r !== "third" && CAPACITY[r] * 2 >= entrants,
+  );
+  return seats.at(-1) ?? rounds[0];
+}
+
+/** Every battle of the round has both sides and a winner. */
+export function roundDone(slots: Slot[] = []): boolean {
+  return slots.length > 0 && slots.every((s) => s.a && s.b && s.winner);
+}
+
 /** The battle's stored matches as slots, each at its place in its round; the rest empty. */
 export function draftOf(rounds: Round[], matches: Schemas["Match"][]): Draft {
   return Object.fromEntries(

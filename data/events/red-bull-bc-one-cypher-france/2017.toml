@@ -14,9 +14,9 @@ sources = [
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "pac-pac", reached = "winner", video = "https://youtu.be/cXIaYboNLcM" },
-  { entrant = "damani", reached = "top2", video = "https://youtu.be/cXIaYboNLcM" },
-  { entrant = "bruce-wayne", reached = "top4", video = "https://youtu.be/J_ZIW6MarM8" },
-  { entrant = "chakal", reached = "top4", video = "https://youtu.be/OwY8hOIrmSw" },
+bracket_size = 4
+matches = [
+  { round = "top4", a = "chakal", b = "pac-pac", winner = "pac-pac", video = "https://youtu.be/OwY8hOIrmSw" },
+  { round = "top4", a = "bruce-wayne", b = "damani", winner = "damani", video = "https://youtu.be/J_ZIW6MarM8" },
+  { round = "final", a = "damani", b = "pac-pac", winner = "pac-pac", video = "https://youtu.be/cXIaYboNLcM" },
 ]

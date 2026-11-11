@@ -40,14 +40,14 @@ gender = "bgirl"
 bracket_size = 16
 matches = [
   { round = "top16", a = "671", b = "alessandrina", winner = "671", votes = [4, 1], video = "https://youtu.be/2q0JHVbvWxk" },
-  { round = "top16", a = "isis", b = "vanessa", winner = "vanessa", votes = [0, 5] },
+  { round = "top16", a = "isis", b = "vanessa", winner = "vanessa", votes = [0, 5] , video = "https://youtu.be/uEk_BZVv8ww" },
   { round = "top16", a = "swami", b = "carlota", winner = "swami", votes = [4, 1], video = "https://youtu.be/XqERQOh5usI" },
   { round = "top16", a = "india", b = "luma", winner = "india", votes = [5, 0], video = "https://youtu.be/5eX7I3W-xEQ" },
   { round = "top16", a = "sunny", b = "fresh-bella", winner = "sunny", votes = [3, 2], video = "https://youtu.be/ItgFygxvSYk" },
   { round = "top16", a = "kimie", b = "paulina", winner = "kimie", votes = [3, 2], video = "https://youtu.be/V948CU5nCNc" },
   { round = "top16", a = "yuika", b = "anti", winner = "anti", votes = [2, 3], video = "https://youtu.be/KRsjKTMyTYs" },
   { round = "top16", a = "logistx", b = "emma", winner = "logistx", votes = [5, 0] },
-  { round = "top8", a = "671", b = "vanessa", winner = "671", votes = [5, 0] },
+  { round = "top8", a = "671", b = "vanessa", winner = "671", votes = [5, 0] , video = "https://youtu.be/J6VsgMbYnp8" },
   { round = "top8", a = "swami", b = "india", winner = "india", votes = [0, 5], video = "https://youtu.be/ABP2DJ9cjT4" },
   { round = "top8", a = "sunny", b = "kimie", winner = "sunny", votes = [5, 0] },
   { round = "top8", a = "anti", b = "logistx", winner = "logistx", votes = [2, 3], video = "https://youtu.be/I_xc6j8aIwE" },

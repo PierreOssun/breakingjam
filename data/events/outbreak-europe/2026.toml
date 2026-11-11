@@ -23,7 +23,7 @@ matches = [
   { round = "top32", a = "federico", b = "djibril", winner = "djibril", votes = [0, 5], video = "https://youtu.be/fTe2tVNEVFA" },
   { round = "top32", a = "so-ta", b = "bez", winner = "so-ta", votes = [5, 0], video = "https://youtu.be/UoqxQqm4fSc" },
   { round = "top32", a = "mini-joe", b = "armand-the-young-hustler", winner = "mini-joe", votes = [5, 0], video = "https://youtu.be/ndToeRfNbro" },
-  { round = "top32", a = "dias", b = "nike1do", winner = "dias", votes = [4, 1] },
+  { round = "top32", a = "dias", b = "nike1do", winner = "dias", votes = [4, 1] , video = "https://youtu.be/Gwp8wwS_nMQ" },
   { round = "top32", a = "cis", b = "mighty-jake", winner = "cis", votes = [3, 2], video = "https://youtu.be/D1KvGeCCLho" },
   { round = "top32", a = "kalmius", b = "monster", winner = "kalmius", votes = [3, 2], video = "https://youtu.be/3AikiDMFcmE" },
   { round = "top32", a = "jee-ess", b = "gravity", winner = "jee-ess", votes = [5, 0], video = "https://youtu.be/-xfABMEVvr0" },

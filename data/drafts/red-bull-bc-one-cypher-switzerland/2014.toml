@@ -1,0 +1,25 @@
+name = "Red Bull BC One Cypher Switzerland 2014"
+# starts_on = unknown: the battle videos went up on 19 May 2014 (no source yet)
+# city = unknown
+timezone = "Europe/Zurich"
+country = "CH"
+sources = [
+  "https://www.youtube.com/channel/UCGuvgZU2QcEzg_dZQUQrvOw",
+  "https://www.redbull.com/ch-de/red-bull-bc-one-switzerland-hall-of-fame",
+]
+judges = ["neguin", "hong-10", "niek"]  # MK.Battles' judge showcase videos
+
+# Only 7 of the 15 battles are filmed, so placings; each winner is whoever played the next round.
+[[battles]]
+key = "bboy"
+name = "1v1 Bboy"
+gender = "bboy"
+results = [
+  { entrant = "artur", reached = "winner", video = "https://youtu.be/Gnr9r5NNldo" },
+  { entrant = "moa", reached = "top2", video = "https://youtu.be/Gnr9r5NNldo" },
+  { entrant = "yu-seng", reached = "top4", video = "https://youtu.be/r6tQbZgVhos" },
+  { entrant = "ez-mike", reached = "top8", video = "https://youtu.be/RNfcnVK7mPA" },
+  { entrant = "kennex", reached = "top8", video = "https://youtu.be/QI9pCmovng4" },
+  { entrant = "wen", reached = "top16", video = "https://youtu.be/9zM6eACFbbs" },
+  { entrant = "azad", reached = "top16", video = "https://youtu.be/34j-1dqxDrM" },
+]

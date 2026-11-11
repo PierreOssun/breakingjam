@@ -35,6 +35,7 @@ import {
   shareTitle,
   totalPrizes,
   whoIsIn,
+  tellsVisitors,
 } from "../features/jams/jamDetail";
 import { JamFlyer } from "../features/jams/JamFlyer";
 import { Lineup } from "../features/jams/Lineup";
@@ -133,7 +134,9 @@ function JamDetail({ jam }: { jam: Jam }) {
         <div className="flex max-w-prose flex-col gap-10 px-4 pt-4 md:px-6 lg:px-0 lg:pt-0">
           <header className="flex flex-col gap-3 lg:gap-4">
             <div className="flex flex-wrap items-center gap-2">
-              <StatusBadge jam={jam} />
+              {(jam.can_edit || tellsVisitors(jam)) && (
+                <StatusBadge jam={jam} />
+              )}
               {chip && <CountdownChip value={chip} />}
             </div>
             <h1 className="font-display text-display-lg break-words lg:text-display-2xl">

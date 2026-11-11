@@ -260,7 +260,7 @@ async fn matches_are_stored_round_by_round_winner_first(pool: PgPool) {
 }
 
 #[sqlx::test]
-async fn a_dancers_look_wins_over_their_battles(pool: PgPool) {
+async fn a_dancers_look_comes_from_dancers_toml_alone(pool: PgPool) {
     let dir = data_dir();
     let dancers = fs::read_to_string(dir.join("dancers.toml")).unwrap();
     fs::write(
@@ -286,15 +286,13 @@ async fn a_dancers_look_wins_over_their_battles(pool: PgPool) {
     .fetch_all(&pool)
     .await
     .unwrap();
-    // Both dance the bboy battle: Lee keeps the look from dancers.toml, Menno takes the battle's.
+    // Both dance the bboy battle: Lee has the look from dancers.toml, Menno none, as a battle
+    // never draws one.
     assert_eq!(
         looks[0].avatar_parts,
         default_look(looks[0].id, BattleGender::Bgirl)
     );
-    assert_eq!(
-        looks[1].avatar_parts,
-        default_look(looks[1].id, BattleGender::Bboy)
-    );
+    assert_eq!(looks[1].avatar_parts, None);
 }
 
 #[sqlx::test]

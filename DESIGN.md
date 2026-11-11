@@ -231,6 +231,7 @@ Base: `inline-flex items-center justify-center gap-2 rounded-full border-2 font-
 - **No flyer image:** render the **generated flyer** (4.24) at the same size. There is no empty placeholder.
 - **Videos available** *(M28)*: when a battle of a live or past jam has a video (`has_videos` from the API; upcoming jams never have it), the preview says so, and the whole preview opens the jam at its battles (`/jams/{slug}#battles`). The chip is never a link of its own.
   - On a grid card's flyer: `absolute bottom-3 left-3 h-7 px-2.5 rounded-full bg-[#0B0D14]/72 backdrop-blur text-white text-[12px] font-extrabold`, a filled `Play` 12px, then "Videos available" ("Vidéos disponibles").
+  - On a Next up card (landing, about 230px wide): not over the flyer, where it hid the flyer's city or battles, but as the "▶ Videos" row chip after the countdown, under the flyer (Nov 2026).
   - On a row card's or the map popup's thumbnail (64–72px wide, too narrow for the words): the same glass as a 24px circle at `bottom-1.5 left-1.5` with the `Play` icon alone, named "Videos available" for screen readers.
   - In a jam list row (§4.14, `/jams` and search): a `h-7 px-2.5 rounded-full border border-border bg-surface text-[12px] font-extrabold` chip in the trailing slot, `Play` 12px in `text-primary-text`, then "Videos".
   ```
@@ -241,6 +242,10 @@ Base: `inline-flex items-center justify-center gap-2 rounded-full border-2 font-
     DPC Jam 2025
     🇨🇭 Zurich
   ```
+- **Next up card** (landing v4, §6): `rounded-[20px] border bg-surface overflow-hidden`, the whole card a link to the jam. The 4:5 flyer, then a slim footer `px-3 py-2.5` holding the countdown chip (§4.30). No distance.
+  - **Generated flyer:** nothing between the flyer and the footer, as the flyer already prints the date, name, city and categories; the name, dates and city stay in the link for screen readers.
+  - **Uploaded flyer:** the date, name (`display-xs`, 2 lines) and city lines under it, `px-3 pt-3`, as the image may not be readable at this size.
+  - **Registration closed** sits in the countdown row under the flyer, after the countdown chip; the row starts right under a generated flyer, so one that wraps leaves no gap on its neighbours (Nov 2026: over the flyer it covered the generated flyer's BreakingJam mark).
 - Public cards show a status badge only when it's exceptional: **Live now** (the countdown chip of §4.30, while today is one of the jam's days; M26), Registration closed (before the jam) or Cancelled. Never show Published.
 
 ### 4.4 Map popup
@@ -280,11 +285,11 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
   - **Wordmark:** `font-display font-extrabold` at 16px (mobile) or 18px (desktop), "Breaking" plus "Jam" in a `bg-primary text-on-primary rounded-full px-[.35em]` pill.
 - **≥ xl** (below that, French and German labels or a long name don't fit), left to right:
   1. Home link (mark + wordmark)
-  2. Nav: ghost sm links **Jam map** (`/map`), **Find a jam** (`/jams`), **Find someone** (`/dancers`). The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
+  2. Nav: ghost sm links **Map** (`/map`), **Jams** (`/jams`), **Dancers** (`/dancers`); French **Carte**, **Jams**, **Danseurs**. Page titles and `<h1>`s use the same words. The active link gets `aria-current="page"` and a 2px `primary-text` underline inset at the bottom.
   3. Spacer
   4. Language switch: ghost sm with `Globe` + ISO code + `CaretDown`
   5. Account: ghost sm muted **Log in** when logged out; when logged in, the **avatar button** opening the account menu (§4.34)
-  - **Register a jam** is not in the bar: it sits under the landing search (§6), and in the menu sheets below `xl`.
+  - **Register a jam** is not in the bar: it sits in the landing hero (§4.41, §6), and in the menu sheets below `xl`.
 - **Avatar button** (logged in, ≥ xl): a 44px round button, `rounded-full border border-border bg-surface`, hover `bg-surface-raised`, open `border-border-strong`, with the visible focus ring. It holds only the dancer page's avatar (36px, `rounded-[11px]`), else a `User` icon in a `bg-surface-raised` square of the same size, 4px from the button's edge. Without a visible name, its accessible name is "Account menu, <name>" and its `title` is the name: the dancer name, else the account's name or its email's local part. `aria-haspopup="menu"`, `aria-expanded`.
 - **Review dot:** for an admin with items to review, a 10px `bg-primary` dot at the button's top-right with a 2px `bg` ring, so "N to review" (§4.34) still gets noticed with the menu closed. Decorative, hidden from assistive tech: the badge in the menu says the count.
 - **Below 360px** (iPhone SE and the like) the bar tightens so the menu button stays on screen: 4px gaps, the wordmark at 15px, and the language switch shows the code alone (no `Globe`, `px-2`, 44px wide).
@@ -379,7 +384,7 @@ One component that changes shape by viewport.
 - **Row** (`<a>`, the whole row is tappable): `flex items-center gap-3.5 -mx-3 px-3 py-3 min-h-[76px] border-b border-border`, hover `bg-surface`; the 12px inset gives the hover fill room around the date block and the trailing item while the text stays in line with the page. Left to right:
   1. **Date block:** `w-[52px] h-14 rounded-md border border-border bg-surface flex flex-col items-center justify-center`. The day is in Unbounded 800 18/22; the short month is in `text-[11px] font-extrabold uppercase tracking-[0.06em] text-primary-text`.
   2. **Body** (`flex-1 min-w-0 flex flex-col gap-1`): the jam name in `text-body font-extrabold truncate`; flag and city in `text-[13px] leading-[18px] text-muted`; then the meta tag and an optional role tag.
-  3. **Trailing:** on past rows, the **▶ Video** pill (§4.37) when the battle has a video, then the result badge; below `sm` the pill goes under the badge. Upcoming and live rows have neither.
+  3. **Per battle** (Nov 2026: one row per jam, a line per battle or role): the battle tag, the role tag, then the result badge and the **▶ Video** pill (§4.37) once there are any, live jams included.
 - **Order:** upcoming rows are soonest first; past rows are most recent first.
 - **Year label:** `sticky top-0 z-[2] bg-bg flex items-center gap-3 pt-3 pb-2`, with the year in `font-display text-display-xs` followed by a 1px `bg-border` line that fills the rest of the width.
   - On the page, use `top-14` on mobile and `lg:top-16` so it sits under the header.
@@ -533,9 +538,9 @@ Every jam gets a 4:5 poster built from its own data: the palette's background wi
   - Text sits on the left: date line, name at 84 → 50 px over ≤ 3 lines, city, then categories + "BREAKINGJAM.COM".
 - **On the jam page:** the flyer is the hero exactly as an uploaded flyer is (mobile full-bleed 375×469; desktop left column, `rounded-lg`). The `<h1>` and fact rows stay below it, so the layout is the same with either.
 
-### 4.25 Person list row ("Find someone")
+### 4.25 Person list row ("Dancers")
 
-- **Page** `/dancers`: the `max-w-prose` column, the `font-display` H1 "Find someone", then a search field (label "Name, alias or @handle", hint "Bboys, bgirls, DJs, MCs, judges.").
+- **Page** `/dancers`: the `max-w-prose` column, the `font-display` H1 "Dancers", then a search field (label "Name, alias or @handle", hint "Bboys, bgirls, DJs, MCs, judges.").
   - Typing searches after a 250 ms pause and keeps `?q=` in the URL, so back and shared links return to the same results.
   - A blank search lists everyone, notable dancers first.
 - **Row** (`<a>` to the dancer page, the whole row tappable): the jam row's shape (§4.14), `flex items-center gap-3.5 py-3 min-h-[76px] border-b border-border`:
@@ -551,29 +556,21 @@ Every jam gets a 4:5 poster built from its own data: the palette's background wi
   - Input in `text-body`, with a muted placeholder.
   - An inline primary sm button at the end.
 - **Mobile:** `h-14`, with no inline button; the CTAs sit below.
-- **Hero search (landing):** the same pill, bigger, alone in the hero (§6).
-  - **Desktop:** `max-w-[760px] h-20 pl-[30px] pr-2 gap-3.5`, `MagnifyingGlass` 24, input at 20px.
-  - **Mobile:** full width, `h-16`, input at 16px.
-  - **Submit:** the round J Bounce logo (`favicon.svg`) as the button, 64px on desktop and 52px on mobile, `aria-label="Search"`. Hover scales it to 1.04; focus gets the standard ring.
-  - **Placeholder:** "Jam, battle, bgirl, bboy, DJ…".
+- **Hero search (landing):** the same pill, bigger, centred in the hero (§6).
+  - **Desktop:** `max-w-[760px] h-[72px] pl-6 pr-[7px] gap-3.5`, `MagnifyingGlass` 24, input at 20px.
+  - **Mobile:** full width, `h-[60px]`, input at 16px.
+  - **Submit:** the round J Bounce logo (`favicon.svg`) as the button, 58px on desktop and 50px on mobile, `aria-label="Search"`. Hover scales it to 1.04; focus gets the standard ring.
+  - **Placeholder:** "Jam, city, battle, bgirl, bboy, DJ…" on desktop, "Jam, city, battle, dancer…" on mobile.
 - **Behaviour:**
   - The landing search submits to `/search?q=`, which lists matching jams and people (§6).
   - No typeahead yet.
 
 ### 4.27 Map preview
 
-*Unused since landing v3; kept as the spec for a future map teaser.*
+*Not on the landing: a map card was tried in landing v4 and left out, as too much for the hero. Kept as the spec for a future map teaser.*
 
-- **Container:** `relative h-[260px] lg:h-[560px] rounded-[28px] overflow-hidden border border-border`.
-  - The whole card is a link to `/map`.
-  - It uses the same MapLibre style as the map page, non-interactive: no scroll-zoom, no drag.
-  - Lazy-load it below the fold on mobile.
-- **Content:**
-  - Upcoming jams as markers, with clusters (§7), framed on the visitor's region.
-  - Desktop only: one mini popup for the soonest jam. It's a `w-[300px]` row card with a compact flyer of 64×80.
-- **Overlays:**
-  - Top-left chip: `h-9 px-3.5 rounded-full bg-bg border border-border shadow-md text-[13px] font-extrabold`, with an 8px `success` dot and "N upcoming jams".
-  - Bottom-left: secondary sm **Open the map →** on `bg-bg`.
+- **Container:** `relative rounded-[28px] border border-border overflow-hidden bg-surface-raised`; the whole card one link to `/map?fit=<its bounds>`. The map page's MapLibre style, not interactive, decorative, loaded lazily over a placeholder of its size.
+- **Overlays:** top-left chip `h-9 px-3.5 rounded-full bg-bg border border-border shadow-md text-[13px] font-extrabold` with an 8px `success` dot and "N jams near you"; bottom-right a primary 40px pill **Open the map →**.
 
 ### 4.28 Flyer upload and crop *(M19)*
 
@@ -611,9 +608,10 @@ Mockups: the "Flyer Upload" canvas (mobile sheet, desktop dialog, field states; 
 
 ### 4.30 Countdown chip
 
-- Next to the status badge on the jam page: "In 9 days", "Tomorrow", "Today", "Live now".
+- Next to the status badge on the jam page: "In 9 days", "Tomorrow", "Today", "Live now". On the landing's Next up cards (§4.3) it also counts in weeks: "In 3 weeks" from 21 days, rounded down.
 - `inline-flex h-6 items-center rounded-full border border-primary-text/50 bg-primary/[.12] px-2.5 text-caption font-extrabold text-primary-text uppercase`.
 - Counted in the jam's own timezone. **Live now** once its first battle has started, or from its second day when no start is announced. Hidden once the jam is over or cancelled.
+- On landing cards, from the visitor's own date: Live now (the jam's days have begun), Today, Tomorrow, In N days (2–20), In N weeks.
 
 ### 4.31 "Who's in" card
 
@@ -664,7 +662,7 @@ What the avatar button opens, logged in (§4.6). One `role="menu"` named "Accoun
 - **Top sheet (< xl):** hangs from the header's bottom edge, full width, `rounded-b-[28px] bg-surface-raised shadow-lg p-4`, scrolling when taller than the screen, over a `bg-scrim` on the page below. The page doesn't scroll while it is open.
 - **Items, in order** (the sheet adds what the bar holds on desktop):
   1. **Profile block** → the account's page (`/dancers/<id>`): 52px avatar, the name in `display-sm` with the verified tick when an approved claim linked it, then in `primary-text` "View my page", or "Not verified yet · Verify it" for a page the account made that waits for its claim (M25; the page has "This is me"), a `CaretRight`. `p-3 rounded-[14px]`, hover and focus `bg-surface`.
-  2. *Sheet only:* **Jam map** (`MapPin`), **Find a jam** (`MagnifyingGlass`), **Find someone** (`User`), then a separator when My jams follows.
+  2. *Sheet only:* **Map** (`MapPin`), **Jams** (`MagnifyingGlass`), **Dancers** (`User`), then a separator when My jams follows.
   3. **My jams** (`Ticket`) → `/org/jams`, with "N drafts" when there are drafts. Only for accounts that have registered a jam (the first one makes the account an organiser), the team and admins: a dancer sees their page, the theme and Log out.
   4. **Admin** (`ShieldCheck`) → `/admin`, **admins and the super admin only**, with "N to review" (jams in review plus pending dancer and organiser claims).
   5. Separator, then **Theme**: a `label` "Theme" (muted, upper case) over a three-way segmented control, **Light** (`Sun`) / **Dark** (`Moon`) / **Auto** (`Monitor`), full width: `rounded-full border border-border bg-surface p-1`, options `h-11 rounded-full`, the chosen one `bg-surface-raised border border-border-strong`, the others muted. It is the site's only theme switch.
@@ -689,7 +687,7 @@ The jam page in edit mode is made of blocks, one per part of the page (Venue, Ba
 - **Date chips:** `h-9 rounded-full border border-border-strong body-sm font-bold`; chips that add something ("+ Last day", "+ Times") are dashed and muted.
 - **Editor bar:** under the header, `sticky border-b bg-surface py-2.5`: the status badge (§4.5), "Editing" from sm, the save state (`Check` success "Saved" · spinning `CircleNotch` "Saving…" · `WarningCircle` danger "Not saved" with an underlined **Fix**, or **Retry** when no field is at fault), then a secondary sm **Preview** and, from lg, the primary sm **Publish**.
 - **A refused field:** its block stays open with the error under the field, even after **Done**, and the bar's **Fix** scrolls to it. The other blocks keep saving meanwhile.
-- **Publish checklist:** a card (§4.32 shape) titled "Ready to publish?" with "n of 5", a 6px progress bar (`bg-border`, fill `bg-success`), the five lines (Name, Dates, City and map pin, At least one battle, Instagram or contact email, the last leading to the Links block, whose Instagram field says "Instagram or contact email: one is needed to publish, so the BreakingJam team can reach you.") with `CheckCircle` (filled, success) or `Circle` (border-strong) and an **Add ›** link for what is missing, the primary **Publish** (disabled while something is missing, "Publish · 2 left"), and the caption "Until then only you can see this page." On phones it is a sticky bottom bar (progress + "n of 5 to publish" + the button) whose button opens the same list as a sheet titled "Almost there".
+- **Publish checklist:** a card (§4.32 shape) titled "Ready to send for review?" ("Ready to publish?" for the team, who publish directly) with "n of 5", a 6px progress bar (`bg-border`, fill `bg-success`), the five lines (Name, Dates, City and map pin, At least one battle, Instagram or contact email, the last leading to the Links block, whose Instagram field says "Instagram or contact email: one is needed to publish, so the BreakingJam team can reach you.") with `CheckCircle` (filled, success) or `Circle` (border-strong) and an **Add ›** link for what is missing, the primary **Send for review** (the team's **Publish**; disabled while something is missing, "Send for review · 2 left"), and the caption "A BreakingJam admin checks it before it goes on the map. Until then only you can see this page." On phones it is a sticky bottom bar (progress + "n of 5 to publish" + the button) whose button opens the same list, with the same caption, as a sheet titled "Almost there".
 - **Venue block, open:** a `label` "Find the place" over a search field (the input shell with a `MagnifyingGlass` at `left-3.5`, placeholder "Venue, address or city"). Suggestions drop below it as a list (`rounded-lg border bg-surface-raised p-1`): rows of a muted `MapPin`, the place in `body font-bold` and its address in `body-sm muted`; the arrow keys move, Enter picks, Esc closes. Then the Venue and Address fields, the pin map (256px, `rounded-md`) with a hint pill at its bottom-left ("Tap the map to drop the pin" · "Drag the pin to the exact door"), and the place: a chip with the flag and "Zürich, Switzerland", the caption "Filled from the address" and a ghost **Edit**, or the City and Country fields while either is blank. The attribution line closes the block.
 - **Battle sheet:** the `form` dialog (§4.9), titled "Add a battle" or "Edit battle".
   - **Chips:** two rows, Category and Format, each a `label` over a wrapping row (`flex flex-wrap gap-2`). A chip is `h-11 px-4 rounded-full border border-border-strong bg-surface body-sm font-semibold` with `aria-pressed`. Lit, it is `bg-primary text-on-primary border-primary`, so a form choice never reads as a map filter. A lit format chip tapped again goes out; a category always stays.
@@ -702,7 +700,7 @@ The jam page in edit mode is made of blocks, one per part of the page (Venue, Ba
     3. Crowning a winner fills their side of the next round's battle (battles 1 and 2 feed battle 1, and so on), and a semi-final's loser the small final. Crowning someone else instead puts them there: that battle loses its crown, since they never fought it, and the old winner leaves the rounds after. Each battle keeps its number, even when the ones before it are still empty. A battle just decided without a link takes the video its loser had as an entry (in the finals, the winner's too): that was the video of their last battle.
     4. A video link that isn't YouTube says "Paste a YouTube link: this one isn't saved." under the field; the battle keeps its last saved link meanwhile and the rest saves as usual. Battles with both sides and a winner are saved 800 ms after the last change; closing the sheet sends what is waiting, with "Your last changes weren't saved." when it can't. A refused bracket says "These results don't make a bracket: each entrant battles once a round, and not again once knocked out."
     5. Without a bracket size: "Pick a bracket (Top 8, Top 16…) under Details to enter the battles round by round."; with fewer than two entrants: "Add at least two entrants to this battle first."
-- **Flyer pill:** over the flyer's top-right, `rounded-full bg-text text-bg p-1 pl-3 caption`: "Generated" (or "Uploaded"), a `bg-bg text-text h-9` **Upload flyer** button, and a remove icon once there is an upload.
+- **Flyer pill:** under the flyer, right-aligned (over its top-right it covered the BreakingJam mark), `rounded-full bg-text text-bg p-1 pl-3 caption`: "Generated" (or "Uploaded"), a `bg-bg text-text h-9` **Upload flyer** button, and a remove icon once there is an upload.
 
 ---
 
@@ -711,7 +709,7 @@ The jam page in edit mode is made of blocks, one per part of the page (Venue, Ba
 `/welcome?next=…`, right after sign-up (email or Google), and from the account menu while the account has no page.
 
 - Reading column (`max-w-prose`, `py-10 lg:py-20`, `gap-6`): the `<h1>` "Are you on BreakingJam?" in `display-lg` (`display-xl` from lg), then in `body-lg muted`: "Dancers, DJs, MCs and judges each have a page with their jams. Find yours and tap “This is me” on it to verify it."
-- **Search:** a search field labelled "Your name in the scene", pre-filled with the account's name, hint "Your name, an alias or your Instagram handle."; it searches as you type (250 ms). The matches are person rows (§4.25) leading to each page, paged with **Show more**; none: "No page matches “…” yet." (§4.22).
+- **Search:** a search field labelled "Your stage name", pre-filled with the account's name, hint "Your stage name, an alias or your Instagram handle."; it searches as you type (250 ms). The matches are person rows (§4.25) leading to each page, paged with **Show more**; none: "No page matches “…” yet." (§4.22).
 - **Not here yet?** A dashed card (`rounded-lg border border-dashed border-border-strong p-4`): the title in `font-extrabold`, "Make your page now: it shows your jams as they come, and you can verify it." (muted), then a secondary **Create my page**, disabled until a search has run (search before create). It opens the picker's short form (stage name, country, Instagram) in place; creating opens the new page.
 - **Skip, I’m just here for the jams:** a ghost button, centred, to `next`.
 - An account that has its page goes straight to `next`.
@@ -753,6 +751,33 @@ The admin area (`/admin`): `<h1>` "Admin", then one filter-chip-shaped tab per t
   - a primary sm **Set team role**, only when the viewer may change it (the API's `team_roles`): never on the viewer's own card or one above them. It opens a short dialog, "Team role of <email>": a select of the roles allowed (**Not on the team**, **Seed admin**, **Admin**), a muted line saying what the chosen one does (taking someone off the team says their team jams pass to you), and **Save**, disabled until the choice changes. A toast confirms: "<email>: Seed admin."
 - **History**, under the queues of **Jams** and **Claims**: an `<h3>` "History" in `display-sm`, then the decisions, newest first, as lighter rows (`rounded-lg border p-3`, no fill): the jam or page as a bold link, a meta tag (**Approved**, **Sent back**, **Rejected**), then in muted `body-sm` "<date> by <admin email>" and, for a jam, its organiser's email, for a claim who asked. A rejection's note follows in `body-sm`. A claim the site withdrew (its handle changed during review) says so instead of an admin.
 
+### 4.40 Quick filter chip *(landing v4)*
+
+- `h-9 px-3.5 rounded-full border border-border bg-surface text-[14px] font-bold`, icons 15px in `primary-text`; hover `bg-surface-raised`. Each is a link; the hit area is extended to 44px.
+- In a `nav` named "Quick filters": **Near me** (`NavigationArrow`) asks for the position on click and opens `/map?lat=&lng=`, or the visitor's country (`/map?fit=`) when refused; **This weekend** (`CalendarBlank`) → `/jams?when=weekend`; **1v1**, **2v2**, **Bgirl**, **Kids** → `/jams?battles=…` (§6 Jams).
+- The row wraps, centred, from lg; below, it scrolls sideways without a scrollbar, bleeding to the screen's edges.
+
+### 4.41 Register button, large *(landing v4)*
+
+- `h-[52px] pl-2 pr-[26px] gap-3 rounded-full text-[17px] font-extrabold text-white`, background `linear-gradient(120deg, primary, accent)`, no border, shadow `0 10px 24px` in `accent` at 35%.
+- On the left a 36px `bg-white/20` circle holding a white `Plus` 18. Hover: `brightness-110`. Focus: the standard ring.
+- Alone and centred under the quick filters, no helper text; full width below lg.
+
+### 4.42 Stats band *(landing v4)*
+
+- Inside the page width, `pb-18` under it: `rounded-[28px] overflow-hidden text-white`, `linear-gradient(135deg, #002FA7 0%, #2A1FB5 60%, #6D3AF5 100%)` in both themes, faint white rings (`rgba(255,255,255,.08)`) in the top-right corner. `px-12 py-10` on desktop, `px-5 py-6` on mobile.
+- Title "BreakingJam so far", `font-display` 22px (18px mobile). Two groups, side by side from lg (`gap-24`), stacked below (`gap-6`):
+  - group labels 12px caps, `.1em` tracking, `#C7D4FF`;
+  - numbers Unbounded 800, 48px (34px mobile); captions 18px (16px mobile), `#DCE4FF`.
+  - **Past:** battles, dancers. **Coming up:** battles, countries, then an arrow; the whole group links to `/map`, its captions underline on hover, and it hides at 0.
+
+### 4.43 Result card *(landing v4)*
+
+- `rounded-[20px] border bg-surface p-4 flex flex-col gap-3.5`, the whole card a link to `/jams/<slug>#battles`.
+- **Top row:** the flyer at 52×65 `rounded-[10px]`, then the date `label` in `primary-text`, the name 16px extrabold on one line with an ellipsis, flag + city.
+- A hairline, then up to two winner lines: the battle name (12px caps, muted, never cut: one column as wide as the card's longest name, 45% of the row at most, wrapping past it, so the crowns line up), the filled `Crown` 16 in `primary-text` (named "Winner"), the winner's name bold with an ellipsis, then the members' 22px avatars (`rounded-[7px]`, overlapping), each named by `title` and `aria-label`. "+N more" (muted) for the battles not shown.
+- **▶ Videos available**, when a battle has a video: `h-[26px] px-2.5 rounded-full border text-[12px] font-extrabold`, `Play` in `primary-text`, aligned left.
+
 ## 5. Layout rules
 
 - **Container:** `mx-auto max-w-content px-4 md:px-6 lg:px-8` (1200px including padding). Reading column: `max-w-prose` (640px).
@@ -777,33 +802,25 @@ The admin area (`/admin`): `<h1>` "Admin", then one filter-chip-shaped tab per t
 
 ## 6. Screens (see the canvas artboards)
 
-**Landing** (order is the same on every viewport):
+**Landing** (v4; order is the same on every viewport):
 
 1. **Header** (§4.6).
-2. **Hero: title, subtitle, the search, then Register a jam.** No pitch paragraph or map preview. Everything is centred.
-   - **Title**, the page's only `<h1>`: "Find your next jam", `font-display` (Unbounded 800), 56px / 62px on desktop and 32px / 38px on mobile, with `text-wrap: balance` so mobile breaks as "Find your / next jam".
-   - **Subtitle** (`<p>`, right under it): "All of breaking, in one search", Manrope 500 (not bold), `muted`, 20px / 30px on desktop and 17px / 26px on mobile.
-   - The hero search (§4.26, landing size).
-   - **Register a jam** under it: primary lg (the J logo's blue) with `Plus` 20, to `/org/jams/new`; 32px below the search (24px on mobile).
-   - Spacing: 12px between title and subtitle (8px on mobile), 36px between subtitle and search (24px on mobile). `pt-24 pb-28` on desktop, `pt-12 pb-16` on mobile.
-   - One `.rings` (1120px desktop, 560px mobile) is centred behind the whole block.
-3. **Next up near you.**
-   - **Title row:**
-     - Title: `display-xl` on desktop, `display-md` on mobile.
-     - Location line: `body-sm muted` "Around <city> · change". Use geolocation if granted, otherwise IP; fall back to "Worldwide".
-     - Link: ghost **See all on the map →**.
-   - **Cards:** grid cards (§4.3), soonest first.
-     - Desktop: 4 columns, first 4 jams.
-     - Mobile: horizontal scroll-snap row of 240px cards, up to 6.
-   - Hide the section when there are no upcoming jams.
-   - On desktop (1440×900) it starts above the fold.
-4. **BreakingJam so far.**
-   - Overline, then two groups: side by side from 1024px (`gap-16`), stacked below (`gap-6`).
-     - **Past** (`label`, muted): battles · dancers.
-     - **Coming up** (`label`, `primary-text`): battles · in countries, with a trailing `ArrowRight`. The whole group links to the map; on hover its captions underline. Hidden with no upcoming battle.
-   - Each count is a `display-xl` number (`stat` on phones) + a `body-lg` muted caption (`body-sm` on phones), separated by a muted "·". Numbers use the locale's thousands separator; captions agree with the number.
-   - Public jams only, never cancelled ones. A battle is past once its jam ended before today, upcoming from the day it ends; countries are those of the upcoming battles.
-5. **Footer** (every content page, the same at every width).
+2. **Hero**, one centred column on every viewport (`pt-10 pb-12`, `pt-20 pb-24` from lg): title, subtitle, search, quick filters, Register. No map card (§4.27).
+   - **Title**, the page's only `<h1>`: "Find your next jam", `font-display` 800, 60/64 on desktop and 32/38 on mobile, `text-wrap: balance`.
+   - **Subtitle** (`<p>`): "All of breaking, in one search", Manrope 500, muted, 20/30 on desktop and 17/26 on mobile.
+   - The hero search (§4.26, landing size), the quick filter chips (§4.40), then the large Register button (§4.41).
+   - One `.rings` (1120px desktop, 560px mobile) centred behind the whole block, clipped by the section (no sideways scroll).
+   - The largest element of the first screen is the title or the search.
+3. **Next up near you**, under a `border-t`, `py-16` (`py-7` mobile).
+   - **Title row:** `<h2>` 36/42 (24/30 mobile); under it "Around <country> · change" (or "Around you" with a shared position; no line without any location); on the right ghost **See all on the map →** ("Map" on mobile).
+   - Four Next up cards (§4.3), soonest first: the soonest jams within 500 km of the reference point, topped up with the nearest others; without a point, the soonest anywhere. Desktop `grid-cols-4 gap-6`; mobile a scroll-snap row of 232px cards, `gap-3`.
+   - Hidden when no jam is upcoming.
+4. **Just happened**, under a `border-t`, same padding.
+   - **Title row:** `<h2>` "Just happened", "Winners and battle videos from the latest jams" ("Winners and battle videos" on mobile), **All results →** ("All" on mobile) to `/jams?when=past`.
+   - The 3 published jams that ended last and have a battle winner, worldwide, most recent first (`GET /api/results`), as result cards (§4.43). Desktop `grid-cols-3 gap-6`; mobile a scroll row of 290px cards.
+   - Hidden without any.
+5. **BreakingJam so far:** the stats band (§4.42), no `border-t`. Public jams only, never cancelled ones. A battle is past once its jam ended before today, upcoming from the day it ends; countries are those of the upcoming battles. Numbers use the locale's thousands separator; captions agree with the number.
+6. **Footer** (every content page, the same at every width).
    - The round Bounce logo at 56px next to the wordmark, then at the far end **Contact**, **Team** and **Instagram** (`InstagramLogo` 16 + "Instagram"), `body-sm font-bold`, 44px targets, underlined on hover. Instagram opens in a new tab.
    - Nothing else: the header holds the other links and the language switch.
    - One row (`justify-between`); below about 400px it wraps, the links under the logo. Nothing hangs past the page's side padding.
@@ -818,10 +835,10 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - A section with nothing in it hides while another has results. When nothing matches anywhere, one inline empty state (§4.22): "Nothing matches “<query>”." A blank search shows the upcoming jams and the notable people.
 - While loading, the sections hold their place with placeholders (§4.29).
 
-**Find a jam** (`/jams`): every jam as a list, for those who don't want the map.
+**Jams** (`/jams`): every jam as a list, for those who don't want the map.
 - Reading column (`max-w-prose`): `display-lg`/`display-xl` title, the search field, the filter chips (§5, wrapped as in the side panel), the result count.
 - Jam rows (§4.14), live and upcoming soonest first; **Past jams** shows the ones that are over, most recent first. 30 at a time, then **Show more**.
-- The search lives in the URL (`?q=`), like the map's.
+- The search lives in the URL (`?q=`), like the map's, and so do the filters: `?when=weekend|month|past` and `?battles=one_v_one,two_v_two,crew,seven_to_smoke,bgirl,kids`. The landing's quick filters (§4.40) and "All results" link here.
 
 **Map with a popup open.**
 - **Mobile:** a dark full-bleed map under a 56px header, with the floating search pill, a filter button (dot when filters are active) and the chip row. The selected marker is 28px with a date tag. The bottom sheet is up, showing the flyer, date, title, distance, badge, categories, **View jam** and Share. **List** and locate float above the sheet.
@@ -847,7 +864,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
        5. **Phones**: rounds below Top 8 start folded behind a dashed `rounded-full border-dashed border-border-strong h-11` **Show the N battles** with `CaretDown`; from lg every round shows.
        6. **Pairings unknown** (a round the data doesn't tell, or the placings an organiser entered): the same section title, still counting "N battles" (one per entry knocked out), then one row per entry placed there, with no note: the name (15px bold), its avatar stack, and the entry's old Video pill at the far end. Once matches are entered for the round, its match cards replace the rows. Without a single 1st and 2nd, the finalists show as rows under "Final". Withdrawn entries never show.
        - 1v1 battles use the same layout, with one avatar per line.
-     - For the jam's organiser: a row per entry instead, withdrawn ones included, with the video pill, the result badge, edit and delete, and an add chip under each battle.
+     - For the jam's editors (its organiser, `seed_admin`+): the results as visitors see them, with a secondary sm **Edit entries** (`PencilSimple`, `aria-pressed`) at the bottom right of the battle that swaps them for a row per entry, withdrawn ones included, with the video pill, the result badge, edit and delete, and an add chip; the button then reads **Done**. Without results, the rows and the add chip show straight away.
   8. **Lineup** (`#lineup`): judges, DJ, MC, hosts, staff, each a `label` and a wrapping row of chips; stacked on phones, side by side from lg. The organiser removes and adds people here.
   9. **About:** the organiser's pitch, up to 200 characters.
   10. **Info** (phones only): website (the host as label, ↗), email (`mailto:`) and Instagram; desktop has them in the facts grid.
@@ -963,8 +980,8 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Do** put blue only where it means "act" or "here" (primary buttons, markers, dates, links). Violet is the second voice for highlights, focus and closed states.
 - **Do** keep shapes rounded: pills for anything you press, 20px corners for containers, 12px for fields and thumbnails.
 - **Do** let the flyer carry the colour on cards and detail pages; the UI around it stays ink and white.
-- **Do** use the thin outlined rings (`.rings`) as the only decoration: at most one per screen, behind a hero or empty state, never behind body text.
-- **Don't** use gradients, glows, neon, or blue-to-violet blends.
+- **Do** use the thin outlined rings (`.rings`) as the only decoration: at most one per screen, behind a hero or empty state, never behind body text. *The landing's stats band (§4.42) has its own faint white rings.*
+- **Don't** use gradients, glows, neon, or blue-to-violet blends. *Two agreed exceptions on the landing (v4): the large Register button (§4.41) and the stats band (§4.42), which also keeps `#002FA7` in dark mode.*
 - **Don't** tilt, rotate or sticker-shadow anything. Don't use graffiti or distressed fonts.
 - **Don't** set Unbounded below 16px, or use it for buttons, labels or body text.
 - **Don't** put white text on violet or blue fills except through `on-primary`. Don't use `#002FA7` in dark mode.

@@ -11,6 +11,7 @@ export type When = "weekend" | "month" | "past";
 export type Filters = { when: When | null; categories: Category[] };
 
 export const NO_FILTERS: Filters = { when: null, categories: [] };
+export const WHENS: When[] = ["weekend", "month", "past"];
 export const CATEGORIES: Category[] = [
   "one_v_one",
   "two_v_two",
@@ -38,7 +39,7 @@ export function jamsOf(collection: Schemas["FeatureCollection"]): MapJam[] {
 }
 
 /** A local calendar date as `YYYY-MM-DD`. */
-function isoDate(date: Date): string {
+export function isoDate(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
@@ -112,6 +113,31 @@ export function matchesFilters(
     return false;
   }
   return true;
+}
+
+/** The filters a `/jams` link asks for: `?when=weekend&battles=one_v_one,kids`. */
+export function filtersOf(params: URLSearchParams): Filters {
+  const when = WHENS.find((w) => w === params.get("when")) ?? null;
+  const asked = (params.get("battles") ?? "").split(",");
+  return { when, categories: CATEGORIES.filter((c) => asked.includes(c)) };
+}
+
+/** Writes `filters` into `params` the way `filtersOf` reads them; other parameters stay. */
+export function writeFilters(params: URLSearchParams, filters: Filters) {
+  if (filters.when) params.set("when", filters.when);
+  else params.delete("when");
+  if (filters.categories.length > 0)
+    params.set("battles", filters.categories.join(","));
+  else params.delete("battles");
+}
+
+/** A `/jams` link with these filters on. */
+export function jamsLink(filters: Partial<Filters>): string {
+  const params = new URLSearchParams();
+  writeFilters(params, { ...NO_FILTERS, ...filters });
+  // Commas read better in a link than `%2C`, and URLSearchParams reads them back as they are.
+  const search = params.toString().replaceAll("%2C", ",");
+  return search ? `/jams?${search}` : "/jams";
 }
 
 export function isFiltered(filters: Filters): boolean {
@@ -214,39 +240,6 @@ export function firstView(
   ]);
 }
 
-/** How many jams "Next up near you" shows at most. */
-const FEATURED = 6;
-
-/**
- * "Next up near you" from the visitor's IP: upcoming jams in their country, soonest first,
- * then the nearest others from its centre; the soonest anywhere when the country is unknown.
- */
-export function featuredJams(jams: MapJam[], country: string | null): MapJam[] {
-  const upcoming = jams
-    .filter((jam) => !isPast(jam))
-    .sort((a, b) => a.starts_on.localeCompare(b.starts_on));
-  const local = upcoming.filter((jam) => jam.country === country);
-  const others = upcoming.filter((jam) => jam.country !== country);
-  const home = country ? COUNTRY_BOUNDS[country] : undefined;
-  if (home) {
-    const centre = centreOf(home);
-    others.sort((a, b) => distanceKm(centre, a) - distanceKm(centre, b));
-  }
-  return [...local, ...others].slice(0, FEATURED);
-}
-
-/** "Next up near you" from the visitor's position: the nearest upcoming jams, soonest first. */
-export function nearestJams(
-  jams: MapJam[],
-  point: { lng: number; lat: number },
-): MapJam[] {
-  return jams
-    .filter((jam) => !isPast(jam))
-    .sort((a, b) => distanceKm(point, a) - distanceKm(point, b))
-    .slice(0, FEATURED)
-    .sort((a, b) => a.starts_on.localeCompare(b.starts_on));
-}
-
 /** The jam page's "More jams coming up": up to 4 upcoming jams other than `jam`, the nearest
  * first, or the soonest when it has no pin. */
 export function otherJams(
@@ -265,7 +258,8 @@ export function otherJams(
   return others.slice(0, 4);
 }
 
-function centreOf([west, south, east, north]: Bounds) {
+/** The middle of a box. */
+export function centreOf([west, south, east, north]: Bounds) {
   return { lng: (west + east) / 2, lat: (south + north) / 2 };
 }
 
@@ -288,6 +282,11 @@ export function distanceKm(
     Math.sin(dLat / 2) ** 2 +
     Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
   return 2 * 6371 * Math.asin(Math.sqrt(h));
+}
+
+/** A box as `/map?fit=` takes it: `west,south,east,north`, to about 10 m. */
+export function fitParam(box: Bounds): string {
+  return box.map((n) => n.toFixed(4)).join(",");
 }
 
 /** A number from the URL; `NaN` when absent or blank (`Number("")` would be 0). */

@@ -6,20 +6,26 @@ country = "CH"
 venue = "Reithalle, Kaserne Basel"
 lat = 47.5634
 lng = 7.5901
-sources = ["https://web.archive.org/web/20170908033010/http://bcone.redbull.com/en_INT/event/red-bull-bc-one-switzerland-cypher-2017"]
+sources = [
+  "https://web.archive.org/web/20170908033010/http://bcone.redbull.com/en_INT/event/red-bull-bc-one-switzerland-cypher-2017",
+  "https://www.youtube.com/channel/UCGuvgZU2QcEzg_dZQUQrvOw",
+]
 judges = ["taisuke", "poe-one", "at", "lamine", "tuff-kid"]
 djs = ["renegade", "just-a-kid"]
 
 # Mixed: Becca was the first b-girl in the main event, and reached the semi-finals.
+# The top 16 isn't filmed: EZ Mike and Wen went out there (Red Bull's page; Becca beat Wen).
 [[battles]]
 key = "open"
 name = "1v1"
 gender = "mixed"
-results = [
-  { entrant = "hill", reached = "winner", video = "https://youtu.be/1Sngs6bi5xM" },
-  { entrant = "baby-og", reached = "top2", video = "https://youtu.be/1Sngs6bi5xM" },
-  { entrant = "t-mo", reached = "top4", video = "https://youtu.be/PWl30pK3GoQ" },
-  { entrant = "becca", reached = "top4", video = "https://youtu.be/9qdPDzLz8wE" },
-  { entrant = "moa", reached = "top8" },
-  { entrant = "ez-mike", reached = "top16" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "jitsou", b = "baby-og", winner = "baby-og", video = "https://youtu.be/9vEehgJI4wE" },
+  { round = "top8", a = "lil-switch", b = "becca", winner = "becca", video = "https://youtu.be/RwXznGAX2Xo" },
+  { round = "top8", a = "moa", b = "hill", winner = "hill", video = "https://youtu.be/YLe-_sdb5Lc" },
+  { round = "top8", a = "t-mo", b = "kiet", winner = "t-mo", video = "https://youtu.be/sPxegiJYuu8" },
+  { round = "top4", a = "t-mo", b = "hill", winner = "hill", video = "https://youtu.be/PWl30pK3GoQ" },
+  { round = "top4", a = "becca", b = "baby-og", winner = "baby-og", video = "https://youtu.be/9qdPDzLz8wE" },
+  { round = "final", a = "hill", b = "baby-og", winner = "hill", video = "https://youtu.be/1Sngs6bi5xM" },
 ]

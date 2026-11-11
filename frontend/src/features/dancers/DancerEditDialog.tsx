@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -19,6 +19,7 @@ import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
 import { applyFieldErrors } from "../../lib/apiErrors";
 import { toHandle } from "../../lib/instagram";
+import { useDebounced } from "../../lib/useDebounced";
 import { ME_KEY, useMe } from "../auth/useMe";
 import {
   type AvatarParts,
@@ -29,6 +30,7 @@ import {
   partsOf,
 } from "./avatarParts";
 import { DancerAvatar } from "./DancerAvatar";
+import { searchDancers } from "./search";
 
 type Dancer = Schemas["DancerResponse"];
 type Title = Schemas["DancerTitle"];
@@ -102,10 +104,11 @@ export function DancerEditDialog({
   });
   const { register, control, handleSubmit, setError, watch } = form;
   const { errors, isDirty } = form.formState;
-  // Null parts mean nobody has drawn the dancer yet (a battle may then suggest a look); once
-  // the picker is touched, the parts are a choice, even when they match the seed.
+  // Null parts mean nobody has drawn the dancer yet, so the seed draws them; once the picker
+  // is touched, the parts are a choice, even when they match the seed.
   const drawn = useRef(false);
-  const [parts, bio] = watch(["parts", "bio"]);
+  const [parts, bio, name] = watch(["parts", "bio", "dancer_name"]);
+  const namesake = useNamesake(dancer, name);
 
   const save = useMutation({
     mutationFn: (values: Values) =>
@@ -151,7 +154,8 @@ export function DancerEditDialog({
       confirmClose={isDirty ? t("form.discard") : undefined}
       action={{ label: t("form.save"), form: formId, loading: save.isPending }}
     >
-      {!dancer.verified_at && (
+      {/* Not on one's own page: "until the dancer verifies it" is about someone else. */}
+      {!dancer.verified_at && !mine && (
         <InlineNotice>{t("dancerEdit.logged")}</InlineNotice>
       )}
       <form
@@ -163,6 +167,10 @@ export function DancerEditDialog({
         <TextField
           label={t("picker.dancerName")}
           data-autofocus={focusHandle ? undefined : true}
+          // A warning only: two dancers may share a name.
+          hint={
+            namesake ? t("dancerEdit.namesake", { name: namesake }) : undefined
+          }
           error={errors.dancer_name?.message}
           {...register("dancer_name")}
         />
@@ -355,4 +363,23 @@ function useSchema() {
       }),
     [t],
   );
+}
+
+/** Another dancer's name when the new stage name is already someone's, once typing pauses. */
+function useNamesake(dancer: Dancer, name: string): string | undefined {
+  const q = useDebounced(name.trim(), 300);
+  const changed = q.length >= 2 && q !== dancer.dancer_name;
+  const found = useQuery({
+    // The pickers' cache of plain lists (SearchPicker).
+    queryKey: ["dancers", "search", q],
+    queryFn: () => searchDancers(q),
+    enabled: changed,
+    staleTime: 30_000,
+  });
+  if (!changed) return undefined;
+  return found.data?.find(
+    (other) =>
+      other.id !== dancer.id &&
+      other.dancer_name.toLowerCase() === q.toLowerCase(),
+  )?.dancer_name;
 }

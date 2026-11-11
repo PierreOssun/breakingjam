@@ -12,12 +12,11 @@ export function safeNext(next: string | null): string {
 }
 
 /**
- * Where a new account goes: the welcome step (M25), then `next`, anywhere but the jam form, as
- * it may only dance or watch (mirrors the API's `after_sign_up`, which does the same for Google
- * sign-ups).
+ * Where a new account goes: the welcome step (M25), then `next` (mirrors the API's
+ * `after_sign_up`, which does the same for Google sign-ups).
  */
 export function afterSignUp(next: string): string {
-  return withNext("/welcome", next === "/org/jams/new" ? "/" : next);
+  return withNext("/welcome", next);
 }
 
 /**

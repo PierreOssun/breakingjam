@@ -8,7 +8,7 @@ import { IconButton } from "../../components/IconButton";
 import { ShareButton } from "../../components/ShareButton";
 import { StatusBadge } from "../../components/StatusBadge";
 import { formatShortDateRange, localeOf } from "../../lib/dates";
-import { shareTitle } from "../jams/jamDetail";
+import { shareTitle, tellsVisitors } from "../jams/jamDetail";
 import { VideosChip } from "../../components/VideosChip";
 import { JamFlyer } from "../jams/JamFlyer";
 import { jamPath, type MapJam } from "./jams";
@@ -154,7 +154,7 @@ function Summary({
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <StatusBadge jam={jam} />
+        {tellsVisitors(jam) && <StatusBadge jam={jam} />}
         {jam.battles.length > 0 && (
           <p className="text-caption text-muted">{jam.battles.join(" · ")}</p>
         )}

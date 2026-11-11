@@ -19,6 +19,7 @@ import { EditorBar } from "../features/jams/EditorBar";
 import { BlockCard, EmptyBlock } from "../features/jams/EditorBlock";
 import {
   AboutBlock,
+  type DateField,
   DatesBlock,
   LinksBlock,
 } from "../features/jams/EditorBlocks";
@@ -97,6 +98,8 @@ function JamEditor({ jam }: { jam: Jam }) {
   const battles = useBattles(jam.id);
   const staff = useStaff(jam.id);
   const [open, setOpen] = useState<Block | null>(null);
+  // The chip tapped: "+ Times" opens the Dates block on the hours, not on the first day.
+  const [dateField, setDateField] = useState<DateField>("starts_on");
   // The checklist waits for the battles, so it never says "3 of 4" for a moment.
   const items = battles.data && checklist(jam, battles.data.length);
   const chip = countdown(jam, firstStart(battles.data ?? []), new Date());
@@ -131,7 +134,7 @@ function JamEditor({ jam }: { jam: Jam }) {
       />
       <div className="mx-auto max-w-content pt-6 lg:grid lg:grid-cols-[420px_1fr] lg:gap-14 lg:px-8">
         <aside className="flex flex-col gap-4 px-4 md:px-6 lg:sticky lg:top-[145px] lg:self-start lg:px-0">
-          <div className="relative">
+          <div className="flex flex-col gap-3">
             <JamFlyer jam={jam} className="rounded-lg" />
             <FlyerOverlay jam={jam} />
           </div>
@@ -152,9 +155,19 @@ function JamEditor({ jam }: { jam: Jam }) {
           <div className="flex flex-col gap-3">
             {chip && <CountdownChip value={chip} />}
             <TitleField draft={draft} />
-            <DateChips draft={draft} onOpen={() => setOpen("dates")} />
+            <DateChips
+              draft={draft}
+              onOpen={(field) => {
+                setDateField(field);
+                setOpen("dates");
+              }}
+            />
             {isOpen("dates") && (
-              <DatesBlock draft={draft} onClose={() => setOpen(null)} />
+              <DatesBlock
+                draft={draft}
+                focus={dateField}
+                onClose={() => setOpen(null)}
+              />
             )}
           </div>
           <VenueBlock {...block("venue")} />
@@ -229,7 +242,13 @@ function TitleField({ draft }: { draft: JamDraft }) {
 }
 
 /** The dates as chips: the days, "+ Last day" until there is one, the hours or "+ Times". */
-function DateChips({ draft, onOpen }: { draft: JamDraft; onOpen: () => void }) {
+function DateChips({
+  draft,
+  onOpen,
+}: {
+  draft: JamDraft;
+  onOpen: (field: DateField) => void;
+}) {
   const { t, i18n } = useTranslation();
   const { starts_on, ends_on, opens_at, closes_at } = draft.values;
   const days = formatShortDateRange(
@@ -250,14 +269,18 @@ function DateChips({ draft, onOpen }: { draft: JamDraft; onOpen: () => void }) {
   const icon = { size: 16, weight: "bold" as const, "aria-hidden": true };
   return (
     <div className="flex flex-wrap gap-2">
-      <button type="button" onClick={onOpen} className={chip}>
+      <button
+        type="button"
+        onClick={() => onOpen("starts_on")}
+        className={chip}
+      >
         <CalendarBlank {...icon} />
         {days}
       </button>
       {!ends_on && (
         <button
           type="button"
-          onClick={onOpen}
+          onClick={() => onOpen("ends_on")}
           className={`${chip} border-dashed text-muted`}
         >
           <Plus {...icon} />
@@ -266,7 +289,7 @@ function DateChips({ draft, onOpen }: { draft: JamDraft; onOpen: () => void }) {
       )}
       <button
         type="button"
-        onClick={onOpen}
+        onClick={() => onOpen("opens_at")}
         className={`${chip} ${hours ? "" : "border-dashed text-muted"}`}
       >
         {hours ? <Clock {...icon} /> : <Plus {...icon} />}

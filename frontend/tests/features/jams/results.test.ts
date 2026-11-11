@@ -3,7 +3,9 @@ import {
   badLink,
   draftOf,
   entryVideo,
+  firstRoundFor,
   matchesBody,
+  roundDone,
   roundsOf,
   withSlot,
 } from "../../../src/features/jams/results";
@@ -19,6 +21,36 @@ describe("roundsOf", () => {
   it("has no rounds without a bracket size", () => {
     expect(roundsOf(null)).toEqual([]);
     expect(roundsOf(6)).toEqual([]);
+  });
+});
+
+describe("firstRoundFor", () => {
+  it("opens on the smallest round that seats every entrant", () => {
+    const top8 = roundsOf(8);
+    expect(firstRoundFor(top8, 8)).toBe("top8");
+    expect(firstRoundFor(top8, 4)).toBe("top4");
+    expect(firstRoundFor(top8, 3)).toBe("top4");
+    expect(firstRoundFor(top8, 2)).toBe("final");
+    // More than the bracket holds: prelims came first, the bracket starts at its top.
+    expect(firstRoundFor(top8, 12)).toBe("top8");
+    expect(firstRoundFor([], 4)).toBeUndefined();
+  });
+});
+
+describe("roundDone", () => {
+  const won = {
+    a: "e1",
+    b: "e2",
+    winner: "a" as const,
+    video: "",
+    offset: null,
+  };
+  it("ticks a round once each of its battles has both sides and a winner", () => {
+    expect(roundDone([won, won])).toBe(true);
+    expect(roundDone([won, { ...won, winner: null }])).toBe(false);
+    expect(roundDone([won, { ...won, b: "" }])).toBe(false);
+    expect(roundDone([])).toBe(false);
+    expect(roundDone(undefined)).toBe(false);
   });
 });
 

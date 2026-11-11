@@ -327,8 +327,7 @@ async fn insert_event(
                 ));
                 continue;
             }
-            let entry_id =
-                db::battles::insert_entry(conn, battle_id, fields.gender, &entry).await?;
+            let entry_id = db::battles::insert_entry(conn, battle_id, &entry).await?;
             entries.insert(standing.entrant, entry_id);
         }
         insert_matches(conn, battle_id, battle, &entries).await?;

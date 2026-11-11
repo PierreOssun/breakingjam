@@ -6,7 +6,7 @@ city = "Banská Bystrica"
 country = "SK"
 lat = 48.7354
 lng = 19.1457
-sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
+sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCv8V_79zZ1RUlUNFbMDSPBg"]
 judges = ["kid-david", "menno", "ata", "lego", "roxrite"]
 mcs = ["mario-bee", "lil-pablo", "osto"]
 djs = ["lean-rock", "fleg", "renegade", "scream", "plash", "smirnoff", "felix"]
@@ -25,12 +25,12 @@ matches = [
   { round = "top16", a = "kleju", b = "tricky", winner = "kleju" },
   { round = "top16", a = "lb", b = "hill", winner = "lb" },
   { round = "top16", a = "hulk", b = "conni", winner = "hulk" },
-  { round = "top8", a = "el-nino", b = "klesio", winner = "el-nino" },
-  { round = "top8", a = "twister", b = "perna", winner = "twister" },
-  { round = "top8", a = "fantum", b = "kleju", winner = "fantum" },
+  { round = "top8", a = "el-nino", b = "klesio", winner = "el-nino" , video = "https://youtu.be/0ZPyeSpypyw" },
+  { round = "top8", a = "twister", b = "perna", winner = "twister" , video = "https://youtu.be/3HZXBtgDF2U" },
+  { round = "top8", a = "fantum", b = "kleju", winner = "fantum" , video = "https://youtu.be/6Tg_ThWbgVQ" },
   { round = "top8", a = "lb", b = "hulk", winner = "lb", video = "https://youtu.be/X-bVRtGxthE" },
-  { round = "top4", a = "el-nino", b = "twister", winner = "el-nino" },
-  { round = "top4", a = "fantum", b = "lb", winner = "fantum" },
+  { round = "top4", a = "el-nino", b = "twister", winner = "el-nino" , video = "https://youtu.be/3uCJbRRxuj0" },
+  { round = "top4", a = "fantum", b = "lb", winner = "fantum" , video = "https://youtu.be/S9UhmsPvWBc" },
   { round = "final", a = "el-nino", b = "fantum", winner = "el-nino", video = "https://youtu.be/peqGsu_bgU8" },
 ]
 
@@ -38,8 +38,15 @@ matches = [
 key = "bgirl"
 name = "1v1 Bgirl"
 gender = "bgirl"
-results = [
-  { entrant = "sunny", reached = "winner" },
+bracket_size = 8
+matches = [
+  { round = "top8", a = "melisa", b = "alessandrina", winner = "melisa", video = "https://youtu.be/GbeCby6BMGo" },
+  { round = "top8", a = "bene", b = "jilou", winner = "jilou", video = "https://youtu.be/b_qwH3Nzx_c" },
+  { round = "top8", a = "terra", b = "queen-mary", winner = "terra", video = "https://youtu.be/e6kdfsCiXck" },
+  { round = "top8", a = "sunny", b = "zofia", winner = "sunny", video = "https://youtu.be/mz4dxXlK-c4" },
+  { round = "top4", a = "sunny", b = "melisa", winner = "sunny", video = "https://youtu.be/G4yFQURa5qA" },
+  { round = "top4", a = "terra", b = "jilou", winner = "terra", video = "https://youtu.be/m2BUag1u5-I" },
+  { round = "final", a = "terra", b = "sunny", winner = "sunny", video = "https://youtu.be/vtsZm8UKJGA" },
 ]
 
 [[battles]]
@@ -47,12 +54,43 @@ key = "2v2"
 name = "2v2"
 gender = "mixed"
 team_size = 2
-results = [
-  { entrant = "menno-roxrite", reached = "winner" },
+bracket_size = 16
+matches = [
+  { round = "top16", a = "jims-onel", b = "yarko-skunk", winner = "yarko-skunk", video = "https://youtu.be/6IsS3BB6_5w" },
+  { round = "top16", a = "menno-roxrite", b = "dead-prezz", winner = "menno-roxrite", video = "https://youtu.be/jM6mBZ_ee1o" },
+  { round = "top16", a = "kleju-chuchu", b = "hulk-potter", winner = "hulk-potter", video = "https://youtu.be/EqnXtfvv2gM" },
+  { round = "top16", a = "spin-manny", b = "ufo-technics", winner = "spin-manny", video = "https://youtu.be/cOqT_mwcpXw" },
+  { round = "top16", a = "kodacho-friek", b = "killa-rockers", winner = "killa-rockers", video = "https://youtu.be/H4zBszOUwlM" },
+  { round = "top16", a = "greku-thomaz", b = "koza-banda", winner = "greku-thomaz", video = "https://youtu.be/eu2DCAEuhH0" },
+  { round = "top16", a = "supreme-beings", b = "tsu-yuri", winner = "supreme-beings", video = "https://youtu.be/Sd7f-etCdMY" },
+  { round = "top16", a = "intact-pluto", b = "tricky-makita", winner = "intact-pluto", video = "https://youtu.be/b6NWom6JkeY" },
+  { round = "top8", a = "menno-roxrite", b = "yarko-skunk", winner = "menno-roxrite", video = "https://youtu.be/HSwpeG2DlEw" },
+  { round = "top8", a = "spin-manny", b = "hulk-potter", winner = "hulk-potter", video = "https://youtu.be/Lqf82jHCc48" },
+  { round = "top8", a = "greku-thomaz", b = "killa-rockers", winner = "greku-thomaz", video = "https://youtu.be/1fY5zun5FkA" },
+  { round = "top8", a = "supreme-beings", b = "intact-pluto", winner = "intact-pluto", video = "https://youtu.be/UyKD1oNrCRs" },
+  { round = "top4", a = "menno-roxrite", b = "greku-thomaz", winner = "menno-roxrite", video = "https://youtu.be/UQghlkA_TUw" },
+  { round = "top4", a = "hulk-potter", b = "intact-pluto", winner = "hulk-potter", video = "https://youtu.be/8q6zV7WEyhI" },
+  { round = "final", a = "menno-roxrite", b = "hulk-potter", winner = "menno-roxrite", video = "https://youtu.be/gCrAlRPILV8" },
 ]
 
+# Countries and spellings from The Bboy Spot's titles; Yuri is taken to be Yuri Dominggos, a Brazilian in the 1v1 the same weekend.
 [battles.teams]
 menno-roxrite = { members = ["menno", "roxrite"] }
+dead-prezz = { crew = "dead-prezz" }
+jims-onel = { members = ["jims", "onel"] }
+yarko-skunk = { members = ["yarko", "skunk"] }
+kleju-chuchu = { members = ["kleju", "chuchu"] }
+hulk-potter = { members = ["hulk", "potter"] }
+spin-manny = { members = ["spin", "manny"] }
+ufo-technics = { name = "Ufo Technics" }
+kodacho-friek = { members = ["kodacho", "friek"] }
+killa-rockers = { name = "Killa Rockers" }
+greku-thomaz = { members = ["greku", "thomaz"] }
+koza-banda = { name = "Koza Banda" }
+supreme-beings = { name = "Supreme Beings" }
+tsu-yuri = { members = ["tsu", "yuri-dominggos"] }
+intact-pluto = { members = ["intact", "pluto"] }
+tricky-makita = { members = ["tricky", "makita"] }
 
 [[battles]]
 key = "kids"
@@ -60,7 +98,8 @@ name = "Kids"
 gender = "mixed"
 age = "kids"
 results = [
-  { entrant = "untied", reached = "winner" },
+  { entrant = "untied", reached = "winner", video = "https://youtu.be/4utfm62wfE4" },
+  { entrant = "axel", reached = "top2", video = "https://youtu.be/4utfm62wfE4" },
 ]
 
 [[battles]]

@@ -99,6 +99,12 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: "/account",
+            lazy: async () => ({
+              Component: (await import("./routes/AccountPage")).AccountPage,
+            }),
+          },
+          {
             path: "/org/jams",
             lazy: async () => ({
               Component: (await import("./routes/OrgJamsPage")).OrgJamsPage,

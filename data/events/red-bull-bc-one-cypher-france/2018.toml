@@ -15,11 +15,11 @@ sources = [
 key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
-results = [
-  { entrant = "shlag", reached = "winner", video = "https://youtu.be/ByCv7XIw-_A" },
-  { entrant = "demez", reached = "top2", video = "https://youtu.be/ByCv7XIw-_A" },
-  { entrant = "tonio", reached = "top4", video = "https://youtu.be/_RQGZ5o7A9U" },
-  { entrant = "kae", reached = "top4", video = "https://youtu.be/qfBe9caGYGE" },
+bracket_size = 4
+matches = [
+  { round = "top4", a = "demez", b = "kae", winner = "demez", video = "https://youtu.be/qfBe9caGYGE" },
+  { round = "top4", a = "tonio", b = "shlag", winner = "shlag", video = "https://youtu.be/_RQGZ5o7A9U" },
+  { round = "final", a = "demez", b = "shlag", winner = "shlag", video = "https://youtu.be/ByCv7XIw-_A" },
 ]
 
 [[battles]]

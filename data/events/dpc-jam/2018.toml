@@ -1,0 +1,57 @@
+name = "DPC Jam 2018"
+starts_on = 2018-10-13
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+venue = "GZ Heuried"
+lat = 47.3673
+lng = 8.5038
+sources = [
+  "https://and8.dance/en/e/2472",
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+]
+judges = ["mowgly", "buz", "shlag"]
+djs = ["dj-senka", "ob-one"]
+mcs = ["godfather"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "alkolil-cheerito", b = "moa-shaymin", winner = "moa-shaymin", video = "https://youtu.be/D4TBxW4zFfg" },
+  { round = "top16", a = "baby-og-hill", b = "el-mouwahidin", winner = "el-mouwahidin", video = "https://youtu.be/XP94HTmjjbA" },
+  { round = "top16", a = "kastrito-ojitos", b = "drummerman-maru", winner = "drummerman-maru", video = "https://youtu.be/R1xBS4ag7_0" },
+  { round = "top16", a = "ormus-force", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/x_pR2nBYxeU" },
+  { round = "top16", a = "vagabonds", b = "bandits", winner = "vagabonds", video = "https://youtu.be/B9Fi9bwm08g" },
+  { round = "top16", a = "malish-samuka", b = "astro-biroflow", winner = "malish-samuka", video = "https://youtu.be/seTh_bCMNNA" },
+  { round = "top16", a = "gorilla-legion", b = "funny-666-kaneki-the-kalameet", winner = "gorilla-legion", video = "https://youtu.be/-neEavyYCR0" },
+  { round = "top16", a = "finn-ozie", b = "tru-cru", winner = "tru-cru", video = "https://youtu.be/TdmnbKqJ710" },
+  { round = "top8", a = "vagabonds", b = "the-ruggeds", winner = "the-ruggeds", video = "https://youtu.be/TchpiTrDC9c" },
+  { round = "top8", a = "drummerman-maru", b = "el-mouwahidin", winner = "el-mouwahidin", video = "https://youtu.be/ex8hafUsU1k" },
+  { round = "top8", a = "moa-shaymin", b = "tru-cru", winner = "tru-cru", video = "https://youtu.be/Amk0xr5rCaQ" },
+  { round = "top8", a = "gorilla-legion", b = "malish-samuka", winner = "malish-samuka", video = "https://youtu.be/ApHpl-40dko" },
+  { round = "top4", a = "tru-cru", b = "malish-samuka", winner = "tru-cru", video = "https://youtu.be/3sZNg7NgHYM" },
+  { round = "top4", a = "the-ruggeds", b = "el-mouwahidin", winner = "el-mouwahidin", video = "https://youtu.be/YkjnSIB_wY8" },
+  { round = "final", a = "tru-cru", b = "el-mouwahidin", winner = "tru-cru", video = "https://youtu.be/MO1mTjqKBZg" },
+]
+
+[battles.teams]
+alkolil-cheerito = { members = ["alkolil", "cheerito"] }
+astro-biroflow = { members = ["biroflow", "astro"] }
+baby-og-hill = { members = ["hill", "baby-og"] }
+bandits = { name = "Bandits" }
+drummerman-maru = { members = ["drummerman", "maru"] }
+el-mouwahidin = { name = "El Mouwahidin" }
+finn-ozie = { members = ["finn", "ozie"] }
+funny-666-kaneki-the-kalameet = { members = ["funny666", "kaneki"] }
+gorilla-legion = { name = "Gorilla Legion" }
+kastrito-ojitos = { members = ["kastrito", "ojitos"] }
+malish-samuka = { members = ["malish", "samuka"] }
+moa-shaymin = { members = ["moa", "shaymin"] }
+ormus-force = { name = "Ormus Force" }
+the-ruggeds = { name = "The Ruggeds" }
+tru-cru = { name = "Tru Cru" }
+vagabonds = { name = "Vagabonds" }

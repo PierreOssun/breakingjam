@@ -1,0 +1,58 @@
+name = "DPC Jam 2022"
+starts_on = 2022-10-08
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+venue = "GZ Heuried"
+lat = 47.3673
+lng = 8.5038
+sources = [
+  "https://and8.dance/en/e/4188",
+  "https://and8.dance/en/stats/reports/4188/1257/r/",
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+]
+judges = ["gombi", "cri6", "chau-lin"]
+djs = ["dj-senka", "dj-catch"]
+mcs = ["godfather"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "enzo-mighty-jake", b = "rico-titris", winner = "enzo-mighty-jake", video = "https://youtu.be/H9KT3p3lufM" },
+  { round = "top16", a = "floor-rec-mascot", b = "daga-lotus", winner = "floor-rec-mascot", video = "https://youtu.be/vMwCXR8zlSE" },
+  { round = "top16", a = "phil-wizard-wing", b = "elina-high5", winner = "phil-wizard-wing", video = "https://youtu.be/E58IffjdRNU" },
+  { round = "top16", a = "tru-cru", b = "ears-tasic", winner = "tru-cru", video = "https://youtu.be/6PfMkoEqjyo" },
+  { round = "top16", a = "alvin-tsukki", b = "funky-parrots", winner = "alvin-tsukki", video = "https://youtu.be/7a3ktLQfs94" },
+  { round = "top16", a = "damani-syssy", b = "bad-matty-spider", winner = "damani-syssy", video = "https://youtu.be/cTh8Q8phiSM" },
+  { round = "top16", a = "legosam-link", b = "epiks-laziness", winner = "legosam-link", video = "https://youtu.be/ZZl-QAjAFSk" },
+  { round = "top16", a = "imad-zealous", b = "cho-issue", winner = "cho-issue", video = "https://youtu.be/PAV3dSkpFrQ" },
+  { round = "top8", a = "phil-wizard-wing", b = "floor-rec-mascot", winner = "phil-wizard-wing", video = "https://youtu.be/TQiQWcOAC-Q" },
+  { round = "top8", a = "tru-cru", b = "alvin-tsukki", winner = "alvin-tsukki", video = "https://youtu.be/ArYQbiAUD-o" },
+  { round = "top8", a = "enzo-mighty-jake", b = "cho-issue", winner = "cho-issue", video = "https://youtu.be/F6csaYCNIog" },
+  { round = "top8", a = "damani-syssy", b = "legosam-link", winner = "damani-syssy", video = "https://youtu.be/V8fMdZ18AO4" },
+  { round = "top4", a = "phil-wizard-wing", b = "cho-issue", winner = "phil-wizard-wing", video = "https://youtu.be/0wYw38HqSOc" },
+  { round = "top4", a = "damani-syssy", b = "alvin-tsukki", winner = "alvin-tsukki", video = "https://youtu.be/lMOiqpXv778" },
+  { round = "final", a = "phil-wizard-wing", b = "alvin-tsukki", winner = "alvin-tsukki", video = "https://youtu.be/ulxZQYrXXKY" },
+]
+
+[battles.teams]
+alvin-tsukki = { crew = "formless-corp", members = ["alvin", "tsukki"] }
+bad-matty-spider = { members = ["spider", "bad-matty"] }
+cho-issue = { members = ["cho", "issue"] }
+daga-lotus = { members = ["daga", "lotus"] }
+damani-syssy = { members = ["damani", "syssy"] }
+ears-tasic = { members = ["tasic", "ears"] }
+elina-high5 = { members = ["high5", "elina"] }
+enzo-mighty-jake = { members = ["mighty-jake", "enzo"] }
+epiks-laziness = { members = ["laziness", "epiks"] }
+floor-rec-mascot = { members = ["mascot", "floor-rec"] }
+funky-parrots = { name = "Funky Parrots" }
+imad-zealous = { crew = "al-molok", members = ["zealuss", "imad"] }
+legosam-link = { members = ["lego-sam", "link"] }
+phil-wizard-wing = { crew = "red-bull-bc-one-all-stars", members = ["wing", "phil-wizard"] }
+rico-titris = { members = ["rico", "titris"] }
+tru-cru = { crew = "tru-cru", members = ["red-rock", "amin-drillz"] }

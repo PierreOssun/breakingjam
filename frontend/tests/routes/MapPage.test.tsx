@@ -308,7 +308,8 @@ describe("MapPage", () => {
     expect(row).toHaveAttribute("aria-current", "true");
     expect(within(popup).getByRole("heading")).toHaveFocus();
     expect(within(popup).getByText("1v1 Bboy · 1v1 Bgirl")).toBeInTheDocument();
-    expect(within(popup).getByText("Published")).toBeInTheDocument();
+    // "Published" tells a visitor nothing (§4.3).
+    expect(within(popup).queryByText("Published")).toBeNull();
     expect(
       within(popup).getByRole("link", { name: "View jam" }),
     ).toHaveAttribute("href", "/jams/concrete-cypher-2");

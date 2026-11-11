@@ -1,0 +1,52 @@
+name = "DPC Jam 2014"
+starts_on = 2014-10-18  # the Saturday before the first upload (2014-10-19); check
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+sources = ["https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg"]
+judges = []
+
+# The D.Point.C crew's 5th anniversary battle; 5 of 8 top 16 battles are filmed, so placings.
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "morning-of-owl", reached = "winner", video = "https://youtu.be/HhjG-CzlVD0" },
+  { entrant = "boyka-toschkin", reached = "top2", video = "https://youtu.be/HhjG-CzlVD0" },
+  { entrant = "dr-hill", reached = "top4", video = "https://youtu.be/lQ8u0O5D3JA" },
+  { entrant = "illusion-crew", reached = "top4", video = "https://youtu.be/32MHa2tPPBk" },
+  { entrant = "only-kings", reached = "top8", video = "https://youtu.be/L4gz8jMXlFg" },
+  { entrant = "prodigy-crew", reached = "top8", video = "https://youtu.be/YE1tp06vCH4" },
+  { entrant = "tru-cru", reached = "top8", video = "https://youtu.be/XA4CiAQVGls" },
+  { entrant = "license-to-chill", reached = "top8", video = "https://youtu.be/xTgycXGFKvw" },
+  { entrant = "ghost-rockz", reached = "top16", video = "https://youtu.be/b-D6yywMPg0" },
+  { entrant = "5-to-5", reached = "top16", video = "https://youtu.be/c-Usul2T7xE" },
+  { entrant = "russian-streetlife", reached = "top16", video = "https://youtu.be/RjYEDTAosxA" },
+  { entrant = "b8b", reached = "top16", video = "https://youtu.be/Ypksfr6brb8" },
+  { entrant = "mindyoursteps", reached = "top16", video = "https://youtu.be/BONB9sTuirg" },
+]
+
+[battles.teams]
+5-to-5 = { name = "5 to 5" }
+b8b = { name = "B8B" }
+boyka-toschkin = { members = ["toschkin", "boyka"] }
+dr-hill = { name = "Dr. Hill", members = ["hill"] }
+ghost-rockz = { name = "Ghost Rockz" }
+illusion-crew = { name = "Illusion Crew" }
+license-to-chill = { name = "License to Chill" }
+mindyoursteps = { name = "Mindyoursteps" }
+morning-of-owl = { name = "Morning of Owl" }
+only-kings = { name = "Only Kings" }
+prodigy-crew = { name = "Prodigy Crew" }
+russian-streetlife = { name = "Russian Streetlife" }
+tru-cru = { name = "Tru Cru" }
+
+[[battles]]
+key = "7-to-smoke"
+name = "7 to Smoke"
+gender = "mixed"
+results = [
+  { entrant = "janick", reached = "winner", video = "https://youtu.be/xJWYJELiBT0" },
+]

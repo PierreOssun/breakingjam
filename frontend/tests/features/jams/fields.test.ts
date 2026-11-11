@@ -208,6 +208,17 @@ describe("what the API would refuse", () => {
 const DAY = "2030-06-01";
 
 describe("battle fields", () => {
+  it("sends a currency only with an amount: a suggested one alone is no prize", () => {
+    const suggested = { ...battleValues(DAY), prize_currency: "CHF" };
+    expect(battleBody(suggested).prize_currency).toBeNull();
+    const prize = { ...suggested, prize_second: "200" };
+    expect(battleBody(prize)).toMatchObject({
+      prize_currency: "CHF",
+      prize_first: null,
+      prize_second: 200,
+    });
+  });
+
   it("sends a start only with a time, on the chosen day", () => {
     expect(battleBody(battleValues(DAY)).starts_at).toBeNull();
     const evening = { ...battleValues(DAY), start_time: "14:30" };
@@ -331,6 +342,12 @@ describe("battle sheet chips", () => {
   it("starts a new battle as 1v1 Open, of no known format", () => {
     expect(categoryOf(fresh())).toBe("open");
     expect(formatOf(fresh())).toBeUndefined();
+  });
+
+  it("has a Top 4 chip, for four crews", () => {
+    const top4 = withFormat(fresh(), "top4");
+    expect(top4.bracket_size).toBe("4");
+    expect(formatOf(top4)).toBe("top4");
   });
 
   it("sets who may enter, and reads the fields back as the chip", () => {

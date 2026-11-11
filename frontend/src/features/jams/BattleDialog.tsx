@@ -12,7 +12,9 @@ import { SelectField } from "../../components/SelectField";
 import { TextField } from "../../components/TextField";
 import { useToast } from "../../components/useToast";
 import { applyFieldErrors } from "../../lib/apiErrors";
+import { currencyOf } from "../../lib/currency";
 import { formatShortDateRange } from "../../lib/dates";
+import { useBattles } from "./queries";
 import { ResultsStep } from "./ResultsStep";
 import { useResults } from "./useResults";
 import {
@@ -70,6 +72,8 @@ type BattleDialogProps = {
   jamId: string;
   /** The jam's days, `YYYY-MM-DD`; a battle starts on one of them. */
   days: string[];
+  /** The jam's country, whose currency the cash prize suggests. */
+  country?: string | null;
   /** The battle to edit, with its entries and matches; a new one when absent. */
   battle?: Schemas["BattleDetail"];
   /** Where an existing battle's sheet opens: its results, once the jam is over. */
@@ -81,21 +85,46 @@ type BattleDialogProps = {
  * The battle sheet (M24): category and format chips over the fields, start, spots and prize;
  * for an existing battle, a Results step too (M29).
  */
-export function BattleDialog({
+export function BattleDialog(props: BattleDialogProps) {
+  const battles = useBattles(props.jamId).data ?? [];
+  // The battle as the list has it now: a caller may hold the one it opened the sheet with.
+  const battle = battles.find((b) => b.id === props.battle?.id) ?? props.battle;
+  return (
+    // Keyed by bracket: one set under Details while the sheet is open starts its results over.
+    <BattleSheet
+      key={battle?.bracket_size ?? "none"}
+      {...props}
+      battle={battle}
+      battles={battles}
+    />
+  );
+}
+
+function BattleSheet({
   jamId,
   days,
+  country,
   battle,
+  battles,
   step: initialStep = "details",
   onClose,
-}: BattleDialogProps) {
+}: BattleDialogProps & { battles: Schemas["BattleDetail"][] }) {
   const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const formId = useId();
+  // The jam's prizes so far, then its country's currency: what the next prize is likely in.
+  const used = battles.flatMap((b) => b.prize_currency ?? []);
+  const home = country ? currencyOf(country) : undefined;
+  const suggested = [...new Set(home ? [...used, home] : used)];
   const form = useForm<BattleFormValues>({
-    defaultValues: battleValues(days[0] ?? "", battle),
+    defaultValues: {
+      ...battleValues(days[0] ?? "", battle),
+      // A new battle keeps the currency of the jam's last prize.
+      ...(!battle && used.length > 0 && { prize_currency: used.at(-1) }),
+    },
   });
-  const { clearErrors, handleSubmit, setError, setValue, watch } = form;
+  const { clearErrors, handleSubmit, reset, setError, setValue, watch } = form;
   const { errors, isDirty } = form.formState;
   const values = watch();
   // A stored battle that no chip describes opens with its fields showing.
@@ -126,7 +155,13 @@ export function BattleDialog({
         queryKey: ["event", jamId, "battles"],
       });
       toast({ kind: "success", message: t("org.battles.saved") });
-      onClose();
+      // Opened for its results (say, to set the bracket they need): back to them.
+      if (battle && initialStep === "results") {
+        reset(values);
+        setStep("results");
+      } else {
+        onClose();
+      }
     },
     onError: () => setError("root", { message: t("errors.generic") }),
   });
@@ -195,7 +230,12 @@ export function BattleDialog({
             }))}
           />
           <StartAndSpots form={form} values={values} days={days} />
-          <Prize form={form} values={values} keep={battle?.prize_currency} />
+          <Prize
+            form={form}
+            values={values}
+            keep={battle?.prize_currency}
+            suggested={suggested}
+          />
           <MoreOptions
             form={form}
             values={values}
@@ -278,14 +318,23 @@ function StartAndSpots({ form, values, days }: Part & { days: string[] }) {
   );
 }
 
-/** The cash prize: a currency, then the three amounts beside it once there is one. */
-function Prize({ form, values, keep }: Part & { keep?: string | null }) {
+/** The cash prize: a currency, the suggested ones first, then the three amounts beside it once
+ * there is one. */
+function Prize({
+  form,
+  values,
+  keep,
+  suggested,
+}: Part & { keep?: string | null; suggested: string[] }) {
   const { t, i18n } = useTranslation();
   const { register } = form;
   const { errors } = form.formState;
   const money = useMemo(
     () => currencies(i18n.language, keep),
     [i18n.language, keep],
+  );
+  const option = ({ code, name }: { code: string; name: string }) => (
+    <option key={code} value={code}>{`${code} · ${name}`}</option>
   );
   return (
     <div className="grid grid-cols-3 gap-x-3 gap-y-6 sm:grid-cols-4">
@@ -296,9 +345,14 @@ function Prize({ form, values, keep }: Part & { keep?: string | null }) {
         {...register("prize_currency")}
       >
         <option value="">{t("org.battles.noPrize")}</option>
-        {money.map(({ code, name }) => (
-          <option key={code} value={code}>{`${code} · ${name}`}</option>
-        ))}
+        {suggested.length > 0 && (
+          <optgroup label={t("org.battles.prizeSuggested")}>
+            {money.filter((m) => suggested.includes(m.code)).map(option)}
+          </optgroup>
+        )}
+        <optgroup label={t("org.battles.prizeAll")}>
+          {money.filter((m) => !suggested.includes(m.code)).map(option)}
+        </optgroup>
       </SelectField>
       {values.prize_currency &&
         PLACES.map((place) => (

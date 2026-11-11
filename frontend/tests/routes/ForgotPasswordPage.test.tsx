@@ -3,6 +3,20 @@ import userEvent from "@testing-library/user-event";
 import { LIL_G, LOGGED_OUT, bodyOf, mockApi, renderApp } from "../support/app";
 
 describe("ForgotPasswordPage", () => {
+  it("words it as a change for an account that is logged in", async () => {
+    mockApi({ "GET /api/auth/me": { status: 200, body: LIL_G } });
+    renderApp("/forgot-password?next=%2Faccount");
+    const main = within(await screen.findByRole("main"));
+    expect(
+      await main.findByRole("heading", { name: "Change your password" }),
+    ).toBeInTheDocument();
+    expect(main.getByRole("link", { name: "Cancel" })).toHaveAttribute(
+      "href",
+      "/account",
+    );
+    expect(main.queryByRole("link", { name: "Back to log in" })).toBeNull();
+  });
+
   it("sends a code, then sets the new password with it and logs in", async () => {
     const fetch = mockApi({
       "GET /api/auth/me": LOGGED_OUT,

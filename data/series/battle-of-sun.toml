@@ -4,7 +4,7 @@ country = "FR"
 timezone = "Europe/Paris"
 
 [youtube]
-channels = ["UCBDSkBbTmI63mIp6UNt09vA"]   # Skillzoo Production
+channels = ["UCBDSkBbTmI63mIp6UNt09vA", "UC4C0dCBNWxN68ni1M5ef9vA", "UCM-ScBo0sccdg5Efj3_mEhg"]   # Skillzoo Production (2026), Breakingstras (2018), Aurélien Freyburger (2013, 2014, 2021)
 title = "Battle of Sun"
 battles = [
   { key = "2v2", name = "2v2", team_size = 2, words = ["2v2"] },

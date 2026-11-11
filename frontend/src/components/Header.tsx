@@ -96,7 +96,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
   );
 }
 
-/** Jam map, Find a jam, Find someone. */
+/** Map, Jams, Dancers. */
 function NavLinks({
   className,
   onClick,
@@ -108,13 +108,13 @@ function NavLinks({
   return (
     <>
       <NavLink to="/map" className={className} onClick={onClick}>
-        {t("nav.jamMap")}
+        {t("nav.map")}
       </NavLink>
       <NavLink to="/jams" end className={className} onClick={onClick}>
-        {t("nav.findJam")}
+        {t("nav.jams")}
       </NavLink>
       <NavLink to="/dancers" end className={className} onClick={onClick}>
-        {t("nav.findSomeone")}
+        {t("nav.dancers")}
       </NavLink>
     </>
   );

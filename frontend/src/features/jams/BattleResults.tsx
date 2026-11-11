@@ -146,6 +146,7 @@ function RoundSection({
   const [grid, flex] = folded
     ? ["hidden lg:grid", "hidden lg:flex"]
     : ["grid", "flex"];
+  // `grid-cols-1` below: an implicit column grows with a long team name, past the screen.
   return (
     <section className="flex flex-col gap-2.5">
       <header className="flex items-center gap-2">
@@ -156,7 +157,7 @@ function RoundSection({
         <span aria-hidden className="h-px flex-1 bg-border" />
       </header>
       {pairings.length > 0 && (
-        <ul className={`${grid} gap-2 lg:grid-cols-2`}>
+        <ul className={`${grid} grid-cols-1 gap-2 lg:grid-cols-2`}>
           {pairings.map((pairing) => (
             <MatchCard
               key={pairing.id}

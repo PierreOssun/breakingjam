@@ -15,6 +15,7 @@ import type { ChecklistItem } from "./jamFields";
 import { storeJam } from "./queries";
 
 type Jam = Schemas["EventResponse"];
+type Transition = "publish" | "submit";
 type Jump = (block: NonNullable<ChecklistItem["block"]>) => void;
 
 /** Sends the draft on its way: to review for organisers, straight to the map for the team. */
@@ -23,7 +24,9 @@ function usePublish(jam: Jam) {
   const toast = useToast();
   const queryClient = useQueryClient();
   // The API offers `publish` to the BreakingJam team only; everyone else goes through review.
-  const transition = jam.actions.includes("publish") ? "publish" : "submit";
+  const transition: Transition = jam.actions.includes("publish")
+    ? "publish"
+    : "submit";
   const move = useMutation({
     mutationFn: async () =>
       unwrap(
@@ -44,13 +47,20 @@ function usePublish(jam: Jam) {
     },
     onError: (error) => toast({ kind: "error", message: error.message }),
   });
-  return { transition, publish: () => move.mutate(), pending: move.isPending };
+  return {
+    transition,
+    // Says where the jam goes: an organiser's "Send for review", the team's "Publish".
+    label: t(`org.publish.actions.${transition}`),
+    publish: () => move.mutate(),
+    pending: move.isPending,
+  };
 }
 
 const missingOf = (items: ChecklistItem[]) =>
   items.filter((item) => !item.done).length;
 
-/** "Publish", or "Publish · 2 left" and disabled while the checklist has gaps. */
+/** "Send for review" (or the team's "Publish"), with "· 2 left" and disabled while the
+ * checklist has gaps. */
 export function PublishButton({
   jam,
   items,
@@ -61,7 +71,7 @@ export function PublishButton({
   className?: string;
 }) {
   const { t } = useTranslation();
-  const { publish, pending } = usePublish(jam);
+  const { label, publish, pending } = usePublish(jam);
   const missing = missingOf(items);
   return (
     <Button
@@ -73,8 +83,8 @@ export function PublishButton({
     >
       {!pending && <RocketLaunch size={16} weight="bold" aria-hidden />}
       {missing > 0
-        ? t("org.publish.left", { count: missing })
-        : t("org.publish.action")}
+        ? t("org.publish.left", { count: missing, action: label })
+        : label}
     </Button>
   );
 }
@@ -99,7 +109,7 @@ export function PublishCard({
     >
       <div className="flex items-baseline justify-between gap-3">
         <h2 id="publish-title" className="text-title">
-          {t("org.publish.title")}
+          {t(`org.publish.titles.${transition}`)}
         </h2>
         <span className="text-body-sm text-muted">
           {t("org.publish.progress", { done, total: items.length })}
@@ -109,10 +119,7 @@ export function PublishCard({
       <Checklist items={items} onJump={onJump} />
       <PublishButton jam={jam} items={items} className="w-full" />
       <p className="text-center text-caption text-muted">
-        {t(
-          transition === "publish" ? "org.publish.team" : "org.publish.review",
-        )}{" "}
-        {t("org.publish.private")}
+        <WhatNext transition={transition} />
       </p>
     </section>
   );
@@ -130,7 +137,7 @@ export function PublishBar({
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const { publish, pending } = usePublish(jam);
+  const { transition, label, publish, pending } = usePublish(jam);
   const missing = missingOf(items);
   const done = items.length - missing;
   return (
@@ -144,15 +151,19 @@ export function PublishBar({
       <Button className="w-full" onClick={() => setOpen(true)}>
         <RocketLaunch size={20} weight="bold" aria-hidden />
         {missing > 0
-          ? t("org.publish.left", { count: missing })
-          : t("org.publish.action")}
+          ? t("org.publish.left", { count: missing, action: label })
+          : label}
       </Button>
       {open && (
         <Dialog
           onClose={() => setOpen(false)}
-          title={t(missing > 0 ? "org.publish.almost" : "org.publish.title")}
+          title={
+            missing > 0
+              ? t("org.publish.almost")
+              : t(`org.publish.titles.${transition}`)
+          }
           action={{
-            label: t("org.publish.action"),
+            label,
             disabled: missing > 0,
             loading: pending,
             onClick: () => {
@@ -164,7 +175,7 @@ export function PublishBar({
           <p className="text-body text-muted">
             {missing > 0
               ? t("org.publish.missing", { count: missing })
-              : t("org.publish.ready")}
+              : t(`org.publish.ready.${transition}`)}
           </p>
           <Progress done={done} total={items.length} />
           <Checklist
@@ -174,6 +185,9 @@ export function PublishBar({
               onJump(block);
             }}
           />
+          <p className="text-body-sm text-muted">
+            <WhatNext transition={transition} />
+          </p>
         </Dialog>
       )}
     </div>
@@ -253,5 +267,16 @@ function Progress({
         style={{ width: `${(done / total) * 100}%` }}
       />
     </div>
+  );
+}
+
+/** Where the jam goes once sent: to an admin's review, or straight to the map for the team. */
+function WhatNext({ transition }: { transition: Transition }) {
+  const { t } = useTranslation();
+  return (
+    <>
+      {t(transition === "publish" ? "org.publish.team" : "org.publish.review")}{" "}
+      {t("org.publish.private")}
+    </>
   );
 }

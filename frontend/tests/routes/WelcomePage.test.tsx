@@ -55,9 +55,7 @@ describe("WelcomePage", () => {
     expect(
       await screen.findByRole("heading", { name: "Are you on BreakingJam?" }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Your name in the scene")).toHaveValue(
-      "Lil G",
-    );
+    expect(screen.getByLabelText("Your stage name")).toHaveValue("Lil G");
     const found = await screen.findByRole("list", { name: "Pages that match" });
     expect(within(found).getByRole("link", { name: /Lil G/ })).toHaveAttribute(
       "href",
@@ -100,12 +98,9 @@ describe("WelcomePage", () => {
     ).toBeInTheDocument();
     expect(create).toBeEnabled();
     // A blank search has looked for nothing yet.
-    await userEvent.clear(screen.getByLabelText("Your name in the scene"));
+    await userEvent.clear(screen.getByLabelText("Your stage name"));
     await waitFor(() => expect(create).toBeDisabled());
-    await userEvent.type(
-      screen.getByLabelText("Your name in the scene"),
-      "Lil G",
-    );
+    await userEvent.type(screen.getByLabelText("Your stage name"), "Lil G");
     await waitFor(() => expect(create).toBeEnabled());
 
     await userEvent.click(create);

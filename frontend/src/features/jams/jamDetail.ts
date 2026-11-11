@@ -6,9 +6,10 @@ import { formatShortDateRange, formatTime, localeOf } from "../../lib/dates";
 
 type Jam = Schemas["Event"];
 
-/** Where the jam is from now: "In 9 days", "Tomorrow", "Today", "Live now". */
+/** Where the jam is from now: "In 3 weeks", "In 9 days", "Tomorrow", "Today", "Live now". */
 export type Countdown =
-  { key: "days"; count: number } | { key: "tomorrow" | "today" | "live" };
+  | { key: "days" | "weeks"; count: number }
+  | { key: "tomorrow" | "today" | "live" };
 
 /** The jam's own date and time now, as `YYYY-MM-DD` and `HH:MM`. */
 function wallClock(now: Date, timeZone: string): { day: string; time: string } {
@@ -36,7 +37,8 @@ function wallClock(now: Date, timeZone: string): { day: string; time: string } {
   };
 }
 
-const daysBetween = (from: string, to: string) =>
+/** Calendar days from one `YYYY-MM-DD` to another. */
+export const daysBetween = (from: string, to: string) =>
   Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
 
 /**
@@ -197,4 +199,26 @@ export function initialsOf(name: string): string {
     .join("")
     .toUpperCase();
   return initials || "?";
+}
+
+/** Whether a visitor learns something from the status badge: "Published" is just how a public
+ * jam upcoming or live is (DESIGN.md §4.3), so only its organiser and the team see it. */
+export function tellsVisitors(jam: {
+  status: Schemas["EventStatus"];
+  phase: Schemas["Phase"];
+}): boolean {
+  return jam.status !== "published" || jam.phase === "past";
+}
+
+/** Whether results can be entered: the jam is public and has started. A draft or a jam in review
+ * waits, even on its day. */
+export function takesResults(jam: {
+  status: Schemas["EventStatus"];
+  phase: Schemas["Phase"];
+}): boolean {
+  return (
+    jam.phase !== "upcoming" &&
+    jam.status !== "draft" &&
+    jam.status !== "in_review"
+  );
 }

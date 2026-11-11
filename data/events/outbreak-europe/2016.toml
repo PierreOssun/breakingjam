@@ -24,7 +24,7 @@ matches = [
   { round = "top16", a = "sunni", b = "sapa", winner = "sunni", video = "https://youtu.be/gMlsfL98riI" },
   { round = "top16", a = "milhouse", b = "yarko", winner = "milhouse", video = "https://youtu.be/asm0Jm7YI5Q" },
   { round = "top16", a = "niek", b = "t-rock", winner = "niek", video = "https://youtu.be/2bglYu_tmRk" },
-  { round = "top16", a = "lil-g", b = "noindex", winner = "lil-g" },
+  { round = "top16", a = "lil-g", b = "noindex", winner = "lil-g" , video = "https://youtu.be/VX4Uu4O2r4g" },
   { round = "top8", a = "kuzya", b = "kleju", winner = "kuzya", video = "https://youtu.be/ZbqPaKpH29s" },
   { round = "top8", a = "thomaz", b = "hulk", winner = "thomaz", video = "https://youtu.be/BUD_Tn3NpMU" },
   { round = "top8", a = "sunni", b = "milhouse", winner = "sunni", video = "https://youtu.be/AYEPiM3uJeg" },

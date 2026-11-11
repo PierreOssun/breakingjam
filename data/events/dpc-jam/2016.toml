@@ -1,0 +1,54 @@
+name = "DPC Jam 2016"
+starts_on = 2016-10-22
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+sources = [
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+  "https://www.youtube.com/watch?v=rZvVX9Pa5-U",
+]
+judges = ["marcio", "art-one", "double-d"]
+djs = ["dj-vientiane", "dj-c4"]
+mcs = ["godfather"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "tru-cru", b = "d-chan-d-raffi", winner = "tru-cru", video = "https://youtu.be/pSYcZ96CuWY" },
+  { round = "top16", a = "chipi-wizard", b = "disfunctional-art", winner = "chipi-wizard", video = "https://youtu.be/fwRpjKc_fK4" },
+  { round = "top16", a = "twizter-yu-seng", b = "patrix-samir", winner = "twizter-yu-seng", video = "https://youtu.be/arvqyUzdlCs" },
+  { round = "top16", a = "shlag-thieu", b = "ghost-rockz", winner = "shlag-thieu", video = "https://youtu.be/bKHAVz5xynE" },
+  { round = "top16", a = "prodigy", b = "lil-zoo-pocket", winner = "lil-zoo-pocket", video = "https://youtu.be/iBY_-fplukc" },
+  { round = "top16", a = "harlekin-intus", b = "jockoss-wilfried", winner = "jockoss-wilfried", video = "https://youtu.be/pTCR5F35DPU" },
+  { round = "top16", a = "cri6-wolf", b = "acho-ran-g", winner = "cri6-wolf", video = "https://youtu.be/8sPyQf_L9IQ" },
+  { round = "top16", a = "baby-og-funk", b = "2dr", winner = "baby-og-funk", video = "https://youtu.be/DkUYLl0oIzA" },
+  { round = "top8", a = "twizter-yu-seng", b = "lil-zoo-pocket", winner = "lil-zoo-pocket", video = "https://youtu.be/oXWC-CVCslA" },
+  { round = "top8", a = "tru-cru", b = "chipi-wizard", winner = "tru-cru", video = "https://youtu.be/KlojIt1ZD0Y" },
+  { round = "top8", a = "shlag-thieu", b = "jockoss-wilfried", winner = "shlag-thieu", video = "https://youtu.be/jte6nMp-QIc" },
+  { round = "top8", a = "baby-og-funk", b = "cri6-wolf", winner = "cri6-wolf", video = "https://youtu.be/IqyEjB6xi_0" },
+  { round = "top4", a = "tru-cru", b = "lil-zoo-pocket", winner = "lil-zoo-pocket", video = "https://youtu.be/ub7wAfz11mc" },
+  { round = "top4", a = "cri6-wolf", b = "shlag-thieu", winner = "shlag-thieu", video = "https://youtu.be/TDQgS0qvbuo" },
+  { round = "final", a = "lil-zoo-pocket", b = "shlag-thieu", winner = "lil-zoo-pocket", video = "https://youtu.be/6Yaxxo4QJZY" },
+]
+
+[battles.teams]
+2dr = { name = "2DR" }
+acho-ran-g = { members = ["acho", "ran-g"] }
+baby-og-funk = { members = ["baby-og", "funk"] }
+chipi-wizard = { members = ["wizard", "chipi"] }
+cri6-wolf = { members = ["cri6", "wolf"] }
+d-chan-d-raffi = { members = ["d-raffi", "d-chan"] }
+disfunctional-art = { name = "Disfunctional Art" }
+ghost-rockz = { name = "Ghost Rockz" }
+harlekin-intus = { members = ["intus", "harlekin"] }
+jockoss-wilfried = { members = ["wilfried", "jockoss"] }
+lil-zoo-pocket = { members = ["pocket", "lil-zoo"] }
+patrix-samir = { members = ["patrix", "samir"] }
+prodigy = { name = "Prodigy" }
+shlag-thieu = { members = ["shlag", "thieu"] }
+tru-cru = { name = "Tru Cru" }
+twizter-yu-seng = { members = ["twizter", "yu-seng"] }

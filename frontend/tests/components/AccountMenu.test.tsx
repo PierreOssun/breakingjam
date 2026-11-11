@@ -227,6 +227,8 @@ describe("AccountMenu", () => {
     const menu = within(screen.getByRole("menu", { name: "Account" }));
     expect(menu.getAllByRole("menuitem")[0]).toHaveFocus();
     await userEvent.keyboard("{ArrowDown}");
+    expect(menu.getByRole("menuitem", { name: "Account" })).toHaveFocus();
+    await userEvent.keyboard("{ArrowDown}");
     expect(menu.getByRole("menuitemradio", { name: "Light" })).toHaveFocus();
     await userEvent.keyboard("{ArrowDown}");
     expect(menu.getByRole("menuitemradio", { name: "Dark" })).toHaveFocus();
@@ -253,6 +255,7 @@ describe("AccountMenu", () => {
       "/map",
       "/jams",
       "/dancers",
+      "/account",
       null, // Log out
       "/org/jams/new",
     ]);
@@ -265,7 +268,7 @@ describe("AccountMenu", () => {
     await userEvent.click(avatar);
     await userEvent.click(
       within(screen.getByRole("menu")).getByRole("menuitem", {
-        name: "Find someone",
+        name: "Dancers",
       }),
     );
     await waitFor(() =>

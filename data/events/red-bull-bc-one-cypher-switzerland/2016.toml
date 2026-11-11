@@ -6,8 +6,13 @@ country = "CH"
 venue = "Bierhübeli"
 lat = 46.9564
 lng = 7.4379
-sources = ["https://web.archive.org/web/20171001223743/http://bcone.redbull.com/en_INT/event/red-bull-bc-one-switzerland-cypher-2016"]
-judges = ["tuff-kid"]  # the only judge the report names
+sources = [
+  "https://web.archive.org/web/20171001223743/http://bcone.redbull.com/en_INT/event/red-bull-bc-one-switzerland-cypher-2016",
+  "https://www.youtube.com/channel/UCGuvgZU2QcEzg_dZQUQrvOw",
+]
+judges = ["roxrite", "extremo", "tuff-kid"]  # staff from the MK.Battles video descriptions
+djs = ["lean-rock", "fonkeechild"]
+mcs = ["cedi"]
 
 [[battles]]
 key = "bboy"
@@ -26,7 +31,7 @@ matches = [
   { round = "top8", a = "moa", b = "nestor", winner = "moa", video = "https://youtu.be/xg4VjFUo1a4" },
   { round = "top8", a = "kiet", b = "kennex", winner = "kiet", video = "https://youtu.be/3TeeqNjImBc" },
   { round = "top8", a = "wen", b = "michel", winner = "michel", video = "https://youtu.be/NK2kW8OP5X0" },
-  { round = "top8", a = "zohair", b = "hill", winner = "hill" },
+  { round = "top8", a = "zohair", b = "hill", winner = "hill", video = "https://youtu.be/K2-kceG_J3A" },
   { round = "top4", a = "moa", b = "kiet", winner = "moa", video = "https://youtu.be/pGwKYUm_K1A" },
   { round = "top4", a = "michel", b = "hill", winner = "hill", video = "https://youtu.be/DN-IYeM4LEI" },
   { round = "final", a = "moa", b = "hill", winner = "hill", video = "https://youtu.be/3bNdiF81O4Q" },

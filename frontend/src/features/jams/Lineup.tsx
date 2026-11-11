@@ -107,6 +107,7 @@ export function Lineup({ jamId, staff, canEdit }: LineupProps) {
             label={t("org.entries.dancer")}
             selected={[]}
             max={1}
+            autoFocus
             onChange={([dancer]) =>
               // The picker stays open while the save runs: one pick, one save.
               dancer &&

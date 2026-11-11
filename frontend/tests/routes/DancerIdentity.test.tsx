@@ -220,6 +220,57 @@ describe("dancer identity", () => {
     expect(screen.queryByRole("button", { name: "This is me" })).toBeNull();
   });
 
+  it("warns, without refusing, when the new stage name is already someone's", async () => {
+    page(
+      user,
+      { can_edit: true },
+      {
+        "GET /api/dancers": {
+          status: 200,
+          body: {
+            items: [{ ...DANCER, id: "other", dancer_name: "Menno" }],
+            next_cursor: null,
+          },
+        },
+      },
+    );
+    renderApp(`/dancers/${ID}`);
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Edit profile" }),
+    );
+    const dialog = within(screen.getByRole("dialog", { name: "Edit profile" }));
+    // Someone else's unverified page: its edits are logged.
+    expect(
+      dialog.getByText(/Edits to this page are logged/),
+    ).toBeInTheDocument();
+    const name = dialog.getByLabelText("Stage name");
+    await userEvent.clear(name);
+    await userEvent.type(name, "menno");
+    expect(
+      await dialog.findByText(/Another dancer is already called Menno/),
+    ).toBeInTheDocument();
+    expect(dialog.getByRole("button", { name: "Save" })).toBeEnabled();
+  });
+
+  it("drops the logged-edits notice on one's own page", async () => {
+    page(
+      {
+        status: 200,
+        body: {
+          ...LIL_G,
+          dancer: { id: ID, dancer_name: "Ventus", verified: false },
+        },
+      },
+      { can_edit: true },
+    );
+    renderApp(`/dancers/${ID}`);
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Edit profile" }),
+    );
+    const dialog = within(screen.getByRole("dialog", { name: "Edit profile" }));
+    expect(dialog.queryByText(/Edits to this page are logged/)).toBeNull();
+  });
+
   it("lets whoever may edit change the profile and the avatar", async () => {
     const fetch = page(
       user,
@@ -239,7 +290,8 @@ describe("dancer identity", () => {
     );
     const dialog = screen.getByRole("dialog", { name: "Edit profile" });
     const handle = within(dialog).getByLabelText(/^Instagram/);
-    expect(handle).toHaveFocus();
+    // Focus lands a frame after the sheet opens (Dialog).
+    await waitFor(() => expect(handle).toHaveFocus());
     await userEvent.type(handle, "https://www.instagram.com/ventus_bj/");
 
     const aliases = within(dialog).getByLabelText(/^Also known as/);

@@ -1,0 +1,57 @@
+name = "DPC Jam 2019"
+starts_on = 2019-11-30  # and8 titles it Kappel am Albis but gives GZ Heuried as the venue, as do the final video's partners
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+venue = "GZ Heuried"
+lat = 47.3673
+lng = 8.5038
+sources = [
+  "https://and8.dance/en/e/3236",
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+]
+judges = ["art-one", "kaku", "lil-ceng"]
+djs = ["dj-senka", "dj-uragun", "dj-catch"]
+mcs = ["godfather"]
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "hong10-issei", b = "tru-pac", winner = "hong10-issei", video = "https://youtu.be/9adyxZHmnpk" },
+  { round = "top16", a = "mowgly-nas", b = "chau-lin-light", winner = "chau-lin-light", video = "https://youtu.be/4WlFtKnBvqU" },
+  { round = "top16", a = "kaos-mini-joe", b = "logan-sandro", winner = "kaos-mini-joe", video = "https://youtu.be/20ZngyV6XNI" },
+  { round = "top16", a = "flow-due", b = "noe-wolfer", winner = "noe-wolfer", video = "https://youtu.be/HdYMz3GAu8M" },
+  { round = "top16", a = "buz-crazy", b = "ormus-crew", winner = "buz-crazy", video = "https://youtu.be/PJj90EwA9R0" },
+  { round = "top16", a = "cicou-ghostface", b = "lil-zoo-tsukki", winner = "lil-zoo-tsukki", video = "https://youtu.be/tsnOGVBrnXI" },
+  { round = "top16", a = "chillie-force", b = "alvin-grom", winner = "alvin-grom", video = "https://youtu.be/xP3Z1CFkr58" },
+  { round = "top16", a = "alkolil-cheerito", b = "ptc-crew", winner = "alkolil-cheerito", video = "https://youtu.be/hD5FOOmWHWQ" },
+  { round = "top8", a = "kaos-mini-joe", b = "alvin-grom", winner = "alvin-grom", video = "https://youtu.be/fMZNMkn4vao" },
+  { round = "top8", a = "hong10-issei", b = "chau-lin-light", winner = "hong10-issei", video = "https://youtu.be/urebvId9etc" },
+  { round = "top8", a = "alkolil-cheerito", b = "noe-wolfer", winner = "alkolil-cheerito", video = "https://youtu.be/dM2hCfKpy2k" },
+  { round = "top8", a = "buz-crazy", b = "lil-zoo-tsukki", winner = "lil-zoo-tsukki", video = "https://youtu.be/b-p6v-ZIOUI" },
+  { round = "top4", a = "lil-zoo-tsukki", b = "alvin-grom", winner = "lil-zoo-tsukki", video = "https://youtu.be/6k1QYsfXV1c" },
+  { round = "top4", a = "alkolil-cheerito", b = "hong10-issei", winner = "alkolil-cheerito", video = "https://youtu.be/rtfalmjrdio" },
+  { round = "final", a = "lil-zoo-tsukki", b = "alkolil-cheerito", winner = "lil-zoo-tsukki", video = "https://youtu.be/dpiI1BUHgY8" },
+]
+
+[battles.teams]
+alkolil-cheerito = { members = ["alkolil", "cheerito"] }
+alvin-grom = { members = ["grom", "alvin"] }
+buz-crazy = { members = ["buz", "crazy"] }
+chau-lin-light = { crew = "tru-cru", members = ["chau-lin", "light"] }
+chillie-force = { name = "Chillie Force" }
+cicou-ghostface = { members = ["cicou", "ghostface"] }
+flow-due = { name = "Flow Due" }
+hong10-issei = { members = ["hong-10", "issei"] }
+kaos-mini-joe = { members = ["kaos", "mini-joe"] }
+lil-zoo-tsukki = { members = ["lil-zoo", "tsukki"] }
+logan-sandro = { members = ["logan", "sandro"] }
+mowgly-nas = { members = ["mowgly", "nas"] }
+noe-wolfer = { members = ["noe", "the-wolfer"] }
+ormus-crew = { name = "Ormus Crew" }
+ptc-crew = { name = "PTC Crew" }
+tru-pac = { name = "Tru Pac" }

@@ -1,0 +1,12 @@
+name = "Battle of Sun 2025"
+starts_on = 2025-09-20
+timezone = "Europe/Paris"
+city = "Saint-Louis"
+country = "FR"
+venue = "Forum Jean-Marie Zoellé"
+lat = 47.5894
+lng = 7.5647
+sources = ["https://and8.dance/en/e/4944"]
+judges = ["cho", "illjaz", "neg-one"]
+mcs = ["sadat"]
+# "Battle of Sun X", a 2v2 with a top 16; no battle video, bracket or result found.

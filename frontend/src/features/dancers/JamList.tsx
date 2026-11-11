@@ -18,49 +18,55 @@ const MORE = 20;
 
 type JamListProps = {
   items: Participation[];
-  /** Past rows carry the result badge. */
-  past: boolean;
   empty: string;
-  /** Past rows only: plays a battle's video (§4.14). */
+  /** Plays a battle's video (§4.14). */
   onPlay?: (participation: Participation) => void;
 };
 
+/** A jam and what the dancer did there: a battle each, or a role on its lineup. */
+type Jam = { event: Participation["event"]; parts: Participation[] };
+
+/** One row per jam, in the order given: a dancer in two battles of a jam is one jam. */
+function byJam(items: Participation[]): Jam[] {
+  const jams = new Map<string, Jam>();
+  for (const p of items) {
+    const jam = jams.get(p.event.id);
+    if (jam) jam.parts.push(p);
+    else jams.set(p.event.id, { event: p.event, parts: [p] });
+  }
+  return [...jams.values()];
+}
+
 /** Jam rows grouped under sticky year labels, 10 at first, then 20 more at a time (§4.14). */
-export function JamList({ items, past, empty, onPlay }: JamListProps) {
+export function JamList({ items, empty, onPlay }: JamListProps) {
   const { t } = useTranslation();
   const [shown, setShown] = useState(FIRST_PAGE);
   if (items.length === 0) return <InlineEmpty>{empty}</InlineEmpty>;
 
+  const jams = byJam(items);
   const rows: ReactNode[] = [];
   let year: number | null = null;
-  for (const participation of items.slice(0, shown)) {
-    const rowYear = yearOf(participation.event.starts_on);
+  for (const jam of jams.slice(0, shown)) {
+    const rowYear = yearOf(jam.event.starts_on);
     if (rowYear !== year) {
       year = rowYear;
       rows.push(
         <YearLabel key={`year-${rowYear}-${rows.length}`} year={rowYear} />,
       );
     }
-    rows.push(
-      <JamRow
-        key={`${participation.event.id}-${participation.battle?.id ?? participation.role}`}
-        participation={participation}
-        past={past}
-        onPlay={onPlay && (() => onPlay(participation))}
-      />,
-    );
+    rows.push(<JamRow key={jam.event.id} jam={jam} onPlay={onPlay} />);
   }
 
   return (
     <>
       <ul>{rows}</ul>
-      {items.length > shown && (
+      {jams.length > shown && (
         <Button
           variant="secondary"
           className="mt-4 w-full"
           onClick={() => setShown((n) => n + MORE)}
         >
-          {t("dancer.showMore", { count: items.length - shown })}
+          {t("dancer.showMore", { count: jams.length - shown })}
         </Button>
       )}
     </>
@@ -77,55 +83,57 @@ function YearLabel({ year }: { year: number }) {
   );
 }
 
-/** One jam a dancer was in (§4.14); the video pill shows when there is a video and `onPlay`. */
-export function JamRow({
-  participation: p,
-  past,
+/** One jam a dancer was in (§4.14): a line per battle or role, with its result and video once
+ * known, live jams included. */
+function JamRow({
+  jam: { event, parts },
   onPlay,
 }: {
-  participation: Participation;
-  past: boolean;
-  onPlay?: () => void;
+  jam: Jam;
+  onPlay?: (participation: Participation) => void;
 }) {
   const { t, i18n } = useTranslation();
 
   return (
     <li className="relative flex min-h-[76px] items-center gap-3.5 border-b border-border py-3">
-      <DateBlock date={p.event.starts_on} />
+      <DateBlock date={event.starts_on} />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        {/* The whole row is the link; the play button sits above it. */}
+        {/* The whole row is the link; the play buttons sit above it. */}
         <Link
-          to={`/jams/${p.event.slug}`}
+          to={`/jams/${event.slug}`}
           className="truncate text-body font-extrabold after:absolute after:inset-0 after:content-['']"
         >
-          {p.event.name}
+          {event.name}
           <span className="sr-only">
-            ,{" "}
-            {formatDateRange(p.event.starts_on, p.event.ends_on, i18n.language)}
+            , {formatDateRange(event.starts_on, event.ends_on, i18n.language)}
           </span>
         </Link>
         <p className="flex items-center gap-1.5 text-[13px] leading-[18px] text-muted">
-          {p.event.country && <Flag code={p.event.country} size="bare" />}
-          {p.event.city}
+          {event.country && <Flag code={event.country} size="bare" />}
+          {event.city}
         </p>
-        {(p.battle || p.role !== "competitor") && (
-          <div className="flex flex-wrap gap-1.5">
+        {parts.map((p) => (
+          <div
+            key={p.battle?.id ?? p.role}
+            className="flex flex-wrap items-center gap-1.5 empty:hidden"
+          >
             {p.battle && <MetaTag>{p.battle.name}</MetaTag>}
             {p.role !== "competitor" && (
               <RoleTag>{t(`dancer.roles.${p.role}`)}</RoleTag>
             )}
+            <ResultBadge
+              finalRank={p.final_rank}
+              reached={p.reached}
+              size="sm"
+            />
+            {p.video_url && onPlay && (
+              <span className="relative">
+                <VideoPill name={event.name} onClick={() => onPlay(p)} />
+              </span>
+            )}
           </div>
-        )}
+        ))}
       </div>
-      {past && (
-        // The pill, then the result; on phones the pill goes under it.
-        <div className="flex flex-col-reverse items-end gap-1.5 sm:flex-row sm:items-center sm:gap-2">
-          {p.video_url && onPlay && (
-            <VideoPill name={p.event.name} onClick={onPlay} />
-          )}
-          <ResultBadge finalRank={p.final_rank} reached={p.reached} />
-        </div>
-      )}
     </li>
   );
 }

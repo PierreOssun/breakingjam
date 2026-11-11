@@ -6,6 +6,7 @@ import {
   type Bounds,
   boundsOf,
   distanceKm,
+  fitParam,
   fold,
   isPast,
   type MapJam,
@@ -50,8 +51,7 @@ export function mapLink(place: Place, jams: MapJam[]): string {
     place.lng,
     place.lat,
   ];
-  const fit = box.map((n) => n.toFixed(4)).join(",");
-  return `/map?lat=${place.lat}&lng=${place.lng}&fit=${fit}`;
+  return `/map?lat=${place.lat}&lng=${place.lng}&fit=${fitParam(box)}`;
 }
 
 /** "100 km", rounded to the kilometre. */

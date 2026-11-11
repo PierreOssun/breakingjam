@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   LIL_G,
@@ -136,7 +136,8 @@ describe("OrganizerPage", () => {
     );
     const sheet = screen.getByRole("dialog", { name: "Edit page" });
     const handle = within(sheet).getByLabelText(/^Instagram/);
-    expect(handle).toHaveFocus();
+    // Focus lands a frame after the sheet opens (Dialog).
+    await waitFor(() => expect(handle).toHaveFocus());
     await userEvent.type(handle, "@Floor.Lords");
     await userEvent.click(within(sheet).getByRole("button", { name: "Save" }));
     expect(await screen.findByText("Page saved.")).toBeInTheDocument();

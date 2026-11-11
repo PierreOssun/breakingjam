@@ -204,7 +204,7 @@ describe("the jam editor", () => {
       await screen.findByRole("heading", { name: "Paris Cypher" }),
     ).toBeInTheDocument();
     const card = await screen.findByRole("region", {
-      name: "Ready to publish?",
+      name: "Ready to send for review?",
     });
     expect(within(card).getByText("3 of 5")).toBeInTheDocument();
     expect(within(card).getByRole("progressbar")).toHaveAttribute(
@@ -212,7 +212,7 @@ describe("the jam editor", () => {
       "3",
     );
     expect(
-      within(card).getByRole("button", { name: "Publish · 2 left" }),
+      within(card).getByRole("button", { name: "Send for review · 2 left" }),
     ).toBeDisabled();
     // Visitors never see empty blocks; the organiser sees what to fill in.
     expect(screen.getByRole("region", { name: "Battles" })).toHaveTextContent(
@@ -516,7 +516,7 @@ describe("the jam editor", () => {
     editApi();
     renderApp(`/org/jams/${ID}/edit`);
     const card = await screen.findByRole("region", {
-      name: "Ready to publish?",
+      name: "Ready to send for review?",
     });
 
     await userEvent.click(
@@ -538,10 +538,10 @@ describe("the jam editor", () => {
     });
     renderApp(`/org/jams/${ID}/edit`);
     const card = await screen.findByRole("region", {
-      name: "Ready to publish?",
+      name: "Ready to send for review?",
     });
     expect(
-      within(card).getByRole("button", { name: "Publish · 3 left" }),
+      within(card).getByRole("button", { name: "Send for review · 3 left" }),
     ).toBeDisabled();
 
     await userEvent.click(
@@ -561,11 +561,11 @@ describe("the jam editor", () => {
   it("opens the checklist as a sheet from the bar on phones", async () => {
     editApi();
     renderApp(`/org/jams/${ID}/edit`);
-    await screen.findByRole("region", { name: "Ready to publish?" });
+    await screen.findByRole("region", { name: "Ready to send for review?" });
 
     // The bar's button is the enabled one: it opens the list rather than publishing.
     const bar = screen
-      .getAllByRole("button", { name: "Publish · 2 left" })
+      .getAllByRole("button", { name: "Send for review · 2 left" })
       .find((button) => !(button as HTMLButtonElement).disabled)!;
     await userEvent.click(bar);
     const sheet = screen.getByRole("dialog", { name: "Almost there" });
@@ -573,7 +573,7 @@ describe("the jam editor", () => {
       "2 things left before your jam goes on the map.",
     );
     expect(
-      within(sheet).getByRole("button", { name: "Publish" }),
+      within(sheet).getByRole("button", { name: "Send for review" }),
     ).toBeDisabled();
 
     await userEvent.click(
@@ -637,6 +637,8 @@ describe("the jam editor", () => {
 
     await user.click(await screen.findByRole("button", { name: "Last day" }));
     const dates = screen.getByRole("region", { name: "Dates" });
+    // Each chip opens the block on its own field.
+    expect(within(dates).getByLabelText(/^Last day/)).toHaveFocus();
     await user.type(within(dates).getByLabelText(/^Last day/), "2030-06-02");
     await user.type(within(dates).getByLabelText(/^Opens/), "14:00");
     await user.type(within(dates).getByLabelText(/^Ends/), "21:30");
@@ -924,7 +926,7 @@ describe("the jam editor", () => {
     const router = renderApp(`/org/jams/${ID}/edit`);
 
     const card = await screen.findByRole("region", {
-      name: "Ready to publish?",
+      name: "Ready to send for review?",
     });
     // The checklist card is hidden on phones, so the button can't live in it.
     expect(
@@ -1013,14 +1015,14 @@ describe("the jam editor", () => {
     });
     renderApp(`/org/jams/${ID}/edit`);
     const card = await screen.findByRole("region", {
-      name: "Ready to publish?",
+      name: "Ready to send for review?",
     });
     expect(within(card).getByText("5 of 5")).toBeInTheDocument();
     // Organisers don't publish directly: a BreakingJam admin reviews each jam first.
     expect(card).toHaveTextContent(/A BreakingJam admin checks it/);
 
     await userEvent.click(
-      within(card).getByRole("button", { name: "Publish" }),
+      within(card).getByRole("button", { name: "Send for review" }),
     );
     expect(
       await screen.findByText(
@@ -1100,10 +1102,10 @@ describe("the jam editor", () => {
     expect(
       within(status).getByRole("button", { name: "Close registration" }),
     ).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: /^Ready to/ })).toBeNull();
     expect(
-      screen.queryByRole("region", { name: "Ready to publish?" }),
+      screen.queryByRole("button", { name: /Publish|Send for review/ }),
     ).toBeNull();
-    expect(screen.queryByRole("button", { name: /Publish/ })).toBeNull();
     // It runs its course by its dates: there is no step to mark it done.
     expect(
       within(status).queryByRole("button", { name: /complete/i }),
@@ -1139,6 +1141,130 @@ describe("the jam editor", () => {
   const chip = (dialog: HTMLElement, name: string) =>
     within(dialog).getByRole("button", { name });
 
+  it("opens the Dates block on the hours from + Times", async () => {
+    editApi();
+    renderApp(`/org/jams/${ID}/edit`);
+    await userEvent.click(await screen.findByRole("button", { name: "Times" }));
+    const dates = screen.getByRole("region", { name: "Dates" });
+    expect(within(dates).getByLabelText(/^Opens/)).toHaveFocus();
+  });
+
+  it("suggests the jam's currency, and keeps the last prize's for the next battle", async () => {
+    editApi({
+      [`GET /api/events/${ID}/battles`]: {
+        status: 200,
+        body: [battle({ prize_currency: "CHF", prize_first: 300 })],
+      },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+    const battles = await screen.findByRole("region", { name: "Battles" });
+    await userEvent.click(
+      await within(battles).findByRole("button", { name: "Add a battle" }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Add a battle" });
+    const currency = within(dialog).getByLabelText(/^Cash prize/);
+    expect(currency).toHaveValue("CHF");
+    // The jam's own prizes, then its country's currency (France: the euro), first.
+    const suggested = within(currency).getByRole("group", {
+      name: "For this jam",
+    });
+    expect(
+      within(suggested)
+        .getAllByRole("option")
+        .map((option) => option.getAttribute("value")),
+    ).toEqual(["CHF", "EUR"]);
+  });
+
+  it("offers results in the editor once the jam has started", async () => {
+    editApi({
+      [`GET /api/events/${ID}`]: {
+        status: 200,
+        body: page({ status: "published", phase: "live", lat: 1, lng: 1 }),
+      },
+      [`GET /api/events/${ID}/battles`]: { status: 200, body: [battle()] },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+    const battles = await screen.findByRole("region", { name: "Battles" });
+    await userEvent.click(
+      await within(battles).findByRole("button", { name: "Enter results" }),
+    );
+    const sheet = within(await screen.findByRole("dialog"));
+    expect(sheet.getByRole("button", { name: "Results" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("keeps results for later while the jam is a draft, even on its day", async () => {
+    editApi({
+      [`GET /api/events/${ID}`]: {
+        status: 200,
+        body: page({ phase: "live" }),
+      },
+      [`GET /api/events/${ID}/battles`]: { status: 200, body: [battle()] },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+    const battles = await screen.findByRole("region", { name: "Battles" });
+    await within(battles).findByRole("heading", { name: "1v1 Bboy" });
+    expect(
+      within(battles).queryByRole("button", { name: "Enter results" }),
+    ).toBeNull();
+  });
+
+  it("goes back to the results once a bracket is set from there", async () => {
+    let bracket: number | null = null;
+    const entries = ["Lil G", "Ventus"].map((dancer_name, n) => ({
+      id: `e${n}`,
+      battle_id: "01920000-0000-7000-8000-0000000b0001",
+      team_name: null,
+      crew: null,
+      status: "confirmed",
+      reached: "na",
+      final_rank: null,
+      members: [{ id: `d${n}`, dancer_name, country: "FR", deleted: false }],
+    }));
+    const stored = () =>
+      battle({ entries, matches: [], bracket_size: bracket });
+    editApi({
+      [`GET /api/events/${ID}`]: {
+        status: 200,
+        body: page({ status: "published", phase: "live", lat: 1, lng: 1 }),
+      },
+      [`GET /api/events/${ID}/battles`]: () => ({
+        status: 200,
+        body: [stored()],
+      }),
+      "PUT /api/battles/01920000-0000-7000-8000-0000000b0001": () => {
+        bracket = 4;
+        return { status: 200, body: stored() };
+      },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+    const battles = await screen.findByRole("region", { name: "Battles" });
+    await userEvent.click(
+      await within(battles).findByRole("button", { name: "Enter results" }),
+    );
+    let sheet = within(await screen.findByRole("dialog"));
+    expect(sheet.getByText(/Pick a bracket/)).toBeInTheDocument();
+    await userEvent.click(sheet.getByRole("button", { name: "Details" }));
+    await userEvent.click(sheet.getByRole("button", { name: "Top 4" }));
+    await userEvent.click(sheet.getByRole("button", { name: "Save" }));
+
+    // The sheet stays, on its results, now with the rounds of the bracket.
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole("dialog")).getByRole("button", {
+          name: "Final",
+        }),
+      ).toBeInTheDocument(),
+    );
+    sheet = within(screen.getByRole("dialog"));
+    expect(sheet.getByRole("button", { name: "Results" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
   it("adds a battle in one tap: 1v1 Open, named by the server", async () => {
     const fetch = editApi({
       [`POST /api/events/${ID}/battles`]: { status: 201, body: battle() },
@@ -1169,22 +1295,26 @@ describe("the jam editor", () => {
   });
 
   it("adds a battle from its chips, with its start, spots and prize", async () => {
+    // The list holds the new battle once it is added, however often it is read before.
+    let added = false;
     const fetch = editApi({
-      [`GET /api/events/${ID}/battles`]: (n) => ({
+      [`GET /api/events/${ID}/battles`]: () => ({
         status: 200,
-        body:
-          n === 0
-            ? []
-            : [
-                battle({
-                  name: "2v2 Mixed",
-                  team_size: 2,
-                  prize_currency: "EUR",
-                  prize_first: 500,
-                }),
-              ],
+        body: added
+          ? [
+              battle({
+                name: "2v2 Mixed",
+                team_size: 2,
+                prize_currency: "EUR",
+                prize_first: 500,
+              }),
+            ]
+          : [],
       }),
-      [`POST /api/events/${ID}/battles`]: { status: 201, body: battle() },
+      [`POST /api/events/${ID}/battles`]: () => {
+        added = true;
+        return { status: 201, body: battle() };
+      },
     });
     renderApp(`/org/jams/${ID}/edit`);
 

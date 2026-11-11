@@ -9,8 +9,9 @@ export function WhosIn({ who }: { who: ReturnType<typeof whoIsIn> }) {
   const { t } = useTranslation();
   const faces = who.dancers.length > 0 ? who.dancers : who.staff;
   if (faces.length === 0) return null;
-  // One DJ is named ("DJ Krate", or just "DJ Spin" when it says so); several are counted.
-  const named = (people: typeof who.djs, role: "dj" | "mc") => {
+  // Each role alike: one person is named ("DJ Krate", or just "DJ Spin" when it says so),
+  // several are counted.
+  const named = (people: typeof who.djs, role: "judge" | "dj" | "mc") => {
     const [only] = people;
     if (people.length > 1)
       return t(`jam.whosIn.${role}s`, { count: people.length });
@@ -20,8 +21,7 @@ export function WhosIn({ who }: { who: ReturnType<typeof whoIsIn> }) {
       : t(`jam.whosIn.${role}`, { name: only.dancer_name });
   };
   const lineup = [
-    who.judges.length > 0 &&
-      t("jam.whosIn.judges", { count: who.judges.length }),
+    named(who.judges, "judge"),
     named(who.djs, "dj"),
     named(who.mcs, "mc"),
   ]

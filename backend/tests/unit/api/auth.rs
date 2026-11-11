@@ -13,8 +13,12 @@ fn safe_next_rejects_other_origins() {
 }
 
 #[test]
-fn a_new_account_is_welcomed_then_skips_only_the_jam_form() {
-    assert_eq!(after_sign_up("/org/jams/new"), "/welcome?next=%2F");
+fn a_new_account_is_welcomed_then_goes_on() {
+    // Someone who signed up to register a jam goes on to the jam form.
+    assert_eq!(
+        after_sign_up("/org/jams/new"),
+        "/welcome?next=%2Forg%2Fjams%2Fnew"
+    );
     assert_eq!(
         after_sign_up("/dancers/01920000-0000-7000-8000-000000000001"),
         "/welcome?next=%2Fdancers%2F01920000-0000-7000-8000-000000000001"

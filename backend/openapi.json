@@ -4247,6 +4247,29 @@
         ]
       }
     },
+    "/api/results": {
+      "get": {
+        "tags": [
+          "results"
+        ],
+        "summary": "The three announced jams that ended last and have a battle winner, the latest first.",
+        "operationId": "latest_results",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JamResults"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/stats": {
       "get": {
         "tags": [
@@ -6926,6 +6949,78 @@
           }
         }
       },
+      "JamResults": {
+        "type": "object",
+        "description": "A jam that is over, with its first battles' winners.",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "starts_on",
+          "ends_on",
+          "city",
+          "country",
+          "has_videos",
+          "battle_count",
+          "winners"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Jam id."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Link target `/jams/{slug}`."
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "description": "First day."
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "description": "Last day."
+          },
+          "city": {
+            "type": "string",
+            "description": "City."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2."
+          },
+          "flyer_card_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The uploaded flyer at 540×675; null means the generated one."
+          },
+          "has_videos": {
+            "type": "boolean",
+            "description": "Whether a battle of the jam has a video."
+          },
+          "battle_count": {
+            "type": "integer",
+            "description": "Every battle of the jam, with or without a winner.",
+            "minimum": 0
+          },
+          "winners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Winner"
+            },
+            "description": "At most two winners, in battle display order."
+          }
+        }
+      },
       "Language": {
         "type": "string",
         "description": "Language of the emails the site sends; the frontend passes its own.",
@@ -8768,6 +8863,24 @@
             "description": "The 6 digits mailed to it."
           }
         }
+      },
+      "Winner": {
+        "type": "object",
+        "description": "Who won one battle.",
+        "required": [
+          "battle",
+          "entry"
+        ],
+        "properties": {
+          "battle": {
+            "type": "string",
+            "description": "The battle's display name."
+          },
+          "entry": {
+            "$ref": "#/components/schemas/Entry",
+            "description": "The winning entry, with its members."
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -8826,6 +8939,10 @@
     {
       "name": "stats",
       "description": "Public counts for the landing page"
+    },
+    {
+      "name": "results",
+      "description": "The latest jams with battle winners"
     }
   ]
 }

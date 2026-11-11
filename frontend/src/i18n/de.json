@@ -1,8 +1,8 @@
 {
   "nav": {
     "home": "BreakingJam Startseite",
-    "findJam": "Jam finden",
-    "findSomeone": "Jemanden finden",
+    "jams": "Jams",
+    "dancers": "Tänzer",
     "myJams": "Meine Jams",
     "registerJam": "Jam eintragen",
     "logIn": "Anmelden",
@@ -13,12 +13,13 @@
     "skipToContent": "Zum Inhalt springen",
     "language": "Sprache: {{name}}",
     "admin": "Admin",
-    "jamMap": "Jam-Karte",
+    "map": "Karte",
     "account": "Konto",
     "accountMenu": "Kontomenü",
     "accountMenuOf": "Kontomenü, {{name}}",
     "contact": "Kontakt",
-    "team": "Team"
+    "team": "Team",
+    "accountSettings": "Konto"
   },
   "account": {
     "viewPage": "Meine Seite ansehen",
@@ -37,8 +38,8 @@
   "welcome": {
     "title": "Bist du auf BreakingJam?",
     "intro": "Tänzer:innen, DJs, MCs und Judges haben je eine Seite mit ihren Jams. Finde deine und tippe dort auf „Das bin ich“, um sie zu verifizieren.",
-    "search": "Dein Name in der Szene",
-    "searchHint": "Dein Name, ein Alias oder dein Instagram-Handle.",
+    "search": "Dein Künstlername",
+    "searchHint": "Dein Künstlername, ein Alias oder dein Instagram-Handle.",
     "found": "Passende Seiten",
     "nobody": "Noch keine Seite passt zu „{{q}}“.",
     "notHere": "Noch nicht dabei?",
@@ -100,7 +101,9 @@
       "send": "Code senden",
       "sentTo": "Wenn {{email}} ein Konto hat, ist ein 6-stelliger Code unterwegs. Er gilt 15 Minuten.",
       "newPassword": "Neues Passwort",
-      "submit": "Passwort speichern und anmelden"
+      "submit": "Passwort speichern und anmelden",
+      "changeTitle": "Passwort ändern",
+      "changeIntro": "Wir schicken einen Code an deine E-Mail, um zu bestätigen, dass du es bist; dann legst du das neue Passwort fest."
     }
   },
   "validation": {
@@ -114,12 +117,12 @@
     "handle": "Buchstaben, Ziffern, . oder _ (höchstens 30)."
   },
   "pages": {
-    "map": "Jam-Karte",
-    "people": "Jemanden finden",
+    "map": "Karte",
+    "people": "Tänzer",
     "orgJams": "Deine Jams",
     "orgJamNew": "Jam eintragen",
     "orgJamEdit": "Jam bearbeiten",
-    "jams": "Jam finden",
+    "jams": "Jams",
     "search": "Suche",
     "contact": "Kontakt",
     "team": "Team"
@@ -137,9 +140,9 @@
       "title": "Bald in deiner Nähe",
       "around": "Rund um {{place}}",
       "aroundYou": "In deiner Nähe",
-      "worldwide": "Weltweit",
       "change": "ändern",
-      "map": "Alle auf der Karte"
+      "map": "Alle auf der Karte",
+      "mapShort": "Karte"
     },
     "scene": {
       "title": "BreakingJam bisher",
@@ -149,7 +152,6 @@
       "battles_other": "Battles",
       "dancers_one": "Tänzer",
       "dancers_other": "Tänzer",
-      "in": "in",
       "countries_one": "Land",
       "countries_other": "Ländern"
     },
@@ -157,7 +159,19 @@
     "search": "Jams und Leute suchen",
     "searchPlaceholder": "Jam, Stadt, Battle, Bgirl, Bboy, DJ…",
     "searchSubmit": "Suchen",
-    "subtitle": "Das ganze Breaking in einer Suche"
+    "subtitle": "Das ganze Breaking in einer Suche",
+    "searchPlaceholderShort": "Jam, Stadt, Battle, Tänzer…",
+    "quickFilters": "Schnellfilter",
+    "nearMe": "In meiner Nähe",
+    "results": {
+      "title": "Gerade passiert",
+      "sub": "Gewinner und Battle-Videos der letzten Jams",
+      "subShort": "Gewinner und Battle-Videos",
+      "all": "Alle Ergebnisse",
+      "allShort": "Alle",
+      "more_one": "+{{count}} weitere",
+      "more_other": "+{{count}} weitere"
+    }
   },
   "status": {
     "draft": "Entwurf",
@@ -201,6 +215,8 @@
     "countdown": {
       "days_one": "In {{count}} Tag",
       "days_other": "In {{count}} Tagen",
+      "weeks_one": "In {{count}} Woche",
+      "weeks_other": "In {{count}} Wochen",
       "tomorrow": "Morgen",
       "today": "Heute",
       "live": "Läuft gerade"
@@ -216,7 +232,8 @@
       "dj": "DJ {{name}}",
       "djs": "{{count}} DJs",
       "mc": "MC {{name}}",
-      "mcs": "{{count}} MCs"
+      "mcs": "{{count}} MCs",
+      "judge": "Jury: {{name}}"
     },
     "calendar": "Zum Kalender hinzufügen",
     "results": "Ergebnisse ansehen",
@@ -410,7 +427,7 @@
       "instagramUrl": "Instagram-Seite",
       "websiteUrl": "Website",
       "contactEmail": "Kontakt-E-Mail",
-      "contactEmailHint": "Öffentlich: steht auf der Jam-Seite, damit Tänzer:innen dir schreiben können.",
+      "contactEmailHint": "Öffentlich: steht auf der Jam-Seite, damit Tänzer:innen dir schreiben können. Das oder Instagram brauchst du zum Veröffentlichen.",
       "endsOnHint": "Leer lassen für eine eintägige Jam.",
       "opensAt": "Beginn",
       "closesAt": "Ende",
@@ -475,6 +492,7 @@
         "powermove": "Powermove"
       },
       "formatChips": {
+        "top4": "Top 4",
         "top8": "Top 8",
         "top16": "Top 16",
         "top32": "Top 32",
@@ -531,9 +549,13 @@
         "label": "Schritt im Battle-Blatt",
         "details": "Details",
         "results": "Ergebnisse"
-      }
+      },
+      "prizeSuggested": "Für diese Jam",
+      "prizeAll": "Alle Währungen"
     },
     "entries": {
+      "manage": "Anmeldungen bearbeiten",
+      "done": "Fertig",
       "add": "Anmeldung hinzufügen",
       "edit": "Anmeldung bearbeiten",
       "editOne": "{{name}} bearbeiten",
@@ -572,7 +594,8 @@
       "videoStart": "Beginnt bei",
       "videoStartHint": "Bei einem Livestream: wo dieses Battle beginnt, z. B. 1:02:03.",
       "addDancer": "Tänzer:in hinzufügen",
-      "addTeam": "Team hinzufügen"
+      "addTeam": "Team hinzufügen",
+      "teamNameTaken": "Ein anderer Eintrag in diesem Battle heißt schon so. Gib diesem einen eigenen Namen, etwa „… A“."
     },
     "staff": {
       "remove": "{{name}} ({{role}}) entfernen",
@@ -647,13 +670,11 @@
       "linksHint": "Website, Instagram, Kontakt-E-Mail"
     },
     "publish": {
-      "title": "Bereit zum Veröffentlichen?",
       "almost": "Fast geschafft",
       "progress": "{{done}} von {{total}}",
       "toPublish": "{{done}} von {{total}} zum Veröffentlichen",
-      "action": "Veröffentlichen",
-      "left_one": "Veröffentlichen · {{count}} offen",
-      "left_other": "Veröffentlichen · {{count}} offen",
+      "left_one": "{{action}} · {{count}} offen",
+      "left_other": "{{action}} · {{count}} offen",
       "items": {
         "name": "Name",
         "dates": "Daten",
@@ -667,7 +688,18 @@
       "team": "Als BreakingJam-Team veröffentlichst du direkt.",
       "missing_one": "Noch eine Sache, bevor deine Jam auf die Karte kommt.",
       "missing_other": "Noch {{count}} Dinge, bevor deine Jam auf die Karte kommt.",
-      "ready": "Alles da. Veröffentliche, wann du willst."
+      "ready": {
+        "publish": "Alles da. Veröffentliche, wann du willst.",
+        "submit": "Alles da. Schick sie ab, wann du willst."
+      },
+      "actions": {
+        "publish": "Veröffentlichen",
+        "submit": "Zur Prüfung senden"
+      },
+      "titles": {
+        "publish": "Bereit zum Veröffentlichen?",
+        "submit": "Bereit zur Prüfung?"
+      }
     },
     "venue": {
       "find": "Ort finden",
@@ -686,13 +718,16 @@
       "hint": "Wähle, wer gegen wen gebattlet hat, und tippe dann auf die Krone der Gewinner:in: Sie rückt von selbst in die nächste Runde. Jede Änderung speichert sich von selbst.",
       "battle": "Battle {{n}}",
       "side": "Seite {{n}}",
-      "won": "{{name}} hat gewonnen",
+      "won": "{{name}} als Sieger:in markieren",
       "pick": "Teilnehmer:in wählen",
       "video": "Video-Link",
       "invalid": "Diese Ergebnisse ergeben kein Bracket: Alle battlen einmal pro Runde und nach dem Ausscheiden nicht mehr.",
       "needsBracket": "Wähle unter Details ein Bracket (Top 8, Top 16 …), um die Battles Runde für Runde einzutragen.",
       "needsEntries": "Füge diesem Battle zuerst mindestens zwei Teilnehmer:innen hinzu.",
-      "videoInvalid": "Füge einen YouTube-Link ein: Dieser wird nicht gespeichert."
+      "videoInvalid": "Füge einen YouTube-Link ein: Dieser wird nicht gespeichert.",
+      "enter": "Ergebnisse eintragen",
+      "edit": "Ergebnisse bearbeiten",
+      "roundDone": "{{round}} ✓"
     }
   },
   "verify": {
@@ -771,7 +806,8 @@
     },
     "titlesMine": "Ich bin…",
     "titles": "Rollen",
-    "titlesHint": "Das legen nur die Person selbst, sobald verifiziert, und das BreakingJam-Team fest."
+    "titlesHint": "Das legen nur die Person selbst, sobald verifiziert, und das BreakingJam-Team fest.",
+    "namesake": "Es gibt schon eine:n Tänzer:in namens {{name}}. Prüfe vor dem Speichern, dass es nicht dieselbe Person ist."
   },
   "admin": {
     "claims": {
@@ -832,7 +868,9 @@
       "sendBackTitle": "{{name}} zurückschicken?",
       "note": "Was sollen die Veranstalter:innen ändern?",
       "noteHint": "Sichtbar im Jam-Editor.",
-      "incomplete": "Noch nicht bereit zum Veröffentlichen: {{items}}."
+      "incomplete": "Noch nicht bereit zum Veröffentlichen: {{items}}.",
+      "approveTitle": "{{name}} freigeben?",
+      "approveBody": "Sie kommt sofort auf die Karte und ihre Seite wird öffentlich."
     },
     "accounts": {
       "tab": "Konten",
@@ -978,5 +1016,13 @@
       "cta": "Schreib uns"
     },
     "page": "Seite"
+  },
+  "accountPage": {
+    "title": "Konto",
+    "stageName": "Künstlername",
+    "noPage": "Du hast noch keine Tänzer:innen-Seite: Finde deine oder leg sie an; ihr Name ist dein Künstlername.",
+    "organiserName": "Name als Veranstalter:in",
+    "signIn": "Anmeldung",
+    "changePassword": "Passwort ändern"
   }
 }

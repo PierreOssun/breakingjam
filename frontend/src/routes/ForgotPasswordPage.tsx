@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useLocation, useSearchParams } from "react-router";
+import { Link, useLocation, useSearchParams } from "react-router";
 import { z } from "zod";
 import { api } from "../api/client";
 import { Button } from "../components/Button";
@@ -17,7 +17,7 @@ import {
 } from "../features/auth/codes";
 import { ResendButton } from "../features/auth/ResendButton";
 import { safeNext } from "../features/auth/safeNext";
-import { useLogIn } from "../features/auth/useMe";
+import { useLogIn, useMe } from "../features/auth/useMe";
 
 /**
  * "/forgot-password": an email, then the code it receives and a new password on the same page
@@ -31,6 +31,8 @@ export function ForgotPasswordPage() {
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [error, setError] = useState<string | undefined>();
   const language = useMailLanguage();
+  // Logged in, from the account page: the same code flow, worded as a change, not a rescue.
+  const changing = Boolean(useMe().data);
 
   /** Asks for a code; the API answers the same whether the account exists or not. */
   async function send(email: string) {
@@ -43,13 +45,22 @@ export function ForgotPasswordPage() {
 
   return (
     <AuthShell
-      title={t("auth.forgot.title")}
+      title={t(changing ? "auth.forgot.changeTitle" : "auth.forgot.title")}
       error={error}
-      footer={<BackToLogin next={next} />}
+      footer={
+        changing ? (
+          <Link to={next} className="font-bold text-primary-text underline">
+            {t("form.cancel")}
+          </Link>
+        ) : (
+          <BackToLogin next={next} />
+        )
+      }
     >
       {sentTo === null ? (
         <EmailForm
           initial={typed ?? ""}
+          intro={t(changing ? "auth.forgot.changeIntro" : "auth.forgot.intro")}
           onSend={async (email) => {
             if (await send(email)) setSentTo(email);
           }}
@@ -70,9 +81,11 @@ export function ForgotPasswordPage() {
 /** The address to send the code to. */
 function EmailForm({
   initial,
+  intro,
   onSend,
 }: {
   initial: string;
+  intro: string;
   onSend: (email: string) => Promise<void>;
 }) {
   const { t } = useTranslation();
@@ -95,7 +108,7 @@ function EmailForm({
       onSubmit={handleSubmit(({ email }) => onSend(email))}
       className="flex flex-col gap-6"
     >
-      <p className="text-body text-muted">{t("auth.forgot.intro")}</p>
+      <p className="text-body text-muted">{intro}</p>
       <TextField
         label={t("auth.fields.email")}
         type="email"

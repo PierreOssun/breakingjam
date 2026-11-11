@@ -162,6 +162,15 @@ const ORGANISER = {
 };
 
 /** The jam as its organiser sees it. */
+/** A battle's card with its entry rows open, behind "Edit entries" once it has results. */
+async function entriesOf(name: string) {
+  const card = (await screen.findByRole("heading", { name })).closest("li")!;
+  await userEvent.click(
+    within(card).getByRole("button", { name: "Edit entries" }),
+  );
+  return card;
+}
+
 const asOrganiser = (replies: Parameters<typeof mockApi>[0] = {}) =>
   mockJam(ORGANISER, {
     "GET /api/auth/me": { status: 200, body: LIL_G },
@@ -181,7 +190,8 @@ describe("JamPage", () => {
       }),
     ).toBeInTheDocument();
     expect(document.title).toBe("Paris Cypher Sessions · BreakingJam");
-    expect(main.getByText("Published")).toBeInTheDocument();
+    // "Published" tells a visitor nothing: only its organiser sees it.
+    expect(main.queryByText("Published")).toBeNull();
     expect(
       main.getAllByText(/Saturday,? 1.+Sunday,? 2 June 2030/).length,
     ).toBeGreaterThan(0);
@@ -206,10 +216,10 @@ describe("JamPage", () => {
       main.getByRole("link", { name: "Directions" }).getAttribute("href"),
     ).toContain("destination=48.8566,2.3522");
 
-    // Who's in: four dancers (the withdrawn one left out), a judge and the DJ.
+    // Who's in: four dancers (the withdrawn one left out), then a lone judge and DJ by name.
     const whosIn = await main.findByRole("link", { name: /4 dancers in/ });
     expect(whosIn).toHaveAttribute("href", "#battles");
-    expect(whosIn).toHaveTextContent("1 judge · DJ Spin");
+    expect(whosIn).toHaveTextContent("Judge Sensei Kai · DJ Spin");
 
     // DESIGN.md §6 item 9: the organiser, verified, and a way to reach them.
     const organiser = main
@@ -777,9 +787,7 @@ describe("JamPage", () => {
     });
     renderApp(`/jams/${JAM.slug}`);
 
-    const solo = (
-      await screen.findByRole("heading", { name: "1v1 Bboy" })
-    ).closest("li")!;
+    const solo = await entriesOf("1v1 Bboy");
     // The organiser also sees withdrawn entries, marked.
     expect(
       await within(solo).findByText("Withdrawn", { selector: "p" }),
@@ -828,23 +836,21 @@ describe("JamPage", () => {
     });
   });
 
-  it("searches dancers in the picker after a search on Find someone", async () => {
+  it("searches dancers in the picker after a search on Dancers", async () => {
     asOrganiser({
       "GET /api/dancers": {
         status: 200,
         body: { items: [], next_cursor: null },
       },
     });
-    // Find someone pages its results; the picker must not read those pages as its list.
+    // Dancers pages its results; the picker must not read those pages as its list.
     const router = renderApp("/dancers?q=Lil");
     expect(
       await screen.findByText("No one matches “Lil”."),
     ).toBeInTheDocument();
     await router.navigate(`/jams/${JAM.slug}`);
 
-    const solo = (
-      await screen.findByRole("heading", { name: "1v1 Bboy" })
-    ).closest("li")!;
+    const solo = await entriesOf("1v1 Bboy");
     await userEvent.click(
       within(solo).getByRole("button", { name: "Add a dancer" }),
     );
@@ -856,6 +862,79 @@ describe("JamPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows its organiser the results as visitors see them, the entry rows one switch away", async () => {
+    asOrganiser();
+    renderApp(`/jams/${JAM.slug}`);
+
+    const solo = (
+      await screen.findByRole("heading", { name: "1v1 Bboy" })
+    ).closest("li")!;
+    const manage = within(solo).getByRole("button", { name: "Edit entries" });
+    expect(within(solo).getByText("Top 8")).toBeInTheDocument();
+    expect(
+      within(solo).queryByRole("button", { name: "Delete Ventus" }),
+    ).toBeNull();
+
+    await userEvent.click(manage);
+    expect(
+      within(solo).getByRole("button", { name: "Delete Ventus" }),
+    ).toBeInTheDocument();
+    await userEvent.click(within(solo).getByRole("button", { name: "Done" }));
+    expect(
+      within(solo).queryByRole("button", { name: "Delete Ventus" }),
+    ).toBeNull();
+  });
+
+  it("keeps results for later on a draft previewed on its day", async () => {
+    mockJam(
+      { ...ORGANISER, status: "draft", phase: "live" },
+      { "GET /api/auth/me": { status: 200, body: LIL_G } },
+    );
+    renderApp(`/jams/${JAM.slug}`);
+    await screen.findByRole("heading", { name: "1v1 Bboy" });
+    expect(screen.queryByRole("button", { name: /results$/ })).toBeNull();
+  });
+
+  it("names a team after the crew picked for it, and says when the name is taken", async () => {
+    asOrganiser({
+      [`GET /api/events/${JAM.id}/battles`]: {
+        status: 200,
+        body: [
+          battle("b2", "2v2 Mixed", 2, 8, [
+            entry("e4", "b2", {
+              team_name: "Floor Lords",
+              crew: { id: "c1", name: "Floor Lords" },
+              members: [dancer("d4", "Atlas"), dancer("d5", "Drift")],
+            }),
+          ]),
+        ],
+      },
+      "GET /api/crews": {
+        status: 200,
+        body: {
+          items: [
+            { id: "c1", name: "Floor Lords", city: "Paris", country: "FR" },
+          ],
+          next_cursor: null,
+        },
+      },
+    });
+    renderApp(`/jams/${JAM.slug}`);
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Add a team" }),
+    );
+    const sheet = within(screen.getByRole("dialog", { name: "Add an entry" }));
+    await userEvent.type(sheet.getByLabelText("Crew"), "Floor");
+    await userEvent.click(
+      await sheet.findByRole("button", { name: /Floor Lords/ }),
+    );
+    expect(sheet.getByLabelText(/^Team name/)).toHaveValue("Floor Lords");
+    // A second team of the same crew needs a name of its own.
+    expect(
+      sheet.getByText(/Another entry in this battle already goes by this name/),
+    ).toBeInTheDocument();
+  });
+
   it("lets its organiser delete an entry", async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     const fetch = asOrganiser({
@@ -863,7 +942,8 @@ describe("JamPage", () => {
     });
     renderApp(`/jams/${JAM.slug}`);
 
-    const remove = await screen.findByRole("button", { name: "Delete Ventus" });
+    await entriesOf("1v1 Bboy");
+    const remove = screen.getByRole("button", { name: "Delete Ventus" });
     // Before the jam is over, battles themselves are edited in the editor.
     expect(screen.queryByRole("button", { name: "Edit 1v1 Bboy" })).toBeNull();
     await userEvent.click(remove);
@@ -885,9 +965,7 @@ describe("JamPage", () => {
     );
     renderApp(`/jams/${JAM.slug}`);
 
-    const solo = (
-      await screen.findByRole("heading", { name: "1v1 Bboy" })
-    ).closest("li")!;
+    const solo = await entriesOf("1v1 Bboy");
     expect(
       within(solo).getByRole("button", { name: "Add a dancer" }),
     ).toBeInTheDocument();
@@ -896,7 +974,7 @@ describe("JamPage", () => {
     ).toBeInTheDocument();
     // The battle itself still opens its sheet here, since the editor is closed.
     await userEvent.click(
-      within(solo).getByRole("button", { name: "Edit 1v1 Bboy" }),
+      within(solo).getByRole("button", { name: "Edit results" }),
     );
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
     // The details, the flyer and the lineup are settled.
@@ -934,7 +1012,7 @@ describe("JamPage", () => {
     renderApp(`/jams/${JAM.slug}`);
 
     await userEvent.click(
-      await screen.findByRole("button", { name: "Edit 1v1 Bboy" }),
+      await screen.findByRole("button", { name: "Enter results" }),
     );
     const sheet = within(await screen.findByRole("dialog"));
     // Over, the jam opens the sheet on its results.
@@ -950,7 +1028,9 @@ describe("JamPage", () => {
       sheet.getByLabelText("Battle 1, side 2"),
       "e2",
     );
-    await userEvent.click(sheet.getByRole("button", { name: "Lil G won" }));
+    await userEvent.click(
+      sheet.getByRole("button", { name: "Mark Lil G as the winner" }),
+    );
     expect(sheet.getByLabelText(/Video link/)).toHaveValue(VIDEO);
     // No Save button: the battle goes out by itself once it has both sides and a winner.
     expect(sheet.queryByRole("button", { name: "Save" })).toBeNull();

@@ -207,22 +207,21 @@ Drafted from Wikipedia on 2026-10-19. The 22 World Finals from 2004 to 2025 have
 - **Still open:**
   - the countries of 2005's DJ Ace and DJ Billy Brown;
   - whether bgirl Mess is Dutch or Russian (flagged both ways);
-  - videos for 43 of 437 battles, mostly 2004–2010 and the 2022 and 2025 b-girl brackets (`reports/battle-videos.md`).
+  - videos for 15 of 437 battles, mostly 2004–2010 (`reports/battle-videos.md`).
 
 ## DPC Jam and Battle of Sun
 
-Drafted from YouTube on 2026-10-19: [stance](https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA) for DPC Jam, [Skillzoo Production](https://www.youtube.com/channel/UCBDSkBbTmI63mIp6UNt09vA) for Battle of Sun.
+DPC Jam 2025–2026 and Battle of Sun 2026 were drafted from YouTube on 2026-10-19: [stance](https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA) for DPC Jam, [Skillzoo Production](https://www.youtube.com/channel/UCBDSkBbTmI63mIp6UNt09vA) for Battle of Sun. The earlier editions were added on 2026-11-11 (`reports/dpc-jam.md`, `reports/battle-of-sun.md`).
 
-- **What's there:** DPC Jam 2025 and 2026 (2v2, top 16 to final), and Battle of Sun 2026 (2v2 top 16 and kids top 8). Every match has its video.
-- **Before 2025:** DPC Jam has only Shorts. One names the 2023 winners (Hiro10 & Mighty Jake), with no bracket.
-- **Fixed by hand:** two title typos ("MaxMax & Wigor", "Fresh Mod Crew") and the crew spelled Formless Corp/Corps.
-- **Dates:** the Saturday before the first upload, e.g. Battle of Sun 2026-09-19.
-- **Still open:**
-  - the winners of both Battle of Sun finals;
-  - the countries of the new dancers;
-  - whether the kids battle is 1v1 (assumed);
-  - DPC Jam's city (Zurich, from one video description);
-  - whether the Alvin of Formless Corp is the Venezuelan Alvin of Red Bull BC One, and likewise for the other reused keys.
+**DPC Jam** (Zurich, the D.Point.C crew's anniversary 2v2): every edition from 2014, the first, to 2026; 2020 was cancelled.
+- **What's there:** a full top 16 bracket every year from 2015, nearly every battle on [the organiser's channel](https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg) (two quarter-finals, 2015 and 2024, are unfilmed and follow from the rest); 2014 as placings (5 of 8 top 16 battles filmed) with its 7 to Smoke; DPC Jam Europe 2025 (`2025-europe.toml`, the World Final's qualifier at Sneakerness) as placings, every battle filmed but its winner unpublished.
+- **Facts:** dates, venues and staff from and8.dance from 2017, and from the organiser's descriptions before; 2014's and 2015's dates are the Saturday before the first upload, marked `check`. and8 titles 2019 "Kappel am Albis" but gives GZ Heuried as its venue.
+- **Spellings unified before drafting:** Toshkin/Toschkin, El Mouwahidin(e), TruCru, Lilzoo, Chaulin, Schlag (Shlag), Aslan a.k.a Bootuz (`bootuz`).
+- **Still open:** the kids battles (and8 has their rankings from 2022), DPC Europe 2025's winner, most new dancers' countries, and the homonyms in `reports/name-review.md`.
+
+**Battle of Sun** (Saint-Louis, by Ossun Crew): 2018 (Vol. III, a full top 16 filmed by Breakingstras, SBX champion), 2025 (Battle of Sun X: date, venue and judges, no result found) and 2026 (2v2 top 16 and kids top 8).
+- **Drafts** in `data/drafts/battle-of-sun/`: 2013 and 2014 (friends' battles by Ossun Crew, no date), 2015 (the first public edition: five battles, no date or champion), 2017 (one listing) and 2021 (two battles, no date).
+- **Still open:** the winners of both 2026 finals; whether the 2026 kids battle is 1v1 (assumed); editions 2019, 2020 and 2022–2024, for which nothing was found; the organiser's numbering (2018 is the third, 2021 the fourth, 2025 the tenth).
 
 ## Outbreak Europe and Battle of the Year
 

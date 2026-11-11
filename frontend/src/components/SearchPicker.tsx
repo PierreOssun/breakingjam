@@ -16,6 +16,8 @@ type SearchPickerProps<T> = {
   onPick: (item: T) => void;
   /** Already chosen; left out of the results. */
   exclude?: string[];
+  /** In a dialog opened to pick someone: the search takes the focus (`data-autofocus`). */
+  autoFocus?: boolean;
   /** Creating is offered when set: the label and the inline form, seeded with the search. */
   create?: {
     label: string;
@@ -41,7 +43,9 @@ export function SearchPicker<T>(props: SearchPickerProps<T>) {
     enabled: q.length >= 2,
     staleTime: 30_000,
   });
-  const searched = q.length >= 2 && results.isSuccess;
+  // Only for what is typed now: while a new search waits, the last one's results could be
+  // tapped for the wrong person.
+  const searched = q.length >= 2 && q === query.trim() && results.isSuccess;
   const shown = (results.data ?? []).filter(
     (item) => !props.exclude?.includes(idOf(item)),
   );
@@ -64,6 +68,7 @@ export function SearchPicker<T>(props: SearchPickerProps<T>) {
           id={id}
           type="search"
           autoComplete="off"
+          data-autofocus={props.autoFocus || undefined}
           value={query}
           placeholder={t("picker.placeholder")}
           onChange={(e) => setQuery(e.target.value)}

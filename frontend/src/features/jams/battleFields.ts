@@ -100,6 +100,12 @@ export function battleValues(
 
 /** The API body; a blank name lets the server name it from the fields. */
 export function battleBody(values: BattleFormValues): BattleFields {
+  // A currency with no amount is no prize: the sheet may have suggested it.
+  const prize =
+    values.prize_currency !== "" &&
+    PLACES.some((place) => values[`prize_${place}`].trim() !== "")
+      ? values.prize_currency
+      : null;
   return {
     name: values.name.trim() || null,
     format: values.format,
@@ -120,10 +126,10 @@ export function battleBody(values: BattleFormValues): BattleFields {
     bracket_size: number(values.bracket_size),
     max_entries: number(values.max_entries),
     // The amounts are hidden, and dropped, while no currency is chosen.
-    prize_currency: values.prize_currency || null,
-    prize_first: values.prize_currency ? number(values.prize_first) : null,
-    prize_second: values.prize_currency ? number(values.prize_second) : null,
-    prize_third: values.prize_currency ? number(values.prize_third) : null,
+    prize_currency: prize,
+    prize_first: prize ? number(values.prize_first) : null,
+    prize_second: prize ? number(values.prize_second) : null,
+    prize_third: prize ? number(values.prize_third) : null,
     starts_at: values.start_time
       ? `${values.start_day}T${values.start_time}:00`
       : null,
@@ -144,7 +150,14 @@ export const CATEGORIES = [
 export type Category = (typeof CATEGORIES)[number];
 
 /** The battle sheet's format chips (M24), in display order. */
-export const FORMATS = ["top8", "top16", "top32", "smoke", "showcase"] as const;
+export const FORMATS = [
+  "top4",
+  "top8",
+  "top16",
+  "top32",
+  "smoke",
+  "showcase",
+] as const;
 export type FormatChip = (typeof FORMATS)[number];
 
 /** A chip that names the battle, and the word that shows a typed name already says it. */
@@ -174,6 +187,7 @@ const CATEGORY: Record<
 
 /** What a format chip sets: a bracket, or a format of its own. */
 const BRACKET: Partial<Record<FormatChip, string>> = {
+  top4: "4",
   top8: "8",
   top16: "16",
   top32: "32",

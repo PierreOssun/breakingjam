@@ -1,0 +1,53 @@
+name = "DPC Jam 2015"
+starts_on = 2015-10-03  # the Saturday before the first upload (2015-10-06); check
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+sources = [
+  "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
+]
+judges = ["no-mercy", "skychief", "marcio"]
+djs = []
+mcs = []
+
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+bracket_size = 16
+matches = [
+  { round = "top16", a = "the-saxonz", b = "majin-parallel", winner = "the-saxonz", video = "https://youtu.be/oqWdIsJhYQM" },
+  { round = "top16", a = "navi", b = "stylize", winner = "navi", video = "https://youtu.be/gwD-MvAfSWg" },
+  { round = "top16", a = "majin-nation", b = "only-kings", winner = "majin-nation", video = "https://youtu.be/SNcXlG9YGNM" },
+  { round = "top16", a = "license-to-chill", b = "exnatic-flava", winner = "license-to-chill", video = "https://youtu.be/YscGjoj3wlU" },
+  { round = "top16", a = "index-crew", b = "funk-connection", winner = "index-crew", video = "https://youtu.be/Z6s-bnbX1sY" },
+  { round = "top16", a = "fusion-rockers", b = "b8b", winner = "fusion-rockers", video = "https://youtu.be/LI3fo5SJrO4" },
+  { round = "top16", a = "styles-confidential", b = "funk-warriors", winner = "funk-warriors", video = "https://youtu.be/VcGkC0SJfA0" },
+  { round = "top16", a = "unik-breakers", b = "les-garcons", winner = "unik-breakers", video = "https://youtu.be/eSPf-B1CzGs" },
+  { round = "top8", a = "unik-breakers", b = "index-crew", winner = "unik-breakers", video = "https://youtu.be/ykgVHNQFOSU" },
+  { round = "top8", a = "navi", b = "majin-nation", winner = "navi", video = "https://youtu.be/vO9H-ek3d3Y" },
+  { round = "top8", a = "license-to-chill", b = "the-saxonz", winner = "license-to-chill", video = "https://youtu.be/GOdnYSohd9M" },
+  { round = "top8", a = "fusion-rockers", b = "funk-warriors", winner = "fusion-rockers" },  # not filmed: the only pairing left
+  { round = "top4", a = "navi", b = "fusion-rockers", winner = "navi", video = "https://youtu.be/PSE5vkkbyvo" },
+  { round = "top4", a = "license-to-chill", b = "unik-breakers", winner = "unik-breakers", video = "https://youtu.be/YvmDA7iQz8U" },
+  { round = "final", a = "navi", b = "unik-breakers", winner = "unik-breakers", video = "https://youtu.be/lj9E6rVUR8M" },
+]
+
+[battles.teams]
+b8b = { name = "B8B" }
+exnatic-flava = { name = "ExNatic flava" }
+funk-connection = { name = "Funk Connection" }
+funk-warriors = { name = "Funk Warriors" }
+fusion-rockers = { name = "Fusion rockers" }
+index-crew = { name = "Index Crew" }
+les-garcons = { name = "Les Garcons" }
+license-to-chill = { name = "License to Chill" }
+majin-nation = { name = "Majin Nation" }
+majin-parallel = { name = "Majin Parallel" }
+navi = { name = "Navi" }
+only-kings = { name = "Only Kings" }
+styles-confidential = { name = "Styles confidential" }
+stylize = { name = "Stylize" }
+the-saxonz = { name = "The Saxonz" }
+unik-breakers = { name = "Unik Breakers", members = ["hill", "kuzya"] }

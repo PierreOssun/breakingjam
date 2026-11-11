@@ -38,7 +38,7 @@ describe("the place search", () => {
     expect(url.origin + url.pathname).toBe("https://photon.komoot.io/api/");
     expect(Object.fromEntries(url.searchParams)).toEqual({
       q: "Dynamo",
-      limit: "5",
+      limit: "8",
       lang: "de",
       lat: "47.38",
       lon: "8.54",
@@ -67,9 +67,34 @@ describe("the place search", () => {
     const url = new URL(String((fetch.mock.calls[0] as unknown[])[0]));
     expect(Object.fromEntries(url.searchParams)).toEqual({
       q: "Dynamo",
-      limit: "5",
+      limit: "8",
       lang: "en",
     });
+  });
+
+  it("shows a place mapped twice once, and five at most", async () => {
+    // Photon returns a venue's point and its building alike: one row is enough.
+    const twin = feature({ ...DYNAMO.properties, osm_type: "W", osm_id: 9 });
+    const others = Array.from({ length: 6 }, (_, n) =>
+      feature({ name: `Hall ${n}`, city: "Zürich", countrycode: "CH" }),
+    );
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        Response.json({
+          type: "FeatureCollection",
+          features: [DYNAMO, twin, ...others],
+        }),
+      ),
+    );
+    const places = await search("Hall", { language: "en" });
+    expect(places.map((p) => p.title)).toEqual([
+      "Dynamo Jugendkulturhaus",
+      "Hall 0",
+      "Hall 1",
+      "Hall 2",
+      "Hall 3",
+    ]);
   });
 
   it("reads an address, a street and a town as what they are", () => {

@@ -1,0 +1,56 @@
+name = "DPC Jam Europe 2025"
+starts_on = 2025-05-04
+timezone = "Europe/Zurich"
+city = "Zurich"
+country = "CH"
+venue = "Halle 622"  # at the Sneakerness fair
+lat = 47.4134
+lng = 8.5429
+sources = ["https://and8.dance/en/e/5095", "https://www.youtube.com/channel/UCgiz3Pm3FBhDyy3g_fP5OVA"]
+judges = ["buz", "issue", "lil-zoo"]
+djs = ["ob-one", "dj-catch"]
+mcs = ["godfather"]
+
+# The European qualifier for the World Final; all 15 battles are filmed, but no source names the final's winner, so placings.
+# "Floor Legend vs Dead Paradise" is titled 1/4 final, but Floor Legend's quarter-final is against Stranger Thingz, so it is their top 16.
+[[battles]]
+key = "2v2"
+name = "2v2"
+gender = "mixed"
+team_size = 2
+results = [
+  { entrant = "madmax-wigor", reached = "top2", video = "https://youtu.be/RWE_E7UxdwY" },
+  { entrant = "kid-mario-killian", reached = "top2", video = "https://youtu.be/RWE_E7UxdwY" },
+  { entrant = "floor-legend", reached = "top4", video = "https://youtu.be/PlSD3JtPTK8" },
+  { entrant = "baby-og-hill", reached = "top4", video = "https://youtu.be/0YiVdJAyRWA" },
+  { entrant = "against-all-odds", reached = "top8", video = "https://youtu.be/93h8XjoxaU0" },
+  { entrant = "stranger-thingz", reached = "top8", video = "https://youtu.be/X7I13MdjFnc" },
+  { entrant = "cis-djibril", reached = "top8", video = "https://youtu.be/c-XwovxevK0" },
+  { entrant = "juver-mou-g", reached = "top8", video = "https://youtu.be/lrjvhGmL-6E" },
+  { entrant = "neuch-city", reached = "top16", video = "https://youtu.be/0VwySqhs6RU" },
+  { entrant = "disfunctional-art", reached = "top16", video = "https://youtu.be/ItsLsW-jCDM" },
+  { entrant = "ticino-homies", reached = "top16", video = "https://youtu.be/MiQND71jkk0" },
+  { entrant = "azukai-bazuka", reached = "top16", video = "https://youtu.be/PufftBAgL4A" },
+  { entrant = "the-unpredictable", reached = "top16", video = "https://youtu.be/eAsKfBVhh7g" },
+  { entrant = "eddy-flakes", reached = "top16", video = "https://youtu.be/pzAA5GGWDBY" },
+  { entrant = "maghreb-united", reached = "top16", video = "https://youtu.be/uPiukCIZDfc" },
+  { entrant = "dead-paradise", reached = "top16", video = "https://youtu.be/cb0pSJgAtPE" },
+]
+
+[battles.teams]
+madmax-wigor = { members = ["madmax", "wigor"] }
+kid-mario-killian = { members = ["kid-mario", "killian"] }
+floor-legend = { name = "Floor Legend" }
+baby-og-hill = { members = ["baby-og", "hill"] }
+against-all-odds = { name = "Against All Odds" }
+stranger-thingz = { crew = "stranger-thingz" }
+cis-djibril = { members = ["cis", "djibril"] }
+juver-mou-g = { members = ["juver", "mou-g"] }
+neuch-city = { name = "Neuch City" }
+disfunctional-art = { name = "Disfunctional Art" }
+ticino-homies = { name = "Ticino Homies" }
+azukai-bazuka = { members = ["azukai", "bazuka"] }
+the-unpredictable = { name = "The Unpredictable" }
+eddy-flakes = { members = ["eddy", "flakes"] }
+maghreb-united = { name = "Maghreb United" }
+dead-paradise = { name = "Dead Paradise" }

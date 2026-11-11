@@ -180,6 +180,48 @@ pub async fn list(pool: &PgPool, filter: &ListFilter) -> sqlx::Result<Vec<Event>
     .await
 }
 
+/// A jam that is over, as the landing page's "Just happened" shows it.
+pub struct FinishedJam {
+    /// Jam id.
+    pub id: Uuid,
+    /// Display name.
+    pub name: String,
+    /// Public URL segment.
+    pub slug: String,
+    /// First day.
+    pub starts_on: NaiveDate,
+    /// Last day.
+    pub ends_on: NaiveDate,
+    /// City.
+    pub city: String,
+    /// ISO 3166-1 alpha-2.
+    pub country: String,
+    /// The uploaded flyer at card size; null means the generated one.
+    pub flyer_card_url: Option<String>,
+}
+
+/// The `limit` announced jams that ended last and have a battle winner, the latest first.
+pub async fn finished_with_winners(pool: &PgPool, limit: i64) -> sqlx::Result<Vec<FinishedJam>> {
+    sqlx::query_as!(
+        FinishedJam,
+        r#"select id, name, slug, starts_on, ends_on, city as "city!", country as "country!",
+                  flyer_card_url
+           from events
+           where deleted_at is null and status in ('published', 'registration_closed')
+             and city is not null and country is not null
+             and jam_phase(starts_on, ends_on, timezone) = 'past'
+             and exists (
+               select 1 from battles b join entries e on e.battle_id = b.id
+               where b.event_id = events.id and e.final_rank = 1 and e.status <> 'withdrawn'
+             )
+           order by ends_on desc, starts_on desc, id desc
+           limit $1"#,
+        limit,
+    )
+    .fetch_all(pool)
+    .await
+}
+
 /// Points for the world map: announced jams with coordinates, upcoming to past, never cancelled ones.
 pub async fn map_points(pool: &PgPool) -> sqlx::Result<Vec<MapPoint>> {
     // The API keeps a jam's place once it is past draft; the filter makes that true here too.

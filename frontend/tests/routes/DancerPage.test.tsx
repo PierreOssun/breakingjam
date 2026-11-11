@@ -92,7 +92,11 @@ const LIVE = [
 
 const NO_EVENTS = { live: [], upcoming: [], past: [] };
 
-function mockDancer(events = { live: LIVE, upcoming: UPCOMING, past: PAST }) {
+type Events = Record<"live" | "upcoming" | "past", object[]>;
+
+function mockDancer(
+  events: Events = { live: LIVE, upcoming: UPCOMING, past: PAST },
+) {
   return mockApi({
     "GET /api/auth/me": LOGGED_OUT,
     [`GET /api/dancers/${DANCER.id}`]: { status: 200, body: DANCER },
@@ -179,6 +183,35 @@ describe("DancerPage", () => {
     expect(
       within(past).queryByRole("button", { name: /Show more/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows a jam once with each battle's result, live ones included", async () => {
+    const live = { ...jam(30, "2026-11-04"), phase: "live" };
+    const twoVTwo = { ...oneVOne, id: "b2", name: "2v2", team_size: 2 };
+    mockDancer({
+      live: [
+        {
+          event: live,
+          battle: oneVOne,
+          role: "competitor",
+          reached: "winner",
+          final_rank: 1,
+        },
+        { event: live, battle: twoVTwo, role: "competitor", reached: "top4" },
+      ],
+      upcoming: [],
+      past: [],
+    });
+    renderApp(`/dancers/${DANCER.id}`);
+
+    const section = (
+      await screen.findByRole("heading", { name: "Live now" })
+    ).closest("section")!;
+    expect(within(section).getAllByRole("link")).toHaveLength(1);
+    expect(within(section).getByText("1v1 Bboy")).toBeInTheDocument();
+    expect(within(section).getByText("2v2")).toBeInTheDocument();
+    expect(within(section).getByText("1st")).toBeInTheDocument();
+    expect(within(section).getByText("Top 4")).toBeInTheDocument();
   });
 
   it("shows the video pill only on past battles that have a video", async () => {
