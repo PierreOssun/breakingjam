@@ -15,8 +15,10 @@ Two copies of the same stack, each one Cloudflare Worker (ARCHITECTURE §9):
 ```
 browser ──▶ Worker (deploy/src/index.ts)
               ├─ /api/*     ──▶ API container (backend/Dockerfile, Rust) ──▶ Neon Postgres
+              │                   (login, register and password reset first pass the per-IP and per-email limits)
               │                   └─ http://media.internal ──▶ Worker media handler ──▶ R2 bucket
-              ├─ /jams/{slug} ─▶ index.html + Open Graph tags (jam read from the API)
+              ├─ /jams/{slug} ─▶ index.html + Open Graph tags and Event data (jam read from the API)
+              ├─ /sitemap.xml ─▶ API /api/sitemap.xml, cached at the edge for an hour
               └─ anything else ─▶ static assets (frontend/dist, SPA fallback)
 browser ──▶ media.breakingjam.com ──▶ R2 bucket (uploaded flyers)
 ```
@@ -106,7 +108,7 @@ Do steps 2–8 once for production and once for UAT, with that target's values.
 12. **Places**, after the first deploy with the `places` tables (M22), and again whenever `data/places/` changes: Actions → **Import places** → Run workflow, from `uat` or `prod`. It loads the GeoNames cities that "Near <Place>" on `/search` needs, replacing them in one transaction, as the owner role (the target's `DATABASE_URL` secret).
 13. **Email Service** (M27), before the first deploy that has the `send_email` binding: Cloudflare dashboard → Compute → Email Service → Email Sending → onboard `breakingjam.com`. The DNS is on Cloudflare, so it adds the SPF, DKIM and DMARC records itself. Both targets send as `noreply@breakingjam.com` (`FROM` in `src/mail.ts`).
     - It needs the Workers Paid plan, which the containers already need. Until the domain is onboarded, mail only reaches the account's verified addresses; new accounts start with a small daily quota that grows with good sending.
-    - Optional: a WAF rate-limiting rule on `POST /api/auth/*` per IP, in front of the API's own limits (5 tries per code, one code a minute, 10 a day).
+    - The Worker already limits logins, sign-ups and password resets to 60 a minute per IP and 10 a minute per email (`ratelimits` in `wrangler.jsonc`; nothing to create by hand, the `namespace_id`s are ours to choose), in front of the API's own limits (5 tries per code, one code a minute, 10 a day, 30 password hashes waiting). These counts are per Cloudflare location and approximate: against an attack from many addresses, add a WAF rate-limiting rule or turn on *Under Attack* mode in the dashboard.
 14. **Curated jams** (`data/`), after the first deploy with `events.data_key`, and again whenever `data/` gains jams: Actions → **Import data** → Run workflow, from `uat` or `prod`, with the owner account's email. It adds the jams, dancers and crews no earlier run wrote, in one transaction, as the owner role; it never changes what is already there.
     - **Production:** the owner is a team account, shown as the jams' organiser. Sign up with it on the site, named "BreakingJam Team", then in Neon's SQL editor: `update app_users set role = 'seed_admin' where email = '<team email>';`
     - **UAT:** the seed already imported `data/` into its team account (`seed@breakingjam.local`); jams seeded before `events.data_key` existed have no key, so run Import data on UAT only after a fresh seed, or it adds them a second time.

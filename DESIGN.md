@@ -908,7 +908,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
   - At 375×812 the flyer, badges, title, date, city and the action bar show without scrolling.
 - **Desktop:** two columns (§5). Under the flyer, the action card (§4.32). The meta lines run as one inline row, and a facts grid (When, Where, Website, Email, Instagram) follows "Who's in".
 - **Share** (the top bar, the action bar, the action card): the system share sheet with `{ title: "<Jam> · <Wed 4 Nov> · <City>", url }` where there is one (cancelling isn't an error); else the link is copied with the toast "Link copied" (§4.8).
-- **Link previews** (Open Graph, set by the Worker): `og:title` is "<Jam> · <Wed 4 Nov> · <City>", `og:description` the battles + "on BreakingJam", `og:image` the uploaded flyer at card size, else the generated share image.
+- **Link previews** (Open Graph, set by the Worker): `og:title` is "<Jam> · <Wed 4 Nov> · <City>", `og:description` the battles + "on BreakingJam", `og:image` the uploaded flyer at card size, else the generated share image. Every other page shares the site card `/og-image.png` (1200×630: the round logo, the wordmark, the tagline and "breakingjam.com" on ink).
 
 **Jam editor** (`/org/jams/<id>/edit`, M24): the jam page in edit mode, so what the organiser edits is what visitors see.
 - **Start sheet** (§4.9, short): from **Register a jam**, over the organiser's list. "Two things to start. You fill in the rest on the jam page.", then Jam name and First day, **Create the jam page**, and the caption "It stays a draft, visible only to you, until you publish it." The draft's URL and generated flyer work from that moment.

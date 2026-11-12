@@ -28,7 +28,7 @@ use crate::{
         dancer::OwnPage,
         user::{CodePurpose, Role, User},
     },
-    error::{AppError, ErrorEnvelope, InvalidFields, Unauthorized},
+    error::{AppError, Busy, ErrorEnvelope, InvalidFields, Unauthorized},
     mail::Language,
     state::AppState,
 };
@@ -144,6 +144,7 @@ pub(super) type WithCookie<T> = ([(axum::http::HeaderName, HeaderValue); 1], T);
         (status = ACCEPTED, body = CodeSent),
         (status = CONFLICT, description = "Email already registered", body = ErrorEnvelope),
         InvalidFields,
+        Busy,
     )
 )]
 async fn register(
@@ -176,6 +177,7 @@ async fn register(
         (status = OK, body = UserResponse, headers(("set-cookie" = String, description = "`bj_session`, HttpOnly, 30 days"))),
         (status = UNAUTHORIZED, description = "Unknown email, wrong password or Google-only account", body = ErrorEnvelope),
         (status = FORBIDDEN, description = "`email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute", body = ErrorEnvelope),
+        Busy,
     )
 )]
 async fn login(

@@ -63,6 +63,29 @@ describe("LoginPage", () => {
     );
   });
 
+  it("says to wait when there were too many attempts", async () => {
+    const tooMany = {
+      status: 429,
+      body: {
+        error: {
+          code: "too_many_requests",
+          message: "too many attempts, try again in a minute",
+        },
+      },
+    };
+    mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "POST /api/auth/login": tooMany,
+    });
+    renderApp("/login");
+
+    await fillAndSubmit("lilg@example.com", "correct horse");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Too many attempts. Wait a minute and try again.",
+    );
+  });
+
   it("never sends people off-site after login", async () => {
     mockApi({
       "GET /api/auth/me": LOGGED_OUT,

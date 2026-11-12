@@ -1,7 +1,8 @@
-// Open Graph tags for a jam page (ARCHITECTURE §9): the SPA can't give crawlers per-page
-// <meta>, so the Worker adds them to index.html. Pure, so it is tested without a Worker.
+// The head of a jam page for crawlers (ARCHITECTURE §9): the SPA can't give them per-page
+// <meta>, so the Worker adds Open Graph tags, a description and Event structured data to
+// index.html. Pure, so it is tested without a Worker.
 
-/** The fields of `GET /api/events/{slug}` the tags use. */
+/** The fields of `GET /api/events/{slug}` the head uses. */
 export type JamSummary = {
   id: string;
   name: string;
@@ -9,8 +10,20 @@ export type JamSummary = {
   city: string;
   starts_on: string;
   ends_on: string;
-  /** The organiser's flyer at 540×675, null for the generated one. */
+  status?: string;
+  description?: string | null;
+  venue_name?: string | null;
+  address?: string | null;
+  /** ISO 3166-1 alpha-2. */
+  country?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  /** The organiser's flyer at 1080×1350, null for the generated one. */
+  flyer_url?: string | null;
+  /** The same flyer at 540×675. */
   flyer_card_url?: string | null;
+  /** Who runs it; null when the BreakingJam team entered it. */
+  organizer?: { id: string; display_name: string } | null;
 };
 
 const ENTITIES: Record<string, string> = {
@@ -45,6 +58,26 @@ export function shareTitle(jam: JamSummary): string {
   return `${jam.name} · ${jamDates(jam.starts_on, jam.ends_on)} · ${jam.city}`;
 }
 
+/** "1v1 Bboy · 2v2", or what a jam is when it has no battles yet. */
+function battleLine(battles: string[]): string {
+  return battles.length > 0 ? battles.join(" · ") : "A breaking jam";
+}
+
+/** The search snippet: when and where, then the battles, since the title has only the name. */
+export function jamDescription(jam: JamSummary, battles: string[]): string {
+  const dates = jamDates(jam.starts_on, jam.ends_on);
+  return `${dates} in ${jam.city}. ${battleLine(battles)} on BreakingJam.`;
+}
+
+function jamUrl(jam: JamSummary, origin: string): string {
+  return `${origin}/jams/${encodeURIComponent(jam.slug)}`;
+}
+
+/** The 1200×630 image rendered from the jam's generated flyer. */
+function generatedImage(jam: JamSummary, origin: string): string {
+  return `${origin}/api/events/${encodeURIComponent(jam.slug)}/og.png`;
+}
+
 /** The tags to append to <head>: title with dates and city, the battles, and the uploaded
  * flyer, else the 1200×630 share image. */
 export function openGraphTags(
@@ -52,18 +85,16 @@ export function openGraphTags(
   battles: string[],
   origin: string,
 ): string {
-  const slug = encodeURIComponent(jam.slug);
-  const url = `${origin}/jams/${slug}`;
-  const what = battles.length > 0 ? battles.join(" · ") : "A breaking jam";
+  const url = jamUrl(jam, origin);
   // The card size: small enough for every messenger's preview limit.
   const image: [string, string, string] = jam.flyer_card_url
     ? [jam.flyer_card_url, "540", "675"]
-    : [`${origin}/api/events/${slug}/og.png`, "1200", "630"];
+    : [generatedImage(jam, origin), "1200", "630"];
   const tags: [string, string][] = [
     ["og:type", "website"],
     ["og:site_name", "BreakingJam"],
     ["og:title", shareTitle(jam)],
-    ["og:description", `${what} on BreakingJam`],
+    ["og:description", `${battleLine(battles)} on BreakingJam`],
     ["og:url", url],
     ["og:image", image[0]],
     ["og:image:width", image[1]],
@@ -76,4 +107,45 @@ export function openGraphTags(
     return `<meta ${attribute}="${key}" content="${escapeHtml(content)}">`;
   });
   return [...meta, `<link rel="canonical" href="${escapeHtml(url)}">`].join("");
+}
+
+/** schema.org Event data, which lets search engines show the jam as an event with its date
+ * and place. Dates only: the times are wall-clock times that would need the zone's offset. */
+export function eventJsonLd(jam: JamSummary, origin: string): string {
+  const located = jam.lat != null && jam.lng != null;
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: jam.name,
+    url: jamUrl(jam, origin),
+    startDate: jam.starts_on,
+    endDate: jam.ends_on,
+    eventStatus: `https://schema.org/${jam.status === "cancelled" ? "EventCancelled" : "EventScheduled"}`,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: {
+      "@type": "Place",
+      name: jam.venue_name ?? jam.city,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: jam.address ?? undefined,
+        addressLocality: jam.city,
+        addressCountry: jam.country ?? undefined,
+      },
+      geo: located
+        ? { "@type": "GeoCoordinates", latitude: jam.lat, longitude: jam.lng }
+        : undefined,
+    },
+    image: [jam.flyer_url ?? generatedImage(jam, origin)],
+    description: jam.description ?? undefined,
+    organizer: jam.organizer
+      ? {
+          "@type": "Organization",
+          name: jam.organizer.display_name,
+          url: `${origin}/organizers/${encodeURIComponent(jam.organizer.id)}`,
+        }
+      : undefined,
+  };
+  // "</script>" in a jam's text would end the tag early: "<" becomes its JSON escape.
+  const json = JSON.stringify(data).replace(/</g, "\\u003c");
+  return `<script type="application/ld+json">${json}</script>`;
 }

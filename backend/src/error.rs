@@ -2,7 +2,7 @@
 
 use axum::{
     Json,
-    http::StatusCode,
+    http::{StatusCode, header::RETRY_AFTER},
     response::{IntoResponse, Response},
 };
 use serde::Serialize;
@@ -30,6 +30,9 @@ pub enum AppError {
     /// 409: a uniqueness rule or a status transition was violated.
     #[error("{0}")]
     Conflict(String),
+    /// 503: too much heavy work (password hashes, share images) already waits; retry shortly.
+    #[error("busy, try again in a moment")]
+    Busy,
     /// 500: anything unexpected; logged, never shown to the client.
     #[error(transparent)]
     Internal(#[from] anyhow::Error),
@@ -77,6 +80,14 @@ pub struct NotJamWriter(pub ErrorEnvelope);
 )]
 pub struct JamOver(pub ErrorEnvelope);
 
+/// 503 of the routes that hash a password or render an image.
+#[derive(IntoResponses)]
+#[response(
+    status = 503,
+    description = "`busy`: too many of these requests already wait; retry after `Retry-After` seconds"
+)]
+pub struct Busy(pub ErrorEnvelope);
+
 /// One invalid input field.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct FieldError {
@@ -96,8 +107,8 @@ pub struct ErrorEnvelope {
 /// What went wrong; `fields` only for validation errors.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ErrorBody {
-    /// `not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`
-    /// or `internal`.
+    /// `not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`,
+    /// `busy` or `internal`.
     pub code: &'static str,
     /// Human-readable; generic for `internal`.
     pub message: String,
@@ -151,6 +162,7 @@ impl AppError {
             Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
             Self::EmailUnverified => (StatusCode::FORBIDDEN, "email_unverified"),
             Self::Conflict(_) => (StatusCode::CONFLICT, "conflict"),
+            Self::Busy => (StatusCode::SERVICE_UNAVAILABLE, "busy"),
             Self::Internal(_) => (StatusCode::INTERNAL_SERVER_ERROR, "internal"),
         }
     }
@@ -166,6 +178,8 @@ impl IntoResponse for AppError {
             }
             other => other.to_string(),
         };
+        // The queue in front of heavy work empties within seconds.
+        let retry_after = matches!(self, Self::Busy).then_some([(RETRY_AFTER, "2")]);
         let fields = match self {
             Self::Validation(fields) => fields,
             _ => Vec::new(),
@@ -177,7 +191,7 @@ impl IntoResponse for AppError {
                 fields,
             },
         };
-        (status, Json(body)).into_response()
+        (status, retry_after, Json(body)).into_response()
     }
 }
 

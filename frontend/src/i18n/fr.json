@@ -81,6 +81,7 @@
       "invalidCredentials": "E-mail ou mot de passe incorrect.",
       "emailTaken": "Cet e-mail a déjà un compte. Connectez-vous plutôt.",
       "google": "La connexion Google n’a pas fonctionné. Réessayez ou utilisez votre e-mail.",
+      "tooMany": "Trop de tentatives. Attendez une minute et réessayez.",
       "generic": "Une erreur s’est produite. Réessayez."
     },
     "code": {

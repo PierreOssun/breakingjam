@@ -79,6 +79,7 @@ breakingjam/
 │   │   ├── config.rs           # env → Config
 │   │   ├── error.rs            # AppError + IntoResponse
 │   │   ├── state.rs            # AppState { pool, config, ... }
+│   │   ├── slots.rs            # bounded queue in front of CPU-heavy work (password hashes, share images)
 │   │   ├── openapi.rs          # utoipa ApiDoc: info, tags, session security scheme
 │   │   ├── auth/               # password, google oauth, session extractor
 │   │   ├── domain/             # types + invariants, no sqlx
@@ -100,7 +101,7 @@ breakingjam/
     │   ├── features/           # events/, dancers/, crews/, map/, auth/
     │   └── lib/
     ├── tests/                  # Vitest, mirroring src/ (M13)
-    └── public/                 # _headers, robots.txt, logo icons and site.webmanifest (DESIGN.md §10)
+    └── public/                 # _headers, robots.txt, og-image.png, logo icons and site.webmanifest (DESIGN.md §10)
 ├── deploy/                     # Cloudflare Worker, wrangler.jsonc, deploy guide (M13)
 ```
 
@@ -488,8 +489,8 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 ## 5. Backend
 
 ### Error handling
-- `AppError` enum in `error.rs`: `NotFound`, `Validation(Vec<FieldError>)`, `Unauthorized`, `Forbidden`, `Conflict(String)`, `Internal(anyhow::Error)`.
-- `impl IntoResponse for AppError` → JSON body `{ "error": { "code": "not_found", "message": "...", "fields": [...] } }` with the matching HTTP status. Internal errors are logged with `tracing::error!` and return a generic message.
+- `AppError` enum in `error.rs`: `NotFound`, `Validation(Vec<FieldError>)`, `Unauthorized`, `Forbidden`, `Conflict(String)`, `Busy`, `Internal(anyhow::Error)`.
+- `impl IntoResponse for AppError` → JSON body `{ "error": { "code": "not_found", "message": "...", "fields": [...] } }` with the matching HTTP status. Internal errors are logged with `tracing::error!` and return a generic message. `Busy` is a 503 `busy` with `Retry-After: 2`.
 - `From<sqlx::Error>` maps `RowNotFound` → `NotFound`, unique violations → `Conflict`, rest → `Internal`.
 
 ### Handlers
@@ -502,6 +503,7 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 
 ### Auth
 - Password hashing: `argon2` (Argon2id, default params) keyed with the site's pepper, `PASSWORD_PEPPER` (a Worker secret, never in the database; M27). The browser sends the plain password over HTTPS.
+- Flood control: a hash takes 19 MiB and a CPU slice, so two run at once and at most 30 wait (`slots.rs`); past that, login, register and reset answer 503 `busy` at once instead of queueing without end, and a request that hangs up gives its place back. The share image (`og.png`) is bounded the same way. In front of that, the Worker counts the three routes that hash, `POST /api/auth/login`, `/register` and `/password/reset` (§9): 60 a minute per IP address and 10 a minute per email, else 429 `too_many_requests` with `Retry-After: 60`, which the auth forms show as "Too many attempts. Wait a minute and try again." Verifying and resending codes are not counted there: they hash nothing and have the limits above. The limits are Cloudflare's rate-limit bindings: approximate, and counted per Cloudflare location. Without the Worker (local development) only the queue bound applies.
 - Email codes (M27): 6 digits from the OS's secure generator, 15 minutes, 5 tries (each try counted in the same statement that compares, so parallel guesses can't skip the count), one new code a minute per account and purpose, and at most 10 a day (so 50 guesses a day, and no email flood). The email goes out in a background task, in the language the frontend sends (en, fr, de). Register does not log in: `POST /auth/email/verify` does. A reset also confirms the email, as the code proves who reads it. A code that confirms an email also unlinks a Google account linked before anyone proved the address (the reverse of `link_google`). Google sign-in needs no code.
 - Sessions: `sessions` table, cookie `bj_session` (HttpOnly, Secure, SameSite=Lax, 30-day expiry, rolling). Session id is a UUIDv4 (random, not v7).
 - Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `RequireRole(Organizer)` helper. Roles are ordered `user < organizer < seed_admin < admin < super_admin`; a check for a role passes for any higher role. The role is read on every request, so a change takes effect at once.
@@ -538,6 +540,7 @@ GET    /api/auth/google                  → redirect
 GET    /api/auth/google/callback
 
 GET    /api/stats                        public counts for the landing page: past battles, dancers, upcoming battles and their countries
+GET    /api/sitemap.xml                  public: the sitemaps.org list of the site's pages, public jams (by slug), live dancer pages and `organizer`+ accounts with a public jam of their own, with lastmod; the Worker serves it at /sitemap.xml
 GET    /api/results                      public: the 3 announced jams that ended last with a battle winner, latest first, each with its battle count, videos flag and first two winners
 GET    /api/geo                          {country}: the visitor's ISO 3166-1 alpha-2 country from the `cf-ipcountry` header (set by the Worker), null when unknown
 GET    /api/places                       ?q=   {place: {name, country, lat, lng, population} | null}: the city a search names, case and accents aside; an exact name or alternate name first (own names before alternates), then a prefix; when several match, one with a public jam within about 25 km, then the most populated; no lookup under 3 letters, no prefix under 4 nor of a name more than twice as long; under 50,000 people only the place's own name finds it; codes like "ZRH" are no names (M22)
@@ -717,7 +720,9 @@ Seed script: `cargo run --bin seed` inserts an `admin`, a `seed_admin` user ("Br
 - **Domain**: `breakingjam.com` on Cloudflare DNS. One Worker per target (`deploy/`) serves the site at the apex and the API same-origin under `/api/*` (session cookies stay first-party; no CORS in prod). `www` redirects to the apex with a zone Redirect Rule.
 - **Frontend**: Workers static assets from `frontend/dist` with the SPA fallback, not Cloudflare Pages (Cloudflare's current recommendation; one Worker, one deploy). Built with `VITE_API_URL` empty (same origin). `frontend/public/_headers` sets CSP, HSTS and the immutable cache for `/assets/*`.
 - **Visitor country**: the Worker sets `cf-ipcountry` on every `/api/*` request from `request.cf.country`, replacing any value the client sent; `GET /api/geo` reads it for the map's first view.
-- **Open Graph**: the Worker runs first for `/jams/{slug}`, reads the jam from the API as an anonymous visitor (drafts stay hidden) and appends `og:*` tags to `index.html` with HTMLRewriter: the title "<Jam> · <Wed 4 Nov> · <City>", the battle names + "on BreakingJam" (read from `/api/events/{id}/battles`), and the uploaded flyer at card size, else `/api/events/{slug}/og.png` (M21).
+- **Open Graph**: the Worker runs first for `/jams/{slug}`, reads the jam from the API as an anonymous visitor (drafts stay hidden) and appends `og:*` tags to `index.html` with HTMLRewriter: the title "<Jam> · <Wed 4 Nov> · <City>", the battle names + "on BreakingJam" (read from `/api/events/{id}/battles`), and the uploaded flyer at card size, else `/api/events/{slug}/og.png` (M21). It also replaces index.html's site-wide preview tags (`/og-image.png`, the default of every other page), sets the meta description to "<dates> in <City>. <battles> on BreakingJam.", and appends schema.org `Event` JSON-LD (dates, place, flyer, organiser; cancelled jams marked). A jam the API doesn't show anonymously (unknown slug or draft) answers 404, so search engines drop it; the app still renders it, and the 404 page marks itself `noindex` for every other unknown path.
+- **Sign-in limits**: the Worker refuses a login, sign-up or password reset over 60 a minute from one IP address (`cf-connecting-ip`, set by Cloudflare's edge) or over 10 a minute on one email, before it reaches the API: `ratelimits` bindings `AUTH_BY_IP` and `AUTH_BY_EMAIL` in `wrangler.jsonc`, with their own `namespace_id`s on UAT (§5 Auth). The address is checked first, so an address over its limit can't use up an email's tries. The email is read from a copy of the body, which must say its size and stay under 4 KB (else 413 `payload_too_large`), and is folded further than the API folds it (no whitespace, invisible characters, accents or case), so every spelling the API matches to one account shares one counter.
+- **Search engines**: `robots.txt` allows everything and names `/sitemap.xml`, which the Worker answers from `GET /api/sitemap.xml` and keeps in the edge cache for an hour, as it reads every public jam and dancer. One file holds up to 50,000 addresses: split it into an index before the site gets there.
 - **API**: `backend/Dockerfile` (multi-stage, `cargo-chef`, distroless) runs as a Cloudflare Container (GA April 2026, Workers Paid plan). The Worker passes its vars and secrets to it as environment variables and spreads requests over `API_INSTANCES` instances. Instances sleep after 30 minutes idle and wake in 1–3 s. They run in western Europe, next to Neon: the Worker creates them with the location hint `weur`, and `wrangler.jsonc` limits the containers to the `WEUR` region. Without that, an instance stays wherever its first request came from (the first UAT one ran in Los Angeles, about 0.5 s per query). The Dockerfile stays generic.
 - **DB**: Neon Postgres, reached **directly over TLS** with the API's own sqlx pool. Hyperdrive was the plan, but containers can't use it (cloudflare/containers#97, open as of October 2026). Migrations run from the deploy workflow with `sqlx migrate run` before the new containers roll out, so they must stay compatible with the API version still running. The API connects as `breakingjam_app` (rows only, no DDL); migrations use the owner role.
 - **Releases**: commits move `main` → `uat` → `prod` by fast-forward pushes. A push to `uat` or `prod` starts `.github/workflows/deploy.yml` in the GitHub environment of the same name (`prod` needs a reviewer): the full CI, the frontend build, a Neon snapshot branch, the migrations, `wrangler deploy` (Worker, assets, image), then a `/api/health` check. `wrangler rollback` returns to the previous Worker version.

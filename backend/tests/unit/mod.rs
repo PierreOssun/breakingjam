@@ -12,6 +12,7 @@ mod error;
 mod flyer;
 mod mail;
 mod media;
+mod slots;
 
 use chrono::{NaiveDate, Utc};
 use uuid::Uuid;

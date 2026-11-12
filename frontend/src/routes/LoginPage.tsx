@@ -8,7 +8,7 @@ import { api } from "../api/client";
 import { Button } from "../components/Button";
 import { TextField } from "../components/TextField";
 import { AuthShell } from "../features/auth/AuthShell";
-import { useMailLanguage } from "../features/auth/codes";
+import { authFailure, useMailLanguage } from "../features/auth/codes";
 import { GoogleSignIn } from "../features/auth/GoogleSignIn";
 import { afterSignUp, safeNext, withNext } from "../features/auth/safeNext";
 import { useLogIn } from "../features/auth/useMe";
@@ -55,7 +55,7 @@ export function LoginPage() {
       const message =
         response.status === 401
           ? t("auth.errors.invalidCredentials")
-          : t("auth.errors.generic");
+          : authFailure(t, response.status);
       setError("root", { message });
     } catch {
       setError("root", { message: t("auth.errors.generic") });

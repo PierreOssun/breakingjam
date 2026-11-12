@@ -9,7 +9,7 @@ import { Button } from "../components/Button";
 import { TextField } from "../components/TextField";
 import { splitFieldErrors } from "../lib/apiErrors";
 import { AuthShell } from "../features/auth/AuthShell";
-import { useMailLanguage } from "../features/auth/codes";
+import { authFailure, useMailLanguage } from "../features/auth/codes";
 import { GoogleSignIn } from "../features/auth/GoogleSignIn";
 import { afterSignUp, safeNext, withNext } from "../features/auth/safeNext";
 
@@ -69,7 +69,7 @@ export function RegisterPage() {
       ] as const);
       for (const [name, message] of fields) setError(name, { message });
       if (fields.length === 0)
-        setError("root", { message: t("auth.errors.generic") });
+        setError("root", { message: authFailure(t, response.status) });
     } catch {
       setError("root", { message: t("auth.errors.generic") });
     }

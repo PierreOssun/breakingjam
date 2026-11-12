@@ -28,7 +28,8 @@ use crate::state::AppState;
         (name = "geo", description = "Where the visitor is"),
         (name = "places", description = "The cities a search can name"),
         (name = "stats", description = "Public counts for the landing page"),
-        (name = "results", description = "The latest jams with battle winners")
+        (name = "results", description = "The latest jams with battle winners"),
+        (name = "sitemap", description = "Every public page, for search engines")
     )
 )]
 struct ApiDoc;

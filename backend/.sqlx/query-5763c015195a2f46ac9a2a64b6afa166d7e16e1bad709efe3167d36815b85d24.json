@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id::text as \"id!\" from app_users where email = 'org@example.com'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Text",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "5763c015195a2f46ac9a2a64b6afa166d7e16e1bad709efe3167d36815b85d24"
+}

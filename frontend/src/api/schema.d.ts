@@ -1049,6 +1049,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sitemap.xml": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The sitemap protocol's list of every public page, with when each last changed. */
+        get: operations["sitemap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1720,8 +1737,8 @@ export interface components {
         /** @description What went wrong; `fields` only for validation errors. */
         ErrorBody: {
             /**
-             * @description `not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`
-             *     or `internal`.
+             * @description `not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`,
+             *     `busy` or `internal`.
              */
             code: string;
             /** @description Human-readable; generic for `internal`. */
@@ -2888,6 +2905,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description `busy`: too many of these requests already wait; retry after `Retry-After` seconds */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
     login: {
@@ -2924,6 +2950,15 @@ export interface operations {
             };
             /** @description `email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `busy`: too many of these requests already wait; retry after `Retry-After` seconds */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3148,6 +3183,15 @@ export interface operations {
             };
             /** @description Wrong, expired or used-up code (field `code`), an unknown email, or a bad password */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `busy`: too many of these requests already wait; retry after `Retry-After` seconds */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3554,6 +3598,15 @@ export interface operations {
             };
             /** @description No such jam, or a draft you can't see */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `busy`: too many of these requests already wait; retry after `Retry-After` seconds */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6386,6 +6439,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlaceMatch"];
+                };
+            };
+        };
+    };
+    sitemap: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A sitemaps.org `urlset` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/xml": string;
+                };
+            };
+            /** @description Database unreachable */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };

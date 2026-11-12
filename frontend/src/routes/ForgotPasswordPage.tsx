@@ -10,6 +10,7 @@ import { TextField } from "../components/TextField";
 import { AuthShell, BackToLogin } from "../features/auth/AuthShell";
 import { CodeField } from "../features/auth/CodeField";
 import {
+  authFailure,
   codeSchema,
   showCodeErrors,
   useMailLanguage,
@@ -39,7 +40,7 @@ export function ForgotPasswordPage() {
     const { response } = await api
       .POST("/api/auth/password/forgot", { body: { email, language } })
       .catch(() => ({ response: undefined }));
-    setError(response?.ok ? undefined : t("auth.errors.generic"));
+    setError(response?.ok ? undefined : authFailure(t, response?.status));
     return Boolean(response?.ok);
   }
 
@@ -159,12 +160,13 @@ function ResetForm({
     // A banner from an earlier attempt no longer applies.
     onError(undefined);
     try {
-      const { data, error } = await api.POST("/api/auth/password/reset", {
-        body: { email, code, password },
-      });
+      const { data, error, response } = await api.POST(
+        "/api/auth/password/reset",
+        { body: { email, code, password } },
+      );
       if (data) return logIn(data);
       if (!showCodeErrors(setError, error, ["code", "password"], t))
-        onError(t("auth.errors.generic"));
+        onError(authFailure(t, response.status));
     } catch {
       onError(t("auth.errors.generic"));
     }

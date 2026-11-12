@@ -26,6 +26,12 @@ export function codeSchema(t: TFunction) {
     .regex(/^\d{6}$/, t("auth.code.invalid"));
 }
 
+/** What an auth form says when the API refused for a reason no field explains. */
+export function authFailure(t: TFunction, status: number | undefined): string {
+  // The Worker's limit on sign-in attempts per address and per email (ARCHITECTURE §9).
+  return status === 429 ? t("auth.errors.tooMany") : t("auth.errors.generic");
+}
+
 /**
  * Puts the API's field errors on the form, a wrong, expired or used-up code in the site's words;
  * false when it named no field.

@@ -31,7 +31,8 @@ use crate::{
         user::{Role, User},
     },
     error::{
-        AppError, ErrorEnvelope, InvalidCursor, InvalidFields, JamNotVisible, JamOver, Unauthorized,
+        AppError, Busy, ErrorEnvelope, InvalidCursor, InvalidFields, JamNotVisible, JamOver,
+        Unauthorized,
     },
     flyer::{self, FlyerOptions, FlyerText, Lang},
     state::AppState,
@@ -565,6 +566,7 @@ async fn flyer_svg(
     responses(
         (status = OK, description = "PNG, 1200×630", content_type = "image/png", body = Png),
         JamNotVisible,
+        Busy,
     )
 )]
 async fn og_png(

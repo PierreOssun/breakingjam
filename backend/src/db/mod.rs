@@ -11,6 +11,7 @@ pub mod events;
 pub mod organizers;
 pub mod places;
 pub mod sessions;
+pub mod sitemap;
 pub mod stats;
 pub mod users;
 

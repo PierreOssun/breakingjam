@@ -81,6 +81,7 @@
       "invalidCredentials": "E-Mail oder Passwort falsch.",
       "emailTaken": "Für diese E-Mail gibt es schon ein Konto. Melde dich stattdessen an.",
       "google": "Die Google-Anmeldung hat nicht geklappt. Versuch es nochmal oder nutze deine E-Mail.",
+      "tooMany": "Zu viele Versuche. Warte eine Minute und versuch es nochmal.",
       "generic": "Etwas ist schiefgelaufen. Versuch es nochmal."
     },
     "code": {

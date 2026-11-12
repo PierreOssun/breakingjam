@@ -70,3 +70,13 @@ async fn unique_violation_maps_to_conflict(pool: sqlx::PgPool) {
         other => panic!("expected Conflict, got {other:?}"),
     }
 }
+
+#[tokio::test]
+async fn busy_says_when_to_retry() {
+    let response = AppError::Busy.into_response();
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    assert_eq!(response.headers()["retry-after"], "2");
+    let body = response.into_body().collect().await.unwrap().to_bytes();
+    let body: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(body["error"]["code"], "busy");
+}

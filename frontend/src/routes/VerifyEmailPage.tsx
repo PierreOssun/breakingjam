@@ -10,6 +10,7 @@ import { TextField } from "../components/TextField";
 import { AuthShell, BackToLogin } from "../features/auth/AuthShell";
 import { CodeField } from "../features/auth/CodeField";
 import {
+  authFailure,
   codeSchema,
   RESEND_SECONDS,
   showCodeErrors,
@@ -51,12 +52,13 @@ export function VerifyEmailPage() {
 
   const onSubmit = handleSubmit(async (body) => {
     try {
-      const { data, error } = await api.POST("/api/auth/email/verify", {
-        body,
-      });
+      const { data, error, response } = await api.POST(
+        "/api/auth/email/verify",
+        { body },
+      );
       if (data) return logIn(data);
       if (!showCodeErrors(setError, error, ["email", "code"], t))
-        setError("root", { message: t("auth.errors.generic") });
+        setError("root", { message: authFailure(t, response.status) });
     } catch {
       setError("root", { message: t("auth.errors.generic") });
     }
@@ -73,7 +75,7 @@ export function VerifyEmailPage() {
       clearErrors("root");
       return true;
     }
-    setError("root", { message: t("auth.errors.generic") });
+    setError("root", { message: authFailure(t, response?.status) });
     return false;
   }
 

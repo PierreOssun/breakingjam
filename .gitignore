@@ -19,3 +19,4 @@ frontend/shots/
 .serena/
 
 .playwright-mcp
+deploy/RUNBOOK-first-prod-release.md

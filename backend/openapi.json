@@ -85,6 +85,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "`busy`: too many of these requests already wait; retry after `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -136,6 +146,16 @@
           },
           "403": {
             "description": "`email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`busy`: too many of these requests already wait; retry after `Retry-After` seconds",
             "content": {
               "application/json": {
                 "schema": {
@@ -436,6 +456,16 @@
           },
           "422": {
             "description": "Wrong, expired or used-up code (field `code`), an unknown email, or a bad password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`busy`: too many of these requests already wait; retry after `Retry-After` seconds",
             "content": {
               "application/json": {
                 "schema": {
@@ -1037,6 +1067,16 @@
           },
           "404": {
             "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`busy`: too many of these requests already wait; retry after `Retry-After` seconds",
             "content": {
               "application/json": {
                 "schema": {
@@ -4983,6 +5023,37 @@
           }
         }
       }
+    },
+    "/api/sitemap.xml": {
+      "get": {
+        "tags": [
+          "sitemap"
+        ],
+        "summary": "The sitemap protocol's list of every public page, with when each last changed.",
+        "operationId": "sitemap",
+        "responses": {
+          "200": {
+            "description": "A sitemaps.org `urlset`",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Database unreachable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6471,7 +6542,7 @@
         "properties": {
           "code": {
             "type": "string",
-            "description": "`not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`\nor `internal`."
+            "description": "`not_found`, `validation`, `unauthorized`, `forbidden`, `email_unverified`, `conflict`,\n`busy` or `internal`."
           },
           "message": {
             "type": "string",
@@ -9079,6 +9150,10 @@
     {
       "name": "results",
       "description": "The latest jams with battle winners"
+    },
+    {
+      "name": "sitemap",
+      "description": "Every public page, for search engines"
     }
   ]
 }

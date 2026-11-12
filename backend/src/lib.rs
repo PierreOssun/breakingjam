@@ -12,6 +12,7 @@ pub mod flyer;
 pub mod mail;
 pub mod media;
 pub mod openapi;
+pub mod slots;
 pub mod state;
 
 #[cfg(test)]

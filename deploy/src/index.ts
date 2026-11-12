@@ -2,9 +2,15 @@
 // assets, forwards /api/* to the Rust API running as a Cloudflare Container, gives jam
 // pages their Open Graph tags, stores the images the API uploads and sends its emails.
 import { Container, ContainerProxy } from "@cloudflare/containers";
+import { isAuthAttempt, refusal } from "./authLimit";
 import { FROM, MAIL_HOST, sendMail } from "./mail";
 import { MEDIA_STORE_HOST, storeMedia } from "./media";
-import { type JamSummary, openGraphTags } from "./openGraph";
+import {
+  eventJsonLd,
+  type JamSummary,
+  jamDescription,
+  openGraphTags,
+} from "./openGraph";
 
 /** Bindings and vars from wrangler.jsonc, and the secrets set with `wrangler secret put`. */
 export interface Env {
@@ -14,6 +20,10 @@ export interface Env {
   MEDIA: R2Bucket;
   /** Cloudflare Email Service: the sign-up and password codes (M27). */
   EMAIL: SendEmail;
+  /** Sign-in attempts a minute from one IP address. */
+  AUTH_BY_IP: RateLimit;
+  /** Sign-in attempts a minute on one email, from anywhere. */
+  AUTH_BY_EMAIL: RateLimit;
   /** `https://breakingjam.com`: the one public origin. */
   APP_BASE_URL: string;
   GOOGLE_REDIRECT_URL: string;
@@ -114,16 +124,34 @@ function asTestSite(response: Response) {
     .transform(marked);
 }
 
-/** The API, a jam page with its Open Graph tags, or a file of the built site. */
+/** The API, the sitemap, a jam page with its own head, or a file of the built site. */
 async function route(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   if (url.pathname.startsWith("/api/")) {
+    if (isAuthAttempt(request)) {
+      const refused = await refusal(request, env.AUTH_BY_IP, env.AUTH_BY_EMAIL);
+      if (refused) return refused;
+    }
     return api(env).fetch(withCountry(request));
   }
+  if (url.pathname === "/sitemap.xml") return sitemap(request, env);
   // The segment stays as the browser encoded it: decoding could throw on a malformed one.
   const jam = /^\/jams\/([^/]+)\/?$/.exec(url.pathname);
   if (jam?.[1]) return jamPage(request, env, jam[1]);
   return env.ASSETS.fetch(request);
+}
+
+/** The sitemap at the root, where search engines look for it. The API builds it from every
+ * public jam and dancer, so it is kept at the edge for the hour its `Cache-Control` allows. */
+async function sitemap(request: Request, env: Env): Promise<Response> {
+  const key = new Request(new URL("/sitemap.xml", request.url));
+  const cached = await caches.default.match(key);
+  if (cached) return cached;
+  const response = await api(env).fetch(
+    new Request(new URL("/api/sitemap.xml", request.url)),
+  );
+  if (response.ok) await caches.default.put(key, response.clone());
+  return response;
 }
 
 /** The request with the visitor's country (`GET /api/geo`), replacing any the client sent. */
@@ -136,30 +164,49 @@ function withCountry(request: Request) {
   return forwarded;
 }
 
-/** index.html with the jam's Open Graph tags; the plain page when the jam can't be read. */
+/** index.html with the jam's own head; a 404 for a jam nobody can see, so search engines
+ * drop it; the plain page when the jam can't be read. */
 async function jamPage(request: Request, env: Env, slug: string) {
   const [page, jam] = await Promise.all([
-    // The SPA fallback answers any path with index.html.
-    env.ASSETS.fetch(request),
+    // The SPA fallback answers any path with index.html. Asked without the browser's
+    // validators: a 304 would have no body to rewrite, or to send with a 404.
+    env.ASSETS.fetch(new Request(request.url, { method: request.method })),
     publicJam(request, env, slug),
   ]);
-  if (!jam || !page.headers.get("content-type")?.includes("text/html")) {
-    return page;
-  }
+  if (!page.headers.get("content-type")?.includes("text/html")) return page;
+  // The app still shows the page: its organiser sees their draft, others "Page not found".
+  if (jam === "missing")
+    return new Response(page.body, { status: 404, headers: page.headers });
+  if (!jam) return page;
   const battles = await publicBattles(request, env, jam.id);
   const origin = new URL(env.APP_BASE_URL).origin;
-  return new HTMLRewriter()
-    .on("title", {
-      element: (title) => {
-        title.setInnerContent(`${jam.name} · BreakingJam`);
-      },
-    })
-    .on("head", {
-      element: (head) => {
-        head.append(openGraphTags(jam, battles, origin), { html: true });
-      },
-    })
-    .transform(page);
+  return (
+    new HTMLRewriter()
+      .on("title", {
+        element: (title) => {
+          title.setInnerContent(`${jam.name} · BreakingJam`);
+        },
+      })
+      .on('meta[name="description"]', {
+        element: (meta) => {
+          meta.setAttribute("content", jamDescription(jam, battles));
+        },
+      })
+      // index.html's site-wide preview, replaced by the jam's own below.
+      .on('meta[property^="og:"], meta[name^="twitter:"]', {
+        element: (meta) => {
+          meta.remove();
+        },
+      })
+      .on("head", {
+        element: (head) => {
+          const tags =
+            openGraphTags(jam, battles, origin) + eventJsonLd(jam, origin);
+          head.append(tags, { html: true });
+        },
+      })
+      .transform(page)
+  );
 }
 
 /** The jam's battle names in display order; none when the API can't say. */
@@ -180,17 +227,19 @@ async function publicBattles(
   }
 }
 
-/** The jam as an anonymous visitor sees it: null for drafts, unknown slugs or an API error. */
+/** The jam as an anonymous visitor sees it: "missing" for drafts and unknown slugs, null when
+ * the API can't say. */
 async function publicJam(
   request: Request,
   env: Env,
   slug: string,
-): Promise<JamSummary | null> {
+): Promise<JamSummary | "missing" | null> {
   try {
     const path = `/api/events/${slug}`;
     const response = await api(env).fetch(
       new Request(new URL(path, request.url)),
     );
+    if (response.status === 404) return "missing";
     return response.ok ? ((await response.json()) as JamSummary) : null;
   } catch {
     return null;

@@ -17,7 +17,7 @@ use crate::{
     auth::password,
     db,
     domain::user::{CodePurpose, User, random_code},
-    error::{AppError, InvalidFields},
+    error::{AppError, Busy, InvalidFields},
     mail::{Language, Message},
     state::AppState,
 };
@@ -153,6 +153,7 @@ async fn forgot_password(
     responses(
         (status = OK, body = UserResponse, headers(("set-cookie" = String, description = "`bj_session`, HttpOnly, 30 days"))),
         (status = UNPROCESSABLE_ENTITY, description = "Wrong, expired or used-up code (field `code`), an unknown email, or a bad password", body = crate::error::ErrorEnvelope),
+        Busy,
     )
 )]
 async fn reset_password(

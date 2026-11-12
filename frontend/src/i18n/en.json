@@ -81,6 +81,7 @@
       "invalidCredentials": "Wrong email or password.",
       "emailTaken": "This email already has an account. Log in instead.",
       "google": "Google sign-in didn’t work. Try again or use your email.",
+      "tooMany": "Too many attempts. Wait a minute and try again.",
       "generic": "Something went wrong. Try again."
     },
     "code": {
