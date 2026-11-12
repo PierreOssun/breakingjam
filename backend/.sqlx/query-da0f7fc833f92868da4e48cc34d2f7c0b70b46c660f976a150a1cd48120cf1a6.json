@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update email_codes set day_started_at = now() - interval '25 hours'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "da0f7fc833f92868da4e48cc34d2f7c0b70b46c660f976a150a1cd48120cf1a6"
+}

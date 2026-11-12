@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into crews (id, name) values ($1, 'Crew')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "47c8419c3e2931ab67d5b1ec163c93b5e25260cffabfbf97a7a6edd86bbf89c1"
+}

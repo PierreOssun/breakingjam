@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into entry_members (entry_id, dancer_id) select $1, unnest($2::uuid[])",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "UuidArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e8b1970b888167e19788e28dbffb5c0ce23beb36f87e779423c7334caaa79bd6"
+}

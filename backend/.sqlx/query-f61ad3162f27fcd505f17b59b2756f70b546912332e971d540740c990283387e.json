@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select data_key as \"key!\", coalesce(merged_into_id, id) as \"id!\"\n           from dancers where data_key is not null",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key!",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "data_key"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "id!",
+        "type_info": "Uuid",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true,
+      null
+    ]
+  },
+  "hash": "f61ad3162f27fcd505f17b59b2756f70b546912332e971d540740c990283387e"
+}

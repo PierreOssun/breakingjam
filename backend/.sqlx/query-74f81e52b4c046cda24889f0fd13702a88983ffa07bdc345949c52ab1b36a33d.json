@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into crew_memberships (dancer_id, crew_id, since) values ($1, $2, null)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "74f81e52b4c046cda24889f0fd13702a88983ffa07bdc345949c52ab1b36a33d"
+}

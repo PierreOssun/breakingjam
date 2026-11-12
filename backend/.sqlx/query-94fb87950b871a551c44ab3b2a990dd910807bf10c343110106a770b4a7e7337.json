@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into event_staff (event_id, dancer_id, role) values ($1, $2, $3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        {
+          "Custom": {
+            "name": "staff_role",
+            "kind": {
+              "Enum": [
+                "judge",
+                "dj",
+                "mc",
+                "organizer",
+                "other"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "94fb87950b871a551c44ab3b2a990dd910807bf10c343110106a770b4a7e7337"
+}

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into dancer_claims (id, dancer_id, user_id, code, status)\n             values ($1, $2, $3, 'BJ-TEST', $4::text::claim_status)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4019bd67a5fc36e55f486f123dac691fc4c410606133875358f1954fcd0c3c04"
+}

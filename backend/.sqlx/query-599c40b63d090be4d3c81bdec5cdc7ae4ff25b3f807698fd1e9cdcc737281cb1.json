@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select count(*) as \"count!\" from entries\n           where battle_id = $1 and status <> 'withdrawn' and ($2::uuid is null or id <> $2)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "599c40b63d090be4d3c81bdec5cdc7ae4ff25b3f807698fd1e9cdcc737281cb1"
+}

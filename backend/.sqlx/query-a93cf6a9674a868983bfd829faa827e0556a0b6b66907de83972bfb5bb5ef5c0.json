@@ -1,0 +1,78 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select e.id as event_id, u.id, u.display_name, u.instagram_handle,\n                  u.verified_at is not null as \"verified!\",\n                  (select count(*) from events o\n                   where o.organizer_id = u.id and o.deleted_at is null and not o.entered_by_team\n                     and o.status not in ('draft', 'in_review')) as \"jams!\"\n           from events e join app_users u on u.id = e.organizer_id\n           where e.id = any($1) and not e.entered_by_team",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "event_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "display_name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "verified!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 5,
+        "name": "jams!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      null,
+      null
+    ]
+  },
+  "hash": "a93cf6a9674a868983bfd829faa827e0556a0b6b66907de83972bfb5bb5ef5c0"
+}

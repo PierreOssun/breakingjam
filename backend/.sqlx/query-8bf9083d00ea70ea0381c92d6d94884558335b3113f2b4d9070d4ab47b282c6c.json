@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select exists(\n             select 1 from dancer_claims\n             where dancer_id = $1 and user_id <> $2 and status = 'pending'\n           ) as \"exists!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "8bf9083d00ea70ea0381c92d6d94884558335b3113f2b4d9070d4ab47b282c6c"
+}

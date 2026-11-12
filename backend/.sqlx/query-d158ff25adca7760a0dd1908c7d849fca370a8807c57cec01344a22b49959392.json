@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set last_seen_at = null",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "d158ff25adca7760a0dd1908c7d849fca370a8807c57cec01344a22b49959392"
+}

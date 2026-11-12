@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select dancer_id from dancer_claims where id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "dancer_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancer_claims",
+            "name": "dancer_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "bda4b4a50db9c7b6a59e9bed88bf605d15d9298804d96c3dcd74dc39f5947616"
+}

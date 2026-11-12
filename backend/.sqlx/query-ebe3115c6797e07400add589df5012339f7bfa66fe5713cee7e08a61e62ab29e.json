@@ -1,0 +1,105 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set\n             display_name = btrim($2),\n             instagram_handle = nullif(lower(ltrim(btrim($3), '@')), ''),\n             country = $4, city = nullif(btrim($5), ''), bio = nullif(btrim($6), ''),\n             verified_at = case\n               when instagram_handle is not distinct from nullif(lower(ltrim(btrim($3), '@')), '')\n               then verified_at\n             end\n           where id = $1\n           returning id, display_name, instagram_handle, country, city,\n                     bio, verified_at",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "display_name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "city",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "city"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "bio",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "bio"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "verified_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "verified_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Bpchar",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "ebe3115c6797e07400add589df5012339f7bfa66fe5713cee7e08a61e62ab29e"
+}

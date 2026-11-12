@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "with session as (\n           update sessions set expires_at = now() + make_interval(days => $2) where id = $1\n           returning user_id\n         )\n         update app_users set last_seen_at = now() where id = (select user_id from session)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a55e25c3ca504f713164cc650be0af5e19ebe74abe5bb0e99392efff5bc1639a"
+}

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set user_id = $2, verified_at = now() where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ad5d7c487c85ecb5750f5070444defac8ddee316fd718fbb93f4d4287417b71d"
+}

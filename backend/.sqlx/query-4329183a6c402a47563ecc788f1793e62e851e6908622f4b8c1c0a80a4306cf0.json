@@ -1,0 +1,57 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select name, status::text as \"status!\", lat, lng from events",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "status!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "lat",
+        "type_info": "Float8",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "lat"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "lng",
+        "type_info": "Float8",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "lng"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      null,
+      true,
+      true
+    ]
+  },
+  "hash": "4329183a6c402a47563ecc788f1793e62e851e6908622f4b8c1c0a80a4306cf0"
+}

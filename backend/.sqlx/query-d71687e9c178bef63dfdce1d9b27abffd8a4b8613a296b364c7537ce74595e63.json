@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update entries\n             set final_rank = $1, status = $2::text::entry_status, video_url = $3,\n                 reached = case $1::int when 1 then 'winner' when 2 then 'top2' else 'na' end\n                           ::bracket_stage\n             where id = $4::text::uuid",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d71687e9c178bef63dfdce1d9b27abffd8a4b8613a296b364c7537ce74595e63"
+}

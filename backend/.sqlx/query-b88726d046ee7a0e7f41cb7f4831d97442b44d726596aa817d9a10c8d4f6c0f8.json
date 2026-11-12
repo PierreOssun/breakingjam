@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into crew_memberships (dancer_id, crew_id) values ($1, $2) on conflict do nothing",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b88726d046ee7a0e7f41cb7f4831d97442b44d726596aa817d9a10c8d4f6c0f8"
+}

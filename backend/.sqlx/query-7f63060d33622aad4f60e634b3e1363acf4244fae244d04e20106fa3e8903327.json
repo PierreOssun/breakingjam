@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select exists(select 1 from app_users where email = $1) as \"seeded!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "seeded!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        {
+          "Custom": {
+            "name": "citext",
+            "kind": "Simple"
+          }
+        }
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "7f63060d33622aad4f60e634b3e1363acf4244fae244d04e20106fa3e8903327"
+}

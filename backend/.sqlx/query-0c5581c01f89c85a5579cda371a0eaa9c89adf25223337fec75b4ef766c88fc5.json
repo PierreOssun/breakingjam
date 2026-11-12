@@ -1,0 +1,168 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select c.id as \"id!\", c.status as \"status!: ClaimStatus\", c.decided_at as \"decided_at!\",\n                  c.admin_email, c.user_id as \"user_id!\", u.email::text as \"email!\",\n                  u.display_name as \"display_name!\", c.instagram_handle,\n                  d.id as \"dancer_id?\", d.dancer_name as \"dancer_name?\", d.country as \"country?\",\n                  d.country2, d.avatar_url, d.avatar,\n                  d.deleted_at is not null as \"deleted?\"\n           from (\n             select c.id, c.status, coalesce(c.reviewed_at, c.created_at) as decided_at,\n                    a.email::text as admin_email, c.user_id, c.dancer_id,\n                    d.instagram_handle\n             from dancer_claims c\n             join dancers d on d.id = c.dancer_id\n             left join app_users a on a.id = c.reviewed_by\n             where c.status <> 'pending'\n             union all\n             select c.id, c.status, coalesce(c.reviewed_at, c.created_at),\n                    a.email::text, c.user_id, null, c.instagram_handle\n             from organizer_claims c\n             left join app_users a on a.id = c.reviewed_by\n             where c.status <> 'pending'\n           ) c\n           join app_users u on u.id = c.user_id\n           left join dancers d on d.id = c.dancer_id\n           order by c.decided_at desc, c.id desc\n           limit $1 offset $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "status!: ClaimStatus",
+        "type_info": {
+          "Custom": {
+            "name": "claim_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        },
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "decided_at!",
+        "type_info": "Timestamptz",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "admin_email",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 4,
+        "name": "user_id!",
+        "type_info": "Uuid",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 5,
+        "name": "email!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 6,
+        "name": "display_name!",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "display_name"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 8,
+        "name": "dancer_id?",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "dancer_name?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "dancer_name"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "country?",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "country2",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country2"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "avatar_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar_url"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "avatar",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "deleted?",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      false,
+      null,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "0c5581c01f89c85a5579cda371a0eaa9c89adf25223337fec75b4ef766c88fc5"
+}

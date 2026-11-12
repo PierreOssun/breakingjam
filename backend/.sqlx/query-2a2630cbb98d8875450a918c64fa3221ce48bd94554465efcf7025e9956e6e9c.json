@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into entries (id, battle_id, status, video_url)\n         select gen_random_uuid(), id, $3::text::entry_status, $2\n         from battles where event_id = $1::text::uuid order by position limit 1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2a2630cbb98d8875450a918c64fa3221ce48bd94554465efcf7025e9956e6e9c"
+}

@@ -1,0 +1,111 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, user_id, instagram_handle, code, status as \"status: ClaimStatus\",\n                  reviewed_at, created_at\n           from organizer_claims where id = $1 for update",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "organizer_claims",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "organizer_claims",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "organizer_claims",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "code",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "organizer_claims",
+            "name": "code"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "status: ClaimStatus",
+        "type_info": {
+          "Custom": {
+            "name": "claim_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "organizer_claims",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "reviewed_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "organizer_claims",
+            "name": "reviewed_at"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "organizer_claims",
+            "name": "created_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "f0be938fac9bd4bb98c2f54501ed04c2a67b8beb8750dab248522eb835d699d4"
+}

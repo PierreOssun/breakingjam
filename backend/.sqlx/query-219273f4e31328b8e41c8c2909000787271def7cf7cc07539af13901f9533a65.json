@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set role = 'seed_admin' where email = $1::text::citext",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "219273f4e31328b8e41c8c2909000787271def7cf7cc07539af13901f9533a65"
+}

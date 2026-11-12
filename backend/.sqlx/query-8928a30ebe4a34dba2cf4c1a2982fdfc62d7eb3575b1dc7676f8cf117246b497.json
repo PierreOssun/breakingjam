@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update events set lat = 48.86 where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8928a30ebe4a34dba2cf4c1a2982fdfc62d7eb3575b1dc7676f8cf117246b497"
+}

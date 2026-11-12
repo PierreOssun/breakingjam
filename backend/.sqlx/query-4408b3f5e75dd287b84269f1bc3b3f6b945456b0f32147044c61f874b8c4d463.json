@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into event_staff (event_id, dancer_id, role) values ($1, $2, $3) on conflict do nothing",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        {
+          "Custom": {
+            "name": "staff_role",
+            "kind": {
+              "Enum": [
+                "judge",
+                "dj",
+                "mc",
+                "organizer",
+                "other"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4408b3f5e75dd287b84269f1bc3b3f6b945456b0f32147044c61f874b8c4d463"
+}

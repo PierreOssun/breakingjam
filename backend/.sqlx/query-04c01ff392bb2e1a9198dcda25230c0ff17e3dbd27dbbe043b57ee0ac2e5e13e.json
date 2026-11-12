@@ -1,0 +1,102 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, name, country, city, instagram_handle, created_at, updated_at\n         from crews\n         where deleted_at is null and ($1::text is null or name ilike $1)\n         order by lower(name), id\n         limit $2 offset $3",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "city",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "city"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "crews",
+            "name": "updated_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "04c01ff392bb2e1a9198dcda25230c0ff17e3dbd27dbbe043b57ee0ac2e5e13e"
+}

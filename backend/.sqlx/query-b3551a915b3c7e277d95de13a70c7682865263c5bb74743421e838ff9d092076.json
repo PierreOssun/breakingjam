@@ -1,0 +1,86 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set role = coalesce($2, case\n             when exists(select 1 from events where organizer_id = $1 and deleted_at is null)\n             then 'organizer'::user_role else 'user'::user_role end)\n           where id = $1\n           returning id, email::text as \"email!\", display_name, role as \"role: Role\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "email!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "display_name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "role: Role",
+        "type_info": {
+          "Custom": {
+            "name": "user_role",
+            "kind": {
+              "Enum": [
+                "user",
+                "organizer",
+                "seed_admin",
+                "admin",
+                "super_admin"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "role"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "user_role",
+            "kind": {
+              "Enum": [
+                "user",
+                "organizer",
+                "seed_admin",
+                "admin",
+                "super_admin"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      false,
+      false
+    ]
+  },
+  "hash": "b3551a915b3c7e277d95de13a70c7682865263c5bb74743421e838ff9d092076"
+}

@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update email_codes set attempts = attempts + 1\n           where user_id = $1 and purpose = $2 and attempts < 5 and expires_at > now()\n           returning code = $3 as \"matched!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "matched!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "email_code_purpose",
+            "kind": {
+              "Enum": [
+                "verify_email",
+                "reset_password"
+              ]
+            }
+          }
+        },
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "177c2f31f13ea671dde637eabfd58115e219fc2630167c5555ae60220cef373b"
+}

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update organizer_claims set status = 'rejected', reviewed_at = now()\n           where user_id = $1 and status = 'pending'\n             and instagram_handle is distinct from $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "eb7567846aa7e4ec189e25aa90bf419896da9e5ddebbf4295c9c33dd294823f2"
+}

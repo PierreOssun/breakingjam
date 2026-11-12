@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set role = $2::text::user_role where email = $1::text::citext",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f4e60906914d273f365ff1a57b4602d00157d54f35bafb17f3eaf928aba59c00"
+}

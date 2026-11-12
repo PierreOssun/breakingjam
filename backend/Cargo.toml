@@ -1,0 +1,42 @@
+[package]
+name = "breakingjam"
+version = "0.1.0"
+edition = "2024"
+publish = false
+default-run = "breakingjam"
+
+[dependencies]
+anyhow = "1"
+argon2 = "0.6"
+axum = { version = "0.8", features = ["multipart"] }
+chrono = { version = "0.4", default-features = false, features = ["serde", "std"] }
+dotenvy = "0.15"
+oauth2 = { version = "5", default-features = false, features = ["reqwest", "rustls-tls"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+resvg = { version = "0.48", default-features = false, features = ["text"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha1 = "0.11"
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "uuid", "chrono", "json"] }
+thiserror = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal", "sync"] }
+toml = { version = "1", default-features = false, features = ["std", "parse", "serde"] }
+tower-http = { version = "0.6", features = ["trace", "request-id"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+unicode-normalization = "0.1"
+url = "2"
+utoipa = { version = "6", features = ["chrono", "uuid", "preserve_order", "preserve_path_order"] }
+utoipa-axum = "0.3"
+utoipa-swagger-ui = { version = "10", features = ["axum", "vendored"], optional = true }
+uuid = { version = "1", features = ["serde", "v4", "v7"] }
+validator = { version = "0.21", features = ["derive"] }
+
+[features]
+# Serves Swagger UI at /api/docs; a dev tool, so off in tests and the image (clippy still checks it).
+swagger = ["dep:utoipa-swagger-ui"]
+
+[dev-dependencies]
+http-body-util = "0.1"
+tokio = { version = "1", features = ["time"] }
+tower = { version = "0.5", features = ["util"] }

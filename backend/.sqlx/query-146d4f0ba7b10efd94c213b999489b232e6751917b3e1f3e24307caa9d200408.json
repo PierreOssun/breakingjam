@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update event_staff s set dancer_id = $2\n         where dancer_id = $1\n           and not exists (select 1 from event_staff t\n                           where t.dancer_id = $2 and t.event_id = s.event_id and t.role = s.role)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "146d4f0ba7b10efd94c213b999489b232e6751917b3e1f3e24307caa9d200408"
+}

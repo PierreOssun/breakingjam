@@ -1,0 +1,91 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, email::text as \"email!\", display_name, role as \"role: Role\", password_hash,\n                  email_verified_at is not null as \"email_verified!\"\n           from app_users where email = $1::text::citext",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "email!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "display_name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "role: Role",
+        "type_info": {
+          "Custom": {
+            "name": "user_role",
+            "kind": {
+              "Enum": [
+                "user",
+                "organizer",
+                "seed_admin",
+                "admin",
+                "super_admin"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "role"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "password_hash",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "password_hash"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "email_verified!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      false,
+      false,
+      true,
+      null
+    ]
+  },
+  "hash": "63a272c9de2c021b9097df67fcb1887d60b3a1855456a7759bb5a09d6ae3d977"
+}

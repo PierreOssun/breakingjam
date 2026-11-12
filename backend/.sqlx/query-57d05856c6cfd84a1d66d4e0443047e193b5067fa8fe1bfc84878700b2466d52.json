@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancer_claims set status = 'rejected', reviewed_by = $3, reviewed_at = now()\n         where dancer_id = $1 and status = 'pending' and id <> $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "57d05856c6cfd84a1d66d4e0443047e193b5067fa8fe1bfc84878700b2466d52"
+}

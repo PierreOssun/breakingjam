@@ -1,0 +1,276 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, user_id, dancer_name, aliases, country, country2, city, bio,\n                  instagram_handle, instagram_hidden, source as \"source: DancerSource\", verified_at,\n                  avatar_url,\n                  avatar, titles as \"titles: Vec<DancerTitle>\",\n                  created_by, merged_into_id, created_at, updated_at\n           from dancers where id = $1 and deleted_at is null",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "dancer_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "dancer_name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "aliases",
+        "type_info": "TextArray",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "aliases"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "country2",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country2"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "city",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "city"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "bio",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "bio"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "instagram_hidden",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_hidden"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "source: DancerSource",
+        "type_info": {
+          "Custom": {
+            "name": "dancer_source",
+            "kind": {
+              "Enum": [
+                "seed",
+                "organizer",
+                "self"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "source"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "verified_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "verified_at"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "avatar_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar_url"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "avatar",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "titles: Vec<DancerTitle>",
+        "type_info": {
+          "Custom": {
+            "name": "dancer_title[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "dancer_title",
+                  "kind": {
+                    "Enum": [
+                      "bboy",
+                      "bgirl",
+                      "breaker",
+                      "dj",
+                      "mc",
+                      "judge"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "titles"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "created_by",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "created_by"
+          }
+        }
+      },
+      {
+        "ordinal": 16,
+        "name": "merged_into_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "merged_into_id"
+          }
+        }
+      },
+      {
+        "ordinal": 17,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "updated_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "updated_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "8cac24f7efdd732cc2b3db55fabfe8ac07f7c572479f5009c6ba8dc6336c78b0"
+}

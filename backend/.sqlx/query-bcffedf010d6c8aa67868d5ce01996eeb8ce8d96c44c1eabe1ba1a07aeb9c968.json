@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into battles (id, event_id, name, format, team_size, gender, age, age_min)\n         values ($1, $2, '1v1 Bboy', 'team', 1, 'bboy', 'adult', 18)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bcffedf010d6c8aa67868d5ce01996eeb8ce8d96c44c1eabe1ba1a07aeb9c968"
+}

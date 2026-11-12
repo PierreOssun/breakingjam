@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select d.dancer_name from event_staff s join dancers d on d.id = s.dancer_id where s.role = 'judge'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "dancer_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "dancer_name"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ad721133d15fa915faa7a1e8347c7e92a88457eb5d9e170cf174912d4b42076d"
+}

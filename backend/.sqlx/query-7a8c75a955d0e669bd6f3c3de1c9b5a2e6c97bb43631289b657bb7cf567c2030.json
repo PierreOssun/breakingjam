@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into event_staff (event_id, dancer_id, role)\n         select $1, d, r from unnest($2::uuid[], $3::staff_role[]) as t(d, r)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "UuidArray",
+        {
+          "Custom": {
+            "name": "staff_role[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "staff_role",
+                  "kind": {
+                    "Enum": [
+                      "judge",
+                      "dj",
+                      "mc",
+                      "organizer",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7a8c75a955d0e669bd6f3c3de1c9b5a2e6c97bb43631289b657bb7cf567c2030"
+}

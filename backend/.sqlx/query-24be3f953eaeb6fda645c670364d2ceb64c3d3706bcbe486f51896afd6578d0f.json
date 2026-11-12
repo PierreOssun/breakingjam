@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update events\n             set status = $1::text::event_status,\n                 starts_on = (now() at time zone 'Europe/Paris')::date + $2::int,\n                 ends_on = (now() at time zone 'Europe/Paris')::date + $2::int\n             where id = $3::text::uuid",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "24be3f953eaeb6fda645c670364d2ceb64c3d3706bcbe486f51896afd6578d0f"
+}

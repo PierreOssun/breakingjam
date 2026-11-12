@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id from app_users limit 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ef330b5ec4ce482d063a507ed23d56a4f4afb8bcf3fa79ed50e6a0643966b901"
+}

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set merged_into_id = $2 where merged_into_id = $1 or id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4901e9cd755ab45395491c3895e19fd7c14c8f74567e0864d62264609949fbd5"
+}
