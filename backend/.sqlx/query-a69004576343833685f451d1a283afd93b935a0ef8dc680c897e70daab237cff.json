@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "with expired as (\n           delete from sessions where user_id = $2 and expires_at < now()\n         ), session as (\n           insert into sessions (id, user_id, expires_at)\n           values ($1, $2, now() + make_interval(days => $3))\n           returning user_id\n         )\n         update app_users set last_seen_at = now() where id = (select user_id from session)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a69004576343833685f451d1a283afd93b935a0ef8dc680c897e70daab237cff"
+}
