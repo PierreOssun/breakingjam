@@ -53,4 +53,4 @@ lotus-mighty-max = { members = ["lotus", "mighty-max"] }
 lucky-titris = { members = ["lucky", "titris"] }
 nord-diamond-zeku = { members = ["zeku", "nord-diamond"] }
 nori-satoru = { members = ["nori", "satoru"] }
-pesto-zip-rock = { members = ["zip-rock", "pesto"] }
+pesto-zip-rock = { members = ["ziprock", "pesto"] }

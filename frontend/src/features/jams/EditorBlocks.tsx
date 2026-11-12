@@ -3,6 +3,7 @@ import {
   LinkSimple,
   TextAlignLeft,
 } from "@phosphor-icons/react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../components/Button";
 import { FormError } from "../../components/FormError";
@@ -34,6 +35,9 @@ export function DatesBlock({
   onClose,
 }: Pick<BlockProps, "draft" | "onClose"> & { focus: DateField }) {
   const { t } = useTranslation();
+  // About 400 names: not rebuilt on each keystroke in the block.
+  const zone = draft.values.timezone;
+  const zones = useMemo(() => timezones(zone), [zone]);
   return (
     <BlockCard
       id="dates"
@@ -72,7 +76,7 @@ export function DatesBlock({
         hint={t("org.fields.timezoneHint")}
         {...draft.field("timezone")}
       >
-        {timezones(draft.values.timezone).map((zone) => (
+        {zones.map((zone) => (
           <option key={zone} value={zone}>
             {zone.replaceAll("_", " ")}
           </option>

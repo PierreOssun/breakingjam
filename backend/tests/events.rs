@@ -193,15 +193,6 @@ async fn a_public_jam_that_never_had_a_place_keeps_saving(pool: PgPool) {
     assert_eq!(edited.status, StatusCode::OK, "{}", edited.json);
     let pinned = send(&app, put(&uri, jam("Old Jam"), Some(&owner))).await;
     assert_eq!(pinned.status, StatusCode::OK, "{}", pinned.json);
-
-    // Called off before it had a venue.
-    let bare = json!({ "name": "Bare", "starts_on": "2030-06-01", "ends_on": "2030-06-01",
-                       "timezone": "Europe/Paris" });
-    let cancelled = draft_id(&app, &owner, bare.clone()).await;
-    act(&app, &owner, &cancelled, "cancel").await;
-    let uri = format!("/api/events/{cancelled}");
-    let edited = send(&app, put(&uri, bare, Some(&owner))).await;
-    assert_eq!(edited.status, StatusCode::OK, "{}", edited.json);
 }
 
 #[sqlx::test]
@@ -524,6 +515,12 @@ async fn status_transitions_follow_the_machine(pool: PgPool) {
         StatusCode::NOT_FOUND,
         "someone else's draft does not exist for you"
     );
+    // A cancelled jam is public: a draft can't become one without its review.
+    let unseen = act(&app, &stranger, &other_id, "cancel").await;
+    assert_eq!(unseen.status, StatusCode::CONFLICT);
+    let hidden = send(&app, get(&format!("/api/events/{other_id}"), None)).await;
+    assert_eq!(hidden.status, StatusCode::NOT_FOUND);
+    publish(&pool, &other_id).await;
     assert_eq!(
         act(&app, &stranger, &other_id, "cancel").await.json["status"],
         "cancelled"
@@ -696,6 +693,7 @@ async fn flyer_speaks_the_page_language_and_shows_cancellation(pool: PgPool) {
     let app = app(pool.clone());
     let owner = sign_up(&app, &pool, "org@example.com").await;
     let id = draft_id(&app, &owner, jam("Jam")).await;
+    publish(&pool, &id).await;
     act(&app, &owner, &id, "cancel").await;
 
     let fr = text(
@@ -957,7 +955,7 @@ async fn the_jam_page_says_what_its_writer_may_do(pool: PgPool) {
     let draft = send(&app, get(&uri, Some(&owner))).await;
     assert_eq!(draft.json["phase"], "upcoming");
     assert_eq!(draft.json["can_edit"], true);
-    assert_eq!(draft.json["actions"], json!(["submit", "cancel"]));
+    assert_eq!(draft.json["actions"], json!(["submit"]));
 
     publish(&pool, &id).await;
     let visitor = send(&app, get(&uri, None)).await;

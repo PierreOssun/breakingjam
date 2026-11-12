@@ -48,5 +48,5 @@ kid-mario-killian = { members = ["kid-mario", "killian"] }
 liam-zealuss = { members = ["liam", "zealuss"] }
 lorenzo-rick-zhou = { members = ["rick-zhou", "lorenzo"] }
 madmax-wigor = { members = ["madmax", "wigor"] }
-mighty-jim-pesto = { members = ["pesto", "mighty-jim"] }
+mighty-jim-pesto = { members = ["pesto", "mighty-jimm"] }
 nova = { name = "Nova" }

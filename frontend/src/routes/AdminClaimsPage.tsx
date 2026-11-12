@@ -13,7 +13,7 @@ import { MoreList } from "../components/MoreList";
 import { MetaTag } from "../components/Tag";
 import { useToast } from "../components/useToast";
 import { ME_KEY } from "../features/auth/useMe";
-import { formatMoment } from "../lib/dates";
+import { formatMoment, localeOf } from "../lib/dates";
 import { BREAKINGJAM_INSTAGRAM } from "../lib/instagram";
 
 type Decision = "approve" | "reject";
@@ -253,7 +253,7 @@ function ClaimRow({ review, decide }: { review: Review; decide: DecideFn }) {
     },
     onError: (error) => toast({ kind: "error", message: error.message }),
   });
-  const requested = new Intl.DateTimeFormat(i18n.language, {
+  const requested = new Intl.DateTimeFormat(localeOf(i18n.language), {
     dateStyle: "medium",
   }).format(new Date(review.created_at));
 

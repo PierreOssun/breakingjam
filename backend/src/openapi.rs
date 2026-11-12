@@ -12,7 +12,7 @@ use crate::state::AppState;
 #[openapi(
     info(
         title = "BreakingJam API",
-        description = "The central place for breaking jams. Authenticated calls use the `bj_session` cookie set by register, login or Google sign-in."
+        description = "The central place for breaking jams. Authenticated calls use the `bj_session` cookie set by login, Google sign-in, or confirming an emailed code."
     ),
     modifiers(&SessionCookie),
     tags(

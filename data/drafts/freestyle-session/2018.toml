@@ -41,7 +41,7 @@ matches = [
   { round = "top16", a = "armani-sweepy", b = "furious-styles-crew", winner = "armani-sweepy", video = "https://youtu.be/vPtLASMhPSM" },
   { round = "top16", a = "boogie-burrito", b = "skitzo-flex", winner = "boogie-burrito", video = "https://youtu.be/8FZBIsqTKIY" },
   { round = "top16", a = "inox-jsmooth", b = "dsoul-fishboy", winner = "inox-jsmooth", video = "https://youtu.be/PsMBPShOXe8" },
-  { round = "top16", a = "artillery-hackerman", b = "renegades-crew", winner = "artillery-hackerman", video = "https://youtu.be/xIyHTqN3opA" },
+  { round = "top16", a = "artillery-hackerman", b = "renegades", winner = "artillery-hackerman", video = "https://youtu.be/xIyHTqN3opA" },
   { round = "top8", a = "artillery-hackerman", b = "greenteck-jrock", winner = "greenteck-jrock", video = "https://youtu.be/HiQKZqxpJNc" },
   { round = "top8", a = "boogie-burrito", b = "dnoi-soul", winner = "boogie-burrito", video = "https://youtu.be/rS5iAybUPbU" },
   { round = "top8", a = "armani-sweepy", b = "poppin-c-poppin-prince", winner = "poppin-c-poppin-prince", video = "https://youtu.be/0TreWKSHPlI" },
@@ -74,7 +74,7 @@ jenes-yuta = { members = ["jenes", "yuta"] }
 kosi-outrage = { members = ["outrage", "kosi"] }
 poppin-c-poppin-prince = { members = ["poppin-c", "poppin-prince"] }
 red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars" }
-renegades-crew = { crew = "renegades-crew" }
+renegades = { crew = "renegades" }
 robin-yan = { members = ["yan", "robin"] }
 skitzo-flex = { crew = "skitzo-flex" }
 weezy-the-phoenix = { crew = "weezy-the-phoenix" }

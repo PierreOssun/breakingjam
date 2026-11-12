@@ -504,8 +504,8 @@ const LOOK_STAGES: [&str; 4] = ["klein", "violet", "ink", "night"];
 /// The hoodie each stage would swallow (klein, violet, ink, night), as the frontend's seed avoids.
 const CLASHES: [u64; 4] = [1, 2, 0, 0];
 
-/// The avatar a bgirl or bboy battle suggests for a dancer nobody has drawn yet (DESIGN.md §4.16
-/// seeding): stable for the id; none for mixed battles, which say nothing about the dancer.
+/// The avatar of a dancer `data/` marks as a bboy or bgirl (DESIGN.md §4.16 seeding): stable
+/// for the id; none for mixed, which says nothing about the dancer.
 pub fn default_look(id: Uuid, gender: BattleGender) -> Option<Value> {
     // The random half of a UUIDv7.
     let mut seed = u64::from_le_bytes(id.as_bytes()[8..].try_into().ok()?);

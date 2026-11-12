@@ -9,7 +9,7 @@ lng = 19.1457
 sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCv8V_79zZ1RUlUNFbMDSPBg"]
 judges = ["kid-david", "menno", "ata", "lego", "roxrite"]
 mcs = ["mario-bee", "lil-pablo", "osto"]
-djs = ["lean-rock", "fleg", "renegade", "scream", "plash", "smirnoff", "felix"]
+djs = ["lean-rock", "dj-fleg", "renegade", "scream", "dj-plash-one", "dj-smirnoff", "felix"]
 
 [[battles]]
 key = "bboy"
@@ -42,7 +42,7 @@ bracket_size = 8
 matches = [
   { round = "top8", a = "melisa", b = "alessandrina", winner = "melisa", video = "https://youtu.be/GbeCby6BMGo" },
   { round = "top8", a = "bene", b = "jilou", winner = "jilou", video = "https://youtu.be/b_qwH3Nzx_c" },
-  { round = "top8", a = "terra", b = "queen-mary", winner = "terra", video = "https://youtu.be/e6kdfsCiXck" },
+  { round = "top8", a = "terra", b = "queen-marry", winner = "terra", video = "https://youtu.be/e6kdfsCiXck" },
   { round = "top8", a = "sunny", b = "zofia", winner = "sunny", video = "https://youtu.be/mz4dxXlK-c4" },
   { round = "top4", a = "sunny", b = "melisa", winner = "sunny", video = "https://youtu.be/G4yFQURa5qA" },
   { round = "top4", a = "terra", b = "jilou", winner = "terra", video = "https://youtu.be/m2BUag1u5-I" },
@@ -80,7 +80,7 @@ dead-prezz = { crew = "dead-prezz" }
 jims-onel = { members = ["jims", "onel"] }
 yarko-skunk = { members = ["yarko", "skunk"] }
 kleju-chuchu = { members = ["kleju", "chuchu"] }
-hulk-potter = { members = ["hulk", "potter"] }
+hulk-potter = { members = ["hulk", "poter"] }
 spin-manny = { members = ["spin", "manny"] }
 ufo-technics = { name = "Ufo Technics" }
 kodacho-friek = { members = ["kodacho", "friek"] }

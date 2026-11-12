@@ -21,8 +21,12 @@ fn transitions_follow_the_table() {
         Published.apply(CloseRegistration).unwrap(),
         RegistrationClosed
     );
-    for from in [Draft, InReview, Published, RegistrationClosed] {
+    for from in [Published, RegistrationClosed] {
         assert_eq!(from.apply(Cancel).unwrap(), Cancelled);
+    }
+    // A cancelled jam is public: one that never was would skip its review. It is deleted instead.
+    for from in [Draft, InReview, Cancelled] {
+        assert!(from.apply(Cancel).is_err(), "{from:?}");
     }
 }
 
@@ -245,12 +249,14 @@ fn actions_are_what_the_status_and_role_allow() {
     let organizer = user(Role::Organizer);
     let mut jam = bare_draft();
     jam.organizer_id = organizer.id;
-    assert_eq!(jam.actions(&organizer), [Submit, Cancel]);
-    assert_eq!(
-        jam.actions(&user(Role::SeedAdmin)),
-        [Submit, Publish, Cancel]
-    );
+    assert_eq!(jam.actions(&organizer), [Submit]);
+    assert_eq!(jam.actions(&user(Role::SeedAdmin)), [Submit, Publish]);
     assert!(jam.actions(&user(Role::Organizer)).is_empty(), "not theirs");
+    jam.status = InReview;
+    assert!(
+        jam.actions(&organizer).is_empty(),
+        "it waits for its review"
+    );
     jam.status = Published;
     assert_eq!(jam.actions(&organizer), [CloseRegistration, Cancel]);
     jam.status = Cancelled;

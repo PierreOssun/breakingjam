@@ -5,11 +5,14 @@ use uuid::Uuid;
 
 use crate::domain::user::{Role, User};
 
-/// Creates a session with a random (v4) id, valid for `ttl_days`; the account is seen now.
+/// Creates a session with a random (v4) id, valid for `ttl_days`, in place of the account's
+/// expired ones; the account is seen now.
 pub async fn create(pool: &PgPool, user_id: Uuid, ttl_days: i32) -> sqlx::Result<Uuid> {
     let id = Uuid::new_v4();
     sqlx::query!(
-        "with session as (
+        "with expired as (
+           delete from sessions where user_id = $2 and expires_at < now()
+         ), session as (
            insert into sessions (id, user_id, expires_at)
            values ($1, $2, now() + make_interval(days => $3))
            returning user_id

@@ -44,7 +44,7 @@ export function TestSiteBanner() {
         <IconButton
           label={t("testSite.close")}
           onClick={close}
-          className="text-on-primary! not-disabled:hover:bg-black/15!"
+          className="text-on-primary! not-disabled:hover:bg-[rgb(0_0_0/0.15)]!"
         >
           <X size={24} weight="bold" aria-hidden />
         </IconButton>

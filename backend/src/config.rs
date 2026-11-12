@@ -13,9 +13,9 @@ pub struct Config {
     pub database_url: String,
     /// TCP port the API listens on.
     pub app_port: u16,
-    /// Public base URL of the API, used to build absolute links.
+    /// Public address of the site, used to build absolute links to its pages.
     pub app_base_url: String,
-    /// Origin of the frontend, for CORS.
+    /// Where Google sign-in sends the browser back; the site's address in production.
     pub frontend_origin: String,
     /// Google OAuth client id.
     pub google_client_id: String,
@@ -29,6 +29,8 @@ pub struct Config {
     pub media_public_url: String,
     /// Where the API posts outgoing emails: the Worker's Email Service handler in production.
     pub mail_url: String,
+    /// The commit the running image was built from; none outside a deploy.
+    pub release: Option<String>,
     /// Site secret mixed into every password hash; changing it invalidates every password.
     pub password_pepper: Secret,
 }
@@ -94,6 +96,7 @@ impl Config {
             media_store_url: required("MEDIA_STORE_URL"),
             media_public_url: required("MEDIA_PUBLIC_URL"),
             mail_url: required("MAIL_URL"),
+            release: get("RELEASE"),
             password_pepper: Secret(required("PASSWORD_PEPPER")),
         };
 

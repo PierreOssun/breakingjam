@@ -18,7 +18,7 @@ import {
 type Entry = Schemas["Entry"];
 type Battle = Schemas["BattleDetail"];
 
-/** A battle's results by round (DESIGN.md §6 Battle results): the final, then each round. */
+/** A battle's results by round (DESIGN.md §6 Results by round): the final, then each round. */
 export function BattleResults({
   battle,
   results,

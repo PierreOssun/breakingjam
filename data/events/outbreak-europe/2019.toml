@@ -145,7 +145,7 @@ sisko-the-flaya = { members = ["sisko", "the-flaya"] }
 moa-shaymin = { members = ["shaymin", "moa"] }
 lion-roots-ukol = { members = ["ukol", "lion-roots"] }
 tawfiq-zoopreme = { members = ["tawfiq", "zoopreme"] }
-johnnyfox-xak = { members = ["xak", "johnnyfox"] }
+johnnyfox-xak = { members = ["xak", "johnny-fox"] }
 kate-madmax-2 = { members = ["madmax-2", "kate"] }
 stripes-vicious = { members = ["stripes", "vicious"] }
 

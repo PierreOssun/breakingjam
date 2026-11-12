@@ -74,7 +74,8 @@ export function JamPage() {
       </p>
     );
   if (!jam.data) return <NotFoundPage />;
-  return <JamDetail jam={jam.data} />;
+  // Keyed, so what one jam's page holds (an upload error, an open sheet) never shows on another.
+  return <JamDetail key={jam.data.id} jam={jam.data} />;
 }
 
 /** The jam page's shape while the jam loads (DESIGN.md §4.29): back bar, flyer, title, facts. */

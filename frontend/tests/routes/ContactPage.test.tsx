@@ -97,7 +97,7 @@ describe("ContactPage", () => {
     visit();
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Contactez-nous" }),
+      await screen.findByRole("heading", { level: 1, name: "Contacte-nous" }),
     ).toBeInTheDocument();
     expect(subjectOf(screen.getByRole("link", { name: /^Une idée/ }))).toBe(
       "Idée : ",

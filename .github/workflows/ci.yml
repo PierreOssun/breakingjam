@@ -4,8 +4,13 @@ on:
   pull_request:
   push:
     branches: [main]
-  # The deploy workflow runs the same checks first.
+  # The deploy workflow runs the same checks when this commit has no green run yet.
   workflow_call:
+    inputs:
+      skip_image:
+        description: Leave out the API image build; the deploy builds its own.
+        type: boolean
+        default: false
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -48,14 +53,14 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --all-targets --all-features -- -D warnings
       - run: cargo test
-      # Second run must only set the seed accounts' passwords again. Runs before `prepare --check`, which touches sources and would force a rebuild.
+      # Second run must only set the seed accounts' passwords again. Runs, like the data check, before `prepare --check`, which touches sources and would force a rebuild.
       - run: cargo run --bin seed && cargo run --bin seed
         env:
           SEED_PASSWORD: ci-only
           PASSWORD_PEPPER: ci-only
-      - run: cargo sqlx prepare --check -- --all-targets
       # The curated jams in data/ (data/README.md).
       - run: cargo run --bin data -- check
+      - run: cargo sqlx prepare --check -- --all-targets
 
   frontend:
     runs-on: ubuntu-latest
@@ -72,6 +77,7 @@ jobs:
       - run: npm ci
       # The committed TS types must match backend/openapi.json, which `cargo test` keeps in sync.
       - run: npx openapi-typescript ../backend/openapi.json -o src/api/schema.d.ts && git diff --exit-code -- src/api/schema.d.ts
+      - run: npx prettier --check .
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
@@ -95,6 +101,8 @@ jobs:
       - run: npm test
 
   docker:
+    # On a push or a pull request there is no input, which reads as false: it builds.
+    if: ${{ !inputs.skip_image }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

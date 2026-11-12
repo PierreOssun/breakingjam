@@ -6,7 +6,7 @@ import { IconButton } from "./IconButton";
 import { useModal } from "./useModal";
 
 /** The footer's primary button: what it says and what it does; Cancel beside it closes. */
-export type DialogAction = {
+type DialogAction = {
   label: string;
   /** The Cancel button's text when not "Cancel". */
   cancel?: string;

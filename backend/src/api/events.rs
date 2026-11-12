@@ -476,7 +476,7 @@ async fn delete(
     operation_id = "transition_event",
     params(
         ("id" = Uuid, Path, description = "Jam id"),
-        ("transition" = inline(Transition), Path, description = "`publish` is for `seed_admin`+; cancel is allowed from any status but cancelled"),
+        ("transition" = inline(Transition), Path, description = "`publish` is for `seed_admin`+; `cancel` only from a public status (published, registration closed)"),
     ),
     security(("session" = [])),
     responses(

@@ -27,7 +27,7 @@ bracket_size = 8
 matches = [
   { round = "top8", a = "amir", b = "jeffro", winner = "amir", video = "https://youtu.be/Ufe-nmkZwXI", at = 3070 },
   { round = "top8", a = "gravity", b = "issin", winner = "issin", video = "https://youtu.be/Ufe-nmkZwXI", at = 3600 },
-  { round = "top8", a = "lee", b = "hiro-10", winner = "lee", video = "https://youtu.be/Ufe-nmkZwXI", at = 4120 },
+  { round = "top8", a = "lee", b = "hiro10", winner = "lee", video = "https://youtu.be/Ufe-nmkZwXI", at = 4120 },
   { round = "top8", a = "menno", b = "hong-10", winner = "hong-10", video = "https://youtu.be/Ufe-nmkZwXI", at = 4620 },
   { round = "top4", a = "amir", b = "issin", winner = "amir", video = "https://youtu.be/Ufe-nmkZwXI", at = 6150 },
   { round = "top4", a = "lee", b = "hong-10", winner = "lee", video = "https://youtu.be/Ufe-nmkZwXI", at = 6730 },

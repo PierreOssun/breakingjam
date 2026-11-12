@@ -21,7 +21,7 @@ matches = [
   { round = "top16", a = "sonic", b = "kc", winner = "sonic", votes = [5, 0], video = "https://youtu.be/fwgUZ7BQe7w" },
   { round = "top16", a = "extremo", b = "omar", winner = "omar", votes = [0, 3], video = "https://youtu.be/YjIVtwK8XyM" },
   { round = "top16", a = "by", b = "lil-tim", winner = "by", votes = [5, 0] , video = "https://youtu.be/SgIqaCcKOaw" },
-  { round = "top16", a = "ronnie", b = "kousuke", winner = "ronnie", votes = [5, 0] , video = "https://youtu.be/x4we3VFBkcc" },
+  { round = "top16", a = "ronnie", b = "kosuke", winner = "ronnie", votes = [5, 0] , video = "https://youtu.be/x4we3VFBkcc" },
   { round = "top16", a = "eagle", b = "iron-monkey", winner = "iron-monkey", votes = [2, 3], video = "https://youtu.be/gmDr_TPdpg0" },
   { round = "top16", a = "wake-up", b = "wongo", winner = "wake-up", votes = [4, 0], video = "https://youtu.be/i00Nf8IpGJI" },
   { round = "top16", a = "junior", b = "nuno", winner = "junior", votes = [4, 0], video = "https://youtu.be/HMrRXHvmXU0" },

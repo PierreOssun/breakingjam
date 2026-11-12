@@ -1,3 +1,5 @@
+import type { Schemas } from "../../src/api/client";
+
 /** The "today" of tests that need jams to be upcoming: the fixtures' jams are in 2030. */
 export const TODAY = new Date(2030, 0, 1, 12);
 
@@ -13,7 +15,7 @@ type JamOptions = {
   day?: string;
   /** The last day, when the jam runs several. */
   until?: string;
-  status?: string;
+  status?: Schemas["EventStatus"];
   /** Upcoming, live or past; by default from the days, seen from `TODAY`. */
   phase?: "upcoming" | "live" | "past";
   coordinates?: [number, number];

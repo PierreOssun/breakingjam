@@ -18,7 +18,7 @@ matches = [
   { round = "top16", a = "lagaet", b = "issei", winner = "issei", video = "https://youtu.be/btwZcRaaDWc" },
   { round = "top16", a = "dany", b = "hulk", winner = "dany", video = "https://youtu.be/_1YIa7bVboI" },
   { round = "top16", a = "pac-pac", b = "illz", winner = "pac-pac", video = "https://youtu.be/qKNdaMhiSzw" },
-  { round = "top16", a = "minnesota-joe", b = "kuzya", winner = "kuzya", video = "https://youtu.be/CfwyiXOsEsg" },
+  { round = "top16", a = "mn-joe", b = "kuzya", winner = "kuzya", video = "https://youtu.be/CfwyiXOsEsg" },
   { round = "top16", a = "daniel", b = "moa", winner = "moa", video = "https://youtu.be/MwB6CrPQ74Q" },
   { round = "top16", a = "alkolil", b = "kleju", winner = "alkolil", video = "https://youtu.be/b4sUMaWVDQE" },
   { round = "top16", a = "t-rock", b = "jazz", winner = "t-rock", video = "https://youtu.be/vwRkVmdHDHk" },

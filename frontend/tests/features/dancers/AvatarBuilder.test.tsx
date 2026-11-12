@@ -54,7 +54,9 @@ async function openBuilder(put: object = { status: 200, body: DANCER }) {
   await userEvent.click(
     await screen.findByRole("button", { name: "Edit profile" }),
   );
-  await userEvent.click(screen.getByRole("button", { name: "Change avatar" }));
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Change avatar" }),
+  );
   // The seed never draws a headband, so the name tells the two dialogs apart.
   const builder = within(screen.getByRole("dialog", { name: "Avatar" }));
   return { fetch, builder };

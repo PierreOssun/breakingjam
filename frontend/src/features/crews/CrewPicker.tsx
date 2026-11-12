@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas, unwrap } from "../../api/client";
+import { splitFieldErrors } from "../../lib/apiErrors";
 import { Button } from "../../components/Button";
 import { RemovableChip } from "../../components/RemovableChip";
 import { SearchPicker } from "../../components/SearchPicker";
@@ -91,12 +92,19 @@ function NewCrew({
       return;
     }
     setSaving(true);
-    const { data, error } = await api.POST("/api/crews", {
-      body: { name: name.trim() },
-    });
-    setSaving(false);
-    if (data) return onCreated({ id: data.id, name: data.name });
-    setError(error?.error.fields?.[0]?.message ?? t("errors.generic"));
+    try {
+      const { data, error } = await api.POST("/api/crews", {
+        body: { name: name.trim() },
+      });
+      if (data) return onCreated({ id: data.id, name: data.name });
+      const { fields } = splitFieldErrors(error, ["name"] as const);
+      setError(fields[0]?.[1] ?? t("errors.generic"));
+    } catch {
+      // Offline: the button must not spin for ever.
+      setError(t("errors.generic"));
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

@@ -35,8 +35,9 @@ async fn geo(headers: HeaderMap) -> Json<Geo> {
     Json(Geo { country })
 }
 
-/// A real country code: Cloudflare sends `XX` when it can't tell and `T1` for Tor.
+/// A real country code: Cloudflare sends `XX` when it can't tell and `T1` for Tor, which is
+/// not two letters.
 pub(crate) fn country_code(value: &str) -> Option<String> {
-    let real = upper_ascii_code(value, 2) && !matches!(value, "XX" | "T1");
+    let real = upper_ascii_code(value, 2) && value != "XX";
     real.then(|| value.to_owned())
 }

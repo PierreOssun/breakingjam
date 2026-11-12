@@ -43,10 +43,10 @@ gender = "bboy"
 bracket_size = 8
 matches = [
   { round = "top8", a = "mounir", b = "v-o", winner = "mounir" },
-  { round = "top8", a = "taz", b = "cherep", winner = "cherep" },
+  { round = "top8", a = "taz", b = "chereb", winner = "chereb" },
   { round = "top8", a = "jazzy", b = "chenchen", winner = "jazzy" },
   { round = "top8", a = "tko", b = "kacyo", winner = "kacyo" },
-  { round = "top4", a = "mounir", b = "cherep", winner = "mounir" },
+  { round = "top4", a = "mounir", b = "chereb", winner = "mounir" },
   { round = "top4", a = "jazzy", b = "kacyo", winner = "jazzy" },
   # jazzy: Wikipedia says Jazzy (NL), the video "Mounir vs Jessy"; the existing jazzy is Turkish.
   { round = "final", a = "mounir", b = "jazzy", winner = "mounir", video = "https://www.youtube.com/watch?v=0F47KJhpAu8" },

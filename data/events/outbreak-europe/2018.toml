@@ -9,7 +9,7 @@ lng = 19.1457
 sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
 judges = ["float", "wing", "poe-one", "felix", "hatsolo", "renegade"]
 mcs = ["ivan-urban-action-figure", "lil-pablo", "max", "johnny-mecoch"]
-djs = ["lean-rock", "fleg", "ervin-arana", "renegade", "scream", "plash", "smirnoff", "felix", "bj-piggo"]
+djs = ["lean-rock", "dj-fleg", "ervin-arana", "renegade", "scream", "dj-plash-one", "dj-smirnoff", "felix", "piggo"]
 
 [[battles]]
 key = "bboy"

@@ -43,8 +43,8 @@ andy-shura-meow = { members = ["andy", "shura-meow"] }
 bajou-exaggerate = { members = ["exaggerate", "bajou"] }
 bumblebee-nord-diamond = { members = ["bumblebee", "nord-diamond"] }
 canarus-isaiah = { members = ["isaiah", "canarus"] }
-cheerito-zip-rock = { members = ["zip-rock", "cheerito"] }
-djibril-fababy = { members = ["djibril", "fababy"] }
+cheerito-zip-rock = { members = ["ziprock", "cheerito"] }
+djibril-fababy = { members = ["djibril", "fabab"] }
 g-vybz-nille = { members = ["nille", "g-vybz"] }
 issin-ra1on = { members = ["ra1on", "issin"] }
 jaguar-jimmy = { members = ["jimmy", "jaguar"] }

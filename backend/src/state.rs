@@ -2,7 +2,6 @@
 
 use std::{sync::Arc, time::Duration};
 
-use oauth2::reqwest;
 use sqlx::PgPool;
 
 use crate::{config::Config, mail::Mailer, media::MediaStore};

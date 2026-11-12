@@ -19,18 +19,18 @@ gender = "mixed"
 bracket_size = 8
 matches = [
   { round = "top8", a = "stranger-thingz", b = "coolkidz-mob", winner = "stranger-thingz", video = "https://youtu.be/gdV3WH5kecY" },
-  { round = "top8", a = "marginalz-freshness", b = "found-nation", winner = "found-nation", video = "https://youtu.be/TlwXunNnjRA" },
+  { round = "top8", a = "marginalz-freshness", b = "foundnation", winner = "foundnation", video = "https://youtu.be/TlwXunNnjRA" },
   { round = "top8", a = "young-villains", b = "urbc", winner = "young-villains", video = "https://youtu.be/S5BqL4IOIzo" },
   { round = "top8", a = "style-invaders", b = "flowdue", winner = "style-invaders", video = "https://youtu.be/kjGkpwdLkYQ" },
-  { round = "top4", a = "found-nation", b = "stranger-thingz", winner = "found-nation", video = "https://youtu.be/fXNfTWAuqmA" },
+  { round = "top4", a = "foundnation", b = "stranger-thingz", winner = "foundnation", video = "https://youtu.be/fXNfTWAuqmA" },
   { round = "top4", a = "young-villains", b = "style-invaders", winner = "young-villains", video = "https://youtu.be/TjVXRkgZQsQ" },
-  { round = "final", a = "young-villains", b = "found-nation", winner = "young-villains", video = "https://youtu.be/iyncm_9vo0s" },
+  { round = "final", a = "young-villains", b = "foundnation", winner = "young-villains", video = "https://youtu.be/iyncm_9vo0s" },
 ]
 
 [battles.teams]
 coolkidz-mob = { crew = "coolkidz-mob" }
 flowdue = { crew = "flowdue" }
-found-nation = { crew = "found-nation" }
+foundnation = { crew = "foundnation" }
 marginalz-freshness = { crew = "marginalz-freshness" }
 stranger-thingz = { crew = "stranger-thingz" }
 style-invaders = { crew = "style-invaders" }

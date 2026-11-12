@@ -13,6 +13,11 @@ export function useLogout(onDone?: () => void) {
       unwrap(await api.POST("/api/auth/logout"), "logout"),
     onSuccess: () => {
       queryClient.setQueryData(ME_KEY, null);
+      // What the account could see or do (its jams, edit rights, claim codes) must not wait
+      // in the cache for the next person on this device.
+      queryClient.removeQueries({
+        predicate: (query) => query.queryKey[0] !== ME_KEY[0],
+      });
       onDone?.();
       navigate("/");
     },

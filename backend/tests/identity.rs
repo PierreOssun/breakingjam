@@ -4,7 +4,7 @@ mod test_app;
 use axum::{Router, http::StatusCode};
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use test_app::{TestResponse, app, get, post, publish, put, send, set_role, sign_up};
+use test_app::{TestResponse, app, delete, get, post, publish, put, send, set_role, sign_up};
 use uuid::Uuid;
 
 struct World {
@@ -188,6 +188,52 @@ async fn claims_a_merge_rejects_are_the_merging_admin_s(pool: PgPool) {
     assert_eq!(rejected["user"]["email"], "rival@example.com");
     assert_eq!(rejected["status"], "rejected");
     assert_eq!(rejected["admin_email"], "admin@example.com");
+}
+
+#[sqlx::test]
+async fn a_pending_claim_outlives_a_merge_that_rejects_a_newer_one(pool: PgPool) {
+    let w = world(pool).await;
+    let survivor = w.dancer("Lil G", Some("lilg")).await;
+    let loser = w.dancer("Lil Gee", None).await;
+    let lilg = sign_up(&w.app, &w.pool, "lilg@example.com").await;
+    // A dancer claims both of their pages, the duplicate last.
+    let kept = w.claim(&survivor, &lilg).await.json;
+    w.claim(&loser, &lilg).await;
+
+    let uri = format!("/api/admin/dancers/{loser}/merge");
+    let merged = send(
+        &w.app,
+        post(&uri, json!({ "into": survivor }), Some(&w.admin)),
+    )
+    .await;
+    assert_eq!(merged.status, StatusCode::OK);
+
+    // The duplicate's claim came over rejected and newer: the pending one is still the answer.
+    let uri = format!("/api/dancers/{survivor}/claim");
+    let claim = send(&w.app, get(&uri, Some(&lilg))).await;
+    assert_eq!(claim.json["status"], "pending");
+    assert_eq!(claim.json["id"], kept["id"]);
+    assert_eq!(w.claim(&survivor, &lilg).await.json["id"], kept["id"]);
+}
+
+#[sqlx::test]
+async fn the_owner_of_a_deleted_page_can_own_another(pool: PgPool) {
+    let w = world(pool).await;
+    let first = w.dancer("Lil G", Some("lilg")).await;
+    let lilg = sign_up(&w.app, &w.pool, "lilg@example.com").await;
+    let claim = w.claim(&first, &lilg).await.json;
+    assert_eq!(w.review(&claim, "approve").await.json["status"], "approved");
+
+    let uri = format!("/api/dancers/{first}");
+    let deleted = send(&w.app, delete(&uri, Some(&w.admin))).await;
+    assert_eq!(deleted.status, StatusCode::NO_CONTENT);
+
+    let second = w.dancer("Lil G", Some("lil.g")).await;
+    let claim = w.claim(&second, &lilg).await;
+    assert_eq!(claim.status, StatusCode::OK);
+    let approved = w.review(&claim.json, "approve").await;
+    assert_eq!(approved.status, StatusCode::OK);
+    assert_eq!(approved.json["status"], "approved");
 }
 
 #[sqlx::test]

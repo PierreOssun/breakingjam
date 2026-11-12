@@ -73,25 +73,25 @@
       "password": "Mot de passe",
       "passwordHint": "Au moins 8 caractères.",
       "displayName": "Nom affiché",
-      "displayNameHint": "Visible sur les jams que vous organisez."
+      "displayNameHint": "Visible sur les jams que tu organises."
     },
     "google": "Continuer avec Google",
     "or": "ou",
     "errors": {
       "invalidCredentials": "E-mail ou mot de passe incorrect.",
-      "emailTaken": "Cet e-mail a déjà un compte. Connectez-vous plutôt.",
-      "google": "La connexion Google n’a pas fonctionné. Réessayez ou utilisez votre e-mail.",
-      "tooMany": "Trop de tentatives. Attendez une minute et réessayez.",
-      "generic": "Une erreur s’est produite. Réessayez."
+      "emailTaken": "Cet e-mail a déjà un compte. Connecte-toi plutôt.",
+      "google": "La connexion Google n’a pas fonctionné. Réessaie ou utilise ton e-mail.",
+      "tooMany": "Trop de tentatives. Attends une minute et réessaie.",
+      "generic": "Une erreur s’est produite. Réessaie."
     },
     "code": {
-      "title": "Vérifiez vos e-mails",
-      "sentTo": "Nous avons envoyé un code à 6 chiffres à {{email}}. Saisissez-le ici : il est valable 15 minutes.",
-      "askEmail": "Saisissez votre e-mail et le code à 6 chiffres que nous y avons envoyé.",
+      "title": "Vérifie tes e-mails",
+      "sentTo": "Nous avons envoyé un code à 6 chiffres à {{email}}. Saisis-le ici : il est valable 15 minutes.",
+      "askEmail": "Saisis ton e-mail et le code à 6 chiffres que nous y avons envoyé.",
       "label": "Code",
       "submit": "Confirmer",
-      "invalid": "Saisissez les 6 chiffres de l’e-mail.",
-      "wrong": "Ce code est faux ou a expiré. Vérifiez-le ou demandez-en un nouveau.",
+      "invalid": "Saisis les 6 chiffres de l’e-mail.",
+      "wrong": "Ce code est faux ou a expiré. Vérifie-le ou demandes-en un nouveau.",
       "resend": "Envoyer un nouveau code",
       "resendIn": "Nouveau code dans {{seconds}} s",
       "resent": "Un nouveau code est en route.",
@@ -99,29 +99,29 @@
     },
     "forgot": {
       "title": "Réinitialiser le mot de passe",
-      "intro": "Saisissez l’e-mail de votre compte. Nous vous enverrons un code pour choisir un nouveau mot de passe.",
+      "intro": "Saisis l’e-mail de ton compte. Nous t’enverrons un code pour choisir un nouveau mot de passe.",
       "send": "Envoyer le code",
       "sentTo": "Si {{email}} a un compte, un code à 6 chiffres est en route. Il est valable 15 minutes.",
       "newPassword": "Nouveau mot de passe",
       "submit": "Enregistrer et se connecter",
       "changeTitle": "Changer de mot de passe",
-      "changeIntro": "Nous envoyons un code à votre e-mail pour confirmer que c’est bien vous, puis vous choisissez le nouveau mot de passe."
+      "changeIntro": "Nous envoyons un code à ton e-mail pour confirmer que c’est bien toi, puis tu choisis le nouveau mot de passe."
     }
   },
   "validation": {
     "required": "Obligatoire.",
-    "email": "Saisissez une adresse e-mail valide.",
-    "passwordLength": "Utilisez entre 8 et 128 caractères.",
-    "displayName": "Utilisez entre 1 et 80 caractères.",
+    "email": "Saisis une adresse e-mail valide.",
+    "passwordLength": "Utilise entre 8 et 128 caractères.",
+    "displayName": "Utilise entre 1 et 80 caractères.",
     "tooLong": "{{max}} caractères au maximum.",
-    "url": "Utilisez un lien commençant par https://",
+    "url": "Utilise un lien commençant par https://",
     "endsBeforeStarts": "Le dernier jour ne peut pas précéder le premier.",
     "handle": "Lettres, chiffres, . ou _ (30 au maximum)."
   },
   "pages": {
     "map": "Carte",
     "people": "Danseurs",
-    "orgJams": "Vos jams",
+    "orgJams": "Tes jams",
     "orgJamNew": "Inscrire un jam",
     "orgJamEdit": "Modifier le jam",
     "jams": "Jams",
@@ -136,7 +136,7 @@
     "action": "Retour à l’accueil"
   },
   "errors": {
-    "generic": "Une erreur s’est produite. Rechargez la page pour réessayer."
+    "generic": "Une erreur s’est produite. Recharge la page pour réessayer."
   },
   "landing": {
     "next": {
@@ -158,7 +158,7 @@
       "countries_one": "pays",
       "countries_other": "pays"
     },
-    "heading": "Trouvez votre prochain jam",
+    "heading": "Trouve ton prochain jam",
     "search": "Chercher des jams et des personnes",
     "searchPlaceholder": "Jam, ville, battle, bgirl, bboy, DJ…",
     "searchSubmit": "Rechercher",
@@ -188,7 +188,6 @@
     "backToMap": "Carte",
     "share": "Partager",
     "linkCopied": "Lien copié",
-    "dates": "Dates",
     "venue": "Lieu",
     "instagram": "Instagram",
     "register": "S’inscrire au battle",
@@ -284,14 +283,14 @@
       "showBattles_other": "Voir les {{count}} battles"
     },
     "organiserWanted": {
-      "title": "Vous êtes l’organisateur ?",
-      "body": "L’équipe BreakingJam a ajouté ce jam. Écrivez-nous pour gérer sa page vous-même ou corriger ce qui ne va pas.",
+      "title": "Tu es l’organisateur ?",
+      "body": "L’équipe BreakingJam a ajouté ce jam. Écris-nous pour gérer sa page toi-même ou corriger ce qui ne va pas.",
       "cta": "Nous contacter",
       "subject": "Organisateur de {{name}} :"
     }
   },
   "dancer": {
-    "instagramHidden": "Masqué : seuls vous et l’équipe BreakingJam le voyez.",
+    "instagramHidden": "Masqué : visible seulement par toi et l’équipe BreakingJam.",
     "aka": "alias {{names}}",
     "verified": "Vérifié",
     "live": "En direct",
@@ -364,19 +363,19 @@
     "inArea_one": "{{count}} jam dans cette zone",
     "inArea_other": "{{count}} jams dans cette zone",
     "emptyTitle": "Pas encore de jam ici",
-    "emptyBody": "Dézoomez ou effacez vos filtres. Vous en organisez un ? Mettez-le sur la carte.",
+    "emptyBody": "Dézoome ou efface tes filtres. Tu en organises un ? Mets-le sur la carte.",
     "list": "Liste",
     "backToMap": "Carte",
     "locate": "Afficher ma position",
-    "locateError": "Impossible d’obtenir votre position.",
-    "you": "Votre position",
+    "locateError": "Impossible d’obtenir ta position.",
+    "you": "Ta position",
     "zoomIn": "Zoom avant",
     "zoomOut": "Zoom arrière",
     "close": "Fermer",
     "viewJam": "Voir le jam",
     "cluster_one": "{{count}} jam ici, zoomer",
     "cluster_other": "{{count}} jams ici, zoomer",
-    "loadError": "Les jams n’ont pas pu être chargés. Rechargez la page pour réessayer."
+    "loadError": "Les jams n’ont pas pu être chargés. Recharge la page pour réessayer."
   },
   "dialog": {
     "close": "Fermer",
@@ -389,13 +388,13 @@
     "cancel": "Annuler",
     "save": "Enregistrer",
     "optional": "facultatif",
-    "discard": "Abandonner vos modifications ?"
+    "discard": "Abandonner tes modifications ?"
   },
   "picker": {
     "placeholder": "Nom, alias ou @compte",
     "results": "Résultats",
     "none": "Aucun résultat pour « {{query}} ».",
-    "searchFirst": "Cherchez d’abord : la personne a peut-être déjà une page.",
+    "searchFirst": "Cherche d’abord : la personne a peut-être déjà une page.",
     "newDancer": "Créer un·e nouveau·elle danseur·se",
     "newCrew": "Créer un nouveau crew",
     "dancerName": "Nom de scène",
@@ -404,15 +403,15 @@
     "create": "Créer",
     "remove": "Retirer {{name}}",
     "nameAndCountry": "Un nom et un pays sont nécessaires.",
-    "handleTaken": "Ce compte Instagram a déjà une page. Cherchez-la plutôt.",
+    "handleTaken": "Ce compte Instagram a déjà une page. Cherche-la plutôt.",
     "ownPageTaken": "Ce compte a déjà une page."
   },
   "org": {
-    "newIntro": "Il reste en brouillon, visible par vous seul·e, jusqu’à sa publication.",
+    "newIntro": "Il reste en brouillon, visible par toi seul·e, jusqu’à sa publication.",
     "showMore": "Voir plus",
     "empty": {
       "title": "Pas encore de jam",
-      "body": "Enregistrez votre premier jam. Il reste en brouillon jusqu’à sa publication."
+      "body": "Enregistre ton premier jam. Il reste en brouillon jusqu’à sa publication."
     },
     "fields": {
       "name": "Nom du jam",
@@ -431,20 +430,20 @@
       "instagramUrl": "Page Instagram",
       "websiteUrl": "Site web",
       "contactEmail": "E-mail de contact",
-      "contactEmailHint": "Public : affiché sur la page du jam pour que les danseur·ses puissent vous écrire. Ceci ou Instagram est nécessaire pour publier.",
-      "endsOnHint": "Laissez vide pour un jam d’une journée.",
+      "contactEmailHint": "Public : affiché sur la page du jam pour que les danseur·ses puissent t’écrire. Ceci ou Instagram est nécessaire pour publier.",
+      "endsOnHint": "Laisse vide pour un jam d’une journée.",
       "opensAt": "Ouverture",
       "closesAt": "Fin",
-      "instagramUrlHint": "Instagram ou e-mail de contact : l’un des deux est nécessaire pour publier, afin que l’équipe BreakingJam puisse vous joindre."
+      "instagramUrlHint": "Instagram ou e-mail de contact : l’un des deux est nécessaire pour publier, afin que l’équipe BreakingJam puisse te joindre."
     },
     "status": {
       "title": "Statut",
       "explain": {
         "published": "Sur la carte et ouvert aux inscriptions.",
         "registration_closed": "Sur la carte ; les inscriptions sont closes.",
-        "past": "Il a eu lieu. Notez les résultats dans les battles ci-dessous.",
+        "past": "Il a eu lieu. Note les résultats dans les battles ci-dessous.",
         "cancelled": "Annulé. Sa page l’indique.",
-        "in_review": "Un·e admin BreakingJam le vérifie. Il apparaît sur la carte une fois approuvé ; vous pouvez continuer à le modifier en attendant."
+        "in_review": "Un·e admin BreakingJam le vérifie. Il apparaît sur la carte une fois approuvé ; tu peux continuer à le modifier en attendant."
       },
       "action": {
         "close-registration": "Clore les inscriptions",
@@ -474,6 +473,8 @@
       "moveUp": "Monter {{name}}",
       "moveDown": "Descendre {{name}}",
       "saved": "Battle enregistré.",
+      "startsFresh_one": "Autre format : l’enregistrement supprime l’inscription de ce battle et ses résultats, qui ne correspondent plus.",
+      "startsFresh_other": "Autre format : l’enregistrement supprime les {{count}} inscriptions de ce battle et leurs résultats, qui ne correspondent plus.",
       "deleted": "Battle supprimé.",
       "deleteTitle": "Supprimer ce battle ?",
       "deleteBody": "« {{name}} » et toutes ses inscriptions seront supprimées.",
@@ -534,7 +535,7 @@
       "name": "Nom",
       "more": "Plus d’options",
       "namedAs": "« {{name}} »",
-      "nameHint": "Laissez vide pour un nom tiré des champs ci-dessus.",
+      "nameHint": "Laisse vide pour un nom tiré des champs ci-dessus.",
       "prize": "Prix en argent",
       "noPrize": "Pas de prix en argent",
       "places": {
@@ -570,7 +571,7 @@
       "dancer": "Danseur·se",
       "members_one": "Membre",
       "members_other": "Membres ({{count}})",
-      "needMembers": "Ajoutez au moins un·e danseur·se.",
+      "needMembers": "Ajoute au moins un·e danseur·se.",
       "teamName": "Nom d’équipe",
       "crew": "Crew",
       "status": "Inscription",
@@ -599,7 +600,7 @@
       "videoStartHint": "Pour un live : où commence ce battle, par ex. 1:02:03.",
       "addDancer": "Ajouter un·e danseur·se",
       "addTeam": "Ajouter une équipe",
-      "teamNameTaken": "Une autre inscription de ce battle porte déjà ce nom. Donnez-lui le sien, par exemple « … A »."
+      "teamNameTaken": "Une autre inscription de ce battle porte déjà ce nom. Donne-lui le sien, par exemple « … A »."
     },
     "staff": {
       "remove": "Retirer {{name}} ({{role}})",
@@ -621,26 +622,26 @@
       "removed": "Flyer supprimé : le flyer généré est de retour.",
       "problem": {
         "type": "Ce fichier n’est ni un PNG ni un JPEG.",
-        "size": "Ce fichier dépasse 20 Mo. Exportez-le plus léger et réessayez.",
+        "size": "Ce fichier dépasse 20 Mo. Exporte-le plus léger et réessaie.",
         "small": "Cette image est trop petite : il faut au moins 540 × 675 px.",
-        "unreadable": "Impossible d’ouvrir cette image. Essayez un autre fichier."
+        "unreadable": "Impossible d’ouvrir cette image. Essaie un autre fichier."
       },
       "crop": {
-        "title": "Recadrer votre flyer",
-        "area": "Recadrage du flyer. Faites glisser l’image ou utilisez les flèches pour la déplacer, plus et moins pour zoomer.",
+        "title": "Recadrer ton flyer",
+        "area": "Recadrage du flyer. Fais glisser l’image ou utilise les flèches pour la déplacer, plus et moins pour zoomer.",
         "zoom": "Zoom",
         "zoomIn": "Zoomer",
         "zoomOut": "Dézoomer",
         "reset": "Réinitialiser",
-        "hint": "Faites glisser pour déplacer. Pincez ou utilisez le curseur pour zoomer.",
-        "soft": "Ce cadrage fait {{width}} px de large : il paraîtra flou. Dézoomez ou choisissez une image plus grande : 1080 × 1350 est idéal.",
+        "hint": "Fais glisser pour déplacer. Pince ou utilise le curseur pour zoomer.",
+        "soft": "Ce cadrage fait {{width}} px de large : il paraîtra flou. Dézoome ou choisis une image plus grande : 1080 × 1350 est idéal.",
         "previews": "Sur les cartes et les listes",
         "use": "Utiliser ce flyer"
       },
       "uploaded": "Importé"
     },
     "start": {
-      "intro": "Deux choses pour commencer. Vous remplissez le reste sur la page du jam.",
+      "intro": "Deux choses pour commencer. Tu remplis le reste sur la page du jam.",
       "create": "Créer la page du jam"
     },
     "editor": {
@@ -656,12 +657,12 @@
       "required": "Obligatoire",
       "lastDay": "Dernier jour",
       "times": "Horaires",
-      "emptyNote": "Les blocs vides ne sont visibles que par vous. Les visiteurs voient ce que vous remplissez.",
-      "yourAccount": "Votre compte",
+      "emptyNote": "Les blocs vides ne sont visibles que par toi. Les visiteurs voient ce que tu remplis.",
+      "yourAccount": "Ton compte",
       "change": "Changer",
       "fix": "Corriger",
       "retry": "Réessayer",
-      "leftUnsaved": "Vos dernières modifications n’ont pas été enregistrées."
+      "leftUnsaved": "Tes dernières modifications n’ont pas été enregistrées."
     },
     "blocks": {
       "dates": "Dates",
@@ -669,7 +670,7 @@
       "venueHint": "Ville, adresse et l’épingle sur la carte",
       "battlesHint": "Catégories, format, heure de début, prix",
       "lineupHint": "Juges, DJ et MC",
-      "aboutHint": "Quelques lignes sur votre jam",
+      "aboutHint": "Quelques lignes sur ton jam",
       "links": "Liens",
       "linksHint": "Site web, Instagram, e-mail de contact"
     },
@@ -687,14 +688,14 @@
         "contact": "Instagram ou e-mail de contact"
       },
       "add": "Ajouter",
-      "private": "D’ici là, vous seul·e voyez cette page.",
+      "private": "D’ici là, tu es seul·e à voir cette page.",
       "review": "Un admin BreakingJam le vérifie avant qu’il n’apparaisse sur la carte.",
-      "team": "En tant qu’équipe BreakingJam, vous publiez directement.",
-      "missing_one": "Encore une chose avant que votre jam n’apparaisse sur la carte.",
-      "missing_other": "Encore {{count}} choses avant que votre jam n’apparaisse sur la carte.",
+      "team": "En tant que membre de l’équipe BreakingJam, tu publies directement.",
+      "missing_one": "Encore une chose avant que ton jam n’apparaisse sur la carte.",
+      "missing_other": "Encore {{count}} choses avant que ton jam n’apparaisse sur la carte.",
       "ready": {
-        "publish": "Tout y est. Publiez quand vous voulez.",
-        "submit": "Tout y est. Envoyez-le quand vous voulez."
+        "publish": "Tout y est. Publie quand tu veux.",
+        "submit": "Tout y est. Envoie-le quand tu veux."
       },
       "actions": {
         "publish": "Publier",
@@ -709,26 +710,26 @@
       "find": "Trouver le lieu",
       "placeholder": "Salle, adresse ou ville",
       "results": "Lieux trouvés",
-      "none": "Aucun lieu trouvé. Essayez la rue et la ville, ou touchez la carte pour poser l’épingle.",
-      "error": "La recherche de lieu n’a pas fonctionné. Réessayez dans un instant.",
-      "dragHint": "Glissez l’épingle jusqu’à la porte",
-      "tapHint": "Touchez la carte pour poser l’épingle",
+      "none": "Aucun lieu trouvé. Essaie la rue et la ville, ou touche la carte pour poser l’épingle.",
+      "error": "La recherche de lieu n’a pas fonctionné. Réessaie dans un instant.",
+      "dragHint": "Glisse l’épingle jusqu’à la porte",
+      "tapHint": "Touche la carte pour poser l’épingle",
       "fromAddress": "Rempli d’après l’adresse",
       "attribution": "Recherche de lieux par Photon · © contributeurs OpenStreetMap",
       "pin": "Lieu du jam"
     },
     "results": {
       "round": "Tour",
-      "hint": "Choisissez qui a affronté qui, puis touchez la couronne du gagnant : il passe seul au tour suivant. Chaque modification s’enregistre toute seule.",
+      "hint": "Choisis qui a affronté qui, puis touche la couronne du gagnant : il passe seul au tour suivant. Chaque modification s’enregistre toute seule.",
       "battle": "Battle {{n}}",
       "side": "côté {{n}}",
       "won": "Désigner {{name}} vainqueur",
       "pick": "Choisir un·e inscrit·e",
       "video": "Lien vidéo",
       "invalid": "Ces résultats ne forment pas un tableau : chaque inscrit·e joue une fois par tour, et plus après une élimination.",
-      "needsBracket": "Choisissez un tableau (Top 8, Top 16…) dans Détails pour saisir les battles tour par tour.",
-      "needsEntries": "Ajoutez d’abord au moins deux inscrit·es à ce battle.",
-      "videoInvalid": "Collez un lien YouTube : celui-ci n’est pas enregistré.",
+      "needsBracket": "Choisis un tableau (Top 8, Top 16…) dans Détails pour saisir les battles tour par tour.",
+      "needsEntries": "Ajoute d’abord au moins deux inscrit·es à ce battle.",
+      "videoInvalid": "Colle un lien YouTube : celui-ci n’est pas enregistré.",
       "enter": "Saisir les résultats",
       "edit": "Modifier les résultats",
       "roundDone": "{{round}} ✓"
@@ -736,19 +737,19 @@
   },
   "verify": {
     "thisIsMe": "C’est moi",
-    "title": "Prouvez que c’est vous",
-    "how": "Mettez ce code dans votre bio Instagram, ou envoyez-le en DM à @{{account}}.",
-    "then": "Nous vérifions à la main ; ensuite, cette page est à vous.",
+    "title": "Prouve que c’est toi",
+    "how": "Mets ce code dans ta bio Instagram, ou envoie-le en DM à @{{account}}.",
+    "then": "Nous vérifions à la main ; ensuite, cette page est à toi.",
     "othersPending": "Quelqu’un d’autre a déjà demandé à vérifier ce profil. Nous vérifierons les deux sur Instagram.",
-    "yourCode": "Votre code",
+    "yourCode": "Ton code",
     "copy": "Copier le code",
     "openInstagram": "Ouvrir Instagram",
     "done": "Terminé",
     "copied": "Code copié",
-    "copyByHand": "Votre code est {{code}}.",
+    "copyByHand": "Ton code est {{code}}.",
     "pending": "Vérification en cours",
     "byHand": "Nous vérifions à la main, en général sous un jour.",
-    "conflict": "Impossible de revendiquer cette page : elle est vérifiée, ou votre compte a déjà une page."
+    "conflict": "Impossible de revendiquer cette page : elle est vérifiée, ou ton compte a déjà une page."
   },
   "avatar": {
     "title": "Ton avatar",
@@ -917,14 +918,14 @@
     "titlesMine": "Je suis…",
     "titles": "Rôles",
     "titlesHint": "Seule la personne, une fois vérifiée, et l’équipe BreakingJam les choisissent.",
-    "namesake": "Un·e autre danseur·se s’appelle déjà {{name}}. Vérifiez que ce n’est pas la même personne avant d’enregistrer.",
+    "namesake": "Un·e autre danseur·se s’appelle déjà {{name}}. Vérifie que ce n’est pas la même personne avant d’enregistrer.",
     "hideInstagram": "Masquer mon Instagram sur ma page et dans la recherche",
     "hideInstagramOther": "Masquer cet Instagram sur la page et dans la recherche"
   },
   "admin": {
     "claims": {
       "title": "Demandes de vérification",
-      "intro": "Ouvrez le profil Instagram et cherchez le code dans la bio ou les DM de @{{account}}. N’approuvez jamais sans l’avoir vu.",
+      "intro": "Ouvre le profil Instagram et cherche le code dans la bio ou les DM de @{{account}}. N’approuve jamais sans l’avoir vu.",
       "none": "Aucune demande en attente.",
       "noHandle": "Pas d’Instagram sur la page",
       "by": "Par {{name}} ({{email}}), le {{date}}",
@@ -954,8 +955,8 @@
       "jamsDetail": "{{past}} passés · {{draft}} brouillons · {{cancelled}} annulés",
       "dancers": "Danseur·ses",
       "dancersDetail": "{{verified}} vérifié·es · {{instagram}} avec Instagram",
-      "organizers": "Organisateur·ices",
-      "organizersDetail": "{{verified}} vérifié·es",
+      "organizers": "Organisateurs",
+      "organizersDetail": "{{verified}} vérifiés",
       "accounts": "Comptes",
       "accountsDetail_one": "+{{count}} ces 30 derniers jours",
       "accountsDetail_other": "+{{count}} ces 30 derniers jours",
@@ -964,21 +965,21 @@
       "jamsWaiting_other": "{{count}} jams en attente",
       "dancerClaims_one": "{{count}} demande de danseur·se",
       "dancerClaims_other": "{{count}} demandes de danseur·ses",
-      "organizerClaims_one": "{{count}} demande d’organisateur·ice",
-      "organizerClaims_other": "{{count}} demandes d’organisateur·ices"
+      "organizerClaims_one": "{{count}} demande d’organisateur",
+      "organizerClaims_other": "{{count}} demandes d’organisateurs"
     },
     "jams": {
       "tab": "Jams",
       "title": "Jams à vérifier",
-      "intro": "Vérifiez que chaque jam est réel (son Instagram, ses dates, son lieu) avant qu’il apparaisse sur la carte. Pour en renvoyer un, il faut une note : son organisateur·ice la voit dans l’éditeur du jam.",
+      "intro": "Vérifie que chaque jam est réel (son Instagram, ses dates, son lieu) avant qu’il apparaisse sur la carte. Pour en renvoyer un, il faut une note : son organisateur la voit dans l’éditeur du jam.",
       "none": "Aucun jam en attente.",
       "by": "Par",
       "approve": "Approuver",
       "sendBack": "Renvoyer",
       "approved": "{{name}} est sur la carte.",
-      "sentBack": "{{name}} a été renvoyé à son organisateur·ice.",
+      "sentBack": "{{name}} a été renvoyé à son organisateur.",
       "sendBackTitle": "Renvoyer {{name}} ?",
-      "note": "Que doit changer l’organisateur·ice ?",
+      "note": "Que doit changer l’organisateur ?",
       "noteHint": "Visible dans l’éditeur du jam.",
       "incomplete": "Pas prêt à publier : {{items}}.",
       "approveTitle": "Approuver {{name}} ?",
@@ -1022,7 +1023,7 @@
         "admin": "Admin"
       },
       "explain": {
-        "none": "Hors de l’équipe, le compte redevient organisation (s’il a ses propres jams) ou simple compte. Les jams de l’équipe qu’il a saisis vous reviennent.",
+        "none": "Hors de l’équipe, le compte redevient organisation (s’il a ses propres jams) ou simple compte. Les jams de l’équipe qu’il a saisis te reviennent.",
         "seed_admin": "Saisit et corrige n’importe quel jam, danseur·se ou crew. Ne valide rien.",
         "admin": "Valide aussi les jams et les demandes, fusionne les danseur·ses et gère les seed admins."
       },
@@ -1043,14 +1044,14 @@
     }
   },
   "organizer": {
-    "yourPage": "Votre page d’organisation",
+    "yourPage": "Ta page d’organisation",
     "edit": "Modifier la page",
     "saved": "Page enregistrée.",
     "name": "Nom",
-    "nameHint": "Affiché sur vos jams : le vôtre, ou celui de votre crew ou association.",
+    "nameHint": "Affiché sur tes jams : le tien, ou celui de ton crew ou association.",
     "handleTaken": "Ce compte Instagram est déjà sur une autre page d’organisation.",
     "newHandle": "Un nouveau compte doit être revérifié : la coche disparaît jusqu’à notre vérification.",
-    "whyHandle": "Ajoutez votre Instagram, puis vérifiez-le : les danseur·ses verront que le jam est bien le vôtre.",
+    "whyHandle": "Ajoute ton Instagram, puis vérifie-le : les danseur·ses verront que le jam est bien le tien.",
     "verify": "Vérifier Instagram",
     "noUpcoming": "Pas de jam à venir.",
     "noPast": "Pas encore de jam passé."
@@ -1077,34 +1078,34 @@
   "jams": {
     "count_one": "{{count}} jam",
     "count_other": "{{count}} jams",
-    "empty": "Aucun jam ne correspond à votre recherche et à vos filtres.",
+    "empty": "Aucun jam ne correspond à ta recherche et à tes filtres.",
     "showMore": "Voir plus"
   },
   "contact": {
-    "title": "Contactez-nous",
-    "intro": "Une idée, un bug, un résultat erroné ou juste un bonjour ? Écrivez-nous par e-mail ou sur Instagram.",
+    "title": "Contacte-nous",
+    "intro": "Une idée, un bug, un résultat erroné ou juste un bonjour ? Écris-nous par e-mail ou sur Instagram.",
     "email": "E-mail",
     "instagram": "Instagram",
     "copy": "Copier",
     "copied": "E-mail copié",
-    "copyFailed": "Copie impossible. Sélectionnez l’adresse.",
+    "copyFailed": "Copie impossible. Sélectionne l’adresse.",
     "write": "Écrire un e-mail",
     "dm": "Envoyer un DM",
     "topicsTitle": "À quel sujet nous écrire",
     "topics": {
       "idea": {
         "title": "Une idée",
-        "body": "Quelque chose que vous aimeriez voir sur BreakingJam ?",
+        "body": "Quelque chose que tu aimerais voir sur BreakingJam ?",
         "subject": "Idée :"
       },
       "bug": {
         "title": "Un bug",
-        "body": "Quelque chose ne marche pas ? Envoyez le lien de la page et ce qui s’est passé. Une capture d’écran aide.",
+        "body": "Quelque chose ne marche pas ? Envoie le lien de la page et ce qui s’est passé. Une capture d’écran aide.",
         "subject": "Bug :"
       },
       "fix": {
         "title": "Une info erronée",
-        "body": "Une mauvaise date, un battle manquant, un résultat à corriger ? Envoyez le lien du jam ou de la page danseur·se.",
+        "body": "Une mauvaise date, un battle manquant, un résultat à corriger ? Envoie le lien du jam ou de la page danseur·se.",
         "subject": "Correction :"
       },
       "hello": {
@@ -1124,7 +1125,7 @@
       "marketing": "Marketing & com"
     },
     "join": {
-      "organisers": "Organisateur·ices",
+      "organisers": "Organisateurs",
       "cta": "Nous contacter"
     },
     "page": "Page"
@@ -1133,7 +1134,7 @@
     "title": "Compte",
     "stageName": "Nom de scène",
     "noPage": "Tu n’as pas encore de page de danseur·se : trouve la tienne ou crée-la, son nom sera ton nom de scène.",
-    "organiserName": "Nom d’organisateur·rice",
+    "organiserName": "Nom d’organisateur",
     "signIn": "Connexion",
     "changePassword": "Changer le mot de passe"
   },
@@ -1151,9 +1152,9 @@
       {
         "title": "Ton compte",
         "body": [
-          "Avec une inscription par email, nous gardons ton email, ton nom et une empreinte de ton mot de passe, jamais le mot de passe lui-même.",
-          "Avec la connexion Google, nous recevons ton email, ton nom et l’identifiant Google de ton compte. Nous ne voyons jamais ton mot de passe Google.",
-          "Nous ne t’envoyons par email que les codes qui confirment ton adresse ou réinitialisent ton mot de passe.",
+          "Avec une inscription par e-mail, nous gardons ton e-mail, ton nom et une empreinte de ton mot de passe, jamais le mot de passe lui-même.",
+          "Avec la connexion Google, nous recevons ton e-mail, ton nom et l’identifiant Google de ton compte. Nous ne voyons jamais ton mot de passe Google.",
+          "Nous ne t’envoyons par e-mail que les codes qui confirment ton adresse ou réinitialisent ton mot de passe.",
           "Un cookie te garde connecté. Ta langue et ton thème sont retenus dans ton navigateur. Il n’y a ni publicité, ni traceur, ni mesure d’audience."
         ]
       },
@@ -1175,7 +1176,7 @@
       {
         "title": "Les services que nous utilisons",
         "body": [
-          "Cloudflare héberge le site et les flyers, et envoie nos emails. La base de données est chez Neon, à Francfort.",
+          "Cloudflare héberge le site et les flyers, et envoie nos e-mails. La base de données est chez Neon, à Francfort.",
           "La carte charge ses tuiles chez Protomaps, et la recherche de lieux envoie ce que tu tapes à Photon (Komoot). Une vidéo est lue depuis YouTube, en mode confidentialité avancée, seulement quand tu la lances.",
           "Ton pays, lu depuis ta connexion, décide où la carte s’ouvre. Ta position n’est utilisée que si tu l’autorises, pour la recherche que tu demandes ; nous ne gardons ni l’un ni l’autre."
         ]

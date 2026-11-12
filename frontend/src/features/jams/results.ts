@@ -99,8 +99,8 @@ const loserOf = (slot: Slot) => (slot.winner ? slot[other(slot.winner)] : "");
 
 /**
  * The draft with slot `index` of `round` changed by `change`, and the bracket after it following:
- * a new winner takes their side of the next round's battle (`index / 2`, top or bottom), and a
- * semi-final's new loser theirs in the small final.
+ * a new winner takes the seat the old one had in the next round (else their side of battle
+ * `index / 2`, top or bottom), and a semi-final's new loser theirs in the small final.
  */
 export function withSlot(
   draft: Draft,
@@ -131,11 +131,34 @@ function follow(draft: Draft, at: At, before: Slot) {
     at.round === "third" ? undefined : BRACKET[BRACKET.indexOf(at.round) + 1];
   const into = { index: Math.floor(at.index / 2), side };
   if (later && winnerOf(slot) !== winnerOf(before)) {
-    place(draft, { round: later, ...into }, winnerOf(slot));
+    const seat = seatOf(draft, later, winnerOf(before), into);
+    place(draft, seat, winnerOf(slot));
   }
   if (at.round === "top4" && loserOf(slot) !== loserOf(before)) {
-    place(draft, { round: "third", ...into }, loserOf(slot));
+    const seat = seatOf(draft, "third", loserOf(before), into);
+    place(draft, seat, loserOf(slot));
   }
+}
+
+/**
+ * The seat of `round` that entry `id` holds, which is where whoever replaces them goes: stored
+ * battles come back winner first, and curated ones in the order they were listed, so the place
+ * in the bracket alone can't say. Holding none, the bracket's own seat `into`, or the other
+ * side of that battle when only that one is free.
+ */
+function seatOf(
+  draft: Draft,
+  round: Round,
+  id: string,
+  into: { index: number; side: Side },
+): At & { side: Side } {
+  const slots = draft[round] ?? [];
+  const index = id ? slots.findIndex((s) => s.a === id || s.b === id) : -1;
+  const held = slots[index];
+  if (held) return { round, index, side: held.a === id ? "a" : "b" };
+  const slot = slots[into.index];
+  const taken = slot && slot[into.side] !== "" && slot[other(into.side)] === "";
+  return { round, ...into, side: taken ? other(into.side) : into.side };
 }
 
 /**

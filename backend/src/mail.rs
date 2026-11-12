@@ -1,6 +1,5 @@
 //! Outgoing email: the code messages, and the sender posting them to the Worker's Email Service.
 
-use oauth2::reqwest;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -46,16 +45,16 @@ impl Message {
                 "The code works for 15 minutes. If you didn't ask for it, you can ignore this email.",
             ),
             Fr => (
-                format!("{code} est votre code BreakingJam"),
+                format!("{code} est ton code BreakingJam"),
                 match purpose {
                     VerifyEmail => {
-                        "Bienvenue sur BreakingJam ! Saisissez ce code pour confirmer votre adresse e-mail :"
+                        "Bienvenue sur BreakingJam ! Saisis ce code pour confirmer ton adresse e-mail :"
                     }
                     ResetPassword => {
-                        "Saisissez ce code pour choisir un nouveau mot de passe BreakingJam :"
+                        "Saisis ce code pour choisir un nouveau mot de passe BreakingJam :"
                     }
                 },
-                "Le code est valable 15 minutes. Si vous ne l'avez pas demandé, ignorez cet e-mail.",
+                "Le code est valable 15 minutes. Si tu ne l'as pas demandé, ignore cet e-mail.",
             ),
             De => (
                 format!("{code} ist dein BreakingJam-Code"),

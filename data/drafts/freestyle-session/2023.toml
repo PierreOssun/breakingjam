@@ -49,7 +49,7 @@ matches = [
   { round = "top4", a = "kmel", b = "recon", winner = "kmel", video = "https://youtu.be/goxw80rpAlI" },
   { round = "top4", a = "red-bull-bc-one-all-stars", b = "breakinmia", winner = "breakinmia", video = "https://youtu.be/WRqAy9nRtEE" },
   { round = "top4", a = "phil-wizard-lil-zoo-sunni", b = "rock-force", winner = "phil-wizard-lil-zoo-sunni", video = "https://youtu.be/X1coNpQ0CUk" },
-  { round = "final", a = "charlie-chillout", b = "babylon", winner = "TODO", video = "https://youtu.be/0ipnIIcGJWI" },
+  { round = "final", a = "charlie-chill-out", b = "babylon", winner = "TODO", video = "https://youtu.be/0ipnIIcGJWI" },
   { round = "final", a = "mels", b = "nero-the-professor", winner = "TODO", video = "https://youtu.be/gQENaoeEqX4" },
   { round = "final", a = "marvelous", b = "lily", winner = "TODO", video = "https://youtu.be/RjpykVspv1E" },
   { round = "final", a = "kmel", b = "junior", winner = "TODO", video = "https://youtu.be/UjASDDJiZ2k" },
@@ -59,7 +59,7 @@ matches = [
 [battles.teams]
 babylon = { crew = "babylon" }
 breakinmia = { crew = "breakinmia" }
-charlie-chillout = { crew = "charlie-chillout" }
+charlie-chill-out = { crew = "charlie-chill-out" }
 data = { crew = "data" }
 junior = { crew = "junior" }
 kmel = { crew = "kmel" }

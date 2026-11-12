@@ -160,6 +160,20 @@ async fn reset_password(
     State(state): State<AppState>,
     ValidJson(req): ValidJson<ResetPasswordRequest>,
 ) -> Result<WithCookie<Json<UserResponse>>, AppError> {
+    // A wrong code is refused, its try counted, before the hash: anyone may ask, and a hash
+    // costs CPU. A right one is spent only after it, so a busy server (503) doesn't cost the
+    // user their code.
+    if !holds_code(&state.pool, &req.email, &req.code).await? {
+        redeem_code(
+            &state.pool,
+            &req.email,
+            CodePurpose::ResetPassword,
+            &req.code,
+        )
+        .await?;
+        return Err(wrong_code());
+    }
+    let hash = password::hash(req.password, &state.config.password_pepper).await?;
     let user = redeem_code(
         &state.pool,
         &req.email,
@@ -167,7 +181,6 @@ async fn reset_password(
         &req.code,
     )
     .await?;
-    let hash = password::hash(req.password, &state.config.password_pepper).await?;
     let mut tx = state.pool.begin().await?;
     take_over(&mut tx, user.id).await?;
     db::users::set_password(&mut tx, user.id, &hash).await?;
@@ -214,11 +227,24 @@ async fn redeem_code(
     code: &str,
 ) -> Result<User, AppError> {
     // An unknown email gets the same answer as a wrong code.
-    let wrong = || AppError::invalid("code", "is wrong or has expired");
     let user = db::users::find_credentials(pool, email.trim())
         .await?
-        .ok_or_else(wrong)?
+        .ok_or_else(wrong_code)?
         .user;
     let matched = db::email_codes::redeem(pool, user.id, purpose, code.trim()).await?;
-    matched.then_some(user).ok_or_else(wrong)
+    matched.then_some(user).ok_or_else(wrong_code)
+}
+
+/// Whether `code` is the reset code mailed to `email`, without spending a try.
+async fn holds_code(pool: &PgPool, email: &str, code: &str) -> Result<bool, AppError> {
+    let Some(account) = db::users::find_credentials(pool, email.trim()).await? else {
+        return Ok(false);
+    };
+    let purpose = CodePurpose::ResetPassword;
+    Ok(db::email_codes::matches(pool, account.user.id, purpose, code.trim()).await?)
+}
+
+/// The 422 of a wrong, expired or used-up code.
+fn wrong_code() -> AppError {
+    AppError::invalid("code", "is wrong or has expired")
 }

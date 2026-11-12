@@ -9,7 +9,7 @@ lng = 19.1457
 sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCv8V_79zZ1RUlUNFbMDSPBg"]
 judges = ["poe-one", "hong-10", "neguin"]
 mcs = ["mario-bee", "lil-pablo", "niko", "osto"]
-djs = ["renegade", "scream", "plash", "smirnoff", "fleg", "felix", "skizo", "rawkuts"]
+djs = ["renegade", "scream", "dj-plash-one", "dj-smirnoff", "dj-fleg", "felix", "skizo", "rawkuts"]
 
 [[battles]]
 key = "bboy"

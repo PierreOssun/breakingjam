@@ -99,7 +99,6 @@ async fn show(
         Unauthorized,
         (status = FORBIDDEN, description = "Someone else's page", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No organiser page", body = ErrorEnvelope),
-        (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
         InvalidFields,
     )
 )]

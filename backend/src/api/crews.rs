@@ -211,6 +211,7 @@ async fn remove(
         (status = FORBIDDEN, description = "Below `seed_admin`", body = ErrorEnvelope),
         (status = NOT_FOUND, description = "No such crew or dancer", body = ErrorEnvelope),
         (status = CONFLICT, description = "Already a current member, or a past membership with the same `since`", body = ErrorEnvelope),
+        InvalidFields,
     )
 )]
 async fn add_member(

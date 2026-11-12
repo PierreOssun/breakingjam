@@ -1,5 +1,5 @@
 /* DESIGN.md §2 tokens as a Tailwind v4 theme. Dark is the default; light comes from
-   [data-theme="light"] or the OS setting. `src/styles/tokens.test.ts` keeps these values
+   [data-theme="light"] or the OS setting. `tests/styles/tokens.test.ts` keeps these values
    in sync with the tables in DESIGN.md. */
 @import "tailwindcss";
 @import "@fontsource-variable/unbounded";

@@ -16,7 +16,8 @@ Two copies of the same stack, each one Cloudflare Worker (ARCHITECTURE §9):
 browser ──▶ Worker (deploy/src/index.ts)
               ├─ /api/*     ──▶ API container (backend/Dockerfile, Rust) ──▶ Neon Postgres
               │                   (login, register and password reset first pass the per-IP and per-email limits)
-              │                   └─ http://media.internal ──▶ Worker media handler ──▶ R2 bucket
+              │                   ├─ http://media.internal ──▶ Worker media handler ──▶ R2 bucket
+              │                   └─ http://mail.internal  ──▶ Worker mail handler ──▶ Email Service
               ├─ /jams/{slug} ─▶ index.html + Open Graph tags and Event data (jam read from the API)
               ├─ /sitemap.xml ─▶ API /api/sitemap.xml, cached at the edge for an hour
               └─ anything else ─▶ static assets (frontend/dist, SPA fallback)
@@ -27,7 +28,7 @@ browser ──▶ media.breakingjam.com ──▶ R2 bucket (uploaded flyers)
 - The API runs as a [Cloudflare Container](https://developers.cloudflare.com/containers/) (GA since April 2026, **Workers Paid plan** required).
   - `API_INSTANCES` instances share the traffic (2 in production, 1 on UAT). Each sleeps after 30 minutes without requests and wakes in 1–3 s.
   - Each instance is a Durable Object, which stays where it is first created. The Worker names them `weur-N` and creates them with the location hint `weur`, next to Neon in Frankfurt; as the hint is best effort and places only the object, `wrangler.jsonc` also limits the containers to the `WEUR` region (`constraints.regions`). The first UAT instances, `instance-N`, were created without a hint, near the deploy's check from a US runner, and ran in Los Angeles: every query crossed the Atlantic (about 0.5 s each). Check the placement with `npx wrangler containers list`, then `npx wrangler containers instances <id>` (the `LOCATION` column). If the database moves, change the hint and the names together.
-- The database is [Neon](https://neon.tech). The container connects to it directly over TLS. Hyperdrive [can't be reached from containers](https://github.com/cloudflare/containers/issues/97), so this differs from the original plan in §9.
+- The database is [Neon](https://neon.tech). The container connects to it directly over TLS. Hyperdrive [can't be reached from containers](https://github.com/cloudflare/containers/issues/97).
   - The API uses the role `breakingjam_app`, which reads and writes rows but can't change the schema. Migrations use the owner role.
 - `frontend/public/_headers` sets the security headers (CSP, HSTS…) and the long cache for `/assets/*`.
 - **Uploaded flyers** go to an R2 bucket per target (`breakingjam-media`, `breakingjam-media-uat`), served on its own domain (`media.breakingjam.com`, `media-uat.breakingjam.com`).
@@ -41,14 +42,14 @@ browser ──▶ media.breakingjam.com ──▶ R2 bucket (uploaded flyers)
 
 ## One-time setup
 
-Do steps 2–8 once for production and once for UAT, with that target's values.
+Do steps 2–14 once for production and once for UAT where they apply, with that target's values.
 
 1. **Cloudflare**
    - Put `breakingjam.com` on Cloudflare DNS. Each Worker adds its own record (`breakingjam.com`, `uat.breakingjam.com`) and certificate on its first deploy.
    - For `www`: a proxied `AAAA www 100::` record, and a Redirect Rule (Rules → Redirect Rules → "Redirect from WWW to root", status 301, keep the query string).
    - Subscribe to Workers Paid (containers).
-   - Create an API token with *Workers Scripts: Edit*, *Workers Routes: Edit*, *Containers: Edit*, *Zone: Read* and *DNS: Edit* on the zone; copy your account id.
-2. **Neon:** one project per target (`breakingjam`, `breakingjam-uat`), with a database `breakingjam_prod` (production) or `breakingjam` (UAT), so a connection string that touches production says so, in a region close to your users (e.g. `aws-eu-central-1`).
+   - Create an API token with *Workers Scripts: Edit*, *Workers Routes: Edit*, *Containers: Edit*, *Workers R2 Storage: Edit*, *Zone: Read* and *DNS: Edit* on the zone; copy your account id.
+2. **Neon:** one project per target (`breakingjam`, `breakingjam-uat`), on Postgres 17 (what CI tests and the backup's `pg_dump` expect), with a database `breakingjam_prod` (production) or `breakingjam` (UAT), so a connection string that touches production says so, in a region close to your users (e.g. `aws-eu-central-1`).
    - Use **separate projects**, not a branch of production: a branch starts with production's data, and separate projects have separate credentials.
    - Copy the owner's **direct** (not `-pooler`) connection string, with `?sslmode=require`. Only migrations use it.
    - Create a project-scoped API key (Project settings → API keys) and note the project id. The deploy snapshots the database with them.
@@ -129,12 +130,12 @@ Optionally tag releases on `prod` (`git tag -a v0.1.0 prod -m "BreakingJam v0.1.
 
 On each push to `uat` or `prod`, `.github/workflows/deploy.yml`:
 
-1. runs the whole CI (backend, frontend, worker, Docker image)
+1. looks for a green CI run of this very commit (it ran when the commit was pushed to `main`); only without one does it run CI again (backend, frontend, worker)
 2. builds the frontend with the target's variables
 3. snapshots the database as a Neon branch `pre-deploy-<time>-<commit>` (no compute, expires after 7 days)
 4. runs `sqlx migrate run` against the target's Neon project
-5. runs `wrangler deploy` (`--env uat` for UAT), which builds the image from `backend/Dockerfile` (linux/amd64), pushes it to Cloudflare's registry, uploads the site and rolls the containers
-6. checks that `/api/health` answers
+5. writes the commit into `wrangler.jsonc` (`image_vars.RELEASE`) and runs `wrangler deploy` (`--env uat` for UAT), which builds the image from `backend/Dockerfile` (linux/amd64) with that commit baked in, pushes it to Cloudflare's registry, uploads the site and rolls the containers. Every release is a new image, so every deploy rolls them
+6. waits, up to 15 minutes, until `/api/health` answers with this commit as its `release`: an instance of the previous release answering is not enough, as the new image may have failed to start
 
 **Migrations run before the new API starts**, so the API still serving must work with them: add columns and tables first, and drop old ones a release later. UAT runs each migration first, against UAT's data.
 
@@ -164,7 +165,7 @@ Sign up on the site, then in Neon's SQL editor:
 update app_users set role = 'super_admin' where email = 'you@example.com';
 ```
 
-There is one super admin at most (M31): it makes and removes admins, and admins put people on the team as seed admins. Admins see **Admin** in the header (`/admin`: an overview, the jam review queue and the Instagram claims) and the merge tool on dancer pages. On UAT the seed already created admin accounts; a database seeded before M31 has no seeded super admin, so set UAT's with the same SQL.
+There is one super admin at most (M31): it makes and removes admins, and admins put people on the team as seed admins. Admins see **Admin** in the account menu (`/admin`: an overview, the jam review queue, the Instagram claims and the accounts) and the merge tool on dancer pages. On UAT the seed already created admin accounts; a database seeded before M31 has no seeded super admin, so set UAT's with the same SQL.
 
 ## Costs
 
@@ -189,7 +190,7 @@ The sign-up page listed five more overage rates without showing them. The API co
 
 - **Logs:** `npx wrangler tail` (`--env uat` for UAT) for the Worker, or the Containers page of the dashboard (API, JSON lines with request ids).
 - **Rollback:** `npx wrangler rollback` returns the Worker and site to the previous version; whether it also restores the container image is not yet verified (try it on UAT first). Migrations are not reverted.
-- **Health:** `https://breakingjam.com/api/health` answers `{"status":"ok","version":"…"}` when the API reaches the database.
+- **Health:** `https://breakingjam.com/api/health` answers `{"status":"ok","version":"…","release":"<commit>"}` when the API reaches the database; `release` says which deploy is running.
 - **Taking a flyer down:** an admin opens the jam's editor and removes the flyer, which deletes both images. Cloudflare's cache may keep serving them at their old URLs, which no page links to any more; to make them go at once, purge those two URLs (Caching → Configuration → Custom Purge).
 - **Self-hosted tiles later:**
   - Upload a `.pmtiles` extract to R2 behind a public bucket domain and set `VITE_TILES_URL=pmtiles://https://tiles.breakingjam.com/world.pmtiles`.

@@ -38,10 +38,7 @@ async fn register_mails_a_code_and_logs_in_only_once_it_is_confirmed(pool: PgPoo
         .await
         .unwrap();
     let mail = mail_with(&mails, |m| m["to"] == "lilg@example.com").await;
-    assert_eq!(
-        mail["subject"],
-        format!("{code} est votre code BreakingJam")
-    );
+    assert_eq!(mail["subject"], format!("{code} est ton code BreakingJam"));
     assert!(mail["text"].as_str().unwrap().contains(&code));
 
     let body = json!({ "email": "LilG@example.com", "code": code });

@@ -32,7 +32,7 @@ pub async fn open(conn: &mut PgConnection, dancer_id: Uuid, user_id: Uuid) -> sq
     }
 }
 
-/// The user's most recent claim on the dancer.
+/// The user's pending claim on the dancer, else their most recent one.
 pub async fn latest(
     db: impl PgExecutor<'_>,
     dancer_id: Uuid,
@@ -43,7 +43,8 @@ pub async fn latest(
         r#"select id, dancer_id, user_id, code, status as "status: ClaimStatus",
                   reviewed_at, created_at
            from dancer_claims where dancer_id = $1 and user_id = $2
-           order by created_at desc, id desc limit 1"#,
+           -- A merge can move a newer, rejected claim onto the page of a pending one.
+           order by (status = 'pending') desc, created_at desc, id desc limit 1"#,
         dancer_id,
         user_id,
     )

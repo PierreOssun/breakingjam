@@ -1,13 +1,19 @@
-import { useState } from "react";
+import { lazy, Suspense, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import type { Schemas } from "../../api/client";
 import { Button } from "../../components/Button";
 import { VerifiedTick } from "../../components/VerifiedTick";
 import { useMe } from "../auth/useMe";
 import { DancerAvatar } from "../dancers/DancerAvatar";
-import { OrganizerEditDialog } from "../organizers/OrganizerEditDialog";
 import { useOrganizer } from "../organizers/queries";
 import { initialsOf } from "./jamDetail";
+
+// The form's code loads when someone edits: visitors, who never do, don't download it.
+const OrganizerEditDialog = lazy(() =>
+  import("../organizers/OrganizerEditDialog").then((m) => ({
+    default: m.OrganizerEditDialog,
+  })),
+);
 
 /** Who runs the jam, in the editor: the account, with "Change" opening its organiser page. */
 export function OrganizerCard({ jam }: { jam: Schemas["EventResponse"] }) {
@@ -15,6 +21,7 @@ export function OrganizerCard({ jam }: { jam: Schemas["EventResponse"] }) {
   const me = useMe().data;
   const organizer = useOrganizer(jam.organizer_id).data;
   const [editing, setEditing] = useState(false);
+  const [opening, open] = useTransition();
   const mine = me?.id === jam.organizer_id;
   const name = organizer?.display_name ?? jam.organizer?.display_name ?? "";
   const handle = organizer?.instagram_handle;
@@ -39,17 +46,24 @@ export function OrganizerCard({ jam }: { jam: Schemas["EventResponse"] }) {
           </span>
         </div>
         {organizer?.can_edit && (
-          <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            loading={opening}
+            onClick={() => open(() => setEditing(true))}
+          >
             {t("org.editor.change")}
           </Button>
         )}
       </div>
-      {editing && organizer && (
-        <OrganizerEditDialog
-          organizer={organizer}
-          onClose={() => setEditing(false)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {editing && organizer && (
+          <OrganizerEditDialog
+            organizer={organizer}
+            onClose={() => setEditing(false)}
+          />
+        )}
+      </Suspense>
     </section>
   );
 }

@@ -72,14 +72,14 @@ name = "Crew battle"
 gender = "mixed"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "raw-materials", b = "rock-force-crew", winner = "rock-force-crew", video = "https://youtu.be/LSJrUpLcRnE" },
+  { round = "top16", a = "raw-materials", b = "rock-force", winner = "rock-force", video = "https://youtu.be/LSJrUpLcRnE" },
   { round = "top16", a = "rad", b = "killafornia", winner = "rad", video = "https://youtu.be/mZJcFCdD73M" },
   { round = "top16", a = "sopitas-con-huevos", b = "breakinmia", winner = "breakinmia", video = "https://youtu.be/1KxeZUhQ_1M" },
-  { round = "top16", a = "mighty-zulu-kings", b = "raw-adikts", winner = "mighty-zulu-kings", video = "https://youtu.be/SH2kcl0vheQ" },
+  { round = "top16", a = "mighty-zulu-kingz", b = "raw-adikts", winner = "mighty-zulu-kingz", video = "https://youtu.be/SH2kcl0vheQ" },
   { round = "top16", a = "breakmatic", b = "modd-squad", winner = "breakmatic", video = "https://youtu.be/b-aTFXtb6CI" },
   { round = "top16", a = "havikoro", b = "kosher-bullz", winner = "havikoro", video = "https://youtu.be/OBgTGfKWlag" },
-  { round = "top8", a = "rad", b = "rock-force-crew", winner = "TODO", video = "https://youtu.be/nFe7I2kKS4Q" },
-  { round = "top8", a = "mighty-zulu-kings", b = "breakinmia", winner = "TODO", video = "https://youtu.be/ipRppCIm5ws" },
+  { round = "top8", a = "rad", b = "rock-force", winner = "TODO", video = "https://youtu.be/nFe7I2kKS4Q" },
+  { round = "top8", a = "mighty-zulu-kingz", b = "breakinmia", winner = "TODO", video = "https://youtu.be/ipRppCIm5ws" },
   { round = "top8", a = "havikoro", b = "breakmatic", winner = "TODO", video = "https://youtu.be/PZdGpHMNcCA" },
 ]
 
@@ -89,10 +89,10 @@ breakmatic = { crew = "breakmatic" }
 havikoro = { crew = "havikoro" }
 killafornia = { crew = "killafornia" }
 kosher-bullz = { crew = "kosher-bullz" }
-mighty-zulu-kings = { crew = "mighty-zulu-kings" }
+mighty-zulu-kingz = { crew = "mighty-zulu-kingz" }
 modd-squad = { crew = "modd-squad" }
 rad = { crew = "rad" }
 raw-adikts = { crew = "raw-adikts" }
 raw-materials = { crew = "raw-materials" }
-rock-force-crew = { crew = "rock-force-crew" }
+rock-force = { crew = "rock-force" }
 sopitas-con-huevos = { crew = "sopitas-con-huevos" }

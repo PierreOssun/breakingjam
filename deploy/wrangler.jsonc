@@ -25,6 +25,8 @@
       "class_name": "Api",
       "image": "../backend/Dockerfile",
       "image_build_context": "../backend",
+      // deploy.yml writes the commit here before it deploys; the API reports it at /api/health.
+      "image_vars": { "RELEASE": "local" },
       // 1/4 vCPU and 1 GiB: room for the share-image rendering (resvg).
       "instance_type": "basic",
       // Next to Neon in Frankfurt: each query crosses this distance several times.
@@ -77,6 +79,7 @@
           "class_name": "Api",
           "image": "../backend/Dockerfile",
           "image_build_context": "../backend",
+          "image_vars": { "RELEASE": "local" },
           "instance_type": "basic",
           "constraints": { "regions": ["WEUR"] },
           "max_instances": 2

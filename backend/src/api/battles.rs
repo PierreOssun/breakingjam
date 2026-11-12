@@ -18,7 +18,8 @@ use crate::{
     domain::{
         battle::{
             Battle, BattleFields, BattleOrder, Entry, EntryFields, EntryStatus, MAX_BATTLES, Match,
-            MatchList, StaffList, StaffMember, bracket_problem, placings, starts_during,
+            MatchList, StaffList, StaffMember, bracket_problem, entry_size, placings,
+            starts_during,
         },
         event::{Event, EventStatus},
     },
@@ -130,7 +131,8 @@ async fn create(
     Ok((StatusCode::CREATED, Json(battle)))
 }
 
-/// Replace a battle's fields (not its position).
+/// Replace a battle's fields (not its position); another fixed team size removes its entries
+/// and results, which no longer fit.
 #[utoipa::path(
     put,
     path = "/battles/{id}",
@@ -153,11 +155,19 @@ async fn update(
     Path(id): Path<Uuid>,
     ValidJson(fields): ValidJson<BattleFields>,
 ) -> Result<Json<Battle>, AppError> {
-    let (battle, _) = writable_battle(&state, &current, id).await?;
+    let battle = writable_battle(&state, &current, id).await?;
     let mut tx = state.pool.begin().await?;
     // Locked, so the jam's days can't move from under the start checked here.
     let event = lock_jam(&mut tx, battle.event_id).await?;
     check_start(&fields, &event)?;
+    // Read again under its lock: two saves at once must not decide on what the other changes.
+    let stored = lock_battle(&mut tx, id).await?;
+    let before = entry_size(stored.format, stored.team_size);
+    // An open size holds any entry; under another fixed one the old teams can't be saved, so
+    // the battle starts fresh.
+    if entry_size(fields.format, fields.team_size).is_some_and(|size| before != Some(size)) {
+        db::battles::delete_entries(&mut tx, id).await?;
+    }
     let battle = db::battles::update(&mut *tx, id, &fields.display_name(), &fields).await?;
     tx.commit().await?;
     Ok(Json(battle))
@@ -184,7 +194,7 @@ async fn remove(
     current: CurrentUser,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, AppError> {
-    let (battle, _) = writable_battle(&state, &current, id).await?;
+    let battle = writable_battle(&state, &current, id).await?;
     let mut tx = state.pool.begin().await?;
     let event = lock_jam(&mut tx, battle.event_id).await?;
     // The publish checklist holds past draft: a submitted jam keeps a battle (M24).
@@ -483,12 +493,12 @@ async fn writable_battle(
     state: &AppState,
     current: &CurrentUser,
     id: Uuid,
-) -> Result<(Battle, Event), AppError> {
+) -> Result<Battle, AppError> {
     let battle = db::battles::find(&state.pool, id)
         .await?
         .ok_or(AppError::NotFound)?;
-    let event = writable(state, current, battle.event_id).await?;
-    Ok((battle, event))
+    writable(state, current, battle.event_id).await?;
+    Ok(battle)
 }
 
 /// A battle starts on one of its jam's days, or has no start yet.

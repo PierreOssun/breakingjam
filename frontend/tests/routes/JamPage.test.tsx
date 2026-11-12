@@ -221,7 +221,7 @@ describe("JamPage", () => {
     expect(whosIn).toHaveAttribute("href", "#battles");
     expect(whosIn).toHaveTextContent("Judge Sensei Kai · DJ Spin");
 
-    // DESIGN.md §6 item 9: the organiser, verified, and a way to reach them.
+    // DESIGN.md §6 item 12: the organiser, verified, and a way to reach them.
     const organiser = main
       .getByRole("heading", { name: "Organiser" })
       .closest("section")!;
@@ -451,7 +451,6 @@ describe("JamPage", () => {
     expect(
       screen.queryByRole("link", { name: "Register to battle" }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText(/spots left|Full/)).not.toBeInTheDocument();
   });
 
   it("shows the jam's own hours once announced, else the first battle's start", async () => {
@@ -795,7 +794,7 @@ describe("JamPage", () => {
     await userEvent.click(
       within(solo).getByRole("button", { name: "Add a dancer" }),
     );
-    const dialog = screen.getByRole("dialog", { name: "Add an entry" });
+    const dialog = await screen.findByRole("dialog", { name: "Add an entry" });
     const create = within(dialog).getByRole("button", {
       name: "Create a new dancer",
     });
@@ -854,7 +853,7 @@ describe("JamPage", () => {
     await userEvent.click(
       within(solo).getByRole("button", { name: "Add a dancer" }),
     );
-    const dialog = screen.getByRole("dialog", { name: "Add an entry" });
+    const dialog = await screen.findByRole("dialog", { name: "Add an entry" });
     await userEvent.type(within(dialog).getByLabelText("Dancer"), "Lil");
 
     expect(
@@ -923,7 +922,9 @@ describe("JamPage", () => {
     await userEvent.click(
       await screen.findByRole("button", { name: "Add a team" }),
     );
-    const sheet = within(screen.getByRole("dialog", { name: "Add an entry" }));
+    const sheet = within(
+      await screen.findByRole("dialog", { name: "Add an entry" }),
+    );
     await userEvent.type(sheet.getByLabelText("Crew"), "Floor");
     await userEvent.click(
       await sheet.findByRole("button", { name: /Floor Lords/ }),
@@ -944,8 +945,6 @@ describe("JamPage", () => {
 
     await entriesOf("1v1 Bboy");
     const remove = screen.getByRole("button", { name: "Delete Ventus" });
-    // Before the jam is over, battles themselves are edited in the editor.
-    expect(screen.queryByRole("button", { name: "Edit 1v1 Bboy" })).toBeNull();
     await userEvent.click(remove);
     expect(await screen.findByText("Entry deleted.")).toBeInTheDocument();
     expect(
@@ -1095,7 +1094,8 @@ describe("JamPage", () => {
       await screen.findByRole("button", { name: "Add a judge" }),
     );
     const dialog = screen.getByRole("dialog", { name: "Add a judge" });
-    await userEvent.type(within(dialog).getByLabelText("Dancer"), "atl");
+    // The picker's code comes a moment after the sheet opens.
+    await userEvent.type(await within(dialog).findByLabelText("Dancer"), "atl");
     // Search results tell namesakes apart: @handle, country, crew.
     await userEvent.click(
       await within(dialog).findByRole("button", {

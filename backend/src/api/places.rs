@@ -9,7 +9,7 @@ use super::extract::Query;
 use crate::{
     db,
     domain::place::{Place, search_key},
-    error::AppError,
+    error::{AppError, InvalidFields},
     state::AppState,
 };
 
@@ -45,7 +45,7 @@ pub struct PlaceMatch {
     tag = "places",
     operation_id = "find_place",
     params(PlaceQuery),
-    responses((status = OK, body = PlaceMatch))
+    responses((status = OK, body = PlaceMatch), InvalidFields)
 )]
 async fn find(
     State(state): State<AppState>,

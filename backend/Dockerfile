@@ -25,6 +25,10 @@ FROM gcr.io/distroless/cc-debian13:nonroot AS runtime
 COPY --from=builder /app/target/release/breakingjam /usr/local/bin/breakingjam
 ENV APP_PORT=8080 \
     LOG_FORMAT=json
+# The commit a deploy builds from (deploy.yml sets it): `/api/health` reports it, and it makes
+# each release a new image, so every deploy rolls the containers. Last, to rebuild nothing else.
+ARG RELEASE=""
+ENV RELEASE=${RELEASE}
 EXPOSE 8080
 USER nonroot
 ENTRYPOINT ["/usr/local/bin/breakingjam"]

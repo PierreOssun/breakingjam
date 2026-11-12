@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "BreakingJam API",
-    "description": "The central place for breaking jams. Authenticated calls use the `bj_session` cookie set by register, login or Google sign-in.",
+    "description": "The central place for breaking jams. Authenticated calls use the `bj_session` cookie set by login, Google sign-in, or confirming an emailed code.",
     "license": {
       "name": ""
     },
@@ -146,6 +146,16 @@
           },
           "403": {
             "description": "`email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
             "content": {
               "application/json": {
                 "schema": {
@@ -867,7 +877,7 @@
           {
             "name": "transition",
             "in": "path",
-            "description": "`publish` is for `seed_admin`+; cancel is allowed from any status but cancelled",
+            "description": "`publish` is for `seed_admin`+; `cancel` only from a public status (published, registration closed)",
             "required": true,
             "schema": {
               "type": "string",
@@ -2316,6 +2326,16 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2627,7 +2647,7 @@
         "tags": [
           "battles"
         ],
-        "summary": "Replace a battle's fields (not its position).",
+        "summary": "Replace a battle's fields (not its position); another fixed team size removes its entries\nand results, which no longer fit.",
         "operationId": "update_battle",
         "parameters": [
           {
@@ -4532,16 +4552,6 @@
               }
             }
           },
-          "409": {
-            "description": "Instagram handle already taken",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorEnvelope"
-                }
-              }
-            }
-          },
           "422": {
             "description": "Invalid fields",
             "content": {
@@ -5017,6 +5027,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlaceMatch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
                 }
               }
             }
@@ -7102,6 +7122,13 @@
           "version": {
             "type": "string",
             "description": "Crate version of the running binary."
+          },
+          "release": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The commit the running image was built from, so a deploy can tell the new release\nanswers; null outside a deploy."
           }
         }
       },
@@ -9015,7 +9042,7 @@
       },
       "UserResponse": {
         "type": "object",
-        "description": "The logged-in account, as returned by register, login and me.",
+        "description": "The logged-in account, as returned by login, the code routes and me.",
         "required": [
           "id",
           "email",

@@ -17,6 +17,7 @@ type AuthShellProps = {
 export function AuthShell({ title, error, children, footer }: AuthShellProps) {
   return (
     <section className="mx-auto flex max-w-prose flex-col gap-6 px-4 py-10 md:px-6 lg:py-20">
+      <title>{`${title} · BreakingJam`}</title>
       <h1 className="font-display text-display-lg lg:text-display-xl">
         {title}
       </h1>

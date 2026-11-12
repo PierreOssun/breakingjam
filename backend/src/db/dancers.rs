@@ -349,6 +349,7 @@ pub async fn shared_battle(
            join events e on e.id = b.event_id
            where m1.dancer_id = $1 and m2.dancer_id = $2
              and n1.status <> 'withdrawn' and n2.status <> 'withdrawn'
+             and e.deleted_at is null
            limit 1"#,
         one,
         other,
@@ -482,8 +483,11 @@ async fn redirect(
 
 /// Soft-deletes a dancer; `false` when there was none to delete.
 pub async fn soft_delete(pool: &PgPool, id: Uuid) -> sqlx::Result<bool> {
+    // The owner is let go: `user_id` is unique over deleted rows too, and would keep the
+    // account from ever owning another page.
     let result = sqlx::query!(
-        "update dancers set deleted_at = now() where id = $1 and deleted_at is null",
+        "update dancers set deleted_at = now(), user_id = null
+         where id = $1 and deleted_at is null",
         id
     )
     .execute(pool)
@@ -518,7 +522,7 @@ pub async fn participations(pool: &PgPool, dancer_id: Uuid) -> sqlx::Result<Vec<
            from event_staff s
            join events e on e.id = s.event_id
            where s.dancer_id = $1 and e.deleted_at is null and e.status not in ('draft', 'in_review')
-           order by 4, 1"#,
+           order by 4, 1, 10, 16"#,
         dancer_id,
     )
     .fetch_all(pool)

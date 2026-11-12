@@ -44,13 +44,13 @@ pub struct DancerRecord {
     pub country: String,
     /// Second country, for dancers who represent two.
     pub country2: Option<String>,
-    /// Other spellings, used to link dancers already in the database.
+    /// Other spellings, stored with the page so a search finds them.
     #[serde(default)]
     pub aliases: Vec<String>,
     /// Crew keys; a dancer may be in none, one or several.
     #[serde(default)]
     pub crews: Vec<String>,
-    /// `bboy` or `bgirl`: the avatar's look, before any battle suggests one.
+    /// `bboy` or `bgirl`: the avatar's look; without it the avatar is drawn from the id.
     pub look: Option<BattleGender>,
 }
 
@@ -62,7 +62,7 @@ pub struct CrewRecord {
     pub name: String,
     /// ISO 3166-1 alpha-2, when the crew has a home country.
     pub country: Option<String>,
-    /// Other spellings, used to link crews already in the database.
+    /// Other spellings; only `data check` reads them, to warn about near-duplicates.
     #[serde(default)]
     pub aliases: Vec<String>,
 }
@@ -308,12 +308,52 @@ impl BattleRecord {
         self.team_size.is_some_and(|size| size > 1) || !self.teams.is_empty()
     }
 
+    /// Each match's place in its round, as the site's bracket numbers them: the final is 0, and
+    /// the two matches whose winners meet in match `p` of the next round are `2p` (its side
+    /// `a`) and `2p + 1`. Files list matches in any order, so their order can't say.
+    pub fn match_positions(&self) -> Vec<i16> {
+        let mut positions: Vec<Option<i16>> = vec![None; self.matches.len()];
+        // From the final back: each round is placed by the one its winners go on to.
+        for (later, round) in ROUNDS.iter().rev().enumerate() {
+            let next = later.checked_sub(1).map(|i| ROUNDS[ROUNDS.len() - 1 - i]);
+            let mut taken = BTreeSet::new();
+            for i in 0..self.matches.len() {
+                let m = &self.matches[i];
+                if m.round != *round {
+                    continue;
+                }
+                let place = match next {
+                    None => Some(0),
+                    Some(next) => self.matches.iter().zip(&positions).find_map(|(n, at)| {
+                        let side = [&n.a, &n.b].iter().position(|s| **s == m.winner)?;
+                        (n.round == next).then_some(at.map(|p| 2 * p + side as i16))?
+                    }),
+                };
+                // A place two matches claim (a bracket `check` would refuse) goes to the first.
+                positions[i] = place.filter(|p| taken.insert(*p));
+            }
+        }
+        // What the bracket couldn't place (the small final, a winner who went nowhere) takes
+        // the free places of its round, in file order.
+        let mut placed = Vec::with_capacity(positions.len());
+        for (i, m) in self.matches.iter().enumerate() {
+            let used = |p: &i16| {
+                let same_round = |j: usize| self.matches[j].round == m.round;
+                (0..i).any(|j| same_round(j) && placed[j] == *p)
+                    || (i..positions.len()).any(|j| same_round(j) && positions[j] == Some(*p))
+            };
+            placed.push(positions[i].unwrap_or_else(|| (0..).find(|p| !used(p)).unwrap_or(0)));
+        }
+        placed
+    }
+
     /// Every entrant's result, derived from the bracket; the messages say why it doesn't hold.
     pub fn standings(&self) -> Result<Vec<Standing<'_>>, Vec<String>> {
         match (self.matches.is_empty(), self.results.is_empty()) {
             (false, false) => Err(vec!["has both matches and results; keep one".into()]),
             (true, false) => Ok(self.results.iter().map(ResultRecord::standing).collect()),
-            _ => self.bracket_standings(),
+            (true, true) => Err(vec!["has neither matches nor results".into()]),
+            (false, true) => self.bracket_standings(),
         }
     }
 
@@ -369,6 +409,16 @@ impl BattleRecord {
             }
             return;
         };
+        if third.a == third.b {
+            errors.push(format!("third: {} battles themself", third.a));
+        }
+        if third.winner != third.a && third.winner != third.b {
+            errors.push(format!(
+                "third: winner {} is not in {} vs {}",
+                third.winner, third.a, third.b
+            ));
+            return;
+        }
         for (entrant, rank) in [(third.winner.as_str(), 3), (third.loser(), 4)] {
             match standings
                 .iter_mut()

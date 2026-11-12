@@ -1,6 +1,6 @@
 # BreakingJam — DESIGN.md
 
-v1 · dark first · Tailwind CSS v3.4+ · Mockups: the "BreakingJam — design system" Design canvas (style guide + 6 screens)
+v1 · dark first · Tailwind CSS v4 · Mockups: the "BreakingJam — design system" Design canvas (style guide + 6 screens)
 
 ---
 
@@ -58,7 +58,7 @@ Light, on `bg`: text 18.0 · muted 6.1 · primary 9.9 (white on it 10.7) · acce
 | `label` | 13 / 16 | Manrope 700, UPPERCASE | 0.06em | Dates, field labels, overlines |
 | `caption` | 12 / 16 | Manrope 600 | 0 | Helper text, badges (UPPERCASE, 700, 0.04em) |
 
-Weights loaded: Unbounded 500, 700, 800 · Manrope 500, 600, 700, 800.
+Weights used: Unbounded 500, 700, 800 · Manrope 500, 600, 700, 800 (both are variable fonts, so every weight is one file).
 
 ### 2.3 Spacing, radii, borders, shadows
 
@@ -68,6 +68,8 @@ Weights loaded: Unbounded 500, 700, 800 · Manrope 500, 600, 700, 800.
 - **Shadows:** `sm` floating controls on the map · `md` sticky bars · `lg` popups, sheets, menus, toasts. Cards on a page have **no shadow**, only a border.
 
 ### 2.4 Paste-ready Tailwind config
+
+The app runs Tailwind v4: the tokens it uses are the `@theme` of `frontend/src/styles/index.css`, as hex values, and spacing is Tailwind's default 4px scale. The v3 config below is the original hand-over, kept for reference; nothing pastes it any more.
 
 Put the CSS variables in your global stylesheet. Dark is the default. Light applies through `[data-theme="light"]`, or through the OS setting when the user hasn't chosen.
 
@@ -173,7 +175,7 @@ Put the CSS variables in your global stylesheet. Dark is the default. Light appl
   Fallback: `Unbounded, "Arial Black", "Helvetica Neue", system-ui, sans-serif`
 - **Text: [Manrope](https://fonts.google.com/specimen/Manrope)** (Google Fonts, OFL, variable). A calm geometric grotesque that stays readable at 12–14px on dark backgrounds. Use it for everything else, including buttons and labels.
   Fallback: `Manrope, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif`
-- Load: `https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@500;600;700;800&display=swap` (or self-host with `next/font` / Fontsource).
+- Load: self-hosted, with `@fontsource-variable/unbounded` and `@fontsource-variable/manrope` (the site's content security policy allows no font host).
 - **Mono** (verification codes only): the system stack `ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace`. No extra font download.
 - **Non-Latin jam names** (JA, KO, ZH and others): append the matching Noto Sans family to both stacks for that locale. Check script coverage on Google Fonts before launch, and never let the browser synthesise bold.
 
@@ -297,10 +299,10 @@ Base: `inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full border text-capt
 - **< xl, logged in:** the menu icon button becomes the **avatar button**: the 40px avatar (`rounded-[12px]`) or the `User` square, in a 44px target, named "Account menu". It opens the account menu as a top sheet (§4.34).
 - **Language menu:**
   - Menu box: `w-[200px] rounded-lg border border-border-strong bg-surface-raised shadow-lg p-1`, `role="listbox"`.
-  - Options: `h-11 px-3 rounded-md`, each named in its own language with its own `lang` attribute (English, Français, Deutsch, Español, Português, Italiano, 日本語, 한국어).
+  - Options: `h-11 px-3 rounded-md`, each named in its own language with its own `lang` attribute (English, Français, Deutsch).
   - The current option gets `bg-surface font-bold` and a `Check` in `primary-text`.
   - Arrow keys move between options, Enter selects and Esc closes.
-  - Switching keeps the path and swaps the prefix (`/en/jams/…` → `/fr/jams/…`), and is remembered in a cookie.
+  - Switching keeps the path (routes carry no language prefix) and is remembered in `localStorage`.
 
 ### 4.7 Empty state
 
@@ -429,7 +431,7 @@ One component that changes shape by viewport.
       - No part is tied to a gender, and the schema has no gender field.
       - The seed picks evenly across the 13 looks there were before the rework (ten hair styles, and a cap, a beanie or a backwards cap worn in the hoodie's colour), so no avatar changed when the new parts arrived, and turns each detail on with a 1-in-3 chance. The new parts are only ever chosen.
       - A dancer the curated data (`data/dancers.toml`) names as a bgirl gets a long or tied-up style with lash flicks (lip tint 1 in 2, hoops 1 in 3); one it names as a bboy gets a short or covered style without details. It is stored as an ordinary choice, so it can be changed like any other; entering a battle never changes a look.
-    - Reference implementation: `milestones/avatar-rework/avatar-generator.py` (`make()`), with its golden avatars in `avatar-fixtures.json` and the twelve fighter presets in `fighter-presets.json`. (`frontend/pixel-avatar-generator.py` is the drawing before the rework.)
+    - Reference implementation: `milestones/avatar-rework/avatar-generator.py` (`make()`), with its golden avatars in `avatar-fixtures.json` and the twelve fighter presets in `fighter-presets.json`.
     - Never draw a flag, text, logo, or any existing character into the sprite.
   - **Photo (verified owners only):** `object-cover`, same mask.
   - `alt` is the dancer name.
@@ -445,7 +447,7 @@ One component that changes shape by viewport.
   4. aliases `text-body-sm font-semibold text-muted` ("aka …", joined with " · ")
   5. Instagram handle: Phosphor `InstagramLogo` 20 + `@handle` in `text-body font-extrabold text-text`, 44px min height. It opens `https://instagram.com/<handle>`, which the OS hands to the app. A dancer who hid it shows none; they (and the team) still see it, with `EyeSlash` 14 + "Hidden: only you and the BreakingJam team see it." in `text-caption text-muted` under it.
 - It has to look complete when cropped on its own (screenshots). Nothing inside it depends on the page around it.
-- The **OG image** for `/d/<slug>` renders this same card at 1200×630.
+- The **OG image** for a dancer page would render this same card at 1200×630 *(not built: only jams have a share image)*.
 
 ### 4.18 Pending pill
 
@@ -666,9 +668,10 @@ What the avatar button opens, logged in (§4.6). One `role="menu"` named "Accoun
   2. *Sheet only:* **Map** (`MapPin`), **Jams** (`MagnifyingGlass`), **Dancers** (`User`), then a separator when My jams follows.
   3. **My jams** (`Ticket`) → `/org/jams`, with "N drafts" when there are drafts. Only for accounts that have registered a jam (the first one makes the account an organiser), the team and admins: a dancer sees their page, the theme and Log out.
   4. **Admin** (`ShieldCheck`) → `/admin`, **admins and the super admin only**, with "N to review" (jams in review plus pending dancer and organiser claims).
-  5. Separator, then **Theme**: a `label` "Theme" (muted, upper case) over a three-way segmented control, **Light** (`Sun`) / **Dark** (`Moon`) / **Auto** (`Monitor`), full width: `rounded-full border border-border bg-surface p-1`, options `h-11 rounded-full`, the chosen one `bg-surface-raised border border-border-strong`, the others muted. It is the site's only theme switch.
-  6. Separator, then **Log out** (`SignOut`), in muted text, without confirmation.
-  7. *Sheet only:* a full-width primary lg **Register a jam**.
+  5. Separator, then **Account** (`GearSix`) → `/account`.
+  6. Separator, then **Theme**: a `label` "Theme" (muted, upper case) over a three-way segmented control, **Light** (`Sun`) / **Dark** (`Moon`) / **Auto** (`Monitor`), full width: `rounded-full border border-border bg-surface p-1`, options `h-11 rounded-full`, the chosen one `bg-surface-raised border border-border-strong`, the others muted. It is the site's only theme switch.
+  7. Separator, then **Log out** (`SignOut`), in muted text, without confirmation.
+  8. *Sheet only:* a full-width primary lg **Register a jam**.
 - **Items:** `h-11 px-3 rounded-xl gap-3`, a 20px icon, `font-bold`; hover and focus `bg-surface`. Separators: `h-px bg-border` inset 12px.
 - **Badges:** at the item's right end, `h-6 px-2 rounded-full text-caption font-extrabold`. Drafts: muted (`border border-border bg-surface text-muted`); to review: `bg-primary text-on-primary`. Hidden at 0. Each opening fetches the counts again.
 - **No page of its own:** in place of the profile block, a dashed card, `border-2 border-dashed border-border-strong rounded-[20px] p-4`: a `User` square, "Are you on BreakingJam?" (`font-extrabold`) over "Find your page, or make it." (muted), then a full-width secondary sm **Find my page** with `MagnifyingGlass`, to the welcome step (§4.36) and back to the page it was opened on.
@@ -720,7 +723,7 @@ The jam page in edit mode is made of blocks, one per part of the page (Venue, Ba
 The one way to play a battle video: on a dancer page's past rows (§4.14) and in a jam's Battles section (§6), nowhere else (no play icon on upcoming rows, headers or cards).
 
 - `h-8 px-3 rounded-full border border-border bg-surface text-[13px] font-bold`, hover `border-border-strong`: a filled `Play` 14px in `text-primary-text`, then "Video". The hit area grows to 44px (`after:-inset-y-1.5`).
-- Named "Watch <what>" (the jam, or the dancer or team). It opens the YouTube player in a modal, from the entry's start time (§6 Video embeds); the visitor stays on the page.
+- Named "Watch <what>" (the jam, or the dancer or team). It opens the YouTube player in a modal, from the entry's start time (ARCHITECTURE.md §6 Video embeds); the visitor stays on the page.
 - Order: the pill, then the result. No video, no pill.
 - *Planned, with match videos:* several videos become "Videos · 3", opening a menu (desktop) or a bottom sheet (phones) that lists each video's title and source. Today an entry has at most one video, so nothing shows more than one.
 
@@ -935,7 +938,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **The last card**, `rounded-[28px] border border-dashed border-border-strong p-5`, no rings: an **Organisers** chip (`h-8 rounded-full border border-border body-sm font-bold`) and a primary sm **Get in touch** to `/contact`, side by side.
 - Cards stack with `gap-5` on phones, in two columns with `gap-6` from lg (the join card takes the next cell). Light and dark both come from the tokens.
 
-**Dancer page** (`/d/<slug>`). It's a record, not a social profile: no feed, followers, ratings, rankings or win/loss.
+**Dancer page** (`/dancers/<id>`). It's a record, not a social profile: no feed, followers, ratings, rankings or win/loss.
 - **Mobile 375:**
   1. Header.
   2. Back/Share bar.
@@ -953,7 +956,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Desktop 1024+:** `grid grid-cols-[340px_1fr] gap-12`. The left column is `sticky top-6` and holds the card, chips, action and a 2×2 stats grid. The right column holds the lists, with `display-md` section titles.
 - **Verify modal** (4.9 + 4.19):
   - Title "Verify it’s you", two lines of explanation, then the code.
-  - Buttons: **Copy code** (primary), **Open Instagram** (secondary, opens the @breakingjam DM thread), **Done** (primary too: an exception to §4.1's one primary per region, chosen by the author so the way out reads as clearly as the code). Phones: one full-width column in that order. From lg: a two-column grid, Open Instagram beside Copy code and Done under Copy code; three in a row are wider than the 480px dialog.
+  - Buttons: **Copy code** (primary), **Open Instagram** (secondary, opens the @breaking.jam DM thread), **Done** (primary too: an exception to §4.1's one primary per region, chosen by the author so the way out reads as clearly as the code). Phones: one full-width column in that order. From lg: a two-column grid, Open Instagram beside Copy code and Done under Copy code; three in a row are wider than the 480px dialog.
   - When someone else has already requested it: an inline notice above the code, and the request is still allowed.
   - Submitting moves the page to the pending state.
 - **Edit sheet** (4.9 + 4.20):
@@ -1080,6 +1083,6 @@ The social and app mark: the same “Jam” as the wordmark (“Breaking” + th
 
 *Decoration utility:*
 ```css
-.rings { position:absolute; border-radius:9999px; pointer-events:none;
-  background: repeating-radial-gradient(circle at center, transparent 0 27px, rgb(var(--color-primary-text) / .16) 27px 28px); }
+@utility rings { position:absolute; border-radius:9999px; pointer-events:none;
+  background: repeating-radial-gradient(circle at center, transparent 0 27px, color-mix(in srgb, var(--color-primary-text) 16%, transparent) 27px 28px); }
 ```

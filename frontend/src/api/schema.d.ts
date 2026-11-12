@@ -582,7 +582,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Replace a battle's fields (not its position). */
+        /**
+         * Replace a battle's fields (not its position); another fixed team size removes its entries
+         *     and results, which no longer fit.
+         */
         put: operations["update_battle"];
         post?: never;
         /** Delete a battle and its entries; a jam past draft keeps at least one. */
@@ -1976,6 +1979,11 @@ export interface components {
             status: string;
             /** @description Crate version of the running binary. */
             version: string;
+            /**
+             * @description The commit the running image was built from, so a deploy can tell the new release
+             *     answers; null outside a deploy.
+             */
+            release?: string | null;
         };
         /** @description An approval or a rejection, for the history under the jam queue. */
         JamDecision: {
@@ -2800,7 +2808,7 @@ export interface components {
          * @enum {string}
          */
         Transition: "submit" | "publish" | "close-registration" | "cancel";
-        /** @description The logged-in account, as returned by register, login and me. */
+        /** @description The logged-in account, as returned by login, the code routes and me. */
         UserResponse: {
             /**
              * Format: uuid
@@ -2950,6 +2958,15 @@ export interface operations {
             };
             /** @description `email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3473,7 +3490,7 @@ export interface operations {
             path: {
                 /** @description Jam id */
                 id: string;
-                /** @description `publish` is for `seed_admin`+; cancel is allowed from any status but cancelled */
+                /** @description `publish` is for `seed_admin`+; `cancel` only from a public status (published, registration closed) */
                 transition: "submit" | "publish" | "close-registration" | "cancel";
             };
             cookie?: never;
@@ -4504,6 +4521,15 @@ export interface operations {
             };
             /** @description Already a current member, or a past membership with the same `since` */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6085,15 +6111,6 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Instagram handle already taken */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorEnvelope"];
-                };
-            };
             /** @description Invalid fields */
             422: {
                 headers: {
@@ -6439,6 +6456,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlaceMatch"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };

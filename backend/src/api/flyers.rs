@@ -81,9 +81,20 @@ async fn upload(
     )
     .map_err(|err| AppError::Internal(err.into()))?;
     let flyer = UploadedFlyer { url, card_url };
-    let (event, old) = db::events::set_flyer(&state.pool, id, Some(&flyer)).await?;
-    discard(&state.media, old);
-    Ok(Json(event))
+    match db::events::set_flyer(&state.pool, id, Some(&flyer)).await {
+        Ok((event, old)) => {
+            discard(&state.media, old);
+            Ok(Json(event))
+        }
+        Err(err) => {
+            // The jam was deleted meanwhile: nothing points at the new images. Any other error
+            // may hide a save that went through, so they stay.
+            if matches!(err, sqlx::Error::RowNotFound) {
+                discard(&state.media, Some(flyer));
+            }
+            Err(err.into())
+        }
+    }
 }
 
 /// Go back to the generated flyer; also how admins take down an unsuitable one.

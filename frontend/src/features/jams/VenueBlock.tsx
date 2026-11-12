@@ -16,7 +16,7 @@ import { FormError } from "../../components/FormError";
 import { OptionalLabel } from "../../components/OptionalLabel";
 import { TextField } from "../../components/TextField";
 import { countryName } from "../../lib/countries";
-import type { LngLat } from "../map/PinMap";
+import type { LngLat } from "../../lib/position";
 import { EditorBlock, SummaryLines } from "./EditorBlock";
 import { type Place, reverse, search } from "./geocode";
 import type { JamFormValues } from "./jamFields";

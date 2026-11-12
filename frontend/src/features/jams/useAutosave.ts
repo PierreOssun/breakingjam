@@ -73,6 +73,26 @@ export function useJamAutosave(jam: Jam): JamDraft {
   const again = useRef(false);
   const isDraft = jam.status === "draft";
 
+  // The jam can change elsewhere while the editor is open: another tab, a phone, the team. A
+  // newer copy that is not this editor's own save brings its values in, but for the fields
+  // being edited here, so the next save (the whole jam) doesn't put the old ones back.
+  const seen = useRef(jam.updated_at);
+  useEffect(() => {
+    // Newer only: an older answer can land after this editor's own save.
+    const newer = Date.parse(jam.updated_at) > Date.parse(seen.current);
+    if (!newer || busy.current) return;
+    seen.current = jam.updated_at;
+    const fresh = jamValues(jam);
+    const edited = Object.fromEntries(
+      Object.entries(latest.current).filter(
+        ([key, value]) => value !== stored.current[key as keyof JamFormValues],
+      ),
+    );
+    stored.current = fresh;
+    latest.current = { ...fresh, ...edited };
+    setValues(latest.current);
+  }, [jam]);
+
   /** The PUT: null when accepted, else what the server refused. */
   const send = useCallback(
     async (next: JamFormValues): Promise<SaveErrors | null> => {
@@ -86,6 +106,8 @@ export function useJamAutosave(jam: Jam): JamDraft {
           return { ...Object.fromEntries(fields), root: rest ?? undefined };
         }
         stored.current = next;
+        // This editor's own save: not a change from elsewhere to take in.
+        seen.current = data.updated_at;
         storeJam(queryClient, { id: jam.id, slug: jam.slug }, data);
         // New days may start or end the jam: what its writer may do comes from the server.
         if (data.phase !== jam.phase)

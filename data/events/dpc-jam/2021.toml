@@ -48,7 +48,7 @@ gun-muha = { members = ["gun", "muha"] }
 jerry-the-metall-ralfinio = { crew = "3-16", members = ["jerry-the-metall", "ralfinio"] }
 jetleg-mattix = { members = ["jet-leg", "mattix"] }
 kaneki-the-kalameet-laziness = { members = ["laziness", "kaneki"] }
-lucky-mighty-jim = { members = ["mighty-jim", "lucky"] }
+lucky-mighty-jim = { members = ["mighty-jimm", "lucky"] }
 mowgly-snap = { members = ["mowgly", "snap"] }
 naki-tasic = { members = ["tasic", "naki"] }
 phil-wizard-sunni = { members = ["phil-wizard", "sunni"] }

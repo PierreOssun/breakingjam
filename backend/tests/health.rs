@@ -11,6 +11,8 @@ async fn health_returns_ok(pool: PgPool) {
     assert_eq!(response.status, StatusCode::OK);
     assert!(response.headers.contains_key("x-request-id"));
     assert_eq!(response.json["status"], "ok");
+    // What `RELEASE` holds: the deploy waits for its own commit here.
+    assert_eq!(response.json["release"], "test-RELEASE");
 }
 
 #[sqlx::test]

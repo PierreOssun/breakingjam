@@ -7,7 +7,7 @@ lat = 35.1851
 lng = 136.8998
 sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One"]
 judges = ["storm", "freeze", "wicket", "kosuke", "mounir"]
-mcs = ["rakaa"]
+mcs = ["rakaa-iriscience"]
 djs = ["dj-mar-ski"]
 
 [[battles]]

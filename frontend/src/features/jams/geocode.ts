@@ -1,7 +1,7 @@
 // Place search with Photon (komoot's OpenStreetMap geocoder, decided in M24): it allows
 // suggestions as you type, which Nominatim's policy does not. Data © OpenStreetMap contributors.
 
-import type { LngLat } from "../map/PinMap";
+import type { LngLat } from "../../lib/position";
 
 /** A place Photon found, read into what the venue block fills in. */
 export type Place = {

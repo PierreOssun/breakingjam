@@ -7,7 +7,7 @@ import {
 } from "@phosphor-icons/react";
 import type { TFunction } from "i18next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { lazy, Suspense, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
 import { Button } from "../../components/Button";
@@ -19,14 +19,20 @@ import type { Video } from "../../components/VideoDialog";
 import { VideoPill } from "../../components/VideoPill";
 import { daysOf, formatBattleStart } from "../../lib/dates";
 import { AddChip, DancerChip } from "../dancers/DancerChip";
-import { BattleDialog } from "./BattleDialog";
 import { BattleResults } from "./BattleResults";
 import { membersPerEntry, prizeLine } from "./battleFields";
 import { entryLabel } from "./entryFields";
 import { EntryChips } from "./EntryChips";
-import { EntryDialog } from "./EntryDialog";
 import { takesResults } from "./jamDetail";
 import { resultsOf } from "./rounds";
+
+// The form's code loads when someone edits: visitors, who never do, don't download it.
+const BattleDialog = lazy(() =>
+  import("./BattleDialog").then((m) => ({ default: m.BattleDialog })),
+);
+const EntryDialog = lazy(() =>
+  import("./EntryDialog").then((m) => ({ default: m.EntryDialog })),
+);
 
 type Entry = Schemas["Entry"];
 
@@ -58,6 +64,7 @@ type BattleCardProps = {
 export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<Entry | "new" | null>(null);
+  const [, open] = useTransition();
   const [managing, setManaging] = useState(false);
   const remove = useDeleteEntry(battle.event_id);
   // Its organiser manages the results, even once the jam is over.
@@ -123,7 +130,7 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
               </div>
               <IconButton
                 label={t("org.entries.editOne", { name: entryLabel(entry) })}
-                onClick={() => setEditing(entry)}
+                onClick={() => open(() => setEditing(entry))}
               >
                 <PencilSimple size={20} weight="bold" aria-hidden />
               </IconButton>
@@ -152,7 +159,7 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
                     ? t("org.entries.addDancer")
                     : t("org.entries.addTeam")
                 }
-                onClick={() => setEditing("new")}
+                onClick={() => open(() => setEditing("new"))}
               />
             )}
             <div className="ml-auto flex flex-wrap justify-end gap-2">
@@ -176,13 +183,15 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
               <ResultsButton jam={jam} battle={battle} hasResults={!!results} />
             </div>
           </div>
-          {editing !== null && (
-            <EntryDialog
-              battle={battle}
-              entry={editing === "new" ? undefined : editing}
-              onClose={() => setEditing(null)}
-            />
-          )}
+          <Suspense fallback={null}>
+            {editing !== null && (
+              <EntryDialog
+                battle={battle}
+                entry={editing === "new" ? undefined : editing}
+                onClose={() => setEditing(null)}
+              />
+            )}
+          </Suspense>
         </>
       )}
     </li>
@@ -262,23 +271,31 @@ function ResultsButton({
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [opening, startOpening] = useTransition();
   if (!jam.can_edit_battles || !takesResults(jam)) return null;
   return (
     <>
-      <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
+      <Button
+        variant="secondary"
+        size="sm"
+        loading={opening}
+        onClick={() => startOpening(() => setOpen(true))}
+      >
         <Trophy size={18} weight="bold" aria-hidden />
         {t(hasResults ? "org.results.edit" : "org.results.enter")}
       </Button>
-      {open && (
-        <BattleDialog
-          jamId={jam.id}
-          days={daysOf(jam.starts_on, jam.ends_on)}
-          country={jam.country}
-          battle={battle}
-          step="results"
-          onClose={() => setOpen(false)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {open && (
+          <BattleDialog
+            jamId={jam.id}
+            days={daysOf(jam.starts_on, jam.ends_on)}
+            country={jam.country}
+            battle={battle}
+            step="results"
+            onClose={() => setOpen(false)}
+          />
+        )}
+      </Suspense>
     </>
   );
 }

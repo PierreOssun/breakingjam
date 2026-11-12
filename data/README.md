@@ -8,6 +8,8 @@ data/
   crews.toml                        # every crew, by key
   series/<series>.toml              # a recurring jam: its name and where its editions were drafted from
   events/<series>/<edition>.toml    # one jam per file, e.g. events/red-bull-bc-one/2019.toml
+  drafts/<series>/<edition>.toml    # editions held back until a missing fact is found; never imported
+  places/                           # the GeoNames cities a search can name (its own README)
 ```
 
 The dev seed (`cargo run --bin seed`, from `backend/`) imports every jam here that passes `check` into a fresh local or UAT database. Production gets them through the **Import data** workflow (`cargo run --bin data -- import OWNER_EMAIL`), which adds only the jams, dancers and crews no earlier run wrote: a new file reaches a database that already has the others, but a fix to a jam already imported does not (fix it on the site, as the team).
@@ -25,7 +27,7 @@ cargo run --bin data -- check      # from backend/
 ```toml
 menno = { name = "Menno", country = "NL" }
 lilou = { name = "Lilou", country = "FR", country2 = "DZ" }
-hiro-10 = { name = "Hiro 10", country = "JP", aliases = ["Hiro10"] }
+hiro10 = { name = "Hiro10", country = "JP", aliases = ["Hiro 10"] }
 ```
 
 - **Keys** are lower-case words joined by `-` and never change: the import identifies a dancer by key.
@@ -33,7 +35,7 @@ hiro-10 = { name = "Hiro 10", country = "JP", aliases = ["Hiro10"] }
 - **Two dancers with one name** get two keys and the same `name`, e.g. `benny` and `benny-flying-steps`.
 - **Crews:** `crews = ["formless-corp"]` lists a dancer's crews; a dancer may have none, one or several.
 - **Unknown country:** `country = "ZZ"` (the ISO code for an unknown region). The site shows a globe instead of a flag.
-- **Look:** `look = "bboy"` or `look = "bgirl"` picks the generated avatar. Without it, the dancer's first bboy or bgirl battle picks it; mixed battles leave it random.
+- **Look:** `look = "bboy"` or `look = "bgirl"` picks the generated avatar. Without it the avatar is drawn from the dancer's id; battles never change it.
 - **Every line is a page:** the import writes every dancer, in a jam or not, and stores its key (`dancers.data_key`), so `GET /api/dancers/by-key/{key}` finds them in any environment (the Team page links its people this way). A dancer in no jam still gets a `data check` warning, as it is often a leftover spelling.
 
 **`crews.toml`**, the same way:

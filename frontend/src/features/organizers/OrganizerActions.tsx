@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { lazy, Suspense, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import type { Schemas } from "../../api/client";
 import { Button } from "../../components/Button";
 import { AddHandleButton } from "../verify/AddHandleButton";
 import { VerifyButton } from "../verify/VerifyButton";
-import { OrganizerEditDialog } from "./OrganizerEditDialog";
+
+// The form's code loads when someone edits: visitors, who never do, don't download it.
+const OrganizerEditDialog = lazy(() =>
+  import("./OrganizerEditDialog").then((m) => ({
+    default: m.OrganizerEditDialog,
+  })),
+);
 
 /**
  * The owner's actions on their organiser page: add the handle, verify it (the same code and
@@ -18,13 +24,15 @@ export function OrganizerActions({
   const { t } = useTranslation();
   const handle = organizer.instagram_handle;
   const [editing, setEditing] = useState<"page" | "handle" | null>(null);
+  // A transition, so the button shows it is loading until the form's code has come.
+  const [opening, open] = useTransition();
 
   if (!organizer.can_edit) return null;
   return (
     <div className="flex flex-col gap-3">
       {!handle && (
         <>
-          <AddHandleButton onClick={() => setEditing("handle")} />
+          <AddHandleButton onClick={() => open(() => setEditing("handle"))} />
           <p className="text-caption text-muted">{t("organizer.whyHandle")}</p>
         </>
       )}
@@ -38,17 +46,20 @@ export function OrganizerActions({
       <Button
         variant="secondary"
         className="w-full"
-        onClick={() => setEditing("page")}
+        loading={opening}
+        onClick={() => open(() => setEditing("page"))}
       >
         {t("organizer.edit")}
       </Button>
-      {editing && (
-        <OrganizerEditDialog
-          organizer={organizer}
-          focusHandle={editing === "handle"}
-          onClose={() => setEditing(null)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {editing && (
+          <OrganizerEditDialog
+            organizer={organizer}
+            focusHandle={editing === "handle"}
+            onClose={() => setEditing(null)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

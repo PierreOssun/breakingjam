@@ -17,6 +17,9 @@ pub struct HealthResponse {
     pub status: &'static str,
     /// Crate version of the running binary.
     pub version: &'static str,
+    /// The commit the running image was built from, so a deploy can tell the new release
+    /// answers; null outside a deploy.
+    pub release: Option<String>,
 }
 
 /// `GET /health`.
@@ -42,5 +45,6 @@ async fn health(State(state): State<AppState>) -> Result<Json<HealthResponse>, A
     Ok(Json(HealthResponse {
         status: "ok",
         version: env!("CARGO_PKG_VERSION"),
+        release: state.config.release.clone(),
     }))
 }

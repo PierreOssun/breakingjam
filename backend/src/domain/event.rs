@@ -129,17 +129,16 @@ impl Missing {
 
 impl EventStatus {
     /// The status after `transition`, following draft → in_review → published →
-    /// registration_closed (the team publishes drafts directly), with cancel allowed from any
-    /// state but cancelled. Whether the jam is over is its dates' business, not its status'.
+    /// registration_closed (the team publishes drafts directly). Only a jam that went public can
+    /// be cancelled, since a cancelled jam stays public: a draft would skip its review that way,
+    /// and is deleted instead. Whether the jam is over is its dates' business, not its status'.
     pub fn apply(self, transition: Transition) -> Result<Self, InvalidTransition> {
         use EventStatus::*;
         match (self, transition) {
             (Draft, Transition::Submit) => Ok(InReview),
             (Draft, Transition::Publish) => Ok(Published),
             (Published, Transition::CloseRegistration) => Ok(RegistrationClosed),
-            (Draft | InReview | Published | RegistrationClosed, Transition::Cancel) => {
-                Ok(Cancelled)
-            }
+            (Published | RegistrationClosed, Transition::Cancel) => Ok(Cancelled),
             (from, transition) => Err(InvalidTransition { from, transition }),
         }
     }

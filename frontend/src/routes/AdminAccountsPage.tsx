@@ -10,6 +10,7 @@ import { api, type Schemas, unwrap } from "../api/client";
 import { Button } from "../components/Button";
 import { ChipRow } from "../components/ChipRow";
 import { Dialog } from "../components/Dialog";
+import { FormError } from "../components/FormError";
 import { InlineEmpty } from "../components/InlineEmpty";
 import { MoreList } from "../components/MoreList";
 import { SelectField } from "../components/SelectField";
@@ -188,7 +189,6 @@ function TeamRoleDialog({
       });
       onClose();
     },
-    onError: (error) => toast({ kind: "error", message: error.message }),
   });
 
   return (
@@ -221,6 +221,8 @@ function TeamRoleDialog({
       <p className="text-body-sm text-muted">
         {t(`admin.accounts.explain.${role}`)}
       </p>
+      {/* Here, not in a toast: that would sit under this dialog. */}
+      <FormError message={save.error?.message} />
     </Dialog>
   );
 }

@@ -1,5 +1,6 @@
+import { useLayoutEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Outlet } from "react-router";
+import { Outlet, useLocation, useNavigationType } from "react-router";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { TestSiteBanner } from "./TestSiteBanner";
@@ -17,8 +18,23 @@ function SkipLink() {
   );
 }
 
+/** Another page, opened by a link or a redirect, starts at its top; Back and Forward keep the
+ * browser's position, and a link to a part of a page (`#battles`) goes there. */
+function useTopOfNewPage() {
+  const { pathname, hash } = useLocation();
+  const back = useNavigationType() === "POP";
+  const last = useRef(pathname);
+  useLayoutEffect(() => {
+    // The same page with another search or filter stays where it is.
+    if (last.current === pathname) return;
+    last.current = pathname;
+    if (!back && !hash) window.scrollTo(0, 0);
+  }, [pathname, hash, back]);
+}
+
 /** Content pages: sticky header, document scroll, footer (DESIGN.md §5). */
 export function PageLayout() {
+  useTopOfNewPage();
   return (
     <ToastProvider>
       <div className="flex min-h-dvh flex-col">

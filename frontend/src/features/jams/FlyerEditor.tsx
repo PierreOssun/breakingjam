@@ -1,11 +1,10 @@
 import { Trash, UploadSimple, WarningCircle } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
 import { useToast } from "../../components/useToast";
-import { FlyerCropDialog } from "./FlyerCropDialog";
 import {
   ACCEPTED_TYPES,
   fileProblem,
@@ -14,6 +13,11 @@ import {
   tooSmall,
 } from "./flyerCrop";
 import { storeJam } from "./queries";
+
+// The cropping screen's code loads when a flyer is picked: visitors never download it.
+const FlyerCropDialog = lazy(() =>
+  import("./FlyerCropDialog").then((m) => ({ default: m.FlyerCropDialog })),
+);
 
 type Jam = Schemas["EventResponse"];
 type Problem = "type" | "size" | "small" | "unreadable";
@@ -158,18 +162,20 @@ function useFlyerUpload(jam: Jam) {
       </p>
     ),
     dialog: picked && (
-      <FlyerCropDialog
-        image={picked}
-        jam={jam}
-        saving={upload.isPending}
-        onCrop={(crop) =>
-          upload.mutate(
-            { image: picked, crop },
-            { onSuccess: () => setPicked(null) },
-          )
-        }
-        onClose={() => setPicked(null)}
-      />
+      <Suspense fallback={null}>
+        <FlyerCropDialog
+          image={picked}
+          jam={jam}
+          saving={upload.isPending}
+          onCrop={(crop) =>
+            upload.mutate(
+              { image: picked, crop },
+              { onSuccess: () => setPicked(null) },
+            )
+          }
+          onClose={() => setPicked(null)}
+        />
+      </Suspense>
     ),
   };
 }

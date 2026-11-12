@@ -41,6 +41,26 @@ pub async fn issue(
     Ok(stored > 0)
 }
 
+/// Whether `code` is the account's live code, without spending a try: only to decide what
+/// to do before `redeem`, which stays the judge.
+pub async fn matches(
+    pool: &PgPool,
+    user_id: Uuid,
+    purpose: CodePurpose,
+    code: &str,
+) -> sqlx::Result<bool> {
+    sqlx::query_scalar!(
+        r#"select exists(select 1 from email_codes
+                         where user_id = $1 and purpose = $2 and attempts < 5
+                           and expires_at > now() and code = $3) as "matches!""#,
+        user_id,
+        purpose as _,
+        code,
+    )
+    .fetch_one(pool)
+    .await
+}
+
 /// Spends one of the 5 tries of the account's live code: `true`, and the code gone, when
 /// `code` is it.
 pub async fn redeem(

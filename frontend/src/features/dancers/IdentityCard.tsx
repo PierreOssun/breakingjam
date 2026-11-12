@@ -19,8 +19,6 @@ type IdentityCardProps = {
   /** The handle is kept off the public page: whoever is sent it sees that it is. */
   instagramHidden?: boolean;
   avatar: ReactNode;
-  /** The name's heading: the page title on the dancer's own page, a sub-head elsewhere. */
-  heading?: "h1" | "h3";
 };
 
 /**
@@ -37,7 +35,6 @@ export function IdentityCard(props: IdentityCardProps) {
     instagram,
     avatar,
   } = props;
-  const Heading = props.heading ?? "h1";
   const { t } = useTranslation();
   const flags = props.flags.filter((c): c is string => Boolean(c)).slice(0, 2);
 
@@ -47,9 +44,7 @@ export function IdentityCard(props: IdentityCardProps) {
       {/* `relative` keeps the content painted above the absolutely positioned rings. */}
       <div className="relative">{avatar}</div>
       <div className="relative flex flex-wrap items-center gap-2">
-        <Heading className="font-display text-display-lg break-words">
-          {name}
-        </Heading>
+        <h1 className="font-display text-display-lg break-words">{name}</h1>
         {verified && <VerifiedTick />}
         {/* One group: the city goes to the next line with its flags, never alone. */}
         <span className="flex min-w-0 flex-wrap items-center gap-2">

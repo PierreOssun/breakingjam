@@ -158,10 +158,14 @@ fn check_identities<'a>(
             std::iter::once(identity.name).chain(identity.aliases.iter().map(String::as_str))
         {
             // A trailing s too: `Formless Corp` and `Formless Corps` are one crew.
-            spellings
-                .entry(spelling(name).trim_end_matches('s').to_owned())
-                .or_default()
-                .insert((identity.key, identity.name));
+            let spelling = spelling(name).trim_end_matches('s').to_owned();
+            // A name in another script has no ASCII letters: those are not alike.
+            if !spelling.is_empty() {
+                spellings
+                    .entry(spelling)
+                    .or_default()
+                    .insert((identity.key, identity.name));
+            }
         }
     }
     // Two keys with one exact name were split on purpose (homonyms); only near-spellings warn.

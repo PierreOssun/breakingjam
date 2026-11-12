@@ -491,6 +491,46 @@ async fn organisers_enter_matches_and_placings_follow(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn another_team_size_starts_the_battle_fresh(pool: PgPool) {
+    let jam = jam(pool).await;
+    let mut two_v_two = one_v_one();
+    two_v_two["team_size"] = json!(2);
+    let battle = id_of(&jam.battle(two_v_two.clone()).await);
+    let (lilg, ventus) = (jam.dancer("Lil G").await, jam.dancer("Ventus").await);
+    let duo = jam
+        .entry(&battle, json!({ "dancer_ids": [lilg, ventus] }))
+        .await;
+    assert_eq!(duo.status, StatusCode::CREATED);
+    let uri = format!("/api/battles/{battle}");
+    let entries = async || {
+        let list = format!("/api/events/{}/battles", jam.event_id);
+        let listed = send(&jam.app, get(&list, Some(&jam.owner))).await;
+        listed.json[0]["entries"].as_array().unwrap().len()
+    };
+
+    // A new name or prize leaves the teams alone.
+    let mut renamed = two_v_two;
+    renamed["name"] = json!("Duo battle");
+    let saved = send(&jam.app, put(&uri, renamed, Some(&jam.owner))).await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.json);
+    assert_eq!(entries().await, 1);
+
+    // A duo can't be an entry of a 1v1: they go, and each dancer can enter alone.
+    let saved = send(&jam.app, put(&uri, one_v_one(), Some(&jam.owner))).await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.json);
+    assert_eq!(entries().await, 0);
+    let solo = jam.entry(&battle, json!({ "dancer_ids": [lilg] })).await;
+    assert_eq!(solo.status, StatusCode::CREATED, "{}", solo.json);
+
+    // A showcase of no fixed size holds any entry: nothing to remove.
+    let showcase =
+        json!({ "format": "showcase", "gender": "mixed", "age": "adult", "age_min": 18 });
+    let saved = send(&jam.app, put(&uri, showcase, Some(&jam.owner))).await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.json);
+    assert_eq!(entries().await, 1);
+}
+
+#[sqlx::test]
 async fn deleting_a_battle_removes_its_entries(pool: PgPool) {
     let jam = jam(pool).await;
     let battle = id_of(&jam.battle(one_v_one()).await);

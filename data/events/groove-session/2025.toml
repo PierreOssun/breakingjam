@@ -74,7 +74,7 @@ noneski-eph = { members = ["noneski", "eph"] }
 philip-buch = { members = ["philip", "buch"] }
 phumlailai-minix = { members = ["phumlailai", "minix"] }
 purple-carolinho = { members = ["purple", "carolinho"] }
-ronnie-ruen-tnt = { members = ["ronnie-ruen", "tnt"] }
+ronnie-ruen-tnt = { members = ["ronnie", "tnt"] }
 royal-cesar = { members = ["royal", "cesar"] }
 wingzero-nora-leah = { members = ["wingzero", "nora-leah"] }
 ziprock-seigo = { members = ["ziprock", "seigo"] }

@@ -3,8 +3,7 @@ formless-corp = { name = "Formless Corp", aliases = ["Formless Corps"] }
 super-kidz = { name = "Super Kidz" }
 all-area-crew = { name = "All Area Crew", country = "JP" }
 artistreet = { name = "Artistreet", country = "KR" }
-b-town-all-stars = { name = "B-Town All Stars", country = "DE" }
-b-town-allstars = { name = "B-Town Allstars", country = "DE" }
+b-town-allstars = { name = "B-Town Allstars", country = "DE", aliases = ["B-Town All Stars"] }
 bag-of-trix = { name = "Bag of Trix", country = "CA" }
 battle-born = { name = "Battle Born", country = "US" }
 black-noise = { name = "Black Noise", country = "ZA" }
@@ -14,7 +13,7 @@ city-rockers = { name = "City Rockers", country = "DE" }
 crazy-force-crew = { name = "Crazy Force Crew", country = "CH" }
 deep-trip = { name = "Deep Trip", country = "CH" }
 doble-k-o = { name = "Doble K.O.", country = "ES" }
-drifterz = { name = "Drifterz", country = "KR" }
+drifterz = { name = "Drifterz", country = "KR", aliases = ["DRIFTERZ CREW"] }
 dynamo = { name = "Dynamo", country = "CH" }
 expression-crew = { name = "Expression Crew", country = "KR" }
 extreme-crew = { name = "Extreme Crew", country = "KR" }
@@ -24,7 +23,7 @@ flooriorz = { name = "Flooriorz", country = "JP", aliases = ["Floorriorz"] }
 flow-xl = { name = "Flow XL", country = "KR" }
 flying-steps = { name = "Flying Steps", country = "DE" }
 formosa = { name = "Formosa", country = "TW" }
-foundnation = { name = "Foundnation", country = "JP" }
+foundnation = { name = "Foundnation", country = "JP", aliases = ["Found Nation"] }
 funk-fellaz = { name = "Funk Fellaz", country = "DE" }
 fusion-mc = { name = "Fusion MC", country = "KR" }
 gamblerz = { name = "Gamblerz", country = "KR" }
@@ -46,8 +45,7 @@ pockemon = { name = "Pockémon", country = "FR" }
 predatorz = { name = "Predatorz", country = "RU" }
 quite-boom = { name = "Quite Boom", country = "CN" }
 robot-force = { name = "Robot Force", country = "CN" }
-rock-force = { name = "Rock Force", country = "US" }
-rock-force-crew = { name = "Rock Force Crew", country = "US" }
+rock-force = { name = "Rock Force", country = "US", aliases = ["Rock Force Crew"] }
 s-i-n-e-crew = { name = "S.I.N.E. Crew", country = "VN" }
 scrambling-feet = { name = "Scrambling Feet", country = "CH" }
 smokemon = { name = "Smokémon", country = "FR" }
@@ -62,8 +60,8 @@ tdb = { name = "TDB", country = "DE" }
 team-ohh = { name = "Team Ohh", country = "JP" }
 team-vinotinto = { name = "Team Vinotinto", country = "VE" }
 the-family = { name = "The Family", country = "FR" }
-the-ruggeds = { name = "The Ruggeds", country = "NL" }
-top-9 = { name = "Top 9", country = "RU" }
+the-ruggeds = { name = "The Ruggeds", country = "NL", aliases = ["Ruggeds"] }
+top-9 = { name = "Top 9", country = "RU", aliases = ["Top9"] }
 top-coalition = { name = "Top Coalition", country = "TW" }
 tpec = { name = "TPEC", country = "TW" }
 turn-phrase-crew = { name = "Turn Phrase Crew", country = "JP" }
@@ -80,7 +78,7 @@ belchina = { name = "BelChina" }
 breaknuts = { name = "Breaknuts", aliases = ["BREAKNUTS"] }
 ccu7 = { name = "CCU7" }
 chasseurs2primes = { name = "Chasseurs2primes" }
-fresh-allstars = { name = "Fresh Allstars" }
+fresh-allstars = { name = "Fresh Allstars", aliases = ["Fresh All Stars"] }
 from-downtown = { name = "From DownTown" }
 from-favela = { name = "From Favela" }
 funky-belgianz = { name = "FUNKY BELGIANZ" }
@@ -115,8 +113,7 @@ ariras = { name = "Ariras" }
 ariya = { name = "ARIYA" }
 assassins = { name = "Assassins" }
 babylon = { name = "Babylon" }
-belgians-with-attitude = { name = "BELGIANS WITH ATTITUDE" }
-belgium-with-attitude = { name = "Belgium With Attitude" }
+belgium-with-attitude = { name = "Belgium With Attitude", aliases = ["BELGIANS WITH ATTITUDE"] }
 berry-groove = { name = "BERRY GROOVE" }
 blacklist = { name = "Blacklist", country = "FR" }
 boogie-burrito = { name = "Boogie Burrito" }
@@ -128,8 +125,7 @@ brickheadz = { name = "Brickheadz" }
 bring-it-back-squad = { name = "BRING IT BACK SQUAD" }
 cali-seoul = { name = "Cali Seoul" }
 ceanne = { name = "CEANNE" }
-charlie-chill-out = { name = "Charlie Chill-Out", aliases = ["Charlie Chill Out"] }
-charlie-chillout = { name = "Charlie Chillout" }
+charlie-chill-out = { name = "Charlie Chill-Out", aliases = ["Charlie Chill Out", "Charlie Chillout"] }
 concrete-all-stars = { name = "Concrete All Stars", aliases = ["Concrete All-Stars"] }
 concrete-force-kingz = { name = "Concrete Force Kingz" }
 corrupt-path = { name = "Corrupt Path" }
@@ -142,21 +138,17 @@ data = { name = "Data" }
 doa = { name = "DOA" }
 dol = { name = "Dol" }
 double-dragon = { name = "Double Dragon" }
-drifterz-crew = { name = "DRIFTERZ CREW" }
 el-nino = { name = "El Nino" }
 elusive-fenz = { name = "Elusive Fenz" }
-flexible-flav = { name = "Flexible Flav" }
+flexible-flav = { name = "Flexible Flav", aliases = ["Flxible Flav"] }
 floor-gangz = { name = "Floor Gangz", aliases = ["FLOOR GANGZ"] }
 florida-h-town = { name = "FLORIDA H TOWN" }
 flow-killerz = { name = "Flow Killerz" }
 flow-mo = { name = "Flow Mo" }
 flowxl-kingz = { name = "FlowXL Kingz" }
-flxible-flav = { name = "Flxible Flav" }
 fnc = { name = "FNC" }
 formless = { name = "Formless" }
 found-carnival = { name = "Found Carnival" }
-found-nation = { name = "Found Nation" }
-fresh-all-stars = { name = "Fresh All Stars" }
 full-force = { name = "Full Force" }
 furious-styles-crew = { name = "Furious Styles Crew" }
 german-ingenuity = { name = "GERMAN INGENUITY" }
@@ -164,12 +156,10 @@ good-foot = { name = "Good Foot" }
 gq = { name = "GQ" }
 gravity = { name = "Gravity" }
 green-panda = { name = "Green Panda" }
-gun-smoke-by-nature = { name = "Gun Smoke By Nature" }
 gunsmoke-breakers = { name = "Gunsmoke Breakers" }
-gunsmoke-by-nature = { name = "Gunsmoke By Nature" }
+gunsmoke-by-nature = { name = "Gunsmoke By Nature", aliases = ["Gun Smoke By Nature"] }
 hazardous-beings = { name = "Hazardous Beings" }
 holookunz-rhythm-invade = { name = "HOLOOKUNZ RHYTHM INVADE" }
-hype-battle-rugged-squadron = { name = "HYPE BATTLE 🔥 Rugged Squadron" }
 icey-ives = { name = "Icey Ives" }
 ill-abilities = { name = "Ill Abilities" }
 illusion-of-exist = { name = "ILLUSION OF EXIST" }
@@ -201,16 +191,13 @@ lussy-sky = { name = "Lussy Sky" }
 marvelous = { name = "Marvelous" }
 matadors = { name = "Matadors" }
 mels = { name = "Mels" }
-mighty-zulu-kings = { name = "Mighty Zulu Kings" }
-mighty-zulu-kingz = { name = "Mighty Zulu Kingz" }
+mighty-zulu-kingz = { name = "Mighty Zulu Kingz", aliases = ["Mighty Zulu Kings"] }
 miss-funk = { name = "MISS FUNK" }
 mn-joe = { name = "MN Joe" }
 modd-squad = { name = "Modd Squad" }
 momentum = { name = "Momentum" }
 momentum-crew = { name = "Momentum Crew" }
 monster = { name = "MONSTER" }
-monster-energy = { name = "Monster Energy" }
-monster-energy-bboys = { name = "Monster Energy Bboys" }
 monster-mzk = { name = "MONSTER MZK" }
 morris = { name = "Morris" }
 motion-disorderz = { name = "MOTION DISORDERZ" }
@@ -234,13 +221,10 @@ recon = { name = "Recon" }
 red-bull-bc-one-all-stars = { name = "Red Bull BC One All Stars", aliases = ["RED BULL BC ONE ALL-STARS"] }
 redwan = { name = "REDWAN" }
 renegade-lords = { name = "RENEGADE LORDS" }
-renegades = { name = "Renegades" }
-renegades-crew = { name = "Renegades Crew" }
+renegades = { name = "Renegades", aliases = ["Renegades Crew"] }
 reunion = { name = "Reunion" }
 robin = { name = "Robin" }
-rugged-squadron = { name = "Rugged Squadron" }
-rugged-squadron-x-stance = { name = "Rugged Squadron  x stance" }
-ruggeds = { name = "Ruggeds" }
+rugged-squadron = { name = "Rugged Squadron", aliases = ["Rugged Squadron  x stance", "HYPE BATTLE 🔥 Rugged Squadron"] }
 skb = { name = "SKB", country = "AU" }
 skechers-all-stars = { name = "Skechers All Stars" }
 skilluminated = { name = "Skilluminated" }
@@ -256,10 +240,8 @@ team-ukraine = { name = "Team Ukraine" }
 the-saxonz = { name = "The Saxonz" }
 thesis = { name = "Thesis" }
 tmb = { name = "TMB" }
-top9 = { name = "Top9" }
 total-feeling = { name = "Total Feeling", country = "FR" }
-tru-crew = { name = "Tru Crew" }
-tru-cru = { name = "Tru Cru" }
+tru-cru = { name = "Tru Cru", aliases = ["Tru Crew"] }
 ufa = { name = "UFA" }
 underground-flow = { name = "UNDERGROUND FLOW" }
 united-rivals = { name = "UNITED RIVALS" }
@@ -339,7 +321,7 @@ gully-squad = { name = "Gully Squad", country = "GB" }
 ill-eagles = { name = "Ill Eagles", country = "IT" }
 killa-tactics = { name = "Killa Tactics", country = "BE" }
 massive-monkeys = { name = "Massive Monkeys", country = "US" }
-monster-b-boys = { name = "Monster B-Boys", country = "US" }
+monster-b-boys = { name = "Monster B-Boys", country = "US", aliases = ["Monster Energy", "Monster Energy Bboys"] }
 originals = { name = "Originals", country = "UA" }
 ormus = { name = "Ormus", country = "IT" }
 pm-conspiracy = { name = "PM Conspiracy" }

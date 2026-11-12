@@ -83,7 +83,7 @@ pub struct CodeSent {
     pub email: String,
 }
 
-/// The logged-in account, as returned by register, login and me.
+/// The logged-in account, as returned by login, the code routes and me.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct UserResponse {
     /// Account id.
@@ -177,6 +177,7 @@ async fn register(
         (status = OK, body = UserResponse, headers(("set-cookie" = String, description = "`bj_session`, HttpOnly, 30 days"))),
         (status = UNAUTHORIZED, description = "Unknown email, wrong password or Google-only account", body = ErrorEnvelope),
         (status = FORBIDDEN, description = "`email_unverified`: right password, email not confirmed yet; a new code was mailed unless one went out in the last minute", body = ErrorEnvelope),
+        InvalidFields,
         Busy,
     )
 )]

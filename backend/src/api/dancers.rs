@@ -258,9 +258,9 @@ async fn create_mine(
 /// A new page is unverified, so only `seed_admin`+ may say what its dancer does or hide their
 /// Instagram.
 fn check_new_titles(fields: &DancerFields, current: &CurrentUser) -> Result<(), AppError> {
-    let titled = fields.titles.as_ref().is_some_and(|t| !t.is_empty());
-    let hidden = fields.instagram_hidden == Some(true);
-    if (titled || hidden) && current.user.role < Role::SeedAdmin {
+    // Naming either, even empty or false, is saying it: the same rule as an update.
+    let said = fields.titles.is_some() || fields.instagram_hidden.is_some();
+    if said && current.user.role < Role::SeedAdmin {
         return Err(AppError::Forbidden);
     }
     Ok(())

@@ -48,7 +48,7 @@ const STAGES: Record<Section["key"], Schemas["BracketStage"][]> = {
 };
 
 /**
- * A battle's results by round (DESIGN.md §6 Battle results): the final (from 1st and 2nd when
+ * A battle's results by round (DESIGN.md §6 Results by round): the final (from 1st and 2nd when
  * no final is stored), then each round's pairings, falling back to the placings for the rounds
  * whose pairings are unknown. Null when there is no result yet, so the entrants show as before.
  */

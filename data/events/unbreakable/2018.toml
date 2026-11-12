@@ -20,7 +20,7 @@ matches = [
   { round = "top16", a = "gimnast", b = "wingzero", winner = "wingzero", video = "https://youtu.be/jjoLF7mZZjg" },
   { round = "top16", a = "stripes", b = "twister", winner = "stripes", video = "https://youtu.be/d2oNQ_baHa8" },
   { round = "top16", a = "lucky", b = "sunni", winner = "sunni", video = "https://youtu.be/AyWqwIifTHI" },
-  { round = "top16", a = "luan", b = "mighty-jim", winner = "luan", video = "https://youtu.be/a1T-5vqPZwE" },
+  { round = "top16", a = "luan", b = "mighty-jimm", winner = "luan", video = "https://youtu.be/a1T-5vqPZwE" },
   { round = "top16", a = "cri6", b = "lagaet", winner = "lagaet", video = "https://youtu.be/gppyiuM4OH8" },
   { round = "top16", a = "justen", b = "heady", winner = "justen", video = "https://youtu.be/fXSMlbSI8oU" },
   { round = "top8", a = "wingzero", b = "sunni", winner = "sunni", video = "https://youtu.be/zXWYPI91-Pc" },

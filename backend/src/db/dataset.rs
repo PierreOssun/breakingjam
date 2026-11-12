@@ -20,7 +20,6 @@ pub async fn insert_dancer(
     created_by: Uuid,
 ) -> sqlx::Result<Uuid> {
     let id = Uuid::now_v7();
-    // Set before any entry, so the battles' suggestion (which fills only empty looks) defers to it.
     let avatar = dancer.look.and_then(|look| default_look(id, look));
     sqlx::query!(
         "insert into dancers (id, data_key, dancer_name, aliases, country, country2, avatar, source, notable, created_by)

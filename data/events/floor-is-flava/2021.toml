@@ -42,9 +42,9 @@ matches = [
 alvin-hiro10 = { members = ["hiro10", "alvin"] }
 aya-yung = { members = ["aya", "yung"] }
 blanka-mass = { members = ["mass", "blanka"] }
-cis-mighty-jim = { members = ["mighty-jim", "cis"] }
+cis-mighty-jim = { members = ["mighty-jimm", "cis"] }
 daga-snap = { members = ["snap", "daga"] }
-djibril-fababy = { members = ["djibril", "fababy"] }
+djibril-fababy = { members = ["djibril", "fabab"] }
 emilio-sinx = { members = ["sinx", "emilio"] }
 fe-jazzbear = { members = ["fe", "jazzbear"] }
 gimnast-kolobok = { members = ["gimnast", "kolobok"] }

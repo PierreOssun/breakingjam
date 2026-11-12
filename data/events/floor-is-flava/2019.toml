@@ -46,7 +46,7 @@ daryl-ozzi = { members = ["ozzi", "daryl"] }
 den-pluto = { members = ["den", "pluto"] }
 djibril-nico = { members = ["djibril", "nico"] }
 docteur-desire-raph = { members = ["raph", "docteur-desire"] }
-fababy-keang-size = { members = ["fababy", "keang-size"] }
+fababy-keang-size = { members = ["fabab", "keang-size"] }
 faisi-xl = { members = ["faisi", "xl"] }
 joey-skywalker = { members = ["joey", "skywalker"] }
 kinder-slav = { members = ["slav", "kinder"] }

@@ -17,13 +17,13 @@ name = "Crew battle"
 gender = "mixed"
 results = [
   { entrant = "fusion-mc", reached = "winner", video = "https://youtu.be/0-Wizrt38TY" },
-  { entrant = "b-town-all-stars", reached = "top4", video = "https://youtu.be/GOMPxrK27Lo" },
+  { entrant = "b-town-allstars", reached = "top4", video = "https://youtu.be/GOMPxrK27Lo" },
   { entrant = "flooriorz", reached = "top4", video = "https://youtu.be/0Mvg4wZgF6k" },
   { entrant = "the-ruggeds", reached = "top2", video = "https://youtu.be/0-Wizrt38TY" },
 ]
 
 [battles.teams]
-b-town-all-stars = { crew = "b-town-all-stars" }
+b-town-allstars = { crew = "b-town-allstars" }
 flooriorz = { crew = "flooriorz" }
 fusion-mc = { crew = "fusion-mc" }
 the-ruggeds = { crew = "the-ruggeds" }

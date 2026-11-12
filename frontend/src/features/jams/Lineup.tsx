@@ -1,11 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
 import { Dialog } from "../../components/Dialog";
+import { Skeleton } from "../../components/Skeleton";
 import { useToast } from "../../components/useToast";
 import { AddChip, DancerChip } from "../dancers/DancerChip";
-import { DancerPicker } from "../dancers/DancerPicker";
+
+// The form's code loads when someone edits: visitors, who never do, don't download it.
+const DancerPicker = lazy(() =>
+  import("../dancers/DancerPicker").then((m) => ({ default: m.DancerPicker })),
+);
 
 type Role = Schemas["StaffRole"];
 const ROLES: Role[] = ["judge", "dj", "mc", "organizer", "other"];
@@ -103,21 +108,23 @@ export function Lineup({ jamId, staff, canEdit }: LineupProps) {
           size="form"
           title={t(`org.staff.addRole.${adding}`)}
         >
-          <DancerPicker
-            label={t("org.entries.dancer")}
-            selected={[]}
-            max={1}
-            autoFocus
-            onChange={([dancer]) =>
-              // The picker stays open while the save runs: one pick, one save.
-              dancer &&
-              !save.isPending &&
-              save.mutate([
-                ...assignments,
-                { dancer_id: dancer.id, role: adding },
-              ])
-            }
-          />
+          <Suspense fallback={<Skeleton className="h-11 rounded-md" />}>
+            <DancerPicker
+              label={t("org.entries.dancer")}
+              selected={[]}
+              max={1}
+              autoFocus
+              onChange={([dancer]) =>
+                // The picker stays open while the save runs: one pick, one save.
+                dancer &&
+                !save.isPending &&
+                save.mutate([
+                  ...assignments,
+                  { dancer_id: dancer.id, role: adding },
+                ])
+              }
+            />
+          </Suspense>
         </Dialog>
       )}
     </div>

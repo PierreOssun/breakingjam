@@ -59,7 +59,7 @@ bracket_size = 32
 matches = [
   { round = "top32", a = "starry", b = "ram", winner = "starry", votes = [3, 2], video = "https://youtu.be/_Uead1LjUUQ" },
   { round = "top32", a = "kimie", b = "emka", winner = "kimie", votes = [5, 0], video = "https://youtu.be/-Bz0I7_fz1w" },
-  { round = "top32", a = "alesandrina", b = "syssy", winner = "syssy", votes = [0, 5], video = "https://youtu.be/F_8S_Qx4Bqc" },
+  { round = "top32", a = "alessandrina", b = "syssy", winner = "syssy", votes = [0, 5], video = "https://youtu.be/F_8S_Qx4Bqc" },
   { round = "top32", a = "spidergirl", b = "karla", winner = "spidergirl", votes = [4, 1], video = "https://youtu.be/6XBnORfUMkI" },
   { round = "top32", a = "stefani", b = "kristina", winner = "stefani", votes = [5, 0], video = "https://youtu.be/PhLfbIfUCaI" },
   { round = "top32", a = "posya-rock", b = "tata", winner = "tata", votes = [2, 3], video = "https://youtu.be/3ZoN-Gk287c" },

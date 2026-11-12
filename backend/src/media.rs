@@ -1,7 +1,7 @@
 //! Uploaded images: what a valid one is, and the store they are written to (R2, via the Worker).
 
 use axum::body::Bytes;
-use oauth2::reqwest::{
+use reqwest::{
     self,
     header::{CACHE_CONTROL, CONTENT_TYPE},
 };

@@ -72,12 +72,14 @@ fn url(xml: &mut String, loc: &str, updated_at: Option<DateTime<Utc>>) {
 
 /// The key as one URL path segment: slugs keep any letter, which a URL must percent-encode.
 fn segment(key: &str) -> String {
-    key.bytes()
-        .map(|b| match b {
+    let mut segment = String::with_capacity(key.len());
+    for b in key.bytes() {
+        match b {
             b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' => {
-                char::from(b).to_string()
+                segment.push(char::from(b));
             }
-            _ => format!("%{b:02X}"),
-        })
-        .collect()
+            _ => segment.push_str(&format!("%{b:02X}")),
+        }
+    }
+    segment
 }

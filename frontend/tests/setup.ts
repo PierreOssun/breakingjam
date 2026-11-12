@@ -6,6 +6,9 @@ import i18n from "../src/i18n";
 // which takes over the 1 s default when every file runs in parallel.
 configure({ asyncUtilTimeout: 5000 });
 
+// jsdom has no page to scroll: a new page going to its top would only log "Not implemented".
+window.scrollTo = () => {};
+
 // jsdom has <dialog> without the modal API.
 if (!HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {

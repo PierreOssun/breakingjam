@@ -3,6 +3,8 @@ starts_on = 2016-10-22
 timezone = "Europe/Zurich"
 city = "Zurich"
 country = "CH"
+lat = 47.3673
+lng = 8.5038
 sources = [
   "https://www.youtube.com/channel/UCqzSbOMDzVX1lVia0KAxEbg",
   "https://www.youtube.com/watch?v=rZvVX9Pa5-U",

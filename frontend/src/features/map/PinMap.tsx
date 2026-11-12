@@ -5,10 +5,9 @@ import MapView, {
   type MapRef,
   Marker,
 } from "react-map-gl/maplibre";
+import type { LngLat } from "../../lib/position";
 import { useMediaQuery } from "../../lib/useMediaQuery";
 import { maplibre, useMapStyle } from "./maplibre";
-
-export type LngLat = { lng: number; lat: number };
 
 type PinMapProps = {
   value: LngLat | null;

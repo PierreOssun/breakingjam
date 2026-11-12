@@ -47,6 +47,8 @@ export default function StaticMap({
   return (
     <div className={`overflow-hidden ${className}`}>
       <MapView
+        // The view is only read when the map is made: another place needs another map.
+        key={JSON.stringify(view)}
         mapLib={maplibre}
         mapStyle={style}
         initialViewState={view}

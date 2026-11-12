@@ -1,4 +1,5 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { focusManager } from "@tanstack/react-query";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LIL_G, bodyOf, calls, mockApi, renderApp } from "../support/app";
 import { freezeToday } from "../support/jams";
@@ -83,8 +84,8 @@ const jam = (extra: object = {}) => ({
 
 /** The status changes the API offers an organiser, by status. */
 const ACTIONS: Record<string, string[]> = {
-  draft: ["submit", "cancel"],
-  in_review: ["cancel"],
+  draft: ["submit"],
+  in_review: [],
   published: ["close-registration", "cancel"],
   registration_closed: ["cancel"],
   cancelled: [],
@@ -619,6 +620,37 @@ describe("the jam editor", () => {
     expect(
       within(closed).getByRole("button", { name: "Edit" }),
     ).toBeInTheDocument();
+  });
+
+  it("takes in what changed elsewhere, so the next save doesn't put the old values back", async () => {
+    const user = userEvent.setup();
+    const later = "2030-01-01T11:00:00Z";
+    const elsewhere = { venue_name: "La Place", updated_at: later };
+    const fetch = editApi({
+      // Someone names the venue from another device while this editor is open.
+      [`GET /api/events/${ID}`]: (n) => ({
+        status: 200,
+        body: page(n === 0 ? {} : elsewhere),
+      }),
+      [PUT]: { status: 200, body: jam({ ...elsewhere, description: "Hi" }) },
+    });
+    renderApp(`/org/jams/${ID}/edit`);
+    const about = await screen.findByRole("region", { name: "About" });
+    await user.click(within(about).getByRole("button", { name: "Add" }));
+    // Typed, not saved yet, when the newer copy arrives on coming back to the tab.
+    await user.type(screen.getByRole("textbox", { name: "About" }), "Hi");
+    act(() => {
+      focusManager.setFocused(false);
+      focusManager.setFocused(true);
+    });
+
+    await saved(fetch);
+    // The whole jam goes out: the venue from elsewhere with what was typed here.
+    expect(await bodyOf(fetch, PUT)).toMatchObject({
+      venue_name: "La Place",
+      description: "Hi",
+    });
+    focusManager.setFocused(undefined);
   });
 
   it("sets the last day and the hours from the date chips", async () => {
@@ -1572,7 +1604,7 @@ describe("the jam editor", () => {
     await userEvent.click(
       await within(organiser).findByRole("button", { name: "Change" }),
     );
-    const dialog = screen.getByRole("dialog", { name: "Edit page" });
+    const dialog = await screen.findByRole("dialog", { name: "Edit page" });
     expect(within(dialog).getByLabelText(/^Name/)).toHaveValue("Lil G");
   });
 

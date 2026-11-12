@@ -45,7 +45,7 @@ The seeded accounts use `SEED_PASSWORD` from `backend/.env`:
 ## Tests
 
 ```sh
-just check      # everything CI runs
+just check      # what CI runs, but for its seed run, API types check and Docker build
 ```
 
 - **API:**

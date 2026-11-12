@@ -134,7 +134,7 @@ describe("OrganizerPage", () => {
     await userEvent.click(
       await screen.findByRole("button", { name: "Add Instagram" }),
     );
-    const sheet = screen.getByRole("dialog", { name: "Edit page" });
+    const sheet = await screen.findByRole("dialog", { name: "Edit page" });
     const handle = within(sheet).getByLabelText(/^Instagram/);
     // Focus lands a frame after the sheet opens (Dialog).
     await waitFor(() => expect(handle).toHaveFocus());

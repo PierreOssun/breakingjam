@@ -65,11 +65,11 @@ reset-db: db
     just seed
     just places
 
-# Everything CI runs.
-check:
+# What CI runs, but for its seed run, its check of the generated API types and its Docker build.
+check: db
     cd backend && cargo fmt --check && cargo clippy --all-targets --all-features -- -D warnings && cargo test
-    cd backend && cargo sqlx prepare --check -- --all-targets
     cd backend && cargo run --bin data -- check
+    cd backend && cargo sqlx prepare --check -- --all-targets
     cd frontend && npx prettier --check . && npm run lint && npm run typecheck && npm test && npm run build
     cd deploy && npm run typecheck && npm test
 

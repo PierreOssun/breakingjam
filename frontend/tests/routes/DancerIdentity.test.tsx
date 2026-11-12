@@ -235,7 +235,9 @@ describe("dancer identity", () => {
     await userEvent.click(
       await screen.findByRole("button", { name: "Edit profile" }),
     );
-    const dialog = within(screen.getByRole("dialog", { name: "Edit profile" }));
+    const dialog = within(
+      await screen.findByRole("dialog", { name: "Edit profile" }),
+    );
     // Someone else's unverified page: its edits are logged.
     expect(
       dialog.getByText(/Edits to this page are logged/),
@@ -264,7 +266,9 @@ describe("dancer identity", () => {
     await userEvent.click(
       await screen.findByRole("button", { name: "Edit profile" }),
     );
-    const dialog = within(screen.getByRole("dialog", { name: "Edit profile" }));
+    const dialog = within(
+      await screen.findByRole("dialog", { name: "Edit profile" }),
+    );
     expect(dialog.queryByText(/Edits to this page are logged/)).toBeNull();
   });
 
@@ -285,7 +289,7 @@ describe("dancer identity", () => {
     await userEvent.click(
       await screen.findByRole("button", { name: "Add Instagram" }),
     );
-    const dialog = screen.getByRole("dialog", { name: "Edit profile" });
+    const dialog = await screen.findByRole("dialog", { name: "Edit profile" });
     const handle = within(dialog).getByLabelText(/^Instagram/);
     // Focus lands a frame after the sheet opens (Dialog).
     await waitFor(() => expect(handle).toHaveFocus());
@@ -352,7 +356,7 @@ describe("dancer identity", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/^Hidden:/)).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Edit profile" }));
-    const dialog = screen.getByRole("dialog", { name: "Edit profile" });
+    const dialog = await screen.findByRole("dialog", { name: "Edit profile" });
     const hide = within(dialog).getByRole("checkbox", {
       name: "Hide my Instagram from my page and from search",
     });
@@ -410,7 +414,7 @@ describe("dancer identity", () => {
 
     expect(await screen.findByText("Bgirl · DJ")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Edit profile" }));
-    const dialog = screen.getByRole("dialog", { name: "Edit profile" });
+    const dialog = await screen.findByRole("dialog", { name: "Edit profile" });
     const titles = within(dialog).getByRole("group", { name: "I’m a…" });
     expect(titles).toHaveAccessibleDescription(
       "Only the dancer, once verified, and the BreakingJam team set these.",
@@ -444,7 +448,9 @@ describe("dancer identity", () => {
     await userEvent.click(
       await screen.findByRole("button", { name: "Edit profile" }),
     );
-    const dialog = within(screen.getByRole("dialog", { name: "Edit profile" }));
+    const dialog = within(
+      await screen.findByRole("dialog", { name: "Edit profile" }),
+    );
     const aliases = dialog.getByLabelText(/^Also known as/);
     // "vent" is "Vent" again; a value stops at 100 characters.
     await userEvent.type(aliases, `Vent,vent,${"L".repeat(120)},`);
@@ -490,7 +496,9 @@ describe("dancer identity", () => {
     await userEvent.click(
       await screen.findByRole("button", { name: "Edit profile" }),
     );
-    const dialog = within(screen.getByRole("dialog", { name: "Edit profile" }));
+    const dialog = within(
+      await screen.findByRole("dialog", { name: "Edit profile" }),
+    );
     await userEvent.click(dialog.getByRole("button", { name: "Save" }));
     expect(await dialog.findByRole("alert")).toHaveTextContent(
       "Something went wrong",

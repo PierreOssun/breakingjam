@@ -337,16 +337,15 @@ async fn insert_event(
     })
 }
 
-/// The bracket's matches between the entries written, numbered within each round in file
-/// order; a match missing an entry the result rules refused is left out.
+/// The bracket's matches between the entries written, each at its place in the bracket; a
+/// match missing an entry the result rules refused is left out.
 async fn insert_matches(
     conn: &mut PgConnection,
     battle_id: Uuid,
     battle: &BattleRecord,
     entries: &BTreeMap<&str, Uuid>,
 ) -> sqlx::Result<()> {
-    let mut next = BTreeMap::<MatchRound, i16>::new();
-    for record in &battle.matches {
+    for (record, position) in battle.matches.iter().zip(battle.match_positions()) {
         let loser = if record.winner == record.a {
             &record.b
         } else {
@@ -359,11 +358,10 @@ async fn insert_matches(
             continue;
         };
         let round = MatchRound::from(record.round);
-        let position = next.entry(round).or_default();
         let video_url = record.video.as_deref().and_then(canonical_video);
         let fields = MatchFields {
             round,
-            position: *position,
+            position,
             winner_id,
             loser_id,
             video_offset_seconds: video_url
@@ -373,7 +371,6 @@ async fn insert_matches(
             video_url,
         };
         db::battles::insert_match(conn, battle_id, &fields).await?;
-        *position += 1;
     }
     Ok(())
 }

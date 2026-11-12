@@ -45,7 +45,7 @@ export function AdminLayout() {
   );
 }
 
-/** A filter-chip-shaped tab (DESIGN.md §7), with a count when its queue is not empty. */
+/** A filter-chip-shaped tab (DESIGN.md §4.39), with a count when its queue is not empty. */
 function Tab({
   to,
   end,

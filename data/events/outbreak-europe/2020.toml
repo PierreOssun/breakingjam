@@ -17,7 +17,7 @@ key = "bboy"
 name = "1v1 Bboy"
 gender = "bboy"
 results = [
-  { entrant = "johnnyfox", reached = "winner" },
+  { entrant = "johnny-fox", reached = "winner" },
 ]
 
 [[battles]]

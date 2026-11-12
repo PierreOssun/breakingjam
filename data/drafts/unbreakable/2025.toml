@@ -26,7 +26,7 @@ matches = [
   { round = "top32", a = "mathis", b = "sheka", winner = "sheka", video = "https://youtu.be/0r1_Fetn428" },
   { round = "top32", a = "noneski", b = "wess", winner = "noneski", video = "https://youtu.be/xIfzNB8iEWo" },
   { round = "top32", a = "nebulas", b = "anton", winner = "anton", video = "https://youtu.be/LHOrVcqQEDY" },
-  { round = "top32", a = "p-nut", b = "m17", winner = "TODO", video = "https://youtu.be/Oi4l2G9lb5Q" },
+  { round = "top32", a = "pnut", b = "m17", winner = "TODO", video = "https://youtu.be/Oi4l2G9lb5Q" },
   { round = "top32", a = "link-le-neil", b = "federico", winner = "federico", video = "https://youtu.be/POsn_pqmVVI" },
   { round = "top32", a = "tiger5", b = "stimul", winner = "stimul", video = "https://youtu.be/lTZ34AbigtM" },
   { round = "top32", a = "ichigo", b = "litefoot", winner = "ichigo", video = "https://youtu.be/MxtFwIQSOog" },

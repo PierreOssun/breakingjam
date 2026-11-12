@@ -47,7 +47,7 @@ bracket_size = 16
 matches = [
   { round = "top16", a = "total-feeling", b = "xii-after-ours", winner = "xii-after-ours", video = "https://youtu.be/vooIu_X47c8" },
   { round = "top16", a = "alvin-jeffro-gravity", b = "tmb", winner = "alvin-jeffro-gravity", video = "https://youtu.be/77L--9G78xM" },
-  { round = "top16", a = "concrete-force-kingz", b = "flxible-flav", winner = "TODO", video = "https://youtu.be/nGcvnH99ivc" },
+  { round = "top16", a = "concrete-force-kingz", b = "flexible-flav", winner = "TODO", video = "https://youtu.be/nGcvnH99ivc" },
   { round = "top16", a = "breakinmia", b = "havikoro", winner = "breakinmia", video = "https://youtu.be/sp26kZNEDsM" },
   { round = "top16", a = "fnc", b = "airheads", winner = "fnc", video = "https://youtu.be/J9utkEKROMs" },
   { round = "top16", a = "matadors", b = "doa", winner = "matadors", video = "https://youtu.be/J0HTEfZqV00" },
@@ -75,7 +75,6 @@ danzel = { crew = "danzel" }
 doa = { crew = "doa" }
 flexible-flav = { crew = "flexible-flav" }
 flow-killerz = { crew = "flow-killerz" }
-flxible-flav = { crew = "flxible-flav" }
 fnc = { crew = "fnc" }
 gq = { crew = "gq" }
 green-panda = { crew = "green-panda" }

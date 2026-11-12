@@ -1,5 +1,5 @@
 import { GitMerge } from "@phosphor-icons/react";
-import { useState } from "react";
+import { lazy, Suspense, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import type { Schemas } from "../../api/client";
@@ -9,7 +9,11 @@ import { atLeast } from "../auth/roles";
 import { useMe } from "../auth/useMe";
 import { AddHandleButton } from "../verify/AddHandleButton";
 import { VerifyButton } from "../verify/VerifyButton";
-import { DancerEditDialog } from "./DancerEditDialog";
+
+// The form's code loads when someone edits: visitors, who never do, don't download it.
+const DancerEditDialog = lazy(() =>
+  import("./DancerEditDialog").then((m) => ({ default: m.DancerEditDialog })),
+);
 
 /**
  * The dancer page's action, by state (DESIGN.md §6): nothing for visitors, "This is me" on
@@ -24,12 +28,14 @@ export function DancerActions({
   const { t } = useTranslation();
   const me = useMe().data;
   const [editing, setEditing] = useState<"profile" | "handle" | null>(null);
+  // A transition, so the button shows it is loading until the form's code has come.
+  const [opening, open] = useTransition();
 
   if (!me) return null;
   return (
     <div className="flex flex-col gap-3">
       {dancer.can_edit && !dancer.instagram_handle && (
-        <AddHandleButton onClick={() => setEditing("handle")} />
+        <AddHandleButton onClick={() => open(() => setEditing("handle"))} />
       )}
       <VerifyButton
         kind="dancers"
@@ -43,7 +49,8 @@ export function DancerActions({
         <Button
           variant="secondary"
           className="w-full"
-          onClick={() => setEditing("profile")}
+          loading={opening}
+          onClick={() => open(() => setEditing("profile"))}
         >
           {t("dancerEdit.open")}
         </Button>
@@ -57,13 +64,15 @@ export function DancerActions({
           {t("admin.merge.link")}
         </Link>
       )}
-      {editing && (
-        <DancerEditDialog
-          dancer={dancer}
-          focusHandle={editing === "handle"}
-          onClose={() => setEditing(null)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {editing && (
+          <DancerEditDialog
+            dancer={dancer}
+            focusHandle={editing === "handle"}
+            onClose={() => setEditing(null)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

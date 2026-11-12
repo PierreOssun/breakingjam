@@ -254,9 +254,11 @@ function Progress({
   total: number;
   className?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div
       role="progressbar"
+      aria-label={t("org.publish.progress", { done, total })}
       aria-valuenow={done}
       aria-valuemin={0}
       aria-valuemax={total}

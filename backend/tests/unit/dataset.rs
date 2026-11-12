@@ -109,6 +109,55 @@ fn a_winner_outside_the_match_is_an_error() {
 }
 
 #[test]
+fn a_small_final_won_by_someone_else_is_an_error() {
+    let mut battle = top4();
+    // ami played the final: without this check she would be ranked 3rd and lee 4th.
+    battle.matches[3].winner = "ami".into();
+
+    let errors = battle.standings().unwrap_err();
+    assert_eq!(errors, ["third: winner ami is not in lee vs kastet"]);
+}
+
+#[test]
+fn a_battle_without_matches_or_results_says_so() {
+    let mut battle = top4();
+    battle.matches.clear();
+
+    let errors = battle.standings().unwrap_err();
+    assert_eq!(errors, ["has neither matches nor results"]);
+}
+
+#[test]
+fn matches_take_their_place_in_the_bracket_whatever_their_order_in_the_file() {
+    // A top 8 listed as a results page would: the final first, the quarter-finals shuffled.
+    let mut battle = top4();
+    battle.bracket_size = Some(8);
+    battle.matches = vec![
+        game(Round::Final, "menno", "ami", "ami"),
+        game(Round::Third, "lee", "kastet", "lee"),
+        game(Round::Top4, "kastet", "ami", "ami"),
+        game(Round::Top4, "menno", "lee", "menno"),
+        game(Round::Top8, "lee", "issei", "lee"),
+        game(Round::Top8, "ami", "ayumi", "ami"),
+        game(Round::Top8, "menno", "phil", "menno"),
+        game(Round::Top8, "victor", "kastet", "kastet"),
+    ];
+    assert!(battle.standings().is_ok());
+
+    // menno (side a of the final) won semi-final 0, so ami's is 1; each quarter-final sits
+    // under the side its winner takes in the semi-final.
+    assert_eq!(battle.match_positions(), [0, 0, 1, 0, 1, 3, 0, 2]);
+}
+
+#[test]
+fn matches_the_bracket_cannot_place_take_the_free_places() {
+    let mut battle = top4();
+    // No final: the semi-finals lead nowhere, and keep their order.
+    battle.matches.remove(2);
+    assert_eq!(battle.match_positions(), [0, 1, 0]);
+}
+
+#[test]
 fn an_incomplete_bracket_is_an_error() {
     let mut battle = top4();
     battle.matches.remove(1);

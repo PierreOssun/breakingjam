@@ -62,7 +62,7 @@ abdul-tony = { members = ["abdul", "tony"] }
 vimcem-xak = { members = ["xak", "vimcem"] }
 insight-keebz = { members = ["keebz", "insight"] }
 cydrek-plesniak = { members = ["cydrek", "plesniak"] }
-kosto-step1 = { members = ["step1", "kosto"] }
+kosto-step1 = { members = ["step-one", "kosto"] }
 crab-dwelz = { members = ["dwelz", "crab"] }
 goofy-padre = { members = ["padre", "goofy"] }
 medjan-thomaz = { members = ["thomaz", "medjan"] }

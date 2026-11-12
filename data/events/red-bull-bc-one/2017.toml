@@ -8,7 +8,7 @@ lng = 4.8708
 venue = "Westergasfabriek"
 sources = ["https://en.wikipedia.org/wiki/Red_Bull_BC_One", "https://dancerschoice.com.au/b-boy-menno-wins-bc-one/"]
 judges = ["crazy-legs", "hong-10", "niek", "intact", "at"]
-mcs = ["rakaa"]
+mcs = ["rakaa-iriscience"]
 djs = ["dj-nobunaga"]
 
 [[battles]]

@@ -7,9 +7,9 @@ country = "SK"
 lat = 48.7354
 lng = 19.1457
 sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe", "https://www.youtube.com/channel/UCrzYvC6974a-rhBkj4YT5Yw"]
-judges = ["abstrak", "nasty-ray", "bgirl-at", "dyzee", "lil-john"]
+judges = ["abstrak", "nasty-ray", "at", "dyzee", "lil-john"]
 mcs = ["mario-bee", "lil-pablo", "osto"]
-djs = ["lean-rock", "fleg", "ervin-arana", "renegade", "scream", "plash", "smirnoff", "felix", "shimo"]
+djs = ["lean-rock", "dj-fleg", "ervin-arana", "renegade", "scream", "dj-plash-one", "dj-smirnoff", "felix", "shimo"]
 
 [[battles]]
 key = "bboy"
@@ -45,14 +45,14 @@ matches = [
   { round = "top16", a = "meelisa", b = "maxime", winner = "meelisa", video = "https://youtu.be/-bv4xfg_J8I" },
   { round = "top16", a = "sarah-bee", b = "lady-fury", winner = "sarah-bee", video = "https://youtu.be/1YLWMNetBfQ" },
   { round = "top16", a = "paulina", b = "vanessa", winner = "paulina", video = "https://youtu.be/81nIxVqy8-g" },
-  { round = "top16", a = "jeskillz", b = "narcis", winner = "jeskillz", video = "https://youtu.be/yBhEJB-DnoU" },
+  { round = "top16", a = "jeskilz", b = "narcis", winner = "jeskilz", video = "https://youtu.be/yBhEJB-DnoU" },
   { round = "top16", a = "emilka", b = "san-andrea", winner = "san-andrea", video = "https://youtu.be/Th40Ugf4JiI" },
   { round = "top16", a = "bo", b = "anita", winner = "anita", video = "https://youtu.be/TAObRNf_hZ4" },
   { round = "top8", a = "anita", b = "san-andrea", winner = "san-andrea", video = "https://youtu.be/K06SYoqvR1o" },
-  { round = "top8", a = "law", b = "jeskillz", winner = "jeskillz", video = "https://youtu.be/U2DEEpgLcSQ" },
+  { round = "top8", a = "law", b = "jeskilz", winner = "jeskilz", video = "https://youtu.be/U2DEEpgLcSQ" },
   { round = "top8", a = "paulina", b = "sarah-bee", winner = "paulina", video = "https://youtu.be/P4NWs43XuvE" },
   { round = "top8", a = "meelisa", b = "sunny", winner = "sunny", video = "https://youtu.be/hGrUNEuqX4s" },
-  { round = "top4", a = "san-andrea", b = "jeskillz", winner = "san-andrea", video = "https://youtu.be/rCPJ6DYR7XM" },
+  { round = "top4", a = "san-andrea", b = "jeskilz", winner = "san-andrea", video = "https://youtu.be/rCPJ6DYR7XM" },
   { round = "top4", a = "paulina", b = "sunny", winner = "paulina", video = "https://youtu.be/tSkJGfcdv2Q" },
   { round = "final", a = "san-andrea", b = "paulina", winner = "paulina", video = "https://youtu.be/mUFil8n6dm8" },
 ]

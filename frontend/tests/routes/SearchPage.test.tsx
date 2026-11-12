@@ -37,7 +37,7 @@ const AROUND_MULHOUSE = geojson(
     country: "DE",
     coordinates: [7.85, 48.0],
     day: "2029-06-01",
-    status: "completed",
+    status: "published",
   }),
 );
 

@@ -16,7 +16,7 @@ name = "1v1 Bboy"
 gender = "bboy"
 bracket_size = 16
 matches = [
-  { round = "top16", a = "hiro-10", b = "samuka", winner = "samuka", votes = [1, 4], video = "https://youtu.be/PjAFwiq9YvU" },
+  { round = "top16", a = "hiro10", b = "samuka", winner = "samuka", votes = [1, 4], video = "https://youtu.be/PjAFwiq9YvU" },
   { round = "top16", a = "quake", b = "zooty-zoot", winner = "zooty-zoot", votes = [1, 4], video = "https://youtu.be/sGOVwclk6rA" },
   { round = "top16", a = "nori", b = "menno", winner = "menno", votes = [2, 3], video = "https://youtu.be/s5KIL6yhvMY" },
   { round = "top16", a = "dias", b = "victor", winner = "victor", votes = [2, 3], video = "https://youtu.be/ldfUD-uT29A" },

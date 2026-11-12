@@ -44,7 +44,7 @@ bracket_size = 32
 matches = [
   { round = "top32", a = "florida-h-town", b = "bring-it-back-squad", winner = "bring-it-back-squad", video = "https://youtu.be/fQSE05amKWM" },
   { round = "top32", a = "body-carnival", b = "crew-peligrosos", winner = "body-carnival", video = "https://youtu.be/W7s6orRKcN4" },
-  { round = "top32", a = "belgians-with-attitude", b = "drifterz-crew", winner = "belgians-with-attitude", video = "https://youtu.be/OLnl7hylNoA" },
+  { round = "top32", a = "belgium-with-attitude", b = "drifterz", winner = "belgium-with-attitude", video = "https://youtu.be/OLnl7hylNoA" },
   { round = "top32", a = "monster-mzk", b = "knucklehead-zoo", winner = "monster-mzk", video = "https://youtu.be/RZA6kdMZU3U" },
   { round = "top32", a = "floor-gangz", b = "nothing-2-lose", winner = "nothing-2-lose", video = "https://youtu.be/JXHYQdZDd98" },
   { round = "top32", a = "smac-19", b = "808-breakers", winner = "808-breakers", video = "https://youtu.be/7JRs8P6E1pI" },
@@ -54,16 +54,16 @@ matches = [
   { round = "top32", a = "holookunz-rhythm-invade", b = "3-16", winner = "3-16", video = "https://youtu.be/iZaJK6mk4qU" },
   { round = "top32", a = "boogie-renaissance", b = "illusion-of-exist", winner = "boogie-renaissance", video = "https://youtu.be/dfPbhCF2TnM" },
   { round = "top32", a = "break-syndicate", b = "crazystan", winner = "crazystan", video = "https://youtu.be/2lWEga3_aiY" },
-  { round = "top32", a = "narek-the-show-jeff-mic-shaggy", b = "rock-force-crew", winner = "rock-force-crew", video = "https://youtu.be/vrfAmWY80k8" },
+  { round = "top32", a = "narek-the-show-jeff-mic-shaggy", b = "rock-force", winner = "rock-force", video = "https://youtu.be/vrfAmWY80k8" },
   { round = "top32", a = "crossover", b = "motion-disorderz", winner = "motion-disorderz", video = "https://youtu.be/HDOlYS5dpxw" },
   { round = "top32", a = "underground-flow", b = "juice-crew", winner = "juice-crew", video = "https://youtu.be/mzB-y1KrBXc" },
   { round = "top32", a = "monster", b = "raw-minds", winner = "monster", video = "https://youtu.be/ipixtHKbw3k" },
   { round = "top16", a = "3-16", b = "red-bull-bc-one-all-stars", winner = "red-bull-bc-one-all-stars", video = "https://youtu.be/E9JXNa4UT3U" },
   { round = "top16", a = "crazystan", b = "boogie-renaissance", winner = "crazystan", video = "https://youtu.be/s_Oe8YbHsHI" },
-  { round = "top16", a = "motion-disorderz", b = "rock-force-crew", winner = "rock-force-crew", video = "https://youtu.be/y8uLQwg-KEs" },
+  { round = "top16", a = "motion-disorderz", b = "rock-force", winner = "rock-force", video = "https://youtu.be/y8uLQwg-KEs" },
   { round = "top16", a = "monster", b = "juice-crew", winner = "monster", video = "https://youtu.be/CtoMpzDt0G4" },
   { round = "top16", a = "body-carnival", b = "bring-it-back-squad", winner = "body-carnival", video = "https://youtu.be/TlueTE1VEbM" },
-  { round = "top16", a = "monster-mzk", b = "belgians-with-attitude", winner = "belgians-with-attitude", video = "https://youtu.be/sr5i5LFB0eU" },
+  { round = "top16", a = "monster-mzk", b = "belgium-with-attitude", winner = "belgium-with-attitude", video = "https://youtu.be/sr5i5LFB0eU" },
   { round = "top16", a = "808-breakers", b = "nothing-2-lose", winner = "nothing-2-lose", video = "https://youtu.be/uYL_ucuMnQQ" },
   { round = "top16", a = "renegade-lords", b = "german-ingenuity", winner = "renegade-lords", video = "https://youtu.be/nMZ9Te30uxw" },
   { round = "top8", a = "miss-funk", b = "jayfancy", winner = "miss-funk", video = "https://youtu.be/5iGntF1zgGQ" },
@@ -71,13 +71,13 @@ matches = [
   { round = "top8", a = "juanito", b = "berry-groove", winner = "juanito", video = "https://youtu.be/2o2xQCZrS-Q" },
   { round = "top8", a = "redwan", b = "passion", winner = "passion", video = "https://youtu.be/VvBsUI3qpy8" },
   { round = "top8", a = "renegade-lords", b = "nothing-2-lose", winner = "renegade-lords", video = "https://youtu.be/BCMjrGHzmlQ" },
-  { round = "top8", a = "belgians-with-attitude", b = "body-carnival", winner = "belgians-with-attitude", video = "https://youtu.be/RfN-xK7o5Yk" },
+  { round = "top8", a = "belgium-with-attitude", b = "body-carnival", winner = "belgium-with-attitude", video = "https://youtu.be/RfN-xK7o5Yk" },
   { round = "top8", a = "crazystan", b = "red-bull-bc-one-all-stars", winner = "red-bull-bc-one-all-stars", video = "https://youtu.be/wjTzyVU9kcA" },
-  { round = "top8", a = "monster", b = "rock-force-crew", winner = "rock-force-crew", video = "https://youtu.be/gKDmmqNRuKw" },
+  { round = "top8", a = "monster", b = "rock-force", winner = "rock-force", video = "https://youtu.be/gKDmmqNRuKw" },
   { round = "top4", a = "precise", b = "miss-funk", winner = "precise", video = "https://youtu.be/gl-7g0uaxUU" },
   { round = "top4", a = "juanito", b = "passion", winner = "juanito", video = "https://youtu.be/OckXO07xl9g" },
-  { round = "top4", a = "rock-force-crew", b = "red-bull-bc-one-all-stars", winner = "red-bull-bc-one-all-stars", video = "https://youtu.be/i8Ra55OtMGU" },
-  { round = "top4", a = "renegade-lords", b = "belgians-with-attitude", winner = "renegade-lords", video = "https://youtu.be/IG5xfdHHSSM" },
+  { round = "top4", a = "rock-force", b = "red-bull-bc-one-all-stars", winner = "red-bull-bc-one-all-stars", video = "https://youtu.be/i8Ra55OtMGU" },
+  { round = "top4", a = "renegade-lords", b = "belgium-with-attitude", winner = "renegade-lords", video = "https://youtu.be/IG5xfdHHSSM" },
   { round = "final", a = "juanito", b = "precise", winner = "TODO", video = "https://youtu.be/GwVwfJ9jkSk" },
   { round = "final", a = "renegade-lords", b = "red-bull-bc-one-all-stars", winner = "TODO", video = "https://youtu.be/3wu1UnAMTho" },
 ]
@@ -86,7 +86,7 @@ matches = [
 3-16 = { crew = "3-16" }
 808-breakers = { crew = "808-breakers" }
 ariya = { crew = "ariya" }
-belgians-with-attitude = { crew = "belgians-with-attitude" }
+belgium-with-attitude = { crew = "belgium-with-attitude" }
 berry-groove = { crew = "berry-groove" }
 body-carnival = { crew = "body-carnival" }
 boogie-renaissance = { crew = "boogie-renaissance" }
@@ -96,7 +96,7 @@ ceanne = { crew = "ceanne" }
 crazystan = { crew = "crazystan" }
 crew-peligrosos = { crew = "crew-peligrosos" }
 crossover = { crew = "crossover" }
-drifterz-crew = { crew = "drifterz-crew" }
+drifterz = { crew = "drifterz" }
 floor-gangz = { crew = "floor-gangz" }
 florida-h-town = { crew = "florida-h-town" }
 german-ingenuity = { crew = "german-ingenuity" }
@@ -118,7 +118,7 @@ raw-minds = { crew = "raw-minds" }
 red-bull-bc-one-all-stars = { crew = "red-bull-bc-one-all-stars" }
 redwan = { crew = "redwan" }
 renegade-lords = { crew = "renegade-lords" }
-rock-force-crew = { crew = "rock-force-crew" }
+rock-force = { crew = "rock-force" }
 smac-19 = { crew = "smac-19" }
 underground-flow = { crew = "underground-flow" }
 united-rivals = { crew = "united-rivals" }

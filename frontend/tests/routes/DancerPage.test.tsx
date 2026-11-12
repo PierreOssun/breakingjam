@@ -221,7 +221,9 @@ describe("DancerPage", () => {
     mockDancer();
     renderApp(`/dancers/${DANCER.id}`);
 
-    const pill = await screen.findByRole("button", { name: "Watch Jam 1" });
+    const pill = await screen.findByRole("button", {
+      name: "Watch Jam 1 · 1v1 Bboy",
+    });
     expect(pill).toHaveTextContent("Video");
     expect(screen.getAllByRole("button", { name: /^Watch / })).toEqual([pill]);
   });
@@ -231,7 +233,7 @@ describe("DancerPage", () => {
     renderApp(`/dancers/${DANCER.id}`);
 
     await userEvent.click(
-      await screen.findByRole("button", { name: "Watch Jam 1" }),
+      await screen.findByRole("button", { name: "Watch Jam 1 · 1v1 Bboy" }),
     );
     const dialog = screen.getByRole("dialog", {
       name: "Video: Jam 1 — 1v1 Bboy",

@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
-import { InlineNotice } from "../../components/InlineNotice";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/useToast";
 import { DeleteJamButton } from "./DeleteJamButton";
@@ -46,6 +45,10 @@ export function StatusActions({ jam }: { jam: Jam }) {
   // A draft has the publish checklist instead.
   if (jam.status === "draft") return null;
   const can = (transition: Transition) => jam.actions.includes(transition);
+  // As its badge says: a jam still in review after its date did not "take place".
+  const tookPlace =
+    jam.phase === "past" &&
+    (jam.status === "published" || jam.status === "registration_closed");
   return (
     <section
       aria-labelledby="status-title"
@@ -58,15 +61,8 @@ export function StatusActions({ jam }: { jam: Jam }) {
         <StatusBadge jam={jam} />
       </div>
       <p className="text-body-sm text-muted">
-        {t(
-          `org.status.explain.${jam.phase === "past" && jam.status !== "cancelled" ? "past" : jam.status}`,
-        )}
+        {t(`org.status.explain.${tookPlace ? "past" : jam.status}`)}
       </p>
-      {jam.review_note && (
-        <InlineNotice actionable>
-          {t("org.status.sentBack", { note: jam.review_note })}
-        </InlineNotice>
-      )}
       <div className="flex flex-wrap gap-3">
         {can("close-registration") && (
           <Button

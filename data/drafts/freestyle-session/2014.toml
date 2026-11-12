@@ -27,9 +27,9 @@ name = "Crew battle"
 gender = "mixed"
 bracket_size = 2
 matches = [
-  { round = "final", a = "squadron", b = "top9", winner = "TODO", video = "https://youtu.be/fLY_6nKGGYw" },
+  { round = "final", a = "squadron", b = "top-9", winner = "TODO", video = "https://youtu.be/fLY_6nKGGYw" },
 ]
 
 [battles.teams]
 squadron = { crew = "squadron" }
-top9 = { crew = "top9" }
+top-9 = { crew = "top-9" }

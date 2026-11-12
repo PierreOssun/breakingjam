@@ -44,7 +44,7 @@ locks-shinigabry = { members = ["locks", "shinigabry"] }
 pac-pac-karterio = { members = ["pac-pac", "karterio"] }
 promo-lorenzo = { members = ["promo", "lorenzo"] }
 shaymin-malish = { members = ["shaymin", "malish"] }
-sisko-frederico = { members = ["sisko", "frederico"] }
+sisko-frederico = { members = ["sisko", "federico"] }
 skeeter-comix = { members = ["skeeter", "comix"] }
 stripes-lotus = { members = ["stripes", "lotus"] }
 stuart-malik = { members = ["stuart", "malik"] }

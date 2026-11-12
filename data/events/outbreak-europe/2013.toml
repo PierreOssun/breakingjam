@@ -9,7 +9,7 @@ lng = 19.1457
 sources = ["https://en.wikipedia.org/wiki/Outbreak_Europe"]
 judges = ["alien-ness", "focus", "jeskilz"]
 mcs = ["mario-bee", "lil-pablo", "mex-one"]
-djs = ["lean-rock", "renegade", "scream", "smirnoff", "ervin-arana", "plash"]
+djs = ["lean-rock", "renegade", "scream", "dj-smirnoff", "ervin-arana", "dj-plash-one"]
 
 [[battles]]
 key = "bgirl"

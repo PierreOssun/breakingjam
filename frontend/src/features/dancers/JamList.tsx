@@ -128,7 +128,13 @@ function JamRow({
             />
             {p.video_url && onPlay && (
               <span className="relative">
-                <VideoPill name={event.name} onClick={() => onPlay(p)} />
+                <VideoPill
+                  // Two battles of one jam: each button says which.
+                  name={
+                    p.battle ? `${event.name} · ${p.battle.name}` : event.name
+                  }
+                  onClick={() => onPlay(p)}
+                />
               </span>
             )}
           </div>

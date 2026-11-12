@@ -2,7 +2,7 @@ import { ArrowUUpLeft, Check, DiceFive, X } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Schemas } from "../../api/client";
+import { api, type Schemas, unwrap } from "../../api/client";
 import { Button } from "../../components/Button";
 import { FormError } from "../../components/FormError";
 import { IconButton } from "../../components/IconButton";
@@ -70,14 +70,16 @@ export function AvatarBuilder({
   };
 
   const save = useMutation({
-    mutationFn: () =>
+    mutationFn: async () =>
       // The avatar alone: the profile, and what the Edit profile form behind holds, stay put.
-      api.PUT("/api/dancers/{id}/avatar", {
-        params: { path: { id: dancer.id } },
-        body: { avatar: spec },
-      }),
-    onSuccess: ({ data }) => {
-      if (!data) throw new Error("avatar not saved");
+      unwrap(
+        await api.PUT("/api/dancers/{id}/avatar", {
+          params: { path: { id: dancer.id } },
+          body: { avatar: spec },
+        }),
+        "avatar",
+      ),
+    onSuccess: (data) => {
       queryClient.setQueryData(["dancer", dancer.id], data);
       // The account menu shows its owner's avatar.
       void queryClient.invalidateQueries({ queryKey: ME_KEY });

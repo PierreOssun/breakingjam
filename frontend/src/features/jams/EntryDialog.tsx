@@ -57,7 +57,13 @@ export function EntryDialog({ battle, entry, onClose }: EntryDialogProps) {
   const [crew, setCrew] = useState(entry?.crew ?? null);
   const form = useForm<EntryFormValues>({ defaultValues: entryValues(entry) });
   const { register, handleSubmit, setError, setValue, watch, formState } = form;
-  const { errors, isDirty } = formState;
+  const { errors } = formState;
+  // The picks live outside the form: leaving with new ones asks too.
+  const picked = (list: { id: string }[]) => list.map((m) => m.id).join();
+  const isDirty =
+    formState.isDirty ||
+    picked(members) !== picked(entry?.members ?? []) ||
+    crew?.id !== entry?.crew?.id;
   const teamName = watch("team_name").trim();
   // Two entries under one name can't be told apart where results are entered.
   const taken =

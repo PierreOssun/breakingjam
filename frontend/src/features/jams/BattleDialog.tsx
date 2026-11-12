@@ -7,6 +7,7 @@ import { api, type Schemas } from "../../api/client";
 import { ChipRow } from "../../components/ChipRow";
 import { Dialog } from "../../components/Dialog";
 import { FormError } from "../../components/FormError";
+import { InlineNotice } from "../../components/InlineNotice";
 import { OptionalLabel } from "../../components/OptionalLabel";
 import { SelectField } from "../../components/SelectField";
 import { TextField } from "../../components/TextField";
@@ -29,7 +30,9 @@ import {
   defaultBattleName,
   FORMATS,
   formatOf,
+  entrySize,
   membersPerEntry,
+  wipes,
   PLACES,
   PRESET_AGES,
   withCategory,
@@ -90,9 +93,10 @@ export function BattleDialog(props: BattleDialogProps) {
   // The battle as the list has it now: a caller may hold the one it opened the sheet with.
   const battle = battles.find((b) => b.id === props.battle?.id) ?? props.battle;
   return (
-    // Keyed by bracket: one set under Details while the sheet is open starts its results over.
+    // Keyed by bracket and entry size: either changed under Details while the sheet is open
+    // starts its results over (another size removed the entries the old ones named).
     <BattleSheet
-      key={battle?.bracket_size ?? "none"}
+      key={`${battle?.bracket_size}-${battle && entrySize(battle)}`}
       {...props}
       battle={battle}
       battles={battles}
@@ -174,6 +178,11 @@ function BattleSheet({
     }
   };
   const category = categoryOf(values);
+  // Teams of another size can't stay: the API removes them with this save, so say it first.
+  const startsFresh =
+    battle !== undefined &&
+    battle.entries.length > 0 &&
+    wipes(entrySize(battle), entrySize(battleBody(values)));
   const format = formatOf(values);
 
   return (
@@ -229,6 +238,11 @@ function BattleSheet({
                 pick(withFormat(values, chip === format ? undefined : chip)),
             }))}
           />
+          {startsFresh && (
+            <InlineNotice actionable>
+              {t("org.battles.startsFresh", { count: battle.entries.length })}
+            </InlineNotice>
+          )}
           <StartAndSpots form={form} values={values} days={days} />
           <Prize
             form={form}

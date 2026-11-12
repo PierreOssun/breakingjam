@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Schemas } from "../../api/client";
+import { splitFieldErrors } from "../../lib/apiErrors";
 import { Button } from "../../components/Button";
 import { CountrySelect } from "../../components/CountrySelect";
 import { Flag } from "../../components/Flag";
@@ -147,11 +148,20 @@ export function NewDancer({
       country,
       instagram_handle: toHandle(handle) || null,
     };
-    const { data, error, response } = await api.POST(route, { body });
+    const { data, error, response } = await api
+      .POST(route, { body })
+      // Offline: the button must not spin for ever.
+      .catch(() => ({
+        data: undefined,
+        error: undefined,
+        response: undefined,
+      }));
     setSaving(false);
     if (data) return onCreated(data);
-    if (response.status !== 409) {
-      setError(error?.error.fields?.[0]?.message ?? t("errors.generic"));
+    if (response?.status !== 409) {
+      const known = ["dancer_name", "country", "instagram_handle"] as const;
+      const { fields } = splitFieldErrors(error, known);
+      setError(fields[0]?.[1] ?? t("errors.generic"));
     } else if (route === "/api/dancers/mine") {
       // The account may have made its page meanwhile, in another tab: reading it again moves
       // the welcome step on; without a handle, that is the only conflict there is.

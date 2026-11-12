@@ -155,6 +155,14 @@ pub async fn delete(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<()> {
     Ok(())
 }
 
+/// Deletes every entry of a battle, with its members and matches (cascade).
+pub async fn delete_entries(conn: &mut PgConnection, battle_id: Uuid) -> sqlx::Result<()> {
+    sqlx::query!("delete from entries where battle_id = $1", battle_id)
+        .execute(conn)
+        .await?;
+    Ok(())
+}
+
 /// Sets `position` to each id's index in `ids`.
 pub async fn reorder(pool: &PgPool, event_id: Uuid, ids: &[Uuid]) -> sqlx::Result<()> {
     sqlx::query!(

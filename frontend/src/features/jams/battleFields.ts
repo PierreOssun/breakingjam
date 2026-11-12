@@ -1,6 +1,7 @@
 // The battle form's values and the API body they become; pure, so tested without a form.
 import type { TFunction } from "i18next";
 import type { Schemas } from "../../api/client";
+import { localeOf } from "../../lib/dates";
 
 type Battle = Schemas["Battle"];
 type BattleFields = Schemas["BattleFields"];
@@ -341,7 +342,7 @@ export function prizeLine(
 ): string {
   const currency = battle.prize_currency;
   if (!currency) return "";
-  const money = new Intl.NumberFormat(language, {
+  const money = new Intl.NumberFormat(localeOf(language), {
     style: "currency",
     currency,
     minimumFractionDigits: 0,
@@ -383,6 +384,17 @@ export function defaultBattleName(
         ? " Masters"
         : "";
   return `${format} ${gender}${age}`;
+}
+
+/** How many dancers an entry holds, as the API counts it (`entry_size`); none when open. */
+export function entrySize(battle: Pick<Battle, "format" | "team_size">) {
+  return battle.format === "seven_to_smoke" ? 1 : (battle.team_size ?? null);
+}
+
+/** Whether a save from entry size `before` to `after` removes the battle's entries, as the
+ * API does: an open size holds any entry, another fixed one none of the old. */
+export function wipes(before: number | null, after: number | null) {
+  return after !== null && after !== before;
 }
 
 /** How many dancers an entry holds: the team size, one for seven to smoke, else up to 10. */

@@ -134,6 +134,34 @@ describe("withSlot", () => {
     ]);
   });
 
+  it("puts a corrected winner in the seat the old one had, in a bracket loaded from the API", () => {
+    const stored = (
+      round: Schemas["MatchRound"],
+      position: number,
+      winner_id: string,
+      loser_id: string,
+    ): Schemas["Match"] => ({
+      id: `${round}-${position}`,
+      round,
+      position,
+      winner_id,
+      loser_id,
+      video_url: null,
+      video_offset_seconds: null,
+    });
+    // c, who came from the second battle, won the semi-final: stored winner first, on top.
+    let draft = draftOf(roundsOf(8), [
+      stored("top8", 0, "a", "b"),
+      stored("top8", 1, "c", "d"),
+      stored("top4", 0, "c", "a"),
+    ]);
+    expect(draft.top4?.[0]).toMatchObject({ a: "c", b: "a", winner: "a" });
+
+    // b won the first battle after all: b takes a's seat, and c stays.
+    draft = withSlot(draft, "top8", 0, { winner: "b" });
+    expect(draft.top4?.[0]).toMatchObject({ a: "c", b: "b", winner: null });
+  });
+
   it("drops a stored start once the video link changes", () => {
     const stored = draftOf(rounds, [
       {

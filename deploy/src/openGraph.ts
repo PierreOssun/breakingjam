@@ -54,7 +54,7 @@ export function jamDates(startsOn: string, endsOn: string): string {
 }
 
 /** "Paris Cypher · Sat 8 Jun · Paris": the title of shared links, as the page's Share writes it. */
-export function shareTitle(jam: JamSummary): string {
+function shareTitle(jam: JamSummary): string {
   return `${jam.name} · ${jamDates(jam.starts_on, jam.ends_on)} · ${jam.city}`;
 }
 

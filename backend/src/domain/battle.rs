@@ -152,6 +152,16 @@ pub enum Category {
     Kids,
 }
 
+/// How many dancers an entry of such a battle holds: one in a seven-to-smoke, else the team
+/// size; none while that is open.
+pub fn entry_size(format: BattleFormat, team_size: Option<i16>) -> Option<i16> {
+    match format {
+        BattleFormat::SevenToSmoke => Some(1),
+        // A battle of unknown shape holds whatever the team size says, as the entry rules do.
+        BattleFormat::Team | BattleFormat::Showcase | BattleFormat::Na => team_size,
+    }
+}
+
 impl Battle {
     /// The categories this battle counts for; a 1v1 Bgirl Kids battle is all three.
     pub fn categories(&self) -> Vec<Category> {

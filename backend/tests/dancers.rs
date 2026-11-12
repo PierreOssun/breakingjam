@@ -637,6 +637,9 @@ async fn titles_are_set_by_the_verified_owner_or_the_team_only(pool: PgPool) {
     };
 
     // An organiser makes the page, but doesn't say what its dancer does.
+    // Naming titles at all is the owner's or the team's, an empty list included.
+    let empty = create(&app, &organizer, with_titles("Lil G", json!([]))).await;
+    assert_eq!(empty.status, StatusCode::FORBIDDEN);
     let refused = create(&app, &organizer, with_titles("Lil G", json!(["bboy"]))).await;
     assert_eq!(refused.status, StatusCode::FORBIDDEN);
     let id = id_of(&create(&app, &organizer, dancer("Lil G", None)).await);
