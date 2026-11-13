@@ -15,7 +15,7 @@ Read `ARCHITECTURE.md` first; it is the source of truth for scope, schema and ro
 - Use a named pattern only when it removes real complexity. Allowed and expected here: newtype, an enum state machine for event status (`EventStatus::apply` and `review`; the status comes from the database at runtime, so typestate cannot check it), extractor (axum), repository-free data access (sqlx queries in `db/`, no trait layer), builder only via `derive` crates.
 - High-performance Rust: make the code lock-free or shard the locks; for shared state, use the actor/message-passing pattern with backpressure.
 - If a file deliberately uses a pattern, say so in the first line: `//! Pattern: extractor — the session cookie becomes a handler argument.` Otherwise no header.
-- Any new `trait` or generic parameter needs a one-line justification in the PR description. One implementation = no trait.
+- Any new `trait` or generic parameter needs a one-line justification in your report to the author. One implementation = no trait.
 
 ## Documentation
 - One-liners only. `///` on every public item, one sentence, what not how. No paragraphs, no examples in docs, no `# Arguments` sections.
@@ -24,7 +24,7 @@ Read `ARCHITECTURE.md` first; it is the source of truth for scope, schema and ro
 
 ## Dependencies
 - Before adding a crate, ask: can this be done in under ~30 lines of plain Rust or with a crate already in `Cargo.toml`? If yes, do that.
-- Each new crate goes in a commit of its own with one line in the message saying what it replaces and why it is worth it.
+- Each new crate is a change of its own: name it in your report with one line saying what it replaces and why it is worth it, so the author can commit it separately.
 - Prefer crates that are: maintained in the last 12 months, > 1M downloads, few transitive deps. Check `cargo tree -d` for duplicates after adding.
 - Features off by default; enable only what is used.
 - Same rule for npm: no package for something `fetch`, a 10-line hook, or Tailwind already does.
@@ -33,13 +33,13 @@ Read `ARCHITECTURE.md` first; it is the source of truth for scope, schema and ro
 - Handlers: validate → call `db`/`domain` → map to response. Under ~30 lines or split.
 - Functions: one job, under ~40 lines, ≤ 4 parameters (else a struct).
 - Modules: one aggregate each. No `utils.rs`, no `helpers.rs`, no `common.rs`.
-- Errors: `AppError` everywhere in the API layer; `thiserror` for domain errors; `anyhow` only in `main` and the seed binary.
+- Errors: `AppError` everywhere in the API layer; `thiserror` for domain errors; `anyhow` only in `main`, the binaries (`seed`, `data`) and as the cause inside `AppError::Internal`.
 - SQL: `sqlx::query!`/`query_as!` only. No string-built SQL, no ORM.
 - Tests: never in source files. Integration tests per handler with `#[sqlx::test]` in `backend/tests/*.rs`; unit tests in `backend/tests/unit/`, mirroring `src/` (helpers they test are `pub(crate)`); frontend tests in `frontend/tests/`, mirroring `src/`. No mocks of the database.
-- Formatting and lints: `cargo fmt`, `cargo clippy --all-targets -- -D warnings`, `eslint` + `prettier` with defaults. Never disable a lint to make it pass.
+- Formatting and lints: `cargo fmt`, `cargo clippy --all-targets --all-features -- -D warnings`, `eslint` + `prettier` with defaults. Never disable a lint to make it pass.
 
 ## Workflow
-- One §11 step per session. Stop after each and show the diff summary; do not start the next step unasked.
+- Do what was asked, then stop and show the diff summary; do not start a next step or milestone unasked.
 - Show migrations as SQL before applying them.
 - Run `cargo test` and `npm test` before saying a step is done. Say what you ran and whether it passed.
 - Never commit; the author reviews and commits. Never touch `.env`.

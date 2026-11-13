@@ -1,6 +1,8 @@
 # BreakingJam
 
-For now, only the test version is deployed: [uat.breakingjam.com](https://uat.breakingjam.com).
+[![BreakingJam — every breaking jam, one map](.github/readme-banner.png)](https://breakingjam.com)
+
+Official website: **[breakingjam.com](https://breakingjam.com)**. The test version is at [uat.breakingjam.com](https://uat.breakingjam.com).
 
 - **Map of all events:** a map of upcoming jams, filtered by date and battle category, searchable by name, city or country.
 - **Register and manage an event:** organisers create a jam, submit it for review, and run its battles, entries, results and lineup once a BreakingJam admin has approved it.

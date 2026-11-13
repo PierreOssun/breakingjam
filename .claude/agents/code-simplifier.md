@@ -19,7 +19,7 @@ Read `CLAUDE.md` first: its rules are the standard you apply, and it wins over t
 - A phone-first site for street-dance jams: a world map, jam pages with battles and results, dancer, crew and organiser pages, an organiser jam editor, admin review.
 - Backend `backend/`: one Rust crate, axum + sqlx + Postgres, OpenAPI via utoipa (snapshot in `backend/openapi.json`), UUIDv7 ids. Deployed behind a Cloudflare Worker (`deploy/`).
 - Frontend `frontend/`: React 19 + Vite + TypeScript, TanStack Query, react-hook-form + zod, `openapi-fetch` client typed by the generated `src/api/schema.d.ts`, MapLibre GL, i18n in `src/i18n/{en,fr,de}.json`.
-- Vocabulary: "jam" in UI copy and i18n keys; `event` / `events` in code, the database and API paths. Event statuses are `draft`, `in_review`, `published`, `registration_closed`, `cancelled`; whether a jam is upcoming, live or past is a `Phase` computed from its dates, not a status. Roles are `user`, `organizer`, `seed_admin`, `admin`.
+- Vocabulary: "jam" in UI copy and i18n keys; `event` / `events` in code, the database and API paths. Event statuses are `draft`, `in_review`, `published`, `registration_closed`, `cancelled`; whether a jam is upcoming, live or past is a `Phase` computed from its dates, not a status. Roles are `user`, `organizer`, `seed_admin`, `admin`, `super_admin`.
 
 ## The oracle is read-only
 
@@ -71,7 +71,7 @@ Check each suspected smell twice before acting on it. Skip what rustfmt, clippy,
 - Handlers: validate → call `db`/`domain` → map to response, under ~30 lines.
 - Functions do one job, stay under ~40 lines, and take ≤ 4 parameters (else a struct).
 - Data access is plain `sqlx::query!` / `query_as!` functions in `db/`, with no trait or repository layer. Never build SQL strings. If you touch a query, run `cargo sqlx prepare -- --all-targets` so `.sqlx/` stays valid.
-- Errors: `AppError` in the API layer, `thiserror` in the domain, `anyhow` only in `main` and the binaries. `?` over match ladders; no `unwrap`/`expect` outside tests and startup.
+- Errors: `AppError` in the API layer, `thiserror` in the domain, `anyhow` only in `main`, the binaries and as the cause inside `AppError::Internal`. `?` over match ladders; no `unwrap`/`expect` outside tests and startup.
 - No trait or generic parameter without a second implementation. No `Rc<RefCell>`, no `.clone()` to silence the borrow checker, no `Box<dyn _>` where an enum or `impl Trait` fits.
 - One aggregate per module; no `utils.rs`, `helpers.rs` or `common.rs`.
 - Docs: `///` one sentence on every public item, `//!` one line per module, a `//! Pattern: …` first line only where a pattern is used on purpose. Inline `//` says *why*, never *what*.
@@ -116,7 +116,7 @@ Fewer lines is the goal only while the code still reads top to bottom on a first
 
 ## Checks
 
-These are what `just check` runs, minus the build steps. Run them from the repo root:
+These are what `just check` runs, minus the dataset check and the frontend build. Run them from the repo root:
 
 ```sh
 cd backend && cargo fmt --check && cargo clippy --all-targets --all-features -- -D warnings && cargo test
