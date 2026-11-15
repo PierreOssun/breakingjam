@@ -441,11 +441,16 @@ One component that changes shape by viewport.
 
 - `relative overflow-hidden rounded-[28px] border border-border bg-surface p-5 flex flex-col gap-3`, with one `.rings` (300px) bleeding off the top-right.
 - Contents, top to bottom:
-  1. avatar
+  1. avatar; on a dancer page, the **Edit avatar** button for whoever may edit it (below)
   2. name `font-display text-display-lg` + tick + flag chips + the city, when set (`MapPin` 16 + `text-body-sm font-bold text-muted`), to the right of the flags (`flex flex-wrap items-center gap-2`; chips and city wrap under long names)
   3. titles, when the dancer has said (M25): `label uppercase text-primary-text`, joined with " · " ("BGIRL · DJ"); nothing when none are set, never a guess
   4. aliases `text-body-sm font-semibold text-muted` ("aka …", joined with " · ")
   5. Instagram handle: Phosphor `InstagramLogo` 20 + `@handle` in `text-body font-extrabold text-text`, 44px min height. It opens `https://instagram.com/<handle>`, which the OS hands to the app. A dancer who hid it shows none; they (and the team) still see it, with `EyeSlash` 14 + "Hidden: only you and the BreakingJam team see it." in `text-caption text-muted` under it.
+- **Edit avatar** *(Nov 2026)*: on a dancer page, whoever sees **Edit profile** gets the avatar as one `<button type="button">` named "Edit avatar", which opens the avatar builder (§4.44) directly, not the edit sheet.
+  - Badge: a 36px `rounded-full bg-primary` circle with a 16px `PencilSimple` in `text-on-primary`, `border-[3px] border-surface shadow-sm`, hanging 8px off the avatar's bottom-right corner (`absolute -right-2 -bottom-2`). Decoration inside the button, not a second one; the same size at every width.
+  - While the builder's code loads, the badge's pencil is a spinning `CircleNotch` (touch screens have no cursor to show the wait).
+  - Hover (pointers that can hover) and keyboard focus: a `rgb(11 13 20 / 0.62)` overlay on the avatar, with a 20px pencil over "Edit avatar" in 13px/800 `text-on-primary`; focus also shows the §8 ring, following the avatar's corners. Touch screens get no overlay: the badge is the affordance.
+  - Everyone else sees the plain avatar: no badge, no pointer, not focusable. The badge is absolutely placed, so the card lays out the same with and without it.
 - It has to look complete when cropped on its own (screenshots). Nothing inside it depends on the page around it.
 - The **OG image** for a dancer page would render this same card at 1200×630 *(not built: only jams have a share image)*.
 
@@ -784,9 +789,9 @@ The admin area (`/admin`): `<h1>` "Admin", then one filter-chip-shaped tab per t
 
 ### 4.44 Avatar builder *(Nov 2026)*
 
-Where an avatar's parts are picked, each by looking at it; a fighter-select screen. It opens from the **avatar row** of the edit sheet: the avatar at 72px, the line "Your pixel avatar, shown on your page, in results and in menus." and a secondary sm **Change avatar** with a `PencilSimple`, in a `rounded-lg border bg-surface p-4` card under the label "Avatar".
+Where an avatar's parts are picked, each by looking at it; a fighter-select screen. It opens from the dancer page's avatar, for whoever may edit the page (§4.17), and from the **avatar row** of the edit sheet: the avatar at 72px, the line "Your pixel avatar, shown on your page, in results and in menus." and a secondary sm **Change avatar** with a `PencilSimple`, in a `rounded-lg border bg-surface p-4` card under the label "Avatar".
 
-- **Container:** a `<dialog>` of its own, over the edit sheet.
+- **Container:** a `<dialog>` of its own, over the dancer page or over the edit sheet, whichever opened it.
   - **Below lg:** a full-screen sheet. A 56px top bar (close X, the title "Your avatar", a primary sm **Done**), then the stage, then the tabs and options, which alone scroll.
   - **From lg:** 944px wide, `rounded-[28px]`, two columns. Left, 300px: the title, the stage, and the avatar at the sizes the site shows it, labelled **Page** (56px), **Menu** (36px), **Results** (22px). Right: the tabs, the options, and a footer with **Cancel** and a primary **Save avatar**.
   - It saves by itself (the avatar alone, `PUT /api/dancers/{id}/avatar`), closes, and shows the toast "Avatar saved."; the edit sheet behind stays as it was. A failed save keeps it open with the error in the footer.
@@ -942,7 +947,7 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - **Mobile 375:**
   1. Header.
   2. Back/Share bar.
-  3. Identity card (4.17).
+  3. Identity card (4.17); whoever may edit the page opens the avatar builder from its avatar.
   4. Crew link chips (the city moved into the identity card, Nov 2026).
   5. Primary action, by state:
      - Unverified, logged out: nothing.

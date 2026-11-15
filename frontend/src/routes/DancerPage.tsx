@@ -8,7 +8,7 @@ import { ShareButton } from "../components/ShareButton";
 import { RowsSkeleton } from "../components/Skeleton";
 import { VideoDialog, type Video } from "../components/VideoDialog";
 import { DancerActions } from "../features/dancers/DancerActions";
-import { DancerAvatar } from "../features/dancers/DancerAvatar";
+import { EditableAvatar } from "../features/dancers/EditableAvatar";
 import {
   IdentityCard,
   ProfileSkeleton,
@@ -88,7 +88,7 @@ function DancerDetail({
             titles={dancer.titles.map((title) => t(`dancer.titles.${title}`))}
             instagram={dancer.instagram_handle}
             instagramHidden={dancer.instagram_hidden}
-            avatar={<DancerAvatar dancer={dancer} />}
+            avatar={<EditableAvatar dancer={dancer} />}
           />
           {dancer.crews.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">

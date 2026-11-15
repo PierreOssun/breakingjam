@@ -758,6 +758,7 @@
     "saved": "Avatar enregistré.",
     "failed": "L’avatar n’a pas été enregistré. Réessaie.",
     "change": "Changer d’avatar",
+    "edit": "Modifier l’avatar",
     "rowHint": "Ton avatar en pixels, affiché sur ta page, dans les résultats et dans les menus.",
     "rowHintOther": "Son avatar en pixels, affiché sur sa page, dans les résultats et dans les menus.",
     "surprise": "Surprends-moi",
