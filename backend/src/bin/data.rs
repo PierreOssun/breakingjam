@@ -15,7 +15,7 @@ use breakingjam::dataset::{
     youtube::{self, Video},
 };
 use breakingjam::{
-    dataset::import,
+    dataset::{import, upcoming},
     db,
     domain::{
         place::{NewPlace, parse_geonames_line},
@@ -29,7 +29,8 @@ const USAGE: &str = "usage: data check [DIR]
        data draft-youtube SERIES [DIR]     draft from that list
        data search-youtube QUERY           print the videos matching QUERY, across all of YouTube (101 quota units)
        data import OWNER_EMAIL [DIR]       add DIR's jams that no earlier import wrote to the database
-                                           (DATABASE_URL), owned by that seed_admin or admin account
+                                           (DATABASE_URL), then its upcoming.toml jams not there yet,
+                                           owned by that seed_admin or admin account
        data places [FILE]                  replace the database's places (DATABASE_URL) with FILE,
                                            by default data/places/cities15000.tsv
 DIR defaults to the repository's data/.";
@@ -77,10 +78,12 @@ fn main() -> anyhow::Result<()> {
     }
 }
 
-/// Adds the jams of `dir` that no earlier import wrote, with their dancers and crews, in one
-/// transaction; what is already there stays as the site left it.
+/// Adds the jams of `dir` that no earlier import wrote, with their dancers and crews, then the
+/// upcoming jams of its `upcoming.toml` the database doesn't hold yet, in one transaction; what is
+/// already there stays as the site left it.
 fn import_data(dir: &Path, owner: &str) -> anyhow::Result<()> {
     let (data, unreadable) = dataset::load(dir);
+    let jams_to_come = upcoming::load(dir)?;
     dotenvy::dotenv().ok();
     let url = std::env::var("DATABASE_URL").context("DATABASE_URL must be set")?;
     tokio::runtime::Runtime::new()?.block_on(async {
@@ -97,24 +100,39 @@ fn import_data(dir: &Path, owner: &str) -> anyhow::Result<()> {
         );
         let mut tx = pool.begin().await?;
         let imported = import::insert_all(&mut tx, &data, owner.id).await?;
+        let today = chrono::Utc::now().date_naive();
+        let added = upcoming::insert(&mut tx, &jams_to_come, owner.id, today).await?;
         tx.commit().await?;
-        for error in &unreadable {
-            println!("left out: {error}");
-        }
-        for why in &imported.skipped {
-            println!("left out: {why}");
+        report(&imported, &unreadable, &owner.display_name);
+        for draft in &added.drafts {
+            println!("left as a draft: {draft}");
         }
         println!(
-            "{} jams added ({} already there), {} dancers, {} crews, owned by {}; {} left out",
-            imported.events,
-            imported.events_before,
-            imported.new_dancers,
-            imported.crews,
-            owner.display_name,
-            unreadable.len() + imported.skipped.len(),
+            "{} upcoming jams added ({} of them drafts), {} already there",
+            added.jams,
+            added.drafts.len(),
+            added.already,
         );
         anyhow::Ok(())
     })
+}
+
+/// What the import of past jams wrote and left out.
+fn report(imported: &import::Imported, unreadable: &[dataset::LoadError], owner: &str) {
+    for error in unreadable {
+        println!("left out: {error}");
+    }
+    for why in &imported.skipped {
+        println!("left out: {why}");
+    }
+    println!(
+        "{} jams added ({} already there), {} dancers, {} crews, owned by {owner}; {} left out",
+        imported.events,
+        imported.events_before,
+        imported.new_dancers,
+        imported.crews,
+        unreadable.len() + imported.skipped.len(),
+    );
 }
 
 /// Replaces the places of the database at `DATABASE_URL` (the environment, else `backend/.env`)

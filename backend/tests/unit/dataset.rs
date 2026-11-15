@@ -1,6 +1,7 @@
 //! Unit tests of `crate::dataset`.
 
 mod check;
+mod upcoming;
 mod wikipedia;
 mod wikitext;
 mod youtube;

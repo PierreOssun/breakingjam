@@ -131,31 +131,18 @@ pub async fn unkeyed_events(
     Ok(rows.into_iter().map(|r| (r.name, r.starts_on)).collect())
 }
 
-/// Publishes a jam the import just wrote, under its key: it arrives past or announced, not via review.
-pub async fn publish_imported(
+/// Files a jam the import just wrote under its key, in its status: it arrives published (or a
+/// draft the publish checklist holds back), not via review.
+pub async fn set_imported(
     conn: &mut PgConnection,
     event_id: Uuid,
     key: &str,
-) -> sqlx::Result<()> {
-    sqlx::query!(
-        "update events set status = 'published', data_key = $2 where id = $1",
-        event_id,
-        key,
-    )
-    .execute(conn)
-    .await?;
-    Ok(())
-}
-
-/// Sets a jam's status directly: the seed's invented jams arrive in any status, not via review.
-pub async fn set_status(
-    conn: &mut PgConnection,
-    event_id: Uuid,
     status: EventStatus,
 ) -> sqlx::Result<()> {
     sqlx::query!(
-        "update events set status = $2 where id = $1",
+        "update events set status = $3, data_key = $2 where id = $1",
         event_id,
+        key,
         status as EventStatus,
     )
     .execute(conn)

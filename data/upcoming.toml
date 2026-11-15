@@ -1,0 +1,2285 @@
+# Jams still to come, found on 15 Nov 2026 (sources and confidence: reports/upcoming-jams.md).
+# The seed and `data import` (the Import data workflow) write those not over yet that the database
+# doesn't hold, as the team, as the API would receive them; then they live on the site. See data/README.md.
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "parauabreak-2026-canaa-dos-carajas"
+name = "Parauabreak 2026 - Canaã dos Carajás"
+starts_on = "2026-11-19"
+ends_on = "2026-11-19"
+timezone = "America/Belem"
+venue_name = "Casa da Cultura"
+city = "Canaã dos Carajás"
+country = "BR"
+lat = -6.5297
+lng = -49.8517
+instagram_url = "https://www.instagram.com/parauabreak/"
+sources = ["https://www.guaranyjunior.com.br/2026/10/30/batalhas-parauabreak-voltam-com-tudo-apos-pausa-de-8-anos/", "https://dol.com.br/entretenimento/cultura/966901/parauabreak-retorna-apos-10-anos-com-r-13-mil-em-premios", "https://www.oliberal.com/cultura/para-vira-palco-em-novembro-para-3-eventos-de-breaking-1.1189105"]
+battles = [
+  { name = "2v2", format = "team", team_size = 2, gender = "mixed", age = "na", prize_first = 1500, prize_currency = "BRL", starts_at = "2026-11-19T17:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "circuito-break-jam-2026"
+name = "Circuito Break Jam 2026"
+starts_on = "2026-11-20"
+ends_on = "2026-11-20"
+timezone = "America/Belem"
+venue_name = "Centro de Desenvolvimento Cultural (CDC)"
+address = "Rua Liberdade, Parauapebas - PA"
+city = "Parauapebas"
+country = "BR"
+lat = -6.0679
+lng = -49.9061
+instagram_url = "https://www.instagram.com/circuitobreakjam/"
+sources = ["https://pontodepauta.com/2026/11/05/circuito-break-jam-vai-premiar-os-melhores-bboy-e-bgirl-em-parauapebas/", "https://www.oliberal.com/cultura/para-vira-palco-em-novembro-para-3-eventos-de-breaking-1.1189105"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", prize_first = 5000, prize_currency = "BRL", starts_at = "2026-11-20T17:00:00" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na", prize_first = 5000, prize_currency = "BRL", starts_at = "2026-11-20T17:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "parauabreak-2026-final"
+name = "Parauabreak 2026 - Final"
+starts_on = "2026-11-20"
+ends_on = "2026-11-21"
+timezone = "America/Belem"
+venue_name = "Centro de Desenvolvimento Cultural (CDC)"
+address = "Rua Liberdade, Parauapebas - PA"
+city = "Parauapebas"
+country = "BR"
+lat = -6.0679
+lng = -49.9061
+instagram_url = "https://www.instagram.com/parauabreak/"
+sources = ["https://www.guaranyjunior.com.br/2026/10/30/batalhas-parauabreak-voltam-com-tudo-apos-pausa-de-8-anos/", "https://dol.com.br/entretenimento/cultura/966901/parauabreak-retorna-apos-10-anos-com-r-13-mil-em-premios", "https://www.oliberal.com/cultura/para-vira-palco-em-novembro-para-3-eventos-de-breaking-1.1189105"]
+battles = [
+  { name = "Crew 5v5", format = "team", team_size = 5, gender = "mixed", age = "na", prize_first = 10000, prize_currency = "BRL" },
+]
+
+[[jams]]
+key = "arena-of-stylez-arena-of-power-2026"
+name = "Arena of Stylez / Arena of Power 2026"
+starts_on = "2026-11-20"
+ends_on = "2026-11-21"
+timezone = "Europe/Berlin"
+venue_name = "Dresdner Weihnachts-Circus"
+address = "Washingtonstr. 2, 01139 Dresden"
+city = "Dresden"
+country = "DE"
+lat = 51.0848
+lng = 13.6953
+instagram_url = "https://www.instagram.com/arena_of_stylez"
+website_url = "https://arena-of-stylez.de"
+registration_url = "https://www.ticketmaster.de/event/arena-of-stylez-arena-of-power-tickets/816897466"
+sources = ["https://and8.dance/en/e/5707", "https://arena-of-stylez.de"]
+battles = [
+  { name = "1v1 Power Move Battle", format = "team", team_size = 1, gender = "mixed", age = "na", bracket_size = 16 },
+]
+
+[[jams]]
+key = "baltic-break-festival-rise-of-the-wave-2026"
+name = "Baltic Break Festival Rise of the Wave 2026"
+starts_on = "2026-11-20"
+ends_on = "2026-11-22"
+timezone = "Europe/Berlin"
+venue_name = "Kulturkirche St. Jakobi"
+address = "Jacobiturmstr. 28, 18439 Stralsund"
+city = "Stralsund"
+country = "DE"
+lat = 54.3133
+lng = 13.0929
+instagram_url = "https://www.instagram.com/andregrundmann_"
+contact_email = "info@baltic-dance.de"
+website_url = "http://www.andre-grundmann.de"
+registration_url = "https://and8.dance/en/e/5542/register"
+sources = ["https://and8.dance/en/e/5542"]
+battles = [
+  { name = "Crew vs Crew Youth U18", format = "na", gender = "mixed", age = "kids", age_max = 17 },
+  { name = "Crew vs Crew Adults Open", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "wiba-2026-world-final"
+name = "WIBA 2026 - World Final"
+starts_on = "2026-11-20"
+ends_on = "2026-11-21"
+timezone = "Europe/Paris"
+venue_name = "Anova / La Luciole"
+address = "171 Rue de Bretagne, 61000 Alençon"
+city = "Alençon"
+country = "FR"
+lat = 48.4317
+lng = 0.0668
+instagram_url = "https://www.instagram.com/wiba_france"
+contact_email = "contact.zone61@gmail.com"
+website_url = "https://www.zone61.fr"
+registration_url = "https://www.zone61.fr/collect/description/754643-z-wiba-2026-world-final"
+sources = ["https://www.zone61.fr/collect/description/754643-z-wiba-2026-world-final", "https://kepasa.fr/events/wiba-world-final-2026-11-21", "https://kepasa.fr/events/wiba-last-qualification-2026-11-20"]
+battles = [
+  { name = "2v2 Last Qualification", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "2v2 World Final", format = "team", team_size = 2, gender = "mixed", age = "na", bracket_size = 8 },
+]
+
+[[jams]]
+key = "2o-festival-catarinense-de-hip-hop-etapa-criciuma-2026"
+name = "2º Festival Catarinense de Hip Hop - Etapa Criciúma"
+starts_on = "2026-11-21"
+ends_on = "2026-11-22"
+timezone = "America/Sao_Paulo"
+venue_name = "Sede da ASDC / Casa do Hip Hop Flor e Ser"
+address = "Rua Antônio Rossi, 445, Vila Zuleima, Criciúma - SC, 88817-140"
+city = "Criciúma"
+country = "BR"
+lat = -28.6654
+lng = -49.4023
+instagram_url = "https://www.instagram.com/festivalcatarinensedehiphop/"
+contact_email = "asdc.criciuma@gmail.com"
+website_url = "http://asdccriciuma.blogspot.com/"
+registration_url = "https://forms.gle/3LDTdSMTkfL5aFzH8"
+sources = ["http://asdccriciuma.blogspot.com/2026/10/", "http://asdccriciuma.blogspot.com/2026/11/"]
+battles = [
+  { name = "1v1 Kids 6-12", format = "team", team_size = 1, gender = "mixed", age = "kids", age_min = 6, age_max = 12, bracket_size = 8 },
+  { name = "1v1 Youth 13-17", format = "team", team_size = 1, gender = "mixed", age = "kids", age_min = 13, age_max = 17, bracket_size = 8 },
+  { name = "1v1 Open Adult", format = "team", team_size = 1, gender = "mixed", age = "na", bracket_size = 8 },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "ch2-arena-2026-final"
+name = "CH2 Arena 2026 - Final"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "America/Belem"
+venue_name = "Centro de Desenvolvimento Cultural (CDC)"
+address = "Rua Liberdade, Parauapebas - PA"
+city = "Parauapebas"
+country = "BR"
+lat = -6.0679
+lng = -49.9061
+instagram_url = "https://www.instagram.com/ch2arena/"
+sources = ["https://pontodepauta.com/2026/11/04/batalha-ch2-arena-poe-o-para-na-rota-internacional-do-breaking/", "https://dol.com.br/entretenimento/cultura/967381/batalha-de-breaking-em-belem-vai-levar-vencedores-a-competicao-internacional", "https://www.oliberal.com/cultura/para-vira-palco-em-novembro-para-3-eventos-de-breaking-1.1189105"]
+battles = [
+  { name = "2v2", format = "team", team_size = 2, gender = "mixed", age = "na", starts_at = "2026-11-21T17:00:00" },
+  { name = "Kids", format = "na", gender = "mixed", age = "kids", age_max = 17 },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "4-da-culture-2026"
+name = "4 Da Culture"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Europe/Berlin"
+venue_name = "Garage Nord"
+address = "Weidendamm 28, 30167 Hannover"
+city = "Hannover"
+country = "DE"
+lat = 52.3864
+lng = 9.7288
+instagram_url = "https://www.instagram.com/lockenkopff_"
+sources = ["https://and8.dance/en/e/5743"]
+battles = [
+  { name = "1v1 Breaking", format = "team", team_size = 1, gender = "mixed", age = "na", starts_at = "2026-11-21T16:00:00" },
+]
+
+[[jams]]
+key = "dma-urban-cypher-2026"
+name = "DMA Urban Cypher 2026"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Europe/Berlin"
+venue_name = "DMA Dance Studios"
+address = "Böheimstr. 8, 86153 Augsburg"
+city = "Augsburg"
+country = "DE"
+lat = 48.3682
+lng = 10.9167
+instagram_url = "https://www.instagram.com/dmadancestudios"
+contact_email = "info@dma.dance"
+website_url = "https://www.dma.dance"
+sources = ["https://and8.dance/en/e/5724"]
+battles = [
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na", prize_first = 500, prize_currency = "EUR", starts_at = "2026-11-21T16:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "one-love-2026"
+name = "One Love"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Europe/Berlin"
+venue_name = "halle76 - Raum für kreative Bewegung"
+address = "Wolfartsweierer Str. 11, 76137 Karlsruhe"
+city = "Karlsruhe"
+country = "DE"
+lat = 49.0021
+lng = 8.4265
+instagram_url = "https://www.instagram.com/onelovejam76/"
+sources = ["https://and8.dance/en/e/5657"]
+battles = [
+  { name = "1v1 Breaking", format = "team", team_size = 1, gender = "mixed", age = "na", bracket_size = 8 },
+]
+
+[[jams]]
+key = "battle-day-iii-2026"
+name = "Battle Day III - 2026"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Europe/Tallinn"
+venue_name = "Kammivabriku Club"
+address = "Teguri 26, Tartu"
+city = "Tartu"
+country = "EE"
+lat = 58.3589
+lng = 26.7339
+instagram_url = "https://www.instagram.com/streetdance_estonia/"
+contact_email = "info@tanavatantsijad.ee"
+website_url = "https://www.tanavatantsijad.ee"
+registration_url = "https://fienta.com/et/eesti-tanavatantsijate-liit-battle-day-iii"
+sources = ["https://and8.dance/en/e/5486", "https://www.tanavatantsijad.ee"]
+battles = [
+  { name = "1v1 Breaking Kids U12", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 11 },
+  { name = "1v1 Breaking Junior 13-16", format = "team", team_size = 1, gender = "mixed", age = "kids", age_min = 13, age_max = 16 },
+  { name = "1v1 Bboy 17+", format = "team", team_size = 1, gender = "bboy", age = "na", age_min = 17 },
+  { name = "1v1 Bgirl 17+", format = "team", team_size = 1, gender = "mixed", age = "na", age_min = 17, starts_at = "2026-11-21T12:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "breaking-history-4e-edition-2026"
+name = "Breaking History - 4e édition"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Europe/Paris"
+venue_name = "Palais des sports Jacques Chirac"
+address = "2 rue du Général d'Amade, 82000 Montauban"
+city = "Montauban"
+country = "FR"
+lat = 44.0141
+lng = 1.3721
+instagram_url = "https://www.instagram.com/breakinghistory82"
+registration_url = "https://www.helloasso.com/associations/kids-are-the-future/evenements/breaking-history-2026"
+sources = ["https://kepasa.fr/events/breaking-history-4e-edition-2026-11-21"]
+battles = [
+  { name = "National breaking battle", format = "na", gender = "mixed", age = "na", starts_at = "2026-11-21T20:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "city-battle-2026"
+name = "City Battle"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Europe/Paris"
+venue_name = "Amicale Laïque Écourtoise"
+address = "106 Rue Henri Barbusse, 62860 Écourt-Saint-Quentin"
+city = "Écourt-Saint-Quentin"
+country = "FR"
+lat = 50.2495
+lng = 3.0701
+sources = ["https://kepasa.fr/events/city-battle-2026-11-21"]
+battles = [
+  { name = "2v2", format = "team", team_size = 2, gender = "mixed", age = "na", bracket_size = 16, starts_at = "2026-11-21T17:00:00" },
+  { name = "1v1 Kids U16", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 15, bracket_size = 8 },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "montbeliard-bboy-series-4-2026"
+name = "Montbéliard Bboy Series 4"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Europe/Paris"
+venue_name = "Le Jules Verne"
+address = "Rue Claude Debussy, 25200 Montbéliard"
+city = "Montbéliard"
+country = "FR"
+lat = 47.4993
+lng = 6.7954
+instagram_url = "https://www.instagram.com/art2sens"
+contact_email = "association.artdesens@laposte.net"
+registration_url = "https://www.helloasso.com/associations/association-art-2-sens/evenements/billettrie-bboys-serie-4"
+sources = ["https://kepasa.fr/events/montbeliard-bboy-series-4-2026-11-21"]
+battles = [
+  { name = "1v1 Break", format = "team", team_size = 1, gender = "mixed", age = "na", starts_at = "2026-11-21T15:00:00" },
+]
+
+[[jams]]
+key = "fujifilm-instax-undisputed-accra-2026"
+name = "FUJIFILM instax Undisputed Accra"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Africa/Accra"
+venue_name = "Accra Mall"
+address = "Plot C11 Tetteh Quarshie Interchange, Spintex Rd, Accra"
+city = "Accra"
+country = "GH"
+lat = 5.6222
+lng = -0.1729
+instagram_url = "https://www.instagram.com/undisputedmasters"
+contact_email = "info@thenotoriousibe.com"
+website_url = "https://undisputedmasters.com/accra/"
+registration_url = "https://and8.dance/en/e/5709/register"
+sources = ["https://undisputedmasters.com/accra/", "https://and8.dance/en/e/5709"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", bracket_size = 8, starts_at = "2026-11-21T16:00:00" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na", bracket_size = 8, starts_at = "2026-11-21T16:00:00" },
+]
+
+[[jams]]
+key = "2026-wdsf-asian-breaking-championship"
+name = "2026 WDSF Asian Breaking Championship"
+starts_on = "2026-11-21"
+ends_on = "2026-11-22"
+timezone = "Asia/Hong_Kong"
+venue_name = "Queen Elizabeth Stadium - Arena"
+address = "18 Oi Kwan Road, Wan Chai, Hong Kong"
+city = "Hong Kong"
+country = "HK"
+lat = 22.2751
+lng = 114.1789
+instagram_url = "https://www.instagram.com/hkdsa_breaking"
+contact_email = "info@dancesport.org.hk"
+website_url = "https://www.dancesport.org.hk"
+registration_url = "https://worlddancesport.org/Events/Hong-Kong-China-Hong-Kong-China-21112026-22112026-8800"
+sources = ["https://worlddancesport.org/Events/Hong-Kong-China-Hong-Kong-China-21112026-22112026-8800", "https://www.worlddancesport.org/Breaking"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "breakdance-dream-cup-2026"
+name = "Breakdance Dream Cup 2026"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Asia/Tokyo"
+venue_name = "Lazona Kawasaki Plaza"
+address = "72-1 Horikawacho, Saiwai-ku, Kawasaki 212-8576"
+city = "Kawasaki"
+country = "JP"
+lat = 35.5332
+lng = 139.6959
+instagram_url = "https://www.instagram.com/breakdance_dream_cup"
+website_url = "https://www.isfk.net/"
+sources = ["https://and8.dance/en/e/5731", "https://www.isfk.net/"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "super-break-2026"
+name = "SUPER BREAK 2026"
+starts_on = "2026-11-21"
+ends_on = "2026-11-22"
+timezone = "Asia/Tokyo"
+venue_name = "CLUB CITTA'"
+address = "5-7 Ogawacho, Kawasaki-ku, Kawasaki 210-0023"
+city = "Kawasaki"
+country = "JP"
+lat = 35.5278
+lng = 139.6973
+instagram_url = "https://www.instagram.com/superbreak_official"
+website_url = "https://www.isfk.net/superbreak/"
+sources = ["https://www.isfk.net/superbreak/", "https://and8.dance/en/e/5734"]
+battles = [
+  { name = "1v1 Open", format = "team", team_size = 1, gender = "mixed", age = "na", bracket_size = 16, prize_first = 30000, prize_currency = "JPY" },
+  { name = "3v3", format = "team", team_size = 3, gender = "mixed", age = "na", bracket_size = 16 },
+]
+
+[[jams]]
+key = "bast-a-move-6-bam6-2026"
+name = "Bast'a'move 6 - BAM6"
+starts_on = "2026-11-21"
+ends_on = "2026-11-21"
+timezone = "Europe/Ljubljana"
+venue_name = "BastArts Academy - ŠKD BAST"
+address = "Ob železnici 14, 1000 Ljubljana"
+city = "Ljubljana"
+country = "SI"
+lat = 46.0589
+lng = 14.5345
+instagram_url = "https://www.instagram.com/bast.a.move/"
+registration_url = "https://and8.dance/en/e/5348/register"
+sources = ["https://and8.dance/en/e/5348"]
+battles = [
+  { name = "1v1 Breaking Kids U12", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 11 },
+  { name = "1v1 Breaking U17", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 16 },
+  { name = "1v1 Bgirl Open", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "2v2 Breaking Open", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "7 to Smoke", format = "seven_to_smoke", gender = "mixed", age = "na", starts_at = "2026-11-21T16:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "breaking-news-2026"
+name = "Breaking News 2026"
+starts_on = "2026-11-21"
+ends_on = "2026-11-22"
+timezone = "Asia/Taipei"
+venue_name = "Taoyuan Jingfu Temple (桃園景福宮)"
+address = "No. 208, Zhongzheng Rd, Taoyuan District, Taoyuan 330"
+city = "Taoyuan"
+country = "TW"
+lat = 24.9949
+lng = 121.3109
+instagram_url = "https://www.instagram.com/ty_streetart/"
+sources = ["https://and8.dance/en/e/5472"]
+battles = [
+  { name = "1v1 Open", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "Crew 4v4", format = "team", team_size = 4, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "belgian-breaking-championship-2026"
+name = "Belgian Breaking Championship 2026"
+starts_on = "2026-11-22"
+ends_on = "2026-11-22"
+timezone = "Europe/Brussels"
+venue_name = "Het Depot"
+address = "Martelarenplein 12, 3000 Leuven"
+city = "Leuven"
+country = "BE"
+lat = 50.8815
+lng = 4.7138
+instagram_url = "https://www.instagram.com/breakingvlaanderen/"
+website_url = "https://breakingnet.be/agenda/belgian-breaking-champs-2026-80"
+registration_url = "https://and8.dance/nl/e/5713"
+sources = ["https://breakingnet.be/agenda/belgian-breaking-champs-2026-80", "https://and8.dance/en/e/5713"]
+battles = [
+  { name = "1v1 Adult B-Boys", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 Adult B-Girls", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "1v1 U16 B-Boys", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 15 },
+  { name = "1v1 U16 B-Girls", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 15 },
+  { name = "1v1 U12 B-Boys", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 11 },
+  { name = "1v1 U12 B-Girls", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 11 },
+]
+
+[[jams]]
+key = "underground-heat-vol-2-2026"
+name = "Underground Heat Vol. 2"
+starts_on = "2026-11-22"
+ends_on = "2026-11-22"
+timezone = "Europe/Berlin"
+venue_name = "KulturFabrik Löseke (KUFA)"
+address = "Langer Garten 1, 31137 Hildesheim"
+city = "Hildesheim"
+country = "DE"
+lat = 52.1618
+lng = 9.9577
+instagram_url = "https://www.instagram.com/knockemoutcypher"
+contact_email = "kontakt@kufa.info"
+website_url = "https://www.kufa.info"
+registration_url = "https://and8.dance/en/e/5721/register"
+sources = ["https://and8.dance/en/e/5721"]
+battles = [
+  { name = "Crew vs Crew 3-5 dancers", format = "na", gender = "mixed", age = "na", prize_first = 500, prize_currency = "EUR" },
+  { name = "7 to Smoke 1v1", format = "seven_to_smoke", gender = "mixed", age = "na", prize_first = 100, prize_currency = "EUR", starts_at = "2026-11-22T14:00:00" },
+]
+
+[[jams]]
+key = "breaksm26-2026"
+name = "BreakSM26"
+starts_on = "2026-11-22"
+ends_on = "2026-11-22"
+timezone = "Europe/Helsinki"
+venue_name = "Tiivistämö"
+address = "Kaasutehtaankatu 1, 00580 Helsinki"
+city = "Helsinki"
+country = "FI"
+lat = 60.1870
+lng = 24.9730
+instagram_url = "https://www.instagram.com/suomenbreikkiliitto"
+contact_email = "suomenbreikkiliitto@gmail.com"
+website_url = "https://www.breikkiliitto.fi/tapahtumat"
+registration_url = "https://forms.gle/Ei76AhiWeRLv2PBn7"
+sources = ["https://and8.dance/en/e/5698", "https://www.breikkiliitto.fi/tapahtumat"]
+battles = [
+  { name = "1v1 Kids U11", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 10, prize_first = 100, prize_currency = "EUR", starts_at = "2026-11-22T10:00:00" },
+  { name = "1v1 Youth 12-17", format = "team", team_size = 1, gender = "mixed", age = "kids", age_min = 12, age_max = 17, prize_first = 100, prize_currency = "EUR" },
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", prize_first = 200, prize_currency = "EUR", starts_at = "2026-11-22T15:00:00" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na", prize_first = 200, prize_currency = "EUR" },
+  { name = "Crew vs Crew 4+", format = "na", gender = "mixed", age = "na", prize_first = 1000, prize_currency = "EUR" },
+]
+
+[[jams]]
+key = "battle-urban-talent-2026"
+name = "Battle Urban Talent"
+starts_on = "2026-11-22"
+ends_on = "2026-11-22"
+timezone = "Europe/Paris"
+venue_name = "Gymnase Périquoi"
+address = "Chemin de la Tour aux Chartiers, 94260 Fresnes"
+city = "Fresnes"
+country = "FR"
+lat = 48.7531
+lng = 2.3212
+instagram_url = "https://www.instagram.com/urbantalent_94"
+website_url = "https://urbantalent.fr"
+registration_url = "https://app.urbantalent.fr/inscription"
+sources = ["https://urbantalent.fr", "https://kepasa.fr/events/battle-urban-talent-2026-11-22"]
+battles = [
+  { name = "1v1 Breakdance", format = "team", team_size = 1, gender = "mixed", age = "na", starts_at = "2026-11-22T14:30:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "the-top-wanted-2026"
+name = "The Top Wanted 2026"
+starts_on = "2026-11-22"
+ends_on = "2026-11-22"
+timezone = "Asia/Hong_Kong"
+city = "Hong Kong"
+country = "HK"
+lat = 22.2818
+lng = 114.1583
+instagram_url = "https://www.instagram.com/schoolofhiphop"
+sources = ["https://thelegitsblast.com/en/qualifiers"]
+battles = [
+  { name = "2v2", format = "team", team_size = 2, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "autumn-breaks-2026"
+name = "Autumn Breaks 2026"
+starts_on = "2026-11-22"
+ends_on = "2026-11-22"
+timezone = "Europe/Amsterdam"
+venue_name = "Verkadefabriek"
+address = "Boschdijkstraat 45, 5211 VD 's-Hertogenbosch"
+city = "'s-Hertogenbosch"
+country = "NL"
+lat = 51.6958
+lng = 5.2978
+instagram_url = "https://www.instagram.com/season_breaks/"
+contact_email = "info@cypherhq.nl"
+website_url = "https://cypherhq.nl/autumn-breaks-battle/"
+registration_url = "https://forms.gle/tKEamCdinVmxQgkz5"
+sources = ["https://and8.dance/en/e/5703", "https://cypherhq.nl/"]
+battles = [
+  { name = "1v1 Breaking", format = "team", team_size = 1, gender = "mixed", age = "na", bracket_size = 8, prize_first = 1000, prize_currency = "EUR", starts_at = "2026-11-22T15:30:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "red-bull-bc-one-camp-toronto-2026"
+name = "Red Bull BC One Camp Toronto 2026"
+starts_on = "2026-11-26"
+ends_on = "2026-11-28"
+timezone = "America/Toronto"
+venue_name = "The Great Hall"
+address = "1087 Queen St W, Toronto, ON M6J 1H3"
+city = "Toronto"
+country = "CA"
+lat = 43.6433
+lng = -79.4221
+instagram_url = "https://www.instagram.com/redbullbcone"
+website_url = "https://www.redbull.com/int-en/events/red-bull-bc-one-world-final-toronto"
+sources = ["https://and8.dance/en/e/5688", "https://www.blogto.com/events/red-bull-bc-one-world-final-toronto-2026-nov-27-29-toronto/"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "2v2", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "Footwork 1v1", format = "team", team_size = 1, gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "tech-styles-11-2026"
+name = "Tech Styles 11"
+starts_on = "2026-11-27"
+ends_on = "2026-11-28"
+timezone = "Europe/London"
+venue_name = "Jubilee Centre"
+address = "Jermyn Street, Bradford BD1 4EJ"
+city = "Bradford"
+country = "GB"
+lat = 53.7961
+lng = -1.7472
+instagram_url = "https://www.instagram.com/techstylesinternational"
+website_url = "https://techstylesinternational.co.uk/"
+sources = ["https://fb.me/e/6eQdnDOxo", "https://breaking-calendar.com/en/events/cmttxedsu0002q8yvab25ittf"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "Crew", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "castle-rock-jam-kids-edition-2026"
+name = "Castle Rock Jam - Kids Edition 2026"
+starts_on = "2026-11-28"
+ends_on = "2026-11-28"
+timezone = "Europe/Berlin"
+venue_name = "movetoohot Dance Studios"
+address = "Marktler Str. 45, 84489 Burghausen"
+city = "Burghausen"
+country = "DE"
+lat = 48.1732
+lng = 12.8298
+instagram_url = "https://www.instagram.com/castlerockjam"
+contact_email = "welcome@castlerockjam.de"
+website_url = "https://www.castlerockjam.de"
+registration_url = "https://and8.dance/en/e/5735/register"
+sources = ["https://and8.dance/en/e/5735"]
+battles = [
+  { name = "1v1 Breaking Kids Beginner U15", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 14 },
+  { name = "1v1 Breaking Kids Advanced U15", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 14, starts_at = "2026-11-28T15:00:00" },
+]
+
+[[jams]]
+key = "now-or-never-vol-3-2026"
+name = "NOW OR NEVER vol.3"
+starts_on = "2026-11-28"
+ends_on = "2026-11-28"
+timezone = "Europe/Berlin"
+venue_name = "Sporthalle Grundschule Löhne-Bahnhof"
+address = "Königstraße 47, 32584 Löhne"
+city = "Löhne"
+country = "DE"
+lat = 52.1925
+lng = 8.7155
+instagram_url = "https://www.instagram.com/white.rabbit.crew"
+contact_email = "ezzy92@hotmail.de"
+sources = ["https://and8.dance/en/e/5754"]
+battles = [
+  { name = "1v1 Kids U16", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 15 },
+  { name = "2v2", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "Tricks Battle", format = "na", gender = "mixed", age = "na" },
+  { name = "Longest Move", format = "na", gender = "mixed", age = "na", starts_at = "2026-11-28T13:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "battle-glitch-daft-punk-session-2026"
+name = "Battle Glitch - Daft Punk Session"
+starts_on = "2026-11-28"
+ends_on = "2026-11-28"
+timezone = "Europe/Paris"
+venue_name = "Steppe Bar"
+address = "7 Quai Antoine Riboud, 69002 Lyon"
+city = "Lyon"
+country = "FR"
+lat = 45.7427
+lng = 4.8169
+instagram_url = "https://www.instagram.com/glitchfromhell"
+sources = ["https://kepasa.fr/events/battle-glitch-daft-punk-session-2026-11-28"]
+battles = [
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na", starts_at = "2026-11-28T20:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "breaking-connexion-series-ii-2026"
+name = "Breaking Connexion Series II"
+starts_on = "2026-11-28"
+ends_on = "2026-11-28"
+timezone = "Europe/Paris"
+venue_name = "Gymnase Bourran"
+address = "2 Rue Léo Lagrange, 33700 Mérignac"
+city = "Mérignac"
+country = "FR"
+lat = 44.8378
+lng = -0.6349
+instagram_url = "https://www.instagram.com/breakingconnexionseries"
+registration_url = "https://docs.google.com/forms/d/e/1FAIpQLSdc_voPJNrkmou8vPdNaVkTCiE0O5oUWoCZp8rmdNjs-YHFOQ/viewform"
+sources = ["https://kepasa.fr/events/breaking-connexion-series-ii-2026-11-28"]
+battles = [
+  { name = "3v3 Breaking U16", format = "team", team_size = 3, gender = "mixed", age = "kids", age_max = 15 },
+  { name = "2v2 Breaking 16+", format = "team", team_size = 2, gender = "mixed", age = "na", age_min = 16 },
+]
+
+[[jams]]
+key = "mynavi-dancealive-2027-charismax-iv-kanto-2026"
+name = "Mynavi DANCEALIVE 2027 CHARISMAX IV -KANTO-"
+starts_on = "2026-11-28"
+ends_on = "2026-11-28"
+timezone = "Asia/Tokyo"
+venue_name = "Shibuya Stream"
+address = "3-21-3 Shibuya, Shibuya-ku, Tokyo 150-0002"
+city = "Tokyo"
+country = "JP"
+lat = 35.6571
+lng = 139.7033
+website_url = "https://dancealivejapan.com/"
+registration_url = "https://eventpay.jp/event_info?shop_code=9575039428746557&EventCode=C887809528"
+sources = ["https://dancealivejapan.com/schedule/27charismax04/"]
+battles = [
+  { name = "1v1 Open", format = "team", team_size = 1, gender = "mixed", age = "na", starts_at = "2026-11-28T12:00:00" },
+]
+
+[[jams]]
+key = "open-latvian-breaking-championship-2026"
+name = "Open Latvian Breaking Championship 2026"
+starts_on = "2026-11-28"
+ends_on = "2026-11-28"
+timezone = "Europe/Riga"
+venue_name = "Daugavpils Olimpiskais centrs"
+address = "Stadiona iela 1, 5401 Daugavpils"
+city = "Daugavpils"
+country = "LV"
+lat = 55.8788
+lng = 26.5154
+instagram_url = "https://www.instagram.com/latvian_breaking_championship"
+website_url = "http://www.factorykingz.com"
+registration_url = "https://www.lsdf.lv/lv/event/863450"
+sources = ["https://and8.dance/en/e/5727", "https://www.lsdf.lv/lv/event/863450"]
+battles = [
+  { name = "1v1 Bboy U7", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 6 },
+  { name = "1v1 Bgirl U7", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 6 },
+  { name = "1v1 Bboy U11", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 10 },
+  { name = "1v1 Bgirl U11", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 10 },
+  { name = "1v1 Bboy U15", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 14 },
+  { name = "1v1 Bgirl U15", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 14 },
+  { name = "1v1 Bboy Pro", format = "team", team_size = 1, gender = "bboy", age = "na", prize_first = 200, prize_currency = "EUR" },
+  { name = "1v1 Bgirl Pro", format = "team", team_size = 1, gender = "bgirl", age = "na", prize_first = 100, prize_currency = "EUR" },
+]
+
+[[jams]]
+key = "red-bull-bc-one-world-final-toronto-2026"
+name = "Red Bull BC One World Final Toronto 2026"
+starts_on = "2026-11-29"
+ends_on = "2026-11-29"
+timezone = "America/Toronto"
+venue_name = "Mattamy Athletic Centre"
+address = "50 Carlton St, Toronto, ON M5B 1J2"
+city = "Toronto"
+country = "CA"
+lat = 43.6622
+lng = -79.3803
+instagram_url = "https://www.instagram.com/redbullbcone"
+website_url = "https://www.redbull.com/int-en/events/red-bull-bc-one-world-final-toronto"
+sources = ["https://www.redbull.com/ca-en/events/red-bull-bc-one-world-final-toronto", "https://www.mattamyathleticcentre.ca/events/detail/red-bull-bc-one-world-final-toronto-2026"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", starts_at = "2026-11-29T16:00:00" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na", starts_at = "2026-11-29T16:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "battle-kids-2026"
+name = "Battle Kids 2026"
+starts_on = "2026-11-29"
+ends_on = "2026-11-29"
+timezone = "Europe/Paris"
+venue_name = "Espace Tino Rossi"
+address = "Chemin de la Ferme, 13170 Les Pennes-Mirabeau"
+city = "Les Pennes-Mirabeau"
+country = "FR"
+lat = 43.4087
+lng = 5.3106
+instagram_url = "https://www.instagram.com/ac2nofficiel"
+sources = ["https://agendamistral.fr/battle-kids-battle-de-breakdance-dimanche-29-novembre-2026-sa/", "https://kepasa.fr/events/battle-kids-37712b"]
+battles = [
+  { name = "4v4 Kids 6-16 beginners", format = "team", team_size = 4, gender = "mixed", age = "kids", age_min = 6, age_max = 16 },
+  { name = "4v4 Kids 6-16 advanced", format = "team", team_size = 4, gender = "mixed", age = "kids", age_min = 6, age_max = 16, starts_at = "2026-11-29T14:00:00" },
+]
+
+[[jams]]
+key = "2026-breaking-k-series-final"
+name = "2026 Breaking K Series Final"
+starts_on = "2026-11-29"
+ends_on = "2026-11-29"
+timezone = "Asia/Seoul"
+venue_name = "SAC Art Hall (가빈 아트홀)"
+address = "534 Samseong-ro, Gangnam-gu, Seoul"
+city = "Seoul"
+country = "KR"
+lat = 37.5097
+lng = 127.0555
+instagram_url = "https://www.instagram.com/kfd_official_dancesport/"
+contact_email = "kfd2050@naver.com"
+website_url = "http://www.kfd.or.kr"
+sources = ["https://www.kfd.or.kr/bbs/board.php?bo_table=calendar&wr_id=209", "https://and8.dance/en/e/5759"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "wdsf-world-championships-breaking-hip-hop-freestyle-paris-2026"
+name = "WDSF World Championships Breaking & Hip-Hop Freestyle Paris 2026"
+starts_on = "2026-12-04"
+ends_on = "2026-12-06"
+timezone = "Europe/Paris"
+venue_name = "Adidas Arena"
+address = "Porte de la Chapelle, 75018 Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8996
+lng = 2.3607
+instagram_url = "https://www.instagram.com/_breakingforgold"
+website_url = "https://www.ffdanse.fr/"
+sources = ["https://worlddancesport.org/Events/Paris-France-04122026-06122026-8805", "https://www.paris.fr/evenements/world-championships-breaking-hip-hop-freestyle-123883", "https://www.sortiraparis.com/en/what-to-do-in-paris/sport-wellness/articles/352918-hip-hop-breaking-freestyle-world-championships-at-arena-porte-de-la-chapelle"]
+battles = [
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "jingle-bell-rock-2026"
+name = "Jingle Bell Rock 2026"
+starts_on = "2026-12-05"
+ends_on = "2026-12-05"
+timezone = "America/Toronto"
+venue_name = "Pierrefonds Community High School"
+address = "13800 Boulevard de Pierrefonds, Montréal, QC H9A 1A7"
+city = "Montréal"
+country = "CA"
+lat = 45.4930
+lng = -73.8472
+instagram_url = "https://www.instagram.com/break_city/"
+website_url = "https://breakcity.ca"
+registration_url = "https://www.eventbrite.ca/e/jingle-bell-rock-2026-beginner-street-dance-battle-tickets-2004432653023"
+sources = ["https://www.eventbrite.ca/e/jingle-bell-rock-2026-beginner-street-dance-battle-tickets-2004432653023"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "dancing-dessau-2026"
+name = "Dancing Dessau 2026"
+starts_on = "2026-12-05"
+ends_on = "2026-12-05"
+timezone = "Europe/Berlin"
+venue_name = "Anhalt Arena Dessau"
+address = "Robert-Bosch-Straße 54, 06847 Dessau-Roßlau"
+city = "Dessau-Roßlau"
+country = "DE"
+lat = 51.8300
+lng = 12.2180
+instagram_url = "https://www.instagram.com/ssb_dessau"
+contact_email = "info@anhalt-sport.de"
+registration_url = "https://and8.dance/en/e/5744/register"
+sources = ["https://and8.dance/en/e/5744", "https://www.anhalt-sport.de/events/dancing-dessau-international-breakdance-contest-5.html"]
+battles = [
+  { name = "1v1 Breaking", format = "team", team_size = 1, gender = "mixed", age = "na", prize_first = 1000, prize_currency = "EUR", starts_at = "2026-12-05T15:00:00" },
+  { name = "7 to Smoke", format = "seven_to_smoke", gender = "mixed", age = "na", prize_first = 100, prize_currency = "EUR" },
+  { name = "Crew vs Crew Kids", format = "na", gender = "mixed", age = "kids", age_max = 17 },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "battle-undergronx-vol-7-2026"
+name = "Battle Undergronx Vol 7"
+starts_on = "2026-12-05"
+ends_on = "2026-12-05"
+timezone = "Europe/Paris"
+venue_name = "Salle polyvalente de Gron"
+address = "Rue des Courois, 89100 Gron"
+city = "Gron"
+country = "FR"
+lat = 48.1598
+lng = 3.2652
+instagram_url = "https://www.instagram.com/senssascrew"
+sources = ["https://kepasa.fr/events/battle-undergronx-vol-7-2026-12-05"]
+battles = [
+  { name = "2v2 Kids U15", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 14 },
+  { name = "1v1 Youth 15-20", format = "team", team_size = 1, gender = "mixed", age = "na", age_min = 15, age_max = 20 },
+  { name = "7 to Smoke Footwork", format = "seven_to_smoke", gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "serpat-crew-25th-anniversary-2026"
+name = "Serpat Crew 25th Anniversary"
+starts_on = "2026-12-05"
+ends_on = "2026-12-05"
+timezone = "Europe/Paris"
+venue_name = "JOST Le Havre"
+address = "25 Rue Lesueur, 76600 Le Havre"
+city = "Le Havre"
+country = "FR"
+lat = 49.4939
+lng = 0.1229
+instagram_url = "https://www.instagram.com/superock_serpatcrew"
+sources = ["https://kepasa.fr/events/serpat-crew-25th-anniversary-2026-12-05"]
+battles = [
+  { name = "3v3 Breakdance", format = "team", team_size = 3, gender = "mixed", age = "na", starts_at = "2026-12-05T14:00:00" },
+  { name = "1v1 Toprock All Styles", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "Crew vs Crew", format = "na", gender = "mixed", age = "na", starts_at = "2026-12-05T19:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "the-vortex-jam-2026"
+name = "The Vortex Jam 2026"
+starts_on = "2026-12-05"
+ends_on = "2026-12-05"
+timezone = "Europe/Paris"
+venue_name = "Le Grand Clos"
+address = "Rue Chateaubriand, 35190 Saint-Domineuc"
+city = "Saint-Domineuc"
+country = "FR"
+lat = 48.3724
+lng = -1.8708
+instagram_url = "https://www.instagram.com/thevortexjam"
+registration_url = "https://www.helloasso.com/associations/ladainha/evenements/the-vortex-jam-2026"
+sources = ["https://kepasa.fr/events/the-vortex-jam-2026-12-05"]
+battles = [
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "3v3 Kids", format = "team", team_size = 3, gender = "mixed", age = "kids", age_max = 17 },
+]
+
+[[jams]]
+key = "fortuna-breaking-battle-2026"
+name = "Fortuna Breaking Battle 2026"
+starts_on = "2026-12-06"
+ends_on = "2026-12-06"
+timezone = "Europe/Berlin"
+venue_name = "Tanzstudio Fortuna Saarbrücken"
+city = "Saarbrücken"
+country = "DE"
+lat = 49.2344
+lng = 6.9964
+instagram_url = "https://www.instagram.com/fortuna_breaking_battle"
+contact_email = "tanzsport@atsv-sb.de"
+website_url = "https://www.tanzstudio-fortuna.de/fortuna-breaking-tanz-battle"
+registration_url = "https://www.tanzstudio-fortuna.de/fortuna-breaking-tanz-battle"
+sources = ["https://and8.dance/en/e/5750"]
+battles = [
+  { name = "1v1 Breaking Kids U16", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 15, prize_first = 150, prize_currency = "EUR" },
+  { name = "2v2 Breaking Kids U16", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 15, prize_first = 200, prize_currency = "EUR", starts_at = "2026-12-06T11:00:00" },
+]
+
+[[jams]]
+key = "break-the-castle-vol-4-2026"
+name = "Break the Castle Vol. 4"
+starts_on = "2026-12-06"
+ends_on = "2026-12-06"
+timezone = "Europe/London"
+city = "Edinburgh"
+country = "GB"
+lat = 55.9533
+lng = -3.1884
+instagram_url = "https://www.instagram.com/breakthecastle"
+contact_email = "info@dancehousescotland.com"
+website_url = "https://www.dancehousescotland.com/breakthecastle"
+registration_url = "https://www.dancehousescotland.com/shop-book/Break-The-Castle-2026-c122534752"
+sources = ["https://www.dancehousescotland.com/breakthecastle"]
+battles = [
+  { name = "1v1 Breaking All Ages", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "1v1 Breaking U16", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 15 },
+  { name = "King / Queen of the Castle", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "fn-jam-2026"
+name = "FN JAM 2026"
+starts_on = "2026-12-06"
+ends_on = "2026-12-06"
+timezone = "Asia/Tokyo"
+venue_name = "Murasaki Park Tachikawa Tachihi"
+city = "Tachikawa"
+country = "JP"
+lat = 35.7115
+lng = 139.4175
+instagram_url = "https://www.instagram.com/foundnation_official/"
+sources = ["https://www.instagram.com/p/DYekDvJEt6q/", "https://breaking-calendar.com/en/events/cmpc7gfml0001og825ipo2dh0"]
+battles = [
+  { name = "Crew 5v5", format = "team", team_size = 5, gender = "mixed", age = "na" },
+  { name = "1v1 Toprock", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "2v2 Footwork + Skill", format = "team", team_size = 2, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "streetdance-battle-series-2026-vol-3"
+name = "Streetdance Battle Series 2026 - Vol. 3"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Europe/Vienna"
+venue_name = "last by Schachermayer"
+address = "Lastenstr. 42, 4020 Linz"
+city = "Linz"
+country = "AT"
+lat = 48.2898
+lng = 14.3055
+instagram_url = "https://www.instagram.com/streetdance.battle.series"
+contact_email = "office@sda-ooe.at"
+website_url = "https://www.sda-ooe.at/streetdance-battle-series-2026"
+registration_url = "https://and8.dance/en/e/5415/register"
+sources = ["https://and8.dance/en/e/5415", "https://www.meinbezirk.at/linz-land/c-sport/rueckblick-auf-das-streetdance-battle-weekend-in-asten_a8947722"]
+battles = [
+  { name = "1v1 Bgirl Kids U12", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 11 },
+  { name = "1v1 Bboy Kids U12", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 11, bracket_size = 16 },
+  { name = "1v1 Bgirl Youth 13-18", format = "team", team_size = 1, gender = "bgirl", age = "na", age_min = 13, age_max = 18 },
+  { name = "1v1 Bboy Youth 13-18", format = "team", team_size = 1, gender = "bboy", age = "na", age_min = 13, age_max = 18 },
+  { name = "1v1 Bgirl Pro 16+", format = "team", team_size = 1, gender = "bgirl", age = "na", age_min = 16, prize_first = 200, prize_currency = "EUR" },
+  { name = "1v1 Bboy Pro 16+", format = "team", team_size = 1, gender = "bboy", age = "na", age_min = 16, bracket_size = 8, prize_first = 200, prize_currency = "EUR", starts_at = "2026-12-12T14:00:00" },
+]
+
+[[jams]]
+key = "pre-christmas-battle-2026"
+name = "Pre-Christmas Battle 2026"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Europe/Zurich"
+venue_name = "Lordz Dance Academy"
+address = "Rapperswilerstrasse 4, 8620 Wetzikon"
+city = "Wetzikon"
+country = "CH"
+lat = 47.3180
+lng = 8.7928
+instagram_url = "https://www.instagram.com/lordzdanceacademy"
+website_url = "https://lordz.ch/events/pre-christmas-battle/"
+registration_url = "https://and8.dance/de/e/5610"
+sources = ["https://and8.dance/en/e/5610", "https://lordz.ch/events/pre-christmas-battle/"]
+battles = [
+  { name = "Crew battle B-Boys/B-Girls", format = "na", gender = "mixed", age = "na", starts_at = "2026-12-12T21:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "take-a-break-jam-2026"
+name = "Take A Break Jam"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Europe/Zurich"
+venue_name = "Swingtime"
+address = "Rue de Genève 97, 1004 Lausanne"
+city = "Lausanne"
+country = "CH"
+lat = 46.5249
+lng = 6.6121
+instagram_url = "https://www.instagram.com/take_a_break_jam/"
+sources = ["https://kepasa.fr/events/take-a-break-jam-2026-12-12"]
+battles = [
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na", prize_first = 200, prize_currency = "CHF" },
+]
+
+[[jams]]
+key = "world-kids-breaking-champion-swiss-2026"
+name = "World Kids Breaking Champion Swiss"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Europe/Zurich"
+venue_name = "Lordz Dance Academy"
+address = "Rapperswilerstrasse 4, 8620 Wetzikon"
+city = "Wetzikon"
+country = "CH"
+lat = 47.3180
+lng = 8.7928
+instagram_url = "https://www.instagram.com/lordzdanceacademy"
+website_url = "https://www.lordz.ch"
+registration_url = "https://and8.dance/en/e/5611"
+sources = ["https://and8.dance/en/e/5611", "https://www.lordz.ch"]
+battles = [
+  { name = "1v1 Kids U18", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17, starts_at = "2026-12-12T15:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "67-jam-2026"
+name = "67 Jam 2026"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Europe/Berlin"
+venue_name = "HausDrei Stadtteilkulturzentrum Altona"
+address = "Hospitalstr. 107-109, 22767 Hamburg"
+city = "Hamburg"
+country = "DE"
+lat = 53.5562
+lng = 9.9472
+instagram_url = "https://www.instagram.com/highlevelignorance"
+sources = ["https://and8.dance/en/e/5683"]
+battles = [
+  { name = "2v2 Breaking Kids", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 17, bracket_size = 16 },
+  { name = "2v2 Breaking Adults", format = "team", team_size = 2, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "breaking-battle-series-2026-erfurt"
+name = "Breaking Battle Series 2026 Erfurt"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Europe/Berlin"
+venue_name = "VEB Kultur im Bandhaus Erfurt"
+address = "Hugo-John-Str. 8, 99086 Erfurt"
+city = "Erfurt"
+country = "DE"
+lat = 51.0023
+lng = 11.0370
+instagram_url = "https://www.instagram.com/teambreaking_dtv"
+contact_email = "breaking@tanzsport.de"
+website_url = "https://www.tanzsport.de/de/sportwelt/breaking"
+registration_url = "https://and8.dance/en/e/5708/register"
+sources = ["https://and8.dance/en/e/5708"]
+battles = [
+  { name = "1v1 Bboy Junior", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 17 },
+  { name = "1v1 Bgirl Junior", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 17 },
+  { name = "1v1 Bboy Youth 2011-2013", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 17, prize_first = 150, prize_currency = "EUR" },
+  { name = "1v1 Bgirl Youth 2011-2013", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 17, prize_first = 150, prize_currency = "EUR" },
+  { name = "2v2 Breaking U16", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 15 },
+  { name = "2v2 Breaking Pro", format = "team", team_size = 2, gender = "mixed", age = "na", starts_at = "2026-12-12T10:00:00" },
+]
+
+[[jams]]
+key = "bboy-bgirl-france-2026"
+name = "BBoy & BGirl France 2026"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Europe/Paris"
+venue_name = "Palais de la Bourse (CCI)"
+address = "40 Place du Théâtre, 59800 Lille"
+city = "Lille"
+country = "FR"
+lat = 50.6379
+lng = 3.0642
+instagram_url = "https://www.instagram.com/bboyfrance/"
+website_url = "http://bboyfrance.com/"
+registration_url = "https://www.helloasso.com/associations/association-59760/evenements/bboy-bgirl-france-2026-championnat-de-breaking"
+sources = ["https://and8.dance/en/e/5726", "https://www.helloasso.com/associations/association-59760/evenements/bboy-bgirl-france-2026-championnat-de-breaking", "https://kepasa.fr/events/bboy-bgirl-france-championnat-de-breakdance-1978f6"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", starts_at = "2026-12-12T19:00:00" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "1v1 Junior", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17 },
+  { name = "Last Chance qualifier", format = "na", gender = "mixed", age = "na", starts_at = "2026-12-12T15:00:00" },
+]
+
+[[jams]]
+key = "battle-merry-christ-mantes-2026"
+name = "Battle Merry Christ'Mantes 2026"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Europe/Paris"
+venue_name = "Espace Culturel Jacques Brel"
+address = "21 rue des Merisiers, 78711 Mantes-la-Ville"
+city = "Mantes-la-Ville"
+country = "FR"
+lat = 48.9762
+lng = 1.7083
+instagram_url = "https://www.instagram.com/start2step"
+registration_url = "https://www.billetweb.fr/merry-christmantes-2026"
+sources = ["https://www.billetweb.fr/merry-christmantes-2026", "https://kepasa.fr/events/battle-merry-christ-mantes-11e-edition-2026-12-12"]
+battles = [
+  { name = "1v1 Break", format = "team", team_size = 1, gender = "mixed", age = "na", starts_at = "2026-12-12T14:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "on-the-street-2026"
+name = "On The Street"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "Indian/Reunion"
+venue_name = "La Friche"
+address = "Place des Cheminots, 97420 Le Port, La Réunion"
+city = "Le Port"
+country = "RE"
+lat = -20.9346
+lng = 55.2917
+instagram_url = "https://www.instagram.com/onthestreet_officiel"
+sources = ["https://kepasa.fr/events/on-the-street-2026-12-12"]
+battles = [
+  { name = "1v1 Break Kids", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17, bracket_size = 16 },
+  { name = "1v1 Break", format = "team", team_size = 1, gender = "mixed", age = "na", bracket_size = 8 },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "ground-zero-crew-30th-anniversary-2026"
+name = "Ground Zero Crew 30th Anniversary 2026"
+starts_on = "2026-12-12"
+ends_on = "2026-12-12"
+timezone = "America/New_York"
+venue_name = "Miami Roller Rink"
+address = "12265 SW 112th St, Miami, FL 33186"
+city = "Miami"
+country = "US"
+lat = 25.6640
+lng = -80.3937
+instagram_url = "https://www.instagram.com/groundzerocrew_bboys"
+sources = ["https://and8.dance/en/e/5689", "https://breaking-calendar.com/en/events/cmvm90wvm005pylw2gn4mqolh"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", starts_at = "2026-12-12T18:00:00" },
+]
+
+[[jams]]
+key = "battle-unity-kidz-saison-6-1-2026"
+name = "Battle Unity Kidz - Saison 6 #1"
+starts_on = "2026-12-13"
+ends_on = "2026-12-13"
+timezone = "Europe/Paris"
+venue_name = "Gymnase Yannick Noah"
+address = "Rue Plein Ciel, 14111 Louvigny"
+city = "Louvigny"
+country = "FR"
+lat = 49.1602
+lng = -0.3961
+instagram_url = "https://www.instagram.com/sntcrew/"
+website_url = "https://snt-crew.com/battle-unity-kidz-saison-6/"
+registration_url = "https://snt-crew.com/battle-unity-kidz-saison-6/"
+sources = ["https://snt-crew.com/agenda/", "https://snt-crew.com/battle-unity-kidz-saison-6/"]
+battles = [
+  { name = "4v4 Kids", format = "team", team_size = 4, gender = "mixed", age = "kids", age_max = 17 },
+]
+
+[[jams]]
+key = "battle-of-the-best-2026"
+name = "Battle Of The Best 2026"
+starts_on = "2026-12-13"
+ends_on = "2026-12-13"
+timezone = "Europe/Athens"
+venue_name = "Ceremony Hall of AUTH"
+address = "Aristotle University of Thessaloniki, 546 36 Thessaloniki"
+city = "Thessaloniki"
+country = "GR"
+lat = 40.6297
+lng = 22.9591
+instagram_url = "https://www.instagram.com/battleofthebest.gr"
+contact_email = "info@battleofthebest.gr"
+website_url = "https://www.battleofthebest.gr"
+registration_url = "https://and8.dance/en/e/5720/register"
+sources = ["https://and8.dance/en/e/5720"]
+battles = [
+  { name = "2v2 Breaking Baby", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 17 },
+  { name = "2v2 Breaking Kids", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 17 },
+  { name = "2v2 Breaking Teens", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 17 },
+  { name = "2v2 Breaking Youth", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 17 },
+  { name = "2v2 Breaking Open", format = "team", team_size = 2, gender = "mixed", age = "na", starts_at = "2026-12-13T12:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "flow-elements-2026"
+name = "Flow Elements"
+starts_on = "2026-12-13"
+ends_on = "2026-12-13"
+timezone = "Europe/Rome"
+city = "Cagliari"
+country = "IT"
+lat = 39.2163
+lng = 9.1077
+sources = ["https://breakdanceitalia.it/pages/eventi-breaking", "https://www.instagram.com/p/Dbs13QHDO4w/"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "jdsf-block-battle-2026-middlewest"
+name = "JDSF BLOCK BATTLE 2026 -MiddleWest-"
+starts_on = "2026-12-13"
+ends_on = "2026-12-13"
+timezone = "Asia/Tokyo"
+venue_name = "Nagamori Shigenobu Civic Center"
+address = "20 Nakano, Terado-cho, Muko, Kyoto 617-8665"
+city = "Muko"
+country = "JP"
+lat = 34.9485
+lng = 135.6982
+instagram_url = "https://www.instagram.com/jdsf_breaking"
+contact_email = "breaking@jdsf.or.jp"
+website_url = "https://breaking.jdsf.jp"
+registration_url = "https://forms.gle/JywFoGH7AHpAr4FU9"
+sources = ["https://breaking.jdsf.jp/schedule", "https://and8.dance/en/e/5702"]
+battles = [
+  { name = "1v1 Bboy Junior", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 17 },
+  { name = "1v1 Bgirl Junior", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 17 },
+  { name = "1v1 Bboy Open", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 Bgirl Open", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+]
+
+[[jams]]
+key = "dubai-open-breaking-2026"
+name = "Dubai Open Breaking 2026"
+starts_on = "2026-12-18"
+ends_on = "2026-12-20"
+timezone = "Asia/Dubai"
+venue_name = "Dubai World Trade Centre, Zabeel Hall 6"
+address = "Trade Centre 2, Dubai"
+city = "Dubai"
+country = "AE"
+lat = 25.2276
+lng = 55.2888
+instagram_url = "https://www.instagram.com/dubai_openbreaking"
+website_url = "https://www.dubaiopenbreaking.com"
+registration_url = "https://www.dubaiopenbreaking.com"
+sources = ["https://www.dubaiopenbreaking.com", "https://and8.dance/en/e/5378"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "Crew 5v5", format = "team", team_size = 5, gender = "mixed", age = "na" },
+  { name = "1v1 Junior Bboy 10-15", format = "team", team_size = 1, gender = "bboy", age = "kids", age_min = 10, age_max = 15 },
+  { name = "1v1 Junior Bgirl 10-15", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_min = 10, age_max = 15 },
+]
+
+[[jams]]
+key = "pink-city-world-battle-2026"
+name = "Pink City World Battle 2026"
+starts_on = "2026-12-18"
+ends_on = "2026-12-20"
+timezone = "Europe/Paris"
+venue_name = "Urban Lab (final); Le 9 (Fri); La Cabane, Halles de la Cartoucherie (Sat)"
+address = "4 Impasse Didier Daurat, 31400 Toulouse"
+city = "Toulouse"
+country = "FR"
+lat = 43.5653
+lng = 1.4910
+instagram_url = "https://www.instagram.com/pinkcityworldbattle"
+website_url = "https://pinkcityworldbattle.com/"
+registration_url = "https://pinkcityworldbattle.com/billetterie/"
+sources = ["https://pinkcityworldbattle.com/", "https://kepasa.fr/events/pink-city-world-battle-2026-12-18"]
+battles = [
+  { name = "1v1 Toprock", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "1v1 Footwork", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "1v1 B-Boys", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 B-Girls", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "1v1 Powermoves & Tricks", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "2v2 Open", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "Crew vs Crew 5v5 country delegations", format = "team", team_size = 5, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "swiss-breaking-championship-2026"
+name = "Swiss Breaking Championship 2026"
+starts_on = "2026-12-19"
+ends_on = "2026-12-19"
+timezone = "Europe/Zurich"
+venue_name = "Gemeindesaal Baar"
+address = "Marktgasse 10, 6340 Baar"
+city = "Baar"
+country = "CH"
+lat = 47.1952
+lng = 8.5276
+instagram_url = "https://www.instagram.com/swissbreaking"
+contact_email = "nicole.binggeli@swissbreaking.ch"
+website_url = "https://www.swissbreaking.ch"
+registration_url = "https://and8.dance/en/e/5757"
+sources = ["https://and8.dance/en/e/5757"]
+battles = [
+  { name = "1v1 B-Boys PRO 16+", format = "team", team_size = 1, gender = "bboy", age = "na", age_min = 16, prize_first = 800, prize_currency = "CHF" },
+  { name = "1v1 B-Girls PRO 16+", format = "team", team_size = 1, gender = "bgirl", age = "na", age_min = 16, prize_first = 800, prize_currency = "CHF" },
+  { name = "1v1 U17 Juniors", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 16 },
+  { name = "1v1 U13 Kids", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 12 },
+]
+
+[[jams]]
+key = "break-en-plaine-winter-edition-2026"
+name = "Break'en'Plaine - Winter Edition"
+starts_on = "2026-12-19"
+ends_on = "2026-12-19"
+timezone = "Europe/Paris"
+venue_name = "Dojo, salle omnisports Lilian Thuram"
+address = "Chemin du Piquet, 14610 Cambes-en-Plaine"
+city = "Cambes-en-Plaine"
+country = "FR"
+lat = 49.2303
+lng = -0.3822
+instagram_url = "https://www.instagram.com/nothesame.off"
+website_url = "https://nothesame.fr/break-en-plaine-winter-edition-battle-breaking-cambes-en-plaine/"
+registration_url = "https://www.helloasso.com/associations/nothesame/evenements/break-en-plaine-winter-edition-battle-breaking-cambes-en-plaine"
+sources = ["https://nothesame.fr/break-en-plaine-winter-edition-battle-breaking-cambes-en-plaine/", "https://kepasa.fr/events/break-en-plaine-winter-edition-2026-12-19"]
+battles = [
+  { name = "1v1 U18", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17 },
+  { name = "2v2 U13", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 12, starts_at = "2026-12-19T14:00:00" },
+]
+
+[[jams]]
+key = "chill-in-the-city-12-2026"
+name = "Chill in the City #12"
+starts_on = "2026-12-19"
+ends_on = "2026-12-19"
+timezone = "Europe/Paris"
+venue_name = "Chaillot - Théâtre national de la Danse"
+address = "1 place du Trocadéro et du 11 Novembre, 75116 Paris"
+city = "Paris"
+country = "FR"
+lat = 48.8629
+lng = 2.2874
+instagram_url = "https://www.instagram.com/lechillinthecity"
+website_url = "https://chillinthecity.com/"
+registration_url = "https://theatre-chaillot.fr/fr/programmation/2026-2027/chill-city-la-place-breakleague"
+sources = ["https://chillinthecity.com/", "https://theatre-chaillot.fr/fr/programmation/2026-2027/chill-city-la-place-breakleague", "https://kepasa.fr/events/chill-in-the-city-12-c1d143"]
+battles = [
+  { name = "2v2 Break", format = "team", team_size = 2, gender = "mixed", age = "na", bracket_size = 32, starts_at = "2026-12-19T13:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "kid-z-for-kid-z-2-2026"
+name = "Kid'z for Kid'z 2"
+starts_on = "2026-12-19"
+ends_on = "2026-12-19"
+timezone = "Europe/Paris"
+venue_name = "Local de Quéliverzan"
+address = "80 bis rue du Général Galliéni, 29200 Brest"
+city = "Brest"
+country = "FR"
+lat = 48.3919
+lng = -4.5059
+instagram_url = "https://www.instagram.com/fdn_crew"
+sources = ["https://kepasa.fr/events/kid-z-for-kid-z-2-2026-12-19"]
+battles = [
+  { name = "3v3 Break U18", format = "team", team_size = 3, gender = "mixed", age = "kids", age_max = 17, starts_at = "2026-12-19T17:00:00" },
+]
+
+[[jams]]
+key = "mynavi-dancealive-2027-charismax-v-kyushu-2026"
+name = "Mynavi DANCEALIVE 2027 CHARISMAX V -KYUSHU-"
+starts_on = "2026-12-19"
+ends_on = "2026-12-19"
+timezone = "Asia/Tokyo"
+venue_name = "Scala Espacio"
+address = "B2F F.T Bldg, 4-8-28 Watanabe-dori, Chuo-ku, Fukuoka 810-0004"
+city = "Fukuoka"
+country = "JP"
+lat = 33.5863
+lng = 130.4019
+website_url = "https://dancealivejapan.com/"
+registration_url = "https://eventpay.jp/event_info?shop_code=9575039428746557&EventCode=C949187621"
+sources = ["https://dancealivejapan.com/schedule/27charismax05/"]
+battles = [
+  { name = "1v1 Open", format = "team", team_size = 1, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "c-u-b-e-vol-13-colosseum-urban-battles-event-2026"
+name = "C.U.B.E. Vol. 13 (Colosseum Urban Battles Event)"
+starts_on = "2026-12-29"
+ends_on = "2026-12-29"
+timezone = "Europe/Zagreb"
+venue_name = "Dom Hrvatskih Branitelja"
+address = "Leharova ul. 1, 52100 Pula"
+city = "Pula"
+country = "HR"
+lat = 44.8673
+lng = 13.8458
+contact_email = "milisav.katrasnik@gmail.com"
+registration_url = "https://and8.dance/en/e/5740/register"
+sources = ["https://and8.dance/en/e/5740"]
+battles = [
+  { name = "1v1 Breaking U7", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 6 },
+  { name = "1v1 Breaking U11", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 10 },
+  { name = "1v1 Breaking U13", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 12 },
+  { name = "1v1 Breaking U15", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 14 },
+  { name = "1v1 Breaking Pro 16+", format = "team", team_size = 1, gender = "mixed", age = "na", age_min = 16 },
+  { name = "Crew vs Crew U16", format = "na", gender = "mixed", age = "kids", age_max = 15 },
+  { name = "Crew vs Crew Pro", format = "na", gender = "mixed", age = "na", starts_at = "2026-12-29T13:00:00" },
+]
+
+[[jams]]
+key = "winter-battle-2027"
+name = "Winter Battle 2027"
+starts_on = "2027-01-09"
+ends_on = "2027-01-09"
+timezone = "Europe/Paris"
+venue_name = "Le Sillon (MJC Chemin Vert)"
+address = "1 Rue d'Isigny, 14000 Caen"
+city = "Caen"
+country = "FR"
+lat = 49.1900
+lng = -0.4011
+instagram_url = "https://www.instagram.com/sntcrew/"
+website_url = "https://snt-crew.com/agenda/"
+sources = ["https://snt-crew.com/agenda/", "https://snt-crew.com/"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "mynavi-dancealive-2027-charismax-vi-tohoku"
+name = "Mynavi DANCEALIVE 2027 CHARISMAX VI -TOHOKU-"
+starts_on = "2027-01-11"
+ends_on = "2027-01-11"
+timezone = "Asia/Tokyo"
+venue_name = "Sendai Rensa"
+address = "Tic Bldg 7F, 4-9-18 Ichibancho, Aoba-ku, Sendai 980-0811"
+city = "Sendai"
+country = "JP"
+lat = 38.2650
+lng = 140.8702
+website_url = "https://dancealivejapan.com/"
+registration_url = "https://eventpay.jp/event_info?shop_code=9575039428746557&EventCode=C452711511"
+sources = ["https://dancealivejapan.com/schedule/27charismax06/"]
+battles = [
+  { name = "1v1 Open", format = "team", team_size = 1, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "tokyu-fudosan-holdings-wdsf-breaking-for-gold-world-series-2027-kurume"
+name = "Tokyu Fudosan Holdings WDSF Breaking for Gold World Series 2027 Kurume"
+starts_on = "2027-01-16"
+ends_on = "2027-01-17"
+timezone = "Asia/Tokyo"
+venue_name = "Kurume City Plaza, Rokkakudo Hiroba"
+address = "8-1 Rokutsumon-machi, Kurume, Fukuoka"
+city = "Kurume"
+country = "JP"
+lat = 33.3141
+lng = 130.5133
+instagram_url = "https://www.instagram.com/_breakingforgold"
+website_url = "https://breaking.jdsf.jp/bfg-kurume-2027/"
+registration_url = "https://worlddancesport.org/Events/Kurume-City-Japan-16012027-17012027-8907"
+sources = ["https://worlddancesport.org/Events/Kurume-City-Japan-16012027-17012027-8907", "https://breaking.jdsf.jp/bfg-kurume-2027/"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", bracket_size = 16 },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "Crew", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "kineticz-battle-2027"
+name = "Kineticz Battle 2027"
+starts_on = "2027-01-17"
+ends_on = "2027-01-17"
+timezone = "Europe/Rome"
+venue_name = "Sueño"
+address = "Viale Milano 177, 21013 Gallarate VA"
+city = "Gallarate"
+country = "IT"
+lat = 45.6419
+lng = 8.8209
+instagram_url = "https://www.instagram.com/kineticzcrew"
+contact_email = "kineticzcrew@gmail.com"
+website_url = "https://kineticz.altervista.org/battle/"
+registration_url = "https://kineticz.altervista.org/battle/"
+sources = ["https://and8.dance/en/e/5737"]
+battles = [
+  { name = "1v1 Breaking Beginners", format = "team", team_size = 1, gender = "mixed", age = "na", starts_at = "2027-01-17T13:00:00" },
+  { name = "1v1 Lucky Card Open", format = "team", team_size = 1, gender = "mixed", age = "na", prize_first = 100, prize_currency = "EUR", starts_at = "2027-01-17T16:00:00" },
+]
+
+[[jams]]
+key = "udo-asia-pacific-street-dance-championships-2027"
+name = "UDO Asia-Pacific Street Dance Championships 2027"
+starts_on = "2027-01-21"
+ends_on = "2027-01-24"
+timezone = "Asia/Bangkok"
+venue_name = "MCC Hall, The Mall Lifestore Bangkapi"
+address = "MCC Hall 3F, The Mall Lifestore Bangkapi, 3522 Lat Phrao Rd, Khlong Chan, Bang Kapi, Bangkok 10240"
+city = "Bangkok"
+country = "TH"
+lat = 13.7658
+lng = 100.6427
+instagram_url = "https://www.instagram.com/udo_asia_pacific/"
+contact_email = "udoth.asiapacific@gmail.com"
+website_url = "https://www.udostreetdance.com/en/events/view/udo-asia-pacific-street-dance-championships-2027-01-2027"
+registration_url = "https://www.udostreetdance.com/en/events/dancer_registration/udo-asia-pacific-street-dance-championships-2027-01-2027"
+sources = ["https://www.udostreetdance.com/en/events/view/udo-asia-pacific-street-dance-championships-2027-01-2027"]
+battles = [
+  { name = "1v1 Breaking U16", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 15 },
+  { name = "1v1 Breaking O16", format = "team", team_size = 1, gender = "mixed", age = "na", age_min = 16 },
+]
+
+[[jams]]
+key = "tell-a-story-the-battle-2027"
+name = "Tell A Story: The Battle"
+starts_on = "2027-01-24"
+ends_on = "2027-01-24"
+timezone = "Europe/Zurich"
+venue_name = "BZZ Zofingen"
+address = "Strengelbacherstrasse 27, 4800 Zofingen"
+city = "Zofingen"
+country = "CH"
+lat = 47.2827
+lng = 7.9401
+instagram_url = "https://www.instagram.com/tellastoryswitzerland"
+website_url = "https://www.tellastoryswitzerland.com"
+registration_url = "https://and8.dance/en/e/5751"
+sources = ["https://and8.dance/en/e/5751"]
+battles = [
+  { name = "1v1 Breaking", format = "team", team_size = 1, gender = "mixed", age = "na", bracket_size = 16, starts_at = "2027-01-24T16:00:00" },
+]
+
+[[jams]]
+key = "the-movement-arena-youth-edition-meets-badenbreaks-2027"
+name = "the movement ARENA Youth Edition meets BadenBreaks 2027"
+starts_on = "2027-01-30"
+ends_on = "2027-01-30"
+timezone = "Europe/Zurich"
+venue_name = "Trafo Baden"
+address = "Brown Boveri Platz 1, 5400 Baden"
+city = "Baden"
+country = "CH"
+lat = 47.4783
+lng = 8.3056
+instagram_url = "https://www.instagram.com/badenbreaks"
+contact_email = "arena@themovement.ch"
+website_url = "https://www.badenbreaks.ch"
+registration_url = "https://and8.dance/en/e/5450"
+sources = ["https://and8.dance/en/e/5450"]
+battles = [
+  { name = "1v1 B-Girl Kids U12", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 11, prize_first = 150, prize_currency = "CHF" },
+  { name = "1v1 B-Boy Kids U12", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 11, bracket_size = 8, prize_first = 150, prize_currency = "CHF" },
+  { name = "1v1 B-Girl Youth 13-18", format = "team", team_size = 1, gender = "bgirl", age = "na", age_min = 13, age_max = 18, prize_first = 150, prize_currency = "CHF" },
+  { name = "1v1 B-Boy Youth 13-18", format = "team", team_size = 1, gender = "bboy", age = "na", age_min = 13, age_max = 18, prize_first = 150, prize_currency = "CHF" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "overflow-jam-6-2027"
+name = "Overflow Jam 6"
+starts_on = "2027-02-04"
+ends_on = "2027-02-07"
+timezone = "Europe/Brussels"
+city = "Louvain-la-Neuve"
+country = "BE"
+lat = 50.6741
+lng = 4.6138
+instagram_url = "https://www.instagram.com/overflowtv/"
+sources = ["https://kepasa.fr/events/overflow-jam-6-4722df"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "funk-fusion-jam-2027"
+name = "Funk Fusion Jam 2027"
+starts_on = "2027-02-19"
+ends_on = "2027-02-21"
+timezone = "Europe/Athens"
+city = "Athens"
+country = "GR"
+lat = 37.9756
+lng = 23.7348
+instagram_url = "https://www.instagram.com/funkfusionjam"
+contact_email = "funkfusionjam@gmail.com"
+website_url = "https://www.funkfusionjam.com"
+registration_url = "https://and8.dance/en/e/5554/register"
+sources = ["https://and8.dance/en/e/5554"]
+battles = [
+  { name = "1v1 Toprock", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "3v3 Breaking", format = "team", team_size = 3, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "battle-unity-kidz-saison-6-2-2027"
+name = "Battle Unity Kidz - Saison 6 #2"
+starts_on = "2027-02-20"
+ends_on = "2027-02-20"
+timezone = "Europe/Paris"
+venue_name = "Parc des Expositions de Caen (BMX Indoor)"
+address = "17 Rue Joseph Philippon, 14000 Caen"
+city = "Caen"
+country = "FR"
+lat = 49.1710
+lng = -0.3802
+instagram_url = "https://www.instagram.com/sntcrew/"
+website_url = "https://snt-crew.com/battle-unity-kidz-saison-6/"
+registration_url = "https://snt-crew.com/battle-unity-kidz-saison-6/"
+sources = ["https://snt-crew.com/battle-unity-kidz-saison-6/"]
+battles = [
+  { name = "1v1 Kids", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17 },
+]
+
+[[jams]]
+key = "8th-jdsf-all-japan-breaking-championship-2027"
+name = "8th JDSF All Japan Breaking Championship"
+starts_on = "2027-02-27"
+ends_on = "2027-02-28"
+timezone = "Asia/Tokyo"
+venue_name = "Yoyogi National Gymnasium No. 2"
+address = "2-1-1 Jinnan, Shibuya-ku, Tokyo"
+city = "Tokyo"
+country = "JP"
+lat = 35.6664
+lng = 139.6987
+instagram_url = "https://www.instagram.com/jdsf_breaking"
+contact_email = "breaking@jdsf.or.jp"
+website_url = "https://breaking.jdsf.jp"
+sources = ["https://breaking.jdsf.jp/schedule"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+]
+
+[[jams]]
+key = "cologne-united-battle-2027"
+name = "Cologne United Battle"
+starts_on = "2027-03-06"
+ends_on = "2027-03-06"
+timezone = "Europe/Berlin"
+venue_name = "OT Nippes"
+address = "Werkstattstr. 7, 50733 Köln"
+city = "Köln"
+country = "DE"
+lat = 50.9605
+lng = 6.9471
+instagram_url = "https://www.instagram.com/cologne_united_battle"
+contact_email = "bgirl.rasty@gmail.com"
+sources = ["https://and8.dance/en/e/5749"]
+battles = [
+  { name = "Crew vs Crew 3+", format = "na", gender = "mixed", age = "na", prize_first = 300, prize_currency = "EUR", starts_at = "2027-03-06T14:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "breaking-bora-battle-2027"
+name = "Breaking Bora Battle 2027"
+starts_on = "2027-03-06"
+ends_on = "2027-03-06"
+timezone = "Europe/Rome"
+city = "Trieste"
+country = "IT"
+lat = 45.6496
+lng = 13.7773
+instagram_url = "https://www.instagram.com/breakingborabattle"
+contact_email = "Borabattleinfo@gmail.com"
+sources = ["https://and8.dance/en/e/5756"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "break2future-2027"
+name = "Break2Future 2027"
+starts_on = "2027-03-13"
+ends_on = "2027-03-14"
+timezone = "Europe/Zagreb"
+venue_name = "Tala Ple(j)s"
+address = "Radnička cesta 27, 10000 Zagreb"
+city = "Zagreb"
+country = "HR"
+lat = 45.8039
+lng = 15.9998
+instagram_url = "https://www.instagram.com/break2future.hr"
+contact_email = "break2future@gmail.com"
+registration_url = "https://and8.dance/en/e/5524/register"
+sources = ["https://and8.dance/en/e/5524"]
+battles = [
+  { name = "1v1 Breaking U13", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 12 },
+  { name = "1v1 Breaking U17", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 16 },
+  { name = "1v1 Footwork 7 to Smoke", format = "seven_to_smoke", gender = "mixed", age = "na" },
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "albattle-2027-hip-hop-festival"
+name = "ALBAttle 2027 Hip Hop Festival"
+starts_on = "2027-03-19"
+ends_on = "2027-03-20"
+timezone = "Europe/Rome"
+venue_name = "Palazzo Mostre e Congressi \"Giacomo Morra\""
+address = "Piazza Medford 3, 12051 Alba CN"
+city = "Alba"
+country = "IT"
+lat = 44.7017
+lng = 8.0306
+instagram_url = "https://www.instagram.com/albattleofficial"
+contact_email = "associazionebestreet@gmail.com"
+website_url = "https://www.albattle.it"
+registration_url = "https://and8.dance/en/e/5570/register"
+sources = ["https://and8.dance/en/e/5570"]
+battles = [
+  { name = "1v1 Kids U10", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 9 },
+  { name = "1v1 Kids U12", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 11 },
+  { name = "1v1 Kids U16", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 15 },
+  { name = "1v1 Bgirl Pro", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "1v1 Bboy Pro", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "Crew vs Crew 4+", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "fujifilm-instax-undisputed-world-final-2027"
+name = "FUJIFILM instax Undisputed World Final 2027"
+starts_on = "2027-03-20"
+ends_on = "2027-03-20"
+timezone = "America/Sao_Paulo"
+city = "São Paulo"
+country = "BR"
+lat = -23.5507
+lng = -46.6334
+instagram_url = "https://www.instagram.com/undisputedmasters"
+website_url = "https://undisputedmasters.com"
+sources = ["https://undisputedmasters.com", "https://undisputedmasters.com/accra/"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", bracket_size = 8 },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na", bracket_size = 8 },
+]
+
+[[jams]]
+key = "udo-middle-east-dance-festival-2027"
+name = "UDO Middle East Dance Festival 2027"
+starts_on = "2027-03-26"
+ends_on = "2027-03-28"
+timezone = "Asia/Dubai"
+venue_name = "GEMS Wellington Academy Silicon Oasis"
+address = "GEMS Wellington Academy, Dubai Silicon Oasis, Dubai"
+city = "Dubai"
+country = "AE"
+lat = 25.1177
+lng = 55.3886
+instagram_url = "https://www.instagram.com/udostreetdance/"
+contact_email = "info@udodxb.ae"
+website_url = "https://www.udostreetdance.com/en/events/view/udo-middle-east-dance-festival-2027-03-2027"
+registration_url = "https://www.udostreetdance.com/en/events/dancer_registration/udo-middle-east-dance-festival-2027-03-2027"
+sources = ["https://www.udostreetdance.com/en/events/view/udo-middle-east-dance-festival-2027-03-2027"]
+battles = [
+  { name = "1v1 Breaking Open age", format = "team", team_size = 1, gender = "mixed", age = "na", bracket_size = 4 },
+]
+
+[[jams]]
+key = "rockin-sensation-20th-year-anniversary-2027"
+name = "Rockin' Sensation 20th Year Anniversary"
+starts_on = "2027-03-27"
+ends_on = "2027-03-27"
+timezone = "Asia/Seoul"
+city = "Seoul"
+country = "KR"
+lat = 37.5665
+lng = 126.9780
+instagram_url = "https://www.instagram.com/jungthkoreanroc/"
+sources = ["https://www.instagram.com/p/DZhYatvSjo6/", "https://breaking-calendar.com/en/events/cmqc8bb0q0001ku3oofht8amh"]
+battles = [
+  { name = "2v2", format = "team", team_size = 2, gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "kscs-2027"
+name = "KSCS 2027"
+starts_on = "2027-04-02"
+ends_on = "2027-04-02"
+timezone = "Asia/Tokyo"
+city = "Tokyo"
+country = "JP"
+lat = 35.6769
+lng = 139.7639
+instagram_url = "https://www.instagram.com/kscs.official"
+sources = ["https://thelegitsblast.com/en/qualifiers"]
+battles = [
+  { name = "2v2", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+]
+
+[[jams]]
+key = "mynavi-dancealive-2027-pre-final-qualifier"
+name = "Mynavi DANCEALIVE 2027 pre-final qualifier (前日予選)"
+starts_on = "2027-04-17"
+ends_on = "2027-04-17"
+timezone = "Asia/Tokyo"
+venue_name = "Shibuya Stream"
+address = "3-21-3 Shibuya, Shibuya-ku, Tokyo 150-0002"
+city = "Tokyo"
+country = "JP"
+lat = 35.6571
+lng = 139.7033
+website_url = "https://dancealivejapan.com/"
+registration_url = "https://eventpay.jp/event_info?shop_code=9575039428746557&EventCode=C753026985"
+sources = ["https://dancealivejapan.com/schedule/27zenjitsu/"]
+battles = [
+  { name = "1v1 Open", format = "team", team_size = 1, gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "sun-city-battles-2027"
+name = "Sun City Battles 2027"
+starts_on = "2027-05-01"
+ends_on = "2027-05-02"
+timezone = "Europe/Vilnius"
+city = "Šiauliai"
+country = "LT"
+lat = 55.9341
+lng = 23.3158
+instagram_url = "https://www.instagram.com/suncitybattles"
+sources = ["https://thelegitsblast.com/en/qualifiers/"]
+battles = [
+  { name = "1v1 Breaking", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "1v1 Kids", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17 },
+  { name = "1v1 OG 35+", format = "team", team_size = 1, gender = "mixed", age = "adult", age_min = 35 },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "the-breakdown-challenge-2027"
+name = "The BreakDown Challenge 2027"
+starts_on = "2027-05-15"
+ends_on = "2027-05-16"
+timezone = "Europe/Rome"
+venue_name = "Historic centre"
+city = "Grosseto"
+country = "IT"
+lat = 42.7751
+lng = 11.2878
+instagram_url = "https://www.instagram.com/thebreakdownchallenge"
+contact_email = "xedobboy@gmail.com"
+sources = ["https://and8.dance/en/e/5755"]
+battles = [
+  { name = "3v3 Open", format = "team", team_size = 3, gender = "mixed", age = "na" },
+  { name = "2v2 U16", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 15 },
+  { name = "7 to Smoke Invitational Open", format = "seven_to_smoke", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "world-breaking-classic-world-final-2027"
+name = "World Breaking Classic World Final 2027"
+starts_on = "2027-05-22"
+ends_on = "2027-05-23"
+timezone = "Europe/Amsterdam"
+venue_name = "Klokgebouw"
+address = "Klokgebouw 50, 5617 AB Eindhoven"
+city = "Eindhoven"
+country = "NL"
+lat = 51.4483
+lng = 5.4577
+instagram_url = "https://www.instagram.com/worldbreakingclassic/"
+contact_email = "info@worldbreakingclassic.com"
+website_url = "https://worldbreakingclassic.com"
+sources = ["https://and8.dance/en/e/5640"]
+battles = [
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "the-movement-arena-qualifier-2027"
+name = "the movement ARENA - Qualifier 2027"
+starts_on = "2027-05-23"
+ends_on = "2027-05-23"
+timezone = "Europe/Zurich"
+city = "Aarau"
+country = "CH"
+lat = 47.3927
+lng = 8.0444
+instagram_url = "https://www.instagram.com/themovementarena"
+website_url = "https://www.themovementarena.ch"
+registration_url = "https://and8.dance/en/e/5482"
+sources = ["https://and8.dance/en/e/5482"]
+battles = [
+  { name = "1v1 B-Boy Pro 16+", format = "team", team_size = 1, gender = "bboy", age = "na", age_min = 16 },
+  { name = "1v1 B-Girl Pro 16+", format = "team", team_size = 1, gender = "bgirl", age = "na", age_min = 16 },
+  { name = "2v2 Breaking Kids U15", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 14 },
+]
+
+[[jams]]
+key = "check-the-style-world-final-2027"
+name = "Check The Style World Final 2027"
+starts_on = "2027-05-27"
+ends_on = "2027-05-30"
+timezone = "Europe/Rome"
+city = "L'Aquila"
+country = "IT"
+lat = 42.1369
+lng = 13.6103
+instagram_url = "https://www.instagram.com/check_the_style_events"
+contact_email = "checkthestyle.info@gmail.com"
+website_url = "https://www.checkthestyle.it"
+sources = ["https://and8.dance/en/e/5671", "https://thelegitsblast.com/en/qualifiers/"]
+battles = [
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "1v1 Breaking", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "1v1 Kids", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17 },
+]
+
+[[jams]]
+key = "dna-festival-2027"
+name = "DNA Festival 2027"
+starts_on = "2027-06-11"
+ends_on = "2027-06-13"
+timezone = "Europe/Berlin"
+venue_name = "Große Freiheit 36"
+address = "Große Freiheit 36, 22767 Hamburg"
+city = "Hamburg"
+country = "DE"
+lat = 53.5511
+lng = 9.9581
+instagram_url = "https://www.instagram.com/hiphop_academy_hamburg"
+contact_email = "info@kph-hamburg.de"
+website_url = "https://www.dna-festival.de"
+registration_url = "https://and8.dance/en/e/5626/register"
+sources = ["https://and8.dance/en/e/5626"]
+battles = [
+  { name = "2v2 Breaking Kids U16", format = "team", team_size = 2, gender = "mixed", age = "kids", age_max = 15 },
+  { name = "Crew vs Crew Breaking 4-8 dancers", format = "na", gender = "mixed", age = "na", bracket_size = 4 },
+]
+
+[[jams]]
+key = "jam-de-la-fem-2027"
+name = "Jam de la FEM 2027"
+starts_on = "2027-06-12"
+ends_on = "2027-06-12"
+timezone = "Europe/Amsterdam"
+venue_name = "Theater aan de Parade"
+address = "Parade 23, 5211 KL 's-Hertogenbosch"
+city = "'s-Hertogenbosch"
+country = "NL"
+lat = 51.6869
+lng = 5.3087
+instagram_url = "https://www.instagram.com/jamdelafem"
+contact_email = "info@jamdelafem.com"
+website_url = "https://www.jamdelafem.com"
+sources = ["https://and8.dance/en/e/5716", "https://www.jamdelafem.com"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "find-your-flow-festival-2027"
+name = "Find your Flow Festival 2027"
+starts_on = "2027-06-15"
+ends_on = "2027-06-20"
+timezone = "Europe/Zurich"
+venue_name = "Attisholz Areal"
+address = "Attisholzstrasse 10, 4533 Riedholz"
+city = "Riedholz"
+country = "CH"
+lat = 47.2273
+lng = 7.5771
+instagram_url = "https://www.instagram.com/find_your_flow_festival/"
+contact_email = "info@findyourflowfestival.ch"
+website_url = "https://findyourflowfestival.ch"
+sources = ["https://findyourflowfestival.ch", "https://and8.dance/en/e/5668"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "southbreak-jam-2027-11-years-anniversary"
+name = "Southbreak Jam 2027 - 11 Years Anniversary"
+starts_on = "2027-07-03"
+ends_on = "2027-07-03"
+timezone = "Europe/Athens"
+venue_name = "Mikis Theodorakis Theater"
+address = "1 Katehaki Georgiou Square, 731 32 Chania"
+city = "Chania"
+country = "GR"
+lat = 35.5183
+lng = 24.0202
+instagram_url = "https://www.instagram.com/southbreak_jam"
+contact_email = "southbreakjam@gmail.com"
+registration_url = "https://and8.dance/en/e/5722/register"
+sources = ["https://and8.dance/en/e/5722", "https://thelegitsblast.com/en/qualifiers/"]
+battles = [
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "7 to Smoke Adults", format = "seven_to_smoke", gender = "mixed", age = "na" },
+  { name = "1v1 Breaking Kids", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17, starts_at = "2027-07-03T16:00:00" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "gorska-bitwa-2027"
+name = "Gorska Bitwa 2027"
+starts_on = "2027-07-16"
+ends_on = "2027-07-18"
+timezone = "Europe/Warsaw"
+city = "Krynica-Zdrój"
+country = "PL"
+lat = 49.4206
+lng = 20.9594
+instagram_url = "https://www.instagram.com/gorskabitwa"
+sources = ["https://thelegitsblast.com/en/qualifiers/"]
+battles = [
+  { name = "2v2 Breaking", format = "team", team_size = 2, gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "step-ya-game-up-2027"
+name = "Step Ya Game Up"
+starts_on = "2027-07-17"
+ends_on = "2027-07-19"
+timezone = "America/New_York"
+venue_name = "Peridance Center"
+address = "126 E 13th St, New York, NY 10003"
+city = "New York"
+country = "US"
+lat = 40.7329
+lng = -73.9886
+instagram_url = "https://www.instagram.com/stepyagameupnyc/"
+sources = ["https://and8.dance/en/e/5636"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "outbreak-europe-2027"
+name = "Outbreak Europe 2027"
+starts_on = "2027-07-22"
+ends_on = "2027-07-25"
+timezone = "Europe/Bratislava"
+venue_name = "Europa SC"
+address = "Na Troskách 25, 974 01 Banská Bystrica"
+city = "Banská Bystrica"
+country = "SK"
+lat = 48.7309
+lng = 19.1375
+instagram_url = "https://www.instagram.com/outbreakeurope/"
+website_url = "https://thelegitsblast.com/en/"
+sources = ["https://thelegitsblast.com/en/", "https://and8.dance/en/e/5608"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "german-breaking-championships-2027"
+name = "German Breaking Championships 2027"
+starts_on = "2027-07-30"
+ends_on = "2027-08-01"
+timezone = "Europe/Berlin"
+venue_name = "Staatsoper Stuttgart"
+address = "Oberer Schloßgarten 6, 70173 Stuttgart"
+city = "Stuttgart"
+country = "DE"
+lat = 48.7802
+lng = 9.1849
+instagram_url = "https://www.instagram.com/teambreaking_dtv"
+contact_email = "breaking@tanzsport.de"
+website_url = "https://www.tanzsport.de/de/sportwelt/breaking"
+registration_url = "https://and8.dance/en/e/5637/register"
+sources = ["https://and8.dance/en/e/5637"]
+battles = [
+  { name = "1v1 Bboy Pro", format = "team", team_size = 1, gender = "bboy", age = "na", prize_first = 1000, prize_currency = "EUR" },
+  { name = "1v1 Bgirl Pro", format = "team", team_size = 1, gender = "bgirl", age = "na", prize_first = 1000, prize_currency = "EUR" },
+  { name = "1v1 Bboy Youth 2010-2012", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 17 },
+  { name = "1v1 Bgirl Youth 2010-2012", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 17 },
+  { name = "1v1 Bboy Junior 2013+", format = "team", team_size = 1, gender = "bboy", age = "kids", age_max = 17 },
+  { name = "1v1 Bgirl Junior 2013+", format = "team", team_size = 1, gender = "bgirl", age = "kids", age_max = 17 },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "lbc-summertime-vol-vi-2027"
+name = "LBC Summertime - Vol. VI"
+starts_on = "2027-08-07"
+ends_on = "2027-08-09"
+timezone = "Europe/Berlin"
+city = "Stuttgart"
+country = "DE"
+lat = 48.7784
+lng = 9.1800
+instagram_url = "https://www.instagram.com/lbcsummertime"
+contact_email = "mily14@hotmail.de"
+sources = ["https://and8.dance/en/e/5381"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "uk-b-boy-championships-world-finals-2027"
+name = "UK B-Boy Championships - World Finals 2027"
+starts_on = "2027-08-14"
+ends_on = "2027-08-15"
+timezone = "Europe/London"
+venue_name = "Aviva Studios"
+address = "Water Street, Manchester M3 4JQ"
+city = "Manchester"
+country = "GB"
+lat = 53.4782
+lng = -2.2577
+instagram_url = "https://www.instagram.com/bboychamps/"
+website_url = "https://www.bboychamps.com"
+sources = ["https://and8.dance/en/e/5575"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "the-world-battle-2027-urb-x"
+name = "The World Battle 2027 | URB-X"
+starts_on = "2027-08-25"
+ends_on = "2027-08-29"
+timezone = "Europe/Lisbon"
+city = "Porto"
+country = "PT"
+lat = 41.1502
+lng = -8.6103
+instagram_url = "https://www.instagram.com/theworldbattle/"
+contact_email = "theworldbattle@mxmartcenter.com"
+website_url = "https://theworldbattle.com"
+registration_url = "https://and8.dance/en/e/5673/register"
+sources = ["https://and8.dance/en/e/5673"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na" },
+  { name = "1v1 Bgirl", format = "team", team_size = 1, gender = "bgirl", age = "na" },
+  { name = "1v1 Kids", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 17 },
+  { name = "Crew", format = "na", gender = "mixed", age = "na" },
+  { name = "2v2 Bonnie & Clyde", format = "team", team_size = 2, gender = "mixed", age = "na" },
+  { name = "7 to Smoke", format = "seven_to_smoke", gender = "mixed", age = "na" },
+  { name = "1v1 Toprock", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "1v1 Footwork", format = "team", team_size = 1, gender = "mixed", age = "na" },
+  { name = "1v1 Power & Tricks", format = "team", team_size = 1, gender = "mixed", age = "na" },
+]
+
+# medium: the date comes from a third-party listing or news, not the organiser
+[[jams]]
+key = "unbreakable-2027-ub22-edition"
+name = "Unbreakable 2027 - UB22 Edition"
+starts_on = "2027-09-03"
+ends_on = "2027-09-05"
+timezone = "Europe/Brussels"
+venue_name = "Zeeheldenplein"
+address = "Zeeheldenplein, 8400 Oostende"
+city = "Oostende"
+country = "BE"
+lat = 51.2354
+lng = 2.9187
+instagram_url = "https://www.instagram.com/unbreakable_breaking_champs"
+website_url = "https://unbreakable.be"
+sources = ["https://and8.dance/en/e/5746"]
+battles = [
+  { name = "1v1 Bboy Pro", format = "team", team_size = 1, gender = "bboy", age = "na", prize_first = 1250, prize_currency = "EUR" },
+  { name = "1v1 Bgirl Pro", format = "team", team_size = 1, gender = "bgirl", age = "na", prize_first = 1250, prize_currency = "EUR" },
+  { name = "1v1 Kids U17", format = "team", team_size = 1, gender = "mixed", age = "kids", age_max = 16 },
+  { name = "Crew Adults", format = "na", gender = "mixed", age = "na", prize_first = 3000, prize_currency = "EUR" },
+  { name = "Crew Kids", format = "na", gender = "mixed", age = "kids", age_max = 17 },
+]
+
+[[jams]]
+key = "breakthrough-festival-2027"
+name = "Breakthrough Festival 2027"
+starts_on = "2027-09-09"
+ends_on = "2027-09-12"
+timezone = "Europe/Zurich"
+venue_name = "Dynamo"
+address = "Wasserwerkstrasse 21, 8006 Zürich"
+city = "Zürich"
+country = "CH"
+lat = 47.3833
+lng = 8.5393
+instagram_url = "https://www.instagram.com/breakthrough.festival/"
+contact_email = "info@breakthrough-festival.ch"
+website_url = "http://www.breakthrough-festival.ch"
+sources = ["http://www.breakthrough-festival.ch", "https://and8.dance/en/e/5672"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "the-movement-arena-2027"
+name = "the movement ARENA 2027"
+starts_on = "2027-09-11"
+ends_on = "2027-09-11"
+timezone = "Europe/Zurich"
+venue_name = "Augusta Raurica"
+address = "Giebenacherstrasse 17, 4302 Augst"
+city = "Augst"
+country = "CH"
+lat = 47.5346
+lng = 7.7212
+instagram_url = "https://www.instagram.com/themovementarena"
+website_url = "https://www.themovementarena.ch"
+sources = ["https://and8.dance/en/e/5490"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]
+
+[[jams]]
+key = "soul-cypher-swiss-2027"
+name = "Soul Cypher Swiss 2027"
+starts_on = "2027-10-30"
+ends_on = "2027-10-30"
+timezone = "Europe/Zurich"
+venue_name = "Kanzlei Club"
+address = "Kanzleistrasse 56, 8004 Zürich"
+city = "Zürich"
+country = "CH"
+lat = 47.3755
+lng = 8.5258
+instagram_url = "https://www.instagram.com/soulcypherswiss/"
+contact_email = "info@soulcypher.ch"
+website_url = "https://www.soulcypher.ch"
+registration_url = "https://and8.dance/en/e/5678"
+sources = ["https://and8.dance/en/e/5678"]
+battles = [
+  { name = "Battles to be announced", format = "na", gender = "mixed", age = "na" },
+]

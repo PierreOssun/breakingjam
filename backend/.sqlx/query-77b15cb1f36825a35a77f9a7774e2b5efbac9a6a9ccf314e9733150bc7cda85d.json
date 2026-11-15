@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select e.data_key as \"key!\", e.status::text as \"status!\", e.entered_by_team,\n                  count(b.id) as \"battles!\"\n           from events e left join battles b on b.event_id = e.id\n           group by e.id order by e.starts_on",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key!",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "data_key"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "status!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "entered_by_team",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "entered_by_team"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "battles!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true,
+      null,
+      false,
+      null
+    ]
+  },
+  "hash": "77b15cb1f36825a35a77f9a7774e2b5efbac9a6a9ccf314e9733150bc7cda85d"
+}

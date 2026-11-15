@@ -7,7 +7,7 @@ Two copies of the same stack, each one Cloudflare Worker (ARCHITECTURE §9):
 | Branch | `prod` | `uat` |
 | Site | `breakingjam.com` (public) | `uat.breakingjam.com` (not indexed; optionally behind Cloudflare Access) |
 | Worker | `breakingjam` (top level of `wrangler.jsonc`) | `breakingjam-uat` (`env.uat`) |
-| Database | Neon project `breakingjam`, real data | Neon project `breakingjam-uat`, seeded demo data only |
+| Database | Neon project `breakingjam`, real data | Neon project `breakingjam-uat`, seeded data only (the jams of `data/`, test accounts) |
 | GitHub environment | `prod` (a reviewer approves each deploy) | `uat` |
 
 `main` is the development branch and deploys nowhere. **Production data never goes to UAT**, not even a copy for debugging.
@@ -97,7 +97,7 @@ Do steps 2–14 once for production and once for UAT where they apply, with that
 8. **UAT only, optional: Cloudflare Access** (Zero Trust → Access → Applications, free up to 50 users). It keeps UAT private; without it UAT is public, but `TEST_SITE` keeps it out of search engines and labels it.
    - A self-hosted application for `uat.breakingjam.com`, policy *Allow* with your testers' emails (login with a one-time PIN).
    - A second application for `uat.breakingjam.com/api/health`, policy *Bypass* for *Everyone*, so the deploy's check gets through. The more specific path wins.
-9. **UAT only: demo data.** After the first UAT deploy: Actions → **Seed UAT** → Run workflow, on the `uat` branch (`.github/workflows/seed-uat.yml`). Once the database is seeded it only sets the seed accounts' passwords again, which is how a new `SEED_PASSWORD` or `PASSWORD_PEPPER` reaches them.
+9. **UAT only: seed data** (the seed accounts and the jams of `data/`, past and upcoming). After the first UAT deploy: Actions → **Seed UAT** → Run workflow, on the `uat` branch (`.github/workflows/seed-uat.yml`). Once the database is seeded it only sets the seed accounts' passwords again, which is how a new `SEED_PASSWORD` or `PASSWORD_PEPPER` reaches them.
    - UAT is seeded only from GitHub, so its owner string never sits on a laptop. Production has no seed.
 10. **Production only: backups.** See [Backups](#backups).
 11. **Media bucket**, before the first deploy that has it (the deploy fails on a missing bucket). From `deploy/`, with UAT's names for UAT:
@@ -110,7 +110,7 @@ Do steps 2–14 once for production and once for UAT where they apply, with that
 13. **Email Service** (M27), before the first deploy that has the `send_email` binding: Cloudflare dashboard → Compute → Email Service → Email Sending → onboard `breakingjam.com`. The DNS is on Cloudflare, so it adds the SPF, DKIM and DMARC records itself. Both targets send as `noreply@breakingjam.com` (`FROM` in `src/mail.ts`).
     - It needs the Workers Paid plan, which the containers already need. Until the domain is onboarded, mail only reaches the account's verified addresses; new accounts start with a small daily quota that grows with good sending.
     - The Worker already limits logins, sign-ups and password resets to 60 a minute per IP and 10 a minute per email (`ratelimits` in `wrangler.jsonc`; nothing to create by hand, the `namespace_id`s are ours to choose), in front of the API's own limits (5 tries per code, one code a minute, 10 a day, 30 password hashes waiting). These counts are per Cloudflare location and approximate: against an attack from many addresses, add a WAF rate-limiting rule or turn on *Under Attack* mode in the dashboard.
-14. **Curated jams** (`data/`), after the first deploy with `events.data_key`, and again whenever `data/` gains jams: Actions → **Import data** → Run workflow, from `uat` or `prod`, with the owner account's email. It adds the jams, dancers and crews no earlier run wrote, in one transaction, as the owner role; it never changes what is already there.
+14. **Curated jams** (`data/`), after the first deploy with `events.data_key`, and again whenever `data/` gains jams: Actions → **Import data** → Run workflow, from `uat` or `prod`, with the owner account's email. It adds the jams, dancers and crews no earlier run wrote, then the upcoming jams of `data/upcoming.toml` no earlier run wrote (by key), in one transaction, as the owner role; it never changes what is already there.
     - **Production:** the owner is a team account, shown as the jams' organiser. Sign up with it on the site, named "BreakingJam Team", then in Neon's SQL editor: `update app_users set role = 'seed_admin' where email = '<team email>';`
     - **UAT:** the seed already imported `data/` into its team account (`seed@breakingjam.local`); jams seeded before `events.data_key` existed have no key, so run Import data on UAT only after a fresh seed, or it adds them a second time.
 

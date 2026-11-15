@@ -3,6 +3,7 @@
 pub mod check;
 pub mod draft;
 pub mod import;
+pub mod upcoming;
 pub mod wikipedia;
 pub mod wikitext;
 pub mod youtube;

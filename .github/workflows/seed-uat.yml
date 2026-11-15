@@ -1,6 +1,6 @@
 name: Seed UAT
 
-# Fills the UAT database with the demo data: admin accounts, the data/ jams, demo dancers and crews.
+# Fills the UAT database: the seed accounts and the jams of data/, past and upcoming (data/upcoming.toml).
 # The only way to seed UAT, so its owner credentials stay in GitHub, never on a laptop. Run it by
 # hand from the `uat` branch (Actions → Seed UAT → Run workflow); once seeded, it only sets the seed
 # accounts' passwords again (after a new SEED_PASSWORD or PASSWORD_PEPPER).

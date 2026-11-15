@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update events set name = 'Moved Jam' where data_key = 'upcoming:winter-jam-2030'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "0d941f0f68e6441af0833fa4deddc4bc6bb8a0f883fd800c24a8f36a34f729b1"
+}

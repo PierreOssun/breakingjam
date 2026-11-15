@@ -18,7 +18,7 @@ use crate::{
             BattleAge, BattleFields, BattleFormat, EntryFields, EntryStatus, MatchFields,
             MatchRound, StaffRole, canonical_video,
         },
-        event::EventFields,
+        event::{EventFields, EventStatus},
     },
 };
 
@@ -291,7 +291,7 @@ async fn insert_event(
     let id = db::events::insert(&mut *conn, Uuid::now_v7(), cx.organizer, &fields)
         .await?
         .id;
-    db::dataset::publish_imported(conn, id, key).await?;
+    db::dataset::set_imported(conn, id, key, EventStatus::Published).await?;
     for (role, keys) in [
         (StaffRole::Judge, &event.judges),
         (StaffRole::Mc, &event.mcs),

@@ -285,8 +285,7 @@
     "organiserWanted": {
       "title": "Du organisierst diesen Jam?",
       "body": "Das BreakingJam-Team hat diesen Jam eingetragen. Schreib uns, um seine Seite selbst zu führen oder Fehler zu korrigieren.",
-      "cta": "Kontakt",
-      "subject": "Organisator von {{name}}:"
+      "cta": "Kontakt"
     }
   },
   "dancer": {

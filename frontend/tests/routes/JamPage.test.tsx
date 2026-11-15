@@ -405,7 +405,7 @@ describe("JamPage", () => {
     expect(document.getElementById("battles")).toBeInTheDocument();
   });
 
-  it("asks a team-added jam's organiser to write in, and leaves out the website, the email and the pitch when there are none", async () => {
+  it("sends a team-added jam's organiser to the contact page, and leaves out the website, the email and the pitch when there are none", async () => {
     // A jam the BreakingJam team entered, e.g. an imported past edition.
     mockJam({
       organizer: null,
@@ -429,10 +429,7 @@ describe("JamPage", () => {
     expect(organiser).toHaveTextContent("You’re the organiser?");
     expect(
       within(organiser).getByRole("link", { name: "Contact us" }),
-    ).toHaveAttribute(
-      "href",
-      `mailto:breakingjamtv@gmail.com?subject=${encodeURIComponent("Organiser of Paris Cypher Sessions: ")}`,
-    );
+    ).toHaveAttribute("href", "/contact");
     expect(main.queryByRole("heading", { name: "About" })).toBeNull();
     expect(main.queryByRole("link", { name: "pariscypher.com" })).toBeNull();
     expect(

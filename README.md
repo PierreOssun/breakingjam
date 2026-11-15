@@ -28,7 +28,7 @@ You need Rust (the version is pinned in `backend/rust-toolchain.toml`), Node 22,
 cp backend/.env.example backend/.env         # then fill in what you need (Google sign-in is optional)
 cp frontend/.env.example frontend/.env       # VITE_PROTOMAPS_KEY for the map tiles
 just dev                                     # Postgres, API on :8080, site on :5173
-just seed                                    # admin accounts and demo jams, battles, dancers, crews (local only)
+just seed                                    # the seed accounts, the real past and upcoming jams of data/ (local only)
 ```
 
 Without `just`: `docker compose up -d`, then `cargo run` in `backend/` (it migrates on start in debug builds) and `npm i && npm run dev` in `frontend/` (Vite proxies `/api` to `:8080`). `just --list` shows the other recipes (`reset-db`, `openapi`, `check`…).
@@ -40,9 +40,9 @@ The map starts on the visitor's country, which Cloudflare provides in production
 The seeded accounts use `SEED_PASSWORD` from `backend/.env`:
 
 - `super@breakingjam.local`: the super admin, who also makes and removes admins (M31). Only a fresh seed creates it: on a database seeded before M31, run `just reset-db` or set one with SQL.
-- `admin@breakingjam.local`: the admin area (`/admin`), with two jams waiting for review.
-- `seed@breakingjam.local` ("BreakingJam Team"): runs the demo jams; manage their dancers and lineups from their pages.
-- `organizer@breakingjam.local` ("Cypher Collective"): an ordinary organiser whose jams wait for review.
+- `admin@breakingjam.local`: the admin area (`/admin`).
+- `seed@breakingjam.local` ("BreakingJam Team"): runs every seeded jam, past and upcoming; manage their dancers and lineups from their pages.
+- `organizer@breakingjam.local` ("Cypher Collective"): an ordinary organiser with no jams yet.
 
 ## Tests
 

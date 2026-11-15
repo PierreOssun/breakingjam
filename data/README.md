@@ -12,7 +12,7 @@ data/
   places/                           # the GeoNames cities a search can name (its own README)
 ```
 
-The dev seed (`cargo run --bin seed`, from `backend/`) imports every jam here that passes `check` into a fresh local or UAT database. Production gets them through the **Import data** workflow (`cargo run --bin data -- import OWNER_EMAIL`), which adds only the jams, dancers and crews no earlier run wrote: a new file reaches a database that already has the others, but a fix to a jam already imported does not (fix it on the site, as the team).
+The dev seed (`cargo run --bin seed`, from `backend/`) imports every jam here that passes `check` into a fresh local or UAT database, then the jams of `upcoming.toml` (below). Production gets them through the **Import data** workflow (`cargo run --bin data -- import OWNER_EMAIL`), which adds only the jams, dancers and crews no earlier run wrote: a new file reaches a database that already has the others, but a fix to a jam already imported does not (fix it on the site, as the team).
 
 Check everything, as CI does:
 
@@ -104,6 +104,35 @@ dynamo = { name = "Dynamo" }                                            # a team
 - A team needs a name, a crew or members. Members are optional, since sources often name only the crew.
 - A dancer plays for one team per battle. Kids battles add `age = "kids"`.
   `reached` is `winner`, `top2`, `top4` … `prelims`. Add `rank = 3` for a known third place.
+
+## Upcoming jams
+
+`upcoming.toml` holds real jams still to come; `events/` is for past jams (`check` refuses one that isn't over). The seed, and `data import` (the **Import data** workflow on UAT and production), write each jam not over yet whose `key` no earlier run wrote (one the site deleted included), as the team, under the API's rules: published when the publish checklist holds (a pin, a battle, an Instagram link or a contact email), else left as a draft. From then on the jam lives on the site: fix it there, as the team, since editing this file changes nothing already written.
+
+```toml
+[[jams]]
+key = "red-bull-bc-one-world-final-toronto-2026"   # never changes; stored as upcoming:<key>
+name = "Red Bull BC One World Final Toronto 2026"
+starts_on = "2026-11-29"          # dates in quotes: these are the API's fields
+ends_on = "2026-11-29"
+timezone = "America/Toronto"
+venue_name = "Mattamy Athletic Centre"
+city = "Toronto"
+country = "CA"
+lat = 43.6622
+lng = -79.3803
+instagram_url = "https://www.instagram.com/redbullbcone"
+sources = ["https://www.redbull.com/ca-en/events/red-bull-bc-one-world-final-toronto"]
+battles = [
+  { name = "1v1 Bboy", format = "team", team_size = 1, gender = "bboy", age = "na", starts_at = "2026-11-29T16:00:00" },
+]
+```
+
+- A jam takes the jam editor's fields (`POST /api/events`), a battle the battle sheet's (`POST /api/events/{id}/battles`): `format` is `team` (with `team_size`), `seven_to_smoke` or `na`; `age` is `kids` (with `age_max` of 17 or less), `adult` (with `age_min` of 18 or more) or `na`.
+- A jam whose categories aren't announced yet gets one battle `{ name = "Battles to be announced", format = "na", gender = "mixed", age = "na" }`.
+- `cargo test` checks the file: a field the API would refuse, a misspelt field name or a key used twice fails it.
+- When a jam here is over and its results are curated into `events/`, the import writes that edition as a new jam: delete the upcoming one on the site (as the team) and its entry here.
+- Where each jam comes from, and how sure it is: `reports/upcoming-jams.md`.
 
 ## Describing a series to the drafting tools
 

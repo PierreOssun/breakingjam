@@ -51,7 +51,7 @@ dev target="": db
         exit 1 ;;
     esac
 
-# Create the admin accounts and demo data; once seeded, it only sets the admin accounts' passwords again.
+# Create the seed accounts, the past jams of data/ and the upcoming ones of data/upcoming.toml; once seeded, it only sets the accounts' passwords again.
 seed: db
     cd backend && cargo run --bin seed
 

@@ -1,7 +1,8 @@
 name: Import data
 
 # Adds the curated past jams of data/ to a target's database, with their dancers and crews: the
-# ones no earlier run wrote, in one transaction. What is already there stays as the site left it,
+# ones no earlier run wrote, then the upcoming jams of data/upcoming.toml it doesn't hold yet, in
+# one transaction. What is already there stays as the site left it,
 # so run it by hand from `uat` or `prod` (Actions → Import data → Run workflow) whenever data/
 # gains jams. The owner account must exist and be a seed_admin or admin (deploy/README.md).
 on:
