@@ -40,6 +40,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(login))
         .routes(routes!(logout))
         .routes(routes!(me))
+        .routes(routes!(language))
         .routes(routes!(google_start))
         .routes(routes!(google_callback))
 }
@@ -97,6 +98,8 @@ pub struct UserResponse {
     /// The account's own page: the one an approved claim linked to it, else the one it made for
     /// itself, still unverified; null when it has neither (M25).
     pub dancer: Option<OwnPage>,
+    /// The language its emails are in; null until a client said, which the site then does.
+    pub language: Option<Language>,
 }
 
 impl UserResponse {
@@ -104,6 +107,7 @@ impl UserResponse {
     pub async fn load(pool: &PgPool, user: User) -> sqlx::Result<Self> {
         Ok(Self {
             dancer: db::dancers::own_page(pool, user.id).await?,
+            language: db::users::language(pool, user.id).await?,
             id: user.id,
             email: user.email,
             display_name: user.display_name,
@@ -162,6 +166,8 @@ async fn register(
     let hash = password::hash(req.password, &state.config.password_pepper).await?;
     let user =
         db::users::insert_with_password(&state.pool, email, req.display_name.trim(), &hash).await?;
+    // The language its emails go out in, others' too (M32).
+    db::users::set_language(&state.pool, user.id, req.language).await?;
     send_code(&state, &user, CodePurpose::VerifyEmail, req.language).await?;
     Ok((StatusCode::ACCEPTED, Json(CodeSent { email: user.email })))
 }
@@ -207,6 +213,8 @@ async fn login(
         .await?;
         return Err(AppError::EmailUnverified);
     }
+    // The site's language as they log in: what others' actions email them in (M32).
+    db::users::set_language(&state.pool, account.user.id, req.language).await?;
     log_in(&state, account.user).await
 }
 
@@ -218,6 +226,32 @@ pub(super) async fn log_in(
     let cookie = session::start(state, user.id).await?;
     let user = UserResponse::load(&state.pool, user).await?;
     Ok(([(SET_COOKIE, cookie)], Json(user)))
+}
+
+/// Body of `PUT /auth/language`.
+#[derive(Debug, Deserialize, Validate, ToSchema)]
+pub struct LanguageRequest {
+    /// The site's language now.
+    pub language: Language,
+}
+
+/// Keep the language the account reads its emails in, as the site's language is switched (M32).
+#[utoipa::path(
+    put,
+    path = "/auth/language",
+    tag = "auth",
+    operation_id = "set_language",
+    request_body = LanguageRequest,
+    security(("session" = [])),
+    responses((status = NO_CONTENT, description = "Kept"), Unauthorized, InvalidFields)
+)]
+async fn language(
+    State(state): State<AppState>,
+    current: CurrentUser,
+    ValidJson(req): ValidJson<LanguageRequest>,
+) -> Result<StatusCode, AppError> {
+    db::users::set_language(&state.pool, current.user.id, req.language).await?;
+    Ok(StatusCode::NO_CONTENT)
 }
 
 /// End the current session; succeeds without one too.

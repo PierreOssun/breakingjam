@@ -27,6 +27,8 @@ type DancerPickerProps = {
   max: number;
   /** The dialog opened to pick: its search takes the focus. */
   autoFocus?: boolean;
+  /** Pages never to offer, besides the chosen ones: a team's captain picking teammates (M32). */
+  exclude?: string[];
 };
 
 /** Chosen dancers as removable chips, then search-before-create for more (§1, §6). */
@@ -36,6 +38,7 @@ export function DancerPicker({
   onChange,
   max,
   autoFocus,
+  exclude = [],
 }: DancerPickerProps) {
   const { t } = useTranslation();
   const add = (dancer: LiveDancer) =>
@@ -65,7 +68,7 @@ export function DancerPicker({
           kind="dancers"
           search={searchDancers}
           idOf={(d) => d.id}
-          exclude={selected.map((d) => d.id)}
+          exclude={[...exclude, ...selected.map((d) => d.id)]}
           autoFocus={autoFocus}
           renderItem={(d) => <DancerLine dancer={d} />}
           onPick={(d) => add(d)}

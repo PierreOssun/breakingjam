@@ -1,0 +1,174 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select r.id, r.battle_id, r.team_name, r.created_at,\n                  d.id as dancer_id, d.dancer_name, d.country, d.country2, d.instagram_handle,\n                  d.avatar_url, d.avatar, d.deleted_at is not null as \"deleted!\",\n                  d.instagram_hidden, d.verified_at is not null as \"verified!\"\n           from battle_requests r\n           join battles b on b.id = r.battle_id\n           join battle_request_members m on m.request_id = r.id\n           join dancers d on d.id = m.dancer_id\n           where b.event_id = $1 and r.status = 'pending'\n           order by r.created_at, r.id, m.position",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "battle_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "battle_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "team_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "team_name"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "dancer_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "dancer_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "dancer_name"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "country",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "country2",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "country2"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "instagram_handle",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_handle"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "avatar_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar_url"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "avatar",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "avatar"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "deleted!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 12,
+        "name": "instagram_hidden",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "dancers",
+            "name": "instagram_hidden"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "verified!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      null,
+      false,
+      null
+    ]
+  },
+  "hash": "89bc6d5fda87e294287604da57165d023d4952b6c9a46531bcbb6edc372ca73f"
+}

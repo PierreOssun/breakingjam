@@ -8,6 +8,7 @@ mod config;
 mod dataset;
 mod db;
 mod domain;
+mod entry_mail;
 mod error;
 mod flyer;
 mod mail;

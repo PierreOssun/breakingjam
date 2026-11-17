@@ -196,7 +196,7 @@ async fn page(
     responses(
         (status = CREATED, body = DancerResponse),
         Unauthorized,
-        (status = FORBIDDEN, description = "Below `organizer`, or titles or `instagram_hidden` below `seed_admin`", body = ErrorEnvelope),
+        (status = FORBIDDEN, description = "Below `organizer` without a verified page of one's own, or titles or `instagram_hidden` below `seed_admin`", body = ErrorEnvelope),
         (status = CONFLICT, description = "Instagram handle already taken", body = ErrorEnvelope),
         InvalidFields,
     )
@@ -206,8 +206,15 @@ async fn create(
     current: CurrentUser,
     ValidJson(fields): ValidJson<DancerFields>,
 ) -> Result<(StatusCode, Json<DancerResponse>), AppError> {
-    // An account makes its own page through `create_mine`; other pages come with jams.
-    current.require(Role::Organizer)?;
+    // An account makes its own page through `create_mine`; other pages come with jams, or
+    // with a team a verified dancer asks to enter (M32), whose teammates may have none yet.
+    if current.user.role < Role::Organizer
+        && db::dancers::verified_page(&state.pool, current.user.id)
+            .await?
+            .is_none()
+    {
+        return Err(AppError::Forbidden);
+    }
     check_new_titles(&fields, &current)?;
     let source = DancerSource::for_creator(current.user.role);
     let dancer = db::dancers::insert(&state.pool, &fields, source, current.user.id).await?;

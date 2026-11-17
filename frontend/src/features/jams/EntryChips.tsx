@@ -11,9 +11,12 @@ type Entry = Schemas["Entry"];
  * badge over its members' chips; the video pill when there is one (§4.37). */
 export function EntryChips({
   entry,
+  mine = false,
   onPlay,
 }: {
   entry: Entry;
+  /** The viewer's own entry (M32): "Nova · you", outlined. */
+  mine?: boolean;
   onPlay: (entry: Entry) => void;
 }) {
   const podium = resultOf(entry.final_rank, entry.reached)?.kind === "podium";
@@ -31,7 +34,7 @@ export function EntryChips({
   if (solo && entry.members.length === 1 && !entry.team_name) {
     return (
       <li className="flex items-center gap-2">
-        <DancerChip dancer={solo} badge={badge} />
+        <DancerChip dancer={solo} badge={badge} you={mine} />
         {video}
       </li>
     );

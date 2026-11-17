@@ -7,14 +7,17 @@ mod claims;
 mod codes;
 mod crews;
 mod dancers;
+mod entering;
 mod events;
 mod extract;
 mod flyers;
 pub(crate) mod geo;
+mod going;
 mod health;
 mod organizers;
 pub(crate) mod page;
 mod places;
+mod requests;
 mod results;
 mod reviews;
 mod sitemap;
@@ -34,9 +37,12 @@ pub fn router() -> OpenApiRouter<AppState> {
         .merge(events::router())
         .merge(flyers::router())
         .merge(geo::router())
+        .merge(going::router())
         .merge(dancers::router())
         .merge(crews::router())
         .merge(battles::router())
+        .merge(entering::router())
+        .merge(requests::router())
         .merge(claims::router())
         .merge(admin::router())
         .merge(reviews::router())

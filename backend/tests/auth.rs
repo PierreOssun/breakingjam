@@ -53,6 +53,8 @@ async fn register_mails_a_code_and_logs_in_only_once_it_is_confirmed(pool: PgPoo
     assert_eq!(me.status, StatusCode::OK);
     assert_eq!(me.json["email"], "lilg@example.com");
     assert_eq!(me.json["display_name"], "Lil G");
+    // Its emails' language, for the site to fill in when an account never said.
+    assert_eq!(me.json["language"], "fr");
     assert!(me.cookie("bj_session").is_some(), "me refreshes the cookie");
 }
 

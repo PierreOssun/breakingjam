@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update events set starts_on = '2020-01-04', ends_on = '2020-01-04' where id = $1::text::uuid",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6bba80fe571cf59ed78d0676c17ba1167fd82a56833bfa7672168eddbece5659"
+}

@@ -200,13 +200,7 @@ pub(super) async fn send_code(
         return Ok(());
     }
     let message = Message::code(purpose, language, &user.email, &code);
-    let mail = state.mail.clone();
-    // In the background: a slow mail service must not hold the request, nor show in its timing.
-    tokio::spawn(async move {
-        if let Err(error) = mail.send(&message).await {
-            tracing::warn!(error = %error, "could not send a code email");
-        }
-    });
+    state.mail.send_later(message, "code");
     Ok(())
 }
 

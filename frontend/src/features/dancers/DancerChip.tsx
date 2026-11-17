@@ -1,5 +1,6 @@
 import { Plus, X } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import type { Schemas } from "../../api/client";
 import { DancerAvatar } from "./DancerAvatar";
@@ -10,10 +11,18 @@ type DancerChipProps = {
   remove?: { label: string; onClick: () => void; disabled?: boolean };
   /** A result badge after the name, for a podium place (§4.13). */
   badge?: ReactNode;
+  /** The viewer's own chip (M32): "Nova · you", outlined in the primary colour. */
+  you?: boolean;
 };
 
 /** A link chip to a dancer page, with their avatar; a deleted dancer has no page, so no link (DESIGN.md §4.12). */
-export function DancerChip({ dancer, remove, badge }: DancerChipProps) {
+export function DancerChip({
+  dancer,
+  remove,
+  badge,
+  you = false,
+}: DancerChipProps) {
+  const { t } = useTranslation();
   const shape = `inline-flex h-full items-center gap-2 rounded-full pl-1 ${remove ? "pr-2" : badge ? "pr-1" : "pr-3.5"}`;
   const content = (
     <>
@@ -21,13 +30,17 @@ export function DancerChip({ dancer, remove, badge }: DancerChipProps) {
       <span aria-hidden className="inline-flex">
         <DancerAvatar dancer={dancer} size="chip" />
       </span>
-      {dancer.dancer_name}
+      {you
+        ? t("jam.entry.you", { name: dancer.dancer_name })
+        : dancer.dancer_name}
       {badge && " "}
       {badge}
     </>
   );
   return (
-    <span className="relative inline-flex h-9 items-center rounded-full border border-border-strong text-body-sm font-bold text-text">
+    <span
+      className={`relative inline-flex h-9 items-center rounded-full border text-body-sm font-bold text-text ${you ? "border-primary ring-1 ring-primary" : "border-border-strong"}`}
+    >
       {dancer.deleted ? (
         <span className={shape}>{content}</span>
       ) : (

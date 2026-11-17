@@ -274,6 +274,20 @@ impl Event {
         self.status.is_public() && self.phase == Phase::Past
     }
 
+    /// Whether dancers may enter or leave its battles themselves (M32): announced, registration
+    /// not closed, and not started yet.
+    pub fn takes_entries(&self) -> bool {
+        self.status == EventStatus::Published && self.phase == Phase::Upcoming
+    }
+
+    /// Whether people may say they are going (M32): announced, not called off, not over yet.
+    pub fn takes_attendees(&self) -> bool {
+        matches!(
+            self.status,
+            EventStatus::Published | EventStatus::RegistrationClosed
+        ) && self.phase != Phase::Past
+    }
+
     /// Whether `user` may edit its details, flyer and lineup, change its status or delete it;
     /// the team still may once it is over, to fix history.
     pub fn editable_by(&self, user: &User) -> bool {

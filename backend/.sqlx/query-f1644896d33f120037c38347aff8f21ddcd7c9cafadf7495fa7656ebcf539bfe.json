@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update events set status = 'registration_closed' where id = $1::text::uuid",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f1644896d33f120037c38347aff8f21ddcd7c9cafadf7495fa7656ebcf539bfe"
+}

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "insert into battles\n             (id, event_id, name, format, team_size, gender, age, age_min, age_max,\n              bracket_size, max_entries, prize_currency, prize_first, prize_second,\n              prize_third, starts_at, position)\n           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,\n                   (select coalesce(max(position) + 1, 0) from battles where event_id = $2))\n           returning id, event_id, name, format as \"format: BattleFormat\", team_size,\n                     gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                     bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at, created_at, updated_at",
+  "query": "insert into battles\n             (id, event_id, name, format, team_size, gender, age, age_min, age_max,\n              bracket_size, max_entries, prize_currency, prize_first, prize_second,\n              prize_third, starts_at, registration, position)\n           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,\n                   (select coalesce(max(position) + 1, 0) from battles where event_id = $2))\n           returning id, event_id, name, format as \"format: BattleFormat\", team_size,\n                     gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                     bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at,\n                  registration as \"registration: BattleRegistration\", created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -226,6 +226,28 @@
       },
       {
         "ordinal": 17,
+        "name": "registration: BattleRegistration",
+        "type_info": {
+          "Custom": {
+            "name": "battle_registration",
+            "kind": {
+              "Enum": [
+                "organizer",
+                "approval",
+                "open"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "registration"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -236,7 +258,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -298,7 +320,19 @@
         "Int4",
         "Int4",
         "Int4",
-        "Timestamp"
+        "Timestamp",
+        {
+          "Custom": {
+            "name": "battle_registration",
+            "kind": {
+              "Enum": [
+                "organizer",
+                "approval",
+                "open"
+              ]
+            }
+          }
+        }
       ]
     },
     "nullable": [
@@ -320,8 +354,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "6a4a0aa3b106ef1aa03d4e69a8a2392b832407251a50c14c879b41f6658b6454"
+  "hash": "bbe01fe1769a8e6a2c46f4e62e0b11927d26e88ef57a90093c8000afc259943b"
 }

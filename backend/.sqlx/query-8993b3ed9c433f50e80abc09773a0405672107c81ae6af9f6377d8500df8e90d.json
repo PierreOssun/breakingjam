@@ -1,0 +1,106 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select r.id, r.battle_id, b.event_id, r.user_id, r.team_name,\n                  r.status as \"status: ClaimStatus\",\n                  array(select m.dancer_id from battle_request_members m\n                        where m.request_id = r.id order by m.position) as \"members!\"\n           from battle_requests r join battles b on b.id = r.battle_id\n           where r.id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "battle_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "battle_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "event_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "event_id"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "team_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "team_name"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "status: ClaimStatus",
+        "type_info": {
+          "Custom": {
+            "name": "claim_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "battle_requests",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "members!",
+        "type_info": "UuidArray",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      null
+    ]
+  },
+  "hash": "8993b3ed9c433f50e80abc09773a0405672107c81ae6af9f6377d8500df8e90d"
+}

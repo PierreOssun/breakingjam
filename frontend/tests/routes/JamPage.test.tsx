@@ -41,6 +41,8 @@ const JAM = {
   can_edit: false,
   can_edit_battles: false,
   actions: [],
+  takes_attendees: true,
+  takes_entries: true,
   organizer: {
     id: "01920000-0000-7000-8000-0000000000a1",
     display_name: "Floor Lords e.V.",
@@ -371,7 +373,8 @@ describe("JamPage", () => {
     const links = await screen.findAllByRole("link", {
       name: "Register to battle",
     });
-    expect(links).toHaveLength(2);
+    // Beside "I'm going" (M32), in the action bar on phones and in the action card on desktop.
+    expect(links).toHaveLength(3);
     for (const link of links) {
       expect(link).toHaveAttribute("href", JAM.registration_url);
       expect(link).toHaveAttribute("target", "_blank");

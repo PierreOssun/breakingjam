@@ -267,7 +267,7 @@ async fn reorder(
         Unauthorized,
         NotJamWriter,
         (status = NOT_FOUND, description = "No such battle, or its jam is a draft you can't see", body = ErrorEnvelope),
-        (status = CONFLICT, description = "A dancer is already entered in this battle, or the battle is full", body = ErrorEnvelope),
+        (status = CONFLICT, description = "`already_entered`: a dancer is in this battle already; `battle_full`: no place left", body = ErrorEnvelope),
         InvalidFields,
     )
 )]
@@ -311,7 +311,7 @@ async fn create_entry(
         Unauthorized,
         NotJamWriter,
         (status = NOT_FOUND, description = "No such entry, or its jam is a draft you can't see", body = ErrorEnvelope),
-        (status = CONFLICT, description = "A dancer is already entered in this battle, or the battle is full", body = ErrorEnvelope),
+        (status = CONFLICT, description = "`already_entered`: a dancer is in this battle already; `battle_full`: no place left", body = ErrorEnvelope),
         InvalidFields,
     )
 )]
@@ -514,20 +514,20 @@ fn check_start(fields: &BattleFields, event: &Event) -> Result<(), AppError> {
 }
 
 /// The jam, locked and read again: what a save checks against it holds until it commits.
-async fn lock_jam(conn: &mut PgConnection, id: Uuid) -> Result<Event, AppError> {
+pub(super) async fn lock_jam(conn: &mut PgConnection, id: Uuid) -> Result<Event, AppError> {
     db::events::find_locked(conn, id)
         .await?
         .ok_or(AppError::NotFound)
 }
 
 /// The battle, locked and read again: entries count against its current limit one save at a time.
-async fn lock_battle(conn: &mut PgConnection, id: Uuid) -> Result<Battle, AppError> {
+pub(super) async fn lock_battle(conn: &mut PgConnection, id: Uuid) -> Result<Battle, AppError> {
     db::battles::lock(&mut *conn, id).await?;
     db::battles::find(conn, id).await?.ok_or(AppError::NotFound)
 }
 
 /// Checks the entry's dancers; a deleted one may only stay, as one of the entry's `members`.
-async fn check_members(
+pub(super) async fn check_members(
     conn: &mut PgConnection,
     dancer_ids: &[Uuid],
     members: &[Uuid],
@@ -542,7 +542,7 @@ async fn check_members(
 /// Checks the §4 rules left once the battle is locked: the crew, one entry per
 /// dancer per battle and `max_entries`; a withdrawn entry only needs the crew. `existing` is the
 /// entry being saved again: it may keep its deleted crew, and holds its place unless withdrawn.
-async fn check_entry(
+pub(super) async fn check_entry(
     conn: &mut PgConnection,
     battle: &Battle,
     fields: &EntryFields,
@@ -561,9 +561,7 @@ async fn check_entry(
     let except_entry = existing.map(|e| e.id);
     if db::battles::already_entered(&mut *conn, battle.id, &fields.dancer_ids, except_entry).await?
     {
-        return Err(AppError::Conflict(
-            "a dancer is already entered in this battle".into(),
-        ));
+        return Err(AppError::AlreadyEntered);
     }
     // Lowering the limit must not lock out the entries already in: only a new place is counted.
     let takes_a_place = existing.is_none_or(|e| e.status == EntryStatus::Withdrawn);
@@ -571,7 +569,7 @@ async fn check_entry(
         && let Some(max) = battle.max_entries
         && db::battles::active_entry_count(conn, battle.id, except_entry).await? >= i64::from(max)
     {
-        return Err(AppError::Conflict("battle is full".into()));
+        return Err(AppError::BattleFull);
     }
     Ok(())
 }

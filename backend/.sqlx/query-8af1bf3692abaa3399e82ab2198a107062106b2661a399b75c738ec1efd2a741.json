@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select e.id, e.name, e.slug, count(*) as \"count!\"\n           from battle_requests r\n           join battles b on b.id = r.battle_id\n           join events e on e.id = b.event_id\n           where e.organizer_id = $1 and e.deleted_at is null and r.status = 'pending'\n             and e.status <> 'cancelled' and jam_phase(e.starts_on, e.ends_on, e.timezone) <> 'past'\n           group by e.id\n           order by e.starts_on, e.id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "slug",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "events",
+            "name": "slug"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "8af1bf3692abaa3399e82ab2198a107062106b2661a399b75c738ec1efd2a741"
+}

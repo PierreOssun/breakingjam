@@ -8,6 +8,7 @@ import { ChipRow } from "../../components/ChipRow";
 import { Dialog } from "../../components/Dialog";
 import { FormError } from "../../components/FormError";
 import { InlineNotice } from "../../components/InlineNotice";
+import { MetaTag } from "../../components/Tag";
 import { OptionalLabel } from "../../components/OptionalLabel";
 import { SelectField } from "../../components/SelectField";
 import { TextField } from "../../components/TextField";
@@ -35,6 +36,8 @@ import {
   wipes,
   PLACES,
   PRESET_AGES,
+  formEntrySize,
+  registrationOf,
   withCategory,
   withFormat,
 } from "./battleFields";
@@ -53,6 +56,7 @@ const FIELDS = [
   "prize_second",
   "prize_third",
   "starts_at",
+  "registration",
 ] as const;
 /** The fields under "More options", which stay open while the server refuses one of them. */
 const MORE = [
@@ -256,6 +260,7 @@ function BattleSheet({
             open={more || MORE.some((key) => errors[key])}
             onToggle={setMore}
           />
+          <WhoCanEnter form={form} values={values} />
           <FormError message={errors.root?.message} />
         </form>
       )}
@@ -381,6 +386,98 @@ function Prize({
           />
         ))}
     </div>
+  );
+}
+
+const MODES = ["organizer", "approval", "open"] as const;
+
+/**
+ * Who can enter (M32): the organiser adds them (the default), they ask (step 3, not yet), or
+ * verified dancers enter directly, solo battles only. Real radios, so arrows move between them.
+ */
+function WhoCanEnter({ form, values }: Part) {
+  const { t } = useTranslation();
+  const { errors } = form.formState;
+  const size = formEntrySize(values);
+  const solo = size === 1;
+  const chosen = registrationOf(values);
+  const unit = solo ? "dancers" : "teams";
+  const options: Record<
+    (typeof MODES)[number],
+    { line: string; tag?: string; disabled?: boolean }
+  > = {
+    organizer: {
+      line: t(`org.battles.entry.organizerLine.${unit}`),
+      tag: t("org.battles.entry.default"),
+    },
+    approval:
+      size !== null
+        ? { line: t(`org.battles.entry.approvalLine.${unit}`) }
+        : {
+            line: t("org.battles.entry.needsSizeLine"),
+            tag: t("org.battles.entry.needsSize"),
+            disabled: true,
+          },
+    open: solo
+      ? { line: t("org.battles.entry.openLine") }
+      : {
+          line: t("org.battles.entry.soloOnlyLine"),
+          tag: t("org.battles.entry.soloOnly"),
+          disabled: true,
+        },
+  };
+  return (
+    <fieldset className="flex flex-col gap-2">
+      <legend className="mb-2 text-label text-text uppercase">
+        {t("org.battles.entry.label")}
+      </legend>
+      {MODES.map((mode) => {
+        const { line, tag, disabled } = options[mode];
+        return (
+          <label
+            key={mode}
+            className="flex min-h-11 cursor-pointer gap-3 rounded-lg border border-border p-4 transition-colors duration-fast has-checked:border-primary has-checked:ring-2 has-checked:ring-primary/25 has-disabled:cursor-not-allowed has-disabled:opacity-60"
+          >
+            <input
+              type="radio"
+              name="registration"
+              value={mode}
+              checked={chosen === mode}
+              disabled={disabled}
+              onChange={() =>
+                form.setValue("registration", mode, { shouldDirty: true })
+              }
+              className="mt-0.5 size-5 shrink-0 accent-primary"
+            />
+            <span className="flex min-w-0 flex-col gap-1">
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="text-body font-bold">
+                  {t(`org.battles.entry.modes.${mode}`)}
+                </span>
+                {tag && <MetaTag>{tag}</MetaTag>}
+              </span>
+              <span className="text-body-sm text-muted">{line}</span>
+            </span>
+          </label>
+        );
+      })}
+      {/* Open or With approval asked for, but a chip or the team size no longer allows it: it
+          saves as the organiser's, and says so here (a toast would sit under the sheet). */}
+      {chosen !== values.registration && (
+        <InlineNotice actionable>
+          {t(
+            values.registration === "open"
+              ? "org.battles.entry.openDropped"
+              : "org.battles.entry.approvalDropped",
+          )}
+        </InlineNotice>
+      )}
+      {errors.registration?.message && (
+        <p className="text-body-sm text-danger">
+          {errors.registration.message}
+        </p>
+      )}
+    </fieldset>
   );
 }
 

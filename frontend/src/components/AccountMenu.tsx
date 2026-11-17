@@ -1,4 +1,5 @@
 import {
+  Bell,
   CaretRight,
   GearSix,
   MagnifyingGlass,
@@ -22,6 +23,7 @@ import { atLeast } from "../features/auth/roles";
 import { withNext } from "../features/auth/safeNext";
 import { useLogout } from "../features/auth/useLogout";
 import { DancerAvatar } from "../features/dancers/DancerAvatar";
+import { useWaitingRequests } from "../features/jams/entering";
 import { useMyDraftCount } from "../features/jams/queries";
 import { setTheme, THEMES, useTheme, type Theme } from "../lib/theme";
 import { buttonClasses } from "./buttonClasses";
@@ -59,11 +61,14 @@ export function AccountMenu({
   // A plain user has no jam: registering the first one makes the account an organiser.
   const organises = me.role !== "user";
   const admin = atLeast(me.role, "admin");
+  // Jams of theirs where dancers wait for an answer (M32): one item each.
+  const waiting = useWaitingRequests(organises).data ?? [];
   // The arrows' order, top to bottom.
   const keys = [
     "profile",
     ...(sheet ? ["map", "jams", "dancers"] : []),
     ...(organises ? ["myJams"] : []),
+    ...waiting.map((jam) => `requests:${jam.id}`),
     ...(admin ? ["admin"] : []),
     "account",
     ...THEMES,
@@ -173,6 +178,22 @@ export function AccountMenu({
                 {t("nav.myJams")}
                 <DraftsBadge />
               </MenuLink>
+              {waiting.map((jam) => (
+                <MenuLink
+                  key={jam.id}
+                  to={`/jams/${jam.slug}#battles`}
+                  icon={Bell}
+                  roving={item(`requests:${jam.id}`)}
+                >
+                  <span className="min-w-0 truncate">
+                    {/* One jam: "Requests"; several: which jam each is. */}
+                    {waiting.length === 1
+                      ? t("nav.requests")
+                      : t("nav.requestsAt", { name: jam.name })}
+                  </span>
+                  <Badge tone="primary">{jam.count}</Badge>
+                </MenuLink>
+              ))}
               {admin && (
                 <MenuLink to="/admin" icon={ShieldCheck} roving={item("admin")}>
                   {t("nav.admin")}

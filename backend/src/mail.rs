@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 use crate::{config::Config, domain::user::CodePurpose};
 
 /// Language of the emails the site sends; the frontend passes its own.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum Language {
     /// English, also when the client says nothing.
@@ -16,6 +16,32 @@ pub enum Language {
     Fr,
     /// German.
     De,
+}
+
+impl Language {
+    /// As stored on the account: `en`, `fr` or `de`.
+    pub fn code(self) -> &'static str {
+        match self {
+            Self::En => "en",
+            Self::Fr => "fr",
+            Self::De => "de",
+        }
+    }
+
+    /// A stored code read back.
+    pub fn parse(code: &str) -> Option<Self> {
+        match code {
+            "en" => Some(Self::En),
+            "fr" => Some(Self::Fr),
+            "de" => Some(Self::De),
+            _ => None,
+        }
+    }
+
+    /// The stored code read back; English when the account hasn't said.
+    pub fn from_code(code: Option<&str>) -> Self {
+        code.and_then(Self::parse).unwrap_or_default()
+    }
 }
 
 /// One plain-text email, as the Worker's handler takes it.
@@ -92,6 +118,17 @@ impl Mailer {
             http,
             url: config.mail_url.clone(),
         }
+    }
+
+    /// Sends `message` in the background: a slow mail service must not hold a request, nor
+    /// show in its timing. A failure is logged as `what`.
+    pub fn send_later(&self, message: Message, what: &'static str) {
+        let mail = self.clone();
+        tokio::spawn(async move {
+            if let Err(error) = mail.send(&message).await {
+                tracing::warn!(error = %error, what, "could not send an email");
+            }
+        });
     }
 
     /// Hands `message` to the mail service.

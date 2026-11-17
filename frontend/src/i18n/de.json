@@ -20,7 +20,9 @@
     "contact": "Kontakt",
     "team": "Team",
     "accountSettings": "Konto",
-    "privacy": "Datenschutz"
+    "privacy": "Datenschutz",
+    "requests": "Anfragen",
+    "requestsAt": "Anfragen · {{name}}"
   },
   "account": {
     "viewPage": "Meine Seite ansehen",
@@ -286,6 +288,108 @@
       "title": "Du organisierst diesen Jam?",
       "body": "Das BreakingJam-Team hat diesen Jam eingetragen. Schreib uns, um seine Seite selbst zu führen oder Fehler zu korrigieren.",
       "cta": "Kontakt"
+    },
+    "going": {
+      "button": "Ich bin dabei",
+      "you": "Du bist dabei",
+      "count_one": "{{count}} ist dabei",
+      "count_other": "{{count}} sind dabei",
+      "seeYou": "Wir sehen uns am {{day}}",
+      "share": "Mit deiner Crew teilen",
+      "named": "Nur verifizierte Tänzer:innen werden genannt. Alle anderen werden nur gezählt.",
+      "leave": "Ich bin doch nicht dabei",
+      "who": "Wer dabei ist",
+      "others_one": "und {{count}} weitere Person",
+      "others_other": "und {{count}} weitere Personen",
+      "failed": "Konnte nicht gespeichert werden. Versuch es noch einmal.",
+      "enterBattle": "Mitmachen"
+    },
+    "entry": {
+      "setting": {
+        "open": "Offen · Tänzer:innen melden sich direkt an",
+        "organizer": {
+          "dancers": "Durch Veranstalter:in · du trägst die Tänzer:innen ein",
+          "teams": "Durch Veranstalter:in · du trägst die Teams ein"
+        },
+        "approval": "Mit Freigabe · keine Anfragen offen"
+      },
+      "change": "Ändern",
+      "closed": "Anmeldung geschlossen",
+      "site": "Auf der Seite der Veranstalter:in anmelden",
+      "siteLine": "Öffnet die eigene Anmeldeseite der Veranstalter:in.",
+      "contact": "Veranstalter:in kontaktieren",
+      "contactLine": {
+        "dancers": "Die Veranstalter:in trägt die Tänzer:innen ein.",
+        "teams": "Die Veranstalter:in trägt die Teams ein."
+      },
+      "in": "Du bist drin",
+      "withdraw": "Zurückziehen",
+      "inLine": "Du kannst dich zurückziehen, bis die Anmeldung schließt.",
+      "full": "Battle ist voll",
+      "login": "Anmelden, um teilzunehmen",
+      "loginLine": "Du brauchst eine verifizierte Tänzerseite, um teilzunehmen.",
+      "verify": "Verifizieren lassen, um teilzunehmen",
+      "verifyLine": "Nur verifizierte Tänzer:innen können teilnehmen. Die Prüfung geschieht von Hand und kann einen Tag dauern.",
+      "enter": "Teilnehmen",
+      "enterLine": "Du bist direkt dabei.",
+      "placesLeft_one": "Noch 1 Platz frei.",
+      "placesLeft_other": "Noch {{count}} Plätze frei.",
+      "title": "Bei {{name}} teilnehmen",
+      "as": "Du trittst an als",
+      "starts": "{{name}} beginnt um {{time}}",
+      "note": "Dein Name steht sofort auf der Jam-Seite. Du kannst dich zurückziehen, bis die Anmeldung schließt.",
+      "filled": "Dieser Battle ist gerade voll geworden.",
+      "withdrawTitle": "Von {{name}} zurückziehen?",
+      "withdrawBody": "Dein Platz wird wieder frei. Du kannst wieder teilnehmen, solange die Anmeldung offen ist.",
+      "keep": "Bleiben",
+      "you": "{{name}} · du",
+      "waiting_one": "{{count}} Anfrage offen",
+      "waiting_other": "{{count}} Anfragen offen",
+      "review": "Ansehen",
+      "pending": "Anfrage gesendet",
+      "cancelRequest": "Anfrage zurückziehen",
+      "pendingLine": "Du bekommst eine E-Mail, sobald die Veranstalter:in antwortet.",
+      "declined": "Anfrage abgelehnt",
+      "declinedLine": "Die Veranstalter:in hat deine Anfrage abgelehnt.",
+      "ask": "Teilnahme anfragen",
+      "askLine": "Die Veranstalter:in nimmt deine Anfrage an oder lehnt sie ab.",
+      "inTeamLine": "Dein Team ist dabei. Nur die Veranstalter:in kann es zurückziehen.",
+      "fullLine_one": "{{count}} von {{count}} Platz belegt.",
+      "fullLine_other": "{{count}} von {{count}} Plätzen belegt.",
+      "taken_one": "{{count}} von {{max}} Plätzen belegt",
+      "taken_other": "{{count}} von {{max}} Plätzen belegt"
+    },
+    "ask": {
+      "title": "Bei {{name}} anfragen",
+      "intro": "Die Veranstalter:in sieht sich deine Anfrage an und nimmt sie an oder lehnt sie ab.",
+      "as": "Du fragst an als",
+      "teamName": "Teamname",
+      "teammates": "Teammitglieder",
+      "missing_one": "Füge noch {{count}} Person hinzu, damit das Team voll ist.",
+      "missing_other": "Füge noch {{count}} Personen hinzu, damit das Team voll ist.",
+      "igHidden": "Die Veranstalter:in sieht dein Instagram @{{handle}}, auch wenn es auf deiner Seite verborgen ist.",
+      "igPublic": "Die Veranstalter:in sieht dein Instagram @{{handle}}.",
+      "igNone": "Deine Seite hat kein Instagram. Die Veranstalter:in sieht nur deinen Namen.",
+      "addIg": "Instagram hinzufügen",
+      "send": "Senden",
+      "cancelAnyTime": "Du bekommst eine E-Mail mit der Antwort. Du kannst die Anfrage jederzeit zurückziehen.",
+      "teammateIn": "Ein Teammitglied ist schon in diesem Battle."
+    },
+    "requests": {
+      "title": "Anfragen",
+      "waiting_one": "{{count}} offen",
+      "waiting_other": "{{count}} offen",
+      "full": "voll",
+      "accept": "Annehmen",
+      "decline": "Ablehnen",
+      "hidden": "auf der Seite verborgen",
+      "empty": "Keine Anfragen offen.",
+      "footer": "Angenommene Tänzer:innen erscheinen auf der Jam-Seite. Wer angefragt hat, bekommt eine E-Mail mit deiner Antwort.",
+      "filled": "Dieser Battle ist voll.",
+      "entered_one": "{{count}} von {{max}} angemeldet",
+      "entered_other": "{{count}} von {{max}} angemeldet",
+      "enteredNoMax_one": "{{count}} angemeldet",
+      "enteredNoMax_other": "{{count}} angemeldet"
     }
   },
   "dancer": {
@@ -555,7 +659,31 @@
         "results": "Ergebnisse"
       },
       "prizeSuggested": "Für diese Jam",
-      "prizeAll": "Alle Währungen"
+      "prizeAll": "Alle Währungen",
+      "entry": {
+        "label": "Wer teilnehmen kann",
+        "modes": {
+          "organizer": "Durch Veranstalter:in",
+          "approval": "Mit Freigabe",
+          "open": "Offen"
+        },
+        "default": "Standard",
+        "soloOnly": "Nur Solo",
+        "organizerLine": {
+          "dancers": "Du trägst die Tänzer:innen selbst ein. Sie erreichen dich über Kontakt.",
+          "teams": "Du trägst die Teams selbst ein. Tänzer:innen erreichen dich über Kontakt."
+        },
+        "openLine": "Verifizierte Tänzer:innen melden sich direkt an, bis der Battle voll ist.",
+        "soloOnlyLine": "Nur für Solo-Battles. Ein Team braucht deine Freigabe.",
+        "openDropped": "Ein Team kann sich nicht selbst anmelden: Die Teilnahme läuft wieder über dich.",
+        "approvalLine": {
+          "dancers": "Verifizierte Tänzer:innen fragen an. Du siehst ihr Instagram und nimmst an oder lehnst ab.",
+          "teams": "Verifizierte Tänzer:innen fragen mit vollem Team an. Du siehst ihr Instagram und nimmst an oder lehnst ab."
+        },
+        "needsSize": "Braucht eine Größe",
+        "needsSizeLine": "Lege unter Weitere Optionen eine Teamgröße fest: Ein Team fragt vollständig an.",
+        "approvalDropped": "Ohne Teamgröße kann ein Team nicht anfragen: Die Teilnahme läuft wieder über dich."
+      }
     },
     "entries": {
       "manage": "Anmeldungen bearbeiten",
@@ -1140,7 +1268,7 @@
   },
   "privacy": {
     "title": "Datenschutz",
-    "updated": "Zuletzt aktualisiert: 11. November 2026",
+    "updated": "Zuletzt aktualisiert: 15. November 2026",
     "intro": "BreakingJam listet Breaking-Jams und ihre Ergebnisse. Diese Seite sagt, was wir über dich speichern, warum, und wie du es ändern oder löschen lässt.",
     "sections": [
       {
@@ -1154,7 +1282,7 @@
         "body": [
           "Bei der Anmeldung mit E-Mail speichern wir deine E-Mail, deinen Namen und einen Hash deines Passworts, nie das Passwort selbst.",
           "Bei der Anmeldung mit Google erhalten wir deine E-Mail, deinen Namen und Googles Kennung deines Kontos. Dein Google-Passwort sehen wir nie.",
-          "Wir mailen dir nur die Codes, die deine Adresse bestätigen oder dein Passwort zurücksetzen.",
+          "Wir mailen dir die Codes, die deine Adresse bestätigen oder dein Passwort zurücksetzen, und Neuigkeiten zu Battles, bei denen du teilnimmst oder anfragst: deine Anfrage und die Antwort der Veranstalter:in. Veranstaltest du einen Jam, schreiben wir dir jedes Mal, wenn sich jemand bei einem seiner Battles anmeldet oder anfragt.",
           "Ein Cookie hält dich angemeldet. Sprache und Design merkt sich dein Browser. Es gibt keine Werbung, keine Tracker und keine Analyse."
         ]
       },
@@ -1171,6 +1299,15 @@
         "title": "Jams, die du einträgst",
         "body": [
           "Die Angaben eines Jams, sein Flyer und der Name des Veranstalters sind öffentlich, sobald der Jam freigegeben ist."
+        ]
+      },
+      {
+        "title": "Jams, bei denen du dabei bist",
+        "body": [
+          "Wenn du auf „Ich bin dabei“ tippst, speichern wir, dass dein Konto zu diesem Jam geht. Die Jam-Seite zeigt, wie viele dabei sind.",
+          "Ist deine Tänzerseite verifiziert, wird sie in der Liste der Teilnehmenden genannt; sonst wirst du nur gezählt. Tippe auf „Du bist dabei“, um es jederzeit zurückzunehmen.",
+          "Wenn du dich selbst bei einem Battle anmeldest, steht deine Tänzerseite sofort bei den Teilnehmenden und du bist als dabei vermerkt. Zurückziehen löscht die Anmeldung.",
+          "Wenn du bei einem Battle anfragst, sieht die Veranstalter:in deine Tänzerseite und dein Instagram, auch wenn es auf deiner Seite verborgen ist."
         ]
       },
       {

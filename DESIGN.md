@@ -702,6 +702,10 @@ The jam page in edit mode is made of blocks, one per part of the page (Venue, Ba
   - **Chips:** two rows, Category and Format, each a `label` over a wrapping row (`flex flex-wrap gap-2`). A chip is `h-11 px-4 rounded-full border border-border-strong bg-surface body-sm font-semibold` with `aria-pressed`. Lit, it is `bg-primary text-on-primary border-primary`, so a form choice never reads as a map filter. A lit format chip tapped again goes out; a category always stays.
   - **Below the chips:** Start time and Max dancers side by side, also on phones; a longer jam puts its Day first, and entries of two or more say "Max teams". Then the cash prize: the currency on its own row, with the three amounts beside it from sm once a currency is chosen (under it on phones).
   - **More options:** a `rounded-md border` row, "More options" in `body font-bold` over a `body-sm muted` line: the name that will be saved, in quotes, when there is one, then the battle's summary (as on its card). A `CaretDown` turns when open. It folds out Size, Open to, Age, Bracket and Name.
+  - **Who can enter** *(M32)*: last on Details, a radio group (`fieldset`, real radios, so arrows move between them) of three cards, `rounded-lg border p-4`, the checked one `border-primary ring-2 ring-primary/25`, a disabled one at 60%: the mode in bold with a meta tag, a `body-sm muted` line.
+    - **By the organiser** ("Default"): "You add the dancers yourself. Dancers reach you through Contact." (teams for team battles).
+    - **With approval**: "Verified dancers ask to enter. You see their Instagram, then accept or decline." (teams: "ask with a full team"). A battle without a fixed size can't take requests, which are full teams: disabled, tagged "Needs a size", "Set a team size under More options: a team asks as a full team."; a chip or the size that takes the size away says "Without a team size a team can’t ask: who can enter is back to By the organiser."
+    - **Open**: "Verified dancers enter directly, until the battle is full." On a team battle it is disabled, tagged "Solo only": "For solo battles only. A team needs your approval." A chip, or the team size under More options, that makes an open battle a team one saves it as By the organiser, and an actionable notice (§4.21) under the group says "A team can’t enter by itself: who can enter is back to By the organiser." A notice, not a toast: an open `<dialog>` sits in the top layer, over any toast.
   - **The action:** **Add battle** for a new battle, so one tap adds a 1v1 Open; **Save** when editing.
   - **Results step** *(M29)*: an existing battle's sheet opens with a two-way switch over its body, **Details** | **Results** (`grid grid-cols-2 rounded-full border p-1`, the picked half `bg-text text-bg`, `aria-pressed`). It opens on Details in the jam editor and on Results from the jam page once the jam is over. Details keeps its footer **Save**; Results has no footer: it saves as you go.
     1. The save state ("Saved", "Saving…", "Not saved · Retry", as in the editor bar), then **Round** chips (the bracket's rounds from its first, so a Top 16 opens on 8 empty battles, then 3rd place when there are semi-finals), one round at a time, then the hint "Pick who battled whom, then tap the crown of the winner: they move on to the next round by themselves. Every change saves itself."
@@ -819,6 +823,58 @@ Where an avatar's parts are picked, each by looking at it; a fighter-select scre
 - Each single-choice group is a `radiogroup` of radios named by their labels; lash flicks, lip tint and hoops are checkboxes in the same thumbnail style. Nothing bounces when the preview changes.
 - Every part and fighter is original: none copies a character of a game, an anime or a manga.
 
+### 4.45 I'm going *(M32, Nov 2026)*
+
+Under the jam's meta lines, on published and registration-closed jams that aren't past; never on drafts, jams in review, cancelled or past jams.
+
+- **Buttons:** `flex flex-wrap gap-3`, each `min-w-max flex-auto`, so they sit side by side while both labels fit whole and take a full-width row each when they don't (phones, French and German): no label is ever cut.
+  - When this viewer has a battle to enter (§4.46: Enter battle, Log in to enter or Get verified to enter; not one they are in, nor a full one): **Enter a battle** ↓ (primary, to `#battles`), then **I'm going** (secondary).
+  - Else with a registration link: **Register to battle** ↗ (primary, as §4.32), then **I'm going** (secondary).
+  - Without: **I'm going** alone, primary, full width.
+  - Going: **✓ You're going**, `border-2 border-primary bg-primary/10 text-primary-text`, in place of I'm going. "Add to calendar" is not repeated beside it: the action bar and card (§4.32) and the sheet below have it.
+  - Logged out, the tap goes to log in with `next=/jams/<slug>?going=1`; back on the jam, the tap takes effect once and the parameter goes.
+  - The button and the count change at once and go back, with an error toast, if the save fails; the sheet that opened with the tap closes then, so the toast isn't under it.
+- **Count:** "42 going" (`UsersThree`, `body-sm muted`, 44px tall), hidden at 0; it opens **Who's going**.
+- **After the first tap** (and on tapping You're going): a short Dialog (§4.9) titled "See you on Sat 12 Dec" (the first day), then the success pill "✓ You're going" (as the Published badge, §4.10), the line "<Jam> · <City> · 14:00–21:00", **Add to calendar** (primary, the .ics), **Share with your crew** (secondary), the caption "Only verified dancers are named. Everyone else is just counted.", and, once going, a ghost **I'm not going any more**.
+- **Who's going:** a short Dialog with the verified dancers as dancer chips (§4.12), each to their page, then "and 40 others", and the same caption.
+
+### 4.46 Entering a battle *(M32, Nov 2026)*
+
+The bottom of each battle card, under a hairline (`border-t border-border pt-4`), `aria-live="polite"`: one control and a `caption muted` line. The first that matches wins:
+
+| When | Control | Line |
+|---|---|---|
+| The jam is past | nothing: its results speak | |
+| The viewer edits the jam, requests waiting | accent pill (`Bell`): "3 requests waiting", ghost sm **Review ›** opening the Requests sheet | |
+| The viewer edits the jam | "Open · dancers enter directly", "With approval · no requests waiting" or "By the organiser · you add the dancers" (`body-sm muted`), ghost sm **Change** to the battle sheet | |
+| Registration closed, or the jam live or cancelled | grey pill (`h-11 rounded-full bg-border/60 muted`, `Lock`): "Registration closed" | |
+| By the organiser, with a registration link | secondary **Register on the organiser’s site** ↗ | "Opens the organiser’s own registration page." |
+| By the organiser | secondary **Contact the organiser**: the jam's email, else an Instagram DM, else our Contact page for the team's jams | "The organiser adds the dancers." (teams) |
+| The viewer's verified page is in it | success pill "✓ You’re in" (as the Published badge), ghost sm **Withdraw** | "You can withdraw until registration closes." |
+| The viewer is in as part of a team | the success pill, no Withdraw | "Your team is in. Only the organiser can take it out." and a **Contact the organiser** link |
+| The viewer's request waits | accent pill (`border-accent-text bg-accent/[.14] text-accent-text`, `Clock`): "Request sent", ghost sm **Cancel request**, which acts at once | "You get an email when the organiser answers." |
+| With approval, their last request declined | grey pill (`X`): "Request declined" | "The organiser declined your request." and a **Contact the organiser** link |
+| Open or with approval, and full | grey pill "Battle is full" | "32 of 32 places taken." and a **Contact the organiser** link |
+| Logged out | primary **Log in to enter** (back to the jam) | "You need a verified dancer page to enter." |
+| No verified page | secondary **Get verified to enter** (`SealCheck`), to the viewer's page, else the welcome step | "Only verified dancers can enter. Verification is a manual check and can take a day." |
+| With approval | primary **Ask to enter** | "The organiser accepts or declines your request." |
+| Open | primary **Enter battle** | "You enter directly. 20 places left." (no count without a maximum) |
+
+- **Enter sheet:** a short Dialog (§4.9) "Enter 1v1 Bboy": an "Entering as" card (`rounded-lg border bg-surface p-3`: the avatar, the name, the verified tick and the flag), then the battle's day (the jam's days while it has no start) and the jam, the battle's start and "12 of 32 places taken" (`primary-text` icons), the note "Your name appears on the jam page straight away. You can withdraw until registration closes.", and **Enter battle** with Cancel. When the last place went first, the sheet stays, says "This battle just filled up." in danger and disables the button, and the card behind turns to Battle is full. Any other failure says "Something went wrong…" there too, the button still live; one that says the dancer is in already (a double tap, another tab) closes the sheet quietly, the card saying "You’re in".
+- **Withdraw:** a short Dialog "Withdraw from 1v1 Bboy?", "Your place goes back to the battle. You can enter again while registration is open.", **Withdraw** and **Keep my place** ("Rester", "Bleiben": the footer holds both on one row at 320px); a failure says so inside it, and one that finds the dancer out already counts as done. The "You’re in" row wraps at 320px (French, German), Withdraw staying on the right.
+- **Your chip:** before any result, the viewer's own entry leads the list, its chip reading "Nova · you" with `border-primary ring-1 ring-primary`.
+- **Ask sheet** *(step 3)*: a Dialog "Ask to enter 1v1 Bgirl" (`form` size for a team), "The organiser looks at your request and accepts or declines it.", an "Asking as" card and the lines of the Enter sheet. A team battle adds **Team name** and **Teammates** (the label stays over the chips once the team is full and the search hides), the dancer picker (search, or a new page for someone not on BreakingJam yet), with "Add 1 more dancer to make the team." while it isn't full; **Send request** waits for a full team. Then a note tinted `bg-accent/[.10]` with `InstagramLogo` in `accent-text`: "The organiser will see your Instagram @handle, even though it is hidden on your page." (or without the hidden part, or "You have no Instagram on your page. The organiser will only see your name." with **Add Instagram** to the dancer page), and the centred caption "You get an email with the answer. You can cancel the request any time." **Send request** is "Envoyer" and "Senden": the footer holds it beside Cancel at 320px. Refusals show inside it: "This battle just filled up.", "A teammate is in this battle already."; a request already waiting closes it quietly.
+- **A request is never public:** not in the entrants, not in any count.
+
+### 4.47 Requests sheet *(M32 step 3)*
+
+For the jam's editors, from **Review ›** on a battle card.
+
+- A short Dialog "Requests", then "1v1 Bgirl · 2 of 16 entered · **3 waiting**" (`body-sm muted`, the waiting part `accent-text` bold, "· full" when no place is left).
+- One card per request, oldest first (`rounded-lg border bg-surface p-3`): a team's name in bold with when it was sent ("2 hr ago", "yesterday") on the right; each member a row: 36px avatar, the name (to their page), the verified tick, the flag, then the Instagram handle as a link opening Instagram in a new tab, and `Lock` "hidden on their page" when their page hides it (a solo request has the time on its row). Two equal sm buttons: primary **✓ Accept** (disabled while the battle is full) and secondary **Decline**, which act at once; the card leaves the list.
+- "Accepted dancers appear on the jam page. Whoever asked gets an email with your answer." under the list; "No requests waiting." when empty. A refusal shows inside it ("This battle is full.").
+- **Account menu:** an organiser with requests waiting gets **Requests** (`Bell`) with the count, to that jam's battles; with several jams one item each, "Requests · Winter Cypher".
+
 ## 5. Layout rules
 
 - **Container:** `mx-auto max-w-content px-4 md:px-6 lg:px-8` (1200px including padding). Reading column: `max-w-prose` (640px).
@@ -892,8 +948,9 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
   3. The status badge and the countdown chip (§4.30).
   4. The title, `display-lg` (`display-2xl` from lg).
   5. **Meta lines**, each with a `primary-text` icon: the date, with "from 14:00" when a battle start is announced (jams have days, not times); the flag, city and country; all cash prizes together, "€1,750 in prizes", when there are any.
-  6. **"Who's in"** (§4.31).
-  7. **Battles** (`#battles`): one card per battle, `bg-surface border rounded-lg p-5`.
+  6. **I'm going** and how many are (§4.45, M32).
+  7. **"Who's in"** (§4.31).
+  8. **Battles** (`#battles`): one card per battle, `bg-surface border rounded-lg p-5`.
      - Header: the name in `display-sm`; "Starts 14:00" (`Clock`) and "8 / 16 dancers" (`UsersThree`, teams for team battles) in muted; the prize line with `Trophy`; the format as a meta tag on the right ("Top 8", "7 to Smoke").
      - **No result yet:** the entries as dancer chips in a wrapping row (§4.12); the podium gets its badge inside the chip; the **▶ Video** pill (§4.37) after the chip when an entry has a video (for a team: name, pill, then badge).
      - **Results by round** (M29, "Jam page — battle results by round" on the canvas), once an entry has a result:
@@ -906,13 +963,13 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
        6. **Pairings unknown** (a round the data doesn't tell, or the placings an organiser entered): the same section title, still counting "N battles" (one per entry knocked out), then one row per entry placed there, with no note: the name (15px bold), its avatar stack, and the entry's old Video pill at the far end. Once matches are entered for the round, its match cards replace the rows. Without a single 1st and 2nd, the finalists show as rows under "Final". Withdrawn entries never show.
        - 1v1 battles use the same layout, with one avatar per line.
      - For the jam's editors (its organiser, `seed_admin`+): the results as visitors see them, with a secondary sm **Edit entries** (`PencilSimple`, `aria-pressed`) at the bottom right of the battle that swaps them for a row per entry, withdrawn ones included, with the video pill, the result badge, edit and delete, and an add chip; the button then reads **Done**. Without results, the rows and the add chip show straight away.
-  8. **Lineup** (`#lineup`): judges, DJ, MC, hosts, staff, each a `label` and a wrapping row of chips; stacked on phones, side by side from lg. The organiser removes and adds people here.
-  9. **About:** the organiser's pitch, up to 200 characters.
-  10. **Info** (phones only): website (the host as label, ↗), email (`mailto:`) and Instagram; desktop has them in the facts grid.
-  11. **Venue:** a static mini map (MapLibre, not interactive, the map page's style), `rounded-lg`, 170px tall (220px from lg), with the selected marker centred. Under it the address, then a secondary sm **Directions** opening Apple Maps on Apple devices and Google Maps elsewhere. Without a pin: the address only.
-  12. **Organiser:** a card with a 52px rounded-square initials avatar (a logo once organisers have one), the name in bold with the verified tick, "N jams on BreakingJam · @handle" in muted, and a secondary sm **Contact** (the jam's public email, else an Instagram DM). On phones it wraps and the button goes full width. When the BreakingJam team entered the jam (it lists jams it doesn't run, the imported past editions among them), the card is a dashed one (`rounded-lg border border-dashed border-border-strong p-4`) under the same heading: "You’re the organiser?" (`font-extrabold`), "The BreakingJam team added this jam. Write to us to run its page yourself, or to fix what’s wrong." (muted), and a secondary sm **Contact us** (`EnvelopeSimple`), a link to the Contact page (`/contact`), where the email address can be copied when no mail app opens.
-  13. **More jams coming up:** up to 4 other upcoming jams, the nearest first (the soonest when this one has no pin), as grid cards (§4.3): a scroll of 200px cards on phones, 4 columns from lg, with **See the map →**. Hidden when there are none.
-  14. The action bar (§4.32).
+  9. **Lineup** (`#lineup`): judges, DJ, MC, hosts, staff, each a `label` and a wrapping row of chips; stacked on phones, side by side from lg. The organiser removes and adds people here.
+  10. **About:** the organiser's pitch, up to 200 characters.
+  11. **Info** (phones only): website (the host as label, ↗), email (`mailto:`) and Instagram; desktop has them in the facts grid.
+  12. **Venue:** a static mini map (MapLibre, not interactive, the map page's style), `rounded-lg`, 170px tall (220px from lg), with the selected marker centred. Under it the address, then a secondary sm **Directions** opening Apple Maps on Apple devices and Google Maps elsewhere. Without a pin: the address only.
+  13. **Organiser:** a card with a 52px rounded-square initials avatar (a logo once organisers have one), the name in bold with the verified tick, "N jams on BreakingJam · @handle" in muted, and a secondary sm **Contact** (the jam's public email, else an Instagram DM). On phones it wraps and the button goes full width. When the BreakingJam team entered the jam (it lists jams it doesn't run, the imported past editions among them), the card is a dashed one (`rounded-lg border border-dashed border-border-strong p-4`) under the same heading: "You’re the organiser?" (`font-extrabold`), "The BreakingJam team added this jam. Write to us to run its page yourself, or to fix what’s wrong." (muted), and a secondary sm **Contact us** (`EnvelopeSimple`), a link to the Contact page (`/contact`), where the email address can be copied when no mail app opens.
+  14. **More jams coming up:** up to 4 other upcoming jams, the nearest first (the soonest when this one has no pin), as grid cards (§4.3): a scroll of 200px cards on phones, 4 columns from lg, with **See the map →**. Hidden when there are none.
+  15. The action bar (§4.32).
   - At 375×812 the flyer, badges, title, date, city and the action bar show without scrolling.
 - **Desktop:** two columns (§5). Under the flyer, the action card (§4.32). The meta lines run as one inline row, and a facts grid (When, Where, Website, Email, Instagram) follows "Who's in".
 - **Share** (the top bar, the action bar, the action card): the system share sheet with `{ title: "<Jam> · <Wed 4 Nov> · <City>", url }` where there is one (cancelling isn't an error); else the link is copied with the toast "Link copied" (§4.8).

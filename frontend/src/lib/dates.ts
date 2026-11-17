@@ -140,3 +140,26 @@ export function formatMoment(iso: string, language: string): string {
     timeStyle: "short",
   }).format(new Date(iso));
 }
+
+/** How long ago, short: "now", "5 min ago", "2 hr ago", "yesterday", "3 days ago" (request
+ * lists). */
+export function timeAgo(
+  iso: string,
+  language: string,
+  now = new Date(),
+): string {
+  const format = new Intl.RelativeTimeFormat(localeOf(language), {
+    numeric: "auto",
+    style: "short",
+  });
+  const minutes = Math.min(
+    0,
+    Math.round((Date.parse(iso) - now.getTime()) / 60_000),
+  );
+  // "now", not "this minute": the seconds of the same, which read as a moment.
+  if (minutes === 0) return format.format(0, "second");
+  if (minutes > -60) return format.format(minutes, "minute");
+  const hours = Math.round(minutes / 60);
+  if (hours > -24) return format.format(hours, "hour");
+  return format.format(Math.round(hours / 24), "day");
+}

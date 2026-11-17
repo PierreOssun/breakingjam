@@ -18,6 +18,7 @@ use uuid::Uuid;
 
 use super::{
     extract::{Path, Query, ValidJson},
+    going::Going,
     page::{self, Page},
 };
 use crate::{
@@ -270,17 +271,32 @@ pub struct EventResponse {
     /// Who runs it: the jam page's organiser card (M12c); null when the BreakingJam team
     /// entered it, as the team is not its organiser.
     pub organizer: Option<OrganizerRef>,
+    /// How many are going, and whether the caller is (M32).
+    #[serde(flatten)]
+    pub going: Going,
+    /// Whether people may say they are going: announced, not called off, not over (M32).
+    pub takes_attendees: bool,
+    /// Whether dancers may enter or leave its open battles themselves now (M32).
+    pub takes_entries: bool,
 }
 
 impl EventResponse {
     /// The jam as `user` sees it, with what they may do.
-    pub fn new(event: Event, user: Option<&User>, organizer: Option<OrganizerRef>) -> Self {
+    pub fn new(
+        event: Event,
+        user: Option<&User>,
+        organizer: Option<OrganizerRef>,
+        going: Going,
+    ) -> Self {
         Self {
             can_edit: user.is_some_and(|u| event.editable_by(u)),
             can_edit_battles: user.is_some_and(|u| can_write(u, event.organizer_id)),
             actions: user.map(|u| event.actions(u)).unwrap_or_default(),
+            takes_attendees: event.takes_attendees(),
+            takes_entries: event.takes_entries(),
             event,
             organizer,
+            going,
         }
     }
 }
@@ -306,7 +322,8 @@ async fn show(
     let event = readable(&state, &current, &id_or_slug).await?;
     let organizer = db::organizers::reference(&state.pool, event.id).await?;
     let user = current.as_ref().map(|c| &c.user);
-    Ok(Json(EventResponse::new(event, user, organizer)))
+    let going = Going::of(&state.pool, event.id, user).await?;
+    Ok(Json(EventResponse::new(event, user, organizer, going)))
 }
 
 /// Register a jam as a draft; a first jam makes a `user` an `organizer`.
@@ -646,9 +663,19 @@ pub(super) async fn readable(
     current: &MaybeUser,
     id_or_slug: &str,
 ) -> Result<Event, AppError> {
+    visible(state, current.as_ref().map(|c| &c.user), id_or_slug).await
+}
+
+/// The jam if `user` (none: a visitor) may see it: 404 when it is missing or a draft they can't
+/// write.
+pub(super) async fn visible(
+    state: &AppState,
+    user: Option<&User>,
+    id_or_slug: &str,
+) -> Result<Event, AppError> {
     db::events::find(&state.pool, id_or_slug)
         .await?
-        .filter(|event| event.visible_to(current.as_ref().map(|c| &c.user)))
+        .filter(|event| event.visible_to(user))
         .ok_or(AppError::NotFound)
 }
 

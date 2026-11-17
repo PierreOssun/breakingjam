@@ -24,13 +24,16 @@ import { VerifiedTick } from "../components/VerifiedTick";
 import { VideoDialog, type Video } from "../components/VideoDialog";
 import { BattleCard } from "../features/jams/BattleCard";
 import { CountdownChip } from "../features/jams/CountdownChip";
+import { ContactAnchor } from "../features/jams/ContactAnchor";
 import { FlyerActions } from "../features/jams/FlyerEditor";
+import { GoingActions } from "../features/jams/Going";
 import { ActionBar, ActionCard } from "../features/jams/JamActions";
 import {
   countdown,
   directionsUrl,
   firstStart,
   openingHours,
+  organiserContact,
   placeLine,
   shareTitle,
   totalPrizes,
@@ -143,6 +146,7 @@ function JamDetail({ jam }: { jam: Jam }) {
               {jam.name}
             </h1>
             <Meta jam={jam} battles={battles.data ?? []} />
+            <GoingActions jam={jam} battles={battles.data ?? []} />
             <WhosIn who={who} />
           </header>
 
@@ -442,15 +446,7 @@ function OrganizerCard({
   ]
     .filter(Boolean)
     .join(" · ");
-  const contact = email
-    ? { href: `mailto:${email}` }
-    : handle
-      ? {
-          href: `https://ig.me/m/${handle}`,
-          target: "_blank",
-          rel: "noopener noreferrer",
-        }
-      : null;
+  const contact = organiserContact({ contact_email: email, organizer });
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface p-4">
       <InitialsAvatar name={organizer.display_name} />
@@ -468,17 +464,17 @@ function OrganizerCard({
       </div>
       {contact && (
         // Full width on phones, where it wraps under the name.
-        <a
-          {...contact}
+        <ContactAnchor
+          contact={contact}
           className={`${buttonClasses("secondary", "sm")} w-full sm:w-auto`}
         >
-          {email ? (
+          {contact.kind === "email" ? (
             <EnvelopeSimple size={16} weight="bold" aria-hidden />
           ) : (
             <InstagramLogo size={16} weight="bold" aria-hidden />
           )}
           {t("jam.contact")}
-        </a>
+        </ContactAnchor>
       )}
     </div>
   );

@@ -2,7 +2,7 @@
 
 Until M32, only a jam's organiser (and `seed_admin`+) adds entries; dancers get in through an outside link or the organiser card's **Contact**. M32 lets the organiser choose, per battle, how dancers enter, and gives every jam an **I'm going** button with a public count. It reverses M24's "battle registration stays an outside link".
 
-Nothing is built yet: this is the brief. It has three parts: the author's decisions, the UI brief from Design, and the schema and API sketch.
+All four steps are built (2026-11-15 to 18). It has three parts: the author's decisions, the UI brief from Design, and the schema and API sketch.
 
 ## Decisions (with the author, 2026-11-15)
 
@@ -224,7 +224,7 @@ Bottom sheet on mobile, dialog (max 520px) on desktop.
   - The Instagram handle as a link that opens Instagram in a new tab. If the dancer hides it publicly, add a small lock and "hidden on their page".
   - The name and avatar link to the dancer page.
   - Two equal buttons: primary **✓ Accept**, secondary **Decline**
-- Footer line: "Accepted dancers appear on the jam page. Each dancer gets an email with your answer." (Until step 4, only the first sentence.)
+- Footer line: "Accepted dancers appear on the jam page. Whoever asked gets an email with your answer." (Until step 4, only the first sentence.)
 - Accept and Decline act at once. The card leaves the list and the counts in the sub-line and on the battle card update.
 - When the battle is full, Accept is disabled on every card and the sub-line ends with "· full".
 - Empty state: "No requests waiting."
@@ -297,6 +297,10 @@ create table battle_request_members (                       -- the teammates of 
 
 -- step 4
 alter table app_users add column language text;             -- en, fr, de; null = not known yet
+
+-- after the walkthrough: the organiser hears of the same asker and battle twice a day at most
+create table request_mails (battle_id, user_id, sends smallint check (sends between 1 and 2),
+                            day_started_at timestamptz, primary key (battle_id, user_id));
 ```
 
 ## API (a sketch)
@@ -307,10 +311,39 @@ alter table app_users add column language text;             -- en, fr, de; null 
 
 ## Steps
 
-1. "I'm going": the table, the routes, the buttons, the count and the list.
-2. The battle setting, and Open for solo battles.
-3. With approval: solo requests with accept and decline, then team requests with the teammate picker.
-4. Emails, with the account language.
+1. "I'm going": the table, the routes, the buttons, the count and the list. Done 2026-11-15. Where it differs from the UI brief:
+   - **No "Add to calendar" beside "You're going":** the action bar (phones) and the action card (desktop) right there already offer it, and two equal buttons cut "You're going" and "Add to calendar" to "You're goi…" at 375px. The sheet keeps it.
+   - **The two buttons wrap** instead of sharing the row equally: side by side while both labels fit whole (desktop), one full-width row each on phones, where "Register to battle" and "I'm going" don't fit at 375px.
+   - **The count opens "Who's going"**, the verified dancers by name and "and N others" (the author's decision), and the sheet's last line says so: "Only verified dancers are named. Everyone else is just counted."
+   - **The sheet's pill comes under its title**, as the shared Dialog puts the title first.
+   - The action bar and card are unchanged: with a registration link, "Register to battle" shows both there and beside "I'm going".
+2. The battle setting, and Open for solo battles. Done 2026-11-15. Where it differs from the UI brief, or settles what it left open:
+   - **No action on past jams:** the brief's "Registration closed" pill would sit under the results of every past jam, the imported ones included. Live and cancelled jams show it.
+   - **With approval** shows, disabled, tagged "Soon"; the API refuses it (422 `registration`) until step 3.
+   - **Withdraw deletes the entry**, so the place is free and the dancer may enter again; it works for a solo entry the organiser gave by hand too, in an open battle. A team entry can't be left this way (409): the organiser removes it.
+   - **"Get verified to enter"** leads to the viewer's own page, where "This is me" starts the check, else to the welcome step that finds or makes it.
+   - **German "Enter a battle"** is "Mitmachen": "Bei einem Battle mitmachen" ran past a 320px screen.
+   - The battle card keeps every entrant as a chip: no "+7 more".
+   - From the walkthrough on an iPhone-sized browser against the real API (2026-11-16): errors and the "back to By the organiser" note show inside the sheets, as toasts sit under an open `<dialog>`; a double tap or another tab no longer shows an error; "Enter a battle" shows only while this viewer has a battle to enter; the "You’re in" row wraps at 320px; "Keep my place" is "Rester" / "Bleiben" so both footer buttons fit.
+   - From the code review (2026-11-17): entering and leaving check the battle and the jam again under their locks; "full" and "already in" have error codes of their own (`battle_full`, `already_entered`); the jam says `takes_attendees` and `takes_entries`, so the page keeps no copy of those rules; the enter sheet shows the battle's own day; the team size also brings the "back to By the organiser" note; every "Contact the organiser" opens an Instagram DM in a new tab.
+   - From the second code review (2026-11-18): merging a page moves it out of waiting team requests too; a jam that is over or called off stops counting in the account menu's Requests; a solo request takes no team name, and none takes control characters (the name heads the organiser's email); `/auth/me` says the account's language, and the site sends its own once when it is unknown (Google sign-ins, older sessions); a request is checked with the entry rules `accept` uses; each email reads the battle's jam once.
+3. With approval: solo requests with accept and decline, then team requests with the teammate picker. Done 2026-11-17. Decisions taken while building it:
+   - **Only battles of fixed size** take requests (422 `registration` otherwise), as a request is a full team.
+   - **Teammates not on BreakingJam** get their page from the captain's picker before the request is sent, so `POST /api/dancers` now also lets an account with a verified page make a page for someone else. A declined request can leave such pages unused (accepted in the decisions above).
+   - **The organiser and `seed_admin`+** answer from the jam page; the account menu lists only the account's own jams.
+   - **Accepting works whatever the mode is now**, while the request waits: switching a battle away from With approval doesn't drop the requests already sent.
+   - **A full battle**: asking is refused (`battle_full`) and Accept is disabled; Decline still works.
+   - **A declined dancer** has no button to ask again (as the UI brief), but the API lets them: a request is only refused while another of theirs waits.
+   - Not designed by the UI brief, so drawn here: the team part of the Ask sheet (team name, teammates picker, "Add 1 more dancer…") and the team card of the Requests sheet (the team's name over one row per member).
+   - Merging a dancer page doesn't move its requests: a waiting one stays on the merged page's id until it is answered.
+4. Emails, with the account language. Done 2026-11-18:
+   - **The organiser** gets one email per dancer who enters an open battle or asks (a team named by its team name), at the login email, in their own language. No daily digest (the author's decision over the UI brief's).
+   - **The dancer** gets "Request sent", then "You're in" (the battle's day and start, the venue) or "Your request for …" (declined), each with the jam page's link.
+   - **The account's language** is kept at sign-up, at each login, and when the site's language is switched (`PUT /api/auth/language`); accounts that haven't said read English until their next login.
+   - **Nothing is sent** when a dancer withdraws or cancels a request, nor when an organiser adds a dancer by hand.
+   - The lines the UI brief held back until now are in: "You get an email when the organiser answers.", "You get an email with the answer. You can cancel the request any time.", "Whoever asked gets an email with your answer." (the brief's "Each dancer gets…" was wrong for teams: only the captain is emailed)
+   - From the walkthrough against the real API with a mail catcher (2026-11-18): an accepted team's email no longer tells its captain to withdraw (a team leaves through the organiser); dates are written out as in a sentence ("Sunday 13 December", "dimanche 13 décembre", "Sonntag, 13. Dezember"), not in the flyer's short forms; a request sent seconds ago reads "now"; the place counts take their plural forms ("1 inscrit sur 8", "1 of 1 place taken").
+   - Decided after the walkthrough (2026-11-18): cancelling and asking again emails the organiser twice a day at most per asker and battle (`request_mails`, as the 6-digit codes are capped); the asker still gets "Request sent" each time. A team's other members stay unemailed: only the captain hears.
 
 Each step updates ARCHITECTURE.md, DESIGN.md and the privacy page for what it adds.
 

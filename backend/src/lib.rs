@@ -7,6 +7,7 @@ pub mod config;
 pub mod dataset;
 pub mod db;
 pub mod domain;
+pub mod entry_mail;
 pub mod error;
 pub mod flyer;
 pub mod mail;

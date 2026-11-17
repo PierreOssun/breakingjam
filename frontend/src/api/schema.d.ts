@@ -92,6 +92,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/language": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Keep the language the account reads its emails in, as the site's language is switched (M32). */
+        put: operations["set_language"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/google": {
         parameters: {
             query?: never;
@@ -355,6 +372,28 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events/{id}/going": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who is going to a jam. */
+        get: operations["list_going"];
+        /** Say you are going to a jam; saying it twice changes nothing. */
+        put: operations["add_going"];
+        post?: never;
+        /**
+         * Take back "I'm going"; possible whatever the jam's state, so no one stays listed against
+         *     their will.
+         */
+        delete: operations["remove_going"];
         options?: never;
         head?: never;
         patch?: never;
@@ -663,6 +702,149 @@ export interface paths {
         put: operations["replace_staff"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/battles/{id}/enter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enter an open battle as yourself: your verified page, confirmed at once; you're going too. */
+        post: operations["enter_battle"];
+        /**
+         * Leave a battle you entered, or were entered in alone, while registration is open; you stay
+         *     going to the jam.
+         */
+        delete: operations["leave_battle"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/battles/{id}/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask to enter a battle "with approval": alone, or as a team's captain with a full team. */
+        post: operations["ask_to_enter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events/{id}/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The requests waiting in a jam's battles, oldest first: for its writers, who see each
+         *     member's Instagram handle even when the page hides it.
+         */
+        get: operations["list_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events/{id}/requests/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The caller's latest request in each battle of a jam: waiting, accepted or declined. */
+        get: operations["my_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/requests/waiting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The caller's own jams with requests waiting, for the account menu. */
+        get: operations["waiting_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/requests/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept a request: its dancers become a confirmed entry, and the asker is going. */
+        post: operations["accept_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/requests/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline a request; the dancer sees it was declined. */
+        post: operations["decline_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Take back your own request while it waits. */
+        delete: operations["cancel_request"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1214,6 +1396,8 @@ export interface components {
              * @description When it starts, as wall-clock time in the jam's timezone; null until announced.
              */
             starts_at?: string | null;
+            /** @description How dancers enter it. */
+            registration: components["schemas"]["BattleRegistration"];
             /**
              * Format: date-time
              * @description Row creation time.
@@ -1294,6 +1478,8 @@ export interface components {
              * @description When it starts, wall-clock time in the jam's timezone, on one of its days; null = not announced.
              */
             starts_at?: string | null;
+            /** @description How dancers enter it; `organizer` when omitted. `open` is for solo battles only. */
+            registration?: components["schemas"]["BattleRegistration"];
         };
         /**
          * @description How a battle is run.
@@ -1327,6 +1513,33 @@ export interface components {
             gender: components["schemas"]["BattleGender"];
             /** @description Age category. */
             age: components["schemas"]["BattleAge"];
+        };
+        /**
+         * @description How dancers enter a battle (M32).
+         * @enum {string}
+         */
+        BattleRegistration: "organizer" | "approval" | "open";
+        /** @description A request waiting for the organiser, with who it would enter. */
+        BattleRequest: {
+            /**
+             * Format: uuid
+             * @description Primary key, UUIDv7.
+             */
+            id: string;
+            /**
+             * Format: uuid
+             * @description The battle asked for.
+             */
+            battle_id: string;
+            /** @description The team's name; null for a solo battle. */
+            team_name?: string | null;
+            /**
+             * Format: date-time
+             * @description When it was sent.
+             */
+            created_at: string;
+            /** @description The asker first, then their teammates. */
+            members: components["schemas"]["RequestMember"][];
         };
         /**
          * @description Furthest stage an entry reached; `Winner` is first place.
@@ -1915,7 +2128,7 @@ export interface components {
             phase: components["schemas"]["Phase"];
         };
         /** @description A jam page: the jam, and what the caller may do with it. */
-        EventResponse: components["schemas"]["Event"] & {
+        EventResponse: components["schemas"]["Event"] & components["schemas"]["Going"] & {
             /**
              * @description Whether the caller may edit its details, flyer and lineup or delete it; no longer for its
              *     organiser once it is public and over.
@@ -1926,6 +2139,10 @@ export interface components {
             /** @description The status changes the caller may make now. */
             actions: components["schemas"]["Transition"][];
             organizer?: components["schemas"]["OrganizerRef"] | null;
+            /** @description Whether people may say they are going: announced, not called off, not over (M32). */
+            takes_attendees: boolean;
+            /** @description Whether dancers may enter or leave its open battles themselves now (M32). */
+            takes_entries: boolean;
         };
         /**
          * @description Lifecycle of a jam (§4 "Event status transitions").
@@ -1972,6 +2189,31 @@ export interface components {
         Geo: {
             /** @description ISO 3166-1 alpha-2 of the visitor's country; null when unknown. */
             country?: string | null;
+        };
+        /** @description How many are going to a jam, and whether the caller is. */
+        Going: {
+            /**
+             * Format: int64
+             * @description Accounts that said they are going.
+             */
+            going_count: number;
+            /** @description Whether the caller is one of them; false when logged out. */
+            going: boolean;
+        };
+        /** @description Who is going: the verified dancers by name, and how many others. */
+        GoingList: {
+            /**
+             * Format: int64
+             * @description Accounts going, named or not.
+             */
+            going_count: number;
+            /** @description The verified dancer pages of the accounts going. */
+            dancers: components["schemas"]["DancerRef"][];
+            /**
+             * Format: int64
+             * @description Accounts going without a verified page: counted, never named.
+             */
+            others: number;
         };
         /** @description Body of `GET /api/health`. */
         HealthResponse: {
@@ -2047,6 +2289,11 @@ export interface components {
          * @enum {string}
          */
         Language: "en" | "fr" | "de";
+        /** @description Body of `PUT /auth/language`. */
+        LanguageRequest: {
+            /** @description The site's language now. */
+            language: components["schemas"]["Language"];
+        };
         /** @description Body of `POST /auth/login`. */
         LoginRequest: {
             /** @description Login email, case-insensitive. */
@@ -2205,6 +2452,21 @@ export interface components {
         MyClaim: components["schemas"]["Claim"] & {
             /** @description Another account has a pending claim on the same page; both go to review. */
             others_pending: boolean;
+        };
+        /** @description The asker's view of their latest request in a battle. */
+        MyRequest: {
+            /**
+             * Format: uuid
+             * @description Primary key, UUIDv7.
+             */
+            id: string;
+            /**
+             * Format: uuid
+             * @description The battle asked for.
+             */
+            battle_id: string;
+            /** @description Pending until the organiser answers. */
+            status: components["schemas"]["ClaimStatus"];
         };
         /** @description An organiser's page; never the account's email or role. */
         Organizer: {
@@ -2647,6 +2909,20 @@ export interface components {
             /** @description What the organiser should change, shown on their jam editor. */
             note: string;
         };
+        /** @description What a dancer sends: for a team battle, the team's name and the teammates beside them. */
+        RequestFields: {
+            /** @description The team's name; null for a solo battle, blank is stored as null. */
+            team_name?: string | null;
+            /** @description The other members, by page; empty for a solo battle. The asker leads the team. */
+            teammates?: string[];
+        };
+        /** @description Someone a request would enter, as its organiser sees them. */
+        RequestMember: components["schemas"]["DancerRef"] & {
+            /** @description The handle is hidden on the public page. */
+            instagram_hidden: boolean;
+            /** @description The page is verified. */
+            verified: boolean;
+        };
         /** @description Body of `POST /auth/password/reset`. */
         ResetPasswordRequest: {
             /** @description Login email, case-insensitive. */
@@ -2822,6 +3098,7 @@ export interface components {
             /** @description Account role, snake_case. */
             role: components["schemas"]["Role"];
             dancer?: components["schemas"]["OwnPage"] | null;
+            language?: components["schemas"]["Language"] | null;
         };
         /** @description Body of `POST /auth/email/verify`. */
         VerifyEmailRequest: {
@@ -2829,6 +3106,23 @@ export interface components {
             email: string;
             /** @description The 6 digits mailed to it. */
             code: string;
+        };
+        /** @description The jams of an organiser with requests waiting, for the account menu. */
+        WaitingRequests: {
+            /**
+             * Format: uuid
+             * @description The jam.
+             */
+            id: string;
+            /** @description Its name. */
+            name: string;
+            /** @description Its page. */
+            slug: string;
+            /**
+             * Format: int64
+             * @description Requests waiting in its battles.
+             */
+            count: number;
         };
         /** @description Who won one battle. */
         Winner: {
@@ -3024,6 +3318,46 @@ export interface operations {
             };
             /** @description No valid session */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    set_language: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LanguageRequest"];
+            };
+        };
+        responses: {
+            /** @description Kept */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3813,6 +4147,126 @@ export interface operations {
             };
         };
     };
+    list_going: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoingList"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    add_going: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Going"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The jam is not announced, called off or over: no one can say they are going */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    remove_going: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Going"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     search_dancers: {
         parameters: {
             query?: {
@@ -3880,7 +4334,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Below `organizer`, or titles or `instagram_hidden` below `seed_admin` */
+            /** @description Below `organizer` without a verified page of one's own, or titles or `instagram_hidden` below `seed_admin` */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4914,7 +5368,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description A dancer is already entered in this battle, or the battle is full */
+            /** @description `already_entered`: a dancer is in this battle already; `battle_full`: no place left */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -4985,7 +5439,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description A dancer is already entered in this battle, or the battle is full */
+            /** @description `already_entered`: a dancer is in this battle already; `battle_full`: no place left */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -5208,6 +5662,472 @@ export interface operations {
             };
             /** @description Invalid fields */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    enter_battle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Battle id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The account has no verified dancer page */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such battle, or its jam is a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not open to enter or registration closed (`conflict`), in already (`already_entered`), or full (`battle_full`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    leave_battle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Battle id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Left */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The account has no verified dancer page */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such battle, or you are not in it */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Registration closed, the organiser adds its dancers, or a team entry */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    ask_to_enter: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Battle id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestFields"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyRequest"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The account has no verified dancer page */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such battle, or its jam is a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not taking requests or registration closed (`conflict`), `already_requested`, `already_entered` or `battle_full` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_requests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BattleRequest"][];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not the jam's organiser nor `seed_admin`+ */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    my_requests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jam id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyRequest"][];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such jam, or a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    waiting_requests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitingRequests"][];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    accept_request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Request id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not the jam's organiser nor `seed_admin`+ */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such request, or its jam is a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Answered already (`conflict`), `already_entered` or `battle_full` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Invalid fields */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    decline_request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Request id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Declined */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not the jam's organiser nor `seed_admin`+ */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No such request, or its jam is a draft you can't see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Answered already */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    cancel_request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Request id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancelled */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No waiting request of yours by that id */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

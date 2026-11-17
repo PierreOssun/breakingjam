@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into request_mails (battle_id, user_id) values ($1, $2)\n         on conflict (battle_id, user_id) do update\n           set sends = case when request_mails.day_started_at < now() - interval '1 day'\n                            then 1 else request_mails.sends + 1 end,\n               day_started_at = case when request_mails.day_started_at < now() - interval '1 day'\n                                     then now() else request_mails.day_started_at end\n           where request_mails.sends < 2\n              or request_mails.day_started_at < now() - interval '1 day'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a2bfc3b7418db972c0802f7dd8c31667b6603c8c7e0c31240b7301ba2367892e"
+}

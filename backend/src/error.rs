@@ -30,6 +30,15 @@ pub enum AppError {
     /// 409: a uniqueness rule or a status transition was violated.
     #[error("{0}")]
     Conflict(String),
+    /// 409 `battle_full`: the battle has no place left (`max_entries`), so a page can tell.
+    #[error("battle is full")]
+    BattleFull,
+    /// 409 `already_entered`: a dancer of the entry is in the battle already (a double tap, M32).
+    #[error("a dancer is already entered in this battle")]
+    AlreadyEntered,
+    /// 409 `already_requested`: the dancer's request for this battle is waiting already (M32).
+    #[error("a request for this battle is waiting already")]
+    AlreadyRequested,
     /// 503: too much heavy work (password hashes, share images) already waits; retry shortly.
     #[error("busy, try again in a moment")]
     Busy,
@@ -79,6 +88,14 @@ pub struct NotJamWriter(pub ErrorEnvelope);
     description = "The jam is public and over: only its battles and results change"
 )]
 pub struct JamOver(pub ErrorEnvelope);
+
+/// 409 of "I'm going" on a jam that takes no one (M32).
+#[derive(IntoResponses)]
+#[response(
+    status = 409,
+    description = "The jam is not announced, called off or over: no one can say they are going"
+)]
+pub struct NotTakingAttendees(pub ErrorEnvelope);
 
 /// 503 of the routes that hash a password or render an image.
 #[derive(IntoResponses)]
@@ -162,6 +179,9 @@ impl AppError {
             Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
             Self::EmailUnverified => (StatusCode::FORBIDDEN, "email_unverified"),
             Self::Conflict(_) => (StatusCode::CONFLICT, "conflict"),
+            Self::BattleFull => (StatusCode::CONFLICT, "battle_full"),
+            Self::AlreadyEntered => (StatusCode::CONFLICT, "already_entered"),
+            Self::AlreadyRequested => (StatusCode::CONFLICT, "already_requested"),
             Self::Busy => (StatusCode::SERVICE_UNAVAILABLE, "busy"),
             Self::Internal(_) => (StatusCode::INTERNAL_SERVER_ERROR, "internal"),
         }

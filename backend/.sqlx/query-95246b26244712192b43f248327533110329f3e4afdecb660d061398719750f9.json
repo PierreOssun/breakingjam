@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update dancers set verified_at = now(),\n           user_id = (select id from app_users where email = $1::text::citext)\n         where id = $2::text::uuid",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "95246b26244712192b43f248327533110329f3e4afdecb660d061398719750f9"
+}

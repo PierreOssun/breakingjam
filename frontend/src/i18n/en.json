@@ -20,7 +20,9 @@
     "contact": "Contact",
     "team": "Team",
     "accountSettings": "Account",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "requests": "Requests",
+    "requestsAt": "Requests · {{name}}"
   },
   "account": {
     "viewPage": "View my page",
@@ -286,6 +288,108 @@
       "title": "You’re the organiser?",
       "body": "The BreakingJam team added this jam. Write to us to run its page yourself, or to fix what’s wrong.",
       "cta": "Contact us"
+    },
+    "going": {
+      "button": "I’m going",
+      "you": "You’re going",
+      "count_one": "{{count}} going",
+      "count_other": "{{count}} going",
+      "seeYou": "See you on {{day}}",
+      "share": "Share with your crew",
+      "named": "Only verified dancers are named. Everyone else is just counted.",
+      "leave": "I’m not going any more",
+      "who": "Who’s going",
+      "others_one": "and {{count}} other",
+      "others_other": "and {{count}} others",
+      "failed": "Couldn’t save that. Try again.",
+      "enterBattle": "Enter a battle"
+    },
+    "entry": {
+      "setting": {
+        "open": "Open · dancers enter directly",
+        "organizer": {
+          "dancers": "By the organiser · you add the dancers",
+          "teams": "By the organiser · you add the teams"
+        },
+        "approval": "With approval · no requests waiting"
+      },
+      "change": "Change",
+      "closed": "Registration closed",
+      "site": "Register on the organiser’s site",
+      "siteLine": "Opens the organiser’s own registration page.",
+      "contact": "Contact the organiser",
+      "contactLine": {
+        "dancers": "The organiser adds the dancers.",
+        "teams": "The organiser adds the teams."
+      },
+      "in": "You’re in",
+      "withdraw": "Withdraw",
+      "inLine": "You can withdraw until registration closes.",
+      "full": "Battle is full",
+      "login": "Log in to enter",
+      "loginLine": "You need a verified dancer page to enter.",
+      "verify": "Get verified to enter",
+      "verifyLine": "Only verified dancers can enter. Verification is a manual check and can take a day.",
+      "enter": "Enter battle",
+      "enterLine": "You enter directly.",
+      "placesLeft_one": "1 place left.",
+      "placesLeft_other": "{{count}} places left.",
+      "title": "Enter {{name}}",
+      "as": "Entering as",
+      "starts": "{{name}} starts {{time}}",
+      "note": "Your name appears on the jam page straight away. You can withdraw until registration closes.",
+      "filled": "This battle just filled up.",
+      "withdrawTitle": "Withdraw from {{name}}?",
+      "withdrawBody": "Your place goes back to the battle. You can enter again while registration is open.",
+      "keep": "Keep my place",
+      "you": "{{name}} · you",
+      "waiting_one": "{{count}} request waiting",
+      "waiting_other": "{{count}} requests waiting",
+      "review": "Review",
+      "pending": "Request sent",
+      "cancelRequest": "Cancel request",
+      "pendingLine": "You get an email when the organiser answers.",
+      "declined": "Request declined",
+      "declinedLine": "The organiser declined your request.",
+      "ask": "Ask to enter",
+      "askLine": "The organiser accepts or declines your request.",
+      "inTeamLine": "Your team is in. Only the organiser can take it out.",
+      "fullLine_one": "{{count}} of {{count}} place taken.",
+      "fullLine_other": "{{count}} of {{count}} places taken.",
+      "taken_one": "{{count}} of {{max}} places taken",
+      "taken_other": "{{count}} of {{max}} places taken"
+    },
+    "ask": {
+      "title": "Ask to enter {{name}}",
+      "intro": "The organiser looks at your request and accepts or declines it.",
+      "as": "Asking as",
+      "teamName": "Team name",
+      "teammates": "Teammates",
+      "missing_one": "Add {{count}} more dancer to make the team.",
+      "missing_other": "Add {{count}} more dancers to make the team.",
+      "igHidden": "The organiser will see your Instagram @{{handle}}, even though it is hidden on your page.",
+      "igPublic": "The organiser will see your Instagram @{{handle}}.",
+      "igNone": "You have no Instagram on your page. The organiser will only see your name.",
+      "addIg": "Add Instagram",
+      "send": "Send request",
+      "cancelAnyTime": "You get an email with the answer. You can cancel the request any time.",
+      "teammateIn": "A teammate is in this battle already."
+    },
+    "requests": {
+      "title": "Requests",
+      "waiting_one": "{{count}} waiting",
+      "waiting_other": "{{count}} waiting",
+      "full": "full",
+      "accept": "Accept",
+      "decline": "Decline",
+      "hidden": "hidden on their page",
+      "empty": "No requests waiting.",
+      "footer": "Accepted dancers appear on the jam page. Whoever asked gets an email with your answer.",
+      "filled": "This battle is full.",
+      "entered_one": "{{count}} of {{max}} entered",
+      "entered_other": "{{count}} of {{max}} entered",
+      "enteredNoMax_one": "{{count}} entered",
+      "enteredNoMax_other": "{{count}} entered"
     }
   },
   "dancer": {
@@ -555,7 +659,31 @@
         "results": "Results"
       },
       "prizeSuggested": "For this jam",
-      "prizeAll": "All currencies"
+      "prizeAll": "All currencies",
+      "entry": {
+        "label": "Who can enter",
+        "modes": {
+          "organizer": "By the organiser",
+          "approval": "With approval",
+          "open": "Open"
+        },
+        "default": "Default",
+        "soloOnly": "Solo only",
+        "organizerLine": {
+          "dancers": "You add the dancers yourself. Dancers reach you through Contact.",
+          "teams": "You add the teams yourself. Dancers reach you through Contact."
+        },
+        "openLine": "Verified dancers enter directly, until the battle is full.",
+        "soloOnlyLine": "For solo battles only. A team needs your approval.",
+        "openDropped": "A team can’t enter by itself: who can enter is back to By the organiser.",
+        "approvalLine": {
+          "dancers": "Verified dancers ask to enter. You see their Instagram, then accept or decline.",
+          "teams": "Verified dancers ask with a full team. You see their Instagram, then accept or decline."
+        },
+        "needsSize": "Needs a size",
+        "needsSizeLine": "Set a team size under More options: a team asks as a full team.",
+        "approvalDropped": "Without a team size a team can’t ask: who can enter is back to By the organiser."
+      }
     },
     "entries": {
       "manage": "Edit entries",
@@ -1140,7 +1268,7 @@
   },
   "privacy": {
     "title": "Privacy",
-    "updated": "Last updated: 11 November 2026",
+    "updated": "Last updated: 15 November 2026",
     "intro": "BreakingJam lists breaking jams and their results. This page says what we keep about you, why, and how to have it changed or removed.",
     "sections": [
       {
@@ -1154,7 +1282,7 @@
         "body": [
           "With an email sign-up we keep your email, your name and a hash of your password, never the password itself.",
           "With Google sign-in we receive your email, your name and Google’s identifier for your account. We never see your Google password.",
-          "We email you only the codes that confirm your address or reset your password.",
+          "We email you the codes that confirm your address or reset your password, and news of the battles you enter or ask to enter: your request, and the organiser’s answer. If you run a jam, we email you each time a dancer enters one of its battles or asks to.",
           "One cookie keeps you logged in. Your language and theme are remembered in your browser. There are no ads, no trackers and no analytics."
         ]
       },
@@ -1171,6 +1299,15 @@
         "title": "Jams you register",
         "body": [
           "A jam’s details, flyer and organiser name are public once the jam is approved."
+        ]
+      },
+      {
+        "title": "Jams you’re going to",
+        "body": [
+          "When you tap “I’m going”, we keep that your account is going to that jam. The jam page shows how many people are going.",
+          "If your dancer page is verified, it is named in the list of who’s going; otherwise you are only counted. Tap “You’re going” to take it back at any time.",
+          "When you enter a battle yourself, your dancer page shows in its entries at once and you are marked as going. Withdrawing removes the entry.",
+          "When you ask to enter a battle, its organiser sees your dancer page and its Instagram handle, even if you hide it on your page."
         ]
       },
       {

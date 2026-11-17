@@ -2,12 +2,13 @@
 
 use std::collections::HashMap;
 
-use sqlx::{PgConnection, PgPool};
+use sqlx::{PgConnection, PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::{
     auth::google::Profile,
     domain::user::{Account, AccountView, Role, User},
+    mail::Language,
 };
 
 /// Inserts a password account with the default `user` role.
@@ -281,4 +282,42 @@ pub async fn emails(pool: &PgPool, ids: &[Uuid]) -> sqlx::Result<HashMap<Uuid, S
     .fetch_all(pool)
     .await?;
     Ok(rows.into_iter().map(|r| (r.id, r.email)).collect())
+}
+
+/// Keeps the language the account reads its emails in (M32).
+pub async fn set_language(
+    db: impl PgExecutor<'_>,
+    id: Uuid,
+    language: Language,
+) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update app_users set language = $2 where id = $1",
+        id,
+        language.code(),
+    )
+    .execute(db)
+    .await?;
+    Ok(())
+}
+
+/// The language the account reads the site in; none until a client said.
+pub async fn language(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<Option<Language>> {
+    let code = sqlx::query_scalar!("select language from app_users where id = $1", id)
+        .fetch_one(db)
+        .await?;
+    Ok(code.as_deref().and_then(Language::parse))
+}
+
+/// Where and in which language to email an account: its login email, confirmed or Google's.
+pub async fn mail_to(
+    db: impl PgExecutor<'_>,
+    id: Uuid,
+) -> sqlx::Result<Option<(String, Language)>> {
+    let row = sqlx::query!(
+        r#"select email::text as "email!", language from app_users where id = $1"#,
+        id
+    )
+    .fetch_optional(db)
+    .await?;
+    Ok(row.map(|r| (r.email, Language::from_code(r.language.as_deref()))))
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, event_id, name, format as \"format: BattleFormat\", team_size,\n                  gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                  bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at, created_at, updated_at\n           from battles where id = $1",
+  "query": "update battles set\n             name = $2, format = $3, team_size = $4, gender = $5, age = $6, age_min = $7,\n             age_max = $8, bracket_size = $9, max_entries = $10, prize_currency = $11,\n             prize_first = $12, prize_second = $13, prize_third = $14, starts_at = $15,\n             registration = $16\n           where id = $1\n           returning id, event_id, name, format as \"format: BattleFormat\", team_size,\n                     gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                     bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at,\n                  registration as \"registration: BattleRegistration\", created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -226,6 +226,28 @@
       },
       {
         "ordinal": 17,
+        "name": "registration: BattleRegistration",
+        "type_info": {
+          "Custom": {
+            "name": "battle_registration",
+            "kind": {
+              "Enum": [
+                "organizer",
+                "approval",
+                "open"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "registration"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -236,7 +258,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -249,7 +271,67 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Uuid",
+        "Text",
+        {
+          "Custom": {
+            "name": "battle_format",
+            "kind": {
+              "Enum": [
+                "team",
+                "seven_to_smoke",
+                "na",
+                "showcase"
+              ]
+            }
+          }
+        },
+        "Int2",
+        {
+          "Custom": {
+            "name": "battle_gender",
+            "kind": {
+              "Enum": [
+                "bboy",
+                "bgirl",
+                "mixed"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "battle_age",
+            "kind": {
+              "Enum": [
+                "kids",
+                "adult",
+                "na"
+              ]
+            }
+          }
+        },
+        "Int2",
+        "Int2",
+        "Int2",
+        "Int4",
+        "Bpchar",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Timestamp",
+        {
+          "Custom": {
+            "name": "battle_registration",
+            "kind": {
+              "Enum": [
+                "organizer",
+                "approval",
+                "open"
+              ]
+            }
+          }
+        }
       ]
     },
     "nullable": [
@@ -271,8 +353,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "bbe7955b92cdc879c7b4467faa91eeea3597fbb2953f4140f744c80c3dddc611"
+  "hash": "c14004dc32344bc5d75412098a94cde6a257b4fe8facc3d3ecaf24ac1ad8b168"
 }

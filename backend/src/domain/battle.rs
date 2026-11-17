@@ -80,6 +80,22 @@ pub enum EntryStatus {
     Withdrawn,
 }
 
+/// How dancers enter a battle (M32).
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
+)]
+#[sqlx(type_name = "battle_registration", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum BattleRegistration {
+    /// The organiser adds them; dancers reach the organiser (today's behaviour).
+    #[default]
+    Organizer,
+    /// Verified dancers ask, and the organiser accepts or declines.
+    Approval,
+    /// Verified dancers enter directly until the battle is full; solo battles only.
+    Open,
+}
+
 /// What a staff member does at a jam.
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, sqlx::Type, utoipa::ToSchema,
@@ -131,6 +147,8 @@ pub struct Battle {
     pub position: i16,
     /// When it starts, as wall-clock time in the jam's timezone; null until announced.
     pub starts_at: Option<NaiveDateTime>,
+    /// How dancers enter it.
+    pub registration: BattleRegistration,
     /// Row creation time.
     pub created_at: DateTime<Utc>,
     /// Last write, maintained by a trigger.
@@ -190,7 +208,8 @@ impl Battle {
     schema(function = "age_bounds_match_category"),
     schema(function = "age_max_not_below_min"),
     schema(function = "bracket_size_is_valid"),
-    schema(function = "prizes_have_a_currency")
+    schema(function = "prizes_have_a_currency"),
+    schema(function = "registration_fits")
 )]
 pub struct BattleFields {
     /// Free text; blank means "generate from the structured fields".
@@ -230,6 +249,24 @@ pub struct BattleFields {
     pub prize_third: Option<i32>,
     /// When it starts, wall-clock time in the jam's timezone, on one of its days; null = not announced.
     pub starts_at: Option<NaiveDateTime>,
+    /// How dancers enter it; `organizer` when omitted. `open` is for solo battles only.
+    #[serde(default)]
+    pub registration: BattleRegistration,
+}
+
+// A team entering by itself could name anyone as a teammate: the organiser approves teams. A
+// request is a full team, so it needs a battle that says how many that is.
+fn registration_fits(fields: &BattleFields) -> Result<(), ValidationError> {
+    let size = entry_size(fields.format, fields.team_size);
+    match fields.registration {
+        BattleRegistration::Open if size != Some(1) => {
+            Err(rule("registration", "open is for solo battles"))
+        }
+        BattleRegistration::Approval if size.is_none() => {
+            Err(rule("registration", "with approval needs a team size"))
+        }
+        _ => Ok(()),
+    }
 }
 
 // The §4 table checks, so a bad combination is a 422 naming the field, not a DB error.
@@ -363,6 +400,25 @@ pub struct EntryFields {
 }
 
 impl EntryFields {
+    /// A dancer entering by themselves (M32): alone, confirmed at once, no result yet.
+    pub fn solo(dancer_id: Uuid) -> Self {
+        Self::confirmed(None, vec![dancer_id])
+    }
+
+    /// An entry its dancers asked for, confirmed as it goes in (M32), with no result yet.
+    pub fn confirmed(team_name: Option<String>, dancer_ids: Vec<Uuid>) -> Self {
+        Self {
+            team_name,
+            crew_id: None,
+            dancer_ids,
+            status: EntryStatus::Confirmed,
+            reached: BracketStage::Na,
+            final_rank: None,
+            video_url: None,
+            video_offset_seconds: None,
+        }
+    }
+
     /// Fills derived values: `final_rank` from `reached`, canonical YouTube URL, blank → null.
     pub fn normalize(&mut self) {
         if self.final_rank.is_none() {

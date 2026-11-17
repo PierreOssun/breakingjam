@@ -27,6 +27,7 @@ This document is the source of truth for the project and evolves with it. Anythi
 - Seed data: the curated past jams of `data/` with their dancers and crews, added to production by the **Import data** workflow (`data import`, owned by the team's `seed_admin` account), and well-known dancers entered by a `seed_admin` (see roles in §5).
 - Crew CRUD and crew membership (dated).
 - Battles per jam (1v1, 2v2 … 10v10, seven-to-smoke; bboy/bgirl/mixed; kids/adult) and entries (the organiser's record of the lineup and results; `pending` means the team isn't complete yet) with members and the stage reached.
+- Entering battles (M32): each battle says who can enter: **by the organiser** (the default, as before: dancers use Contact or the jam's registration link), **with approval** (step 3, 2026-11-17: a verified dancer asks, alone or as a team's captain with a full team, and the organiser or `seed_admin`+ accepts, which makes a normal entry, or declines; a request is never public, and the organiser sees each member's Instagram even when their page hides it; battles of fixed size only) or **open** (solo battles only: a verified dancer enters from the battle card, confirmed at once, until it is full, and may withdraw until registration closes). Entering marks the account as going. Only while the jam is published and upcoming; the battle card says what each viewer can do (DESIGN.md §4.46).
 - Jam phases (M26): a jam is **upcoming**, **live** (today is one of its days) or **past**, by its own calendar in its timezone, never by a status someone has to set. Live jams are a group of their own on the dancer and organiser pages and wear a "Live now" chip on cards. Once a public jam is past, its organiser can still record its battles, entries, results and videos, but no longer edit its details, flyer or lineup, change its status or delete it; the BreakingJam team (`seed_admin`+) still can, to fix history.
 - Event staff (judges, DJ, MC).
 - Auth: email + password, and Google OAuth. Session cookies. A password account logs in only once its email is confirmed with a 6-digit code mailed to it, and "Forgot password" mails the same kind of code (M27).
@@ -167,6 +168,7 @@ create table app_users (
   bio text,
   verified_at timestamptz,            -- set when an admin confirms the handle; cleared when it changes
   last_seen_at timestamptz,           -- M31: set when a session starts and when `GET /auth/me` slides it
+  language text check (language in ('en', 'fr', 'de')),   -- M32: the language its emails go out in; set at sign-up, login and on switching; null reads as English
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -350,6 +352,7 @@ create index on events (organizer_id);
 create type battle_format as enum ('team', 'seven_to_smoke', 'na', 'showcase');   -- showcase added in M24; na = not known
 create type battle_gender as enum ('bboy', 'bgirl', 'mixed');   -- mixed = open to both
 create type battle_age as enum ('kids', 'adult', 'na');
+create type battle_registration as enum ('organizer', 'approval', 'open');   -- M32; `approval` is refused until step 3
 create type bracket_stage as enum ('prelims', 'top64', 'top32', 'top16', 'top8', 'top4', 'top2', 'winner', 'na');
 
 create table battles (
@@ -370,6 +373,7 @@ create table battles (
   prize_third integer check (prize_third >= 0),
   position smallint not null default 0,   -- display order on the jam page
   starts_at timestamp,                    -- wall-clock start in the jam's timezone, on one of its days (API-checked); null = not announced (M18)
+  registration battle_registration not null default 'organizer',   -- M32: who enters it; `open` only for solo battles (API-checked)
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   check (format <> 'team' or team_size is not null),
@@ -432,6 +436,40 @@ create table event_staff (
 );
 create index on event_staff (dancer_id);
 
+create table battle_requests (        -- M32 step 3: asking to enter a battle "with approval"; never an entry
+  id uuid primary key,
+  battle_id uuid not null references battles(id) on delete cascade,
+  user_id uuid not null references app_users(id) on delete cascade,   -- the account that asked
+  dancer_id uuid not null references dancers(id),                      -- its verified page: the dancer, or a team's captain
+  team_name text,
+  status claim_status not null default 'pending',                       -- pending, approved, rejected; a cancelled one is deleted
+  decided_by uuid references app_users(id) on delete set null,
+  decided_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create unique index battle_requests_one_pending on battle_requests (battle_id, dancer_id) where status = 'pending';
+create index on battle_requests (battle_id, status);
+create table battle_request_members (   -- who would enter, the asker first
+  request_id uuid not null references battle_requests(id) on delete cascade,
+  dancer_id uuid not null references dancers(id),
+  position smallint not null,
+  primary key (request_id, dancer_id)
+);
+create table request_mails (            -- "asked to enter" emails to the organiser: 2 a day per asker and battle
+  battle_id uuid not null references battles(id) on delete cascade,
+  user_id uuid not null references app_users(id) on delete cascade,
+  sends smallint not null default 1 check (sends between 1 and 2),
+  day_started_at timestamptz not null default now(),
+  primary key (battle_id, user_id)
+);
+
+create table event_attendees (        -- M32: "I'm going", one row per account and jam
+  event_id uuid not null references events(id) on delete cascade,
+  user_id uuid not null references app_users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (event_id, user_id)
+);
+
 -- M22: GeoNames cities of 15,000+ people, loaded by `cargo run --bin data -- places` (data/places/).
 create table places (
   id uuid primary key,
@@ -485,7 +523,7 @@ Principles: the Instagram handle is the identity key but may be absent; verifica
   4. On approve: `dancers.user_id = claim.user_id`, `verified_at = now()`, other pending claims on that dancer are rejected, the code is invalid. The dancer can now edit their own page.
 - **Edits** (decided in M7b): an *unverified* dancer may be edited only by its creator (usually the organiser who added it during jam registration) or by `seed_admin`/`admin`; every change is written to `dancer_edits`. There are no community edits. On a *verified* dancer only the owner, `seed_admin` or `admin` may edit. A handle change after verification does not touch `user_id` or `verified_at` — ownership is bound to the account, not the string. Anonymous visitors can never edit.
 - **Avatar**: when `avatar_url` is null the frontend renders the generated pixel avatar of DESIGN.md §4.16, seeded by `dancer.id`; whoever may edit the dancer can choose its parts, stored in `avatar` as a spec (decided in M12b; a spec since the Nov 2026 avatar rework). The API checks every slot and value it is sent (`domain::dancer::avatar_shape`) and never draws. Flags are chips beside it, never drawn into it. Verified dancers may upload a picture (`POST /api/dancers/{id}/avatar`, image ≤ 2 MB, stored on R2) — **deferred** (decided in M7b); it can reuse the flyer upload's store and crop (M19). Instagram pictures are never fetched.
-- **Merge**: `POST /api/admin/dancers/{id}/merge {into}` moves `entry_members`, `event_staff`, `crew_memberships`, `dancer_claims` to the survivor, unions `aliases`, keeps the survivor's handle (or adopts the loser's if the survivor had none, as hidden as it was), and sets `merged_into_id` on the loser. `GET /api/dancers/{id}` on a merged row returns `301`-style `{ "merged_into": uuid }`; the frontend redirects.
+- **Merge**: `POST /api/admin/dancers/{id}/merge {into}` moves `entry_members`, the teammates of waiting `battle_request_members` (M32), `event_staff`, `crew_memberships`, `dancer_claims` to the survivor, unions `aliases`, keeps the survivor's handle (or adopts the loser's if the survivor had none, as hidden as it was), and sets `merged_into_id` on the loser. `GET /api/dancers/{id}` on a merged row returns `301`-style `{ "merged_into": uuid }`; the frontend redirects.
 
 ### Organiser identity (M12c)
 - The organiser page is the account's public side: `display_name` (shown on their jams), and the `instagram_handle`, `country`, `city`, `bio` columns of `app_users`. Never the email or role. Only accounts that registered a jam (`organizer`+) have one; only its owner edits it.
@@ -506,7 +544,7 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 ## 5. Backend
 
 ### Error handling
-- `AppError` enum in `error.rs`: `NotFound`, `Validation(Vec<FieldError>)`, `Unauthorized`, `Forbidden`, `EmailUnverified`, `Conflict(String)`, `Busy`, `Internal(anyhow::Error)`.
+- `AppError` enum in `error.rs`: `NotFound`, `Validation(Vec<FieldError>)`, `Unauthorized`, `Forbidden`, `EmailUnverified`, `Conflict(String)`, `BattleFull` and `AlreadyEntered` (409 `battle_full` and `already_entered`, M32: the entry rules, so a page tells a full battle and a double tap from other refusals without reading the message), `Busy`, `Internal(anyhow::Error)`.
 - `impl IntoResponse for AppError` → JSON body `{ "error": { "code": "not_found", "message": "...", "fields": [...] } }` with the matching HTTP status. Internal errors are logged with `tracing::error!` and return a generic message. `Busy` is a 503 `busy` with `Retry-After: 2`.
 - `From<sqlx::Error>` maps `RowNotFound` → `NotFound`, unique violations → `Conflict`, rest → `Internal`.
 
@@ -522,6 +560,7 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 - Password hashing: `argon2` (Argon2id, default params) keyed with the site's pepper, `PASSWORD_PEPPER` (a Worker secret, never in the database; M27). The browser sends the plain password over HTTPS.
 - Flood control: a hash takes 19 MiB and a CPU slice, so two run at once and at most 30 wait (`slots.rs`); past that, login, register and reset answer 503 `busy` at once instead of queueing without end, and a request that hangs up gives its place back. The share image (`og.png`) is bounded the same way. In front of that, the Worker counts the three routes that hash, `POST /api/auth/login`, `/register` and `/password/reset` (§9): 60 a minute per IP address and 10 a minute per email, else 429 `too_many_requests` with `Retry-After: 60`, which the auth forms show as "Too many attempts. Wait a minute and try again." Verifying and resending codes are not counted there: they hash nothing and have the limits above. The limits are Cloudflare's rate-limit bindings: approximate, and counted per Cloudflare location. Without the Worker (local development) only the queue bound applies.
 - Email codes (M27): 6 digits from the OS's secure generator, 15 minutes, 5 tries (each try counted in the same statement that compares, so parallel guesses can't skip the count), one new code a minute per account and purpose, and at most 10 a day (so 50 guesses a day, and no email flood). The email goes out in a background task, in the language the frontend sends (en, fr, de). Register does not log in: `POST /auth/email/verify` does. A reset also confirms the email, as the code proves who reads it. A code that confirms an email also unlinks a Google account linked before anyone proved the address (the reverse of `link_google`). Google sign-in needs no code.
+- Battle emails (M32 step 4, `entry_mail.rs`): plain text in the reader's own language, dates written out ("Sunday 13 December") (`app_users.language`, as an organiser's email is triggered from a dancer's browser), sent in the background after the change is saved; a failure is logged, never the request's error. The jam's organiser, at their login email, gets one per dancer who enters an open battle or asks to enter (a team by its name), no digest, and at most two a day per asker and battle however often they cancel and ask again (`request_mails`); the asker gets "request sent", then "you're in" (the battle's day and start, the venue; how to withdraw, or for a team that only the organiser takes it out) or "declined"; a team's other members aren't emailed. Each links to the jam page. Withdrawing and cancelling send nothing.
 - Sessions: `sessions` table, cookie `bj_session` (HttpOnly, Secure, SameSite=Lax, 30-day expiry, rolling). Session id is a UUIDv4 (random, not v7). A login deletes the account's expired sessions; logging out clears the browser's cached data too, so the next person on the device sees nothing of the account.
 - Extractors: `CurrentUser` (required) and `MaybeUser` (optional). `CurrentUser::require(Role::Organizer)` checks a role. Roles are ordered `user < organizer < seed_admin < admin < super_admin`; a check for a role passes for any higher role. The role is read on every request, so a change takes effect at once.
 - Roles:
@@ -535,7 +574,7 @@ Transitions are explicit endpoints (`POST /events/{id}/submit` etc.), not a free
 - Authorization rules:
   - Event write: `organizer_id == user.id`, or `seed_admin`+.
   - Dancer write (unverified): its creator (`created_by`), or `seed_admin`+; logged in `dancer_edits`. Dancer write (verified): `dancer.user_id == user.id`, or `seed_admin`+.
-  - Dancer create: `organizer`+ (from a jam), or `user` for their own page (`source = self`).
+  - Dancer create: `organizer`+ (from a jam), an account with a verified page (a team's teammates when it asks to enter, M32), or `user` for their own page (`source = self`).
   - Crew create: `organizer`+ (from the entry sheet). Crew edit, delete and memberships: `seed_admin`+ (M26: a first draft makes any account an organiser, so `organizer`+ meant anyone; membership self-service later).
   - Jam review, claims review, merge, team roles (seed admins only), overview counts, accounts and histories: `admin`+. Admin roles: `super_admin` only.
 
@@ -547,12 +586,13 @@ GET    /api/docs                         (Swagger UI, with `--features swagger`:
 
 POST   /api/auth/register                {email, password, display_name, language}: 202 {email}, no session; mails a `verify_email` code (M27)
 POST   /api/auth/login                   {email, password, language}: 403 `email_unverified` (and a new code) while the email is not confirmed
+PUT    /api/auth/language            {language}: 204; the account's language, kept for the emails others' actions send it (M32); the frontend sends it when the site's language is switched, and once for an account whose `language` is null (Google sign-ins, sessions older than M32)
 POST   /api/auth/email/verify            {email, code}: confirms the email, ends any other session and logs in; 422 on `code` when wrong, expired or spent
 POST   /api/auth/email/resend            {email, language}: always 204; mails a code to an unconfirmed account, once a minute and 10 times a day
 POST   /api/auth/password/forgot         {email, language}: always 204; mails a `reset_password` code to any account
 POST   /api/auth/password/reset          {email, code, password}: sets the password, confirms the email, ends every session, logs in
 POST   /api/auth/logout
-GET    /api/auth/me                      {id, email, display_name, role, dancer}: dancer = the account's own page (§4 "Dancer identity": id, name, avatar, `verified`), null when it has none (M23, M25); login, `email/verify`, `password/reset` and role changes return the same
+GET    /api/auth/me                      {id, email, display_name, role, dancer, language}: language = the emails' language, null until a client said (M32); dancer = the account's own page (§4 "Dancer identity": id, name, avatar, `verified`), null when it has none (M23, M25); login, `email/verify`, `password/reset` and role changes return the same
 GET    /api/auth/google                  → redirect
 GET    /api/auth/google/callback
 
@@ -564,7 +604,10 @@ GET    /api/places                       ?q=   {place: {name, country, lat, lng,
 
 GET    /api/events                       ?status=&mine=&cursor=&limit=   (mine=true: caller's own jams incl. drafts, login required; M26 dropped the unused country, from and to)
 GET    /api/events.geojson               published and registration_closed events with coordinates, as FeatureCollection (id, name, slug, starts_on, ends_on, status, phase, city, country, battles: names in display order, categories: what the map's chips match, flyer_card_url, has_videos: a battle of this live or past jam has a video, M28)
-GET    /api/events/{id_or_slug}           + phase, can_edit, can_edit_battles, actions, organizer {id, display_name, instagram_handle, verified, jams: how many public jams} (M12, M12c, M21, M26)
+GET    /api/events/{id_or_slug}           + phase, can_edit, can_edit_battles, actions, organizer {id, display_name, instagram_handle, verified, jams: how many public jams} (M12, M12c, M21, M26), going_count and going: whether the caller is, takes_attendees and takes_entries: whether people may say they are going, and dancers enter or leave its open battles, now (`Event::takes_attendees`, `takes_entries`; the page keeps no copy of these rules) (M32)
+GET    /api/events/{id}/going            public: {going_count, dancers, others}, from one query so the numbers agree: the verified dancer pages of the accounts going, by name, and how many others; an unverified page proves nothing, so it is only counted (M32)
+PUT    /api/events/{id}/going            logged in: {going_count, going}; twice is once; 409 unless the jam is published or registration closed and not past
+DELETE /api/events/{id}/going            logged in: {going_count, going}; whatever the jam's state, so no one stays listed against their will
 GET    /api/events/{id_or_slug}/flyer.svg  ?compact=&lang=en|fr|de   generated 4:5 flyer to inline (DESIGN.md §4.24)
 GET    /api/events/{id_or_slug}/og.png     ?lang=   1200×630 Open Graph image
 GET    /api/events/{id_or_slug}/calendar.ics      "Add to calendar": one all-day event over the jam's days, its venue and page link (M21)
@@ -578,11 +621,20 @@ DELETE /api/events/{id}/flyer            back to the generated flyer; how admins
 PUT    /api/battles/{id}/matches         [{round, position, winner_id, loser_id, video_url?, video_offset_seconds?}]: replaces the battle's matches (M29), jam writer as for entries; 422 on `matches` unless both sides are the battle's non-withdrawn entries, each plays once a round, each battle has its own place in its round (0 to the round's battles − 1; battles 2k and 2k+1 feed battle k) and a knocked-out entry plays no later round (but a semi-final loser the small final); the placings they decide follow (each loser's stage, 1st/2nd/3rd/4th from the finals) with the video and start of each entry's last match
 GET    /api/events/{id}/battles          ordered by position, each with its entries (members, crew, results) and its matches (round, winner, loser, video; M29), so the jam page loads in three calls (M26)
 POST   /api/events/{id}/battles          {name?, format, team_size?, gender, age, age_min?, age_max?, bracket_size?, max_entries?, prize_currency?, prize_first?, prize_second?, prize_third?, starts_at?}
-PUT    /api/battles/{id}                 another fixed entry size (team size, or one for a seven-to-smoke) removes the battle's entries and matches, which no longer fit (the sheet says so before saving); an open size keeps them
+PUT    /api/battles/{id}                 `registration` (M32) absent = `organizer`, `open` only for solo battles, else 422 `registration`; another fixed entry size (team size, or one for a seven-to-smoke) removes the battle's entries and matches, which no longer fit (the sheet says so before saving); an open size keeps them
 DELETE /api/battles/{id}                 422 `battles` for the last battle of a jam past draft
 PUT    /api/events/{id}/battles/order    [battle_id, ...] → the battles with their entries, as GET
 
 POST   /api/battles/{id}/entries         {team_name?, crew_id?, dancer_ids: [...]}
+POST   /api/battles/{id}/enter           M32: the caller's verified page enters an open battle, confirmed at once, and the account is going; 403 without a verified page, 409 when the battle isn't open or the jam isn't published and upcoming (both checked again with the jam and the battle locked, as an organiser may change either meanwhile), `already_entered`, or `battle_full`
+DELETE /api/battles/{id}/enter           the caller leaves: their solo entry (one they made, or the organiser gave them) is deleted while the jam takes entries, checked and deleted under the same locks; going stays; 404 when not in it, 409 for a team entry or a battle the organiser fills
+POST   /api/battles/{id}/requests        M32 step 3: {team_name?, teammates: [dancer_id]}: the caller's verified page asks to enter a battle "with approval", alone or leading a full team (`entry size` members, distinct, live; a team name only for a team, without control characters), 201 {id, battle_id, status}; 403 without a verified page; 409 when the battle doesn't take requests or the jam isn't published and upcoming (checked under the jam and battle locks), `already_requested`, `already_entered` or `battle_full`; 422 `teammates` or `team_name`
+GET    /api/events/{id}/requests         the jam's writers: the requests waiting in its battles, oldest first, each with its members (DancerRef with the handle even when hidden, `instagram_hidden`, `verified`)
+GET    /api/events/{id}/requests/mine    logged in: the caller's latest request in each battle of the jam (pending, approved, rejected)
+GET    /api/requests/waiting             logged in: the caller's own jams with requests waiting, and how many (the account menu); a jam over or called off is left out, its requests lapse
+POST   /api/requests/{id}/accept         the jam's writers: the request becomes a confirmed entry (the entry rules as for any entry, under the battle's lock) and the asker is going; 409 once answered, `already_entered`, `battle_full`
+POST   /api/requests/{id}/decline        the jam's writers; 409 once answered
+DELETE /api/requests/{id}                the asker takes back their own waiting request; 404 otherwise
 PUT    /api/entries/{id}                 status, reached, final_rank, video_url, video_offset_seconds, members
 DELETE /api/entries/{id}
 
@@ -593,7 +645,7 @@ GET    /api/dancers                      ?q=&country=&cursor=&limit=   (q = ilik
 GET    /api/dancers/{id}                 profile + current crews; instagram_handle is null for all but the owner and seed_admin+ when instagram_hidden
 GET    /api/dancers/by-key/{key}         the same, for the dancer the curated import wrote for `key` (data/dancers.toml): the same in every environment, unlike ids; the Team page links its people this way
 GET    /api/dancers/{id}/events          {live, upcoming, past} — jams where the dancer is an entry member or staff; each item: event (id, name, slug, starts_on, ends_on, city, country, status, phase), battle (id, name, format, team_size, gender, age), role (competitor|judge|dj|mc…), entry status, reached, final_rank, video_url
-POST   /api/dancers                      a page for someone else, organizer+; naming `titles` or `instagram_hidden` at all, empty or false included, is seed_admin+ (403), as on PUT
+POST   /api/dancers                      a page for someone else, organizer+ or an account with a verified page (M32); naming `titles` or `instagram_hidden` at all, empty or false included, is seed_admin+ (403), as on PUT
 POST   /api/dancers/mine                 the account's own page, unverified, source self; 409 when it has one (M25)
 PUT    /api/dancers/{id}                 see authorization rules; writes dancer_edits when unverified; titles and instagram_hidden absent = kept, sent only by the verified owner or seed_admin+ (else 403); can_set_titles on the page says who; an absent avatar is kept too, and a hidden handle when an editor who is not shown it saves
 PUT    /api/dancers/{id}/avatar          the generated avatar alone ({avatar: spec}), from its builder; same rights and edit log as the profile
@@ -695,7 +747,7 @@ Frontend env (`frontend/.env`, all public, `VITE_` prefix): `VITE_API_URL` (empt
 - Dancer picker (used in entry and staff editing): debounced search on `dancer_name` showing existing matches; "create new dancer" is only enabled after a search has run (search-before-create). The crew picker works the same way.
 - Jam location (M24 step 2, replacing the Nominatim search of M12): the Venue block's **Find the place** field asks Photon (`photon.komoot.io`, OpenStreetMap data, attributed under the block) from the browser as you type, after 3 letters and a 300 ms pause, for 5 places in the UI language, biased to the pin when there is one; `features/jams/geocode.ts` reads each result into a venue name (named places only, never towns or streets), an address line, the city and the country code. Picking one fills those fields and drops the pin, replacing what an earlier pick filled in but never what was typed by hand; the pin is then dragged or the map tapped to the exact door. A pin dropped before any search asks Photon's `/reverse` once for the city and country, a new drop calling off the last. City and country show as a flag chip "Filled from the address" with Edit while they are what the search found, and as fields otherwise. A jam needs its city, country and pin to be submitted or published.
 - On the jam page, every dancer (entries, staff) is a link chip with their avatar, to `/dancers/{id}`.
-- Jam page v2 (M21, DESIGN.md §6 Jam detail): an inset flyer, the status badge and a countdown chip, the title, meta lines (date with the first battle's start, city, all prizes), a "Who's in" card, then Battles (entries as wrapping chip rows), Lineup, About, Info (phones), Venue (a static MapLibre mini map, loaded lazily, and Directions), Organiser and "More jams coming up". The primary action follows the jam's state (register, add to calendar, see results; none when cancelled), in a bar along the bottom on phones and a card under the flyer on desktop. Its logic is pure in `features/jams/jamDetail.ts`. Share sends "<Jam> · <date> · <City>" to the system sheet, else copies the link with a toast.
+- Jam page v2 (M21, DESIGN.md §6 Jam detail): an inset flyer, the status badge and a countdown chip, the title, meta lines (date with the first battle's start, city, all prizes), a "Who's in" card, then Battles (entries as wrapping chip rows), Lineup, About, Info (phones), Venue (a static MapLibre mini map, loaded lazily, and Directions), Organiser and "More jams coming up". The primary action follows the jam's state (register, add to calendar, see results; none when cancelled), in a bar along the bottom on phones and a card under the flyer on desktop. Its logic is pure in `features/jams/jamDetail.ts`. Under the meta lines, **I'm going** (M32, DESIGN.md §4.45) on published and registration-closed jams that aren't past: any account, one tap, the count public, the verified dancers going named. Share sends "<Jam> · <date> · <City>" to the system sheet, else copies the link with a toast.
 - Jam editor (M24, DESIGN.md §4.35 and §6 Jam editor): `/org/jams/new` opens the start sheet over the organiser's list (name, first day → `POST /api/events` → the editor). `/org/jams/{id}/edit` is the jam page in edit mode: a bar under the header (status badge, Saved / Saving… / Not saved, Preview to `/jams/{slug}`, Publish on desktop), Delete at the foot of a draft at every width, the flyer with a Generated / Upload flyer pill under it, the title with an Edit pill, date chips (the days, "+ Last day", "+ Times" or the hours) opening the Dates block, then the Venue, Battles, Lineup, About and Links blocks and the Organiser card. Edits go out as one `PUT` 800 ms after typing stops (`features/jams/useAutosave.ts`). When a newer copy of the jam arrives that is not the editor's own save (another tab or device, the team), its values come in, except for the fields being edited here, so the next `PUT` of the whole jam doesn't put old values back. A field the API would refuse (`jamFields.jamProblems`, mirroring `EventFields`) stays at its stored value in that `PUT`, so one bad link never holds back the rest; its block stays open on the error, and the bar's "Not saved · Fix" leads to it ("Retry" when no field is at fault). Leaving the page sends what waits, with a toast if it can't; closing the tab asks first. The editor is keyed by jam, so its copy never goes out under another jam's id. The checklist (`jamFields.checklist`) is a card under the flyer on desktop and a sticky "Send for review · N left" bar on phones (the team's "Publish") that opens it as a sheet; each missing item's "Add" opens its block. A blank last day means a one-day jam.
 - Jam page facts (M15): dates, venue, then the optional website (its host as the label, e.g. "pariscypher.com", opening in a new tab), contact email (a `mailto:` link, public by the organiser's choice) and Instagram. The description is a short pitch of at most 200 characters (About). Each of these shows only when set; the upcoming jams of `data/upcoming.toml` carry most of them, the imported historical jams leave them empty.
 - People are managed on the jam page, not in the editor: its organiser sees **Add a dancer** (or **Add a team**) under each battle, an add chip per lineup role (judge, DJ, MC, host, staff), and edit and delete on each entry and person, withdrawn entries included. `/org/jams/{id}/edit` keeps the status, details, flyer and battles (with their prizes).
@@ -801,7 +853,7 @@ Seed script: `cargo run --bin seed` inserts a `super_admin`, an `admin`, a `seed
 29. Battle results by round (M29): `battle_matches` (the final made from 1st vs 2nd for existing results), the import storing every curated match, the jam page by round (final card, crowned match cards, placings where pairings are unknown, rounds below Top 8 folded on phones). a) data, API, jam page — done; b) organisers enter matches (a "Results" step in the battle sheet) — done.
 30. Reaching organisers (M30): the publish checklist wants an Instagram link or a contact email, the review queue shows the organiser's login email, and jams the team added end with "You’re the organiser? Contact us" — done (`milestones/30-organiser-contact.md`).
 31. Admin panel (M31): one super admin who manages the team (admins manage seed admins only), an Accounts tab (last seen, new, unconfirmed, organisers, team), and the history of jam and claim decisions under their queues, from an `admin_actions` log. a) schema, API; b) frontend — done (`milestones/31-admin-panel.md`).
-32. Entering battles and "I'm going" (M32): each battle says how dancers enter (by the organiser, with approval, or open for solo battles), verified dancers only, emails to the organiser and the dancer, and an **I'm going** button with a count on every jam. a) I'm going; b) the battle setting and Open; c) With approval; d) emails — planned, nothing built (`milestones/32-battle-registration-and-going.md`).
+32. Entering battles and "I'm going" (M32): each battle says how dancers enter (by the organiser, with approval, or open for solo battles), verified dancers only, emails to the organiser and the dancer, and an **I'm going** button with a count on every jam. a) I'm going — done; b) the battle setting and Open — done; c) With approval — done; d) emails — done (`milestones/32-battle-registration-and-going.md`).
 33. Map dates (M33): a two-handle slider over the next 12 months picks the map's From and To, with month bars, presets (1, 3, 6 months, 1 year) and `from`/`to` in the URL; it replaces "Next 30 days", while This weekend and Past jams stay — planned, nothing built (`milestones/33-map-date-slider.md`).
 
 For Every suggested build order point, save it in milestones/ with a filename matching the build order point.

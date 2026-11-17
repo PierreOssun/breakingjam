@@ -29,6 +29,8 @@ export type BattleFormValues = {
   start_day: string;
   /** `HH:MM`; blank = the start isn't announced. */
   start_time: string;
+  /** Who can enter (M32); `open` only while the battle is solo. */
+  registration: Schemas["BattleRegistration"];
 };
 
 /** Places with a cash prize, in order. */
@@ -75,6 +77,7 @@ export function battleValues(
       prize_third: "",
       start_day: firstDay,
       start_time: "",
+      registration: "organizer",
     };
   }
   return {
@@ -96,6 +99,7 @@ export function battleValues(
     prize_third: text(battle.prize_third),
     start_day: battle.starts_at?.slice(0, 10) ?? firstDay,
     start_time: battle.starts_at?.slice(11, 16) ?? "",
+    registration: battle.registration,
   };
 }
 
@@ -134,7 +138,28 @@ export function battleBody(values: BattleFormValues): BattleFields {
     starts_at: values.start_time
       ? `${values.start_day}T${values.start_time}:00`
       : null,
+    registration: registrationOf(values),
   };
+}
+
+/** How many dancers an entry of the battle in the form holds; null while that is open. */
+export function formEntrySize(values: BattleFormValues): number | null {
+  const sized = values.format === "team" || values.format === "showcase";
+  return entrySize({
+    format: values.format,
+    team_size: sized ? number(values.team_size) : null,
+  });
+}
+
+/** Who can enter, as saved (M32): only a solo battle stays open, and only a battle of fixed size
+ * takes requests, which are full teams; otherwise the organiser adds the dancers. */
+export function registrationOf(
+  values: BattleFormValues,
+): Schemas["BattleRegistration"] {
+  const size = formEntrySize(values);
+  if (values.registration === "open" && size !== 1) return "organizer";
+  if (values.registration === "approval" && size === null) return "organizer";
+  return values.registration;
 }
 
 /** The battle sheet's category chips (M24), in display order. */

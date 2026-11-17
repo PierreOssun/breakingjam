@@ -8,6 +8,7 @@ pub mod dancer;
 pub mod event;
 pub mod organizer;
 pub mod place;
+pub mod request;
 pub mod user;
 
 use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};

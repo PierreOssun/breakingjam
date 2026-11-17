@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into battle_request_members (request_id, dancer_id, position)\n         select $1, member, (n - 1)::smallint from unnest($2::uuid[]) with ordinality as m(member, n)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "UuidArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "28e1f90df31d1a89787da80c5eab427dbce573d75083debeba18e86154601c28"
+}

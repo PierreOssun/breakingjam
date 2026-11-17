@@ -26,6 +26,7 @@ fn battle_fields(format: BattleFormat, team_size: Option<i16>, age: BattleAge) -
         prize_second: None,
         prize_third: None,
         starts_at: None,
+        registration: BattleRegistration::Organizer,
     }
 }
 
@@ -48,6 +49,7 @@ fn battle(format: BattleFormat, team_size: Option<i16>) -> Battle {
         prize_third: None,
         position: 0,
         starts_at: None,
+        registration: BattleRegistration::Organizer,
         created_at: Utc::now(),
         updated_at: Utc::now(),
     }

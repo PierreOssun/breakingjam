@@ -10,6 +10,7 @@ use validator::Validate;
 use super::{
     events::EventResponse,
     extract::{Path, Query, ValidJson},
+    going::Going,
     page::{self, Page, PageQuery},
 };
 use crate::{
@@ -85,7 +86,8 @@ async fn queue(
             let organizer = organizers.get(&event.id).cloned();
             let organizer_email = emails.get(&event.organizer_id).cloned().unwrap_or_default();
             ReviewItem {
-                jam: EventResponse::new(event, Some(&current.user), organizer),
+                // A jam in review takes no one going yet.
+                jam: EventResponse::new(event, Some(&current.user), organizer, Going::default()),
                 organizer_email,
             }
         })

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update app_users set language = $2 where id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7d2e6579de0228bd6136cb049a0a74166657074d2a26958a7a7568515cd6c810"
+}

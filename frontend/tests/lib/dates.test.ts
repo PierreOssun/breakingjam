@@ -1,4 +1,5 @@
 import {
+  timeAgo,
   dayAndMonth,
   daysOf,
   formatBattleStart,
@@ -73,5 +74,22 @@ describe("dates", () => {
     expect(formatBattleStart("2023-09-23T14:30:00", false, "fr")).toMatch(
       /^sam\.? 23 sept\.?,? 14:30$/,
     );
+  });
+});
+
+describe("timeAgo", () => {
+  const now = new Date("2026-11-18T12:00:00Z");
+  const ago = (ms: number) => new Date(now.getTime() - ms).toISOString();
+
+  it.each([
+    [10_000, "en", "now"],
+    [5 * 60_000, "en", "5 min ago"],
+    [2 * 3_600_000, "en", "2 hr ago"],
+    [26 * 3_600_000, "en", "yesterday"],
+    [3 * 86_400_000, "en", "3 days ago"],
+    [10_000, "fr", "maintenant"],
+    [10_000, "de", "jetzt"],
+  ])("reads %i ms ago in %s as %s", (ms, language, expected) => {
+    expect(timeAgo(ago(ms), language, now)).toBe(expected);
   });
 });

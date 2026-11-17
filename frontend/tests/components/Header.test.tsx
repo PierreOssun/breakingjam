@@ -1,6 +1,14 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { LIL_G, LOGGED_OUT, calls, mockApi, renderApp } from "../support/app";
+import i18n from "../../src/i18n";
+import {
+  LIL_G,
+  LOGGED_OUT,
+  bodyOf,
+  calls,
+  mockApi,
+  renderApp,
+} from "../support/app";
 
 /** The page header, once the (possibly lazy) route has rendered. */
 async function header() {
@@ -45,6 +53,56 @@ describe("Header", () => {
     ).toBeInTheDocument();
     expect(document.documentElement.lang).toBe("fr");
     expect(localStorage.getItem("bj.lang")).toBe("fr");
+  });
+
+  it("keeps the language on the account, for the emails it gets", async () => {
+    const fetch = mockApi({
+      "GET /api/auth/me": { status: 200, body: LIL_G },
+      "PUT /api/auth/language": { status: 204 },
+    });
+    renderApp("/");
+
+    await userEvent.click(
+      await (
+        await header()
+      ).findByRole("button", { name: "Language: English" }),
+    );
+    await userEvent.click(screen.getByRole("option", { name: "Deutsch" }));
+
+    expect(await bodyOf(fetch, "PUT /api/auth/language")).toEqual({
+      language: "de",
+    });
+  });
+
+  it("gives an account that never said the site's language", async () => {
+    await i18n.changeLanguage("fr");
+    const fetch = mockApi({
+      "GET /api/auth/me": { status: 200, body: { ...LIL_G, language: null } },
+      "PUT /api/auth/language": { status: 204 },
+    });
+    renderApp("/");
+
+    await waitFor(() =>
+      expect(calls(fetch)).toContain("PUT /api/auth/language"),
+    );
+    expect(await bodyOf(fetch, "PUT /api/auth/language")).toEqual({
+      language: "fr",
+    });
+  });
+
+  it("leaves accounts alone when logged out", async () => {
+    const fetch = mockApi({ "GET /api/auth/me": LOGGED_OUT });
+    renderApp("/");
+
+    await userEvent.click(
+      await (
+        await header()
+      ).findByRole("button", { name: "Language: English" }),
+    );
+    await userEvent.click(screen.getByRole("option", { name: "Français" }));
+
+    await (await header()).findByRole("link", { name: "Danseurs" });
+    expect(calls(fetch)).not.toContain("PUT /api/auth/language");
   });
 
   it("works from the keyboard", async () => {

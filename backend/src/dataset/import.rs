@@ -15,8 +15,8 @@ use crate::{
     db,
     domain::{
         battle::{
-            BattleAge, BattleFields, BattleFormat, EntryFields, EntryStatus, MatchFields,
-            MatchRound, StaffRole, canonical_video,
+            BattleAge, BattleFields, BattleFormat, BattleRegistration, EntryFields, EntryStatus,
+            MatchFields, MatchRound, StaffRole, canonical_video,
         },
         event::{EventFields, EventStatus},
     },
@@ -426,6 +426,7 @@ fn battle_fields(battle: &BattleRecord) -> BattleFields {
         prize_third: None,
         // The sources give days, not running orders.
         starts_at: None,
+        registration: BattleRegistration::Organizer,
     }
 }
 

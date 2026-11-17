@@ -85,4 +85,5 @@ export const LIL_G = {
   display_name: "Lil G",
   role: "user",
   dancer: null,
+  language: "en",
 };

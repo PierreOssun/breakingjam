@@ -19,12 +19,15 @@ import type { Video } from "../../components/VideoDialog";
 import { VideoPill } from "../../components/VideoPill";
 import { daysOf, formatBattleStart } from "../../lib/dates";
 import { AddChip, DancerChip } from "../dancers/DancerChip";
+import { BattleEntry } from "./BattleEntry";
 import { BattleResults } from "./BattleResults";
 import { membersPerEntry, prizeLine } from "./battleFields";
 import { entryLabel } from "./entryFields";
 import { EntryChips } from "./EntryChips";
+import { myEntry } from "./entering";
 import { takesResults } from "./jamDetail";
 import { resultsOf } from "./rounds";
+import { useMe } from "../auth/useMe";
 
 // The form's code loads when someone edits: visitors, who never do, don't download it.
 const BattleDialog = lazy(() =>
@@ -66,16 +69,22 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
   const [editing, setEditing] = useState<Entry | "new" | null>(null);
   const [, open] = useTransition();
   const [managing, setManaging] = useState(false);
+  // The battle sheet on Details, from "Change" under the card (M32).
+  const [details, setDetails] = useState(false);
   const remove = useDeleteEntry(battle.event_id);
   // Its organiser manages the results, even once the jam is over.
   const canEdit = jam.can_edit_battles;
   const active = battle.entries.filter((e) => e.status !== "withdrawn");
+  const results = resultsOf(battle);
+  // Before any result, the viewer's own entry leads, marked as theirs (M32).
+  const me = useMe().data;
+  const mine = results ? undefined : myEntry(battle, me);
   const shown = [...(canEdit ? battle.entries : active)].sort(
     (a, b) =>
+      Number(b === mine) - Number(a === mine) ||
       (a.final_rank ?? STAGE_ORDER[a.reached]) -
-      (b.final_rank ?? STAGE_ORDER[b.reached]),
+        (b.final_rank ?? STAGE_ORDER[b.reached]),
   );
-  const results = resultsOf(battle);
   // Editors see the results as visitors do; without any, the rows are all there is to see.
   const rows = canEdit && (managing || !results);
   const play = (entry: Entry) =>
@@ -104,7 +113,12 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
           }
         >
           {shown.map((entry) => (
-            <EntryChips key={entry.id} entry={entry} onPlay={play} />
+            <EntryChips
+              key={entry.id}
+              entry={entry}
+              mine={entry === mine}
+              onPlay={play}
+            />
           ))}
         </ul>
       )}
@@ -194,6 +208,22 @@ export function BattleCard({ jam, battle, onPlay }: BattleCardProps) {
           </Suspense>
         </>
       )}
+      <BattleEntry
+        jam={jam}
+        battle={battle}
+        onChange={() => open(() => setDetails(true))}
+      />
+      <Suspense fallback={null}>
+        {details && (
+          <BattleDialog
+            jamId={jam.id}
+            days={daysOf(jam.starts_on, jam.ends_on)}
+            country={jam.country}
+            battle={battle}
+            onClose={() => setDetails(false)}
+          />
+        )}
+      </Suspense>
     </li>
   );
 }

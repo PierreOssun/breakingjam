@@ -1,5 +1,8 @@
 import { CaretDown, Check, Globe } from "@phosphor-icons/react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { api } from "../api/client";
+import { useMe } from "../features/auth/useMe";
 import { LANGUAGES, setLanguage } from "../i18n";
 import { buttonClasses } from "./buttonClasses";
 import { useMenu } from "./useMenu";
@@ -12,9 +15,21 @@ export function LanguageSwitch() {
   const { t, i18n } = useTranslation();
   const current =
     LANGUAGES.find((l) => l.code === i18n.resolvedLanguage) ?? LANGUAGES[0];
-  const menu = useMenu(LANGUAGES.length, (index) =>
-    setLanguage(LANGUAGES[index]?.code ?? current.code),
-  );
+  const me = useMe().data;
+  // An account that never said (a Google sign-in, a session older than M32) takes the site's
+  // language once, so the emails others' actions send it can be read.
+  const unknown = me != null && me.language == null;
+  useEffect(() => {
+    if (unknown)
+      void api.PUT("/api/auth/language", { body: { language: current.code } });
+  }, [unknown, current.code]);
+  const menu = useMenu(LANGUAGES.length, (index) => {
+    const language = LANGUAGES[index]?.code ?? current.code;
+    setLanguage(language);
+    // The account keeps it for the emails others' actions send it (M32); if this fails, the
+    // next login says it again.
+    if (me) void api.PUT("/api/auth/language", { body: { language } });
+  });
 
   return (
     <div ref={menu.rootRef} className="relative">

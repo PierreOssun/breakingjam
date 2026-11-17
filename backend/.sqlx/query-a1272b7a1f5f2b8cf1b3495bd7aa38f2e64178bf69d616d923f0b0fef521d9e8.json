@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select email::text as \"email!\", language from app_users where id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "email!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "language",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_users",
+            "name": "language"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      true
+    ]
+  },
+  "hash": "a1272b7a1f5f2b8cf1b3495bd7aa38f2e64178bf69d616d923f0b0fef521d9e8"
+}

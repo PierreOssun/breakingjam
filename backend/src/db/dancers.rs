@@ -123,6 +123,18 @@ pub async fn find(db: impl PgExecutor<'_>, id: Uuid) -> sqlx::Result<Option<Danc
     .await
 }
 
+/// The account's verified page, the one an approved claim linked to it, if it is still live.
+pub async fn verified_page(db: impl PgExecutor<'_>, user_id: Uuid) -> sqlx::Result<Option<Uuid>> {
+    sqlx::query_scalar!(
+        "select id from dancers
+         where user_id = $1 and verified_at is not null
+           and deleted_at is null and merged_into_id is null",
+        user_id,
+    )
+    .fetch_optional(db)
+    .await
+}
+
 /// The account's own live page: the one an approved claim linked to it, else the one it made
 /// for itself (or what that was merged into), as long as nobody else owns that.
 pub async fn own_page(pool: &PgPool, user_id: Uuid) -> sqlx::Result<Option<OwnPage>> {
@@ -325,6 +337,7 @@ pub async fn merge(
     let (from, into) = (loser.id, survivor.id);
     let aliases = merged_aliases(survivor, loser);
     move_entry_members(conn, from, into).await?;
+    move_requests(conn, from, into).await?;
     move_staff(conn, from, into).await?;
     move_memberships(conn, from, into).await?;
     move_claims(conn, from, survivor, admin).await?;
@@ -372,6 +385,27 @@ async fn move_entry_members(conn: &mut PgConnection, from: Uuid, into: Uuid) -> 
     sqlx::query!("delete from entry_members where dancer_id = $1", from)
         .execute(&mut *conn)
         .await?;
+    Ok(())
+}
+
+/// Teammates in waiting requests follow the page, as entries do (an asker's page is verified,
+/// so never merged away); a member row the survivor already has is dropped.
+async fn move_requests(conn: &mut PgConnection, from: Uuid, into: Uuid) -> sqlx::Result<()> {
+    sqlx::query!(
+        "update battle_request_members set dancer_id = $2
+         where dancer_id = $1
+           and request_id not in (select request_id from battle_request_members where dancer_id = $2)",
+        from,
+        into,
+    )
+    .execute(&mut *conn)
+    .await?;
+    sqlx::query!(
+        "delete from battle_request_members where dancer_id = $1",
+        from
+    )
+    .execute(&mut *conn)
+    .await?;
     Ok(())
 }
 

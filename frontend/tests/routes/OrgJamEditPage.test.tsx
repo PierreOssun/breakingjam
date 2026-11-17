@@ -1323,6 +1323,8 @@ describe("the jam editor", () => {
       prize_second: null,
       prize_third: null,
       starts_at: null,
+      // Who can enter: the organiser, unless the sheet says otherwise (M32).
+      registration: "organizer",
     });
   });
 
@@ -1395,6 +1397,8 @@ describe("the jam editor", () => {
       prize_second: null,
       prize_third: null,
       starts_at: "2030-06-02T14:30:00",
+      // Who can enter: the organiser, unless the sheet says otherwise (M32).
+      registration: "organizer",
     });
   });
 

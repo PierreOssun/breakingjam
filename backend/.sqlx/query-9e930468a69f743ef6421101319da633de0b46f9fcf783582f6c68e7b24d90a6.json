@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "select id, event_id, name, format as \"format: BattleFormat\", team_size,\n                  gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                  bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at, created_at, updated_at\n           from battles where event_id = any($1) order by event_id, position, id",
+  "query": "select id, event_id, name, format as \"format: BattleFormat\", team_size,\n                  gender as \"gender: BattleGender\", age as \"age: BattleAge\", age_min, age_max,\n                  bracket_size, max_entries, prize_currency, prize_first, prize_second,\n                  prize_third, position, starts_at,\n                  registration as \"registration: BattleRegistration\", created_at, updated_at\n           from battles where id = $1",
   "describe": {
     "columns": [
       {
@@ -226,6 +226,28 @@
       },
       {
         "ordinal": 17,
+        "name": "registration: BattleRegistration",
+        "type_info": {
+          "Custom": {
+            "name": "battle_registration",
+            "kind": {
+              "Enum": [
+                "organizer",
+                "approval",
+                "open"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "battles",
+            "name": "registration"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -236,7 +258,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -249,7 +271,7 @@
     ],
     "parameters": {
       "Left": [
-        "UuidArray"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -271,8 +293,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "9e048a96d25bb4388f39a3efa88ffd394c3eb58508381283853ec57c3669f990"
+  "hash": "9e930468a69f743ef6421101319da633de0b46f9fcf783582f6c68e7b24d90a6"
 }

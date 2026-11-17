@@ -240,6 +240,55 @@
         ]
       }
     },
+    "/api/auth/language": {
+      "put": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Keep the language the account reads its emails in, as the site's language is switched (M32).",
+        "operationId": "set_language",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LanguageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Kept"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/auth/google": {
       "get": {
         "tags": [
@@ -1344,6 +1393,174 @@
         }
       }
     },
+    "/api/events/{id}/going": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Who is going to a jam.",
+        "operationId": "list_going",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoingList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "session": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Say you are going to a jam; saying it twice changes nothing.",
+        "operationId": "add_going",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Going"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The jam is not announced, called off or over: no one can say they are going",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Take back \"I'm going\"; possible whatever the jam's state, so no one stays listed against\ntheir will.",
+        "operationId": "remove_going",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Going"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/dancers": {
       "get": {
         "tags": [
@@ -1449,7 +1666,7 @@
             }
           },
           "403": {
-            "description": "Below `organizer`, or titles or `instagram_hidden` below `seed_admin`",
+            "description": "Below `organizer` without a verified page of one's own, or titles or `instagram_hidden` below `seed_admin`",
             "content": {
               "application/json": {
                 "schema": {
@@ -2868,7 +3085,7 @@
             }
           },
           "409": {
-            "description": "A dancer is already entered in this battle, or the battle is full",
+            "description": "`already_entered`: a dancer is in this battle already; `battle_full`: no place left",
             "content": {
               "application/json": {
                 "schema": {
@@ -2965,7 +3182,7 @@
             }
           },
           "409": {
-            "description": "A dancer is already entered in this battle, or the battle is full",
+            "description": "`already_entered`: a dancer is in this battle already; `battle_full`: no place left",
             "content": {
               "application/json": {
                 "schema": {
@@ -3274,6 +3491,626 @@
           },
           "422": {
             "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/battles/{id}/enter": {
+      "post": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Enter an open battle as yourself: your verified page, confirmed at once; you're going too.",
+        "operationId": "enter_battle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Battle id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account has no verified dancer page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such battle, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Not open to enter or registration closed (`conflict`), in already (`already_entered`), or full (`battle_full`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Leave a battle you entered, or were entered in alone, while registration is open; you stay\ngoing to the jam.",
+        "operationId": "leave_battle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Battle id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Left"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account has no verified dancer page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such battle, or you are not in it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Registration closed, the organiser adds its dancers, or a team entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/battles/{id}/requests": {
+      "post": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Ask to enter a battle \"with approval\": alone, or as a team's captain with a full team.",
+        "operationId": "ask_to_enter",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Battle id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account has no verified dancer page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such battle, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Not taking requests or registration closed (`conflict`), `already_requested`, `already_entered` or `battle_full`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/requests": {
+      "get": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "The requests waiting in a jam's battles, oldest first: for its writers, who see each\nmember's Instagram handle even when the page hides it.",
+        "operationId": "list_requests",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BattleRequest"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/requests/mine": {
+      "get": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "The caller's latest request in each battle of a jam: waiting, accepted or declined.",
+        "operationId": "my_requests",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Jam id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyRequest"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such jam, or a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/requests/waiting": {
+      "get": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "The caller's own jams with requests waiting, for the account menu.",
+        "operationId": "waiting_requests",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WaitingRequests"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/requests/{id}/accept": {
+      "post": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Accept a request: its dancers become a confirmed entry, and the asker is going.",
+        "operationId": "accept_request",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Request id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such request, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Answered already (`conflict`), `already_entered` or `battle_full`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/requests/{id}/decline": {
+      "post": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Decline a request; the dancer sees it was declined.",
+        "operationId": "decline_request",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Request id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Declined"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the jam's organiser nor `seed_admin`+",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such request, or its jam is a draft you can't see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Answered already",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/requests/{id}": {
+      "delete": {
+        "tags": [
+          "battles"
+        ],
+        "summary": "Take back your own request while it waits.",
+        "operationId": "cancel_request",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Request id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Cancelled"
+          },
+          "401": {
+            "description": "No valid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No waiting request of yours by that id",
             "content": {
               "application/json": {
                 "schema": {
@@ -5225,6 +6062,7 @@
           "gender",
           "age",
           "position",
+          "registration",
           "created_at",
           "updated_at"
         ],
@@ -5338,6 +6176,10 @@
             ],
             "format": "date-time",
             "description": "When it starts, as wall-clock time in the jam's timezone; null until announced."
+          },
+          "registration": {
+            "$ref": "#/components/schemas/BattleRegistration",
+            "description": "How dancers enter it."
           },
           "created_at": {
             "type": "string",
@@ -5498,6 +6340,10 @@
             ],
             "format": "date-time",
             "description": "When it starts, wall-clock time in the jam's timezone, on one of its days; null = not announced."
+          },
+          "registration": {
+            "$ref": "#/components/schemas/BattleRegistration",
+            "description": "How dancers enter it; `organizer` when omitted. `open` is for solo battles only."
           }
         }
       },
@@ -5567,6 +6413,56 @@
           "age": {
             "$ref": "#/components/schemas/BattleAge",
             "description": "Age category."
+          }
+        }
+      },
+      "BattleRegistration": {
+        "type": "string",
+        "description": "How dancers enter a battle (M32).",
+        "enum": [
+          "organizer",
+          "approval",
+          "open"
+        ]
+      },
+      "BattleRequest": {
+        "type": "object",
+        "description": "A request waiting for the organiser, with who it would enter.",
+        "required": [
+          "id",
+          "battle_id",
+          "created_at",
+          "members"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "battle_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The battle asked for."
+          },
+          "team_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The team's name; null for a solo battle."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When it was sent."
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestMember"
+            },
+            "description": "The asker first, then their teammates."
           }
         }
       },
@@ -6963,11 +7859,17 @@
             "description": "The jam itself."
           },
           {
+            "$ref": "#/components/schemas/Going",
+            "description": "How many are going, and whether the caller is (M32)."
+          },
+          {
             "type": "object",
             "required": [
               "can_edit",
               "can_edit_battles",
-              "actions"
+              "actions",
+              "takes_attendees",
+              "takes_entries"
             ],
             "properties": {
               "can_edit": {
@@ -6995,6 +7897,14 @@
                     "type": "null"
                   }
                 ]
+              },
+              "takes_attendees": {
+                "type": "boolean",
+                "description": "Whether people may say they are going: announced, not called off, not over (M32)."
+              },
+              "takes_entries": {
+                "type": "boolean",
+                "description": "Whether dancers may enter or leave its open battles themselves now (M32)."
               }
             }
           }
@@ -7104,6 +8014,53 @@
               "null"
             ],
             "description": "ISO 3166-1 alpha-2 of the visitor's country; null when unknown."
+          }
+        }
+      },
+      "Going": {
+        "type": "object",
+        "description": "How many are going to a jam, and whether the caller is.",
+        "required": [
+          "going_count",
+          "going"
+        ],
+        "properties": {
+          "going_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Accounts that said they are going."
+          },
+          "going": {
+            "type": "boolean",
+            "description": "Whether the caller is one of them; false when logged out."
+          }
+        }
+      },
+      "GoingList": {
+        "type": "object",
+        "description": "Who is going: the verified dancers by name, and how many others.",
+        "required": [
+          "going_count",
+          "dancers",
+          "others"
+        ],
+        "properties": {
+          "going_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Accounts going, named or not."
+          },
+          "dancers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DancerRef"
+            },
+            "description": "The verified dancer pages of the accounts going."
+          },
+          "others": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Accounts going without a verified page: counted, never named."
           }
         }
       },
@@ -7259,6 +8216,19 @@
           "fr",
           "de"
         ]
+      },
+      "LanguageRequest": {
+        "type": "object",
+        "description": "Body of `PUT /auth/language`.",
+        "required": [
+          "language"
+        ],
+        "properties": {
+          "language": {
+            "$ref": "#/components/schemas/Language",
+            "description": "The site's language now."
+          }
+        }
       },
       "LoginRequest": {
         "type": "object",
@@ -7579,6 +8549,31 @@
           }
         ],
         "description": "Your claim on a dancer page, and whether someone else is claiming it too."
+      },
+      "MyRequest": {
+        "type": "object",
+        "description": "The asker's view of their latest request in a battle.",
+        "required": [
+          "id",
+          "battle_id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Primary key, UUIDv7."
+          },
+          "battle_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The battle asked for."
+          },
+          "status": {
+            "$ref": "#/components/schemas/ClaimStatus",
+            "description": "Pending until the organiser answers."
+          }
+        }
       },
       "Organizer": {
         "type": "object",
@@ -8758,6 +9753,53 @@
           }
         }
       },
+      "RequestFields": {
+        "type": "object",
+        "description": "What a dancer sends: for a team battle, the team's name and the teammates beside them.",
+        "properties": {
+          "team_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The team's name; null for a solo battle, blank is stored as null."
+          },
+          "teammates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The other members, by page; empty for a solo battle. The asker leads the team."
+          }
+        }
+      },
+      "RequestMember": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DancerRef",
+            "description": "The page; its Instagram handle is sent even when hidden on the page (the dancer was told)."
+          },
+          {
+            "type": "object",
+            "required": [
+              "instagram_hidden",
+              "verified"
+            ],
+            "properties": {
+              "instagram_hidden": {
+                "type": "boolean",
+                "description": "The handle is hidden on the public page."
+              },
+              "verified": {
+                "type": "boolean",
+                "description": "The page is verified."
+              }
+            }
+          }
+        ],
+        "description": "Someone a request would enter, as its organiser sees them."
+      },
       "ResetPasswordRequest": {
         "type": "object",
         "description": "Body of `POST /auth/password/reset`.",
@@ -9077,6 +10119,17 @@
                 "type": "null"
               }
             ]
+          },
+          "language": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Language",
+                "description": "The language its emails are in; null until a client said, which the site then does."
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
@@ -9095,6 +10148,36 @@
           "code": {
             "type": "string",
             "description": "The 6 digits mailed to it."
+          }
+        }
+      },
+      "WaitingRequests": {
+        "type": "object",
+        "description": "The jams of an organiser with requests waiting, for the account menu.",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "count"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The jam."
+          },
+          "name": {
+            "type": "string",
+            "description": "Its name."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Its page."
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Requests waiting in its battles."
           }
         }
       },

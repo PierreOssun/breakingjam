@@ -1,6 +1,6 @@
 // What the jam page derives from a jam (DESIGN.md §6 Jam detail): its countdown, its primary
 // action, the prizes, who is in. Pure, so it is tested without a page.
-import type { Schemas } from "../../api/client";
+import { API_ORIGIN, type Schemas } from "../../api/client";
 import { countryName } from "../../lib/countries";
 import { formatShortDateRange, formatTime, localeOf } from "../../lib/dates";
 
@@ -67,6 +67,32 @@ export function countdown(
 export function firstStart(battles: Schemas["Battle"][]): string | null {
   const starts = battles.flatMap((b) => (b.starts_at ? [b.starts_at] : []));
   return starts.sort()[0] ?? null;
+}
+
+/** "Add to calendar": the API's .ics, one all-day event over the jam's days (§4.32). */
+export function calendarUrl(jam: Pick<Jam, "slug">): string {
+  return `${API_ORIGIN}/api/events/${encodeURIComponent(jam.slug)}/calendar.ics`;
+}
+
+/** How to reach the organiser: the jam's public email, else an Instagram DM; the team's own
+ * jams (no organiser) lead to the Contact page. */
+export type OrganiserContact = {
+  href: string;
+  kind: "email" | "instagram" | "team";
+};
+
+export function organiserContact(
+  jam: Pick<Jam, "contact_email"> & {
+    organizer?: Schemas["OrganizerRef"] | null;
+  },
+): OrganiserContact | null {
+  if (!jam.organizer) return { href: "/contact", kind: "team" };
+  if (jam.contact_email)
+    return { href: `mailto:${jam.contact_email}`, kind: "email" };
+  const handle = jam.organizer.instagram_handle;
+  return handle
+    ? { href: `https://ig.me/m/${handle}`, kind: "instagram" }
+    : null;
 }
 
 /** The action bar's and action card's primary button (§4.32); none for a cancelled jam. */

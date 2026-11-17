@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select count(*) as \"count!\", coalesce(bool_or(user_id = $2), false) as \"going!\"\n           from event_attendees where event_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "going!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "75e5ed03dc270b09c4f30ae1580ae49d9e1a9fee15b77205f094d0dfabbe0c41"
+}

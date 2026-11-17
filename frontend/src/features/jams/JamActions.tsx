@@ -1,15 +1,26 @@
 import { ArrowSquareOut, CalendarPlus, Trophy } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
-import { API_ORIGIN, type Schemas } from "../../api/client";
+import type { Schemas } from "../../api/client";
 import { buttonClasses } from "../../components/buttonClasses";
 import { ShareButton } from "../../components/ShareButton";
-import { actionCaption, primaryAction, shareTitle } from "./jamDetail";
+import {
+  actionCaption,
+  calendarUrl,
+  primaryAction,
+  shareTitle,
+} from "./jamDetail";
 
 type Jam = Schemas["EventResponse"];
 
 /** The state's primary action (DESIGN.md §4.32): register on the organiser's site, add the jam
  * to a calendar (the API's .ics), or jump to the results. */
-function PrimaryButton({ jam, className }: { jam: Jam; className: string }) {
+export function PrimaryButton({
+  jam,
+  className,
+}: {
+  jam: Jam;
+  className: string;
+}) {
   const { t } = useTranslation();
   const classes = `${buttonClasses("primary", "md")} ${className}`;
   switch (primaryAction(jam)) {
@@ -27,10 +38,7 @@ function PrimaryButton({ jam, className }: { jam: Jam; className: string }) {
       );
     case "calendar":
       return (
-        <a
-          href={`${API_ORIGIN}/api/events/${encodeURIComponent(jam.slug)}/calendar.ics`}
-          className={classes}
-        >
+        <a href={calendarUrl(jam)} className={classes}>
           <CalendarPlus size={20} weight="bold" aria-hidden />
           <span className="min-w-0 truncate">{t("jam.calendar")}</span>
         </a>
