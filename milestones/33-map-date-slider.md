@@ -2,7 +2,14 @@
 
 On the map, people pick a start and an end date with a two-handle slider over the next 12 months, so they can see, for example, which jams are around Zurich in the next 6 months. It replaces the map's "Next 30 days" chip.
 
-Nothing is built yet: this is the brief. The decisions below were taken with the author after reading it; where they and the Design brief differ, the decisions win.
+Built 2026-11-19 (frontend only: `features/map/range.ts`, `RangeSlider.tsx`, `DateCard.tsx`, `MapPage.tsx`; DESIGN.md §4.48). The decisions below were taken with the author after reading the brief; where they and the Design brief differ, the decisions win.
+
+## As built (2026-11-19)
+
+- Below 360px the dates row drops its calendar icon and the presets use `caption`, so German fits at 320px ("19. Nov. 2027", "6 Monate").
+- Month labels are centred where each month starts (under the handle's place), not pinned to the card's edges.
+- "{n} jams around {place}" takes the search as typed, as the brief says, so a jam name reads "around red bull".
+- On a Sunday "This weekend" is that one day (From = To); dragging then keeps the handles a day apart again.
 
 ## Decisions (with the author, 2026-11-15)
 

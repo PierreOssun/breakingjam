@@ -167,7 +167,7 @@
     "subtitle": "All of breaking, in one search",
     "searchPlaceholderShort": "Jam, city, battle, dancer…",
     "quickFilters": "Quick filters",
-    "nearMe": "Near me",
+    "map": "Map",
     "results": {
       "title": "Just happened",
       "sub": "Winners and battle videos from the latest jams",
@@ -478,7 +478,25 @@
     "viewJam": "View jam",
     "cluster_one": "{{count}} jam here, zoom in",
     "cluster_other": "{{count}} jams here, zoom in",
-    "loadError": "The jams didn’t load. Reload the page to try again."
+    "loadError": "The jams didn’t load. Reload the page to try again.",
+    "listCount": "List · {{count}}",
+    "around_one": "{{count}} jam around {{place}}",
+    "around_other": "{{count}} jams around {{place}}",
+    "dates": {
+      "now": "Now",
+      "from": "From",
+      "to": "To",
+      "hide": "Hide the dates",
+      "jams_one": "{{count}} jam",
+      "jams_other": "{{count}} jams",
+      "none": "No jams",
+      "preset": {
+        "1": "1 month",
+        "3": "3 months",
+        "6": "6 months",
+        "12": "1 year"
+      }
+    }
   },
   "dialog": {
     "close": "Close",

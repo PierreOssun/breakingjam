@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { configure } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 import i18n from "../src/i18n";
 
 // Pages are lazy routes: the first test of a file waits for the module to be transformed,
@@ -21,6 +21,9 @@ if (!HTMLDialogElement.prototype.showModal) {
 }
 
 afterEach(async () => {
+  // Unmount first: a page still mounted would react to the reset below, e.g. by saving the
+  // language again once fetch is no longer stubbed.
+  cleanup();
   vi.unstubAllGlobals();
   vi.useRealTimers();
   localStorage.clear();

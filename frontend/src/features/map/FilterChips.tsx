@@ -15,10 +15,17 @@ type FilterChipsProps = {
    * `sheet`: wrapped under visible group titles, in the filter sheet.
    */
   variant: "panel" | "map" | "sheet";
+  /** The time chips offered; the map has no "Next 30 days" (its date range does that). */
+  whens?: When[];
 };
 
 /** The time and category chips (DESIGN.md §5): one time filter at most, any categories. */
-export function FilterChips({ filters, onChange, variant }: FilterChipsProps) {
+export function FilterChips({
+  filters,
+  onChange,
+  variant,
+  whens = WHENS,
+}: FilterChipsProps) {
   const { t } = useTranslation();
   const toggleWhen = (when: When) =>
     onChange({ ...filters, when: filters.when === when ? null : when });
@@ -35,7 +42,7 @@ export function FilterChips({ filters, onChange, variant }: FilterChipsProps) {
   const groups = [
     {
       title: t("map.when"),
-      chips: WHENS.map((when) => (
+      chips: whens.map((when) => (
         <Chip
           key={when}
           on={filters.when === when}

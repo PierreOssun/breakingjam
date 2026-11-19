@@ -167,7 +167,7 @@
     "subtitle": "Das ganze Breaking in einer Suche",
     "searchPlaceholderShort": "Jam, Stadt, Battle, Tänzer…",
     "quickFilters": "Schnellfilter",
-    "nearMe": "In meiner Nähe",
+    "map": "Karte",
     "results": {
       "title": "Gerade passiert",
       "sub": "Gewinner und Battle-Videos der letzten Jams",
@@ -478,7 +478,25 @@
     "viewJam": "Jam ansehen",
     "cluster_one": "{{count}} Jam hier, hineinzoomen",
     "cluster_other": "{{count}} Jams hier, hineinzoomen",
-    "loadError": "Die Jams wurden nicht geladen. Lade die Seite neu, um es noch einmal zu versuchen."
+    "loadError": "Die Jams wurden nicht geladen. Lade die Seite neu, um es noch einmal zu versuchen.",
+    "listCount": "Liste · {{count}}",
+    "around_one": "{{count}} Jam rund um {{place}}",
+    "around_other": "{{count}} Jams rund um {{place}}",
+    "dates": {
+      "now": "Jetzt",
+      "from": "Von",
+      "to": "Bis",
+      "hide": "Daten ausblenden",
+      "jams_one": "{{count}} Jam",
+      "jams_other": "{{count}} Jams",
+      "none": "Keine Jams",
+      "preset": {
+        "1": "1 Monat",
+        "3": "3 Monate",
+        "6": "6 Monate",
+        "12": "1 Jahr"
+      }
+    }
   },
   "dialog": {
     "close": "Schließen",

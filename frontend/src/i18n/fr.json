@@ -167,7 +167,7 @@
     "subtitle": "Tout le breaking, en une recherche",
     "searchPlaceholderShort": "Jam, ville, battle, danseur…",
     "quickFilters": "Filtres rapides",
-    "nearMe": "Près de moi",
+    "map": "Carte",
     "results": {
       "title": "Ça vient de se passer",
       "sub": "Vainqueurs et vidéos des battles des derniers jams",
@@ -478,7 +478,25 @@
     "viewJam": "Voir le jam",
     "cluster_one": "{{count}} jam ici, zoomer",
     "cluster_other": "{{count}} jams ici, zoomer",
-    "loadError": "Les jams n’ont pas pu être chargés. Recharge la page pour réessayer."
+    "loadError": "Les jams n’ont pas pu être chargés. Recharge la page pour réessayer.",
+    "listCount": "Liste · {{count}}",
+    "around_one": "{{count}} jam autour de {{place}}",
+    "around_other": "{{count}} jams autour de {{place}}",
+    "dates": {
+      "now": "Maintenant",
+      "from": "Du",
+      "to": "Au",
+      "hide": "Masquer les dates",
+      "jams_one": "{{count}} jam",
+      "jams_other": "{{count}} jams",
+      "none": "Aucun jam",
+      "preset": {
+        "1": "1 mois",
+        "3": "3 mois",
+        "6": "6 mois",
+        "12": "1 an"
+      }
+    }
   },
   "dialog": {
     "close": "Fermer",

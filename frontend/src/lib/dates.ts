@@ -88,6 +88,20 @@ export function dayAndMonth(
   return { day: String(date.getUTCDate()), month };
 }
 
+/** "3 Feb", with the year when it isn't `currentYear`: "3 Feb 2027" (the map's From and To). */
+export function formatDay(
+  iso: string,
+  language: string,
+  currentYear: number,
+): string {
+  return new Intl.DateTimeFormat(localeOf(language), {
+    day: "numeric",
+    month: "short",
+    year: yearOf(iso) === currentYear ? undefined : "numeric",
+    timeZone: "UTC",
+  }).format(calendarDate(iso));
+}
+
 /** The calendar year of a date. */
 export function yearOf(iso: string): number {
   return calendarDate(iso).getUTCFullYear();

@@ -767,7 +767,7 @@ The admin area (`/admin`): `<h1>` "Admin", then one filter-chip-shaped tab per t
 ### 4.40 Quick filter chip *(landing v4)*
 
 - `h-9 px-3.5 rounded-full border border-border bg-surface text-[14px] font-bold`, icons 15px in `primary-text`; hover `bg-surface-raised`. Each is a link; the hit area is extended to 44px.
-- In a `nav` named "Quick filters": **Near me** (`NavigationArrow`) asks for the position on click and opens `/map?lat=&lng=`, or the visitor's country (`/map?fit=`) when refused; **This weekend** (`CalendarBlank`) → `/jams?when=weekend`; **1v1**, **2v2**, **Bgirl**, **Kids** → `/jams?battles=…` (§6 Jams).
+- In a `nav` named "Quick filters": **Map** (`MapTrifold`) → `/map`, which opens on the visitor's country without asking for the position; **This weekend** (`CalendarBlank`) → `/jams?when=weekend`; **1v1**, **2v2**, **Bgirl**, **Kids** → `/jams?battles=…` (§6 Jams).
 - The row wraps, centred, from lg; below, it scrolls sideways without a scrollbar, bleeding to the screen's edges.
 
 ### 4.41 Register button, large *(landing v4)*
@@ -875,6 +875,22 @@ For the jam's editors, from **Review ›** on a battle card.
 - "Accepted dancers appear on the jam page. Whoever asked gets an email with your answer." under the list; "No requests waiting." when empty. A refusal shows inside it ("This battle is full.").
 - **Account menu:** an organiser with requests waiting gets **Requests** (`Bell`) with the count, to that jam's battles; with several jams one item each, "Requests · Winter Cypher".
 
+### 4.48 Map dates *(M33, Nov 2026)*
+
+The map's From and To, over the next 12 months: one card (`rounded-xl border border-border-strong bg-surface-raised shadow-lg`, `px-3` below sm, `px-4` from sm), top to bottom:
+
+1. **Dates row:** `CalendarBlank` in `primary-text` (hidden below 360px), a **From** button ("Now", or "3 Feb", with the year only when it isn't this one: "3 Feb 2027"), a dash, a **To** button, and on the right the count in bold `primary-text`: "14 jams", "1 jam", "No jams". The buttons (`h-11 rounded-md border border-border-strong bg-surface body-sm bold`) open the native date picker, limited to today … a year from today and kept a day apart.
+2. **Bars** (decorative): one per month of the slider, as tall as its jams in the current view whatever the dates (2px at least); `primary` at 50% inside the range, `border` outside.
+3. **Slider:** a 6px `border` track, the range in `primary`, two 28px `surface-raised` knobs with a 3px `primary` border and `shadow-sm`, each in a 44px touch area. A drag or a tap moves the nearest handle; they never cross and keep a day apart. Each handle is a `role="slider"` ("From", "To", the readable date as its value text): arrows move a day, Page Up/Down a month, Home/End to the ends.
+4. **Months** under the track, every second one (Nov, Jan, Mar…), centred where that month starts.
+5. **Presets:** four equal chips, **1 month**, **3 months**, **6 months**, **1 year** (filter chip style, §5; `caption` below 360px), "on" only while the range is exactly one of them.
+
+While a handle moves, the map, list and counts follow about every 150 ms and once more on release; the URL and the screen reader's count only on release.
+
+- **< lg:** folded by default into a 52px pill 16px from the sides and 24px above the map's foot (the attribution sits under it): `CalendarBlank`, "Now – 15 Nov 2027", a tag with the matching preset, `CaretUp`. A tap opens the card in its place, with a grip on top; a tap or a swipe down on the grip, or a tap on the map, folds it. **List** ("List · 14") and locate sit 16px above the pill or the card. Hidden while a jam's sheet is up; above the empty state's sheet when nothing matches.
+- **≥ lg:** always open, 560px wide, centred 28px above the bottom of the map; no grip. The panel's count reads "14 jams in this area · Now – 15 May 2027", or "14 jams around Zurich · …" after a search.
+- With **Past jams** on, the card goes (the dates can't reach the past) and comes back with its range when it goes off.
+
 ## 5. Layout rules
 
 - **Container:** `mx-auto max-w-content px-4 md:px-6 lg:px-8` (1200px including padding). Reading column: `max-w-prose` (640px).
@@ -887,8 +903,8 @@ For the jam's editors, from **Review ›** on a battle card.
 - **Content pages** (landing, jam detail, organiser forms): sticky header, normal document scroll, footer.
   - Forms are a single column, `max-w-prose`, with fields at `gap-6` and a sticky bottom action bar on mobile.
 - **Map page:** an app shell with **no footer and no page scroll**: `h-dvh flex flex-col overflow-hidden`, with the header as the first row and the map filling the rest.
-  - **≥ lg:** a 400px left panel (`border-r`, scrolls on its own: search, filter chips, result count, row cards) next to the map. Popups are anchored. Zoom and locate controls sit top-right as a 44px icon-button group (`rounded-md shadow-md`).
-  - **< lg:** a full-bleed map with floating search and filter button at `top-3 inset-x-4`, plus a horizontally scrolling chip row below. A **List** pill sits bottom-left and locate bottom-right, 16px above the sheet. The popup becomes the bottom sheet. **List** opens a full-screen list that has a **Map** pill to return.
+  - **≥ lg:** a 400px left panel (`border-r`, scrolls on its own: search, filter chips, result count with the dates, row cards) next to the map, whose dates card (§4.48) sits at its bottom. Popups are anchored. Zoom and locate controls sit top-right as a 44px icon-button group (`rounded-md shadow-md`).
+  - **< lg:** a full-bleed map with floating search and filter button at `top-3 inset-x-4`, plus a horizontally scrolling chip row below. A **List** pill sits bottom-left and locate bottom-right, 16px above the dates pill (§4.48) or the sheet. The popup becomes the bottom sheet. **List** opens a full-screen list that has a **Map** pill to return.
   - Filter chips: `h-11 px-3.5 rounded-full border border-border-strong text-body-sm font-semibold`. Active: `bg-text text-bg border-text`.
 - **Jam detail:** ≥ lg uses `grid grid-cols-[420px_1fr] gap-14`.
   - Left column, `lg:sticky lg:top-6`: the flyer (4:5, `rounded-lg`), then the action card (§4.32).
@@ -936,9 +952,12 @@ The organisers' pitch moves to a future `/register` landing; dancers find themse
 - Reading column (`max-w-prose`): `display-lg`/`display-xl` title, the search field, the filter chips (§5, wrapped as in the side panel), the result count.
 - Jam rows (§4.14), live and upcoming soonest first; **Past jams** shows the ones that are over, most recent first. 30 at a time, then **Show more**.
 - The search lives in the URL (`?q=`), like the map's, and so do the filters: `?when=weekend|month|past` and `?battles=one_v_one,two_v_two,crew,seven_to_smoke,bgirl,kids`. The landing's quick filters (§4.40) and "All results" link here.
+- Jams keeps its time chips, **Next 30 days** included; only the map has the dates (§4.48).
+
+**Map** (`/map`, dates in M33): the jams of the chosen dates, the next 12 months by default (§4.48). The time chips are **This weekend**, which sets the dates to the coming Saturday and Sunday (no preset lit then; off again, the default), and **Past jams**; **Next 30 days** is the dates' job. A search follows the dates too, so past jams come only with **Past jams**. The dates, the battles and Past jams live in the URL (`?from=&to=`, only off the default; `?battles=`; `?when=past`); a From in the past is today and a To beyond a year a year.
 
 **Map with a popup open.**
-- **Mobile:** a dark full-bleed map under a 56px header, with the floating search pill, a filter button (dot when filters are active) and the chip row. The selected marker is 28px with a date tag. The bottom sheet is up, showing the flyer, date, title, distance, badge, categories, **View jam** and Share. **List** and locate float above the sheet.
+- **Mobile:** a dark full-bleed map under a 56px header, with the floating search pill, a filter button (dot when filters are active) and the chip row. The selected marker is 28px with a date tag. The bottom sheet is up, showing the flyer, date, title, distance, badge, categories, **View jam** and Share; the dates pill hides meanwhile. **List** and locate float above the sheet.
 - **Desktop:** the 400px side panel (search set to "Zurich", chips, "6 jams in this area", row cards with the selected one highlighted) next to the map. The anchored 320px popup sits above the selected marker, with zoom and locate top-right and attribution bottom-right.
 
 **Jam detail** (`/jams/<slug>`, v2 in M21): the most shared page, built for people arriving from Instagram or WhatsApp on a phone.

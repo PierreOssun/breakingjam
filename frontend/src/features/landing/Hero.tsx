@@ -1,13 +1,10 @@
-import { CalendarBlank, NavigationArrow, Plus } from "@phosphor-icons/react";
-import type { MouseEvent, ReactNode } from "react";
+import { CalendarBlank, MapTrifold, Plus } from "@phosphor-icons/react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { HeroSearch } from "../../components/HeroSearch";
-import { currentPosition } from "../../lib/position";
 import { useMediaQuery } from "../../lib/useMediaQuery";
-import { COUNTRY_BOUNDS } from "../map/countryBounds";
-import { type Category, fitParam, jamsLink } from "../map/jams";
-import { useVisitorCountry } from "../map/queries";
+import { type Category, jamsLink } from "../map/jams";
 
 /** The battle chips, in the map's order. */
 const BATTLES: Category[] = ["one_v_one", "two_v_two", "bgirl", "kids"];
@@ -18,7 +15,6 @@ const BATTLES: Category[] = ["one_v_one", "two_v_two", "bgirl", "kids"];
  */
 export function Hero() {
   const { t } = useTranslation();
-  const country = useVisitorCountry();
   const wide = useMediaQuery("(min-width: 1024px)");
   return (
     <section className="relative overflow-hidden">
@@ -46,7 +42,7 @@ export function Hero() {
             to="/search"
           />
         </div>
-        <QuickFilters country={country.data ?? null} />
+        <QuickFilters />
         <RegisterJam />
       </div>
     </section>
@@ -59,19 +55,8 @@ const CHIP =
 
 /** Shortcuts into the map and the jam list: a centred row that wraps from lg, scrolls edge to
  * edge below. */
-function QuickFilters({ country }: { country: string | null }) {
+function QuickFilters() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const home = country ? COUNTRY_BOUNDS[country] : undefined;
-  const fallback = home ? `/map?fit=${fitParam(home)}` : "/map";
-  // Asks for the position only now; refused, the map opens on the visitor's country.
-  const nearMe = (event: MouseEvent) => {
-    event.preventDefault();
-    currentPosition().then(
-      ({ lng, lat }) => void navigate(`/map?lat=${lat}&lng=${lng}`),
-      () => void navigate(fallback),
-    );
-  };
   const icon = (glyph: ReactNode) => (
     <span aria-hidden className="text-primary-text">
       {glyph}
@@ -82,9 +67,9 @@ function QuickFilters({ country }: { country: string | null }) {
       aria-label={t("landing.quickFilters")}
       className="-mx-4 mt-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] md:-mx-6 md:w-[calc(100%+3rem)] md:px-6 lg:mx-0 lg:mt-5 lg:w-auto lg:flex-wrap lg:justify-center lg:overflow-visible lg:px-0"
     >
-      <Link to={fallback} onClick={nearMe} className={CHIP}>
-        {icon(<NavigationArrow size={15} weight="bold" />)}
-        {t("landing.nearMe")}
+      <Link to="/map" className={CHIP}>
+        {icon(<MapTrifold size={15} weight="bold" />)}
+        {t("landing.map")}
       </Link>
       <Link to={jamsLink({ when: "weekend" })} className={CHIP}>
         {icon(<CalendarBlank size={15} weight="bold" />)}

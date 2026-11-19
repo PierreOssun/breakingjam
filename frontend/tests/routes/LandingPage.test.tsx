@@ -1,11 +1,9 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { COUNTRY_BOUNDS } from "../../src/features/map/countryBounds";
-import { fitParam } from "../../src/features/map/jams";
 import { calls, LOGGED_OUT, mockApi, renderApp } from "../support/app";
 import { freezeToday, geojson, jamFeature } from "../support/jams";
 
-// Near me opens /map, whose map needs WebGL, which jsdom lacks.
+// Map opens /map, whose map needs WebGL, which jsdom lacks.
 vi.mock("../../src/features/map/JamMap", () => ({
   JamMap: () => <div data-testid="map" />,
 }));
@@ -276,9 +274,9 @@ describe("LandingPage", () => {
 
     const hrefs = filters
       .getAllByRole("link")
-      .slice(1)
       .map((link) => [link.textContent, link.getAttribute("href")]);
     expect(hrefs).toEqual([
+      ["Map", "/map"],
       ["This weekend", "/jams?when=weekend"],
       ["1v1", "/jams?battles=one_v_one"],
       ["2v2", "/jams?battles=two_v_two"],
@@ -286,19 +284,12 @@ describe("LandingPage", () => {
       ["Kids", "/jams?battles=kids"],
     ]);
 
-    // jsdom has no geolocation, like a visitor who says no: the map opens on their country.
-    const swiss = `/map?fit=${fitParam(COUNTRY_BOUNDS.CH!)}`;
-    await waitFor(() =>
-      expect(filters.getByRole("link", { name: "Near me" })).toHaveAttribute(
-        "href",
-        swiss,
-      ),
-    );
-    await userEvent.click(filters.getByRole("link", { name: "Near me" }));
+    // Straight to the map, without asking for the position: the map opens on the country.
+    await userEvent.click(filters.getByRole("link", { name: "Map" }));
     await waitFor(() =>
       expect(
         router.state.location.pathname + router.state.location.search,
-      ).toBe(swiss),
+      ).toBe("/map"),
     );
   });
 

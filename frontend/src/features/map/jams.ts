@@ -2,6 +2,15 @@
 import type { Schemas } from "../../api/client";
 import { countryName } from "../../lib/countries";
 import { COUNTRY_BOUNDS } from "./countryBounds";
+import {
+  defaultRange,
+  isoRange,
+  type Range,
+  rangeFromUrl,
+  runsIn,
+  sameRange,
+  writeRange,
+} from "./range";
 
 export type Category = Schemas["Category"];
 export type MapJam = Schemas["MapJam"] & { lng: number; lat: number };
@@ -12,6 +21,8 @@ export type Filters = { when: When | null; categories: Category[] };
 
 export const NO_FILTERS: Filters = { when: null, categories: [] };
 export const WHENS: When[] = ["weekend", "month", "past"];
+/** The map's time chips: its date range replaces "Next 30 days" (M33). */
+export const MAP_WHENS: When[] = ["weekend", "past"];
 export const CATEGORIES: Category[] = [
   "one_v_one",
   "two_v_two",
@@ -65,14 +76,6 @@ export function rangeOf(
   return [isoDate(from), isoDate(addDays(saturday, 1))];
 }
 
-/** Whether a jam runs on at least one day of `[from, to]`. */
-function overlaps(
-  jam: Pick<MapJam, "starts_on" | "ends_on">,
-  [from, to]: [string, string],
-): boolean {
-  return jam.starts_on <= to && jam.ends_on >= from;
-}
-
 /** Where a preview leads: straight to the jam's battles when they have videos (DESIGN.md §4.3). */
 export function jamPath(jam: Pick<MapJam, "slug" | "has_videos">): string {
   return `/jams/${jam.slug}${jam.has_videos ? "#battles" : ""}`;
@@ -96,7 +99,7 @@ export function byDate() {
 
 function matchesWhen(jam: MapJam, when: When, today: Date): boolean {
   if (when === "past") return isPast(jam);
-  return overlaps(jam, rangeOf(when, today));
+  return runsIn(jam, isoRange(rangeOf(when, today)));
 }
 
 /** Time AND categories; within categories, any one is enough. */
@@ -106,13 +109,15 @@ export function matchesFilters(
   today: Date,
 ): boolean {
   if (filters.when && !matchesWhen(jam, filters.when, today)) return false;
-  if (
-    filters.categories.length > 0 &&
-    !jam.categories.some((c) => filters.categories.includes(c))
-  ) {
-    return false;
-  }
-  return true;
+  return inCategories(jam, filters.categories);
+}
+
+/** Any one of `categories` is enough; none chosen lets every jam through. */
+function inCategories(jam: MapJam, categories: Category[]): boolean {
+  return (
+    categories.length === 0 ||
+    jam.categories.some((c) => categories.includes(c))
+  );
 }
 
 /** The filters a `/jams` link asks for: `?when=weekend&battles=one_v_one,kids`. */
@@ -171,6 +176,85 @@ export function narrow(
         matchesSearch(jam, search, language),
     )
     .sort(byDate());
+}
+
+/** What the map shows (M33): past jams with the "Past jams" chip, else the days of `range`. */
+export type MapView = { past: boolean; categories: Category[]; range: Range };
+
+export const mapViewAt = (today: Date): MapView => ({
+  past: false,
+  categories: [],
+  range: defaultRange(isoDate(today)),
+});
+
+/**
+ * The map's jams, soonest first: the past ones with "Past jams" on, else the live and upcoming
+ * ones with a day in the range; a search follows the same rule (DESIGN.md §6 Map).
+ */
+export function onMap(
+  jams: MapJam[],
+  view: MapView,
+  search: string,
+  language: string,
+): MapJam[] {
+  return jams
+    .filter(
+      (jam) =>
+        (view.past ? isPast(jam) : !isPast(jam) && runsIn(jam, view.range)) &&
+        inCategories(jam, view.categories) &&
+        matchesSearch(jam, search, language),
+    )
+    .sort(byDate());
+}
+
+/** Whether anything narrows the map beyond its default view. */
+export function isNarrowed(view: MapView, today: Date): boolean {
+  return (
+    view.past ||
+    view.categories.length > 0 ||
+    !sameRange(view.range, defaultRange(isoDate(today)))
+  );
+}
+
+/** The map's view in its URL: `?when=past`, `?battles=` as `/jams` has them, `?from=&to=`. */
+export function mapViewOf(params: URLSearchParams, today: Date): MapView {
+  const { when, categories } = filtersOf(params);
+  const range = rangeFromUrl(params, isoDate(today));
+  return { past: when === "past", categories, range };
+}
+
+/** Writes `view` the way `mapViewOf` reads it; other parameters stay. */
+export function writeMapView(
+  params: URLSearchParams,
+  view: MapView,
+  today: Date,
+) {
+  writeFilters(params, {
+    when: view.past ? "past" : null,
+    categories: view.categories,
+  });
+  writeRange(params, view.range, isoDate(today));
+}
+
+/** The map's chips as `FilterChips` shows them: "This weekend" is on while the range is it. */
+export function chipsOf(view: MapView, today: Date): Filters {
+  const weekend = isoRange(rangeOf("weekend", today));
+  let when: When | null = null;
+  if (view.past) when = "past";
+  else if (sameRange(view.range, weekend)) when = "weekend";
+  return { when, categories: view.categories };
+}
+
+/**
+ * The view after a tap on the chips: "This weekend" sets the range to the weekend, and back to
+ * the default when turned off; "Past jams" keeps the range for when it goes off again.
+ */
+export function withChips(view: MapView, chips: Filters, today: Date): MapView {
+  const weekendBefore = chipsOf(view, today).when === "weekend";
+  let range = view.range;
+  if (chips.when === "weekend") range = isoRange(rangeOf("weekend", today));
+  else if (weekendBefore) range = defaultRange(isoDate(today));
+  return { past: chips.when === "past", categories: chips.categories, range };
 }
 
 /** Every word of the query appears in the name, city, country code or country name. */

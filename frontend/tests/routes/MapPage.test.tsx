@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";
 import type { JamMap } from "../../src/features/map/JamMap";
@@ -75,7 +75,7 @@ function desktop() {
 
 /** The names of the jam rows shown, in order. */
 async function rows() {
-  await screen.findByText(/in this area/);
+  await screen.findByText(/\d+ jams? (in this area|around)/);
   return screen
     .queryAllByRole("article")
     .map((row) => within(row).getByRole("heading").textContent?.split(",")[0]);
@@ -101,7 +101,7 @@ describe("MapPage", () => {
       "Kids Jam Paris",
       "Berlin Breaks",
     ]);
-    expect(count()).toBe("3 jams in this area");
+    expect(count()).toBe("3 jams in this area · Now – 1 Jan 2031");
     // The first view frames every jam, without animation.
     expect(
       JSON.parse(screen.getByTestId("map").dataset.camera ?? "null"),
@@ -116,7 +116,7 @@ describe("MapPage", () => {
       screen.getByRole("button", { name: "Pan to Zurich and Paris" }),
     );
     expect(await rows()).toEqual(["Concrete Cypher", "Kids Jam Paris"]);
-    expect(count()).toBe("2 jams in this area");
+    expect(count()).toBe("2 jams in this area · Now – 1 Jan 2031");
   });
 
   it("starts on the visitor's country", async () => {
@@ -158,15 +158,26 @@ describe("MapPage", () => {
 
     await userEvent.click(kids);
     await userEvent.click(screen.getByRole("button", { name: "2v2" }));
-    await userEvent.click(screen.getByRole("button", { name: "This weekend" }));
+    // This weekend sets the dates to Saturday and Sunday; no preset is on then.
+    const weekend = screen.getByRole("button", { name: "This weekend" });
+    await userEvent.click(weekend);
     expect(await rows()).toEqual(["Concrete Cypher"]);
+    expect(count()).toBe("1 jam in this area · 8 Jun – 9 Jun");
+    expect(screen.getByRole("button", { name: "From: 8 Jun" })).toBeVisible();
+    expect(screen.queryAllByRole("button", { pressed: true })).toEqual([
+      weekend,
+    ]);
+    // "Next 30 days" is the date range's job on the map.
+    expect(screen.queryByRole("button", { name: "Next 30 days" })).toBeNull();
 
-    // One time filter at a time.
-    await userEvent.click(screen.getByRole("button", { name: "Next 30 days" }));
-    expect(
-      screen.getByRole("button", { name: "This weekend" }),
-    ).toHaveAttribute("aria-pressed", "false");
-    expect(await rows()).toEqual(["Concrete Cypher", "Kids Jam Paris"]);
+    // A preset replaces the weekend.
+    await userEvent.click(screen.getByRole("button", { name: "6 months" }));
+    expect(weekend).toHaveAttribute("aria-pressed", "false");
+    expect(await rows()).toEqual([
+      "Concrete Cypher",
+      "Kids Jam Paris",
+      "Berlin Breaks",
+    ]);
   });
 
   it("shows past jams on demand, most recent first, and finds them by search", async () => {
@@ -184,17 +195,30 @@ describe("MapPage", () => {
     renderApp("/map");
 
     expect(await rows()).toEqual(["Berlin Breaks"]);
+    await userEvent.click(screen.getByRole("button", { name: "3 months" }));
 
+    // The dates can't reach the past: their card goes while past jams show.
     const past = screen.getByRole("button", { name: "Past jams" });
     await userEvent.click(past);
     expect(past).toHaveAttribute("aria-pressed", "true");
     expect(await rows()).toEqual(["Kids Jam Paris", "Concrete Cypher"]);
+    expect(count()).toBe("2 jams in this area");
+    expect(screen.queryByRole("slider")).toBeNull();
 
+    // Off again: the card comes back with its dates.
     await userEvent.click(past);
+    expect(
+      screen.getByRole("button", { name: "3 months", pressed: true }),
+    ).toBeInTheDocument();
+
+    // A search follows the dates, so it finds past jams only with the chip.
     await userEvent.type(
       screen.getByRole("searchbox", { name: "Search jams" }),
       "cypher{Enter}",
     );
+    expect(await rows()).toEqual([]);
+    expect(count()).toBe("0 jams around cypher · Now – 1 Apr");
+    await userEvent.click(past);
     expect(await rows()).toEqual(["Concrete Cypher"]);
   });
 
@@ -359,8 +383,8 @@ describe("MapPage", () => {
     renderApp("/map");
     await screen.findByRole("button", { name: "Marker Concrete Cypher" });
 
-    await userEvent.click(screen.getByRole("button", { name: "List" }));
-    expect(count()).toBe("3 jams in this area");
+    await userEvent.click(screen.getByRole("button", { name: "List · 3" }));
+    expect(count()).toBe("3 jams in this area · Now – 1 Jan 2031");
     expect(
       screen.getByRole("link", { name: /^Kids Jam Paris ?, / }),
     ).toHaveAttribute("href", "/jams/kids-jam-paris-3");
@@ -421,5 +445,201 @@ describe("MapPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The jams didn’t load.",
     );
+  });
+});
+
+describe("MapPage dates", () => {
+  beforeEach(() => freezeToday());
+
+  /** The track the handles move on, 365px wide: one pixel a day of 2030. */
+  function track() {
+    const element = screen.getByRole("slider", { name: "To" }).parentElement!;
+    element.getBoundingClientRect = () =>
+      ({ left: 0, width: 365, top: 0, height: 44 }) as DOMRect;
+    return element;
+  }
+
+  it("starts on the next 12 months, without the jams beyond", async () => {
+    desktop();
+    mockApi({
+      "GET /api/auth/me": LOGGED_OUT,
+      "GET /api/events.geojson": geojson(
+        ...GEOJSON.body.features,
+        jamFeature(4, "Far Jam", { day: "2031-03-01" }),
+      ),
+    });
+    renderApp("/map");
+
+    expect(await rows()).toEqual([
+      "Concrete Cypher",
+      "Kids Jam Paris",
+      "Berlin Breaks",
+    ]);
+    const from = screen.getByRole("slider", { name: "From" });
+    const to = screen.getByRole("slider", { name: "To" });
+    expect(from).toHaveAttribute("aria-valuetext", "Now");
+    expect(from).toHaveAttribute("aria-valuenow", "0");
+    expect(to).toHaveAttribute("aria-valuetext", "1 Jan 2031");
+    expect(to).toHaveAttribute("aria-valuenow", "365");
+    expect(
+      screen.getByRole("button", { name: "1 year", pressed: true }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("3 jams")).toBeInTheDocument();
+  });
+
+  it("sets the dates from a preset, lit only while they match it", async () => {
+    desktop();
+    api();
+    const router = renderApp("/map");
+    await rows();
+
+    await userEvent.click(screen.getByRole("button", { name: "6 months" }));
+    expect(await rows()).toEqual(["Concrete Cypher", "Kids Jam Paris"]);
+    expect(count()).toBe("2 jams in this area · Now – 1 Jul");
+    expect(screen.getByText("2 jams")).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole("button", { pressed: true })
+        .map((b) => b.textContent),
+    ).toEqual(["6 months"]);
+    expect(router.state.location.search).toBe("?from=2030-01-01&to=2030-07-01");
+
+    // A day more is no preset.
+    const to = screen.getByRole("slider", { name: "To" });
+    to.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(to).toHaveAttribute("aria-valuetext", "2 Jul");
+    expect(screen.queryAllByRole("button", { pressed: true })).toEqual([]);
+
+    // Back to a year: nothing left in the URL.
+    await userEvent.click(screen.getByRole("button", { name: "1 year" }));
+    expect(router.state.location.search).toBe("");
+  });
+
+  it("moves the handles from the keyboard, never past each other", async () => {
+    desktop();
+    api();
+    renderApp("/map");
+    await rows();
+    const from = screen.getByRole("slider", { name: "From" });
+    const to = screen.getByRole("slider", { name: "To" });
+
+    to.focus();
+    await userEvent.keyboard("{PageDown}");
+    expect(to).toHaveAttribute("aria-valuetext", "1 Dec");
+    await userEvent.keyboard("{Home}");
+    // A day after From at least.
+    expect(to).toHaveAttribute("aria-valuetext", "2 Jan");
+    expect(await screen.findByText("No jams")).toBeInTheDocument();
+    await userEvent.keyboard("{End}");
+    expect(to).toHaveAttribute("aria-valuetext", "1 Jan 2031");
+
+    from.focus();
+    await userEvent.keyboard(
+      "{PageUp}{PageUp}{PageUp}{PageUp}{PageUp}{ArrowRight}",
+    );
+    expect(from).toHaveAttribute("aria-valuetext", "2 Jun");
+    expect(await rows()).toEqual([
+      "Concrete Cypher",
+      "Kids Jam Paris",
+      "Berlin Breaks",
+    ]);
+    await userEvent.keyboard("{End}");
+    expect(from).toHaveAttribute("aria-valuetext", "31 Dec");
+    expect(to).toHaveAttribute("aria-valuetext", "1 Jan 2031");
+  });
+
+  it("opens a shared link on its dates and battles, clamped to the next 12 months", async () => {
+    desktop();
+    api();
+    renderApp("/map?from=2029-05-01&to=2030-06-16&battles=kids");
+
+    expect(await rows()).toEqual(["Kids Jam Paris"]);
+    expect(count()).toBe("1 jam in this area · Now – 16 Jun");
+    expect(
+      screen.getByRole("button", { name: "Kids", pressed: true }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a jam that started before From and runs into the range", async () => {
+    desktop();
+    api();
+    renderApp("/map?from=2030-06-16&to=2035-01-01");
+
+    // Kids Jam Paris runs 15–16 June.
+    expect(await rows()).toEqual(["Kids Jam Paris", "Berlin Breaks"]);
+    expect(count()).toBe("2 jams in this area · 16 Jun – 1 Jan 2031");
+  });
+
+  it("takes an exact date from the date picker", async () => {
+    desktop();
+    api();
+    renderApp("/map");
+    await rows();
+
+    fireEvent.change(screen.getByLabelText("To", { selector: "input" }), {
+      target: { value: "2030-06-10" },
+    });
+    expect(await rows()).toEqual(["Concrete Cypher"]);
+    expect(count()).toBe("1 jam in this area · Now – 10 Jun");
+    expect(screen.getByText("1 jam")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /^Marker / })).toHaveLength(1);
+  });
+
+  // jsdom has no PointerEvent, and would drop clientX from one: React reads a mouse event alike.
+  const pointer = (target: Element, type: string, clientX: number) =>
+    fireEvent(
+      target,
+      new MouseEvent(`pointer${type}`, { bubbles: true, button: 0, clientX }),
+    );
+
+  it("follows a drag, then keeps the dates in the URL once let go", async () => {
+    desktop();
+    api();
+    const router = renderApp("/map");
+    await rows();
+    const slider = track();
+
+    // From the To end of the track to 10 June, day 160.
+    pointer(slider, "down", 365);
+    pointer(slider, "move", 160);
+    expect(screen.getByRole("slider", { name: "To" })).toHaveAttribute(
+      "aria-valuetext",
+      "10 Jun",
+    );
+    pointer(slider, "up", 160);
+
+    expect(await rows()).toEqual(["Concrete Cypher"]);
+    expect(count()).toBe("1 jam in this area · Now – 10 Jun");
+    expect(screen.getByText("1 jam")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /^Marker / })).toHaveLength(1);
+    expect(router.state.location.search).toBe("?from=2030-01-01&to=2030-06-10");
+  });
+
+  it("folds the dates into a pill on phones, hidden while a jam is open", async () => {
+    api();
+    renderApp("/map");
+    await screen.findByRole("button", { name: "Marker Concrete Cypher" });
+
+    const pill = screen.getByRole("button", { name: /^Now – 1 Jan 2031/ });
+    expect(pill).toHaveTextContent("1 year");
+    await userEvent.click(pill);
+    await userEvent.click(screen.getByRole("button", { name: "3 months" }));
+    expect(screen.getByText("No jams")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "List · 0" })).toBeVisible();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Hide the dates" }),
+    );
+    expect(screen.queryByRole("slider")).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: /^Now – 1 Apr/ }));
+    await userEvent.click(screen.getByRole("button", { name: "1 year" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Marker Concrete Cypher" }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "Concrete Cypher" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("slider")).toBeNull();
   });
 });

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../../components/Button";
 import { IconButton } from "../../components/IconButton";
 import { FilterChips } from "./FilterChips";
-import { type Filters, NO_FILTERS } from "./jams";
+import { type Filters, MAP_WHENS, NO_FILTERS } from "./jams";
 
 type FilterSheetProps = {
   open: boolean;
@@ -16,7 +16,7 @@ type FilterSheetProps = {
 };
 
 /**
- * All filters grouped in a bottom sheet, < lg (DESIGN.md §4.9, short content). Chips apply
+ * The map's filters grouped in a bottom sheet, < lg (DESIGN.md §4.9, short content). Chips apply
  * at once; the primary button only closes the sheet.
  */
 export function FilterSheet({
@@ -69,7 +69,12 @@ export function FilterSheet({
             <X size={20} weight="bold" aria-hidden />
           </IconButton>
         </div>
-        <FilterChips filters={filters} onChange={onChange} variant="sheet" />
+        <FilterChips
+          filters={filters}
+          onChange={onChange}
+          variant="sheet"
+          whens={MAP_WHENS}
+        />
         <div className="mt-2 flex gap-3">
           <Button
             variant="ghost"

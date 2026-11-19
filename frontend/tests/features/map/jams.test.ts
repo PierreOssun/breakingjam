@@ -4,6 +4,7 @@ import {
   NO_FILTERS,
   boundsOf,
   byDate,
+  chipsOf,
   clusterLabel,
   distanceKm,
   filtersOf,
@@ -12,11 +13,16 @@ import {
   jamsLink,
   jamsOf,
   matchesFilters,
+  mapViewAt,
+  mapViewOf,
   matchesSearch,
   narrow,
+  onMap,
   otherJams,
   rangeOf,
+  withChips,
   writeFilters,
+  writeMapView,
 } from "../../../src/features/map/jams";
 
 function jam(overrides: Partial<MapJam> = {}): MapJam {
@@ -139,6 +145,87 @@ describe("map jams", () => {
     expect(names({ ...NO_FILTERS, when: "past" })).toEqual(["Old Zurich"]);
     // A search looks through every jam, upcoming first.
     expect(names(NO_FILTERS, "zurich")).toEqual(["New Zurich", "Old Zurich"]);
+  });
+
+  it("shows on the map the jams of its dates, past ones only with 'Past jams', a search alike", () => {
+    const named = (
+      name: string,
+      from: string,
+      to: string,
+      phase: MapJam["phase"],
+    ) => jam({ id: name, name, starts_on: from, ends_on: to, phase });
+    const jams = [
+      named("Old Zurich", "2026-10-01", "2026-10-01", "past"),
+      named("Long Zurich", "2026-10-16", "2026-10-25", "live"),
+      named("New Zurich", "2026-11-20", "2026-11-20", "upcoming"),
+      named("Far Zurich", "2028-01-01", "2028-01-01", "upcoming"),
+    ];
+    const view = mapViewAt(sunday);
+    const names = (v = view, search = "") =>
+      onMap(jams, v, search, "en").map((j) => j.name);
+
+    // A year from today: not the jam beyond it.
+    expect(names()).toEqual(["Long Zurich", "New Zurich"]);
+    // Started before From, still running in the range.
+    const november = { from: "2026-10-20", to: "2026-11-30" };
+    expect(names({ ...view, range: november })).toEqual([
+      "Long Zurich",
+      "New Zurich",
+    ]);
+    expect(
+      names({ ...view, range: { from: "2026-10-26", to: "2026-11-01" } }),
+    ).toEqual([]);
+    // A search follows the range: no past jam without the chip.
+    expect(names(view, "zurich")).toEqual(["Long Zurich", "New Zurich"]);
+    expect(names({ ...view, past: true }, "zurich")).toEqual(["Old Zurich"]);
+  });
+
+  it("turns the map's chips into its view: This weekend sets the dates", () => {
+    const view = mapViewAt(thursday);
+    const weekend = { from: "2026-10-17", to: "2026-10-18" };
+
+    const onWeekend = withChips(
+      view,
+      { when: "weekend", categories: [] },
+      thursday,
+    );
+    expect(onWeekend.range).toEqual(weekend);
+    expect(chipsOf(onWeekend, thursday).when).toBe("weekend");
+    // Off again: back to the default dates.
+    expect(withChips(onWeekend, NO_FILTERS, thursday)).toEqual(view);
+
+    // Past jams keeps the dates for when it goes off.
+    const custom = { ...view, range: { from: "2026-11-01", to: "2026-12-01" } };
+    const past = withChips(
+      custom,
+      { when: "past", categories: ["kids"] },
+      thursday,
+    );
+    expect(past).toEqual({ ...custom, past: true, categories: ["kids"] });
+    expect(
+      withChips(past, { when: null, categories: ["kids"] }, thursday).range,
+    ).toEqual(custom.range);
+  });
+
+  it("keeps the map's view in its URL", () => {
+    const params = new URLSearchParams("q=zurich");
+    const view = {
+      past: false,
+      categories: ["kids" as const],
+      range: { from: "2026-10-15", to: "2027-01-15" },
+    };
+    writeMapView(params, view, thursday);
+    expect(params.toString()).toBe(
+      "q=zurich&battles=kids&from=2026-10-15&to=2027-01-15",
+    );
+    expect(mapViewOf(params, thursday)).toEqual(view);
+
+    writeMapView(params, { ...mapViewAt(thursday), past: true }, thursday);
+    expect(params.toString()).toBe("q=zurich&when=past");
+    // /jams's "Next 30 days" means nothing on the map.
+    expect(mapViewOf(new URLSearchParams("when=month"), thursday)).toEqual(
+      mapViewAt(thursday),
+    );
   });
 
   it("searches name, city and country, ignoring case and accents", () => {

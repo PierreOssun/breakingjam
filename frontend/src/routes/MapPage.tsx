@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import { useToast } from "../components/useToast";
+import { DateCard, DatePill } from "../features/map/DateCard";
 import { FilterChips } from "../features/map/FilterChips";
 import { FilterSheet } from "../features/map/FilterSheet";
 import { JamPopup, JamSheet } from "../features/map/JamCard";
@@ -23,18 +24,31 @@ import {
   askedView,
   type Bounds,
   boundsOf,
+  chipsOf,
   distanceKm,
   type Filters,
   firstView,
   inBounds,
-  isFiltered,
+  isNarrowed,
+  isoDate,
   isPast,
+  MAP_WHENS,
   type MapJam,
-  narrow,
-  NO_FILTERS,
+  type MapView,
+  mapViewAt,
+  mapViewOf,
+  onMap,
+  withChips,
+  writeMapView,
 } from "../features/map/jams";
 import { MapEmpty } from "../features/map/MapEmpty";
 import { useMapJams, useVisitorCountry } from "../features/map/queries";
+import {
+  lastDay,
+  monthCounts,
+  type Range,
+  rangeLabel,
+} from "../features/map/range";
 import { RowCard, RowCardsSkeleton } from "../features/map/RowCard";
 import { SearchForm } from "../features/map/SearchForm";
 import { currentPosition, type LngLat } from "../lib/position";
@@ -59,9 +73,10 @@ function useHeight(): [(element: HTMLElement | null) => void, number] {
 }
 
 /**
- * `/map`: every upcoming jam on a world map, past ones on demand, narrowed by time, battle category and a search
- * on name, city or country (DESIGN.md §5, §6). ≥ lg a side panel lists the jams in view;
- * below, the map is full-bleed with a list view one tap away.
+ * `/map`: the jams of the chosen dates (the next 12 months by default) on a world map, past
+ * ones on demand, narrowed by battle category and a search on name, city or country
+ * (DESIGN.md §5, §6). ≥ lg a side panel lists the jams in view; below, the map is full-bleed
+ * with a list view one tap away.
  */
 export function MapPage() {
   const { t, i18n } = useTranslation();
@@ -72,9 +87,32 @@ export function MapPage() {
   const country = useVisitorCountry();
 
   // A search arrives as `?q=`, from the search page's "See all on the map" (DESIGN.md §6).
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const asked = params.get("q")?.trim() ?? "";
-  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  // Dates and filters live in the URL, so a shared link opens on them (M33).
+  const today = isoDate(new Date());
+  const view = useMemo(() => mapViewOf(params, new Date()), [params]);
+  const setView = useCallback(
+    (next: MapView) =>
+      setParams(
+        (params) => {
+          writeMapView(params, next, new Date());
+          return params;
+        },
+        { replace: true },
+      ),
+    [setParams],
+  );
+  const chips = chipsOf(view, new Date());
+  const changeChips = (next: Filters) =>
+    setView(withChips(view, next, new Date()));
+  // A handle being dragged: the map follows it, the URL only once it is let go.
+  const [dragged, setDragged] = useState<Range | null>(null);
+  const shown = useMemo(
+    () => (dragged ? { ...view, range: dragged } : view),
+    [view, dragged],
+  );
+  const [datesOpen, setDatesOpen] = useState(false);
   const [query, setQuery] = useState(asked);
   const [search, setSearch] = useState(asked);
   const [bounds, setBounds] = useState<Bounds | null>(null);
@@ -85,13 +123,27 @@ export function MapPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const matching = useMemo(
-    () => narrow(all ?? [], filters, search, i18n.language, new Date()),
-    [all, filters, search, i18n.language],
+    () => onMap(all ?? [], shown, search, i18n.language),
+    [all, shown, search, i18n.language],
   );
   const inView = bounds
     ? matching.filter((jam) => inBounds(jam, bounds))
     : matching;
-  const narrowed = isFiltered(filters) || search !== "";
+  // The bars over the slider: the jams in view in each month, whatever the range.
+  const months = useMemo(() => {
+    const year = { from: today, to: lastDay(today) };
+    const yearly = onMap(
+      all ?? [],
+      { ...view, range: year },
+      search,
+      i18n.language,
+    );
+    const here = bounds
+      ? yearly.filter((jam) => inBounds(jam, bounds))
+      : yearly;
+    return monthCounts(here, today);
+  }, [all, view, search, i18n.language, bounds, today]);
+  const narrowed = isNarrowed(view, new Date()) || search !== "";
   const selected = selection
     ? (matching.find((jam) => jam.id === selection.id) ?? null)
     : null;
@@ -165,7 +217,7 @@ export function MapPage() {
       document.activeElement.blur(); // closes the phone keyboard
     }
     if (!value) return;
-    const found = narrow(all ?? [], filters, value, i18n.language, new Date());
+    const found = onMap(all ?? [], view, value, i18n.language);
     const box = boundsOf(found);
     if (box)
       setCamera({ kind: "fit", bounds: box, maxZoom: 13, animate: true });
@@ -177,7 +229,8 @@ export function MapPage() {
   }
 
   function clearAll() {
-    setFilters(NO_FILTERS);
+    setDragged(null);
+    setView(mapViewAt(new Date()));
     setQuery("");
     setSearch("");
   }
@@ -194,12 +247,47 @@ export function MapPage() {
 
   const [top, topHeight] = useHeight();
   const [bottom, bottomHeight] = useHeight();
+  const [card, cardHeight] = useHeight();
 
+  function changeDates(range: Range) {
+    setDragged(null);
+    setView({ ...view, range });
+  }
+  const dateCard = (
+    <DateCard
+      range={shown.range}
+      today={today}
+      months={months}
+      count={inView.length}
+      onDrag={setDragged}
+      onChange={changeDates}
+      onCollapse={wide ? undefined : () => setDatesOpen(false)}
+    />
+  );
+
+  // Quiet while a handle moves, so a screen reader hears the count once it is let go.
   const count = (
-    <p role="status" className="text-body-sm text-muted">
-      {all && t("map.inArea", { count: inView.length })}
+    <p
+      role="status"
+      aria-live={dragged ? "off" : "polite"}
+      className="text-body-sm text-muted"
+    >
+      {all && countLine()}
     </p>
   );
+  function countLine() {
+    const jams = search
+      ? t("map.around", { count: inView.length, place: search })
+      : t("map.inArea", { count: inView.length });
+    if (view.past) return jams;
+    const dates = rangeLabel(
+      shown.range,
+      today,
+      i18n.language,
+      t("map.dates.now"),
+    );
+    return `${jams} · ${dates}`;
+  }
   const loadError = jams.isError && (
     <p role="alert" className="text-body-sm text-danger">
       {t("map.loadError")}
@@ -210,12 +298,20 @@ export function MapPage() {
       jams={matching}
       selected={selected}
       onSelect={select}
-      onClear={() => setSelection(null)}
+      onClear={() => {
+        setSelection(null);
+        setDatesOpen(false);
+      }}
       onBoundsChange={setBounds}
       camera={camera}
       insets={
         wide
-          ? { top: 0, right: 60, bottom: 20, left: 0 }
+          ? {
+              top: 0,
+              right: 60,
+              bottom: view.past ? 20 : cardHeight + 28,
+              left: 0,
+            }
           : { top: topHeight, right: 0, bottom: bottomHeight, left: 0 }
       }
       popup={
@@ -241,9 +337,10 @@ export function MapPage() {
               onSubmit={submitSearch}
             />
             <FilterChips
-              filters={filters}
-              onChange={setFilters}
+              filters={chips}
+              onChange={changeChips}
               variant="panel"
+              whens={MAP_WHENS}
             />
             {count}
             {loadError}
@@ -266,7 +363,17 @@ export function MapPage() {
             </ul>
           )}
         </aside>
-        <div className="relative flex-1">{map}</div>
+        <div className="relative flex-1">
+          {map}
+          {!view.past && (
+            <div
+              ref={card}
+              className="absolute bottom-7 left-1/2 z-10 w-[560px] max-w-[calc(100%-2rem)] -translate-x-1/2"
+            >
+              {dateCard}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -275,6 +382,7 @@ export function MapPage() {
     selected && userLocation ? distanceKm(userLocation, selected) : null;
   const emptyHere = narrowed && all !== undefined && inView.length === 0;
   const sheetUp = selected !== null || emptyHere;
+  const datesShown = !view.past && selected === null;
   return (
     <div className="absolute inset-0">
       <title>{`${t("pages.map")} · BreakingJam`}</title>
@@ -295,12 +403,17 @@ export function MapPage() {
             floating
           />
           <FilterButton
-            active={(filters.when ? 1 : 0) + filters.categories.length}
+            active={(chips.when ? 1 : 0) + chips.categories.length}
             onClick={() => setFiltersOpen(true)}
           />
         </div>
         <div className="pointer-events-auto">
-          <FilterChips filters={filters} onChange={setFilters} variant="map" />
+          <FilterChips
+            filters={chips}
+            onChange={changeChips}
+            variant="map"
+            whens={MAP_WHENS}
+          />
         </div>
       </div>
 
@@ -343,9 +456,9 @@ export function MapPage() {
               {loadError}
             </div>
           )}
-          {/* 16px above the sheet; with none, clear of the attribution under the locate pill. */}
+          {/* 16px above the dates or the sheet; with neither, clear of the attribution. */}
           <div
-            className={`flex items-end justify-between px-4 ${sheetUp ? "pb-4" : "pb-8"}`}
+            className={`flex items-end justify-between px-4 ${sheetUp || datesShown ? "pb-4" : "pb-8"}`}
           >
             <Pill
               onClick={() => {
@@ -354,7 +467,9 @@ export function MapPage() {
               }}
             >
               <ListBullets size={16} weight="bold" aria-hidden />
-              {t("map.list")}
+              {all
+                ? t("map.listCount", { count: inView.length })
+                : t("map.list")}
             </Pill>
             <button
               type="button"
@@ -365,6 +480,22 @@ export function MapPage() {
               <Crosshair size={20} weight="bold" aria-hidden />
             </button>
           </div>
+          {datesShown && (
+            // 24px above the map's foot, where the attribution stays readable under it.
+            <div
+              className={`pointer-events-auto mx-4 ${emptyHere ? "mb-4" : "mb-6"}`}
+            >
+              {datesOpen ? (
+                dateCard
+              ) : (
+                <DatePill
+                  range={shown.range}
+                  today={today}
+                  onOpen={() => setDatesOpen(true)}
+                />
+              )}
+            </div>
+          )}
           <div className="pointer-events-auto">
             {selected ? (
               <JamSheet jam={selected} onClose={close} distance={distance} />
@@ -382,8 +513,8 @@ export function MapPage() {
       <FilterSheet
         open={filtersOpen}
         onClose={() => setFiltersOpen(false)}
-        filters={filters}
-        onChange={setFilters}
+        filters={chips}
+        onChange={changeChips}
         count={inView.length}
       />
     </div>
